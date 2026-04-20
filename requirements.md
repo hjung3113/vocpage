@@ -1,0 +1,275 @@
+# 🚀 VOC 시스템 구축 프로젝트 기획서 (Final)
+
+## 1. 프로젝트 개요
+본 프로젝트는 분석 시스템 내부에 통합되는 **VOC(Voice of Customer) 서브 시스템**을 구축하는 것을 목표로 합니다. **Linear**의 간결한 UX와 **Jira**의 강력한 관리 기능을 결합하여, 사용자의 피드백을 효율적으로 수집하고 관리자가 체계적으로 대응할 수 있는 환경을 제공합니다.
+
+---
+
+## 2. 요구사항 정의 (Requirement Definition)
+
+### 2.1 비즈니스 및 인프라 요구사항
+- **시스템 통합:** 기존 분석 시스템의 왼쪽 네비게이션 구조를 유지하며 서브 페이지 형태로 작동.
+- **인증 자동화:** 사내 AD(Active Directory) 연동을 통한 SSO(Single Sign-On) 구현 (인증 스켈레톤 필요).
+- **데이터 무결성:** PostgreSQL을 활용한 정규화된 DB 설계 및 확장성 확보.
+- **품질 관리:** **TDD(Test-Driven Development)** 기반 개발을 통해 서비스 안정성 극대화.
+- **인프라:** Docker 기반의 컨테이너화로 개발 및 운영 환경 일원화.
+
+### 2.2 사용자(제보자) 요구사항
+- **작성 편의:** **Toast UI Editor**를 활용한 리치 텍스트 편집(이미지 드래그 앤 드롭, 표, 파일 첨부).
+- **카테고리 선택:** VOC 작성 시 드롭다운으로 카테고리를 직접 선택. (자동 설정 없음)
+- **진행 확인:** 본인 작성 VOC의 실시간 상태 확인 및 댓글 소통.
+
+### 2.3 관리자 요구사항
+- **업무 배정:** VOC별 담당자(Assignee) 지정 및 추적.
+- **계층형 관리:** 하나의 이슈 아래 여러 하위 작업(Sub-task)을 생성하여 관리 (최대 2단계).
+- **자동 분류:** 키워드를 활용한 **자동 태깅(Auto-tagging)** 기능 (규칙 기반, MVP).
+- **상태 전환:** VOC 상태 변경 권한은 Manager/Admin으로 제한.
+- **우선순위 설정:** Priority(Urgent/High/Medium/Low)는 Manager/Admin만 설정 가능.
+- **삭제:** Soft Delete는 Admin 전용. User는 삭제 불가.
+- **카테고리/태그규칙/권한 관리:** Admin 전용.
+
+---
+
+## 3. 기술 스택 (Tech Stack)
+
+| 구분 | 기술 스택 | 비고 |
+| :--- | :--- | :--- |
+| **Frontend** | Vite, React, TypeScript | Design md 스타일 적용 |
+| **Backend** | Node.js (Express), TypeScript | AD/LDAP 인증 미들웨어 |
+| **Database** | PostgreSQL | Self-join 및 M:N 관계 설계 |
+| **Infra** | Docker, Docker Compose | 환경 일치 및 배포 편의성 |
+| **Editor** | Toast UI Editor | 오픈소스 리치 텍스트 에디터 |
+| **Testing** | Vitest (FE), Jest/Supertest (BE) | TDD 개발 수행 |
+
+---
+
+## 4. 데이터베이스 설계 (Data Schema)
+
+- **`users`**: 사내 유저 정보. 컬럼: `id(uuid)`, `ad_username`, `display_name`, `email`, `role(enum: user/manager/admin)`, `is_active`, `created_at`.
+- **`categories`**: VOC 카테고리 목록. 컬럼: `id`, `name`, `slug(URL-safe)`, `is_archived`. Admin이 관리.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. 인증-2025-0001)`, `sequence_no(카테고리·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/보류)`, `priority(enum: urgent/high/medium/low, default medium)`, `category_id`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `deleted_at`, `created_at`, `updated_at`.
+- **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
+- **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑.
+- **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소.
+- **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
+- **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`.
+- **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
+
+---
+
+## 5. UI/UX 디자인 가이드 (Linear Style)
+
+1. **메인 리스트:** 정갈한 테이블 UI. 이슈 ID, 제목, 상태, 담당자, 태그를 한 줄에 표시. 아코디언 형태로 하위 작업 노출.
+2. **사이드 드로어(Side Drawer):** 리스트 항목 클릭 시 우측에서 상세 화면 슬라이드. (분석 시스템의 맥락 유지)
+3. **등록 모달:** 제목과 본문에 집중한 미니멀 디자인. 불필요한 입력값은 자동 태그로 대체.
+
+---
+
+## 6. 핵심 로직 및 함수 정의
+
+### 6.1 Backend (Express)
+- `validateADSession`: AD 인증 토큰 검증 미들웨어.
+- `createVOC`: 본문 분석 후 자동 태그(Level 1, 2) 적용 및 저장.
+- `getVOCList`: 계층형 구조(Parent-Child)를 고려한 데이터 조회.
+- `updateVOCStatus`: 이슈 상태 변경 및 관리자 배정 로직.
+
+### 6.2 Frontend (React)
+- `useVOCFilter`: 메뉴/상태/태그별 복합 필터링 훅.
+- `useAutoTag`: 입력 텍스트 실시간 분석을 통한 태그 추천 UI.
+- `useDrawer`: 상세 보기 드로어 제어 및 상태 동기화.
+
+---
+
+## 7. 향후 확장성
+- **AI 자동 분류:** LLM API를 통한 고도화된 자동 태깅.
+- **데이터 분석:** VOC 데이터를 기반으로 한 분석 시스템 메뉴별 장애/개선 통계 리포트 생성.
+- **Out of scope (MVP):** 이메일/슬랙 알림, SLA 에스컬레이션, 전문 검색(FTS), 3단계 이상 Sub-task 계층, AI 태깅, 벌크 상태 변경.
+
+---
+
+## 8. 상세 기능 명세
+
+### 8.1 VOC 식별자 (Issue Code)
+- 형식: `{카테고리슬러그}-{yyyy}-{순번4자리}` (예: `인증-2025-0001`)
+- 카테고리별·연도별 독립 순번. 삭제된 VOC의 순번은 재사용하지 않음 (증가 전용).
+- 카테고리명 변경 후에도 기존 VOC의 `issue_code`는 불변.
+- 동시 생성 경합은 DB sequence로 원자성 보장.
+- 순번 상한 9999 초과 시 5자리로 자동 확장 (`0001` → `00001`).
+
+### 8.2 상태 전환 매트릭스
+
+| 현재 상태 | 가능한 다음 상태 | 권한 |
+|:---|:---|:---|
+| 접수됨 | 검토중 | Manager, Admin |
+| 검토중 | 처리중, 보류 | Manager, Admin |
+| 처리중 | 완료, 보류 | Manager, Admin |
+| 완료 | 처리중 (재오픈) | Manager, Admin |
+| 보류 | 검토중, 처리중 | Manager, Admin |
+
+- 상태 변경 시 `voc_history`에 이력 기록 (변경 전·후 상태, 변경자, 타임스탬프).
+- 상태 변경 시 VOC 작성자 및 담당자에게 인앱 알림 발송.
+- 미완료 Sub-task가 있는 부모 VOC를 '완료'로 전환 시 경고 메시지 후 강제 진행 가능.
+
+### 8.3 권한 모델
+
+| 기능 | User | Manager | Admin |
+|:---|:---:|:---:|:---:|
+| VOC 작성 | ✅ | ✅ | ✅ |
+| 본인 VOC 조회 | ✅ | ✅ | ✅ |
+| 전체 VOC 조회 | ❌ | ✅ | ✅ |
+| 상태 변경 | ❌ | ✅ | ✅ |
+| 담당자 배정 | ❌ | ✅ | ✅ |
+| Priority 설정 | ❌ | ✅ | ✅ |
+| VOC Soft Delete | ❌ | ❌ | ✅ |
+| 카테고리/태그규칙 관리 | ❌ | ❌ | ✅ |
+| 사용자 권한 관리 | ❌ | ❌ | ✅ |
+
+- Manager는 Admin과 동일하게 전체 VOC를 조회할 수 있으나, Soft Delete/카테고리·태그규칙·사용자 권한 관리 기능만 제외.
+- 마지막 Admin 계정은 강등 불가. 본인의 권한을 본인이 변경 불가.
+
+### 8.4 Priority
+
+- 4단계: `urgent` / `high` / `medium` (기본값) / `low`
+- 생성 시 서버에서 `medium`으로 강제 설정 (클라이언트 값 무시).
+- Manager/Admin만 변경 가능. 변경 이력은 `voc_history`에 기록.
+
+### 8.5 파일 첨부
+
+- 허용 형식: PNG, JPG, GIF, WebP (이미지만)
+- 최대 크기: 10MB / 파일
+- 최대 개수: 5개 / VOC (본문 기준. 댓글 이미지는 별도)
+- 업로드 검증: MIME 스니핑 + 확장자 일치 검증. 실행 파일 헤더 차단.
+- 오류 응답: 용량 초과 → 413, 형식 불일치 → 415, 5개 초과 → 400.
+
+### 8.6 인앱 알림
+
+- **발생 조건:**
+  - 내 VOC에 타인이 댓글 작성 (본인 댓글은 알림 미발생)
+  - 내 VOC의 상태 변경
+  - 나에게 담당자 배정
+- **UI:** 벨 아이콘 + 미읽음 배지(최대 표시 99+). 클릭 시 알림 패널 열림 및 읽음 처리.
+- **보관:** 최근 50건 표시. 30일 이후 자동 읽음 처리.
+- **중복 억제:** 동일 VOC에서 같은 유형의 알림은 5분 내 디바운스.
+
+### 8.7 Sub-task
+
+- 최대 2단계: `vocs` → Sub-task. Sub-task의 Sub-task 생성 불가 (DB 제약으로 강제).
+- Sub-task ID: `{parent-issue-code}-{N}` (예: `인증-2025-0001-1`)
+- Sub-task는 독립적인 상태·담당자·Priority 보유.
+- 부모 VOC Soft Delete 시 Sub-task도 cascade soft delete.
+
+### 8.8 카테고리
+
+- VOC 작성 시 드롭다운으로 작성자가 직접 선택 (자동 설정 없음).
+- Admin이 카테고리 목록 추가/수정/아카이브 가능.
+- 사용 중인 카테고리 삭제 불가 (409 반환). 아카이브 처리 후 신규 생성에서만 제외.
+- 카테고리명 변경 시 기존 `issue_code` 불변.
+
+### 8.9 삭제 정책
+
+- Soft Delete: `deleted_at = NOW()` 기록. 물리 삭제 없음.
+- Admin만 삭제 가능. 삭제된 VOC는 일반 목록 API에서 제외.
+- Admin은 `?includeDeleted=true` 파라미터로 삭제된 항목 조회/복원 가능.
+
+### 8.10 입력값 제한
+
+- VOC 제목: 최대 200자
+- VOC 본문: 최대 64KB (HTML)
+- 댓글: 최대 16KB (HTML), Toast UI Editor 사용
+- 댓글 이미지: 파일당 5MB 이하
+- 카테고리명: 한글 2~8자, URL-safe slug 병행 저장
+
+### 8.11 VOC 목록 필터/검색/페이지네이션
+
+- **필터 항목:** 상태(다중 선택), 카테고리(단일), 담당자(단일)
+- **텍스트 검색:** 제목 + 본문 대상 SQL `ILIKE '%keyword%'`. MVP에서는 FTS 미사용.
+- **페이지네이션:** 오프셋 기반, 기본 25개/페이지. `GET /api/vocs?page=1&limit=25&status=접수됨&categoryId=...&assigneeId=...&q=keyword`
+- **정렬:** 기본 `created_at DESC`. `?sort=priority|updated_at` 지원.
+
+### 8.12 파일 저장소
+
+- 첨부 파일은 BE 컨테이너의 Docker volume(`/uploads/{voc_id}/`)에 저장.
+- 정적 파일 서빙: Express `static` 미들웨어 또는 별도 `/files/:id` 엔드포인트로 인증 후 제공.
+- 운영 환경에서는 volume을 호스트 경로에 마운트하여 백업 대상 포함.
+
+### 8.13 댓글 수정/삭제 정책
+
+- **수정:** 본인이 작성한 댓글만 수정 가능. 수정 시 `updated_at` 갱신 및 UI에 "(수정됨)" 표시.
+- **삭제:** 본인이 작성한 댓글 삭제 가능(Hard Delete). Admin은 모든 댓글 삭제 가능.
+- VOC 작성자 본인의 댓글에는 수정/삭제 버튼 노출, 타인 댓글에는 미노출.
+
+### 8.14 인앱 알림 폴링
+
+- FE에서 30초 주기로 `GET /api/notifications/unread-count` 호출하여 배지 업데이트.
+- 알림 패널 열릴 때 `GET /api/notifications` 전체 목록 조회 및 일괄 읽음 처리.
+- 탭이 비활성(hidden) 상태일 때는 폴링 일시 중단 (`document.visibilityState` 활용).
+
+### 8.15 기존 분석 시스템 통합
+
+- VOC 시스템은 독립 React SPA로 빌드되며, 분석 시스템의 네비게이션 메뉴에서 `<iframe src="https://voc.internal" />` 방식으로 임베드.
+- 인증: 분석 시스템의 AD 세션 쿠키를 동일 도메인 또는 `postMessage`를 통해 VOC BE로 전달.
+- VOC 앱의 `<body>`는 배경색 투명 처리하여 부모 앱의 테마와 일체감 유지.
+
+---
+
+## 9. 프로토타입 리뷰 기반 추가 요구사항 (2026-04-21)
+
+### 9.1 필터 고급 옵션
+- **담당자 필터:** 담당자 단일 선택으로 VOC 목록 필터링 (기존 8.11에 명시된 내용 구체화)
+- **우선순위 필터:** Urgent/High/Medium/Low 다중 선택 가능
+- **태그 필터:** 등록된 태그 기준 다중 선택 필터
+
+### 9.2 서브태스크 생성 진입점
+- 상세 드로어 헤더에 "+ Sub-task 추가" 버튼 노출
+- 버튼 클릭 시 드로어 상단 인라인 폼 표시 (제목 입력 → 저장/취소)
+- 저장 시 `{parent-code}-{N}` 형식 코드 자동 부여, 목록에 즉시 반영
+- 부모 VOC가 이미 Sub-task인 경우 버튼 비활성화 (최대 2단계 제한)
+
+### 9.3 첨부파일 UI 명세
+- **등록 모달:** 본문 에디터 하단에 드래그앤드롭 영역 + 파일 선택 버튼 노출
+- **드로어 상세:** "첨부파일" 섹션 추가, 파일명/크기/삭제 버튼 표시
+- 허용 형식·크기 제한은 기존 8.5 그대로 적용 (PNG·JPG·GIF·WebP, 10MB/개, 5개/VOC)
+- 파일 선택 즉시 목록에 표시, 등록 완료 전까지는 미리보기 상태
+
+### 9.4 관리자 페이지 상세 명세
+
+#### 9.4.1 태그 규칙 관리
+- 테이블: 키워드 목록(쉼표 구분) | 생성 태그명 | 매칭 방식(키워드) | 작업(수정/삭제)
+- "규칙 추가" 버튼 → 인라인 입력 폼
+- 규칙 삭제 시 확인 다이얼로그 없이 즉시 삭제 (프로토타입 한정)
+
+#### 9.4.2 카테고리 관리
+- 테이블: 카테고리명 | 슬러그 | VOC 수 | 상태(활성/아카이브) | 작업
+- "카테고리 추가" 버튼 → 모달 또는 인라인 폼
+- 아카이브 처리 시 신규 VOC 등록에서 선택 불가, 기존 데이터는 유지
+
+#### 9.4.3 사용자 관리
+- 테이블: 이름 | AD 계정 | 이메일 | 역할(User/Manager/Admin) | 활성 여부 | 작업
+- 역할 변경: 인라인 드롭다운으로 즉시 변경
+- 마지막 Admin 강등 불가 (경고 표시)
+- 본인 계정 역할 변경 불가
+
+### 9.5 정렬 옵션
+- 정렬 기준: 등록일 내림차순(기본) / 등록일 오름차순 / 우선순위 / 최근 업데이트
+- 상단 정렬 아이콘 클릭 시 드롭다운 메뉴
+
+### 9.6 검색 결과 하이라이팅
+- 검색어 입력 시 VOC 목록의 제목·태그에서 매칭 텍스트 강조 표시
+- 검색 조건과 상태 필터는 AND 조건으로 동작
+
+### 9.7 댓글 인라인 편집
+- 본인 댓글의 수정 버튼 클릭 시 댓글 내용이 편집 가능한 textarea로 전환
+- 저장/취소 버튼 표시, 저장 시 "(수정됨)" 마크 추가
+
+### 9.8 페이지네이션
+- 기본 표시: 25개/페이지 (프로토타입에서는 5개 표시 후 "더 보기")
+- "N개 항목 더 보기" 클릭 시 나머지 항목 표시
+- 전체 항목 수 및 현재 페이지 정보 표시
+
+### 9.9 Out of scope (MVP에서 제외 유지)
+- 벌크 액션 (다중 선택 → 일괄 상태 변경/담당자 배정)
+- 마감일(Due Date) 필드
+- @멘션 댓글
+- CSV/Excel 내보내기
+- 중복 VOC 감지
+- 통계/대시보드 뷰

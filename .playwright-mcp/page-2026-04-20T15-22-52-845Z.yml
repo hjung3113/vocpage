@@ -1,0 +1,429 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - img [ref=e6]
+        - generic [ref=e9]: VOCpage
+        - generic [ref=e10]: BETA
+      - generic [ref=e11]:
+        - generic [ref=e12]: 보기
+        - generic [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+          - text: 전체 VOC
+          - generic [ref=e17]: "12"
+        - generic [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+          - text: 내 VOC
+        - generic [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+          - text: 담당 VOC
+      - generic [ref=e28]:
+        - generic [ref=e29]: 카테고리
+        - generic [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+          - text: 인증
+          - generic [ref=e34]: "5"
+        - generic [ref=e35] [cursor=pointer]:
+          - img [ref=e36]
+          - text: 데이터 분석
+          - generic [ref=e37]: "3"
+        - generic [ref=e38] [cursor=pointer]:
+          - img [ref=e39]
+          - text: 데이터 파이프라인
+          - generic [ref=e43]: "2"
+        - generic [ref=e44] [cursor=pointer]:
+          - img [ref=e45]
+          - text: 대시보드
+          - generic [ref=e50]: "2"
+      - generic [ref=e52]:
+        - generic [ref=e53]: 관리자
+        - generic [ref=e54] [cursor=pointer]:
+          - img [ref=e55]
+          - text: 태그 규칙 관리
+        - generic [ref=e58] [cursor=pointer]:
+          - img [ref=e59]
+          - text: 카테고리 관리
+        - generic [ref=e61] [cursor=pointer]:
+          - img [ref=e62]
+          - text: 사용자 관리
+      - generic [ref=e67] [cursor=pointer]:
+        - generic [ref=e68]: 홍
+        - generic [ref=e69]:
+          - generic [ref=e70]: 홍길동
+          - generic [ref=e71]: Admin
+        - img [ref=e72]
+    - main [ref=e75]:
+      - generic [ref=e76]:
+        - generic [ref=e77]: 전체 VOC
+        - generic [ref=e78]: 12개
+        - generic [ref=e79]:
+          - img [ref=e80]
+          - textbox "제목, 본문 검색..." [ref=e83]
+        - img [ref=e85] [cursor=pointer]
+        - img [ref=e89] [cursor=pointer]
+        - button "새 VOC 등록" [ref=e93] [cursor=pointer]:
+          - img [ref=e94]
+          - text: 새 VOC 등록
+      - generic [ref=e95]:
+        - generic [ref=e96]: 필터
+        - generic [ref=e97] [cursor=pointer]:
+          - img [ref=e98]
+          - text: 전체
+        - generic [ref=e102] [cursor=pointer]:
+          - img [ref=e103]
+          - text: 접수됨
+        - generic [ref=e105] [cursor=pointer]:
+          - img [ref=e106]
+          - text: 검토중
+        - generic [ref=e109] [cursor=pointer]:
+          - img [ref=e110]
+          - text: 처리중
+        - generic [ref=e112] [cursor=pointer]:
+          - img [ref=e113]
+          - text: 보류
+        - generic [ref=e115] [cursor=pointer]:
+          - img [ref=e116]
+          - text: 완료
+        - button "필터 더보기" [ref=e119] [cursor=pointer]:
+          - img [ref=e120]
+          - text: 필터 더보기
+      - generic [ref=e121]:
+        - generic [ref=e122]:
+          - generic [ref=e123] [cursor=pointer]:
+            - text: 이슈 ID
+            - img [ref=e124]
+          - generic [ref=e127] [cursor=pointer]: 제목
+          - generic [ref=e128] [cursor=pointer]: 상태
+          - generic [ref=e129] [cursor=pointer]: 담당자
+          - generic [ref=e130] [cursor=pointer]: 우선순위
+          - generic [ref=e131] [cursor=pointer]: 등록일
+        - generic [ref=e132]:
+          - generic [ref=e133] [cursor=pointer]:
+            - img [ref=e136]
+            - generic [ref=e138]: 인증-2025-0001
+            - generic [ref=e140]:
+              - generic [ref=e141]: 로그인 후 세션이 자꾸 만료됩니다 — 30분마다 재로그인 요구됨
+              - generic [ref=e142]:
+                - generic [ref=e143]: 인증
+                - generic [ref=e144]: 세션
+            - generic [ref=e146]: 처리중
+            - generic [ref=e149]:
+              - generic [ref=e150]: 김
+              - text: 김관리
+            - generic [ref=e152]:
+              - img [ref=e153]
+              - text: Urgent
+            - generic [ref=e156]: 2025.06.12
+          - generic:
+            - generic [ref=e157] [cursor=pointer]:
+              - generic [ref=e159]:
+                - img [ref=e160]
+                - generic [ref=e163]: 인증-2025-0001-1
+              - generic [ref=e166]: 세션 만료 시간 설정값 확인 및 조정
+              - generic [ref=e168]: 완료
+              - generic [ref=e171]:
+                - generic [ref=e172]: 김
+                - text: 김관리
+              - generic [ref=e174]:
+                - img [ref=e175]
+                - text: Medium
+              - generic [ref=e177]: 2025.06.13
+            - generic [ref=e178] [cursor=pointer]:
+              - generic [ref=e180]:
+                - img [ref=e181]
+                - generic [ref=e184]: 인증-2025-0001-2
+              - generic [ref=e187]: AD 토큰 갱신 로직 패치
+              - generic [ref=e189]: 처리중
+              - generic [ref=e192]:
+                - generic [ref=e193]: 박
+                - text: 박개발
+              - generic [ref=e195]:
+                - img [ref=e196]
+                - text: High
+              - generic [ref=e199]: 2025.06.13
+        - generic [ref=e201] [cursor=pointer]:
+          - generic [ref=e202]:
+            - generic:
+              - img
+          - generic [ref=e203]: 분석-2025-0047
+          - generic [ref=e205]:
+            - generic [ref=e206]: 대시보드 월별 매출 차트에서 특정 월 데이터가 0으로 표시됨
+            - generic [ref=e207]:
+              - generic [ref=e208]: 차트
+              - generic [ref=e209]: 데이터
+          - generic [ref=e211]: 검토중
+          - generic [ref=e214]:
+            - generic [ref=e215]: 이
+            - text: 이분석
+          - generic [ref=e217]:
+            - img [ref=e218]
+            - text: High
+          - generic [ref=e221]: 2025.06.11
+        - generic [ref=e223] [cursor=pointer]:
+          - generic [ref=e224]:
+            - generic:
+              - img
+          - generic [ref=e225]: 파이프라인-2025-0008
+          - generic [ref=e227]:
+            - generic [ref=e228]: ETL 배치 작업이 매일 새벽 2시 이후 실패 — 타임아웃 관련
+            - generic [ref=e229]:
+              - generic [ref=e230]: ETL
+              - generic [ref=e231]: 오류
+          - generic [ref=e233]: 접수됨
+          - generic [ref=e236]:
+            - img [ref=e237]
+            - text: 미배정
+          - generic [ref=e243]:
+            - img [ref=e244]
+            - text: Medium
+          - generic [ref=e246]: 2025.06.10
+        - generic [ref=e248] [cursor=pointer]:
+          - generic [ref=e249]:
+            - generic:
+              - img
+          - generic [ref=e250]: 대시보드-2025-0015
+          - generic [ref=e252]:
+            - generic [ref=e253]: KPI 요약 위젯에서 전월 대비 증감률이 반대로 표시됨
+            - generic [ref=e255]: KPI
+          - generic [ref=e257]: 완료
+          - generic [ref=e260]:
+            - generic [ref=e261]: 김
+            - text: 김관리
+          - generic [ref=e263]:
+            - img [ref=e264]
+            - text: Low
+          - generic [ref=e267]: 2025.06.08
+        - generic [ref=e269] [cursor=pointer]:
+          - generic [ref=e270]:
+            - generic:
+              - img
+          - generic [ref=e271]: 인증-2025-0002
+          - generic [ref=e273]:
+            - generic [ref=e274]: 비밀번호 초기화 이메일이 수신되지 않음
+            - generic [ref=e275]:
+              - generic [ref=e276]: 인증
+              - generic [ref=e277]: 이메일
+          - generic [ref=e279]: 보류
+          - generic [ref=e282]:
+            - generic [ref=e283]: 이
+            - text: 이분석
+          - generic [ref=e285]:
+            - img [ref=e286]
+            - text: High
+          - generic [ref=e289]: 2025.06.07
+        - generic [ref=e290]: 7개 항목 더 보기 · 1 / 1 페이지
+  - generic [ref=e291]:
+    - generic [ref=e292]:
+      - generic [ref=e293]:
+        - generic [ref=e294]: 인증-2025-0001
+        - generic [ref=e295]: 로그인 후 세션이 자꾸 만료됩니다 — 30분마다 재로그인 요구됨
+      - generic [ref=e296]:
+        - img [ref=e298] [cursor=pointer]
+        - img [ref=e303] [cursor=pointer]
+        - img [ref=e307] [cursor=pointer]
+        - img [ref=e311] [cursor=pointer]
+    - generic [ref=e314]:
+      - generic [ref=e315]:
+        - generic [ref=e316]:
+          - generic [ref=e317]: 상태
+          - combobox [ref=e318] [cursor=pointer]:
+            - option "접수됨"
+            - option "검토중"
+            - option "처리중" [selected]
+            - option "완료"
+            - option "보류"
+        - generic [ref=e319]:
+          - generic [ref=e320]: 우선순위
+          - combobox [ref=e321] [cursor=pointer]:
+            - option "Urgent" [selected]
+            - option "High"
+            - option "Medium"
+            - option "Low"
+        - generic [ref=e322]:
+          - generic [ref=e323]: 담당자
+          - generic [ref=e324]:
+            - generic [ref=e325]: 김
+            - combobox [ref=e326] [cursor=pointer]:
+              - option "김관리" [selected]
+              - option "박개발"
+              - option "이분석"
+              - option "미배정"
+        - generic [ref=e327]:
+          - generic [ref=e328]: 카테고리
+          - generic [ref=e329]:
+            - img [ref=e330]
+            - text: 인증
+        - generic [ref=e333]:
+          - generic [ref=e334]: 작성자
+          - generic [ref=e335]:
+            - generic [ref=e336]: 박
+            - text: 박사용자
+        - generic [ref=e337]:
+          - generic [ref=e338]: 등록일
+          - generic [ref=e339]: 2025년 6월 12일
+      - generic [ref=e340]:
+        - generic [ref=e341]: 태그
+        - generic [ref=e342]: 인증
+        - generic [ref=e343]: 세션
+        - generic [ref=e344]: AD
+        - img [ref=e346] [cursor=pointer]
+      - generic [ref=e347]:
+        - generic [ref=e348]: 본문
+        - generic [ref=e349]:
+          - paragraph [ref=e350]:
+            - text: 분석 시스템 로그인 후 약
+            - strong [ref=e351]: 30분
+            - text: 이 지나면 자동으로 세션이 만료되어 재로그인을 요구합니다. 업무 중 집중해서 작업하다 보면 갑자기 페이지가 로그인 화면으로 전환됩니다.
+          - paragraph [ref=e352]:
+            - text: 동일 현상이
+            - strong [ref=e353]: 크롬, 엣지, 파이어폭스
+            - text: 모두에서 발생하며, 탭을 활성 상태로 유지해도 만료됩니다.
+          - paragraph [ref=e354]: "재현 방법: 로그인 → 30분 대기 → 페이지 새로고침 → 로그인 화면으로 리다이렉트."
+      - generic [ref=e355]:
+        - generic [ref=e356]: 변경 이력
+        - generic [ref=e357]:
+          - generic [ref=e359]:
+            - strong [ref=e360]: 김관리
+            - text: 님이 상태를
+            - strong [ref=e361]: 검토중 → 처리중
+            - text: 으로 변경했습니다.
+          - generic [ref=e362]: 어제 14:23
+        - generic [ref=e363]:
+          - generic [ref=e365]:
+            - strong [ref=e366]: 김관리
+            - text: 님이 담당자로 배정되었습니다.
+          - generic [ref=e367]: 어제 10:05
+        - generic [ref=e368]:
+          - generic [ref=e370]:
+            - strong [ref=e371]: 홍길동
+            - text: 님이 우선순위를
+            - strong [ref=e372]: Medium → Urgent
+            - text: 으로 변경했습니다.
+          - generic [ref=e373]: 어제 09:48
+        - generic [ref=e374]:
+          - generic [ref=e376]:
+            - strong [ref=e377]: 박사용자
+            - text: 님이 VOC를 등록했습니다.
+          - generic [ref=e378]: 2025.06.12
+      - generic [ref=e379]:
+        - generic [ref=e380]: 댓글 2개
+        - generic [ref=e381]:
+          - generic [ref=e382]:
+            - generic [ref=e383]: 김
+            - generic [ref=e384]: 김관리
+            - generic [ref=e385]: 어제 14:30
+            - generic [ref=e386]:
+              - img [ref=e388] [cursor=pointer]
+              - img [ref=e392] [cursor=pointer]
+          - generic [ref=e395]: AD 토큰 만료 설정값이 30분으로 고정되어 있어 슬라이딩 세션이 동작하지 않는 것으로 확인했습니다. 패치 진행 중입니다.
+        - generic [ref=e396]:
+          - generic [ref=e397]:
+            - generic [ref=e398]: 박
+            - generic [ref=e399]: 박개발
+            - generic [ref=e400]: 오늘 09:12
+          - generic [ref=e401]:
+            - text: 토큰 갱신 로직 패치 완료했습니다. Sub-task
+            - strong [ref=e402]: 인증-2025-0001-2
+            - text: 확인 부탁드립니다.
+          - generic [ref=e403]: (수정됨)
+        - generic [ref=e404]:
+          - textbox "댓글을 입력하세요 (Markdown 지원, Toast UI Editor 마운트 예정)" [ref=e405]
+          - generic [ref=e406]:
+            - generic [ref=e407]: Shift+Enter로 줄바꿈
+            - button "취소" [ref=e408] [cursor=pointer]
+            - button "등록" [ref=e409] [cursor=pointer]:
+              - img [ref=e410]
+              - text: 등록
+  - generic [ref=e415]:
+    - generic [ref=e416]:
+      - generic [ref=e417]: 새 VOC 등록
+      - img [ref=e419] [cursor=pointer]
+    - generic [ref=e422]:
+      - generic [ref=e423]:
+        - generic [ref=e424]: 제목 *
+        - textbox "문제를 간결하게 설명해 주세요 (최대 200자)" [active] [ref=e425]
+        - generic [ref=e426]: 0 / 200
+      - generic [ref=e427]:
+        - generic [ref=e428]:
+          - generic [ref=e429]: 카테고리 *
+          - combobox [ref=e430] [cursor=pointer]:
+            - option "카테고리 선택..." [selected]
+            - option "인증"
+            - option "데이터 분석"
+            - option "데이터 파이프라인"
+            - option "대시보드"
+        - generic [ref=e431]:
+          - generic [ref=e432]: 우선순위 (Admin 설정)
+          - combobox [disabled] [ref=e433]:
+            - option "Medium (기본값)" [selected]
+      - generic [ref=e434]:
+        - generic [ref=e435]: 본문 *
+        - generic [ref=e436]:
+          - generic [ref=e437]:
+            - button "B" [ref=e438] [cursor=pointer]
+            - button "I" [ref=e439] [cursor=pointer]
+            - button "S" [ref=e440] [cursor=pointer]
+            - button "H1" [ref=e441] [cursor=pointer]
+            - button "H2" [ref=e442] [cursor=pointer]
+            - button "—" [ref=e443] [cursor=pointer]
+            - button "• 목록" [ref=e444] [cursor=pointer]
+            - button "1. 목록" [ref=e445] [cursor=pointer]
+            - button "</> 코드" [ref=e446] [cursor=pointer]
+            - button "⊞ 표" [ref=e447] [cursor=pointer]
+            - button "🖼 이미지" [ref=e448] [cursor=pointer]
+          - textbox "문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요. 이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개) ※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다." [ref=e449]:
+            - /placeholder: "문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요.\n이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개)\n\n※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다."
+        - generic [ref=e450]:
+          - generic [ref=e451]: "자동 태그 추천:"
+          - generic [ref=e452]: 제목·본문 입력 시 자동으로 추천됩니다
+    - generic [ref=e453]:
+      - generic [ref=e454]:
+        - img [ref=e455]
+        - text: 등록 후 이슈 ID가 자동 부여됩니다
+      - generic [ref=e457]:
+        - button "취소" [ref=e458] [cursor=pointer]
+        - button "VOC 등록" [ref=e459] [cursor=pointer]:
+          - img [ref=e460]
+          - text: VOC 등록
+  - generic:
+    - generic:
+      - generic: 알림
+      - generic: 모두 읽음 처리
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 박개발
+          - text: 님이
+          - strong: 인증-2025-0001
+          - text: 에 댓글을 달았습니다.
+        - generic: 방금 전
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 인증-2025-0001
+          - text: 상태가
+          - strong: 처리중
+          - text: 으로 변경됐습니다.
+        - generic: 어제 14:23
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 분석-2025-0047
+          - text: 의 담당자로 배정됐습니다.
+        - generic: 어제 10:05
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 이분석
+          - text: 님이
+          - strong: 인증-2025-0002
+          - text: 에 댓글을 달았습니다.
+        - generic: 2025.06.11

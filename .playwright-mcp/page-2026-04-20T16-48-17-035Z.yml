@@ -1,0 +1,230 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e583]
+      - generic [ref=e9]: VOCpage
+      - generic [ref=e10]: BETA
+    - generic [ref=e11]:
+      - generic [ref=e12]: 보기
+      - generic [ref=e13] [cursor=pointer]:
+        - img [ref=e586]
+        - text: 전체 VOC
+        - generic [ref=e17]: "12"
+      - generic [ref=e18] [cursor=pointer]:
+        - img [ref=e589]
+        - text: 내 VOC
+      - generic [ref=e22] [cursor=pointer]:
+        - img [ref=e592]
+        - text: 담당 VOC
+    - generic [ref=e28]:
+      - generic [ref=e29]: 카테고리
+      - generic [ref=e30] [cursor=pointer]:
+        - img [ref=e596]
+        - text: 인증
+        - generic [ref=e34]: "5"
+      - generic [ref=e35] [cursor=pointer]:
+        - img [ref=e599]
+        - text: 데이터 분석
+        - generic [ref=e37]: "3"
+      - generic [ref=e38] [cursor=pointer]:
+        - img [ref=e600]
+        - text: 데이터 파이프라인
+        - generic [ref=e43]: "2"
+      - generic [ref=e44] [cursor=pointer]:
+        - img [ref=e604]
+        - text: 대시보드
+        - generic [ref=e50]: "2"
+    - generic [ref=e52]:
+      - generic [ref=e53]: 관리자
+      - generic [ref=e54] [cursor=pointer]:
+        - img [ref=e609]
+        - text: 태그 규칙 관리
+      - generic [ref=e58] [cursor=pointer]:
+        - img [ref=e612]
+        - text: 카테고리 관리
+      - generic [ref=e61] [cursor=pointer]:
+        - img [ref=e614]
+        - text: 사용자 관리
+    - generic [ref=e67] [cursor=pointer]:
+      - generic [ref=e68]: 홍
+      - generic [ref=e69]:
+        - generic [ref=e70]: 홍길동
+        - generic [ref=e71]: Admin
+      - img [ref=e619]
+  - main [ref=e75]:
+    - generic [ref=e622]:
+      - generic [ref=e623]:
+        - generic [ref=e624]: 카테고리 관리
+        - generic [ref=e625]: 5개
+        - button "카테고리 추가" [ref=e626] [cursor=pointer]:
+          - img [ref=e627]
+          - text: 카테고리 추가
+      - table [ref=e630]:
+        - rowgroup [ref=e631]:
+          - row "# 카테고리명 설명 VOC 수" [ref=e632]:
+            - columnheader "#" [ref=e633]
+            - columnheader "카테고리명" [ref=e634]
+            - columnheader "설명" [ref=e635]
+            - columnheader "VOC 수" [ref=e636]
+            - columnheader [ref=e637]
+        - rowgroup [ref=e638]:
+          - row "1 인증 SSO·OAuth·권한 관련 VOC 5 건 편집 삭제" [ref=e639]:
+            - cell "1" [ref=e640]
+            - cell "인증" [ref=e641]: 인증
+            - cell "SSO·OAuth·권한 관련 VOC" [ref=e643]
+            - cell "5 건" [ref=e644]:
+              - strong [ref=e645]: "5"
+              - text: 건
+            - cell "편집 삭제" [ref=e646]:
+              - generic [ref=e647]:
+                - button "편집" [ref=e648] [cursor=pointer]
+                - button "삭제" [ref=e649] [cursor=pointer]
+          - row "2 데이터 분석 분석 도구·대시보드 KPI 3 건 편집 삭제" [ref=e650]:
+            - cell "2" [ref=e651]
+            - cell "데이터 분석" [ref=e652]: 데이터 분석
+            - cell "분석 도구·대시보드 KPI" [ref=e654]
+            - cell "3 건" [ref=e655]:
+              - strong [ref=e656]: "3"
+              - text: 건
+            - cell "편집 삭제" [ref=e657]:
+              - generic [ref=e658]:
+                - button "편집" [ref=e659] [cursor=pointer]
+                - button "삭제" [ref=e660] [cursor=pointer]
+          - row "3 데이터 파이프라인 ETL·배치·스케줄러 2 건 편집 삭제" [ref=e661]:
+            - cell "3" [ref=e662]
+            - cell "데이터 파이프라인" [ref=e663]: 데이터 파이프라인
+            - cell "ETL·배치·스케줄러" [ref=e665]
+            - cell "2 건" [ref=e666]:
+              - strong [ref=e667]: "2"
+              - text: 건
+            - cell "편집 삭제" [ref=e668]:
+              - generic [ref=e669]:
+                - button "편집" [ref=e670] [cursor=pointer]
+                - button "삭제" [ref=e671] [cursor=pointer]
+          - row "4 대시보드 위젯·레이아웃·보고서 2 건 편집 삭제" [ref=e672]:
+            - cell "4" [ref=e673]
+            - cell "대시보드" [ref=e674]: 대시보드
+            - cell "위젯·레이아웃·보고서" [ref=e676]
+            - cell "2 건" [ref=e677]:
+              - strong [ref=e678]: "2"
+              - text: 건
+            - cell "편집 삭제" [ref=e679]:
+              - generic [ref=e680]:
+                - button "편집" [ref=e681] [cursor=pointer]
+                - button "삭제" [ref=e682] [cursor=pointer]
+          - row "5 API REST·GraphQL 엔드포인트 0 건 편집 삭제" [ref=e683]:
+            - cell "5" [ref=e684]
+            - cell "API" [ref=e685]: API
+            - cell "REST·GraphQL 엔드포인트" [ref=e687]
+            - cell "0 건" [ref=e688]:
+              - strong [ref=e689]: "0"
+              - text: 건
+            - cell "편집 삭제" [ref=e690]:
+              - generic [ref=e691]:
+                - button "편집" [ref=e692] [cursor=pointer]
+                - button "삭제" [ref=e693] [cursor=pointer]
+  - generic [ref=e324]:
+    - img [ref=e694] [cursor=pointer]
+    - img [ref=e698] [cursor=pointer]
+    - img [ref=e701] [cursor=pointer]
+    - img [ref=e704] [cursor=pointer]
+  - generic:
+    - generic:
+      - generic:
+        - generic: 새 VOC 등록
+        - generic:
+          - img
+      - generic:
+        - generic:
+          - generic: 제목 *
+          - textbox "문제를 간결하게 설명해 주세요 (최대 200자)"
+          - generic: 0 / 200
+        - generic:
+          - generic:
+            - generic: 카테고리 *
+            - combobox:
+              - option "카테고리 선택..." [selected]
+              - option "인증"
+              - option "데이터 분석"
+              - option "데이터 파이프라인"
+              - option "대시보드"
+          - generic:
+            - generic: 우선순위 (Admin 설정)
+            - combobox [disabled]:
+              - option "Medium (기본값)" [selected]
+        - generic:
+          - generic: 본문 *
+          - generic:
+            - generic:
+              - button "B"
+              - button "I"
+              - button "S"
+              - button "H1"
+              - button "H2"
+              - button "—"
+              - button "• 목록"
+              - button "1. 목록"
+              - button "</> 코드"
+              - button "⊞ 표"
+              - button "🖼 이미지"
+            - textbox "문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요. 이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개) ※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다.":
+              - /placeholder: "문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요.\n이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개)\n\n※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다."
+          - generic:
+            - generic: "자동 태그 추천:"
+            - generic: 제목·본문 입력 시 자동으로 추천됩니다
+        - generic:
+          - generic: 첨부파일 (선택)
+          - button "파일 선택 또는 끌어다 놓기":
+            - img
+            - text: 파일 선택 또는 끌어다 놓기
+      - generic:
+        - generic:
+          - img
+          - text: 등록 후 이슈 ID가 자동 부여됩니다
+        - generic:
+          - button "취소"
+          - button "VOC 등록":
+            - img
+            - text: VOC 등록
+  - generic:
+    - generic:
+      - generic: 알림
+      - generic: 모두 읽음 처리
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 박개발
+          - text: 님이
+          - strong: 인증-2025-0001
+          - text: 에 댓글을 달았습니다.
+        - generic: 방금 전
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 인증-2025-0001
+          - text: 상태가
+          - strong: 처리중
+          - text: 으로 변경됐습니다.
+        - generic: 어제 14:23
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 분석-2025-0047
+          - text: 의 담당자로 배정됐습니다.
+        - generic: 어제 10:05
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 이분석
+          - text: 님이
+          - strong: 인증-2025-0002
+          - text: 에 댓글을 달았습니다.
+        - generic: 2025.06.11

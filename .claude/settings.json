@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path // empty'); [ -n \"$f\" ] && [ -f \"$f\" ] && echo \"File exists: use Edit, not Write (unless full rewrite)\""
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path // empty'); lim=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.limit // empty'); [ -n \"$f\" ] && [ -f \"$f\" ] && [ -z \"$lim\" ] && lines=$(wc -l < \"$f\" 2>/dev/null || echo 0) && [ \"$lines\" -gt 200 ] && echo \"Large file ($lines lines): use offset+limit\""
+          }
+        ]
+      }
+    ]
+  }
+}

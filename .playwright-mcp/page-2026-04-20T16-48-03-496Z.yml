@@ -1,0 +1,334 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e343]
+      - generic [ref=e9]: VOCpage
+      - generic [ref=e10]: BETA
+    - generic [ref=e11]:
+      - generic [ref=e12]: 보기
+      - generic [ref=e13] [cursor=pointer]:
+        - img [ref=e346]
+        - text: 전체 VOC
+        - generic [ref=e17]: "12"
+      - generic [ref=e18] [cursor=pointer]:
+        - img [ref=e349]
+        - text: 내 VOC
+      - generic [ref=e22] [cursor=pointer]:
+        - img [ref=e352]
+        - text: 담당 VOC
+    - generic [ref=e28]:
+      - generic [ref=e29]: 카테고리
+      - generic [ref=e30] [cursor=pointer]:
+        - img [ref=e356]
+        - text: 인증
+        - generic [ref=e34]: "5"
+      - generic [ref=e35] [cursor=pointer]:
+        - img [ref=e359]
+        - text: 데이터 분석
+        - generic [ref=e37]: "3"
+      - generic [ref=e38] [cursor=pointer]:
+        - img [ref=e360]
+        - text: 데이터 파이프라인
+        - generic [ref=e43]: "2"
+      - generic [ref=e44] [cursor=pointer]:
+        - img [ref=e364]
+        - text: 대시보드
+        - generic [ref=e50]: "2"
+    - generic [ref=e52]:
+      - generic [ref=e53]: 관리자
+      - generic [ref=e54] [cursor=pointer]:
+        - img [ref=e369]
+        - text: 태그 규칙 관리
+      - generic [ref=e58] [cursor=pointer]:
+        - img [ref=e372]
+        - text: 카테고리 관리
+      - generic [ref=e61] [cursor=pointer]:
+        - img [ref=e374]
+        - text: 사용자 관리
+    - generic [ref=e67] [cursor=pointer]:
+      - generic [ref=e68]: 홍
+      - generic [ref=e69]:
+        - generic [ref=e70]: 홍길동
+        - generic [ref=e71]: Admin
+      - img [ref=e379]
+  - main [ref=e75]:
+    - generic [ref=e382]:
+      - generic [ref=e383]:
+        - generic [ref=e384]: 태그 규칙 관리
+        - generic [ref=e385]: 11개
+        - button "규칙 추가" [ref=e386] [cursor=pointer]:
+          - img [ref=e387]
+          - text: 규칙 추가
+      - table [ref=e390]:
+        - rowgroup [ref=e391]:
+          - row "# 키워드 패턴 연결 태그 유형 상태" [ref=e392]:
+            - columnheader "#" [ref=e393]
+            - columnheader "키워드 패턴" [ref=e394]
+            - columnheader "연결 태그" [ref=e395]
+            - columnheader "유형" [ref=e396]
+            - columnheader "상태" [ref=e397]
+            - columnheader [ref=e398]
+        - rowgroup [ref=e399]:
+          - 'row "1 로그인 sso oauth 인증 권한 세션 # 인증 키워드 활성 삭제" [ref=e400]':
+            - cell "1" [ref=e401]
+            - cell "로그인 sso oauth 인증 권한 세션" [ref=e402]:
+              - generic [ref=e403]:
+                - generic [ref=e404]: 로그인
+                - generic [ref=e405]: sso
+                - generic [ref=e406]: oauth
+                - generic [ref=e407]: 인증
+                - generic [ref=e408]: 권한
+                - generic [ref=e409]: 세션
+            - cell "# 인증" [ref=e410]
+            - cell "키워드" [ref=e411]
+            - cell "활성" [ref=e412]:
+              - generic [ref=e413] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e415]:
+              - button "삭제" [ref=e416] [cursor=pointer]
+          - 'row "2 api 엔드포인트 rest graphql # API 키워드 활성 삭제" [ref=e417]':
+            - cell "2" [ref=e418]
+            - cell "api 엔드포인트 rest graphql" [ref=e419]:
+              - generic [ref=e420]:
+                - generic [ref=e421]: api
+                - generic [ref=e422]: 엔드포인트
+                - generic [ref=e423]: rest
+                - generic [ref=e424]: graphql
+            - cell "# API" [ref=e425]
+            - cell "키워드" [ref=e426]
+            - cell "활성" [ref=e427]:
+              - generic [ref=e428] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e430]:
+              - button "삭제" [ref=e431] [cursor=pointer]
+          - 'row "3 성능 속도 느림 최적화 응답시간 # 성능 키워드 활성 삭제" [ref=e432]':
+            - cell "3" [ref=e433]
+            - cell "성능 속도 느림 최적화 응답시간" [ref=e434]:
+              - generic [ref=e435]:
+                - generic [ref=e436]: 성능
+                - generic [ref=e437]: 속도
+                - generic [ref=e438]: 느림
+                - generic [ref=e439]: 최적화
+                - generic [ref=e440]: 응답시간
+            - cell "# 성능" [ref=e441]
+            - cell "키워드" [ref=e442]
+            - cell "활성" [ref=e443]:
+              - generic [ref=e444] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e446]:
+              - button "삭제" [ref=e447] [cursor=pointer]
+          - 'row "4 ui ux 화면 레이아웃 디자인 # UI/UX 키워드 활성 삭제" [ref=e448]':
+            - cell "4" [ref=e449]
+            - cell "ui ux 화면 레이아웃 디자인" [ref=e450]:
+              - generic [ref=e451]:
+                - generic [ref=e452]: ui
+                - generic [ref=e453]: ux
+                - generic [ref=e454]: 화면
+                - generic [ref=e455]: 레이아웃
+                - generic [ref=e456]: 디자인
+            - cell "# UI/UX" [ref=e457]
+            - cell "키워드" [ref=e458]
+            - cell "활성" [ref=e459]:
+              - generic [ref=e460] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e462]:
+              - button "삭제" [ref=e463] [cursor=pointer]
+          - 'row "5 데이터 조회 쿼리 sql db # 데이터 키워드 활성 삭제" [ref=e464]':
+            - cell "5" [ref=e465]
+            - cell "데이터 조회 쿼리 sql db" [ref=e466]:
+              - generic [ref=e467]:
+                - generic [ref=e468]: 데이터
+                - generic [ref=e469]: 조회
+                - generic [ref=e470]: 쿼리
+                - generic [ref=e471]: sql
+                - generic [ref=e472]: db
+            - cell "# 데이터" [ref=e473]
+            - cell "키워드" [ref=e474]
+            - cell "활성" [ref=e475]:
+              - generic [ref=e476] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e478]:
+              - button "삭제" [ref=e479] [cursor=pointer]
+          - 'row "6 보고서 리포트 엑셀 출력 다운로드 # 리포트 키워드 활성 삭제" [ref=e480]':
+            - cell "6" [ref=e481]
+            - cell "보고서 리포트 엑셀 출력 다운로드" [ref=e482]:
+              - generic [ref=e483]:
+                - generic [ref=e484]: 보고서
+                - generic [ref=e485]: 리포트
+                - generic [ref=e486]: 엑셀
+                - generic [ref=e487]: 출력
+                - generic [ref=e488]: 다운로드
+            - cell "# 리포트" [ref=e489]
+            - cell "키워드" [ref=e490]
+            - cell "활성" [ref=e491]:
+              - generic [ref=e492] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e494]:
+              - button "삭제" [ref=e495] [cursor=pointer]
+          - 'row "7 etl 배치 파이프라인 스케줄 # ETL 키워드 활성 삭제" [ref=e496]':
+            - cell "7" [ref=e497]
+            - cell "etl 배치 파이프라인 스케줄" [ref=e498]:
+              - generic [ref=e499]:
+                - generic [ref=e500]: etl
+                - generic [ref=e501]: 배치
+                - generic [ref=e502]: 파이프라인
+                - generic [ref=e503]: 스케줄
+            - cell "# ETL" [ref=e504]
+            - cell "키워드" [ref=e505]
+            - cell "활성" [ref=e506]:
+              - generic [ref=e507] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e509]:
+              - button "삭제" [ref=e510] [cursor=pointer]
+          - 'row "8 타임아웃 만료 에러 오류 실패 500 # 오류 키워드 활성 삭제" [ref=e511]':
+            - cell "8" [ref=e512]
+            - cell "타임아웃 만료 에러 오류 실패 500" [ref=e513]:
+              - generic [ref=e514]:
+                - generic [ref=e515]: 타임아웃
+                - generic [ref=e516]: 만료
+                - generic [ref=e517]: 에러
+                - generic [ref=e518]: 오류
+                - generic [ref=e519]: 실패
+                - generic [ref=e520]: "500"
+            - cell "# 오류" [ref=e521]
+            - cell "키워드" [ref=e522]
+            - cell "활성" [ref=e523]:
+              - generic [ref=e524] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e526]:
+              - button "삭제" [ref=e527] [cursor=pointer]
+          - 'row "9 대시보드 kpi 위젯 보고서 # 대시보드 키워드 활성 삭제" [ref=e528]':
+            - cell "9" [ref=e529]
+            - cell "대시보드 kpi 위젯 보고서" [ref=e530]:
+              - generic [ref=e531]:
+                - generic [ref=e532]: 대시보드
+                - generic [ref=e533]: kpi
+                - generic [ref=e534]: 위젯
+                - generic [ref=e535]: 보고서
+            - cell "# 대시보드" [ref=e536]
+            - cell "키워드" [ref=e537]
+            - cell "활성" [ref=e538]:
+              - generic [ref=e539] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e541]:
+              - button "삭제" [ref=e542] [cursor=pointer]
+          - 'row "10 이메일 메일 smtp 알림 # 이메일 키워드 활성 삭제" [ref=e543]':
+            - cell "10" [ref=e544]
+            - cell "이메일 메일 smtp 알림" [ref=e545]:
+              - generic [ref=e546]:
+                - generic [ref=e547]: 이메일
+                - generic [ref=e548]: 메일
+                - generic [ref=e549]: smtp
+                - generic [ref=e550]: 알림
+            - cell "# 이메일" [ref=e551]
+            - cell "키워드" [ref=e552]
+            - cell "활성" [ref=e553]:
+              - generic [ref=e554] [cursor=pointer]: 활성
+            - cell "삭제" [ref=e556]:
+              - button "삭제" [ref=e557] [cursor=pointer]
+          - 'row "11 \\b(bug|fix|issue)\\b # 버그 정규식 비활성 삭제" [ref=e558]':
+            - cell "11" [ref=e559]
+            - cell "\\b(bug|fix|issue)\\b" [ref=e560]:
+              - generic [ref=e562]: \b(bug|fix|issue)\b
+            - cell "# 버그" [ref=e563]
+            - cell "정규식" [ref=e564]
+            - cell "비활성" [ref=e565]:
+              - generic [ref=e566] [cursor=pointer]: 비활성
+            - cell "삭제" [ref=e568]:
+              - button "삭제" [ref=e569] [cursor=pointer]
+  - generic [ref=e324]:
+    - img [ref=e570] [cursor=pointer]
+    - img [ref=e574] [cursor=pointer]
+    - img [ref=e577] [cursor=pointer]
+    - img [ref=e580] [cursor=pointer]
+  - generic:
+    - generic:
+      - generic:
+        - generic: 새 VOC 등록
+        - generic:
+          - img
+      - generic:
+        - generic:
+          - generic: 제목 *
+          - textbox "문제를 간결하게 설명해 주세요 (최대 200자)"
+          - generic: 0 / 200
+        - generic:
+          - generic:
+            - generic: 카테고리 *
+            - combobox:
+              - option "카테고리 선택..." [selected]
+              - option "인증"
+              - option "데이터 분석"
+              - option "데이터 파이프라인"
+              - option "대시보드"
+          - generic:
+            - generic: 우선순위 (Admin 설정)
+            - combobox [disabled]:
+              - option "Medium (기본값)" [selected]
+        - generic:
+          - generic: 본문 *
+          - generic:
+            - generic:
+              - button "B"
+              - button "I"
+              - button "S"
+              - button "H1"
+              - button "H2"
+              - button "—"
+              - button "• 목록"
+              - button "1. 목록"
+              - button "</> 코드"
+              - button "⊞ 표"
+              - button "🖼 이미지"
+            - textbox "문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요. 이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개) ※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다.":
+              - /placeholder: "문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요.\n이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개)\n\n※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다."
+          - generic:
+            - generic: "자동 태그 추천:"
+            - generic: 제목·본문 입력 시 자동으로 추천됩니다
+        - generic:
+          - generic: 첨부파일 (선택)
+          - button "파일 선택 또는 끌어다 놓기":
+            - img
+            - text: 파일 선택 또는 끌어다 놓기
+      - generic:
+        - generic:
+          - img
+          - text: 등록 후 이슈 ID가 자동 부여됩니다
+        - generic:
+          - button "취소"
+          - button "VOC 등록":
+            - img
+            - text: VOC 등록
+  - generic:
+    - generic:
+      - generic: 알림
+      - generic: 모두 읽음 처리
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 박개발
+          - text: 님이
+          - strong: 인증-2025-0001
+          - text: 에 댓글을 달았습니다.
+        - generic: 방금 전
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 인증-2025-0001
+          - text: 상태가
+          - strong: 처리중
+          - text: 으로 변경됐습니다.
+        - generic: 어제 14:23
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 분석-2025-0047
+          - text: 의 담당자로 배정됐습니다.
+        - generic: 어제 10:05
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - paragraph:
+          - strong: 이분석
+          - text: 님이
+          - strong: 인증-2025-0002
+          - text: 에 댓글을 달았습니다.
+        - generic: 2025.06.11
