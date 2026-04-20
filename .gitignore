@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Claude / OMC internal state
+.omc/
+.playwright-mcp/
+.claude/settings.local.json
+
+# Test screenshots (local only)
+test-*.png
+admin-*.png

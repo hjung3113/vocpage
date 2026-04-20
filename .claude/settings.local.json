@@ -1,7 +1,0 @@
-{
-  "enabledPlugins": {
-    "oh-my-claudecode@omc": true,
-    "impeccable@impeccable": true,
-    "playwright@claude-plugins-official": true
-  }
-}
