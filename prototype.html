@@ -108,6 +108,28 @@ html, body {
 .nav-badge.accent { background: var(--brand); color: #fff; }
 .nav-badge.muted  { background: var(--bg-elevated); color: var(--text-quaternary); }
 .sidebar-divider { height: 1px; background: var(--border-subtle); margin: var(--sp-2) var(--sp-2); }
+.sys-header {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: 5px var(--sp-2); border-radius: 5px;
+  cursor: pointer; font-size: 12.5px; color: var(--text-secondary);
+  user-select: none;
+}
+.sys-header:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.sys-header.active { color: var(--text-primary); }
+.sys-header-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.sys-header-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sys-chevron { width: 12px; height: 12px; color: var(--text-quaternary); transition: transform .15s; flex-shrink: 0; }
+.sys-header.open .sys-chevron { transform: rotate(90deg); }
+.sys-menus { overflow: hidden; max-height: 0; transition: max-height .2s ease; }
+.sys-menus.open { max-height: 200px; }
+.sys-menu-item {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: 4px var(--sp-2) 4px 28px;
+  border-radius: 5px; cursor: pointer;
+  font-size: 12px; color: var(--text-tertiary);
+}
+.sys-menu-item:hover { background: var(--bg-elevated); color: var(--text-secondary); }
+.sys-menu-item.active { color: var(--accent-interactive); background: rgba(94,106,210,.08); }
 .sidebar-user {
   margin-top: auto; padding: var(--sp-3) var(--sp-2);
   border-top: 1px solid var(--border-subtle);
@@ -134,7 +156,7 @@ html, body {
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-app); flex-shrink: 0;
 }
-.topbar-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; }
+.topbar-title { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; }
 .topbar-count {
   font-size: 12px; font-weight: 400; color: var(--text-quaternary);
   background: var(--bg-elevated); padding: 1px 7px;
@@ -276,6 +298,13 @@ html, body {
 .af-chip:hover { background: var(--bg-elevated); color: var(--text-secondary); border-color: var(--border-standard); }
 .af-chip.active { background: var(--brand-bg); border-color: var(--brand-border); color: var(--accent); font-weight: 600; }
 .af-actions { margin-left: auto; display: flex; align-items: flex-end; padding-bottom: 1px; }
+.af-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.type-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 6px; border-radius: 3px; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .2px;
+}
+.type-badge-dot { width: 6px; height: 6px; border-radius: 50%; }
 
 /* ─── List Area ─── */
 .list-area { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border-solid) transparent; }
@@ -662,11 +691,19 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 /* ─── Admin shared ─── */
 .admin-topbar {
   display: flex; align-items: center; gap: 10px;
-  padding: 0 24px; height: 56px; flex-shrink: 0;
+  padding: 0 24px; height: 50px; flex-shrink: 0;
   border-bottom: 1px solid var(--border-subtle);
 }
-.admin-title { font-size: 15px; font-weight: 600; }
-.admin-body { flex: 1; overflow-y: auto; padding: 24px; max-width: 960px; }
+.admin-title { font-size: 15px; font-weight: 700; flex: 1; }
+.admin-body { flex: 1; overflow-y: auto; }
+.admin-btn { display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer; }
+.admin-btn svg { width:13px;height:13px; }
+.toggle-switch { position:relative;display:inline-block;width:34px;height:20px;cursor:pointer; }
+.toggle-switch input { opacity:0;width:0;height:0; }
+.toggle-slider { position:absolute;inset:0;background:var(--border-subtle);border-radius:20px;transition:.2s; }
+.toggle-slider::before { content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s; }
+.toggle-switch input:checked + .toggle-slider { background:var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform:translateX(14px); }
 .admin-card {
   background: var(--bg-surface); border: 1px solid var(--border-subtle);
   border-radius: 10px; overflow: hidden; margin-bottom: 24px;
@@ -695,7 +732,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   background: var(--bg-elevated); color: var(--text-secondary);
   border: 1px solid var(--border-standard);
 }
-.type-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.type-badge-admin { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
 .type-keyword { background: oklch(20% 0.06 72); color: oklch(75% 0.14 72); border: 1px solid oklch(30% 0.08 72); }
 .type-regex   { background: oklch(20% 0.06 290); color: oklch(72% 0.16 290); border: 1px solid oklch(30% 0.09 290); }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
@@ -786,24 +823,30 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   </div>
   <div class="sidebar-section">
     <div class="section-label">보기</div>
-    <div class="nav-item active" onclick="setNav(this)"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent">12</span></div>
-    <div class="nav-item" onclick="setNav(this)"><i data-lucide="user"></i> 내 VOC</div>
-    <div class="nav-item" onclick="setNav(this)"><i data-lucide="user-check"></i> 담당 VOC</div>
+    <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent">12</span></div>
+    <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC</div>
+    <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC</div>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
-    <div class="section-label">카테고리</div>
-    <div class="nav-item" onclick="setNav(this)"><i data-lucide="shield-check"></i> 인증 <span class="nav-badge muted">5</span></div>
-    <div class="nav-item" onclick="setNav(this)"><i data-lucide="bar-chart-2"></i> 데이터 분석 <span class="nav-badge muted">3</span></div>
-    <div class="nav-item" onclick="setNav(this)"><i data-lucide="workflow"></i> 데이터 파이프라인 <span class="nav-badge muted">2</span></div>
-    <div class="nav-item" onclick="setNav(this)"><i data-lucide="layout-dashboard"></i> 대시보드 <span class="nav-badge muted">2</span></div>
+    <div class="section-label">시스템</div>
+    <div id="sidebarSystems"></div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="section-label">정보</div>
+    <div class="nav-item" onclick="setNav(this)" data-view="notices"><i data-lucide="bell"></i> 공지사항 <span class="nav-badge" id="noticeBadge" style="display:none"></span></div>
+    <div class="nav-item" onclick="setNav(this)" data-view="faq"><i data-lucide="help-circle"></i> FAQ</div>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="section-label">관리자</div>
     <div class="nav-item" onclick="setNav(this)" data-page="tag-rules"><i data-lucide="tag"></i> 태그 규칙 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="category"><i data-lucide="folder-open"></i> 카테고리 관리</div>
+    <div class="nav-item" onclick="setNav(this)" data-page="system-menu"><i data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
+    <div class="nav-item" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
+    <div class="nav-item" onclick="setNav(this)" data-page="admin-notices"><i data-lucide="bell"></i> 공지사항 관리</div>
+    <div class="nav-item" onclick="setNav(this)" data-page="admin-faq"><i data-lucide="help-circle"></i> FAQ 관리</div>
   </div>
   <div class="sidebar-user">
     <div class="user-avatar">홍</div>
@@ -818,7 +861,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 <div id="page-voc">
   <!-- Topbar -->
   <div class="topbar">
-    <span class="topbar-title">전체 VOC</span>
+    <span class="topbar-title" id="topbarTitle">전체 VOC</span>
     <span class="topbar-count" id="topbarCount">12개</span>
     <div class="spacer"></div>
     <div class="search-wrap">
@@ -871,29 +914,28 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
       <div class="af-group">
         <div class="af-label">담당자</div>
         <div class="af-opts">
-          <div class="af-chip" onclick="toggleAfChip(this,'assignee','김관리')">김관리</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'assignee','박개발')">박개발</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'assignee','이분석')">이분석</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'assignee','')">미배정</div>
+          <div class="af-chip" onclick="toggleAfChip('assignee','김관리',this)">김관리</div>
+          <div class="af-chip" onclick="toggleAfChip('assignee','박개발',this)">박개발</div>
+          <div class="af-chip" onclick="toggleAfChip('assignee','이분석',this)">이분석</div>
+          <div class="af-chip" onclick="toggleAfChip('assignee','',this)">미배정</div>
         </div>
       </div>
       <div class="af-group">
         <div class="af-label">우선순위</div>
         <div class="af-opts">
-          <div class="af-chip" onclick="toggleAfChip(this,'priority','urgent')">Urgent</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'priority','high')">High</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'priority','medium')">Medium</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'priority','low')">Low</div>
+          <div class="af-chip" onclick="toggleAfChip('priority','urgent',this)">Urgent</div>
+          <div class="af-chip" onclick="toggleAfChip('priority','high',this)">High</div>
+          <div class="af-chip" onclick="toggleAfChip('priority','medium',this)">Medium</div>
+          <div class="af-chip" onclick="toggleAfChip('priority','low',this)">Low</div>
         </div>
       </div>
       <div class="af-group">
-        <div class="af-label">카테고리</div>
-        <div class="af-opts">
-          <div class="af-chip" onclick="toggleAfChip(this,'category','인증')">인증</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'category','데이터 분석')">데이터 분석</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'category','데이터 파이프라인')">데이터 파이프라인</div>
-          <div class="af-chip" onclick="toggleAfChip(this,'category','대시보드')">대시보드</div>
-        </div>
+        <div class="af-label">유형</div>
+        <div class="af-chips" id="typeChips"></div>
+      </div>
+      <div class="af-group">
+        <div class="af-label">태그</div>
+        <div class="af-chips" id="tagChips"></div>
       </div>
       <div class="af-actions">
         <button class="btn-ghost" style="padding:5px 10px;font-size:12px" onclick="clearAdvFilter()">초기화</button>
@@ -917,6 +959,18 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   </div>
 </div><!-- /page-voc -->
 
+<!-- ── 공지사항 ── -->
+<div id="page-notices" class="info-page admin-page"></div>
+
+<!-- ── FAQ ── -->
+<div id="page-faq" class="info-page admin-page"></div>
+
+<!-- ── Admin: 공지사항 관리 ── -->
+<div id="page-admin-notices" class="admin-page"></div>
+
+<!-- ── Admin: FAQ 관리 ── -->
+<div id="page-admin-faq" class="admin-page"></div>
+
 <!-- ── Admin: 태그 규칙 관리 ── -->
 <div id="page-tag-rules" class="admin-page">
   <div class="admin-topbar">
@@ -926,7 +980,6 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <button class="btn-ghost" onclick="toggleAddRuleForm()"><i data-lucide="plus"></i> 규칙 추가</button>
   </div>
   <div class="admin-body">
-    <div class="admin-card">
       <div class="admin-add-form" id="addRuleForm">
         <div class="aform-field">
           <label>키워드 (Enter로 추가)</label>
@@ -961,49 +1014,44 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
         </tr></thead>
         <tbody id="tagRulesBody"></tbody>
       </table>
-    </div>
   </div>
 </div>
 
-<!-- ── Admin: 카테고리 관리 ── -->
-<div id="page-category" class="admin-page">
+<!-- ── Admin: 시스템/메뉴 관리 ── -->
+<div id="page-system-menu" class="admin-page">
   <div class="admin-topbar">
-    <span class="admin-title">카테고리 관리</span>
-    <span class="section-count-badge" id="catCount">0개</span>
+    <span class="admin-title">시스템 / 메뉴 관리</span>
     <div class="spacer"></div>
-    <button class="btn-ghost" onclick="toggleAddCatForm()"><i data-lucide="plus"></i> 카테고리 추가</button>
   </div>
   <div class="admin-body">
-    <div class="admin-card">
-      <div class="admin-add-form" id="addCatForm">
-        <div class="aform-field">
-          <label>카테고리명</label>
-          <input type="text" id="newCatName" placeholder="카테고리 이름" style="min-width:160px" />
-        </div>
-        <div class="aform-field">
-          <label>색상</label>
-          <input type="color" id="newCatColor" value="#5e6ad2" style="min-width:60px;height:34px;padding:2px 4px;cursor:pointer;border-radius:6px" />
-        </div>
-        <div class="aform-field">
-          <label>설명</label>
-          <input type="text" id="newCatDesc" placeholder="간단한 설명 (선택)" style="min-width:220px" />
-        </div>
-        <div style="display:flex;gap:6px;align-self:flex-end">
-          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addCategory()">추가</button>
-          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddCatForm()">취소</button>
-        </div>
-      </div>
       <table class="admin-table">
         <thead><tr>
-          <th style="width:36px">#</th>
-          <th>카테고리명</th>
-          <th>설명</th>
-          <th style="width:80px">VOC 수</th>
-          <th style="width:110px"></th>
+          <th>시스템 / 메뉴</th>
+          <th style="width:100px">슬러그</th>
+          <th style="width:60px;text-align:right">VOC</th>
+          <th style="width:80px">상태</th>
         </tr></thead>
-        <tbody id="catBody"></tbody>
+        <tbody id="adminSystemMenuContent"></tbody>
       </table>
-    </div>
+  </div>
+</div>
+
+<div id="page-voc-type" class="admin-page">
+  <div class="admin-topbar">
+    <span class="admin-title">유형 관리</span>
+    <span class="section-count-badge" id="vocTypeCount">0개</span>
+    <div class="spacer"></div>
+  </div>
+  <div class="admin-body">
+      <table class="admin-table">
+        <thead><tr>
+          <th>유형</th>
+          <th style="width:120px">슬러그</th>
+          <th style="width:60px;text-align:right">VOC</th>
+          <th style="width:80px">상태</th>
+        </tr></thead>
+        <tbody id="adminVocTypeContent"></tbody>
+      </table>
   </div>
 </div>
 
@@ -1016,7 +1064,6 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <button class="btn-ghost" onclick="toggleAddUserForm()"><i data-lucide="user-plus"></i> 사용자 초대</button>
   </div>
   <div class="admin-body">
-    <div class="admin-card">
       <div class="admin-add-form" id="addUserForm">
         <div class="aform-field">
           <label>이름</label>
@@ -1051,7 +1098,6 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
         </tr></thead>
         <tbody id="usersBody"></tbody>
       </table>
-    </div>
   </div>
 </div>
 
@@ -1094,11 +1140,23 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
       </div>
       <div class="form-row">
         <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">카테고리 <span class="form-req">*</span></label>
-          <select class="form-select">
-            <option value="">카테고리 선택...</option>
-            <option>인증</option><option>데이터 분석</option>
-            <option>데이터 파이프라인</option><option>대시보드</option>
+          <label class="form-label">시스템 <span class="form-req">*</span></label>
+          <select class="form-select" id="modalSysSelect" onchange="onModalSysChange()">
+            <option value="">시스템 선택...</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">메뉴 <span class="form-req">*</span></label>
+          <select class="form-select" id="modalMenuSelect" disabled>
+            <option value="">시스템 먼저 선택...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:var(--sp-3)">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">유형 <span class="form-req">*</span></label>
+          <select class="form-select" id="modalTypeSelect">
+            <option value="">유형 선택...</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0">
@@ -1225,7 +1283,7 @@ const VOCDATA = [
    subs:[]},
 
   {id:'voc3',code:'파이프라인-2025-0008',title:'ETL 배치 작업이 매일 새벽 2시 이후 실패 — 타임아웃 관련',
-   status:'접수됨',priority:'medium',assignee:'',assigneeInit:'',assigneeCls:'',
+   status:'접수됨',priority:'medium',assignee:'홍길동',assigneeInit:'홍',assigneeCls:'',
    systemId:'sys3',menuId:'m7',type:'bug',tags:['ETL','오류'],
    author:'최분석',authorInit:'최',authorCls:'',
    date:'2025.06.10',
@@ -1328,7 +1386,26 @@ const SUBDATA = {
        body:`<p>토큰 갱신 미들웨어에서 만료 30분 전 자동 갱신 요청을 발행하도록 패치합니다. 현재 코드 리뷰 중이며 QA 후 배포 예정입니다.</p>`},
 };
 
+// ── 공지사항 데이터
+const NOTICES = [
+  { id: 1, title: '시스템 정기 점검 안내 (04/25 02:00~06:00)', content: '<p>안녕하세요. 시스템 안정성 강화를 위한 <strong>정기 점검</strong>을 아래와 같이 진행합니다.</p><ul><li>일시: 2026-04-25 02:00 ~ 06:00</li><li>영향: 전체 서비스 일시 중단</li></ul><p>불편을 드려 죄송합니다.</p>', level: 'urgent', popup: true, from: '2026-04-20', to: '2026-04-25', visible: true },
+  { id: 2, title: '첨부파일 용량 제한 변경 안내 (10MB → 20MB)', content: '<p>사용자 요청에 따라 첨부파일 최대 용량을 <strong>20MB</strong>로 확대합니다. (기존 10MB)</p><p>적용일: 2026-04-22부터</p>', level: 'important', popup: true, from: '2026-04-21', to: '2026-05-10', visible: true },
+  { id: 3, title: 'VOC 시스템 사용 가이드 배포', content: '<p>신규 입사자를 위한 VOC 시스템 사용 가이드를 배포합니다. 우측 상단 <strong>도움말</strong> 메뉴에서 확인하세요.</p>', level: 'normal', popup: false, from: '2026-04-01', to: '2026-06-30', visible: true },
+];
+
+// ── FAQ 데이터
+const FAQS = [
+  { id: 1, category: '사용법', q: 'VOC는 어떻게 등록하나요?', a: '<p>상단 <strong>+ VOC 등록</strong> 버튼을 클릭하면 등록 모달이 열립니다. 시스템 → 메뉴 → 유형을 선택한 후 제목과 내용을 입력하고 저장하세요.</p>', visible: true },
+  { id: 2, category: '사용법', q: '담당자를 지정하려면 어떻게 하나요?', a: '<p>VOC 상세 드로어에서 <strong>담당자</strong> 필드를 클릭하면 사용자 목록이 나타납니다. Manager 이상 권한이 있어야 지정 가능합니다.</p>', visible: true },
+  { id: 3, category: '오류', q: '파일 첨부가 안 됩니다.', a: '<p>지원 형식: PNG, JPG, GIF, WebP (최대 20MB / 개, 5개 / VOC). 다른 형식의 파일은 업로드가 제한됩니다. 문제가 지속되면 관리자에게 문의하세요.</p>', visible: true },
+  { id: 4, category: '정책', q: 'VOC 상태는 누가 변경할 수 있나요?', a: '<p>상태 변경(진행 중 / 완료 등)은 <strong>Manager 이상</strong> 권한을 가진 사용자만 가능합니다. 일반 사용자는 본인이 등록한 VOC를 조회만 할 수 있습니다.</p>', visible: true },
+  { id: 5, category: '정책', q: 'VOC를 삭제할 수 있나요?', a: '<p>삭제는 <strong>Admin</strong>만 가능합니다. 삭제된 VOC는 복구되지 않으며, Soft Delete 방식으로 처리됩니다.</p>', visible: true },
+  { id: 6, category: '기타', q: '내 계정 역할(권한)은 어디서 확인하나요?', a: '<p>사이드바 좌측 하단 프로필 영역에서 현재 역할을 확인할 수 있습니다. 역할 변경이 필요하면 Admin에게 문의하세요.</p>', visible: true },
+];
+
 // ── State
+const CURRENT_USER = '홍길동';
+let currentView    = 'all'; // 'all' | 'mine' | 'assigned'
 let currentStatus = '전체';
 let searchQuery   = '';
 let showAll       = false;
@@ -1336,6 +1413,7 @@ let sortKey       = 'date-desc';
 let filterAssignees  = new Set();
 let filterPriorities = new Set();
 let filterTypes      = new Set();
+let filterTags       = new Set();
 let advFilterOpen    = false;
 let activeSysId  = null;
 let activeMenuId = null;
@@ -1373,12 +1451,15 @@ function formatDateKo(d) {
 // ── Filter & Sort
 function getVisible() {
   let list = VOCDATA.filter(v => {
+    if (currentView === 'mine'     && v.author   !== CURRENT_USER) return false;
+    if (currentView === 'assigned' && v.assignee !== CURRENT_USER) return false;
     if (currentStatus !== '전체' && v.status !== currentStatus) return false;
     if (activeSysId  && v.systemId !== activeSysId)  return false;
     if (activeMenuId && v.menuId   !== activeMenuId)  return false;
     if (filterAssignees.size  > 0 && !filterAssignees.has(v.assignee))  return false;
     if (filterPriorities.size > 0 && !filterPriorities.has(v.priority)) return false;
     if (filterTypes.size      > 0 && !filterTypes.has(v.type))          return false;
+    if (filterTags.size       > 0 && !v.tags?.some(tag => filterTags.has(tag))) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return v.title.toLowerCase().includes(q) || v.tags.some(t => t.toLowerCase().includes(q));
@@ -1431,11 +1512,15 @@ function renderRow(v) {
           <div class="vcell"><div class="date-cell">${s.date}</div></div>
         </div>`;
       }).join('')}</div>` : '';
+  const typeInfo = TYPE_MAP[v.type];
+  const typeBadge = typeInfo
+    ? `<span class="type-badge" style="background:${typeInfo.color}18;color:${typeInfo.color}"><span class="type-badge-dot" style="background:${typeInfo.color}"></span>${typeInfo.name}</span>`
+    : '';
   return `<div class="voc-group">
     <div class="voc-row" id="row-${v.id}" onclick="openDrawer('${v.id}')">
       <div class="vcell">${expandBtn}</div>
       <div class="vcell"><span class="issue-code">${v.code}</span></div>
-      <div class="vcell"><div class="voc-title-cell"><span class="voc-title-text">${titleText}</span><div class="tag-row">${tagsHTML}</div></div></div>
+      <div class="vcell"><div class="voc-title-cell">${typeBadge}<span class="voc-title-text">${titleText}</span><div class="tag-row">${tagsHTML}</div></div></div>
       <div class="vcell">${statusHTML(v.status)}</div>
       <div class="vcell">${assigneeHTML(v)}</div>
       <div class="vcell">${priHTML(v.priority)}</div>
@@ -1449,24 +1534,109 @@ function loadMore() { showAll = true; renderList(); }
 // ── Search
 function onSearch(val) { searchQuery = val.trim(); showAll = false; renderList(); }
 
+// ── Sidebar system/menu filter
+function renderSidebar() {
+  const el = document.getElementById('sidebarSystems');
+  if (!el) return;
+  el.innerHTML = SYSTEMS.map(sys => {
+    const sysMenus = MENUS.filter(m => m.systemId === sys.id);
+    const sysCount = VOCDATA.filter(v => v.systemId === sys.id).length;
+    const isOpen   = openSysId === sys.id;
+    const isSysActive = activeSysId === sys.id && !activeMenuId;
+    return `
+      <div class="sys-header${isOpen ? ' open' : ''}${isSysActive ? ' active' : ''}" onclick="setSysFilter('${sys.id}')">
+        <i data-lucide="${sys.icon}" class="sys-header-icon"></i>
+        <span class="sys-header-name">${sys.name}</span>
+        <span class="nav-badge muted">${sysCount}</span>
+        <i data-lucide="chevron-right" class="sys-chevron"></i>
+      </div>
+      <div class="sys-menus${isOpen ? ' open' : ''}">
+        ${sysMenus.map(m => {
+          const cnt = VOCDATA.filter(v => v.menuId === m.id).length;
+          const isActive = activeMenuId === m.id;
+          return `<div class="sys-menu-item${isActive ? ' active' : ''}" onclick="setMenuFilter('${m.id}')">${m.name} <span class="nav-badge muted" style="margin-left:auto">${cnt}</span></div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function switchToVocPage() {
+  const vocPage = document.getElementById('page-voc');
+  const isAdminActive = [...document.querySelectorAll('.admin-page')].some(p => p.classList.contains('active'));
+  if (isAdminActive) {
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    vocPage.classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector('.nav-item').classList.add('active');
+  }
+}
+
+function setSysFilter(sysId) {
+  switchToVocPage();
+  if (activeSysId === sysId && !activeMenuId) {
+    openSysId = openSysId === sysId ? null : sysId;
+  } else {
+    activeSysId  = sysId;
+    activeMenuId = null;
+    openSysId    = sysId;
+  }
+  renderSidebar();
+  renderList();
+}
+
+function setMenuFilter(menuId) {
+  const menu = MENU_MAP[menuId];
+  if (!menu) return;
+  switchToVocPage();
+  activeSysId  = menu.systemId;
+  activeMenuId = menuId;
+  openSysId    = menu.systemId;
+  renderSidebar();
+  renderList();
+}
+
 // ── Nav
 function setNav(el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   el.classList.add('active');
-  const page = el.dataset.page || 'voc';
+  const view = el.dataset.view;
+  const page = el.dataset.page;
   const vocPage = document.getElementById('page-voc');
   const adminPages = document.querySelectorAll('.admin-page');
-  if (page === 'voc') {
+  const infoPages = document.querySelectorAll('.info-page');
+
+  if (view === 'notices' || view === 'faq') {
+    vocPage.classList.add('hidden');
+    adminPages.forEach(p => p.classList.remove('active'));
+    infoPages.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + view);
+    if (target) target.classList.add('active');
+    document.getElementById('topbarTitle').textContent = view === 'notices' ? '공지사항' : 'FAQ';
+    if (view === 'notices') renderNotices();
+    if (view === 'faq') renderFaq();
+    lucide.createIcons();
+  } else if (!page) {
     vocPage.classList.remove('hidden');
     adminPages.forEach(p => p.classList.remove('active'));
+    infoPages.forEach(p => p.classList.remove('active'));
+    activeSysId = null; activeMenuId = null; openSysId = null;
+    currentView = view || 'all';
+    const titleMap = {all:'전체 VOC', mine:'내 VOC', assigned:'담당 VOC'};
+    document.getElementById('topbarTitle').textContent = titleMap[currentView];
+    renderSidebar(); renderList();
   } else {
     vocPage.classList.add('hidden');
     adminPages.forEach(p => p.classList.remove('active'));
+    infoPages.forEach(p => p.classList.remove('active'));
     const target = document.getElementById('page-' + page);
     if (target) target.classList.add('active');
-    if (page === 'tag-rules') renderTagRules();
-    if (page === 'category')  renderCategories();
-    if (page === 'users')     renderUsers();
+    if (page === 'tag-rules')      renderTagRules();
+    if (page === 'system-menu')    renderSystemMenu();
+    if (page === 'voc-type')       renderVocTypes();
+    if (page === 'users')          renderUsers();
+    if (page === 'admin-notices')  renderAdminNotices();
+    if (page === 'admin-faq')      renderAdminFaq();
     lucide.createIcons();
   }
 }
@@ -1512,28 +1682,55 @@ function toggleAdvFilter() {
   advFilterOpen = !advFilterOpen;
   document.getElementById('advFilterWrap').classList.toggle('open', advFilterOpen);
   document.getElementById('filterMoreBtn').classList.toggle('filter-on', advFilterOpen || hasAdvFilters());
+  if (advFilterOpen) { renderTypeChips(); renderTagChips(); }
 }
-function toggleAfChip(el, type, val) {
+function renderTypeChips() {
+  const el = document.getElementById('typeChips');
+  if (!el) return;
+  el.innerHTML = VOC_TYPES.map(t =>
+    `<div class="af-chip${filterTypes.has(t.slug) ? ' active' : ''}" onclick="toggleAfChip('type','${t.slug}',this)" style="display:inline-flex;align-items:center;gap:5px">
+      <span class="af-dot" style="background:${t.color}"></span>${t.name}
+    </div>`
+  ).join('');
+}
+function renderTagChips() {
+  const el = document.getElementById('tagChips');
+  if (!el) return;
+  const allTags = [...new Set(VOCDATA.flatMap(v => v.tags || []))].sort();
+  el.innerHTML = allTags.map(tag =>
+    `<div class="af-chip${filterTags.has(tag) ? ' active' : ''}" onclick="toggleTagChip('${tag}',this)">${tag}</div>`
+  ).join('');
+}
+function toggleTagChip(tag, el) {
+  filterTags.has(tag) ? filterTags.delete(tag) : filterTags.add(tag);
+  el.classList.toggle('active');
+  updateFilterBtnState();
+  renderList();
+}
+function toggleAfChip(type, val, el) {
   const sets = {assignee: filterAssignees, priority: filterPriorities, type: filterTypes};
   const s = sets[type];
   if (s.has(val)) { s.delete(val); el.classList.remove('active'); }
   else            { s.add(val);    el.classList.add('active'); }
+  if (type === 'type') renderTypeChips();
   updateFilterBtnState();
   showAll = false;
   renderList();
 }
 function clearAdvFilter() {
-  filterAssignees.clear(); filterPriorities.clear(); filterTypes.clear();
+  filterAssignees.clear(); filterPriorities.clear(); filterTypes.clear(); filterTags.clear();
   document.querySelectorAll('.af-chip').forEach(c => c.classList.remove('active'));
+  renderTypeChips();
+  renderTagChips();
   updateFilterBtnState();
   renderList();
 }
 function hasAdvFilters() {
-  return filterAssignees.size + filterPriorities.size + filterTypes.size > 0;
+  return filterAssignees.size + filterPriorities.size + filterTypes.size + filterTags.size > 0;
 }
 function updateFilterBtnState() {
   const btn = document.getElementById('filterMoreBtn');
-  const count = filterAssignees.size + filterPriorities.size + filterTypes.size;
+  const count = filterAssignees.size + filterPriorities.size + filterTypes.size + filterTags.size;
   const badgeHTML = count > 0 ? `<span class="fc-badge">${count}</span>` : '';
   btn.innerHTML = `<i data-lucide="sliders-horizontal"></i> 필터 더보기${badgeHTML}`;
   btn.classList.toggle('filter-on', advFilterOpen || hasAdvFilters());
@@ -1588,6 +1785,9 @@ function buildSubsSection(d) {
       <div class="sub-inline-form" id="sub-form-${d.id}" style="display:none">
         <input class="sub-inline-input" id="sub-input-${d.id}" placeholder="서브태스크 제목 입력..."
                onkeydown="subKeydown(event,'${d.id}')" />
+        <select id="subtaskTypeSelect-${d.id}" class="form-select" style="width:120px;flex-shrink:0">
+          ${VOC_TYPES.map(t => `<option value="${t.slug}">${t.name}</option>`).join('')}
+        </select>
         <button class="btn-primary" style="padding:5px 11px;font-size:12px;white-space:nowrap" onclick="confirmSub('${d.id}')">
           <i data-lucide="check" style="width:11px;height:11px"></i>
         </button>
@@ -1629,12 +1829,14 @@ function confirmSub(vocId) {
   const inp = document.getElementById('sub-input-'+vocId);
   const title = inp?.value.trim();
   if (!title) { inp?.focus(); return; }
+  const typeSel = document.getElementById('subtaskTypeSelect-'+vocId);
+  const type = typeSel?.value || 'bug';
   const voc = VOC_MAP[vocId];
   const newId = 'sub-new-' + (++newSubCounter);
   const newSub = {
     id: newId, parentId: vocId,
     code: (voc?.code || vocId) + '-' + newSubCounter,
-    title, status: '접수됨', priority: 'medium',
+    title, type, status: '접수됨', priority: 'medium',
     assignee:'', assigneeInit:'', assigneeCls:'',
     author:'김관리', authorInit:'김', authorCls:'', tags:[], date:'', body:'',
   };
@@ -1862,8 +2064,18 @@ function openDrawer(id) {
         <div class="meta-val">${assigneeSelectHTML}</div>
       </div>
       <div class="meta-item">
-        <div class="meta-lbl">카테고리</div>
-        <div class="meta-val"><i data-lucide="${CAT_ICON[d.category]||'folder'}" style="width:13px;height:13px;color:var(--text-quaternary)"></i>${d.category||'—'}</div>
+        <div class="meta-lbl">시스템</div>
+        <div class="meta-val">${SYS_MAP[d.systemId]?.name || '—'}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-lbl">메뉴</div>
+        <div class="meta-val">${MENU_MAP[d.menuId]?.name || '—'}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-lbl">유형</div>
+        <div class="meta-val">${(typeInfo => typeInfo
+          ? `<span class="type-badge" style="background:${typeInfo.color}18;color:${typeInfo.color}"><span class="type-badge-dot" style="background:${typeInfo.color}"></span>${typeInfo.name}</span>`
+          : d.type || '—')(TYPE_MAP[d.type])}</div>
       </div>
       <div class="meta-item">
         <div class="meta-lbl">작성자</div>
@@ -1952,7 +2164,37 @@ function closeDrawer() {
 }
 
 // ── Modal
-function openModal() { document.getElementById('modalBg').classList.add('open'); setTimeout(() => document.getElementById('titleInput').focus(), 80); }
+function initModalSelects() {
+  const sysEl  = document.getElementById('modalSysSelect');
+  const typeEl = document.getElementById('modalTypeSelect');
+  if (!sysEl || !typeEl) return;
+  sysEl.innerHTML  = '<option value="">시스템 선택...</option>' +
+    SYSTEMS.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  typeEl.innerHTML = '<option value="">유형 선택...</option>' +
+    VOC_TYPES.map(t => `<option value="${t.slug}">${t.name}</option>`).join('');
+  document.getElementById('modalMenuSelect').innerHTML = '<option value="">시스템 먼저 선택...</option>';
+  document.getElementById('modalMenuSelect').disabled = true;
+}
+
+function onModalSysChange() {
+  const sysId   = document.getElementById('modalSysSelect').value;
+  const menuEl  = document.getElementById('modalMenuSelect');
+  if (!sysId) {
+    menuEl.innerHTML = '<option value="">시스템 먼저 선택...</option>';
+    menuEl.disabled  = true;
+    return;
+  }
+  const sysMenus = MENUS.filter(m => m.systemId === sysId);
+  menuEl.innerHTML = '<option value="">메뉴 선택...</option>' +
+    sysMenus.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  menuEl.disabled = false;
+}
+
+function openModal() {
+  initModalSelects();
+  document.getElementById('modalBg').classList.add('open');
+  setTimeout(() => document.getElementById('titleInput').focus(), 80);
+}
 function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
 function handleBgClick(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
 
@@ -2049,6 +2291,222 @@ let ADMIN_USERS = [
 ];
 let ruleNextId=12, catNextId=6, userNextId=6;
 
+// ── 공지사항 렌더
+function renderNotices() {
+  const today = new Date().toISOString().slice(0,10);
+  const el = document.getElementById('page-notices');
+  const visible = NOTICES.filter(n => n.visible && n.from <= today && n.to >= today);
+  const levelLabel = { urgent:'긴급', important:'중요', normal:'일반' };
+  const levelColor = { urgent:'#e5484d', important:'#f5a623', normal:'var(--text-tertiary)' };
+  el.innerHTML = `
+    <div class="admin-topbar"><h2 class="admin-title">공지사항</h2></div>
+    <div class="admin-body">
+      ${visible.length === 0 ? '<p style="color:var(--text-tertiary);padding:32px 24px">등록된 공지사항이 없습니다.</p>' : ''}
+      ${visible.map((n, i) => `
+        <div class="notice-item" style="border-bottom:1px solid var(--border-subtle)">
+          <div onclick="toggleNotice(${n.id})" style="display:flex;align-items:center;gap:10px;padding:12px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
+            <span style="font-size:11px;font-weight:600;color:${levelColor[n.level]};border:1px solid ${levelColor[n.level]};border-radius:4px;padding:1px 7px;flex-shrink:0">${levelLabel[n.level]}</span>
+            <span style="flex:1;font-size:14px;color:var(--text-primary)">${n.title}</span>
+            <span style="font-size:12px;color:var(--text-tertiary);flex-shrink:0">${n.from} ~ ${n.to}</span>
+            <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="notice-icon-${n.id}"></i>
+          </div>
+          <div id="notice-body-${n.id}" style="display:none;padding:12px 24px 16px;background:var(--bg-elevated);font-size:13.5px;color:var(--text-secondary);line-height:1.7;border-top:1px solid var(--border-subtle)">${n.content}</div>
+        </div>`).join('')}
+    </div>`;
+  lucide.createIcons();
+}
+
+function toggleNotice(id) {
+  const body = document.getElementById('notice-body-' + id);
+  const icon = document.getElementById('notice-icon-' + id);
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  icon.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// ── FAQ 렌더
+let faqQuery = '';
+let faqCategory = '전체';
+
+function renderFaq() {
+  const el = document.getElementById('page-faq');
+  const categories = ['전체', ...new Set(FAQS.map(f => f.category))];
+  const filtered = FAQS.filter(f => {
+    if (!f.visible) return false;
+    if (faqCategory !== '전체' && f.category !== faqCategory) return false;
+    if (faqQuery) {
+      const q = faqQuery.toLowerCase();
+      return f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q);
+    }
+    return true;
+  });
+  function hl(text) {
+    if (!faqQuery) return text;
+    const re = new RegExp(`(${faqQuery.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    return text.replace(re, '<mark style="background:#5e6ad233;color:var(--accent);border-radius:2px">$1</mark>');
+  }
+  el.innerHTML = `
+    <div class="admin-topbar"><h2 class="admin-title">FAQ</h2></div>
+    <div class="admin-body">
+      <div style="padding:12px 24px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border-subtle);padding-bottom:12px">
+        <input id="faqSearch" type="text" placeholder="검색..." value="${faqQuery}"
+          oninput="faqQuery=this.value;renderFaq()"
+          style="padding:6px 11px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;width:200px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${categories.map(c => `<button onclick="faqCategory='${c}';renderFaq()" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border-subtle);background:${faqCategory===c?'var(--brand-bg)':'transparent'};color:${faqCategory===c?'var(--accent)':'var(--text-secondary)'};font-size:12px;cursor:pointer">${c}</button>`).join('')}
+        </div>
+      </div>
+      ${filtered.length === 0 ? '<p style="color:var(--text-tertiary);padding:16px 24px">검색 결과가 없습니다.</p>' : ''}
+      ${filtered.map(f => `
+        <div style="border-bottom:1px solid var(--border-subtle)">
+          <div onclick="toggleFaq(${f.id})" style="display:flex;align-items:center;gap:10px;padding:12px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
+            <span style="font-size:11px;font-weight:600;color:var(--text-tertiary);border:1px solid var(--border-subtle);border-radius:4px;padding:1px 7px;flex-shrink:0">${f.category}</span>
+            <span style="flex:1;font-size:14px;color:var(--text-primary)">${hl(f.q)}</span>
+            <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="faq-icon-${f.id}"></i>
+          </div>
+          <div id="faq-body-${f.id}" style="display:none;padding:12px 24px 16px;background:var(--bg-elevated);font-size:13.5px;color:var(--text-secondary);line-height:1.7;border-top:1px solid var(--border-subtle)">${hl(f.a)}</div>
+        </div>`).join('')}
+    </div>`;
+  lucide.createIcons();
+}
+
+function toggleFaq(id) {
+  const body = document.getElementById('faq-body-' + id);
+  const icon = document.getElementById('faq-icon-' + id);
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  icon.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// ── Admin: 공지사항 관리
+let noticeNextId = NOTICES.length + 1;
+function renderAdminNotices() {
+  const el = document.getElementById('page-admin-notices');
+  const levelLabel = { urgent:'긴급', important:'중요', normal:'일반' };
+  el.innerHTML = `
+    <div class="admin-topbar">
+      <h2 class="admin-title">공지사항 관리</h2>
+      <button class="admin-btn" onclick="toggleAdminNoticeForm()"><i data-lucide="plus"></i> 공지 추가</button>
+    </div>
+    <div class="admin-body">
+      <div id="adminNoticeForm" style="display:none;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end">
+          <input id="newNoticeTitle" placeholder="제목" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
+          <select id="newNoticeLevel" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
+            <option value="normal">일반</option><option value="important">중요</option><option value="urgent">긴급</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary);white-space:nowrap"><input type="checkbox" id="newNoticePopup"> 팝업</label>
+        </div>
+        <textarea id="newNoticeContent" placeholder="내용 (HTML 가능)" rows="3" style="width:100%;margin-top:8px;padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="newNoticeFrom" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
+          <span style="line-height:34px;color:var(--text-tertiary)">~</span>
+          <input id="newNoticeTo" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
+          <button onclick="addAdminNotice()" style="padding:6px 14px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer">저장</button>
+          <button onclick="toggleAdminNoticeForm()" style="padding:6px 14px;background:none;border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-tertiary);font-size:12px;cursor:pointer">취소</button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>제목</th><th>중요도</th><th>팝업</th><th>노출 기간</th><th>노출</th><th>작업</th></tr></thead>
+        <tbody>${NOTICES.map(n => `
+          <tr id="anotice-row-${n.id}">
+            <td style="color:var(--text-primary)">${n.title}</td>
+            <td><span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;border:1px solid var(--border-subtle)">${levelLabel[n.level]}</span></td>
+            <td>${n.popup ? '<span style="color:var(--accent);font-size:12px">ON</span>' : '<span style="color:var(--text-tertiary);font-size:12px">—</span>'}</td>
+            <td style="font-size:12px;color:var(--text-secondary)">${n.from} ~ ${n.to}</td>
+            <td><label class="toggle-switch"><input type="checkbox" ${n.visible?'checked':''} onchange="toggleNoticeVisible(${n.id},this.checked)"><span class="toggle-slider"></span></label></td>
+            <td><button onclick="deleteAdminNotice(${n.id})" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:12px;padding:3px 8px;border-radius:4px" onmouseover="this.style.color='#e5484d'" onmouseout="this.style.color='var(--text-tertiary)'">삭제</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  lucide.createIcons();
+}
+
+function toggleAdminNoticeForm() {
+  const f = document.getElementById('adminNoticeForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+function addAdminNotice() {
+  const title = document.getElementById('newNoticeTitle').value.trim();
+  const content = document.getElementById('newNoticeContent').value.trim();
+  const level = document.getElementById('newNoticeLevel').value;
+  const popup = document.getElementById('newNoticePopup').checked;
+  const from = document.getElementById('newNoticeFrom').value;
+  const to = document.getElementById('newNoticeTo').value;
+  if (!title || !from || !to) return;
+  NOTICES.push({ id: noticeNextId++, title, content: `<p>${content}</p>`, level, popup, from, to, visible: true });
+  renderAdminNotices();
+}
+function toggleNoticeVisible(id, val) {
+  const n = NOTICES.find(x => x.id === id);
+  if (n) n.visible = val;
+}
+function deleteAdminNotice(id) {
+  const row = document.getElementById('anotice-row-' + id);
+  if (row) { row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(() => { NOTICES.splice(NOTICES.findIndex(x=>x.id===id), 1); renderAdminNotices(); }, 200); }
+}
+
+// ── Admin: FAQ 관리
+let faqNextId = FAQS.length + 1;
+function renderAdminFaq() {
+  const el = document.getElementById('page-admin-faq');
+  const cats = ['사용법','오류','정책','기타'];
+  el.innerHTML = `
+    <div class="admin-topbar">
+      <h2 class="admin-title">FAQ 관리</h2>
+      <button class="admin-btn" onclick="toggleAdminFaqForm()"><i data-lucide="plus"></i> FAQ 추가</button>
+    </div>
+    <div class="admin-body">
+      <div id="adminFaqForm" style="display:none;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px">
+          <input id="newFaqQ" placeholder="질문 (Q)" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
+          <select id="newFaqCat" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
+            ${cats.map(c=>`<option>${c}</option>`).join('')}
+          </select>
+        </div>
+        <textarea id="newFaqA" placeholder="답변 (A)" rows="3" style="width:100%;margin-top:8px;padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button onclick="addAdminFaq()" style="padding:6px 14px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer">저장</button>
+          <button onclick="toggleAdminFaqForm()" style="padding:6px 14px;background:none;border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-tertiary);font-size:12px;cursor:pointer">취소</button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>질문</th><th>카테고리</th><th>노출</th><th>작업</th></tr></thead>
+        <tbody>${FAQS.map(f => `
+          <tr id="afaq-row-${f.id}">
+            <td style="color:var(--text-primary)">${f.q}</td>
+            <td><span style="font-size:11px;padding:2px 7px;border-radius:4px;border:1px solid var(--border-subtle);color:var(--text-secondary)">${f.category}</span></td>
+            <td><label class="toggle-switch"><input type="checkbox" ${f.visible?'checked':''} onchange="toggleFaqVisible(${f.id},this.checked)"><span class="toggle-slider"></span></label></td>
+            <td><button onclick="deleteAdminFaq(${f.id})" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:12px;padding:3px 8px;border-radius:4px" onmouseover="this.style.color='#e5484d'" onmouseout="this.style.color='var(--text-tertiary)'">삭제</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  lucide.createIcons();
+}
+
+function toggleAdminFaqForm() {
+  const f = document.getElementById('adminFaqForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+function addAdminFaq() {
+  const q = document.getElementById('newFaqQ').value.trim();
+  const a = document.getElementById('newFaqA').value.trim();
+  const category = document.getElementById('newFaqCat').value;
+  if (!q || !a) return;
+  FAQS.push({ id: faqNextId++, category, q, a: `<p>${a}</p>`, visible: true });
+  renderAdminFaq();
+}
+function toggleFaqVisible(id, val) {
+  const f = FAQS.find(x => x.id === id);
+  if (f) f.visible = val;
+}
+function deleteAdminFaq(id) {
+  const row = document.getElementById('afaq-row-' + id);
+  if (row) { row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(() => { FAQS.splice(FAQS.findIndex(x=>x.id===id), 1); renderAdminFaq(); }, 200); }
+}
+
 // ── Admin Renders
 function renderTagRules() {
   const tbody = document.getElementById('tagRulesBody');
@@ -2057,7 +2515,7 @@ function renderTagRules() {
       <td style="color:var(--text-quaternary);font-size:12px">${i+1}</td>
       <td><div class="kw-list">${r.kw.map(k=>`<span class="kw-pill">${k}</span>`).join('')}</div></td>
       <td><span class="tag-pill-sm"># ${r.tag}</span></td>
-      <td><span class="type-badge type-${r.type}">${r.type==='keyword'?'키워드':'정규식'}</span></td>
+      <td><span class="type-badge-admin type-${r.type}">${r.type==='keyword'?'키워드':'정규식'}</span></td>
       <td><span style="cursor:pointer;user-select:none" onclick="toggleRuleActive(${r.id})">
         <span class="status-dot ${r.active?'on':'off'}"></span>
         <span style="font-size:12px;color:${r.active?'var(--status-green)':'var(--text-quaternary)'}">${r.active?'활성':'비활성'}</span>
@@ -2067,22 +2525,53 @@ function renderTagRules() {
   document.getElementById('tagRuleCount').textContent = `${ADMIN_RULES.length}개`;
 }
 
-function renderCategories() {
-  const tbody = document.getElementById('catBody');
-  tbody.innerHTML = ADMIN_CATS.map((c,i) => `
-    <tr id="cat-row-${c.id}" style="transition:opacity .2s">
-      <td style="color:var(--text-quaternary);font-size:12px">${i+1}</td>
-      <td class="td-primary"><span class="color-swatch" style="background:${c.color}"></span>${c.name}</td>
-      <td style="color:var(--text-tertiary)">${c.desc||'—'}</td>
-      <td><strong style="color:var(--text-primary)">${c.count}</strong> <span style="font-size:11px;color:var(--text-quaternary)">건</span></td>
-      <td style="text-align:right">
-        <div style="display:flex;gap:6px;justify-content:flex-end">
-          <button class="a-btn" onclick="editCat(${c.id})">편집</button>
-          <button class="a-btn danger" onclick="deleteCat(${c.id})">삭제</button>
-        </div>
-      </td>
-    </tr>`).join('');
-  document.getElementById('catCount').textContent = `${ADMIN_CATS.length}개`;
+function renderSystemMenu() {
+  const el = document.getElementById('adminSystemMenuContent');
+  if (!el) return;
+  let rows = '';
+  SYSTEMS.forEach(s => {
+    const sysMenus = MENUS.filter(m => m.systemId === s.id);
+    const cnt = VOCDATA.filter(v => v.systemId === s.id).length;
+    rows += `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <i data-lucide="${s.icon}" style="width:14px;height:14px;color:var(--text-tertiary);flex-shrink:0"></i>
+        <span class="td-primary">${s.name}</span>
+      </div></td>
+      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">${s.slug}</td>
+      <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${cnt}</td>
+      <td><span class="status-pill open">활성</span></td>
+    </tr>`;
+    sysMenus.forEach(m => {
+      const mc = VOCDATA.filter(v => v.menuId === m.id).length;
+      rows += `<tr>
+        <td style="padding-left:32px;font-size:13px;color:var(--text-secondary)">└ ${m.name}</td>
+        <td></td>
+        <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${mc}</td>
+        <td></td>
+      </tr>`;
+    });
+  });
+  el.innerHTML = rows;
+  lucide.createIcons();
+}
+
+function renderVocTypes() {
+  const el = document.getElementById('adminVocTypeContent');
+  if (!el) return;
+  el.innerHTML = VOC_TYPES.map(t => {
+    const cnt = VOCDATA.filter(v => v.type === t.slug).length;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <span class="cat-swatch" style="background:${t.color};flex-shrink:0"></span>
+        <span class="td-primary">${t.name}</span>
+      </div></td>
+      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">${t.slug}</td>
+      <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${cnt}</td>
+      <td><span class="status-pill open">활성</span></td>
+    </tr>`;
+  }).join('');
+  const badge = document.getElementById('vocTypeCount');
+  if (badge) badge.textContent = `${VOC_TYPES.length}개`;
 }
 
 const ROLE_MAP = {admin:'Admin', manager:'Manager', dev:'Developer', viewer:'Viewer'};
@@ -2216,7 +2705,61 @@ function deleteUser(id) {
 document.querySelectorAll('.sort-item:not(.active) .sort-check').forEach(c => c.style.display = 'none');
 
 lucide.createIcons();
+renderSidebar();
 renderList();
+
+// ── 공지 팝업 초기화
+(function initNoticePopup() {
+  const today = new Date().toISOString().slice(0,10);
+  const levelOrder = { urgent: 0, important: 1, normal: 2 };
+  const popupNotices = NOTICES
+    .filter(n => n.visible && n.popup && n.from <= today && n.to >= today)
+    .filter(n => localStorage.getItem('notice_hide_' + n.id) !== today)
+    .sort((a, b) => levelOrder[a.level] - levelOrder[b.level]);
+
+  if (popupNotices.length === 0) return;
+
+  const levelLabel = { urgent:'긴급', important:'중요', normal:'일반' };
+  const levelColor = { urgent:'#e5484d', important:'#f5a623', normal:'var(--text-tertiary)' };
+
+  const overlay = document.createElement('div');
+  overlay.id = 'noticePopupOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:center;justify-content:center';
+
+  overlay.innerHTML = `
+    <div style="background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:12px;width:480px;max-width:90vw;max-height:80vh;overflow-y:auto;padding:28px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <span style="font-size:15px;font-weight:600;color:var(--text-primary)">공지사항</span>
+        <button onclick="closeNoticePopup()" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:20px;line-height:1">✕</button>
+      </div>
+      ${popupNotices.map(n => `
+        <div style="border:1px solid var(--border-subtle);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="font-size:11px;font-weight:600;color:${levelColor[n.level]};border:1px solid ${levelColor[n.level]};border-radius:4px;padding:1px 7px">${levelLabel[n.level]}</span>
+            <span style="font-size:13.5px;font-weight:500;color:var(--text-primary)">${n.title}</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.65">${n.content}</div>
+          <label style="display:flex;align-items:center;gap:6px;margin-top:12px;cursor:pointer;font-size:12px;color:var(--text-tertiary)">
+            <input type="checkbox" id="hide-today-${n.id}" onchange="handleHideToday(${n.id}, this.checked)">
+            오늘 하루 보지 않기
+          </label>
+        </div>`).join('')}
+      <button onclick="closeNoticePopup()" style="width:100%;margin-top:8px;padding:9px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer">확인</button>
+    </div>`;
+
+  document.body.appendChild(overlay);
+})();
+
+function handleHideToday(id, checked) {
+  const today = new Date().toISOString().slice(0,10);
+  if (checked) localStorage.setItem('notice_hide_' + id, today);
+  else localStorage.removeItem('notice_hide_' + id);
+}
+
+function closeNoticePopup() {
+  const el = document.getElementById('noticePopupOverlay');
+  if (el) el.remove();
+}
 </script>
 </body>
 </html>

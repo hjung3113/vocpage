@@ -1,57 +1,53 @@
 # vocpage — Session Progress
 
 ## NEXT ACTION
-prototype.html 파트5 (분류 체계 반영) — JS/데이터 레이어 완료, 아래 UI 레이어 남음:
+디자인 통일성 수정 완료 → 다음 세션에서 추가 UI 피드백 수령 후 반영
 
-1. **사이드바 HTML**: 정적 카테고리 섹션 → `<div id="sidebarSystems"></div>` + CSS (.sys-header, .sys-menus, .sys-menu-item 아코디언)
-2. **사이드바 JS**: `renderSidebar()`, `setSysFilter(sysId)`, `setMenuFilter(menuId)` 추가; `setNav()` 내에서 sys/menu 상태 초기화
-3. **모달 HTML**: 단일 카테고리 select 1개 → 시스템·메뉴·유형 select 3개 (2-row layout)
-4. **모달 JS**: `initModalSelects()`, `onModalSysChange()` 추가
-5. **유형 뱃지**: `renderRow()` title 셀에 type badge 인라인; 드로어 "카테고리" 메타 → 시스템/메뉴/유형 3개 meta-item
-6. **필터 패널 HTML**: 카테고리 chips 4개 → 유형 chips 4개 (색상 dot + `.af-dot` CSS)
-7. **Admin 사이드바**: `data-page="category"` → `data-page="system-menu"` + 새 `data-page="voc-type"` 항목
-8. **Admin 페이지 HTML**: `page-category` → `page-system-menu` (시스템·메뉴 트리) + `page-voc-type` (유형 테이블) 신규
-9. **Admin JS**: `renderCategories()` → `renderSystemMenu()` + `renderVocTypes()` 교체; `setNav()` 분기 업데이트
-10. **Admin JS 데이터**: `ADMIN_CATS` 제거, `SYSTEMS`/`MENUS`/`VOC_TYPES` 직접 활용
+## 완료된 작업 (2026-04-21 추가)
+- 공지사항/FAQ 요구사항 인터뷰 → requirements.md 섹션 10 추가
+- prototype.html 공지사항 & FAQ 구현:
+  - 사이드바 하단 정보 섹션 (공지사항/FAQ 메뉴)
+  - 공지사항 페이지: 중요도 배지(긴급/중요/일반), 인라인 펼침
+  - 로그인 팝업: 팝업=ON 공지 자동 표시, "오늘 하루 보지 않기" (localStorage)
+  - FAQ 페이지: 아코디언 + 키워드 검색 + 카테고리 탭
+  - Admin 공지사항 관리: 등록 폼, 노출 토글, 삭제
+  - Admin FAQ 관리: 등록 폼, 노출 토글, 삭제
+- REVIEW-notice-faq.md 리뷰 가이드 작성
 
 ## 완료된 작업
+- 기능 검증 완료 (2026-04-21):
+  - 드로어 메타 시스템/메뉴/유형 3개 표시 ✅
+  - Sub-task 폼 유형 select 노출 ✅
+  - Admin 시스템/메뉴 관리, 유형 관리 페이지 렌더링 ✅
+
+- Admin 페이지 디자인 통일 (2026-04-21):
+  - page-system-menu, page-voc-type → admin-topbar/body/card/table 구조로 변경
+  - renderSystemMenu, renderVocTypes → tbody tr 기반 테이블로 재작성
+
+- Admin → VOC 페이지 전환 수정 (2026-04-21):
+  - switchToVocPage() 헬퍼 추가
+  - setSysFilter, setMenuFilter 호출 시 admin 페이지 활성 상태면 VOC 페이지로 자동 전환
+
+- 내 VOC / 담당 VOC 구현 (2026-04-21):
+  - CURRENT_USER = '홍길동' 상수 추가
+  - currentView state ('all'|'mine'|'assigned') 추가
+  - nav-item에 data-view 속성 추가
+  - getVisible()에 currentView 필터 로직 추가
+  - topbarTitle id 추가, setNav에서 타이틀 동기화
+  - voc3 assignee를 '홍길동'으로 설정 (담당 VOC 데이터)
+
+- prototype.html 파트5 UI 레이어 완료 (2026-04-21):
+  - 사이드바: 정적 카테고리 → SYSTEMS/MENUS 기반 아코디언 트리 (renderSidebar/setSysFilter/setMenuFilter)
+  - 모달: 카테고리 select 1개 → 시스템/메뉴/유형 연계 드롭다운 3개 (initModalSelects/onModalSysChange)
+  - 유형 뱃지: renderRow() title 셀 + 드로어 메타 시스템/메뉴/유형 3개
+  - 필터 패널: 카테고리 chips → 유형 chips + 태그 chips (spec 9.1 반영)
+  - Admin: page-category → page-system-menu + page-voc-type
+  - Sub-task 폼에 유형 select 추가 (spec 8.7 반영)
+  - filterTags Set + getVisible() 태그 필터 로직 추가
+
 - prototype.html 파트5 JS/데이터 레이어 (2026-04-21):
   - VOCDATA 12개 + SUBDATA 2개: category 필드 제거, systemId/menuId/type 필드 추가
   - JS 상태: filterCategories → filterTypes, activeSysId/activeMenuId/openSysId 변수 추가
   - getVisible(): sys/menu 필터 로직 + filterTypes 적용
-  - toggleAfChip/clearAdvFilter/hasAdvFilters/updateFilterBtnState: filterCategories → filterTypes
-  - CAT_ICON 헬퍼 제거 (SYS_MAP/TYPE_MAP으로 대체 예정)
-  UI 레이어는 다음 세션에서 작업 (NEXT ACTION 참고)
 
-- requirements.md 분류 체계 재설계 (2026-04-21): 카테고리 → 시스템/메뉴/유형 3단계. voc_types Admin 관리 테이블화, 메뉴 필수화, 사이드바 아코디언 트리, Sub-task 상속 규칙, "기타" 메뉴 자동 생성 명세 추가.
-
-- requirements.md 1차 구체화 (2026-04-20)
-- requirements.md 2차 구체화 (2026-04-20): 섹션 8.11~8.15 추가
-- prototype.html 최초 제작 (2026-04-20): VOC 목록, 드로어, 등록 모달, 알림 패널
-- prototype.html 파트1 보강 (2026-04-21):
-  - VOCDATA 12개 JS 데이터 배열로 동적 렌더링 전환
-  - 상태 필터 pill 실제 필터링 동작
-  - 검색 + 하이라이팅 (mark 태그)
-  - 페이지네이션 ("더 보기" → 전체 12개 표시)
-  - requirements.md 섹션 9 추가 (프로토타입 리뷰 기반 요구사항)
-- prototype.html 파트2 보강 (2026-04-21):
-  - 정렬 드롭다운 (등록일↑↓, 우선순위, 담당자) — sort-anchor 패턴, 활성 시 버튼 accent 색상
-  - 필터 더보기 패널 (담당자·우선순위·카테고리 복합 필터, 슬라이드다운 패널, 활성 개수 배지)
-  - VOCDATA에 body/author/authorInit/authorCls 필드 추가 (12개 + sub 2개)
-  - 드로어 완전 동적화: 상태·우선순위 select 자동 선택, 담당자·카테고리·작성자·등록일·태그·본문·이력 실데이터 연결
-
-- prototype.html 파트3 보강 (2026-04-21):
-  - 서브태스크 인라인 생성 (드로어 + 버튼 → 인라인 폼, Enter 확정, Esc 취소, 카운트 갱신)
-  - 첨부파일 UI (드로어: 기존 파일 목록·삭제·파일 선택; 모달: 파일 선택 섹션 추가)
-  - 댓글 인라인 편집 (연필 클릭 → textarea 전환, 저장 시 "(수정됨)" 뱃지, 삭제 애니메이션)
-  - 새 댓글 등록 (Ctrl+Enter 단축키, 카운트 갱신)
-
-- prototype.html 파트4 보강 (2026-04-21):
-  - 태그 규칙 관리: 키워드/정규식 11개 규칙 테이블, 활성/비활성 토글, 규칙 추가 폼 (Enter 토큰 입력), 삭제 애니메이션
-  - 카테고리 관리: 5개 카테고리 + 색상 스와치, 편집(prompt)/삭제, 카테고리 추가 폼 (color picker)
-  - 사용자 관리: 5명 사용자 + 역할 pill (Admin/Manager/Developer/Viewer), 활성 상태, 마지막 접속, 역할 변경/삭제/초대
-  - setNav() 페이지 전환 (#page-voc hidden ↔ .admin-page.active), 공통 admin CSS 추가
-
-## 참고
-- 로컬 서버: python3 -m http.server 8899 (vocpage/ 에서 실행)
-- 프로토타입: http://localhost:8899/prototype.html
+- requirements.md 분류 체계 재설계 (2026-04-21): 카테고리 → 시스템/메뉴/유형 3단계.
