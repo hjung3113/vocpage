@@ -257,6 +257,7 @@ Dark backgrounds suppress shadows — light/dark are separately optimized:
 - **Max content width**: ~1200px (whole app layout)
 - **Table row height**: 40px (body), 34px (header)
 - **Page header height**: 50px — identical across VOC, Admin, Notices, FAQ
+- **Sidebar logo area height**: 50px — must match page header exactly so the top edge of sidebar and main area are flush
 
 ### Content Width Policy
 
