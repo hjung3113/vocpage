@@ -69,7 +69,8 @@ html, body {
 }
 .sidebar-logo {
   display: flex; align-items: center; gap: var(--sp-2);
-  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  padding: 0 var(--sp-4);
+  height: 50px;
   border-bottom: 1px solid var(--border-subtle);
 }
 .logo-mark {
@@ -1211,12 +1212,12 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   </div>
   <div class="notif-item unread" onclick="markRead(this)">
     <div class="notif-icon"><i data-lucide="message-circle"></i></div>
-    <div class="notif-content"><p><strong>박개발</strong>님이 <strong>인증-2025-0001</strong>에 댓글을 달았습니다.</p><div class="notif-time">방금 전</div></div>
+    <div class="notif-content"><p><strong>박개발</strong>님이 <strong>분석-2025-0001</strong>에 댓글을 달았습니다.</p><div class="notif-time">방금 전</div></div>
     <div class="notif-dot-unread"></div>
   </div>
   <div class="notif-item unread" onclick="markRead(this)">
     <div class="notif-icon"><i data-lucide="refresh-cw"></i></div>
-    <div class="notif-content"><p><strong>인증-2025-0001</strong> 상태가 <strong>처리중</strong>으로 변경됐습니다.</p><div class="notif-time">어제 14:23</div></div>
+    <div class="notif-content"><p><strong>분석-2025-0001</strong> 상태가 <strong>처리중</strong>으로 변경됐습니다.</p><div class="notif-time">어제 14:23</div></div>
     <div class="notif-dot-unread"></div>
   </div>
   <div class="notif-item" onclick="markRead(this)">
@@ -1225,30 +1226,26 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   </div>
   <div class="notif-item" onclick="markRead(this)">
     <div class="notif-icon"><i data-lucide="message-circle"></i></div>
-    <div class="notif-content"><p><strong>이분석</strong>님이 <strong>인증-2025-0002</strong>에 댓글을 달았습니다.</p><div class="notif-time">2025.06.11</div></div>
+    <div class="notif-content"><p><strong>이분석</strong>님이 <strong>파이프라인-2025-0002</strong>에 댓글을 달았습니다.</p><div class="notif-time">2025.06.11</div></div>
   </div>
 </div>
 
 <script>
 // ── Taxonomy
 const SYSTEMS = [
-  {id:'sys1',name:'인증 시스템',slug:'인증',icon:'shield-check'},
   {id:'sys2',name:'데이터 분석',slug:'분석',icon:'bar-chart-2'},
   {id:'sys3',name:'데이터 파이프라인',slug:'파이프라인',icon:'workflow'},
   {id:'sys4',name:'대시보드',slug:'대시보드',icon:'layout-dashboard'},
 ];
 const MENUS = [
-  {id:'m1',systemId:'sys1',name:'로그인/SSO'},
-  {id:'m2',systemId:'sys1',name:'비밀번호 관리'},
-  {id:'m3',systemId:'sys1',name:'기타'},
   {id:'m4',systemId:'sys2',name:'차트/그래프'},
   {id:'m5',systemId:'sys2',name:'리포트'},
-  {id:'m6',systemId:'sys2',name:'기타'},
+  {id:'m6',systemId:'sys2',name:'필터/집계'},
   {id:'m7',systemId:'sys3',name:'ETL 배치'},
-  {id:'m8',systemId:'sys3',name:'기타'},
+  {id:'m8',systemId:'sys3',name:'데이터 수집'},
   {id:'m9',systemId:'sys4',name:'위젯'},
   {id:'m10',systemId:'sys4',name:'KPI'},
-  {id:'m11',systemId:'sys4',name:'기타'},
+  {id:'m11',systemId:'sys4',name:'알림 설정'},
 ];
 const VOC_TYPES = [
   {id:'t1',name:'버그',slug:'bug',color:'#e5534b'},
@@ -1263,14 +1260,14 @@ const TYPE_MAP = Object.fromEntries(VOC_TYPES.map(t => [t.slug, t]));
 
 // ── Data
 const VOCDATA = [
-  {id:'voc1',code:'인증-2025-0001',title:'로그인 후 세션이 자꾸 만료됩니다 — 30분마다 재로그인 요구됨',
+  {id:'voc1',code:'분석-2025-0001',title:'차트 필터 다중 적용 시 무한 로딩 발생 — 두 개 이상 선택 후 조회 불가',
    status:'처리중',priority:'urgent',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-   systemId:'sys1',menuId:'m1',type:'bug',tags:['인증','세션','AD'],
+   systemId:'sys2',menuId:'m4',type:'bug',tags:['차트','데이터','오류'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.06.12',
-   body:`<p>분석 시스템 로그인 후 약 <strong>30분</strong>이 지나면 자동으로 세션이 만료되어 재로그인을 요구합니다. 업무 중 집중해서 작업하다 보면 갑자기 페이지가 로그인 화면으로 전환됩니다.</p>
-<p>동일 현상이 <strong>크롬, 엣지, 파이어폭스</strong> 모두에서 발생하며, 탭을 활성 상태로 유지해도 만료됩니다.</p>
-<p>재현 방법: 로그인 → 30분 대기 → 페이지 새로고침 → 로그인 화면으로 리다이렉트.</p>`,
+   body:`<p>차트/그래프 화면에서 필터를 <strong>두 개 이상 동시에 선택</strong>하면 조회 버튼 클릭 후 스피너만 계속 돌고 결과가 나타나지 않습니다.</p>
+<p>단일 필터 적용 시에는 정상 동작합니다. 크롬·엣지 모두 동일하게 발생하며 콘솔에 <code>Query timeout after 30s</code> 오류가 기록됩니다.</p>
+<p>재현 방법: 차트 화면 → 기간 필터 + 부서 필터 동시 선택 → 조회 → 무한 로딩.</p>`,
    subs:['sub1','sub2']},
 
   {id:'voc2',code:'분석-2025-0047',title:'대시보드 월별 매출 차트에서 특정 월 데이터가 0으로 표시됨',
@@ -1300,13 +1297,13 @@ const VOCDATA = [
 <p>모든 KPI 항목에서 동일하게 발생하며, 전일 대비 증감률은 정상입니다. 전월 비교 계산식에서 분자/분모가 뒤바뀐 것으로 추정됩니다.</p>`,
    subs:[]},
 
-  {id:'voc5',code:'인증-2025-0002',title:'비밀번호 초기화 이메일이 수신되지 않음',
+  {id:'voc5',code:'파이프라인-2025-0002',title:'실시간 데이터 수집 파이프라인에서 중복 레코드 삽입 발생',
    status:'보류',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
-   systemId:'sys1',menuId:'m2',type:'bug',tags:['인증','이메일'],
+   systemId:'sys3',menuId:'m8',type:'bug',tags:['ETL','데이터','오류'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.06.07',
-   body:`<p>비밀번호 초기화 버튼 클릭 후 '이메일을 발송했습니다' 메시지가 나타나지만 실제 이메일이 수신되지 않습니다.</p>
-<p>스팸함에도 없으며, 다른 시스템 메일(공지사항 등)은 정상 수신됩니다. 사내 SMTP 서버 설정 또는 메일 필터링 정책 문제로 추정됩니다.</p>`,
+   body:`<p>실시간 수집 파이프라인에서 이벤트 1건이 <strong>2~3회 중복 삽입</strong>되는 현상이 확인됐습니다. 중복 건수는 일별 약 200~300건이며 고유 키 제약 위반 에러도 함께 발생합니다.</p>
+<p>네트워크 재시도 로직이 ACK 타임아웃을 중복 실패로 오인하여 재전송하는 것이 원인으로 추정됩니다.</p>`,
    subs:[]},
 
   {id:'voc6',code:'분석-2025-0031',title:'사용자별 접속 통계에서 중복 카운트 발생',
@@ -1336,13 +1333,13 @@ const VOCDATA = [
 <p>에러: <code>java.lang.OutOfMemoryError: GC overhead limit exceeded</code></p>`,
    subs:[]},
 
-  {id:'voc9',code:'인증-2025-0003',title:'SSO 로그인 후 세션이 타 브라우저에서 공유되는 문제',
+  {id:'voc9',code:'대시보드-2025-0023',title:'접속 현황 위젯 클릭 시 드릴다운 상세 화면이 열리지 않음',
    status:'완료',priority:'medium',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-   systemId:'sys1',menuId:'m1',type:'bug',tags:['인증','세션'],
+   systemId:'sys4',menuId:'m9',type:'bug',tags:['대시보드','위젯'],
    author:'홍길동',authorInit:'홍',authorCls:'',
    date:'2025.06.02',
-   body:`<p>SSO 로그인 후 동일 계정으로 <strong>다른 브라우저에서도 이미 로그인된 상태</strong>로 표시됩니다. 보안 정책상 동시 세션은 1개만 허용해야 합니다.</p>
-<p>Chrome에서 로그인 후 Firefox에서 접속해도 별도 인증 없이 접근 가능합니다. 세션 토큰이 공유 스토리지에 저장되는 것이 원인으로 파악됩니다.</p>`,
+   body:`<p>사용자 접속 현황 위젯의 막대 그래프 항목을 클릭하면 드릴다운 상세 화면이 열려야 하지만 아무 반응이 없습니다.</p>
+<p>다른 위젯(매출 현황, KPI 요약)은 정상 동작합니다. 클릭 이벤트 핸들러가 마운트 타이밍 오류로 바인딩되지 않은 것으로 추정됩니다.</p>`,
    subs:[]},
 
   {id:'voc10',code:'분석-2025-0052',title:'분기별 목표 달성률 리포트 다운로드 시 빈 파일 생성',
@@ -1374,16 +1371,16 @@ const VOCDATA = [
 ];
 
 const SUBDATA = {
-  sub1:{id:'sub1',parentId:'voc1',code:'인증-2025-0001-1',title:'세션 만료 시간 설정값 확인 및 조정',
+  sub1:{id:'sub1',parentId:'voc1',code:'분석-2025-0001-1',title:'다중 필터 쿼리 실행 계획 분석 및 인덱스 검토',
        status:'완료',priority:'medium',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-       systemId:'sys1',menuId:'m1',type:'bug',
+       systemId:'sys2',menuId:'m4',type:'bug',
        author:'김관리',authorInit:'김',authorCls:'',tags:[],date:'2025.06.13',
-       body:`<p>AD 토큰 만료 설정값이 30분으로 고정되어 있었으며 슬라이딩 세션 갱신 로직이 비활성화된 상태였습니다. 설정값을 8시간으로 조정하고 슬라이딩 세션을 활성화했습니다.</p>`},
-  sub2:{id:'sub2',parentId:'voc1',code:'인증-2025-0001-2',title:'AD 토큰 갱신 로직 패치',
+       body:`<p>다중 필터 조건 적용 시 풀 테이블 스캔이 발생하고 있었으며, 복합 인덱스가 누락된 상태였습니다. 기간·부서 컬럼에 복합 인덱스를 추가하고 쿼리 타임아웃을 60초로 상향 조정했습니다.</p>`},
+  sub2:{id:'sub2',parentId:'voc1',code:'분석-2025-0001-2',title:'차트 렌더링 레이어 비동기 요청 처리 개선',
        status:'처리중',priority:'high',assignee:'박개발',assigneeInit:'박',assigneeCls:'g',
-       systemId:'sys1',menuId:'m1',type:'bug',
+       systemId:'sys2',menuId:'m4',type:'bug',
        author:'김관리',authorInit:'김',authorCls:'',tags:[],date:'2025.06.13',
-       body:`<p>토큰 갱신 미들웨어에서 만료 30분 전 자동 갱신 요청을 발행하도록 패치합니다. 현재 코드 리뷰 중이며 QA 후 배포 예정입니다.</p>`},
+       body:`<p>차트 렌더링 레이어에서 다중 필터 조건을 순차 요청하던 방식을 병렬 Promise.all 방식으로 변경합니다. 현재 코드 리뷰 중이며 QA 후 배포 예정입니다.</p>`},
 };
 
 // ── 공지사항 데이터
@@ -2202,7 +2199,7 @@ function onTitleInput(el) { document.getElementById('titleCount').textContent = 
 function onBodyInput() { refreshTags(); }
 
 const RULES = [
-  {kw:['로그인','세션','ad','인증','토큰','비밀번호','sso'],tag:'인증'},
+  {kw:['집계','수집','스트리밍','파이프라인','인덱스','중복'],tag:'데이터수집'},
   {kw:['차트','그래프','통계','분석','시각화'],tag:'데이터분석'},
   {kw:['etl','배치','파이프라인','스케줄'],tag:'ETL'},
   {kw:['타임아웃','만료','에러','오류','실패','500'],tag:'오류'},
@@ -2263,7 +2260,7 @@ document.addEventListener('keydown', e => {
 
 // ── Admin Data
 let ADMIN_RULES = [
-  {id:1,  kw:['로그인','sso','oauth','인증','권한','세션'], tag:'인증',     type:'keyword', active:true},
+  {id:1,  kw:['집계','수집','스트리밍','파이프라인','중복','인덱스'], tag:'데이터수집', type:'keyword', active:true},
   {id:2,  kw:['api','엔드포인트','rest','graphql'],          tag:'API',      type:'keyword', active:true},
   {id:3,  kw:['성능','속도','느림','최적화','응답시간'],       tag:'성능',     type:'keyword', active:true},
   {id:4,  kw:['ui','ux','화면','레이아웃','디자인'],           tag:'UI/UX',   type:'keyword', active:true},
@@ -2276,7 +2273,7 @@ let ADMIN_RULES = [
   {id:11, kw:['\\b(bug|fix|issue)\\b'],                       tag:'버그',     type:'regex',   active:false},
 ];
 let ADMIN_CATS = [
-  {id:1, name:'인증',           color:'#5e6ad2', desc:'SSO·OAuth·권한 관련 VOC',   count:5},
+  {id:1, name:'데이터수집',      color:'#5e6ad2', desc:'수집·집계·스트리밍 관련 VOC', count:3},
   {id:2, name:'데이터 분석',    color:'#00b58a', desc:'분석 도구·대시보드 KPI',    count:3},
   {id:3, name:'데이터 파이프라인', color:'#e8a838', desc:'ETL·배치·스케줄러',     count:2},
   {id:4, name:'대시보드',       color:'#e85d3e', desc:'위젯·레이아웃·보고서',      count:2},
@@ -2397,7 +2394,14 @@ function renderAdminNotices() {
           </select>
           <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary);white-space:nowrap"><input type="checkbox" id="newNoticePopup"> 팝업</label>
         </div>
-        <textarea id="newNoticeContent" placeholder="내용 (HTML 가능)" rows="3" style="width:100%;margin-top:8px;padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+        <div style="margin-top:8px;border:1px solid var(--brand-border);border-radius:6px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--brand-bg);border-bottom:1px solid var(--brand-border)">
+            <i data-lucide="pen-line" style="width:12px;height:12px;color:var(--accent)"></i>
+            <span style="font-size:11px;font-weight:600;color:var(--accent)">Toast UI Editor</span>
+            <span style="font-size:10.5px;color:var(--text-tertiary)">— 실제 구현 시 에디터가 마운트됩니다</span>
+          </div>
+          <textarea id="newNoticeContent" placeholder="내용을 입력하세요 (Markdown 지원, 이미지 드래그&드롭 가능)" rows="4" style="width:100%;padding:8px 10px;background:var(--bg-app);border:none;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box;outline:none"></textarea>
+        </div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <input id="newNoticeFrom" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
           <span style="line-height:34px;color:var(--text-tertiary)">~</span>
@@ -2465,7 +2469,14 @@ function renderAdminFaq() {
             ${cats.map(c=>`<option>${c}</option>`).join('')}
           </select>
         </div>
-        <textarea id="newFaqA" placeholder="답변 (A)" rows="3" style="width:100%;margin-top:8px;padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+        <div style="margin-top:8px;border:1px solid var(--brand-border);border-radius:6px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--brand-bg);border-bottom:1px solid var(--brand-border)">
+            <i data-lucide="pen-line" style="width:12px;height:12px;color:var(--accent)"></i>
+            <span style="font-size:11px;font-weight:600;color:var(--accent)">Toast UI Editor</span>
+            <span style="font-size:10.5px;color:var(--text-tertiary)">— 실제 구현 시 에디터가 마운트됩니다</span>
+          </div>
+          <textarea id="newFaqA" placeholder="답변을 입력하세요 (Markdown 지원, 이미지 드래그&드롭 가능)" rows="4" style="width:100%;padding:8px 10px;background:var(--bg-app);border:none;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box;outline:none"></textarea>
+        </div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button onclick="addAdminFaq()" style="padding:6px 14px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer">저장</button>
           <button onclick="toggleAdminFaqForm()" style="padding:6px 14px;background:none;border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-tertiary);font-size:12px;cursor:pointer">취소</button>

@@ -93,6 +93,17 @@ Every design decision → written to spec or ADR before session ends.
 Every phase completion → update `claude-progress.txt` + git commit.
 No implementation without a written spec section covering it.
 
+## Document Roles
+
+| File | Language | Scope |
+|------|----------|-------|
+| `design.md` | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
+| `requirements.md` | 한국어 | Functional requirements — feature specs, behavioral rules, data model, API design, business logic |
+
+- **Never put functional/behavioral spec in `design.md`**
+- **Never put visual design rules in `requirements.md`**
+- `design.md` 수정 시 반드시 영어로 작성
+
 ## Document Coherence
 
 | Changed | Must also check |
