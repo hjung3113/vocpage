@@ -186,7 +186,6 @@ html, body {
 }
 .icon-btn:hover { background: var(--bg-elevated); color: var(--text-secondary); border-color: var(--border-standard); }
 .icon-btn svg { width: 15px; height: 15px; }
-.icon-btn.sort-active { border-color: var(--brand-border); color: var(--accent); background: var(--brand-bg); }
 .notif-dot {
   position: absolute; top: 7px; right: 7px;
   width: 6px; height: 6px; border-radius: 50%;
@@ -215,32 +214,6 @@ html, body {
 .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); }
 .btn-ghost svg { width: 13px; height: 13px; }
 .btn-ghost.filter-on { border-color: var(--brand-border); color: var(--accent); background: var(--brand-bg); }
-
-/* ─── Sort Dropdown ─── */
-.sort-anchor { position: relative; }
-.sort-dropdown {
-  position: absolute; top: calc(100% + 6px); right: 0;
-  width: 186px; background: var(--bg-surface);
-  border: 1px solid var(--border-standard); border-radius: 10px;
-  box-shadow: var(--shadow-dialog); z-index: 90; overflow: hidden;
-  opacity: 0; pointer-events: none;
-  transform: translateY(-6px);
-  transition: opacity 0.14s, transform 0.14s;
-}
-.sort-dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-.sort-dropdown-header {
-  font-size: 10.5px; font-weight: 600; color: var(--text-quaternary);
-  text-transform: uppercase; letter-spacing: 0.07em;
-  padding: 8px 12px 5px;
-}
-.sort-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px; font-size: 13px; color: var(--text-secondary);
-  cursor: pointer; transition: background 0.1s;
-}
-.sort-item:hover { background: var(--bg-elevated); }
-.sort-item.active { color: var(--accent); font-weight: 600; }
-.sort-check { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
 
 /* ─── Filter Bar ─── */
 .filterbar {
@@ -322,8 +295,10 @@ html, body {
   display: flex; align-items: center; gap: 3px;
   cursor: pointer; user-select: none; transition: color 0.12s; padding-right: 6px;
 }
-.hcell:hover { color: var(--text-tertiary); }
-.hcell svg { width: 10px; height: 10px; }
+.hcell:hover { color: var(--text-primary); }
+.hcell.sort-active { color: var(--accent); }
+.hcell .sort-icon { width: 12px; height: 12px; opacity: 0.4; vertical-align: middle; }
+.hcell.sort-active .sort-icon { opacity: 1; }
 
 /* ─── VOC Row ─── */
 .voc-group { border-bottom: 1px solid var(--border-subtle); }
@@ -399,6 +374,7 @@ html, body {
   z-index: 50; overflow: hidden; box-shadow: var(--shadow-dialog);
 }
 .drawer.open { transform: translateX(0); }
+.drawer.fullscreen { width: 100% !important; border-radius: 0; }
 .drawer-header {
   display: flex; align-items: flex-start; gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-4) var(--sp-3);
@@ -666,14 +642,19 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--border-solid); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-quaternary); }
 mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px; padding: 0 1px; }
-.load-more-row {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 16px 20px; border-top: 1px solid var(--border-subtle);
-  cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--accent);
-  transition: background .1s;
+/* ─── Pagination ─── */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 12px 16px; }
+.page-btn {
+  min-width: 32px; height: 28px; padding: 0 8px;
+  border: 1px solid var(--border-subtle); border-radius: 6px;
+  background: transparent; color: var(--text-secondary);
+  font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
 }
-.load-more-row:hover { background: var(--bg-elevated); }
-.page-info { font-size: 12px; font-weight: 400; color: var(--text-quaternary); }
+.page-btn:hover:not(:disabled) { background: var(--bg-elevated); color: var(--text-primary); }
+.page-btn.active { background: var(--brand-bg); color: var(--accent); border-color: var(--brand-border); font-weight: 600; }
+.page-btn:disabled { opacity: 0.3; cursor: default; }
+.page-ellipsis { color: var(--text-tertiary); font-size: 12px; padding: 0 4px; }
 .empty-state { padding: 48px 20px; text-align: center; font-size: 13px; color: var(--text-quaternary); }
 [data-tip] { position: relative; }
 [data-tip]:hover::after {
@@ -870,25 +851,6 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
       <i data-lucide="search"></i>
       <input type="text" id="searchInput" placeholder="제목, 본문 검색..." oninput="onSearch(this.value)" />
     </div>
-    <!-- Sort button with dropdown -->
-    <div class="sort-anchor">
-      <div class="icon-btn" id="sortBtn" data-tip="정렬 기준" onclick="toggleSortMenu()"><i data-lucide="arrow-up-down"></i></div>
-      <div class="sort-dropdown" id="sortDropdown">
-        <div class="sort-dropdown-header">정렬 기준</div>
-        <div class="sort-item active" data-key="date-desc" onclick="setSortKey(this)">
-          <span>등록일 최신순</span><i data-lucide="check" class="sort-check"></i>
-        </div>
-        <div class="sort-item" data-key="date-asc" onclick="setSortKey(this)">
-          <span>등록일 오래된순</span>
-        </div>
-        <div class="sort-item" data-key="priority" onclick="setSortKey(this)">
-          <span>우선순위 높은순</span>
-        </div>
-        <div class="sort-item" data-key="assignee" onclick="setSortKey(this)">
-          <span>담당자 가나다순</span>
-        </div>
-      </div>
-    </div>
     <div class="icon-btn" id="notifBtn" data-tip="알림" onclick="toggleNotif()">
       <i data-lucide="bell"></i><span class="notif-dot"></span>
     </div>
@@ -949,15 +911,15 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   <div class="list-area">
     <div class="list-header">
       <div></div>
-      <div class="hcell">이슈 ID <i data-lucide="chevrons-up-down"></i></div>
-      <div class="hcell">제목</div>
-      <div class="hcell">상태</div>
-      <div class="hcell">담당자</div>
-      <div class="hcell">우선순위</div>
-      <div class="hcell">등록일</div>
+      <div class="hcell" data-sort-key="id" onclick="toggleSort('id')">이슈 ID <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+      <div class="hcell" data-sort-key="title" onclick="toggleSort('title')">제목 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+      <div class="hcell" data-sort-key="status" onclick="toggleSort('status')">상태 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+      <div class="hcell" data-sort-key="assignee" onclick="toggleSort('assignee')">담당자 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+      <div class="hcell" data-sort-key="priority" onclick="toggleSort('priority')">우선순위 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+      <div class="hcell sort-active" data-sort-key="date" onclick="toggleSort('date')">등록일 <i data-lucide="chevron-down" class="sort-icon"></i></div>
     </div>
     <div id="listArea"></div>
-    <div id="loadMoreRow"></div>
+    <div id="paginationRow"></div>
   </div>
 </div><!-- /page-voc -->
 
@@ -1114,7 +1076,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
       <div class="d-title" id="dTitle"></div>
     </div>
     <div class="drawer-actions">
-      <div class="icon-btn" data-tip="Sub-task 추가"><i data-lucide="git-branch-plus"></i></div>
+      <div class="icon-btn" id="expandBtn" data-tip="큰 화면으로 보기" onclick="toggleFullscreen()"><i data-lucide="maximize-2"></i></div>
       <div class="icon-btn" data-tip="링크 복사"><i data-lucide="link-2"></i></div>
       <div class="icon-btn" data-tip="삭제 (Admin)"><i data-lucide="trash-2"></i></div>
       <div class="icon-btn" onclick="closeDrawer()" data-tip="닫기"><i data-lucide="x"></i></div>
@@ -1406,8 +1368,8 @@ const CURRENT_USER = '홍길동';
 let currentView    = 'all'; // 'all' | 'mine' | 'assigned'
 let currentStatus = '전체';
 let searchQuery   = '';
-let showAll       = false;
-let sortKey       = 'date-desc';
+let sortKey  = 'date';
+let sortDir  = 'desc';
 let filterAssignees  = new Set();
 let filterPriorities = new Set();
 let filterTypes      = new Set();
@@ -1416,7 +1378,20 @@ let advFilterOpen    = false;
 let activeSysId  = null;
 let activeMenuId = null;
 let openSysId    = null;
-const PAGE_SIZE = 5;
+let currentPage = 1;
+
+function calcPageSize() {
+  const fixed = 56 + 44 + 36 + 52 + 20; // topbar+filterbar+list-header+pagination+padding
+  const available = window.innerHeight - fixed;
+  return Math.max(10, Math.floor(available / 48));
+}
+let PAGE_SIZE = calcPageSize();
+
+window.addEventListener('resize', () => {
+  PAGE_SIZE = calcPageSize();
+  currentPage = 1;
+  renderVOCList();
+});
 
 // ── Helpers
 const PRI_ICON  = {urgent:'flame',high:'chevron-up',medium:'minus',low:'chevron-down'};
@@ -1465,28 +1440,67 @@ function getVisible() {
     return true;
   });
   return list.sort((a, b) => {
-    if (sortKey === 'date-asc')  return a.date.localeCompare(b.date);
-    if (sortKey === 'priority')  return PRI_ORDER[a.priority] - PRI_ORDER[b.priority];
-    if (sortKey === 'assignee')  return (a.assignee || 'ㅎ').localeCompare(b.assignee || 'ㅎ', 'ko');
-    return b.date.localeCompare(a.date); // date-desc default
+    let cmp = 0;
+    if (sortKey === 'date')     cmp = a.date.localeCompare(b.date);
+    else if (sortKey === 'id')       cmp = a.id.localeCompare(b.id);
+    else if (sortKey === 'title')    cmp = a.title.localeCompare(b.title, 'ko');
+    else if (sortKey === 'status')   cmp = a.status.localeCompare(b.status, 'ko');
+    else if (sortKey === 'priority') cmp = PRI_ORDER[a.priority] - PRI_ORDER[b.priority];
+    else if (sortKey === 'assignee') cmp = (a.assignee||'ㅎ').localeCompare(b.assignee||'ㅎ','ko');
+    return sortDir === 'asc' ? cmp : -cmp;
   });
 }
 
-function renderList() {
-  const all   = getVisible();
-  const shown = showAll ? all : all.slice(0, PAGE_SIZE);
-  document.getElementById('listArea').innerHTML = shown.map(renderRow).join('');
-  const remaining = all.length - shown.length;
-  const lmr = document.getElementById('loadMoreRow');
-  if (remaining > 0) {
-    lmr.innerHTML = `<div class="load-more-row" onclick="loadMore()">${remaining}개 항목 더 보기<div class="page-info">${shown.length} / ${all.length}개 표시 중</div></div>`;
-  } else if (all.length === 0) {
-    lmr.innerHTML = `<div class="empty-state">검색 결과가 없습니다</div>`;
+function renderVOCList() {
+  const all = getVisible();
+  const totalPages = Math.ceil(all.length / PAGE_SIZE);
+  if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const shown = all.slice(start, start + PAGE_SIZE);
+
+  if (all.length === 0) {
+    document.getElementById('listArea').innerHTML = '';
+    document.getElementById('paginationRow').innerHTML = `<div class="empty-state">검색 결과가 없습니다</div>`;
   } else {
-    lmr.innerHTML = `<div style="padding:14px 20px;text-align:center;font-size:12px;color:var(--text-quaternary);border-top:1px solid var(--border-subtle)">전체 ${all.length}개 표시 중</div>`;
+    document.getElementById('listArea').innerHTML = shown.map(renderRow).join('');
+    const pr = document.getElementById('paginationRow');
+    if (totalPages <= 1) {
+      pr.innerHTML = '';
+    } else {
+      pr.innerHTML = `<div class="pagination">${renderPageBtns(currentPage, totalPages)}</div>`;
+    }
   }
   document.getElementById('topbarCount').textContent = `${all.length}개`;
   lucide.createIcons();
+}
+
+function renderList() { renderVOCList(); }
+
+function renderPageBtns(cur, total) {
+  const pages = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (cur > 3) pages.push('...');
+    for (let i = Math.max(2, cur-1); i <= Math.min(total-1, cur+1); i++) pages.push(i);
+    if (cur < total - 2) pages.push('...');
+    pages.push(total);
+  }
+  const prev = `<button class="page-btn" ${cur===1?'disabled':''} onclick="goPage(${cur-1})">‹</button>`;
+  const next = `<button class="page-btn" ${cur===total?'disabled':''} onclick="goPage(${cur+1})">›</button>`;
+  const btns = pages.map(p =>
+    p === '...'
+      ? `<span class="page-ellipsis">…</span>`
+      : `<button class="page-btn ${p===cur?'active':''}" onclick="goPage(${p})">${p}</button>`
+  ).join('');
+  return prev + btns + next;
+}
+
+function goPage(n) {
+  currentPage = n;
+  renderVOCList();
+  document.querySelector('.list-area')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderRow(v) {
@@ -1527,10 +1541,8 @@ function renderRow(v) {
   </div>`;
 }
 
-function loadMore() { showAll = true; renderList(); }
-
 // ── Search
-function onSearch(val) { searchQuery = val.trim(); showAll = false; renderList(); }
+function onSearch(val) { searchQuery = val.trim(); currentPage = 1; renderVOCList(); }
 
 // ── Sidebar system/menu filter
 function renderSidebar() {
@@ -1580,7 +1592,8 @@ function setSysFilter(sysId) {
     openSysId    = sysId;
   }
   renderSidebar();
-  renderList();
+  currentPage = 1;
+  renderVOCList();
 }
 
 function setMenuFilter(menuId) {
@@ -1591,7 +1604,8 @@ function setMenuFilter(menuId) {
   activeMenuId = menuId;
   openSysId    = menu.systemId;
   renderSidebar();
-  renderList();
+  currentPage = 1;
+  renderVOCList();
 }
 
 // ── Nav
@@ -1622,7 +1636,7 @@ function setNav(el) {
     currentView = view || 'all';
     const titleMap = {all:'전체 VOC', mine:'내 VOC', assigned:'담당 VOC'};
     document.getElementById('topbarTitle').textContent = titleMap[currentView];
-    renderSidebar(); renderList();
+    currentPage = 1; renderSidebar(); renderVOCList();
   } else {
     vocPage.classList.add('hidden');
     adminPages.forEach(p => p.classList.remove('active'));
@@ -1653,26 +1667,32 @@ function togglePill(el, status) {
   document.querySelectorAll('.filterbar .pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   currentStatus = status;
-  showAll = false;
-  renderList();
+  currentPage = 1;
+  renderVOCList();
 }
 
 // ── Sort
-function toggleSortMenu() {
-  const dd = document.getElementById('sortDropdown');
-  dd.classList.toggle('open');
-}
-function setSortKey(el) {
-  sortKey = el.dataset.key;
-  document.querySelectorAll('.sort-item').forEach(i => {
-    i.classList.toggle('active', i.dataset.key === sortKey);
-    const chk = i.querySelector('.sort-check');
-    if (chk) chk.style.display = i.dataset.key === sortKey ? '' : 'none';
+function toggleSort(key) {
+  if (sortKey === key) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey = key;
+    sortDir = 'asc';
+  }
+  document.querySelectorAll('.hcell').forEach(h => {
+    const isActive = h.dataset.sortKey === key;
+    h.classList.toggle('sort-active', isActive);
+    const icon = h.querySelector('.sort-icon');
+    if (!icon) return;
+    if (isActive) {
+      icon.setAttribute('data-lucide', sortDir === 'asc' ? 'chevron-up' : 'chevron-down');
+    } else {
+      icon.setAttribute('data-lucide', 'chevrons-up-down');
+    }
   });
-  document.getElementById('sortBtn').classList.toggle('sort-active', sortKey !== 'date-desc');
-  document.getElementById('sortDropdown').classList.remove('open');
-  showAll = false;
-  renderList();
+  lucide.createIcons();
+  currentPage = 1;
+  renderVOCList();
 }
 
 // ── Advanced Filter
@@ -1703,7 +1723,8 @@ function toggleTagChip(tag, el) {
   filterTags.has(tag) ? filterTags.delete(tag) : filterTags.add(tag);
   el.classList.toggle('active');
   updateFilterBtnState();
-  renderList();
+  currentPage = 1;
+  renderVOCList();
 }
 function toggleAfChip(type, val, el) {
   const sets = {assignee: filterAssignees, priority: filterPriorities, type: filterTypes};
@@ -1712,8 +1733,8 @@ function toggleAfChip(type, val, el) {
   else            { s.add(val);    el.classList.add('active'); }
   if (type === 'type') renderTypeChips();
   updateFilterBtnState();
-  showAll = false;
-  renderList();
+  currentPage = 1;
+  renderVOCList();
 }
 function clearAdvFilter() {
   filterAssignees.clear(); filterPriorities.clear(); filterTypes.clear(); filterTags.clear();
@@ -1721,7 +1742,8 @@ function clearAdvFilter() {
   renderTypeChips();
   renderTagChips();
   updateFilterBtnState();
-  renderList();
+  currentPage = 1;
+  renderVOCList();
 }
 function hasAdvFilters() {
   return filterAssignees.size + filterPriorities.size + filterTypes.size + filterTags.size > 0;
@@ -2161,6 +2183,18 @@ function closeDrawer() {
   document.querySelectorAll('.voc-row').forEach(r => r.classList.remove('selected'));
 }
 
+function toggleFullscreen() {
+  const drawer = document.getElementById('drawer');
+  const btn = document.getElementById('expandBtn');
+  const isFs = drawer.classList.toggle('fullscreen');
+  btn.dataset.tip = isFs ? '이전 크기로' : '큰 화면으로 보기';
+  btn.querySelector('svg')?.remove();
+  btn.innerHTML = isFs
+    ? '<i data-lucide="minimize-2"></i>'
+    : '<i data-lucide="maximize-2"></i>';
+  lucide.createIcons();
+}
+
 // ── Modal
 function initModalSelects() {
   const sysEl  = document.getElementById('modalSysSelect');
@@ -2242,11 +2276,6 @@ document.addEventListener('click', e => {
   const notBtn = document.getElementById('notifBtn');
   if (panel?.classList.contains('open') && !panel.contains(e.target) && !notBtn.contains(e.target))
     panel.classList.remove('open');
-
-  const dd     = document.getElementById('sortDropdown');
-  const sortBt = document.getElementById('sortBtn');
-  if (dd?.classList.contains('open') && !dd.contains(e.target) && !sortBt.contains(e.target))
-    dd.classList.remove('open');
 });
 
 document.addEventListener('keydown', e => {
@@ -2254,7 +2283,6 @@ document.addEventListener('keydown', e => {
     if (document.getElementById('modalBg').classList.contains('open'))  return closeModal();
     if (document.getElementById('drawer').classList.contains('open'))   return closeDrawer();
     document.getElementById('notifPanel').classList.remove('open');
-    document.getElementById('sortDropdown').classList.remove('open');
   }
   if ((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); openModal(); }
 });
@@ -2713,12 +2741,9 @@ function deleteUser(id) {
   if (row) { row.style.opacity='0'; setTimeout(()=>{ ADMIN_USERS=ADMIN_USERS.filter(x=>x.id!==id); renderUsers(); }, 200); }
 }
 
-// ── Init: hide sort-checks on non-active items
-document.querySelectorAll('.sort-item:not(.active) .sort-check').forEach(c => c.style.display = 'none');
-
 lucide.createIcons();
 renderSidebar();
-renderList();
+renderVOCList();
 
 // ── 공지 팝업 초기화
 (function initNoticePopup() {
