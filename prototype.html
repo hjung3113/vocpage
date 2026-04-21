@@ -70,7 +70,7 @@ html, body {
 .sidebar-logo {
   display: flex; align-items: center; gap: var(--sp-2);
   padding: 0 var(--sp-4);
-  height: 50px;
+  height: 56px;
   border-bottom: 1px solid var(--border-subtle);
 }
 .logo-mark {
@@ -87,15 +87,15 @@ html, body {
   border: 1px solid var(--brand-border); letter-spacing: 0.03em;
   margin-left: 2px; align-self: flex-start; margin-top: 1px;
 }
-.sidebar-section { padding: var(--sp-3) var(--sp-2) var(--sp-1); }
+.sidebar-section { padding: var(--sp-3) var(--sp-2) var(--sp-2); }
 .section-label {
   font-size: 10.5px; font-weight: 600; color: var(--text-quaternary);
-  padding: 0 var(--sp-2) var(--sp-2);
+  padding: 4px var(--sp-2) 7px;
   text-transform: uppercase; letter-spacing: 0.07em;
 }
 .nav-item {
   display: flex; align-items: center; gap: var(--sp-2);
-  padding: 6px var(--sp-2); border-radius: 7px; cursor: pointer;
+  padding: 8px var(--sp-2); border-radius: 7px; cursor: pointer;
   color: var(--text-tertiary); font-size: 13px; font-weight: 400;
   transition: background 0.12s, color 0.12s; user-select: none;
 }
@@ -153,7 +153,7 @@ html, body {
 /* ─── Topbar ─── */
 .topbar {
   display: flex; align-items: center; gap: var(--sp-2);
-  padding: 0 var(--sp-5); height: 50px;
+  padding: 0 var(--sp-5); height: 56px;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-app); flex-shrink: 0;
 }
@@ -245,16 +245,16 @@ html, body {
 /* ─── Filter Bar ─── */
 .filterbar {
   display: flex; align-items: center; gap: 6px;
-  padding: var(--sp-2) var(--sp-5);
+  padding: 9px var(--sp-5) 10px;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-app); flex-shrink: 0;
 }
 .filter-label { font-size: 12px; color: var(--text-quaternary); margin-right: 2px; }
 .pill {
   display: flex; align-items: center; gap: 4px;
-  padding: 4px 11px 4px 8px; background: var(--bg-surface);
+  padding: 5px 12px 5px 10px; background: var(--bg-surface);
   border: 1px solid var(--border-subtle); border-radius: 9999px;
-  color: var(--text-tertiary); font-size: 12px; font-weight: 500;
+  color: var(--text-tertiary); font-size: 13px; font-weight: 500;
   cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s;
   user-select: none;
 }
@@ -312,7 +312,7 @@ html, body {
 .list-header {
   display: grid;
   grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
-  padding: 0 var(--sp-5); height: 34px; align-items: center;
+  padding: 0 var(--sp-5); height: 36px; align-items: center;
   border-bottom: 1px solid var(--border-subtle);
   position: sticky; top: 0; background: var(--bg-app); z-index: 10;
 }
@@ -330,7 +330,7 @@ html, body {
 .voc-row {
   display: grid;
   grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
-  padding: 0 var(--sp-5); height: 40px; align-items: center;
+  padding: 0 var(--sp-5); height: 48px; align-items: center;
   cursor: pointer; transition: background 0.1s;
 }
 .voc-row:hover { background: var(--bg-elevated); }
@@ -354,8 +354,8 @@ html, body {
   background: var(--brand-bg); color: var(--brand); border: 1px solid var(--brand-border);
   white-space: nowrap; letter-spacing: 0.01em;
 }
-.status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .s-접수됨 .status-dot { background: var(--text-quaternary); }
 .s-검토중 .status-dot { background: var(--status-blue); }
 .s-처리중 .status-dot { background: var(--status-green); }
@@ -366,10 +366,10 @@ html, body {
 .s-처리중 { color: var(--status-green); }
 .s-완료   { color: var(--status-emerald); }
 .s-보류   { color: var(--status-amber); }
-.pri-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; }
-.pri-badge svg { width: 12px; height: 12px; }
-.p-urgent { color: var(--status-red); }
-.p-high   { color: var(--status-amber); }
+.pri-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; }
+.pri-badge svg { width: 13px; height: 13px; }
+.p-urgent { color: var(--status-red); font-weight: 600; }
+.p-high   { color: oklch(60% 0.18 45); font-weight: 600; }
 .p-medium { color: var(--text-tertiary); }
 .p-low    { color: var(--text-quaternary); }
 .assignee-cell { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-tertiary); }
@@ -667,17 +667,18 @@ html, body {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-quaternary); }
 mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px; padding: 0 1px; }
 .load-more-row {
-  padding: 16px 20px; text-align: center;
-  border-top: 1px solid var(--border-subtle);
-  cursor: pointer; font-size: 12.5px; color: var(--accent); transition: background .1s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 16px 20px; border-top: 1px solid var(--border-subtle);
+  cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--accent);
+  transition: background .1s;
 }
 .load-more-row:hover { background: var(--bg-elevated); }
-.page-info { font-size: 11.5px; color: var(--text-quaternary); margin-top: 2px; }
+.page-info { font-size: 12px; font-weight: 400; color: var(--text-quaternary); }
 .empty-state { padding: 48px 20px; text-align: center; font-size: 13px; color: var(--text-quaternary); }
 [data-tip] { position: relative; }
 [data-tip]:hover::after {
   content: attr(data-tip);
-  position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+  position: absolute; top: calc(100% + 7px); left: 50%; transform: translateX(-50%);
   background: var(--bg-elevated); border: 1px solid var(--border-standard);
   border-radius: 6px; padding: 4px 9px; font-size: 11.5px; color: var(--text-secondary);
   white-space: nowrap; pointer-events: none; z-index: 200; box-shadow: var(--shadow-sm);
@@ -692,7 +693,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 /* ─── Admin shared ─── */
 .admin-topbar {
   display: flex; align-items: center; gap: 10px;
-  padding: 0 24px; height: 50px; flex-shrink: 0;
+  padding: 0 24px; height: 56px; flex-shrink: 0;
   border-bottom: 1px solid var(--border-subtle);
 }
 .admin-title { font-size: 15px; font-weight: 700; flex: 1; }
@@ -2301,7 +2302,7 @@ function renderNotices() {
       ${visible.length === 0 ? '<p style="color:var(--text-tertiary);padding:32px 24px">등록된 공지사항이 없습니다.</p>' : ''}
       ${visible.map((n, i) => `
         <div class="notice-item" style="border-bottom:1px solid var(--border-subtle)">
-          <div onclick="toggleNotice(${n.id})" style="display:flex;align-items:center;gap:10px;padding:12px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
+          <div onclick="toggleNotice(${n.id})" style="display:flex;align-items:center;gap:10px;padding:14px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
             <span style="font-size:11px;font-weight:600;color:${levelColor[n.level]};border:1px solid ${levelColor[n.level]};border-radius:4px;padding:1px 7px;flex-shrink:0">${levelLabel[n.level]}</span>
             <span style="flex:1;font-size:14px;color:var(--text-primary)">${n.title}</span>
             <span style="font-size:12px;color:var(--text-tertiary);flex-shrink:0">${n.from} ~ ${n.to}</span>
@@ -2350,13 +2351,13 @@ function renderFaq() {
           oninput="faqQuery=this.value;renderFaq()"
           style="padding:6px 11px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;width:200px">
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${categories.map(c => `<button onclick="faqCategory='${c}';renderFaq()" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border-subtle);background:${faqCategory===c?'var(--brand-bg)':'transparent'};color:${faqCategory===c?'var(--accent)':'var(--text-secondary)'};font-size:12px;cursor:pointer">${c}</button>`).join('')}
+          ${categories.map(c => `<button onclick="faqCategory='${c}';renderFaq()" style="padding:5px 12px;border-radius:9999px;border:1px solid ${faqCategory===c?'var(--brand-border)':'var(--border-subtle)'};background:${faqCategory===c?'var(--brand-bg)':'transparent'};color:${faqCategory===c?'var(--accent)':'var(--text-secondary)'};font-size:13px;font-weight:${faqCategory===c?'600':'500'};cursor:pointer;font-family:var(--font-ui)">${c}</button>`).join('')}
         </div>
       </div>
       ${filtered.length === 0 ? '<p style="color:var(--text-tertiary);padding:16px 24px">검색 결과가 없습니다.</p>' : ''}
       ${filtered.map(f => `
         <div style="border-bottom:1px solid var(--border-subtle)">
-          <div onclick="toggleFaq(${f.id})" style="display:flex;align-items:center;gap:10px;padding:12px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
+          <div onclick="toggleFaq(${f.id})" style="display:flex;align-items:center;gap:10px;padding:14px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
             <span style="font-size:11px;font-weight:600;color:var(--text-tertiary);border:1px solid var(--border-subtle);border-radius:4px;padding:1px 7px;flex-shrink:0">${f.category}</span>
             <span style="flex:1;font-size:14px;color:var(--text-primary)">${hl(f.q)}</span>
             <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="faq-icon-${f.id}"></i>
