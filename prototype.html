@@ -1695,9 +1695,26 @@ function switchToVocPage() {
   const isAdminActive = [...document.querySelectorAll('.admin-page')].some(p => p.classList.contains('active'));
   if (isAdminActive) {
     document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.info-page').forEach(p => p.classList.remove('active'));
     vocPage.classList.remove('hidden');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item').classList.add('active');
+  }
+}
+
+function updateVocTitle() {
+  const titleEl = document.getElementById('topbarTitle');
+  if (!titleEl) return;
+  if (activeSysId && activeMenuId) {
+    const sys = SYS_MAP[activeSysId];
+    const menu = MENU_MAP[activeMenuId];
+    titleEl.textContent = `VOC / ${sys?.name || activeSysId} / ${menu?.name || activeMenuId}`;
+  } else if (activeSysId) {
+    const sys = SYS_MAP[activeSysId];
+    titleEl.textContent = `VOC / ${sys?.name || activeSysId}`;
+  } else {
+    const titleMap = {all:'전체 VOC', mine:'내 VOC', assigned:'담당 VOC'};
+    titleEl.textContent = titleMap[currentView] || '전체 VOC';
   }
 }
 
@@ -1710,6 +1727,7 @@ function setSysFilter(sysId) {
     activeMenuId = null;
     openSysId    = sysId;
   }
+  updateVocTitle();
   renderSidebar();
   currentPage = 1;
   renderVOCList();
@@ -1722,6 +1740,7 @@ function setMenuFilter(menuId) {
   activeSysId  = menu.systemId;
   activeMenuId = menuId;
   openSysId    = menu.systemId;
+  updateVocTitle();
   renderSidebar();
   currentPage = 1;
   renderVOCList();
