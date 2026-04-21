@@ -116,7 +116,7 @@ html, body {
   user-select: none;
 }
 .sys-header:hover { background: var(--bg-elevated); color: var(--text-primary); }
-.sys-header.active { color: var(--text-primary); }
+.sys-header.active { background: var(--brand-bg); color: var(--accent); font-weight: 600; }
 .sys-header-icon { width: 14px; height: 14px; flex-shrink: 0; }
 .sys-header-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sys-chevron { width: 12px; height: 12px; color: var(--text-quaternary); transition: transform .15s; flex-shrink: 0; }
@@ -918,8 +918,8 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   <div class="sidebar-section">
     <div class="section-label">보기</div>
     <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent">12</span></div>
-    <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC</div>
-    <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC</div>
+    <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC <span class="nav-badge muted" id="mineBadge"></span></div>
+    <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
@@ -1697,9 +1697,8 @@ function switchToVocPage() {
     document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.info-page').forEach(p => p.classList.remove('active'));
     vocPage.classList.remove('hidden');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelector('.nav-item').classList.add('active');
   }
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 }
 
 function updateVocTitle() {
@@ -2882,6 +2881,24 @@ function deleteUser(id) {
 lucide.createIcons();
 renderSidebar();
 renderVOCList();
+
+// ── 내 VOC / 담당 VOC 카운트 배지
+(function initNavBadges() {
+  const mineCount     = VOCDATA.filter(v => v.author   === CURRENT_USER).length;
+  const assignedCount = VOCDATA.filter(v => v.assignee === CURRENT_USER).length;
+  const mineEl     = document.getElementById('mineBadge');
+  const assignedEl = document.getElementById('assignedBadge');
+  if (mineEl)     { mineEl.textContent     = mineCount;     mineEl.style.display     = mineCount     ? '' : 'none'; }
+  if (assignedEl) { assignedEl.textContent = assignedCount; assignedEl.style.display = assignedCount ? '' : 'none'; }
+
+  const today = new Date().toISOString().slice(0,10);
+  const hasUrgent = NOTICES.some(n => n.visible && n.level === 'urgent' && n.from <= today && n.to >= today);
+  const noticeBadge = document.getElementById('noticeBadge');
+  if (noticeBadge && hasUrgent) {
+    noticeBadge.textContent = '!';
+    noticeBadge.style.cssText = 'display:inline-block;background:#e5484d;color:#fff';
+  }
+})();
 
 // ── 공지 팝업 초기화
 (function initNoticePopup() {
