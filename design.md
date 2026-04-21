@@ -190,37 +190,57 @@ Pill-style tabs on the VOC list page — not generic `<select>`, not full button
 
 ```css
 /* base */
-padding: 5px 12px;
+padding: 5px 12px 5px 10px;
 border-radius: 9999px;
 font-size: 13px; font-weight: 500;
 border: 1px solid var(--border-subtle);
 background: transparent;
-color: var(--text-secondary);
-cursor: pointer;
+color: var(--text-tertiary);
+transition: background 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s cubic-bezier(0.16,1,0.3,1);
 
 /* active */
 background: var(--brand-bg);
 border-color: var(--brand-border);
 color: var(--accent);
 font-weight: 600;
+box-shadow: 0 0 0 1px var(--brand-border); /* double-ring: intentional active signal */
 ```
 
-- Always show an active indicator (background + border color change). Text-only active state is not sufficient.
-- Filter tab row: `padding: 8px 0 10px; gap: 6px` — needs top/bottom breathing room between topbar and table header.
+- Active state uses double-ring (border + box-shadow outline) — unambiguous, not just a color tint
+- Inactive pills are `transparent` — they recede and let active state dominate
+- Press feedback: `transform: scale(0.94)` on `:active`
+- Filterbar height: `44px` — deliberately secondary to topbar's `56px`
+- Filter tab row: `height: 44px; padding: 0 var(--sp-5)` — distinct zone between topbar and list header
 
 ### Status Badge
-- Color dot (8px circle) + text combination
-- Minimum: `font-size: 13px; font-weight: 500` — never use 12px or smaller for status text
-- No background fill — color applied to text and dot only
-- Pair with text always — never dot-only (accessibility)
+Full pill style — background + border + text color, all semantic. Not dot-only.
+
+| Status | BG (dark) | Text (dark) | Border (dark) |
+|--------|-----------|-------------|----------------|
+| 접수됨 | `bg-elevated` | `text-quaternary` | `border-subtle` |
+| 검토중 | `oklch(20% 0.06 240)` | `oklch(67% 0.17 240)` | `oklch(30% 0.09 240)` |
+| 처리중 | `oklch(18% 0.06 150)` | `oklch(55% 0.17 150)` | `oklch(28% 0.09 150)` |
+| 완료 | `oklch(18% 0.06 158)` | `oklch(62% 0.19 158)` | `oklch(28% 0.10 158)` |
+| 보류 | `oklch(20% 0.06 72)` | `oklch(70% 0.16 72)` | `oklch(30% 0.09 72)` |
+
+```css
+/* shared pill shell */
+font-size: 11.5px; font-weight: 600;
+padding: 2px 8px; border-radius: 4px;
+display: inline-flex; align-items: center; gap: 5px;
+```
+
+- Always use both dot AND colored text — never dot-only (accessibility)
+- Status dot: 6px circle, same color as text
+- Status badge is metadata tier: **11.5px** (not 13px — see Typography Tiers below)
 
 ### Priority Badge
 - Icon (arrow up/down/dash) + text combination
-- Urgent: `oklch(58% 0.22 25)` (red) — icon + bold text
-- High: `oklch(60% 0.18 45)` (orange-red)
-- Medium: `var(--text-secondary)` — neutral
-- Low: `var(--text-quaternary)` — de-emphasized
-- `font-size: 13px; font-weight: 600` for Urgent/High; `500` for Medium/Low
+- Urgent: `oklch(58% 0.22 25)` (red) — icon + `font-weight: 700`
+- High: `oklch(60% 0.18 45)` (orange-red) — `font-weight: 600`
+- Medium: `var(--text-tertiary)` — `font-weight: 400`
+- Low: `var(--text-quaternary)` — `font-weight: 400`
+- `font-size: 11.5px` — metadata tier, weight carries the semantic signal
 
 ### Card & Container
 
@@ -339,9 +359,24 @@ Dark backgrounds suppress shadows — light/dark are separately optimized:
 - **Sidebar width**: 222px
 - **Drawer width**: 528px
 - **Max content width**: ~1200px (whole app layout)
-- **Table row height**: 48px (body), 36px (header) — never go below 44px for body rows; tight rows feel cramped and reduce scanability
+- **Table row height**: 52px (body), 32px (header) — 20px gap creates unambiguous chrome vs content hierarchy
+- **Filterbar height**: 44px — secondary zone, intentionally shorter than the 56px topbar
 - **Page header height**: 56px — identical across VOC, Admin, Notices, FAQ
 - **Sidebar logo area height**: 56px — must match page header exactly so the top edge of sidebar and main area are flush
+
+### VOC List Typography Tiers
+
+Three distinct tiers for scannable information density:
+
+| Tier | Elements | Size | Weight | Color |
+|------|----------|------|--------|-------|
+| **1 — Content** | VOC title | 13px | 510 | `text-primary` |
+| **2 — Metadata** | Status, priority, assignee, date | 11.5px | varies | semantic / `text-tertiary` |
+| **3 — Identity** | Issue code, tag pills | 11–12px | 500–600 | `text-tertiary` / muted neutral |
+
+- **Tag pills in rows**: neutral background (`bg-elevated`), muted text (`text-quaternary`) — they must not compete with content titles
+- **Assignee avatars**: muted steel/teal/violet (not brand blue) to differentiate from brand accent
+- **Dates**: `font-variant-numeric: tabular-nums` for column alignment
 
 ### Sidebar Spacing
 - **Nav item padding**: `10px 12px` (vertical 10px gives breathing room without wasting space)
@@ -400,7 +435,8 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 - Use inline `style=` instead of component classes — use `.a-btn`, `.admin-add-form`, `.aform-field`, etc.
 - Hard-code per-page `height`, `font-size`, `font-weight` — reuse Page Header component
 - Wrap page-level tables or lists in card containers — card is for floating UI only
-- Set table row height below 44px — cramped rows hurt scannability regardless of information density goals
+- Set table row height below 48px — cramped rows hurt scannability regardless of information density goals
+- Use `bg-elevated` for row hover — use brand-tinted OKLCH value for premium hover feel
 - Make page title the same visual weight as body text — it must anchor the page
 - Place filter tabs and table header with zero gap between them — they are separate UI zones
 
@@ -411,7 +447,10 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 - All text: WCAG AA or higher (4.5:1 normal text, 3:1 large text)
 - Focus indicator: `box-shadow: 0 0 0 3px var(--brand-bg)` required on all interactive elements
 - Status indicators: never convey state by color alone — always pair with text or icon
-- `prefers-reduced-motion`: transition disable media query to be applied
+- `prefers-reduced-motion`: all transitions and animations must be disabled via `@media (prefers-reduced-motion: reduce)` — also guard JS-triggered animations with `window.matchMedia('(prefers-reduced-motion: reduce)').matches`
+- Accordion/expand animations: use `grid-template-rows: 0fr → 1fr` instead of `max-height` to avoid layout-property animation jank
+- Row entrance: staggered `opacity + translateY` with 28ms per-row delay; skip entirely under reduced-motion
+- Standard easing: `cubic-bezier(0.16, 1, 0.3, 1)` (exponential ease-out) — used consistently across all transitions
 
 ---
 
