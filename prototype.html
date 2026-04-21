@@ -759,6 +759,18 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   background: var(--bg-elevated); color: var(--text-quaternary);
   border: 1px solid var(--border-subtle);
 }
+
+/* ── Sidebar System Accordion */
+.sys-menus { display:none; padding-left:8px; }
+.sys-menus.open { display:block; }
+.sys-chevron { width:12px !important;height:12px !important;flex-shrink:0;transition:transform .15s; }
+.sys-chevron.open { transform:rotate(90deg); }
+.menu-nav-item { padding-left:28px !important;font-size:12.5px;color:var(--text-secondary); }
+.menu-nav-item:hover { color:var(--text-primary); }
+.menu-nav-item.active { color:var(--text-primary); }
+
+/* ── VOC Type Badge */
+.vt-badge { display:inline-flex;align-items:center;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600;letter-spacing:-.01em;white-space:nowrap; }
 </style>
 </head>
 
@@ -1160,11 +1172,42 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 </div>
 
 <script>
+// ── Taxonomy
+const SYSTEMS = [
+  {id:'sys1',name:'인증 시스템',slug:'인증',icon:'shield-check'},
+  {id:'sys2',name:'데이터 분석',slug:'분석',icon:'bar-chart-2'},
+  {id:'sys3',name:'데이터 파이프라인',slug:'파이프라인',icon:'workflow'},
+  {id:'sys4',name:'대시보드',slug:'대시보드',icon:'layout-dashboard'},
+];
+const MENUS = [
+  {id:'m1',systemId:'sys1',name:'로그인/SSO'},
+  {id:'m2',systemId:'sys1',name:'비밀번호 관리'},
+  {id:'m3',systemId:'sys1',name:'기타'},
+  {id:'m4',systemId:'sys2',name:'차트/그래프'},
+  {id:'m5',systemId:'sys2',name:'리포트'},
+  {id:'m6',systemId:'sys2',name:'기타'},
+  {id:'m7',systemId:'sys3',name:'ETL 배치'},
+  {id:'m8',systemId:'sys3',name:'기타'},
+  {id:'m9',systemId:'sys4',name:'위젯'},
+  {id:'m10',systemId:'sys4',name:'KPI'},
+  {id:'m11',systemId:'sys4',name:'기타'},
+];
+const VOC_TYPES = [
+  {id:'t1',name:'버그',slug:'bug',color:'#e5534b'},
+  {id:'t2',name:'기능 요청',slug:'feature',color:'#5e6ad2'},
+  {id:'t3',name:'개선 제안',slug:'improvement',color:'#f5a623'},
+  {id:'t4',name:'문의',slug:'inquiry',color:'#57ab5a'},
+];
+// Lookup helpers
+const SYS_MAP  = Object.fromEntries(SYSTEMS.map(s => [s.id, s]));
+const MENU_MAP = Object.fromEntries(MENUS.map(m => [m.id, m]));
+const TYPE_MAP = Object.fromEntries(VOC_TYPES.map(t => [t.slug, t]));
+
 // ── Data
 const VOCDATA = [
   {id:'voc1',code:'인증-2025-0001',title:'로그인 후 세션이 자꾸 만료됩니다 — 30분마다 재로그인 요구됨',
    status:'처리중',priority:'urgent',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-   category:'인증',tags:['인증','세션','AD'],
+   systemId:'sys1',menuId:'m1',type:'bug',tags:['인증','세션','AD'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.06.12',
    body:`<p>분석 시스템 로그인 후 약 <strong>30분</strong>이 지나면 자동으로 세션이 만료되어 재로그인을 요구합니다. 업무 중 집중해서 작업하다 보면 갑자기 페이지가 로그인 화면으로 전환됩니다.</p>
@@ -1174,7 +1217,7 @@ const VOCDATA = [
 
   {id:'voc2',code:'분석-2025-0047',title:'대시보드 월별 매출 차트에서 특정 월 데이터가 0으로 표시됨',
    status:'검토중',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
-   category:'데이터 분석',tags:['차트','데이터'],
+   systemId:'sys2',menuId:'m4',type:'bug',tags:['차트','데이터'],
    author:'정팀장',authorInit:'정',authorCls:'p',
    date:'2025.06.11',
    body:`<p>월별 매출 차트에서 <strong>2025년 3월, 5월</strong> 데이터가 0으로 표시됩니다. DB에는 정상 저장되어 있고 실제 매출도 발생했습니다.</p>
@@ -1183,7 +1226,7 @@ const VOCDATA = [
 
   {id:'voc3',code:'파이프라인-2025-0008',title:'ETL 배치 작업이 매일 새벽 2시 이후 실패 — 타임아웃 관련',
    status:'접수됨',priority:'medium',assignee:'',assigneeInit:'',assigneeCls:'',
-   category:'데이터 파이프라인',tags:['ETL','오류'],
+   systemId:'sys3',menuId:'m7',type:'bug',tags:['ETL','오류'],
    author:'최분석',authorInit:'최',authorCls:'',
    date:'2025.06.10',
    body:`<p>ETL 배치 작업이 매일 새벽 <strong>2시~3시</strong> 사이에 반복적으로 실패합니다. 에러 로그에는 <code>Connection timeout after 30s</code> 메시지가 기록됩니다.</p>
@@ -1192,7 +1235,7 @@ const VOCDATA = [
 
   {id:'voc4',code:'대시보드-2025-0015',title:'KPI 요약 위젯에서 전월 대비 증감률이 반대로 표시됨',
    status:'완료',priority:'low',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-   category:'대시보드',tags:['KPI'],
+   systemId:'sys4',menuId:'m10',type:'bug',tags:['KPI'],
    author:'홍길동',authorInit:'홍',authorCls:'',
    date:'2025.06.08',
    body:`<p>KPI 요약 위젯에서 전월 대비 증감률이 <strong>반대 부호</strong>로 표시됩니다. 예: 실제 10% 증가인데 -10%로 표시됩니다.</p>
@@ -1201,7 +1244,7 @@ const VOCDATA = [
 
   {id:'voc5',code:'인증-2025-0002',title:'비밀번호 초기화 이메일이 수신되지 않음',
    status:'보류',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
-   category:'인증',tags:['인증','이메일'],
+   systemId:'sys1',menuId:'m2',type:'bug',tags:['인증','이메일'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.06.07',
    body:`<p>비밀번호 초기화 버튼 클릭 후 '이메일을 발송했습니다' 메시지가 나타나지만 실제 이메일이 수신되지 않습니다.</p>
@@ -1210,7 +1253,7 @@ const VOCDATA = [
 
   {id:'voc6',code:'분석-2025-0031',title:'사용자별 접속 통계에서 중복 카운트 발생',
    status:'접수됨',priority:'medium',assignee:'',assigneeInit:'',assigneeCls:'',
-   category:'데이터 분석',tags:['데이터','통계'],
+   systemId:'sys2',menuId:'m5',type:'feature',tags:['데이터','통계'],
    author:'이분석',authorInit:'이',authorCls:'p',
    date:'2025.06.05',
    body:`<p>사용자별 일일 접속 통계에서 동일 사용자가 <strong>2~3회 중복 카운트</strong>됩니다. 새 탭 열기나 페이지 새로고침 시 별도 세션으로 집계되는 것으로 추정됩니다.</p>
@@ -1219,7 +1262,7 @@ const VOCDATA = [
 
   {id:'voc7',code:'대시보드-2025-0003',title:'실시간 매출 현황 위젯 데이터가 1시간씩 지연됨',
    status:'검토중',priority:'high',assignee:'박개발',assigneeInit:'박',assigneeCls:'g',
-   category:'대시보드',tags:['대시보드','데이터'],
+   systemId:'sys4',menuId:'m9',type:'improvement',tags:['대시보드','데이터'],
    author:'정팀장',authorInit:'정',authorCls:'p',
    date:'2025.06.04',
    body:`<p>실시간 매출 현황 위젯의 데이터가 <strong>약 1시간</strong> 지연되어 표시됩니다. 화면 새로고침을 해도 동일하며 다른 위젯(주간 매출 등)은 정상입니다.</p>
@@ -1228,7 +1271,7 @@ const VOCDATA = [
 
   {id:'voc8',code:'파이프라인-2025-0012',title:'Spark 집계 잡이 메모리 부족으로 매주 월요일 실패',
    status:'처리중',priority:'urgent',assignee:'박개발',assigneeInit:'박',assigneeCls:'g',
-   category:'데이터 파이프라인',tags:['ETL','오류'],
+   systemId:'sys3',menuId:'m7',type:'bug',tags:['ETL','오류'],
    author:'최분석',authorInit:'최',authorCls:'',
    date:'2025.06.03',
    body:`<p>Spark 집계 잡이 매주 <strong>월요일 00:30~01:00</strong> 사이 OOM(Out of Memory) 에러로 실패합니다. 주말 동안 쌓인 데이터 볼륨이 커서 executor 메모리를 초과하는 것으로 추정됩니다.</p>
@@ -1237,7 +1280,7 @@ const VOCDATA = [
 
   {id:'voc9',code:'인증-2025-0003',title:'SSO 로그인 후 세션이 타 브라우저에서 공유되는 문제',
    status:'완료',priority:'medium',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-   category:'인증',tags:['인증','세션'],
+   systemId:'sys1',menuId:'m1',type:'bug',tags:['인증','세션'],
    author:'홍길동',authorInit:'홍',authorCls:'',
    date:'2025.06.02',
    body:`<p>SSO 로그인 후 동일 계정으로 <strong>다른 브라우저에서도 이미 로그인된 상태</strong>로 표시됩니다. 보안 정책상 동시 세션은 1개만 허용해야 합니다.</p>
@@ -1246,7 +1289,7 @@ const VOCDATA = [
 
   {id:'voc10',code:'분석-2025-0052',title:'분기별 목표 달성률 리포트 다운로드 시 빈 파일 생성',
    status:'접수됨',priority:'low',assignee:'',assigneeInit:'',assigneeCls:'',
-   category:'데이터 분석',tags:['통계'],
+   systemId:'sys2',menuId:'m5',type:'inquiry',tags:['통계'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.05.30',
    body:`<p>분기별 목표 달성률 리포트를 Excel로 다운로드 시 <strong>빈 파일(0KB)</strong>이 생성됩니다. 파일명은 정상이나 내용이 없습니다.</p>
@@ -1255,7 +1298,7 @@ const VOCDATA = [
 
   {id:'voc11',code:'대시보드-2025-0021',title:'KPI 목표값 편집 저장 후 새로고침하면 이전 값으로 복원',
    status:'보류',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
-   category:'대시보드',tags:['KPI','위젯'],
+   systemId:'sys4',menuId:'m10',type:'improvement',tags:['KPI','위젯'],
    author:'정팀장',authorInit:'정',authorCls:'p',
    date:'2025.05.28',
    body:`<p>KPI 목표값 편집 후 저장 버튼 클릭 시 '저장되었습니다' 토스트가 표시되지만, 페이지 새로고침 시 <strong>이전 값으로 복원</strong>됩니다.</p>
@@ -1264,7 +1307,7 @@ const VOCDATA = [
 
   {id:'voc12',code:'파이프라인-2025-0005',title:'일별 집계 배치가 DST 전환일에 한 시간 데이터 누락',
    status:'완료',priority:'medium',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
-   category:'데이터 파이프라인',tags:['ETL','배치'],
+   systemId:'sys3',menuId:'m7',type:'bug',tags:['ETL','배치'],
    author:'이분석',authorInit:'이',authorCls:'p',
    date:'2025.05.25',
    body:`<p>일별 집계 배치가 <strong>DST(일광절약시간) 전환일</strong>에 한 시간 치 데이터가 누락됩니다. 연 2회(3월, 11월 첫째 주 일요일) 반복 발생합니다.</p>
@@ -1275,10 +1318,12 @@ const VOCDATA = [
 const SUBDATA = {
   sub1:{id:'sub1',parentId:'voc1',code:'인증-2025-0001-1',title:'세션 만료 시간 설정값 확인 및 조정',
        status:'완료',priority:'medium',assignee:'김관리',assigneeInit:'김',assigneeCls:'',
+       systemId:'sys1',menuId:'m1',type:'bug',
        author:'김관리',authorInit:'김',authorCls:'',tags:[],date:'2025.06.13',
        body:`<p>AD 토큰 만료 설정값이 30분으로 고정되어 있었으며 슬라이딩 세션 갱신 로직이 비활성화된 상태였습니다. 설정값을 8시간으로 조정하고 슬라이딩 세션을 활성화했습니다.</p>`},
   sub2:{id:'sub2',parentId:'voc1',code:'인증-2025-0001-2',title:'AD 토큰 갱신 로직 패치',
        status:'처리중',priority:'high',assignee:'박개발',assigneeInit:'박',assigneeCls:'g',
+       systemId:'sys1',menuId:'m1',type:'bug',
        author:'김관리',authorInit:'김',authorCls:'',tags:[],date:'2025.06.13',
        body:`<p>토큰 갱신 미들웨어에서 만료 30분 전 자동 갱신 요청을 발행하도록 패치합니다. 현재 코드 리뷰 중이며 QA 후 배포 예정입니다.</p>`},
 };
@@ -1290,8 +1335,11 @@ let showAll       = false;
 let sortKey       = 'date-desc';
 let filterAssignees  = new Set();
 let filterPriorities = new Set();
-let filterCategories = new Set();
-let advFilterOpen = false;
+let filterTypes      = new Set();
+let advFilterOpen    = false;
+let activeSysId  = null;
+let activeMenuId = null;
+let openSysId    = null;
 const PAGE_SIZE = 5;
 
 // ── Helpers
@@ -1299,7 +1347,6 @@ const PRI_ICON  = {urgent:'flame',high:'chevron-up',medium:'minus',low:'chevron-
 const PRI_CLS   = {urgent:'p-urgent',high:'p-high',medium:'p-medium',low:'p-low'};
 const PRI_LABEL = {urgent:'Urgent',high:'High',medium:'Medium',low:'Low'};
 const PRI_ORDER = {urgent:0,high:1,medium:2,low:3};
-const CAT_ICON  = {'인증':'shield-check','데이터 분석':'bar-chart-2','데이터 파이프라인':'workflow','대시보드':'layout-dashboard'};
 
 function priHTML(p) {
   return `<div class="pri-badge ${PRI_CLS[p]}"><i data-lucide="${PRI_ICON[p]}"></i>${PRI_LABEL[p]}</div>`;
@@ -1327,9 +1374,11 @@ function formatDateKo(d) {
 function getVisible() {
   let list = VOCDATA.filter(v => {
     if (currentStatus !== '전체' && v.status !== currentStatus) return false;
-    if (filterAssignees.size > 0 && !filterAssignees.has(v.assignee)) return false;
+    if (activeSysId  && v.systemId !== activeSysId)  return false;
+    if (activeMenuId && v.menuId   !== activeMenuId)  return false;
+    if (filterAssignees.size  > 0 && !filterAssignees.has(v.assignee))  return false;
     if (filterPriorities.size > 0 && !filterPriorities.has(v.priority)) return false;
-    if (filterCategories.size > 0 && !filterCategories.has(v.category)) return false;
+    if (filterTypes.size      > 0 && !filterTypes.has(v.type))          return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return v.title.toLowerCase().includes(q) || v.tags.some(t => t.toLowerCase().includes(q));
@@ -1465,7 +1514,7 @@ function toggleAdvFilter() {
   document.getElementById('filterMoreBtn').classList.toggle('filter-on', advFilterOpen || hasAdvFilters());
 }
 function toggleAfChip(el, type, val) {
-  const sets = {assignee: filterAssignees, priority: filterPriorities, category: filterCategories};
+  const sets = {assignee: filterAssignees, priority: filterPriorities, type: filterTypes};
   const s = sets[type];
   if (s.has(val)) { s.delete(val); el.classList.remove('active'); }
   else            { s.add(val);    el.classList.add('active'); }
@@ -1474,17 +1523,17 @@ function toggleAfChip(el, type, val) {
   renderList();
 }
 function clearAdvFilter() {
-  filterAssignees.clear(); filterPriorities.clear(); filterCategories.clear();
+  filterAssignees.clear(); filterPriorities.clear(); filterTypes.clear();
   document.querySelectorAll('.af-chip').forEach(c => c.classList.remove('active'));
   updateFilterBtnState();
   renderList();
 }
 function hasAdvFilters() {
-  return filterAssignees.size + filterPriorities.size + filterCategories.size > 0;
+  return filterAssignees.size + filterPriorities.size + filterTypes.size > 0;
 }
 function updateFilterBtnState() {
   const btn = document.getElementById('filterMoreBtn');
-  const count = filterAssignees.size + filterPriorities.size + filterCategories.size;
+  const count = filterAssignees.size + filterPriorities.size + filterTypes.size;
   const badgeHTML = count > 0 ? `<span class="fc-badge">${count}</span>` : '';
   btn.innerHTML = `<i data-lucide="sliders-horizontal"></i> 필터 더보기${badgeHTML}`;
   btn.classList.toggle('filter-on', advFilterOpen || hasAdvFilters());

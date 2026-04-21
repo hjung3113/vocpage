@@ -1,9 +1,30 @@
 # vocpage — Session Progress
 
 ## NEXT ACTION
-다음 파트 결정 필요 — 파트4 완료. 후보: 대시보드 페이지, 통계/리포트, 다크모드 토글, 모바일 반응형.
+prototype.html 파트5 (분류 체계 반영) — JS/데이터 레이어 완료, 아래 UI 레이어 남음:
+
+1. **사이드바 HTML**: 정적 카테고리 섹션 → `<div id="sidebarSystems"></div>` + CSS (.sys-header, .sys-menus, .sys-menu-item 아코디언)
+2. **사이드바 JS**: `renderSidebar()`, `setSysFilter(sysId)`, `setMenuFilter(menuId)` 추가; `setNav()` 내에서 sys/menu 상태 초기화
+3. **모달 HTML**: 단일 카테고리 select 1개 → 시스템·메뉴·유형 select 3개 (2-row layout)
+4. **모달 JS**: `initModalSelects()`, `onModalSysChange()` 추가
+5. **유형 뱃지**: `renderRow()` title 셀에 type badge 인라인; 드로어 "카테고리" 메타 → 시스템/메뉴/유형 3개 meta-item
+6. **필터 패널 HTML**: 카테고리 chips 4개 → 유형 chips 4개 (색상 dot + `.af-dot` CSS)
+7. **Admin 사이드바**: `data-page="category"` → `data-page="system-menu"` + 새 `data-page="voc-type"` 항목
+8. **Admin 페이지 HTML**: `page-category` → `page-system-menu` (시스템·메뉴 트리) + `page-voc-type` (유형 테이블) 신규
+9. **Admin JS**: `renderCategories()` → `renderSystemMenu()` + `renderVocTypes()` 교체; `setNav()` 분기 업데이트
+10. **Admin JS 데이터**: `ADMIN_CATS` 제거, `SYSTEMS`/`MENUS`/`VOC_TYPES` 직접 활용
 
 ## 완료된 작업
+- prototype.html 파트5 JS/데이터 레이어 (2026-04-21):
+  - VOCDATA 12개 + SUBDATA 2개: category 필드 제거, systemId/menuId/type 필드 추가
+  - JS 상태: filterCategories → filterTypes, activeSysId/activeMenuId/openSysId 변수 추가
+  - getVisible(): sys/menu 필터 로직 + filterTypes 적용
+  - toggleAfChip/clearAdvFilter/hasAdvFilters/updateFilterBtnState: filterCategories → filterTypes
+  - CAT_ICON 헬퍼 제거 (SYS_MAP/TYPE_MAP으로 대체 예정)
+  UI 레이어는 다음 세션에서 작업 (NEXT ACTION 참고)
+
+- requirements.md 분류 체계 재설계 (2026-04-21): 카테고리 → 시스템/메뉴/유형 3단계. voc_types Admin 관리 테이블화, 메뉴 필수화, 사이드바 아코디언 트리, Sub-task 상속 규칙, "기타" 메뉴 자동 생성 명세 추가.
+
 - requirements.md 1차 구체화 (2026-04-20)
 - requirements.md 2차 구체화 (2026-04-20): 섹션 8.11~8.15 추가
 - prototype.html 최초 제작 (2026-04-20): VOC 목록, 드로어, 등록 모달, 알림 패널
