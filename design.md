@@ -13,7 +13,8 @@ VOCpage's design language is inspired by **Samsung Galaxy / One UI**'s corporate
 - **Single chromatic color**: Samsung Blue is the only saturated color. Everything else is blue-tinted neutral.
 - **Bidirectional theming**: Dark and light modes are equally beautiful and accessible.
 - **OKLCH palette**: Ensures perceptually uniform color hierarchy.
-- **Information density first**: Function before decoration. Table UI is the core interface.
+- **Information density with breathing room**: Function before decoration. Table UI is the core interface — but every element needs sufficient padding to breathe. Density ≠ cramped. Aim for clear visual hierarchy through whitespace, not just color.
+- **Visual hierarchy through contrast**: Page title, section headers, body text, and metadata must each occupy a distinct visual weight tier. Equal-weight layouts feel flat and hard to scan.
 
 ---
 
@@ -184,9 +185,42 @@ border-radius: 9999px;
 font-size: 11.5px; font-weight: 600;
 ```
 
+### Filter Tab (Status Quick-filter)
+Pill-style tabs on the VOC list page — not generic `<select>`, not full buttons.
+
+```css
+/* base */
+padding: 5px 12px;
+border-radius: 9999px;
+font-size: 13px; font-weight: 500;
+border: 1px solid var(--border-subtle);
+background: transparent;
+color: var(--text-secondary);
+cursor: pointer;
+
+/* active */
+background: var(--brand-bg);
+border-color: var(--brand-border);
+color: var(--accent);
+font-weight: 600;
+```
+
+- Always show an active indicator (background + border color change). Text-only active state is not sufficient.
+- Filter tab row: `padding: 8px 0 10px; gap: 6px` — needs top/bottom breathing room between topbar and table header.
+
 ### Status Badge
-- Color dot (7px circle) + text combination
+- Color dot (8px circle) + text combination
+- Minimum: `font-size: 13px; font-weight: 500` — never use 12px or smaller for status text
 - No background fill — color applied to text and dot only
+- Pair with text always — never dot-only (accessibility)
+
+### Priority Badge
+- Icon (arrow up/down/dash) + text combination
+- Urgent: `oklch(58% 0.22 25)` (red) — icon + bold text
+- High: `oklch(60% 0.18 45)` (orange-red)
+- Medium: `var(--text-secondary)` — neutral
+- Low: `var(--text-quaternary)` — de-emphasized
+- `font-size: 13px; font-weight: 600` for Urgent/High; `500` for Medium/Low
 
 ### Card & Container
 
@@ -200,19 +234,69 @@ border-radius: 8px;   /* standard */   /* 12px: drawer, modal */
 
 > **Do not** wrap page-level content (tables, lists, accordions) in cards. Page content always uses flat full-width layout. See §7 Layout Patterns.
 
+### Sidebar Navigation Items
+
+```css
+/* base */
+padding: 10px 12px;
+border-radius: 6px;
+font-size: 13.5px; font-weight: 400;
+color: var(--text-secondary);
+display: flex; align-items: center; gap: 8px;
+
+/* hover */
+background: var(--bg-elevated);
+color: var(--text-primary);
+
+/* active (current page) */
+background: var(--brand-bg);
+color: var(--accent);
+font-weight: 600;
+```
+
+- Count badge on nav items: `font-size: 11px; font-weight: 700; background: var(--brand); color: #fff; border-radius: 9999px; padding: 1px 6px`
+- Active state must be visually unambiguous — background fill, not just color change
+
 ### Page Header
 
 **Single component** for all pages — VOC, Notices, FAQ, Admin. `.topbar` and `.admin-topbar` must follow identical spec.
 
 ```css
-height: 50px;
+height: 56px;
 padding: 0 24px;
 border-bottom: 1px solid var(--border-subtle);
 /* Title */
 font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px;
 ```
 
+**Page count badge** (e.g., "12개" next to page title):
+```css
+font-size: 13px; font-weight: 400; color: var(--text-tertiary);
+margin-left: 6px;
+```
+The count badge deliberately uses tertiary text color — supporting metadata, not the title itself.
+
 > Diverging heights or title styles between pages misaligns the top border line across page transitions. Reuse the component class — never hard-code values per page.
+
+### Load-more Button
+
+Used when a list has paginated items (e.g., "7개 항목 더 보기 / 5 / 12개 표시 중").
+
+```css
+/* wrapper: centered row, separated from last data row */
+display: flex; flex-direction: column; align-items: center; gap: 4px;
+padding: 16px 0 8px;
+border-top: 1px solid var(--border-subtle);
+
+/* primary text */
+font-size: 13.5px; font-weight: 600; color: var(--accent); cursor: pointer;
+
+/* secondary meta (e.g., "5 / 12개 표시 중") */
+font-size: 12px; font-weight: 400; color: var(--text-quaternary);
+```
+
+- Must have `border-top` to visually anchor it to the list — without it the button floats orphaned in whitespace
+- Never use a full-width button style here — inline text link treatment fits better in a flat list layout
 
 ### Admin Table & Form
 
@@ -255,9 +339,15 @@ Dark backgrounds suppress shadows — light/dark are separately optimized:
 - **Sidebar width**: 222px
 - **Drawer width**: 528px
 - **Max content width**: ~1200px (whole app layout)
-- **Table row height**: 40px (body), 34px (header)
-- **Page header height**: 50px — identical across VOC, Admin, Notices, FAQ
-- **Sidebar logo area height**: 50px — must match page header exactly so the top edge of sidebar and main area are flush
+- **Table row height**: 48px (body), 36px (header) — never go below 44px for body rows; tight rows feel cramped and reduce scanability
+- **Page header height**: 56px — identical across VOC, Admin, Notices, FAQ
+- **Sidebar logo area height**: 56px — must match page header exactly so the top edge of sidebar and main area are flush
+
+### Sidebar Spacing
+- **Nav item padding**: `10px 12px` (vertical 10px gives breathing room without wasting space)
+- **Section label**: `font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-quaternary); padding: 16px 12px 6px` — clear visual anchor for each group
+- **Gap between sidebar sections**: `8px` minimum spacing between the last item of one group and the label of the next
+- **Section label purpose**: Acts as a visual divider — must have enough top padding (≥14px) to feel separate from the preceding nav group
 
 ### Content Width Policy
 
@@ -295,6 +385,10 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 - Reserve Samsung Blue for CTA, focus, and active states only
 - Use Pretendard Variable for all Korean/Latin UI text
 - Use flat full-width layout for all page-level tables, lists, and accordions
+- Give table rows enough vertical padding (≥10px top/bottom) so content breathes
+- Differentiate sidebar section labels clearly from nav items — size, weight, color, and top spacing all contribute
+- Use varied font weight and size across hierarchy tiers — page title, section header, body, metadata must each feel distinct
+- Show filter tab active state with both background color AND border change — not just one
 
 ### Don't
 - Use pure `#000000` / `#ffffff` — always use blue-tinted values
@@ -306,6 +400,9 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 - Use inline `style=` instead of component classes — use `.a-btn`, `.admin-add-form`, `.aform-field`, etc.
 - Hard-code per-page `height`, `font-size`, `font-weight` — reuse Page Header component
 - Wrap page-level tables or lists in card containers — card is for floating UI only
+- Set table row height below 44px — cramped rows hurt scannability regardless of information density goals
+- Make page title the same visual weight as body text — it must anchor the page
+- Place filter tabs and table header with zero gap between them — they are separate UI zones
 
 ---
 
@@ -320,17 +417,49 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 
 ## 10. CSS Reference
 
+Full token set — copy into `:root` as the single source of truth.
+
 ```css
 :root {
   color-scheme: light dark;
 
-  --bg-app:       light-dark(oklch(98% 0.007 252), oklch(11% 0.016 264));
-  --brand:        light-dark(oklch(40% 0.22 265),  oklch(63% 0.19 258));
-  --brand-bg:     light-dark(oklch(93% 0.025 258), oklch(22% 0.035 262));
-  --text-primary: light-dark(oklch(18% 0.026 267), oklch(95.5% 0.007 252));
+  /* Backgrounds */
+  --bg-app:      light-dark(oklch(98% 0.007 252),   oklch(11% 0.016 264));
+  --bg-panel:    light-dark(oklch(96.5% 0.009 255), oklch(14.5% 0.019 262));
+  --bg-surface:  light-dark(oklch(100% 0 0),         oklch(18.5% 0.021 260));
+  --bg-elevated: light-dark(oklch(95% 0.011 256),   oklch(23% 0.022 258));
 
+  /* Text */
+  --text-primary:    light-dark(oklch(18% 0.026 267),   oklch(95.5% 0.007 252));
+  --text-secondary:  light-dark(oklch(36% 0.022 264),   oklch(79% 0.014 255));
+  --text-tertiary:   light-dark(oklch(54% 0.016 260),   oklch(59% 0.012 258));
+  --text-quaternary: light-dark(oklch(68% 0.010 258),   oklch(43% 0.010 260));
+
+  /* Brand (Samsung Blue) */
+  --brand:        light-dark(oklch(40% 0.22 265),  oklch(63% 0.19 258));
+  --accent:       light-dark(oklch(47% 0.23 262),  oklch(70% 0.21 255));
+  --accent-hover: light-dark(oklch(35% 0.22 268),  oklch(76% 0.18 252));
+  --brand-bg:     light-dark(oklch(93% 0.025 258), oklch(22% 0.035 262));
+  --brand-border: light-dark(oklch(80% 0.045 260), oklch(35% 0.060 260));
+
+  /* Borders */
+  --border-subtle:   light-dark(oklch(88% 0.012 254), oklch(20% 0.018 261 / 0.8));
+  --border-standard: light-dark(oklch(83% 0.016 256), oklch(27% 0.020 259 / 0.85));
+  --border-solid:    light-dark(oklch(83% 0.016 256), oklch(25% 0.019 260));
+
+  /* Shadows */
+  --shadow-sm:     light-dark(0 1px 3px oklch(70% 0.04 260 / 0.10),  0 1px 3px oklch(5% 0.01 265 / 0.40));
+  --shadow-md:     light-dark(0 4px 16px oklch(65% 0.05 260 / 0.12), 0 4px 16px oklch(5% 0.01 265 / 0.55));
+  --shadow-dialog: light-dark(0 12px 40px oklch(60% 0.06 260 / 0.14),0 12px 40px oklch(5% 0.01 265 / 0.70));
+
+  /* Spacing */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
+
+  /* Typography */
   --font-ui: "Pretendard Variable", "Pretendard",
     -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+  --font-mono: "D2Coding", "SF Mono", "Menlo", ui-monospace, monospace;
 }
 ```
 
