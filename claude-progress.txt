@@ -1,7 +1,26 @@
 # vocpage — Session Progress
 
 ## NEXT ACTION
-추가 요구사항 수령 대기 중
+디자인 고도화 (다음 세션)
+
+## 완료된 작업 (2026-04-21 추가 — UI 인터랙션 개선, PR #4 머지)
+- 헤더 컬럼 클릭 정렬: sort 드롭다운 제거 → hcell 클릭 토글 (기본: 등록일 내림차순)
+- VOC 상세 큰 화면 전환 버튼 추가 (maximize/minimize 토글, fullscreen CSS)
+- 더보기 → 게시판형 숫자 페이지네이션 (동적 크기 calcPageSize, 최소 10개)
+- Drawer 헤더 Sub-task 추가 버튼 제거 (하단 폼 단일 진입점 유지)
+- requirements.md §9.2/9.5/9.8 개정, §9.9 신규 추가
+
+## 완료된 작업 (2026-04-21 추가 — UI 간격/계층 개선, PR #3 머지)
+- UI/UX 리뷰 → design.md 반영: Filter Tab, Sidebar Nav, Priority Badge, Load-more, Page Count Badge 스펙 추가
+- design.md §10 CSS Reference 전체 토큰 보완
+- 탑바/사이드바 로고/admin-topbar 높이 50px → 56px (전 페이지 동기화)
+- VOC 테이블 row height 40px → 48px, 헤더 34px → 36px
+- 사이드바 nav item padding 6px → 8px, section label 간격 개선
+- 필터 탭 font-size 12px → 13px, padding 증가
+- 상태 배지 13px/8px dot, 우선순위 배지 13px/Urgent·High font-weight:600
+- 공지사항·FAQ 아코디언 row padding 12px → 14px
+- FAQ 카테고리 탭 pill 스타일 통일 (font-size 13px, border+bg active state)
+- 툴팁 방향 수정: bottom → top (탑바에서 위로 잘리던 문제 해결)
 
 ## 완료된 작업 (2026-04-21 추가 — UI 피드백 반영)
 - 사이드바 로고 영역 height: 50px → topbar(50px)와 상단 높이 맞춤
