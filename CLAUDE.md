@@ -115,8 +115,8 @@ No implementation without a written spec section covering it.
 
 ## Session Rules
 
-- **완료 선언 금지** — 사용자가 "완료"라고 말하기 전까지 작업을 완료로 표시하지 않는다
-- **구현 시작 금지** — 사용자가 "구현 시작"을 명시하기 전까지 실제 BE/FE 구현 코드를 작성하지 않는다
+- **No completion claims** — Never mark a task as done until the user explicitly says so
+- **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
 
 ## graphify
 
