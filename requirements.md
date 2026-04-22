@@ -47,10 +47,10 @@
 ## 4. 데이터베이스 설계 (Data Schema)
 
 - **`users`**: 사내 유저 정보. 컬럼: `id(uuid)`, `ad_username`, `display_name`, `email`, `role(enum: user/manager/admin)`, `is_active`, `created_at`.
-- **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(URL-safe)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
+- **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. 인증-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/보류)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `deleted_at`, `created_at`, `updated_at`.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/보류)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `deleted_at`, `created_at`, `updated_at`.
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
 - **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑.
 - **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소.
@@ -94,7 +94,8 @@
 ## 8. 상세 기능 명세
 
 ### 8.1 VOC 식별자 (Issue Code)
-- 형식: `{시스템슬러그}-{yyyy}-{순번4자리}` (예: `인증-2025-0001`)
+- 형식: `{시스템슬러그}-{yyyy}-{순번4자리}` (예: `ANALYSIS-2025-0001`)
+- 시스템 슬러그는 ASCII URL-safe 문자열로 저장 (예: `analysis`, `pipeline`). `issue_code`에는 슬러그 값을 대문자로 사용.
 - 시스템별·연도별 독립 순번. 삭제된 VOC의 순번은 재사용하지 않음 (증가 전용).
 - 시스템명 변경 후에도 기존 VOC의 `issue_code`는 불변.
 - 동시 생성 경합은 DB sequence로 원자성 보장.
@@ -112,7 +113,7 @@
 
 - 상태 변경 시 `voc_history`에 이력 기록 (변경 전·후 상태, 변경자, 타임스탬프).
 - 상태 변경 시 VOC 작성자 및 담당자에게 인앱 알림 발송.
-- 미완료 Sub-task가 있는 부모 VOC를 '완료'로 전환 시 경고 메시지 후 강제 진행 가능.
+- 미완료 Sub-task가 있는 부모 VOC를 '완료'로 전환 시 경고 메시지 후 강제 진행 가능. Sub-task 상태는 변경되지 않으며 담당자가 개별 처리.
 
 ### 8.3 권한 모델
 
@@ -158,7 +159,7 @@
 ### 8.7 Sub-task
 
 - 최대 2단계: `vocs` → Sub-task. Sub-task의 Sub-task 생성 불가 (DB 제약으로 강제).
-- Sub-task ID: `{parent-issue-code}-{N}` (예: `인증-2025-0001-1`)
+- Sub-task ID: `{parent-issue-code}-{N}` (예: `ANALYSIS-2025-0001-1`)
 - Sub-task는 독립적인 상태·담당자·Priority·유형 보유.
 - Sub-task의 시스템/메뉴는 부모 VOC에서 상속 (변경 불가).
 - 부모 VOC Soft Delete 시 Sub-task도 cascade soft delete.
@@ -191,8 +192,9 @@
 - Sub-task의 유형은 부모와 독립적으로 선택 가능.
 
 #### 태그 (Tag)
-- 자동 태깅 전용 — 작성자가 수동으로 태그 추가/삭제 불가.
+- 자동 태깅 전용 — 작성자(User)가 수동으로 태그 추가/삭제 불가.
 - 키워드/정규식 규칙 기반으로 VOC 생성 시 자동 부여.
+- Admin/Manager는 오탐 정정을 위해 개별 VOC의 태그를 수동으로 추가/삭제 가능 (이력은 `voc_history`에 기록).
 - 유형과 역할 구분: 유형은 성격 분류(1개), 태그는 토픽 클러스터링(N개).
 
 ### 8.9 삭제 정책
@@ -207,13 +209,14 @@
 - VOC 본문: 최대 64KB (HTML)
 - 댓글: 최대 16KB (HTML), Toast UI Editor 사용
 - 댓글 이미지: 파일당 5MB 이하
-- 시스템명/메뉴명: 한글 2~16자, URL-safe slug 병행 저장
+- 시스템명/메뉴명: 최소 2자·최대 20자 (공백 포함, 한글/영문/숫자/주요특수문자 허용). URL-safe slug(ASCII) 병행 저장.
 
 ### 8.11 VOC 목록 필터/검색/페이지네이션
 
 - **필터 항목:** 상태(다중 선택), 시스템(단일), 메뉴(단일, 시스템 선택 시 활성화), 유형(다중 선택), 담당자(단일)
 - **텍스트 검색:** 제목 + 본문 대상 SQL `ILIKE '%keyword%'`. MVP에서는 FTS 미사용.
-- **페이지네이션:** 오프셋 기반, 기본 25개/페이지. `GET /api/vocs?page=1&limit=25&status=접수됨&systemId=...&menuId=...&type=bug&assigneeId=...&q=keyword`
+- **필터·검색 스코프:** 해당 사용자가 조회 가능한 VOC 범위로 자동 제한 (User는 본인 VOC 내에서만 동작).
+- **페이지네이션:** 오프셋 기반. 페이지당 항목 수는 §9.8 동적 계산 공식 적용. `GET /api/vocs?page=1&limit={N}&status=접수됨&systemId=...&menuId=...&type=bug&assigneeId=...&q=keyword`
 - **정렬:** 기본 `created_at DESC`. `?sort=priority|updated_at` 지원.
 
 ### 8.12 파일 저장소
@@ -251,7 +254,7 @@
 
 ### 9.2 서브태스크 생성 진입점
 - Sub-task 추가 UI는 **드로어 하단 인라인 폼 한 곳만** 유지. 헤더 아이콘 버튼(중복 진입점) 제거.
-- 드로어 하단 폼: 제목 입력 → 저장/취소 버튼.
+- 드로어 하단 폼: 제목 입력 + (선택) 유형 선택 → 저장/취소 버튼. 유형 미선택 시 부모 VOC 유형과 동일하게 기본 적용.
 - 저장 시 `{parent-code}-{N}` 형식 코드 자동 부여, 목록에 즉시 반영.
 - 부모 VOC가 이미 Sub-task인 경우 하단 폼 비활성화 (최대 2단계 제한, 안내 문구 표시).
 
@@ -386,7 +389,7 @@
 - Admin/Manager가 `팝업 여부 = ON`으로 설정한 공지는 로그인 시 팝업 표시
 - 팝업 하단에 **"오늘 하루 보지 않기"** 체크박스 제공
   - 체크 시 당일 재접속에서 해당 공지 팝업 미표시 (localStorage 기반)
-- 복수의 팝업 공지가 있을 경우 중요도 내림차순으로 순서 표시
+- 복수의 팝업 공지가 있을 경우 중요도 상위(긴급 → 중요 → 일반) 순으로 표시
 
 #### 10.3.3 공지사항 목록 (사용자 뷰)
 - 노출 기간 내이고 노출 여부 = ON인 공지만 표시
@@ -395,7 +398,7 @@
 
 #### 10.3.4 Admin/Manager 관리 기능
 - 공지 목록에서 **노출 여부 토글** (즉시 반영)
-- **삭제**: 완전 삭제 가능 (Soft Delete — DB에는 남기고 목록에서 제거)
+- **삭제**: Soft Delete (목록에서 제거, DB에는 유지). Admin은 관리 목록에서 복원 가능.
 - 노출 기간 종료 시 자동 비노출 (삭제 아님, 관리 목록에는 계속 표시)
 
 ### 10.4 FAQ 요구사항
