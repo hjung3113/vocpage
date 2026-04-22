@@ -1,120 +1,18 @@
 # vocpage — Session Progress
 
 ## NEXT ACTION
-대시보드 프로토타입 구현: `.omc/plans/dashboard-prototype.md` 참고
-- prototype/prototype.html 1개 파일 수정 (~900줄 추가)
-- Chart.js CDN + CSS + HTML + JS (renderDashboard, 탭 전환, 히트맵 드릴다운)
-- 완료 후 사용자 리뷰 → 컨펌 시 BE/FE 실제 구현 진행
+대시보드 설계 완료 상태 — 프로토타입 컨펌 전까지 실제 구현(BE/FE) 진행하지 않음
+다음 세션: prototype.html에 대시보드 뷰 추가 후 dashboard-feature.md 기반으로 컨펌
 
-## 완료된 작업 (2026-04-22 — dashboard-feature.md 2차 리뷰 + 3개 파일 수정)
-- design.md vs dashboard-feature.md 색상 충돌 14건 식별 및 전면 수정
-- Phase 3 디자인 토큰 재작성: 구 Linear 인디고(#5e6ad2) → Samsung Blue OKLCH CSS 변수
-- 상태 색상 5개 design.md §3 기준으로 정정 (보라 #8b5cf6 완전 제거)
-- 차트 팔레트 7색 신규 정의 (--chart-blue ~ --chart-indigo, 라이트/다크 양방향)
-- 사이드바 Dashboard 위치 명세 (담당 VOC 아래, 시스템 트리 위)
-- BE 403 + FE 리다이렉트 이중 방어 명확화
-- dashboard_settings 스키마 완전 명세 (UUID, FK, UNIQUE 제약)
-- Weekly trend 12주 고정 이유 명시
-- 히트맵 빈 셀/빈 상태 UI 명세 추가
-- requirements.md §9.10 "통계/대시보드 뷰" 제거 + §11 대시보드 섹션 신규 추가
-- CLAUDE.md 폰트·색상 토큰 참조 업데이트 (Pretendard/D2Coding, var(--brand))
+## 완료된 작업 (2026-04-23 — 대시보드 v3 설계 확정)
 
-## 완료된 작업 (2026-04-22 — dashboard-feature.md 1차 보강)
-- KPI 카드 날짜 의존성 3그룹 분류 (현재 상태 / 기간 연동 / 이번주 고정)
-- dashboard_settings 별도 테이블로 확정 + 스키마 추가
-- API 엔드포인트 전체에 startDate/endDate 파라미터 추가 + 그룹별 적용 여부 명시
-- 데이터 패칭 전략: React Query (staleTime 5분, 위젯별 독립 쿼리)
-- 로딩/에러/빈 상태 UI 명세 추가
-- FE role guard 리다이렉트 대상 명시 (user → 홈)
-- 성능 기준 명확화 (LCP 3초, 로컬 네트워크, 10만 건 이하)
-
-## 완료된 작업 (2026-04-22 — 스펙 모순 해소 + 요구사항 문서 업데이트, PR #9 머지)
-- PR #9 머지: 프로토타입 격차 7건 보강 + 스펙 모순 리뷰 문서 신규 (docs/explanation/prototype-requirements-review.md)
-- 스펙 결정 사항 11건 requirements.md 반영:
-  - C1: 첨부파일 10MB 통일 (prototype 공지/FAQ 샘플 수정)
-  - C2: 역할 enum 3종 유지 (user/manager/admin) — prototype dev/viewer 제거
-  - C3: Sub-task 폼 제목+유형(선택, 미선택 시 부모 기본값) — §9.2 보완
-  - C4: 공지 팝업 정렬 "긴급→중요→일반" 으로 명확화 — §10.3.2
-  - C5: 공지 Soft Delete + Admin 복원 가능 명시 — §10.3.4
-  - C6: 필터 스코프 User는 본인 VOC 내로 자동 제한 — §8.11 추가
-  - C7: Sub-task 상태 유지 (부모 완료 강제 시 자식 상태 불변) — §8.2
-  - C8: 시스템명 최대 20자, 한글/영문/숫자/공백/특수문자 허용 — §8.10
-  - C9: issue_code 슬러그 ASCII 영문 대문자 (ANALYSIS-2025-0001) — §8.1/§4/§8.7
-  - C10: page size §9.8 동적 계산으로 일원화 (§8.11 "기본 25개" 제거)
-  - C11: Admin/Manager 오탐 태그 수동 정정 가능, 이력 기록 — §8.8
-
-## 완료된 작업 (2026-04-21 추가 — UI 인터랙션 개선, PR #4 머지)
-- 헤더 컬럼 클릭 정렬: sort 드롭다운 제거 → hcell 클릭 토글 (기본: 등록일 내림차순)
-- VOC 상세 큰 화면 전환 버튼 추가 (maximize/minimize 토글, fullscreen CSS)
-- 더보기 → 게시판형 숫자 페이지네이션 (동적 크기 calcPageSize, 최소 10개)
-- Drawer 헤더 Sub-task 추가 버튼 제거 (하단 폼 단일 진입점 유지)
-- requirements.md §9.2/9.5/9.8 개정, §9.9 신규 추가
-
-## 완료된 작업 (2026-04-21 추가 — UI 간격/계층 개선, PR #3 머지)
-- UI/UX 리뷰 → design.md 반영: Filter Tab, Sidebar Nav, Priority Badge, Load-more, Page Count Badge 스펙 추가
-- design.md §10 CSS Reference 전체 토큰 보완
-- 탑바/사이드바 로고/admin-topbar 높이 50px → 56px (전 페이지 동기화)
-- VOC 테이블 row height 40px → 48px, 헤더 34px → 36px
-- 사이드바 nav item padding 6px → 8px, section label 간격 개선
-- 필터 탭 font-size 12px → 13px, padding 증가
-- 상태 배지 13px/8px dot, 우선순위 배지 13px/Urgent·High font-weight:600
-- 공지사항·FAQ 아코디언 row padding 12px → 14px
-- FAQ 카테고리 탭 pill 스타일 통일 (font-size 13px, border+bg active state)
-- 툴팁 방향 수정: bottom → top (탑바에서 위로 잘리던 문제 해결)
-
-## 완료된 작업 (2026-04-21 추가 — UI 피드백 반영)
-- 사이드바 로고 영역 height: 50px → topbar(50px)와 상단 높이 맞춤
-- 시스템 예시 변경: 인증 시스템 제거 → 분석 3개 시스템만 유지 (데이터 분석 / 데이터 파이프라인 / 대시보드)
-- MENUS: sys1 메뉴 3개 제거 → 분석 관련 메뉴로 재구성 (필터/집계, 데이터 수집, 알림 설정)
-- VOC 예시 데이터: 인증 VOC 3개 → 분석 관련 VOC로 교체 (분석-2025-0001, 파이프라인-2025-0002, 대시보드-2025-0023)
-- SUBDATA, 알림, 태그 규칙, ADMIN_CATS 전부 분석 시스템 기준으로 변경
-- 공지사항/FAQ 추가 폼에 Toast UI Editor 배지 표시 (프로토타입 반영)
-
-## 완료된 작업 (2026-04-21 추가)
-- 공지사항/FAQ 요구사항 인터뷰 → requirements.md 섹션 10 추가
-- prototype.html 공지사항 & FAQ 구현:
-  - 사이드바 하단 정보 섹션 (공지사항/FAQ 메뉴)
-  - 공지사항 페이지: 중요도 배지(긴급/중요/일반), 인라인 펼침
-  - 로그인 팝업: 팝업=ON 공지 자동 표시, "오늘 하루 보지 않기" (localStorage)
-  - FAQ 페이지: 아코디언 + 키워드 검색 + 카테고리 탭
-  - Admin 공지사항 관리: 등록 폼, 노출 토글, 삭제
-  - Admin FAQ 관리: 등록 폼, 노출 토글, 삭제
-- REVIEW-notice-faq.md 리뷰 가이드 작성
-
-## 완료된 작업
-- 기능 검증 완료 (2026-04-21):
-  - 드로어 메타 시스템/메뉴/유형 3개 표시 ✅
-  - Sub-task 폼 유형 select 노출 ✅
-  - Admin 시스템/메뉴 관리, 유형 관리 페이지 렌더링 ✅
-
-- Admin 페이지 디자인 통일 (2026-04-21):
-  - page-system-menu, page-voc-type → admin-topbar/body/card/table 구조로 변경
-  - renderSystemMenu, renderVocTypes → tbody tr 기반 테이블로 재작성
-
-- Admin → VOC 페이지 전환 수정 (2026-04-21):
-  - switchToVocPage() 헬퍼 추가
-  - setSysFilter, setMenuFilter 호출 시 admin 페이지 활성 상태면 VOC 페이지로 자동 전환
-
-- 내 VOC / 담당 VOC 구현 (2026-04-21):
-  - CURRENT_USER = '홍길동' 상수 추가
-  - currentView state ('all'|'mine'|'assigned') 추가
-  - nav-item에 data-view 속성 추가
-  - getVisible()에 currentView 필터 로직 추가
-  - topbarTitle id 추가, setNav에서 타이틀 동기화
-  - voc3 assignee를 '홍길동'으로 설정 (담당 VOC 데이터)
-
-- prototype.html 파트5 UI 레이어 완료 (2026-04-21):
-  - 사이드바: 정적 카테고리 → SYSTEMS/MENUS 기반 아코디언 트리 (renderSidebar/setSysFilter/setMenuFilter)
-  - 모달: 카테고리 select 1개 → 시스템/메뉴/유형 연계 드롭다운 3개 (initModalSelects/onModalSysChange)
-  - 유형 뱃지: renderRow() title 셀 + 드로어 메타 시스템/메뉴/유형 3개
-  - 필터 패널: 카테고리 chips → 유형 chips + 태그 chips (spec 9.1 반영)
-  - Admin: page-category → page-system-menu + page-voc-type
-  - Sub-task 폼에 유형 select 추가 (spec 8.7 반영)
-  - filterTags Set + getVisible() 태그 필터 로직 추가
-
-- prototype.html 파트5 JS/데이터 레이어 (2026-04-21):
-  - VOCDATA 12개 + SUBDATA 2개: category 필드 제거, systemId/menuId/type 필드 추가
-  - JS 상태: filterCategories → filterTypes, activeSysId/activeMenuId/openSysId 변수 추가
-  - getVisible(): sys/menu 필터 로직 + filterTypes 적용
-
-- requirements.md 분류 체계 재설계 (2026-04-21): 카테고리 → 시스템/메뉴/유형 3단계.
+- **dashboard-feature.md** v3 전면 재작성 (660줄)
+  - 글로벌 필터 시스템: 전체→시스템→메뉴 3단계 계층 + 담당자 직교 필터 전체 명세
+  - 히트맵 X축 셀렉터 3종, Y축 합계 행, 고정 레이아웃, 브레드크럼 동작 상세 명세
+  - 주간 트렌드 3선 정의 (신규/진행중/완료)
+  - 담당자별 처리현황 신규 위젯 명세
+  - 장기 미처리 dim 탭별 전환 규칙
+  - 시스템/메뉴 카드 탭 연동 명세
+  - API 엔드포인트 전체 업데이트 (systemId/menuId/assigneeId 공통 파라미터)
+  - FE 상태 타입 정의
+- **시각화 참조 파일**: `.superpowers/brainstorm/71061-1776875230/content/dashboard-v3.html`
