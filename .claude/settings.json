@@ -18,6 +18,15 @@
             "command": "f=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path // empty'); lim=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.limit // empty'); [ -n \"$f\" ] && [ -f \"$f\" ] && [ -z \"$lim\" ] && lines=$(wc -l < \"$f\" 2>/dev/null || echo 0) && [ \"$lines\" -gt 200 ] && echo \"Large file ($lines lines): use offset+limit\""
           }
         ]
+      },
+      {
+        "matcher": "Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f graphify-out/graph.json ] && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"graphify: Knowledge graph exists. Read graphify-out/GRAPH_REPORT.md for god nodes and community structure before searching raw files.\"}}' || true"
+          }
+        ]
       }
     ]
   }

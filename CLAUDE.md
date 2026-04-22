@@ -62,10 +62,11 @@ The system is a three-tier app: React SPA → Express REST API → PostgreSQL.
 
 The full spec is in `design.md`. Critical tokens:
 
-- **Background palette:** `#08090a` (app base), `#0f1011` (panels), `#191a1b` (elevated surfaces)
-- **Brand accent:** `#5e6ad2` (bg), `#7170ff` (interactive), `#828fff` (hover)
-- **Text:** `#f7f8f8` (primary), `#d0d6e0` (secondary), `#8a8f98` (tertiary)
-- **Typography:** Inter Variable at weight 510; Berkeley Mono for code; aggressive negative letter-spacing at display sizes
+- **Background palette (OKLCH):** `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--bg-elevated)` — 모두 blue-tinted OKLCH, hex 직접 사용 금지
+- **Brand accent (Samsung Blue):** `var(--brand)` / `var(--accent)` / `var(--accent-hover)` — Linear 인디고(`#5e6ad2`) 구 값 사용 금지
+- **Text:** `var(--text-primary)` / `var(--text-secondary)` / `var(--text-tertiary)` / `var(--text-quaternary)`
+- **Typography:** Pretendard Variable (Korean+Latin UI); D2Coding (issue code, code blocks)
+- **Full token reference:** `design.md §10 CSS Reference` — 항상 CSS 커스텀 프로퍼티 사용
 - **Spacing:** 8px grid base; max-width ~1200px
 - **Elevation:** communicated via background opacity (not shadow darkness) — `rgba(255,255,255,0.05)` for surfaces, multi-layer shadow only for dialogs
 - **Components:** Radix UI primitives as base; ghost buttons, translucent cards, border-focused inputs
@@ -111,3 +112,12 @@ No implementation without a written spec section covering it.
 | Spec (design decision, constraint) | Implementation plan |
 | Implementation plan (task added/removed) | Spec section it implements |
 | CLAUDE.md (new rule) | Spec if rule affects behavior |
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)

@@ -1,7 +1,32 @@
 # vocpage — Session Progress
 
 ## NEXT ACTION
-디자인 고도화 (다음 세션)
+대시보드 프로토타입 구현: `.omc/plans/dashboard-prototype.md` 참고
+- prototype/prototype.html 1개 파일 수정 (~900줄 추가)
+- Chart.js CDN + CSS + HTML + JS (renderDashboard, 탭 전환, 히트맵 드릴다운)
+- 완료 후 사용자 리뷰 → 컨펌 시 BE/FE 실제 구현 진행
+
+## 완료된 작업 (2026-04-22 — dashboard-feature.md 2차 리뷰 + 3개 파일 수정)
+- design.md vs dashboard-feature.md 색상 충돌 14건 식별 및 전면 수정
+- Phase 3 디자인 토큰 재작성: 구 Linear 인디고(#5e6ad2) → Samsung Blue OKLCH CSS 변수
+- 상태 색상 5개 design.md §3 기준으로 정정 (보라 #8b5cf6 완전 제거)
+- 차트 팔레트 7색 신규 정의 (--chart-blue ~ --chart-indigo, 라이트/다크 양방향)
+- 사이드바 Dashboard 위치 명세 (담당 VOC 아래, 시스템 트리 위)
+- BE 403 + FE 리다이렉트 이중 방어 명확화
+- dashboard_settings 스키마 완전 명세 (UUID, FK, UNIQUE 제약)
+- Weekly trend 12주 고정 이유 명시
+- 히트맵 빈 셀/빈 상태 UI 명세 추가
+- requirements.md §9.10 "통계/대시보드 뷰" 제거 + §11 대시보드 섹션 신규 추가
+- CLAUDE.md 폰트·색상 토큰 참조 업데이트 (Pretendard/D2Coding, var(--brand))
+
+## 완료된 작업 (2026-04-22 — dashboard-feature.md 1차 보강)
+- KPI 카드 날짜 의존성 3그룹 분류 (현재 상태 / 기간 연동 / 이번주 고정)
+- dashboard_settings 별도 테이블로 확정 + 스키마 추가
+- API 엔드포인트 전체에 startDate/endDate 파라미터 추가 + 그룹별 적용 여부 명시
+- 데이터 패칭 전략: React Query (staleTime 5분, 위젯별 독립 쿼리)
+- 로딩/에러/빈 상태 UI 명세 추가
+- FE role guard 리다이렉트 대상 명시 (user → 홈)
+- 성능 기준 명확화 (LCP 3초, 로컬 네트워크, 10만 건 이하)
 
 ## 완료된 작업 (2026-04-22 — 스펙 모순 해소 + 요구사항 문서 업데이트, PR #9 머지)
 - PR #9 머지: 프로토타입 격차 7건 보강 + 스펙 모순 리뷰 문서 신규 (docs/explanation/prototype-requirements-review.md)
