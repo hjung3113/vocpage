@@ -917,7 +917,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   </div>
   <div class="sidebar-section">
     <div class="section-label">보기</div>
-    <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent">12</span></div>
+    <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent" id="allBadge">0</span></div>
     <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC <span class="nav-badge muted" id="mineBadge"></span></div>
     <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
   </div>
@@ -1096,15 +1096,48 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 <div id="page-system-menu" class="admin-page">
   <div class="admin-topbar">
     <span class="admin-title">시스템 / 메뉴 관리</span>
+    <span class="section-count-badge" id="sysMenuCount">0개</span>
     <div class="spacer"></div>
+    <button class="btn-ghost" onclick="toggleAddSystemForm()"><i data-lucide="folder-plus"></i> 시스템 추가</button>
+    <button class="btn-ghost" onclick="toggleAddMenuForm()"><i data-lucide="plus"></i> 메뉴 추가</button>
   </div>
   <div class="admin-body">
+      <div class="admin-add-form" id="addSystemForm">
+        <div class="aform-field">
+          <label>시스템명</label>
+          <input type="text" id="newSystemName" placeholder="예: 결제" style="min-width:160px" />
+        </div>
+        <div class="aform-field">
+          <label>슬러그 (URL-safe)</label>
+          <input type="text" id="newSystemSlug" placeholder="예: 결제" style="min-width:140px" />
+        </div>
+        <div style="display:flex;gap:6px;align-self:flex-end">
+          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addSystem()">추가</button>
+          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddSystemForm()">취소</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-quaternary);margin-left:auto;align-self:center">시스템 추가 시 &quot;기타&quot; 메뉴가 자동 생성됩니다.</div>
+      </div>
+      <div class="admin-add-form" id="addMenuForm">
+        <div class="aform-field">
+          <label>대상 시스템</label>
+          <select id="newMenuSystem" style="min-width:160px"></select>
+        </div>
+        <div class="aform-field">
+          <label>메뉴명</label>
+          <input type="text" id="newMenuName" placeholder="예: 차트/그래프" style="min-width:160px" />
+        </div>
+        <div style="display:flex;gap:6px;align-self:flex-end">
+          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addMenu()">추가</button>
+          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddMenuForm()">취소</button>
+        </div>
+      </div>
       <table class="admin-table">
         <thead><tr>
           <th>시스템 / 메뉴</th>
           <th style="width:100px">슬러그</th>
           <th style="width:60px;text-align:right">VOC</th>
-          <th style="width:80px">상태</th>
+          <th style="width:90px">상태</th>
+          <th style="width:70px"></th>
         </tr></thead>
         <tbody id="adminSystemMenuContent"></tbody>
       </table>
@@ -1116,14 +1149,34 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <span class="admin-title">유형 관리</span>
     <span class="section-count-badge" id="vocTypeCount">0개</span>
     <div class="spacer"></div>
+    <button class="btn-ghost" onclick="toggleAddTypeForm()"><i data-lucide="plus"></i> 유형 추가</button>
   </div>
   <div class="admin-body">
+      <div class="admin-add-form" id="addTypeForm">
+        <div class="aform-field">
+          <label>유형명</label>
+          <input type="text" id="newTypeName" placeholder="예: 장애" style="min-width:140px" />
+        </div>
+        <div class="aform-field">
+          <label>슬러그</label>
+          <input type="text" id="newTypeSlug" placeholder="예: incident" style="min-width:140px" />
+        </div>
+        <div class="aform-field">
+          <label>색상</label>
+          <input type="color" id="newTypeColor" value="#5e6ad2" style="min-width:56px;padding:2px;height:34px" />
+        </div>
+        <div style="display:flex;gap:6px;align-self:flex-end">
+          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addType()">추가</button>
+          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddTypeForm()">취소</button>
+        </div>
+      </div>
       <table class="admin-table">
         <thead><tr>
           <th>유형</th>
           <th style="width:120px">슬러그</th>
           <th style="width:60px;text-align:right">VOC</th>
-          <th style="width:80px">상태</th>
+          <th style="width:90px">상태</th>
+          <th style="width:70px"></th>
         </tr></thead>
         <tbody id="adminVocTypeContent"></tbody>
       </table>
@@ -1307,26 +1360,27 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 <script>
 // ── Taxonomy
 const SYSTEMS = [
-  {id:'sys2',name:'데이터 분석',slug:'분석',icon:'bar-chart-2'},
-  {id:'sys3',name:'데이터 파이프라인',slug:'파이프라인',icon:'workflow'},
-  {id:'sys4',name:'대시보드',slug:'대시보드',icon:'layout-dashboard'},
+  {id:'sys2',name:'데이터 분석',slug:'분석',icon:'bar-chart-2',archived:false},
+  {id:'sys3',name:'데이터 파이프라인',slug:'파이프라인',icon:'workflow',archived:false},
+  {id:'sys4',name:'대시보드',slug:'대시보드',icon:'layout-dashboard',archived:false},
 ];
 const MENUS = [
-  {id:'m4',systemId:'sys2',name:'차트/그래프'},
-  {id:'m5',systemId:'sys2',name:'리포트'},
-  {id:'m6',systemId:'sys2',name:'필터/집계'},
-  {id:'m7',systemId:'sys3',name:'ETL 배치'},
-  {id:'m8',systemId:'sys3',name:'데이터 수집'},
-  {id:'m9',systemId:'sys4',name:'위젯'},
-  {id:'m10',systemId:'sys4',name:'KPI'},
-  {id:'m11',systemId:'sys4',name:'알림 설정'},
+  {id:'m4',systemId:'sys2',name:'차트/그래프',archived:false},
+  {id:'m5',systemId:'sys2',name:'리포트',archived:false},
+  {id:'m6',systemId:'sys2',name:'필터/집계',archived:false},
+  {id:'m7',systemId:'sys3',name:'ETL 배치',archived:false},
+  {id:'m8',systemId:'sys3',name:'데이터 수집',archived:false},
+  {id:'m9',systemId:'sys4',name:'위젯',archived:false},
+  {id:'m10',systemId:'sys4',name:'KPI',archived:false},
+  {id:'m11',systemId:'sys4',name:'알림 설정',archived:false},
 ];
 const VOC_TYPES = [
-  {id:'t1',name:'버그',slug:'bug',color:'#e5534b'},
-  {id:'t2',name:'기능 요청',slug:'feature',color:'#5e6ad2'},
-  {id:'t3',name:'개선 제안',slug:'improvement',color:'#f5a623'},
-  {id:'t4',name:'문의',slug:'inquiry',color:'#57ab5a'},
+  {id:'t1',name:'버그',slug:'bug',color:'#e5534b',archived:false},
+  {id:'t2',name:'기능 요청',slug:'feature',color:'#5e6ad2',archived:false},
+  {id:'t3',name:'개선 제안',slug:'improvement',color:'#f5a623',archived:false},
+  {id:'t4',name:'문의',slug:'inquiry',color:'#57ab5a',archived:false},
 ];
+let sysNextSeq = 5, menuNextSeq = 12, typeNextSeq = 5;
 // Lookup helpers
 const SYS_MAP  = Object.fromEntries(SYSTEMS.map(s => [s.id, s]));
 const MENU_MAP = Object.fromEntries(MENUS.map(m => [m.id, m]));
@@ -1546,7 +1600,10 @@ function getVisible() {
     if (filterTags.size       > 0 && !v.tags?.some(tag => filterTags.has(tag))) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return v.title.toLowerCase().includes(q) || v.tags.some(t => t.toLowerCase().includes(q));
+      const bodyText = (v.body || '').replace(/<[^>]*>/g, '').toLowerCase();
+      return v.title.toLowerCase().includes(q)
+        || bodyText.includes(q)
+        || v.tags.some(t => t.toLowerCase().includes(q));
     }
     return true;
   });
@@ -1667,8 +1724,8 @@ function onSearch(val) { searchQuery = val.trim(); currentPage = 1; renderVOCLis
 function renderSidebar() {
   const el = document.getElementById('sidebarSystems');
   if (!el) return;
-  el.innerHTML = SYSTEMS.map(sys => {
-    const sysMenus = MENUS.filter(m => m.systemId === sys.id);
+  el.innerHTML = SYSTEMS.filter(s => !s.archived).map(sys => {
+    const sysMenus = MENUS.filter(m => m.systemId === sys.id && !m.archived);
     const sysCount = VOCDATA.filter(v => v.systemId === sys.id).length;
     const isOpen   = openSysId === sys.id;
     const isSysActive = activeSysId === sys.id && !activeMenuId;
@@ -1930,26 +1987,32 @@ function buildSubsSection(d) {
       <span class="sub-row-title">${s.title}</span>
       <div class="mini-av ${s.assigneeCls||''}" style="width:20px;height:20px;font-size:9px;flex-shrink:0">${s.assigneeInit||'—'}</div>
     </div>`).join('');
+  const isSubtask = !!d.parentId;
+  const addBlock = isSubtask
+    ? `<div class="sub-add-row" style="color:var(--text-quaternary);cursor:not-allowed;opacity:.7" data-tip="Sub-task 아래에는 추가할 수 없습니다 (최대 2단계)">
+         <i data-lucide="ban" style="width:13px;height:13px"></i> 서브태스크 추가 불가 (최대 2단계)
+       </div>`
+    : `<div class="sub-add-row" id="sub-add-row-${d.id}" onclick="showSubForm('${d.id}')">
+         <i data-lucide="plus" style="width:13px;height:13px"></i> 서브태스크 추가
+       </div>
+       <div class="sub-inline-form" id="sub-form-${d.id}" style="display:none">
+         <input class="sub-inline-input" id="sub-input-${d.id}" placeholder="서브태스크 제목 입력..."
+                onkeydown="subKeydown(event,'${d.id}')" />
+         <select id="subtaskTypeSelect-${d.id}" class="form-select" style="width:120px;flex-shrink:0">
+           ${VOC_TYPES.map(t => `<option value="${t.slug}">${t.name}</option>`).join('')}
+         </select>
+         <button class="btn-primary" style="padding:5px 11px;font-size:12px;white-space:nowrap" onclick="confirmSub('${d.id}')">
+           <i data-lucide="check" style="width:11px;height:11px"></i>
+         </button>
+         <button class="btn-ghost" style="padding:5px 10px;font-size:12px" onclick="cancelSub('${d.id}')">취소</button>
+       </div>`;
   return `
     <div class="d-subtasks">
       <div class="d-section-title" style="display:flex;align-items:center;gap:6px">
         서브태스크<span style="font-size:10.5px;color:var(--text-quaternary);font-weight:400;text-transform:none">${subs.length}개</span>
       </div>
       <div class="subtask-list" id="sub-list-${d.id}">${subsHTML}</div>
-      <div class="sub-add-row" id="sub-add-row-${d.id}" onclick="showSubForm('${d.id}')">
-        <i data-lucide="plus" style="width:13px;height:13px"></i> 서브태스크 추가
-      </div>
-      <div class="sub-inline-form" id="sub-form-${d.id}" style="display:none">
-        <input class="sub-inline-input" id="sub-input-${d.id}" placeholder="서브태스크 제목 입력..."
-               onkeydown="subKeydown(event,'${d.id}')" />
-        <select id="subtaskTypeSelect-${d.id}" class="form-select" style="width:120px;flex-shrink:0">
-          ${VOC_TYPES.map(t => `<option value="${t.slug}">${t.name}</option>`).join('')}
-        </select>
-        <button class="btn-primary" style="padding:5px 11px;font-size:12px;white-space:nowrap" onclick="confirmSub('${d.id}')">
-          <i data-lucide="check" style="width:11px;height:11px"></i>
-        </button>
-        <button class="btn-ghost" style="padding:5px 10px;font-size:12px" onclick="cancelSub('${d.id}')">취소</button>
-      </div>
+      ${addBlock}
     </div>`;
 }
 
@@ -2247,9 +2310,9 @@ function openDrawer(id) {
     <div class="d-tags">
       <span class="at-label">태그</span>
       ${tagsHTML}
-      <div class="icon-btn" style="width:26px;height:26px;border-style:dashed" data-tip="태그 추가">
-        <i data-lucide="plus" style="width:12px;height:12px"></i>
-      </div>
+      <span style="font-size:10.5px;color:var(--text-quaternary);margin-left:auto" data-tip="본문 키워드 기반 자동 태깅 (수동 편집 불가)">
+        <i data-lucide="sparkles" style="width:11px;height:11px;vertical-align:-2px"></i> 자동 태깅
+      </span>
     </div>
 
     <div class="d-section">
@@ -2338,9 +2401,9 @@ function initModalSelects() {
   const typeEl = document.getElementById('modalTypeSelect');
   if (!sysEl || !typeEl) return;
   sysEl.innerHTML  = '<option value="">시스템 선택...</option>' +
-    SYSTEMS.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    SYSTEMS.filter(s => !s.archived).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
   typeEl.innerHTML = '<option value="">유형 선택...</option>' +
-    VOC_TYPES.map(t => `<option value="${t.slug}">${t.name}</option>`).join('');
+    VOC_TYPES.filter(t => !t.archived).map(t => `<option value="${t.slug}">${t.name}</option>`).join('');
   document.getElementById('modalMenuSelect').innerHTML = '<option value="">시스템 먼저 선택...</option>';
   document.getElementById('modalMenuSelect').disabled = true;
 }
@@ -2353,7 +2416,7 @@ function onModalSysChange() {
     menuEl.disabled  = true;
     return;
   }
-  const sysMenus = MENUS.filter(m => m.systemId === sysId);
+  const sysMenus = MENUS.filter(m => m.systemId === sysId && !m.archived);
   menuEl.innerHTML = '<option value="">메뉴 선택...</option>' +
     sysMenus.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
   menuEl.disabled = false;
@@ -2709,27 +2772,92 @@ function renderSystemMenu() {
   SYSTEMS.forEach(s => {
     const sysMenus = MENUS.filter(m => m.systemId === s.id);
     const cnt = VOCDATA.filter(v => v.systemId === s.id).length;
+    const sysState = s.archived
+      ? `<span style="font-size:12px;color:var(--text-quaternary)"><span class="status-dot off"></span>아카이브</span>`
+      : `<span style="font-size:12px;color:var(--status-green)"><span class="status-dot on"></span>활성</span>`;
     rows += `<tr>
       <td><div style="display:flex;align-items:center;gap:8px">
         <i data-lucide="${s.icon}" style="width:14px;height:14px;color:var(--text-tertiary);flex-shrink:0"></i>
-        <span class="td-primary">${s.name}</span>
+        <span class="td-primary" style="${s.archived?'opacity:.55':''}">${s.name}</span>
       </div></td>
       <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">${s.slug}</td>
       <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${cnt}</td>
-      <td><span class="status-pill open">활성</span></td>
+      <td>${sysState}</td>
+      <td style="text-align:right">
+        <button class="a-btn" onclick="toggleArchiveSystem('${s.id}')">${s.archived?'복원':'아카이브'}</button>
+      </td>
     </tr>`;
     sysMenus.forEach(m => {
       const mc = VOCDATA.filter(v => v.menuId === m.id).length;
+      const menuState = m.archived
+        ? `<span style="font-size:12px;color:var(--text-quaternary)"><span class="status-dot off"></span>아카이브</span>`
+        : `<span style="font-size:12px;color:var(--status-green)"><span class="status-dot on"></span>활성</span>`;
       rows += `<tr>
-        <td style="padding-left:32px;font-size:13px;color:var(--text-secondary)">└ ${m.name}</td>
+        <td style="padding-left:32px;font-size:13px;color:var(--text-secondary);${m.archived?'opacity:.55':''}">└ ${m.name}</td>
         <td></td>
         <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${mc}</td>
-        <td></td>
+        <td>${menuState}</td>
+        <td style="text-align:right">
+          <button class="a-btn" onclick="toggleArchiveMenu('${m.id}')">${m.archived?'복원':'아카이브'}</button>
+        </td>
       </tr>`;
     });
   });
   el.innerHTML = rows;
+  const cnt = document.getElementById('sysMenuCount');
+  if (cnt) cnt.textContent = `시스템 ${SYSTEMS.length} · 메뉴 ${MENUS.length}`;
   lucide.createIcons();
+}
+
+function toggleAddSystemForm() {
+  const f = document.getElementById('addSystemForm');
+  f.classList.toggle('open');
+  document.getElementById('addMenuForm')?.classList.remove('open');
+  if (f.classList.contains('open')) setTimeout(()=>document.getElementById('newSystemName').focus(), 40);
+}
+function toggleAddMenuForm() {
+  const f = document.getElementById('addMenuForm');
+  f.classList.toggle('open');
+  document.getElementById('addSystemForm')?.classList.remove('open');
+  const sel = document.getElementById('newMenuSystem');
+  if (sel) sel.innerHTML = SYSTEMS.filter(s => !s.archived).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  if (f.classList.contains('open')) setTimeout(()=>document.getElementById('newMenuName').focus(), 40);
+}
+function addSystem() {
+  const name = document.getElementById('newSystemName').value.trim();
+  const slug = document.getElementById('newSystemSlug').value.trim();
+  if (!name || !slug) return;
+  const id = 'sys' + (++sysNextSeq);
+  SYSTEMS.push({id, name, slug, icon:'folder', archived:false});
+  // 시스템 생성 시 "기타" 메뉴 자동 생성 (req §8.8 / §9.4.2)
+  MENUS.push({id:'m'+(++menuNextSeq), systemId:id, name:'기타', archived:false});
+  SYS_MAP[id]  = SYSTEMS[SYSTEMS.length-1];
+  MENU_MAP[MENUS[MENUS.length-1].id] = MENUS[MENUS.length-1];
+  document.getElementById('newSystemName').value = '';
+  document.getElementById('newSystemSlug').value = '';
+  document.getElementById('addSystemForm').classList.remove('open');
+  renderSystemMenu();
+  renderSidebar();
+}
+function addMenu() {
+  const sysId = document.getElementById('newMenuSystem').value;
+  const name  = document.getElementById('newMenuName').value.trim();
+  if (!sysId || !name) return;
+  const m = {id:'m'+(++menuNextSeq), systemId:sysId, name, archived:false};
+  MENUS.push(m);
+  MENU_MAP[m.id] = m;
+  document.getElementById('newMenuName').value = '';
+  document.getElementById('addMenuForm').classList.remove('open');
+  renderSystemMenu();
+  renderSidebar();
+}
+function toggleArchiveSystem(id) {
+  const s = SYSTEMS.find(x => x.id === id);
+  if (s) { s.archived = !s.archived; renderSystemMenu(); renderSidebar(); }
+}
+function toggleArchiveMenu(id) {
+  const m = MENUS.find(x => x.id === id);
+  if (m) { m.archived = !m.archived; renderSystemMenu(); renderSidebar(); }
 }
 
 function renderVocTypes() {
@@ -2737,18 +2865,48 @@ function renderVocTypes() {
   if (!el) return;
   el.innerHTML = VOC_TYPES.map(t => {
     const cnt = VOCDATA.filter(v => v.type === t.slug).length;
+    const state = t.archived
+      ? `<span style="font-size:12px;color:var(--text-quaternary)"><span class="status-dot off"></span>아카이브</span>`
+      : `<span style="font-size:12px;color:var(--status-green)"><span class="status-dot on"></span>활성</span>`;
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:8px">
-        <span class="cat-swatch" style="background:${t.color};flex-shrink:0"></span>
-        <span class="td-primary">${t.name}</span>
+        <span class="color-swatch" style="background:${t.color};flex-shrink:0"></span>
+        <span class="td-primary" style="${t.archived?'opacity:.55':''}">${t.name}</span>
       </div></td>
       <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">${t.slug}</td>
       <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${cnt}</td>
-      <td><span class="status-pill open">활성</span></td>
+      <td>${state}</td>
+      <td style="text-align:right">
+        <button class="a-btn" onclick="toggleArchiveType('${t.slug}')">${t.archived?'복원':'아카이브'}</button>
+      </td>
     </tr>`;
   }).join('');
   const badge = document.getElementById('vocTypeCount');
   if (badge) badge.textContent = `${VOC_TYPES.length}개`;
+}
+
+function toggleAddTypeForm() {
+  const f = document.getElementById('addTypeForm');
+  f.classList.toggle('open');
+  if (f.classList.contains('open')) setTimeout(()=>document.getElementById('newTypeName').focus(), 40);
+}
+function addType() {
+  const name  = document.getElementById('newTypeName').value.trim();
+  const slug  = document.getElementById('newTypeSlug').value.trim();
+  const color = document.getElementById('newTypeColor').value;
+  if (!name || !slug) return;
+  if (TYPE_MAP[slug]) { alert('이미 존재하는 슬러그입니다.'); return; }
+  const t = {id:'t'+(++typeNextSeq), name, slug, color, archived:false};
+  VOC_TYPES.push(t);
+  TYPE_MAP[slug] = t;
+  document.getElementById('newTypeName').value = '';
+  document.getElementById('newTypeSlug').value = '';
+  document.getElementById('addTypeForm').classList.remove('open');
+  renderVocTypes();
+}
+function toggleArchiveType(slug) {
+  const t = VOC_TYPES.find(x => x.slug === slug);
+  if (t) { t.archived = !t.archived; renderVocTypes(); }
 }
 
 const ROLE_MAP = {admin:'Admin', manager:'Manager', dev:'Developer', viewer:'Viewer'};
@@ -2884,10 +3042,13 @@ renderVOCList();
 
 // ── 내 VOC / 담당 VOC 카운트 배지
 (function initNavBadges() {
+  const allCount      = VOCDATA.length;
   const mineCount     = VOCDATA.filter(v => v.author   === CURRENT_USER).length;
   const assignedCount = VOCDATA.filter(v => v.assignee === CURRENT_USER).length;
+  const allEl      = document.getElementById('allBadge');
   const mineEl     = document.getElementById('mineBadge');
   const assignedEl = document.getElementById('assignedBadge');
+  if (allEl)      { allEl.textContent      = allCount; }
   if (mineEl)     { mineEl.textContent     = mineCount;     mineEl.style.display     = mineCount     ? '' : 'none'; }
   if (assignedEl) { assignedEl.textContent = assignedCount; assignedEl.style.display = assignedCount ? '' : 'none'; }
 
