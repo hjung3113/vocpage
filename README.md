@@ -8,10 +8,10 @@ Linear의 간결한 UX + Jira의 관리 기능을 결합. Samsung Blue 디자인
 
 ## 프로토타입
 
-`prototype.html` — 단일 파일 인터랙티브 프로토타입. 백엔드 없이 브라우저에서 바로 실행.
+`prototype/prototype.html` — 단일 파일 인터랙티브 프로토타입. 백엔드 없이 브라우저에서 바로 실행.
 
 ```bash
-python3 -m http.server 8899
+cd prototype && python3 -m http.server 8899
 # → http://localhost:8899/prototype.html
 ```
 

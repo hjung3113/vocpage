@@ -102,7 +102,7 @@ No implementation without a written spec section covering it.
 
 - **Never put functional/behavioral spec in `design.md`**
 - **Never put visual design rules in `requirements.md`**
-- `design.md` 수정 시 반드시 영어로 작성
+- `design.md` must always be written in English
 
 ## Document Coherence
 
