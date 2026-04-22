@@ -831,8 +831,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 .role-pill { font-size: 11.5px; padding: 2px 9px; border-radius: 4px; font-weight: 600; }
 .role-admin   { background: oklch(20% 0.06 262); color: var(--accent); border: 1px solid var(--brand-border); }
 .role-manager { background: oklch(20% 0.07 72); color: oklch(75% 0.14 72); border: 1px solid oklch(30% 0.09 72); }
-.role-dev     { background: oklch(18% 0.07 150); color: var(--status-emerald); border: 1px solid oklch(28% 0.10 150); }
-.role-viewer  { background: var(--bg-elevated); color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
+.role-user    { background: var(--bg-elevated); color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
 .user-avatar-sm {
   width: 28px; height: 28px; border-radius: 50%;
   background: var(--brand-bg); border: 1px solid var(--brand-border);
@@ -1206,8 +1205,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
           <select id="newUserRole">
             <option value="admin">Admin</option>
             <option value="manager" selected>Manager</option>
-            <option value="dev">Developer</option>
-            <option value="viewer">Viewer</option>
+            <option value="user">User</option>
           </select>
         </div>
         <div style="display:flex;gap:6px;align-self:flex-end">
@@ -1514,7 +1512,7 @@ const SUBDATA = {
 // ── 공지사항 데이터
 const NOTICES = [
   { id: 1, title: '시스템 정기 점검 안내 (04/25 02:00~06:00)', content: '<p>안녕하세요. 시스템 안정성 강화를 위한 <strong>정기 점검</strong>을 아래와 같이 진행합니다.</p><ul><li>일시: 2026-04-25 02:00 ~ 06:00</li><li>영향: 전체 서비스 일시 중단</li></ul><p>불편을 드려 죄송합니다.</p>', level: 'urgent', popup: true, from: '2026-04-20', to: '2026-04-25', visible: true },
-  { id: 2, title: '첨부파일 용량 제한 변경 안내 (10MB → 20MB)', content: '<p>사용자 요청에 따라 첨부파일 최대 용량을 <strong>20MB</strong>로 확대합니다. (기존 10MB)</p><p>적용일: 2026-04-22부터</p>', level: 'important', popup: true, from: '2026-04-21', to: '2026-05-10', visible: true },
+  { id: 2, title: '첨부파일 용량 제한 안내', content: '<p>첨부파일 최대 용량은 파일당 <strong>10MB</strong>, VOC당 최대 5개입니다.</p><p>허용 형식: PNG, JPG, GIF, WebP</p>', level: 'important', popup: true, from: '2026-04-21', to: '2026-05-10', visible: true },
   { id: 3, title: 'VOC 시스템 사용 가이드 배포', content: '<p>신규 입사자를 위한 VOC 시스템 사용 가이드를 배포합니다. 우측 상단 <strong>도움말</strong> 메뉴에서 확인하세요.</p>', level: 'normal', popup: false, from: '2026-04-01', to: '2026-06-30', visible: true },
 ];
 
@@ -1522,7 +1520,7 @@ const NOTICES = [
 const FAQS = [
   { id: 1, category: '사용법', q: 'VOC는 어떻게 등록하나요?', a: '<p>상단 <strong>+ VOC 등록</strong> 버튼을 클릭하면 등록 모달이 열립니다. 시스템 → 메뉴 → 유형을 선택한 후 제목과 내용을 입력하고 저장하세요.</p>', visible: true },
   { id: 2, category: '사용법', q: '담당자를 지정하려면 어떻게 하나요?', a: '<p>VOC 상세 드로어에서 <strong>담당자</strong> 필드를 클릭하면 사용자 목록이 나타납니다. Manager 이상 권한이 있어야 지정 가능합니다.</p>', visible: true },
-  { id: 3, category: '오류', q: '파일 첨부가 안 됩니다.', a: '<p>지원 형식: PNG, JPG, GIF, WebP (최대 20MB / 개, 5개 / VOC). 다른 형식의 파일은 업로드가 제한됩니다. 문제가 지속되면 관리자에게 문의하세요.</p>', visible: true },
+  { id: 3, category: '오류', q: '파일 첨부가 안 됩니다.', a: '<p>지원 형식: PNG, JPG, GIF, WebP (최대 10MB / 개, 5개 / VOC). 다른 형식의 파일은 업로드가 제한됩니다. 문제가 지속되면 관리자에게 문의하세요.</p>', visible: true },
   { id: 4, category: '정책', q: 'VOC 상태는 누가 변경할 수 있나요?', a: '<p>상태 변경(진행 중 / 완료 등)은 <strong>Manager 이상</strong> 권한을 가진 사용자만 가능합니다. 일반 사용자는 본인이 등록한 VOC를 조회만 할 수 있습니다.</p>', visible: true },
   { id: 5, category: '정책', q: 'VOC를 삭제할 수 있나요?', a: '<p>삭제는 <strong>Admin</strong>만 가능합니다. 삭제된 VOC는 복구되지 않으며, Soft Delete 방식으로 처리됩니다.</p>', visible: true },
   { id: 6, category: '기타', q: '내 계정 역할(권한)은 어디서 확인하나요?', a: '<p>사이드바 좌측 하단 프로필 영역에서 현재 역할을 확인할 수 있습니다. 역할 변경이 필요하면 Admin에게 문의하세요.</p>', visible: true },
@@ -2511,9 +2509,9 @@ let ADMIN_CATS = [
 let ADMIN_USERS = [
   {id:1, name:'홍길동', init:'홍', email:'hong@vocpage.io', role:'admin',   active:true,  lastSeen:'방금 전'},
   {id:2, name:'김관리', init:'김', email:'kim@vocpage.io',  role:'manager', active:true,  lastSeen:'1시간 전'},
-  {id:3, name:'박개발', init:'박', email:'park@vocpage.io', role:'dev',     active:true,  lastSeen:'어제'},
-  {id:4, name:'이분석', init:'이', email:'lee@vocpage.io',  role:'viewer',  active:true,  lastSeen:'3일 전'},
-  {id:5, name:'최영업', init:'최', email:'choi@vocpage.io', role:'viewer',  active:false, lastSeen:'14일 전'},
+  {id:3, name:'박개발', init:'박', email:'park@vocpage.io', role:'user',    active:true,  lastSeen:'어제'},
+  {id:4, name:'이분석', init:'이', email:'lee@vocpage.io',  role:'user',    active:true,  lastSeen:'3일 전'},
+  {id:5, name:'최영업', init:'최', email:'choi@vocpage.io', role:'user',    active:false, lastSeen:'14일 전'},
 ];
 let ruleNextId=12, catNextId=6, userNextId=6;
 
@@ -2909,8 +2907,8 @@ function toggleArchiveType(slug) {
   if (t) { t.archived = !t.archived; renderVocTypes(); }
 }
 
-const ROLE_MAP = {admin:'Admin', manager:'Manager', dev:'Developer', viewer:'Viewer'};
-const ROLE_CLS = {admin:'role-admin', manager:'role-manager', dev:'role-dev', viewer:'role-viewer'};
+const ROLE_MAP = {admin:'Admin', manager:'Manager', user:'User'};
+const ROLE_CLS = {admin:'role-admin', manager:'role-manager', user:'role-user'};
 function renderUsers() {
   const tbody = document.getElementById('usersBody');
   tbody.innerHTML = ADMIN_USERS.map(u => `

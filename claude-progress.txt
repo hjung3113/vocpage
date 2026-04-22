@@ -3,6 +3,21 @@
 ## NEXT ACTION
 디자인 고도화 (다음 세션)
 
+## 완료된 작업 (2026-04-22 — 스펙 모순 해소 + 요구사항 문서 업데이트, PR #9 머지)
+- PR #9 머지: 프로토타입 격차 7건 보강 + 스펙 모순 리뷰 문서 신규 (docs/explanation/prototype-requirements-review.md)
+- 스펙 결정 사항 11건 requirements.md 반영:
+  - C1: 첨부파일 10MB 통일 (prototype 공지/FAQ 샘플 수정)
+  - C2: 역할 enum 3종 유지 (user/manager/admin) — prototype dev/viewer 제거
+  - C3: Sub-task 폼 제목+유형(선택, 미선택 시 부모 기본값) — §9.2 보완
+  - C4: 공지 팝업 정렬 "긴급→중요→일반" 으로 명확화 — §10.3.2
+  - C5: 공지 Soft Delete + Admin 복원 가능 명시 — §10.3.4
+  - C6: 필터 스코프 User는 본인 VOC 내로 자동 제한 — §8.11 추가
+  - C7: Sub-task 상태 유지 (부모 완료 강제 시 자식 상태 불변) — §8.2
+  - C8: 시스템명 최대 20자, 한글/영문/숫자/공백/특수문자 허용 — §8.10
+  - C9: issue_code 슬러그 ASCII 영문 대문자 (ANALYSIS-2025-0001) — §8.1/§4/§8.7
+  - C10: page size §9.8 동적 계산으로 일원화 (§8.11 "기본 25개" 제거)
+  - C11: Admin/Manager 오탐 태그 수동 정정 가능, 이력 기록 — §8.8
+
 ## 완료된 작업 (2026-04-21 추가 — UI 인터랙션 개선, PR #4 머지)
 - 헤더 컬럼 클릭 정렬: sort 드롭다운 제거 → hcell 클릭 토글 (기본: 등록일 내림차순)
 - VOC 상세 큰 화면 전환 버튼 추가 (maximize/minimize 토글, fullscreen CSS)
