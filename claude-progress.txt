@@ -1,8 +1,10 @@
 # vocpage — Session Progress
 
-## NEXT ACTION
-대시보드 설계 완료 상태 — 프로토타입 컨펌 전까지 실제 구현(BE/FE) 진행하지 않음
-다음 세션: prototype.html에 대시보드 뷰 추가 후 dashboard-feature.md 기반으로 컨펌
+## 다음 세션 읽을 문서
+
+- `requirements.md` §11 (대시보드 스펙)
+- `.omc/plans/dashboard-feature.md` (v3 위젯/필터/API 전체 명세)
+- `prototype/prototype.html` (현재 프로토타입 상태)
 
 ## 완료된 작업 (2026-04-23 — 대시보드 v3 설계 확정)
 

@@ -113,6 +113,11 @@ No implementation without a written spec section covering it.
 | Implementation plan (task added/removed) | Spec section it implements |
 | CLAUDE.md (new rule) | Spec if rule affects behavior |
 
+## Session Rules
+
+- **완료 선언 금지** — 사용자가 "완료"라고 말하기 전까지 작업을 완료로 표시하지 않는다
+- **구현 시작 금지** — 사용자가 "구현 시작"을 명시하기 전까지 실제 BE/FE 구현 코드를 작성하지 않는다
+
 ## graphify
 
 This project has a graphify knowledge graph at graphify-out/.
