@@ -23,7 +23,8 @@ npm run test -- --testPathPattern=filename       # Single test
 
 ## Database Schema
 
-- `vocs` — core entity; `parent_id` self-join for sub-tasks.
+- **PostgreSQL + pgvector extension** — Docker image `pgvector/pgvector:pg16`. Initial migration must run `CREATE EXTENSION IF NOT EXISTS vector;` before any table DDL.
+- `vocs` — core entity; `parent_id` self-join for sub-tasks. Includes `embedding vector(1536) NULL` column reserved for future similarity search / RAG — **MVP does not populate or query this column**. HNSW index added in a later migration when the feature lands.
 - `tags` + `voc_tags` — M:N tag relationship.
 - `tag_rules` — keyword/regex patterns driving auto-tagging.
 - `users` — identity; linked to AD session on login.

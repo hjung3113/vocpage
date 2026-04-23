@@ -11,6 +11,7 @@ docs/specs/reviews/
 ├── phase2/   requirements-expert-review-2026-04-23.md, REVIEW-notice-faq.md
 ├── phase4/   requirements-5expert-review-2026-04-23.md
 └── phase6/   design-enforcement.md   ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
+             voc-ai-workflow-fit-review.md  ← Phase 6-1 AI 워크플로우 적합성 리뷰 (스키마 변경 필요)
 ```
 
 ---
@@ -94,6 +95,23 @@ docs/specs/reviews/
 - [ ] 리뷰 결과를 `design.md`에 반영 (영어, 비주얼 스펙만)
 - [ ] 기능 변경 시 `requirements.md`에 반영 (한국어, 기능 스펙만)
 - [ ] `prototype/prototype.html` 최종 상태 = 확정 디자인 기준점으로 커밋
+- [ ] **AI 워크플로우 적합성 리뷰 반영** (`reviews/phase6/voc-ai-workflow-fit-review.md`)
+  - **세션 2026-04-23 진행분 (결정 완료 — requirements.md §4 반영 O)**:
+    - [x] 🔴 갭 #1 (설비 마스터): 별도 테이블 불채택. `tags.kind enum('general','equipment','menu')` 3-카테고리로 대체. 외부 마스터 sync 없음.
+    - [x] 🔴 갭 #2 (LLM 정규화 저장): `vocs.structured_payload jsonb` 단일 컬럼. 실시간 AI는 v2, MVP는 담당자가 완료/드랍 시 폼으로 입력.
+    - [x] 🟠 갭 #3 (root_cause/resolution): `structured_payload` JSON 내부 키로 흡수 (`symptom`/`root_cause`/`resolution` 필수 텍스트).
+    - [x] 보류→드랍 이름 변경 + `resolution_quality`/`drop_reason` enum 추가.
+  - **다음 세션에서 결정 필요 (Q3 이후)**:
+    - [ ] ⚠️ **Q1 재리뷰 필요**: 설비 마스터 불채택 + `tags.kind` 3-카테고리 구조 — 다음 세션 시작 시 다시 토론. 고려 포인트: equipment 태그의 중복·표기 흔들림 관리, 주메뉴 FK와 `menu` 태그의 역할 분리 명확화, 외부 마스터 쿼리 실패 시 fallback.
+    - [ ] `status` 5단계 유지 vs 4단계 단순화(`접수/진행중/완료/드랍`) 확정
+    - [ ] 상태 전환 매트릭스(§8.2) 업데이트 — 보류→드랍, 완료/드랍 시 정규화 필수 규칙 추가
+    - [ ] 🟠 갭 #7 `comments.visibility enum('internal','public')` 채택 여부
+    - [ ] 🟡 갭 #4 임베딩 대상·갱신 시점 스펙 문장 추가
+    - [ ] 🟡 갭 #5 `is_golden_case`, `embed_stale` 플래그 필드 추가 여부
+    - [ ] 🟡 갭 #6 `tag_rules` vs 엔티티 해석 역할 경계 명시 (3-카테고리 태그 구조에 맞춰 재정리)
+    - [ ] 🟢 갭 #8~10 예약 컬럼(`source`, `chatbot_session_id`, `linked_code_refs`) 및 유사도 임계치 자리 예약
+    - [ ] Phase 4 5-Expert 리뷰 미결 — AD 인증 방식 확정, §2.3 Sub-task 표현 통일, 대시보드 API endpoint 목록, 환경변수, 에러 응답 포맷, 파일명 저장 방식, KPI 목표값
+    - [ ] `related_programs/db_tables/jobs/sps` 외부 시스템 검증 쿼리 구현 명세 (어떤 시스템에 어떤 API/쿼리로 물을지)
 
 ### 6-2. 디자인 일관성 강제 체계
 - [ ] `design.md`에서 CSS 변수 토큰 목록 추출 → 컴포넌트별 토큰 사용 규칙 문서화
@@ -125,6 +143,7 @@ docs/specs/reviews/
 - [ ] 마이그레이션 방식 결정 (수동 SQL 파일 vs node-pg-migrate vs Flyway)
 - [ ] 마이그레이션 파일 구조 및 명명 규칙 결정
 - [ ] prototype.html 예시 데이터 기반 시드 fixture 작성 계획
+- [ ] **pgvector 확장 초기 마이그레이션에 포함**: `CREATE EXTENSION IF NOT EXISTS vector;` + `vocs.embedding vector(1536) NULL` 컬럼 생성 (MVP 미사용, 향후 유사검색/RAG용 예약). Docker 이미지는 `pgvector/pgvector:pg16` 사용.
 
 ### 6-8. 상태 관리 방식 확정
 - [ ] React Context vs Redux 결정 — requirements.md에서 열려있는 항목 확정
@@ -136,6 +155,18 @@ docs/specs/reviews/
 - [ ] 각 컴포넌트의 HTML 구조 + CSS 클래스 → React 컴포넌트 매핑 규칙 문서화
 - [ ] Storybook 또는 컴포넌트 체크리스트로 prototype vs 구현 비교 방법 결정
 - [ ] 구현 순서: prototype 섹션별로 1:1 대응되도록 티켓화
+
+---
+
+## Phase 7: 실구현 (추후 진입)
+
+> **선행 조건**: Phase 6 전 항목 완료 — 스펙·테스트 전략·스캐폴딩·인증 mock·DB 전략 확정 후에만 진입
+
+### 7-1. 요구사항 ↔ 프로토타입 불일치 처리 규칙 ⚠️ 구현 중 상시
+- [ ] 구현 중 `requirements.md` (및 `feature-*.md`, `dashboard.md`) 와 `prototype/prototype.html` 사이에 **불일치를 발견하면 임의로 결정하지 말고 사용자에게 먼저 질문**한다
+- [ ] 질문 형식: "요구사항 §X: A / 프로토타입: B — 어느 쪽 기준으로 구현할까요?" (양쪽 근거 라인/섹션 명시)
+- [ ] 사용자 답변 확정 후 → 정답 쪽을 정본으로 두고 나머지 문서/프로토타입을 동기화 커밋
+- [ ] 동기화 없이 구현만 먼저 진행하지 않는다 (doc drift 금지)
 
 ---
 

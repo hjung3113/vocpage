@@ -117,6 +117,7 @@ docs/specs/
 
 - **No completion claims** — Never mark a task as done until the user explicitly says so
 - **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
+- **Debate, don't defer** — 사용자 말이 항상 정답이라고 가정하지 말 것. 스펙·설계 결정에서 반대 논거·트레이드오프·놓친 케이스가 보이면 동의하기 전에 짚고 토론한다. 수동적 "네" 금지 — 엔지니어 대 엔지니어로 반박/확인/대안 제시.
 
 ## graphify
 

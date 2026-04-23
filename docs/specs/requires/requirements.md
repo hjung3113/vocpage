@@ -63,9 +63,30 @@
 - **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe, 전역 UNIQUE)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성. `slug` 제약: `(system_id, slug)` 복합 UNIQUE.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/보류)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `deleted_at`, `created_at`, `updated_at`.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
+  - `status`: 기존 `보류`를 `드랍`으로 대체 (사실상 드랍에 가깝게 운영). 상태 전환 매트릭스(§8.2) 업데이트 필요. 5단계 유지 vs 4단계(`접수/진행중/완료/드랍`)로 단순화는 다음 세션에서 확정.
+  - `structured_payload` 스키마 (완료·드랍 시 필수 입력 폼, UI는 JSON 직접 편집 아닌 폼 기반):
+    ```json
+    {
+      "target": ["설비명/모델 1", ...],    // array, 선택
+      "symptom": "현상 (필수, 텍스트)",
+      "root_cause": "원인 (필수, 텍스트)",
+      "resolution": "조치내역 (필수, 텍스트)",
+      "related_menus": [...],              // 영향 받는 다른 메뉴 (array)
+      "related_programs": [...],           // 저장 시 검증 (존재하지 않으면 저장 차단)
+      "related_db_tables": [...],          // 저장 시 검증
+      "related_jobs": [...],               // 저장 시 검증
+      "related_sps": [...]                 // 저장 시 검증
+    }
+    ```
+  - **검증 정책**: 잘못된 참조(DB/프로그램/job/SP 이름이 실제 존재 안 함)는 저장 차단. 빈 필드는 저장 시 확인 모달(`X, Y 필드 비어있음. 저장?`) 노출 후 인지 동의만 받음. 외부 시스템 장애 시 검증 통과 처리.
+  - `embedding` 컬럼은 pgvector 확장 기반. **MVP 단계에서는 쓰기/읽기 모두 미사용(전량 NULL 유지)**, 향후 유사 VOC 검색 / LLM 대응 초안 생성(RAG) 용도로 활용 예정. 차원수 1536은 OpenAI `text-embedding-3-small` 기준 가결정 — 모델 확정 시 재검토. HNSW 인덱스(`vector_cosine_ops`)는 기능 도입 시 별도 마이그레이션으로 추가.
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
-- **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑.
+- **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑. `tags.kind enum('general','equipment','menu')` — 3-카테고리 구조:
+  - `general`: 기존 자유 태그 (사용자 분류용)
+  - `equipment`: 설비/공정/메이커/모델 태그 (문제 범위가 여러 대상에 걸칠 수 있음). 별도 설비 마스터 테이블 두지 않음 — 외부 마스터 시스템에서 쿼리 시 즉시(<1s) 응답 가능하므로 text만 저장.
+  - `menu`: VOC 생성 시 선택한 주메뉴 외에 **영향받는 다른 메뉴**를 태깅. (주메뉴는 `vocs.menu_id` FK 유지)
+  - 엔티티 해석 결과(v2 AI 워크플로우)는 `equipment`/`menu` 카테고리로 저장.
 - **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소. <!-- v2 AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
 - **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
 - **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`.
