@@ -146,7 +146,7 @@ docs/specs/reviews/
       - §16.3 외부 마스터 연동 정책 전면 개편 (7A 10건 + API 계약 + 장애 fallback), §16.4 대시보드 영향, §16.5 v3 리뷰 확정 이력 표, §16.6 다음 세션 잔여
   - **다음 세션 시작점** (우선순위 순):
     - [x] **feature-voc.md 정합성 확인**: §8.2 상태 전환 매트릭스가 requirements.md §4와 일치하는지 재검증, Q7 Internal Notes UI/Timeline 규칙을 §9.4 관리자 페이지 상세에 교차 반영 필요 여부 점검. ✅ 2026-04-24
-    - [ ] **7B 필드별 마스터 매핑** (진행 중): `external-masters.md` 작성 완료, **설비 마스터 MSSQL 스키마 TBD** — 담당자 자료 수집 후 §3 채워야 완료.
+    - [x] **7B 필드별 마스터 매핑**: `docs/specs/requires/external-masters.md` 작성 완료 (커밋 b5836e9). 설비 마스터 MSSQL 스키마는 TBD로 문서 내 명시 — 담당자 자료 수집 후 §3 보완 예정. ✅ 2026-04-24
     - [x] **Phase 4 5-Expert 리뷰 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL` 추가, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만 유지). ✅ 2026-04-24
 
 ### 6-2. 디자인 일관성 강제 체계
