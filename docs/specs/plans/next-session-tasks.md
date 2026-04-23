@@ -1,7 +1,17 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-23 (2차)
+> 최종 업데이트: 2026-04-23 (3차)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
+
+## Reviews 폴더 구조
+
+```
+docs/specs/reviews/
+├── phase0/   prototype-requirements-review.md
+├── phase2/   requirements-expert-review-2026-04-23.md, REVIEW-notice-faq.md
+├── phase4/   requirements-5expert-review-2026-04-23.md
+└── phase6/   design-enforcement.md   ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
+```
 
 ---
 
@@ -67,17 +77,12 @@
 
 ---
 
-## Phase 5: CLAUDE.md 분리
+## Phase 5: CLAUDE.md 분리 ✅ 완료 (2026-04-23)
 
-> **선행 조건**: Phase 4 완료 (참조할 파일 경로·구조가 확정된 후 split 가능)
-
-- [ ] 현재 `CLAUDE.md` 내용을 4개 단위로 분리:
-  - `frontend/CLAUDE.md` — FE 스택, 컴포넌트 규칙, 상태 관리, 테스트
-  - `backend/CLAUDE.md` — BE 스택, API 설계, 인증 미들웨어, DB 마이그레이션
-  - `prototype/CLAUDE.md` — 프로토타입 작업 규칙, 디자인 토큰 사용 기준
-  - `CLAUDE.md` (프로젝트 루트) — 공통 규칙, 문서 구조, 세션 가이드, 아키텍처 개요만
-- [ ] 루트 `CLAUDE.md` 200줄 이내로 유지
-- [ ] `.claude/CLAUDE.md` 업데이트 (분리된 파일 경로 반영)
+- [x] `frontend/CLAUDE.md` — FE 스택, 컴포넌트 규칙, 상태 관리, 디자인 토큰
+- [x] `backend/CLAUDE.md` — BE 스택, API 설계, 인증 미들웨어, DB 스키마
+- [x] `prototype/CLAUDE.md` — 프로토타입 작업 규칙, 디자인 토큰 사용 기준
+- [x] 루트 `CLAUDE.md` — 공통 규칙만 (129줄, 200줄 이내)
 
 ---
 

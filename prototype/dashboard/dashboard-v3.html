@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOCpage 대시보드 v3</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg-app: light-dark(oklch(98% 0.007 252), oklch(11% 0.016 264));
+  --bg-panel: light-dark(oklch(96.5% 0.009 255), oklch(14.5% 0.019 262));
+  --bg-surface: light-dark(oklch(100% 0 0), oklch(18.5% 0.021 260));
+  --bg-elevated: light-dark(oklch(95% 0.011 256), oklch(23% 0.022 258));
+  --text-primary: light-dark(oklch(18% 0.026 267), oklch(95.5% 0.007 252));
+  --text-secondary: light-dark(oklch(36% 0.022 264), oklch(79% 0.014 255));
+  --text-tertiary: light-dark(oklch(54% 0.016 260), oklch(59% 0.012 258));
+  --text-quaternary: light-dark(oklch(68% 0.010 258), oklch(43% 0.010 260));
+  --brand: light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
+  --brand-bg: light-dark(oklch(93% 0.025 258), oklch(22% 0.035 262));
+  --brand-border: light-dark(oklch(80% 0.045 260), oklch(35% 0.060 260));
+  --border-subtle: light-dark(oklch(88% 0.012 254), oklch(20% 0.018 261 / 0.8));
+  --border-standard: light-dark(oklch(83% 0.016 256), oklch(27% 0.020 259 / 0.85));
+  --chart-blue: light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
+  --chart-emerald: light-dark(oklch(40% 0.20 158), oklch(62% 0.19 158));
+  --chart-amber: light-dark(oklch(50% 0.17 72), oklch(70% 0.16 72));
+  --chart-red: light-dark(oklch(42% 0.22 25), oklch(58% 0.22 25));
+  --chart-sky: light-dark(oklch(48% 0.16 235), oklch(72% 0.14 235));
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,sans-serif;background:var(--bg-app);color:var(--text-primary);font-size:13px;line-height:1.5;}
+
+.app-shell{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:210px;flex-shrink:0;background:var(--bg-panel);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;}
+.sidebar-logo{padding:0 16px 20px;font-size:15px;font-weight:700;color:var(--brand);}
+.sidebar-section-label{padding:4px 16px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-quaternary);margin-top:8px;}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;}
+.sidebar-item:hover{background:var(--bg-elevated);}
+.sidebar-item.active{background:var(--brand-bg);color:var(--brand);font-weight:600;border-right:2px solid var(--brand);}
+.sidebar-divider{height:1px;background:var(--border-subtle);margin:8px 16px;}
+
+.main{flex:1;overflow-y:auto;background:var(--bg-app);display:flex;flex-direction:column;}
+
+.dash-header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px 10px;border-bottom:1px solid var(--border-subtle);position:sticky;top:0;background:var(--bg-app);z-index:20;gap:12px;}
+.dash-title{font-size:17px;font-weight:700;letter-spacing:-.02em;flex-shrink:0;}
+.dash-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
+.filter-select{padding:4px 8px;border-radius:6px;border:1px solid var(--border-standard);background:var(--bg-surface);color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:inherit;}
+.filter-select:focus{outline:none;border-color:var(--brand);}
+
+.filter-context{padding:6px 24px;background:var(--brand-bg);border-bottom:1px solid var(--brand-border);font-size:12px;color:var(--brand);display:none;align-items:center;gap:6px;}
+.filter-context-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:var(--brand);color:white;font-size:11px;font-weight:600;}
+
+.global-tabs{display:flex;align-items:center;gap:2px;padding:0 24px;border-bottom:1px solid var(--border-subtle);overflow-x:auto;flex-shrink:0;background:var(--bg-app);}
+.global-tab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s;}
+.global-tab:hover{color:var(--text-secondary);}
+.global-tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+
+.dash-body{padding:20px 24px;display:flex;flex-direction:column;gap:18px;max-width:1200px;}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-quaternary);margin-bottom:8px;}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border-standard);background:var(--bg-surface);color:var(--text-secondary);}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--text-tertiary);}
+.btn-group{display:flex;gap:1px;background:var(--bg-elevated);border-radius:6px;padding:2px;}
+.btn-group .btn{padding:3px 9px;font-size:11px;border:none;background:transparent;border-radius:4px;color:var(--text-tertiary);}
+.btn-group .btn.active{background:var(--bg-surface);color:var(--brand);font-weight:600;box-shadow:0 1px 3px oklch(0% 0 0 / .1);}
+.date-btn-group{display:flex;gap:1px;background:var(--bg-elevated);border-radius:6px;padding:2px;}
+.date-btn{padding:3px 9px;font-size:11px;border:none;background:transparent;border-radius:4px;color:var(--text-tertiary);cursor:pointer;}
+.date-btn.active{background:var(--bg-surface);color:var(--brand);font-weight:600;}
+
+/* kpi */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.kpi-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:13px 15px;cursor:pointer;transition:border-color .15s;}
+.kpi-card:hover{border-color:var(--brand-border);}
+.kpi-card.alert-red{border-color:oklch(58% .22 25 / .35);}
+.kpi-card.alert-amber{border-color:oklch(70% .16 72 / .30);}
+.kpi-label{font-size:11px;color:var(--text-tertiary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-value{font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:3px;}
+.kpi-sublabel{font-size:10px;color:var(--text-quaternary);margin-bottom:3px;}
+.kpi-delta{font-size:11px;font-weight:500;}
+.delta-pos{color:oklch(62% .19 158);}
+.delta-neg{color:oklch(58% .22 25);}
+.delta-amb{color:oklch(70% .16 72);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.widget{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:15px;}
+.widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.widget-title{font-size:13px;font-weight:600;}
+
+.tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border-subtle);}
+.tab{padding:5px 11px;font-size:12px;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+
+.donut-wrap{position:relative;width:96px;height:96px;flex-shrink:0;}
+.donut-ring{width:96px;height:96px;border-radius:50%;}
+.donut-hole{position:absolute;inset:20px;border-radius:50%;background:var(--bg-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-total{font-size:17px;font-weight:700;line-height:1;}
+.donut-total-label{font-size:9px;color:var(--text-quaternary);}
+.donut-section{display:flex;align-items:center;gap:16px;}
+.legend{flex:1;display:flex;flex-direction:column;gap:4px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;}
+.legend-item:hover .legend-name{color:var(--brand);}
+.legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.legend-name{flex:1;color:var(--text-secondary);}
+.legend-count{font-weight:600;color:var(--text-primary);min-width:26px;text-align:right;}
+.legend-pct{color:var(--text-quaternary);min-width:30px;text-align:right;}
+.legend-bar-wrap{width:44px;height:3px;background:var(--bg-elevated);border-radius:2px;overflow:hidden;}
+.legend-bar{height:100%;border-radius:2px;}
+
+.matrix-table{width:100%;border-collapse:collapse;font-size:11px;}
+.matrix-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:4px 5px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.matrix-table th.rh{text-align:left;}
+.matrix-table td{padding:5px 4px;text-align:center;font-weight:600;font-size:12px;cursor:pointer;border-radius:3px;}
+.matrix-table td.rh{text-align:left;font-size:11px;cursor:default;}
+.matrix-table td.rh:hover{opacity:1!important;}
+.matrix-table td:hover{opacity:.8;}
+
+/* heatmap — fixed layout to prevent size jumping */
+.heatmap-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.breadcrumb{font-size:11px;color:var(--text-tertiary);}
+.breadcrumb .crumb{cursor:pointer;}
+.breadcrumb .crumb:hover{color:var(--brand);}
+.breadcrumb .sep{color:var(--text-quaternary);margin:0 4px;}
+#hmTable{min-height:200px;}
+.heatmap-table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;}
+.heatmap-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:4px 6px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;overflow:hidden;}
+.heatmap-table th.rl{text-align:left;}
+.heatmap-table td{padding:5px 6px;text-align:center;font-size:11px;font-weight:600;border-radius:3px;overflow:hidden;}
+.heatmap-table td.rl{text-align:left;font-weight:500;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.heatmap-table td.rl.clickable{cursor:pointer;}
+.heatmap-table td.rl.clickable:hover{color:var(--brand);}
+.heatmap-table td.tc{color:var(--text-tertiary);font-weight:700;}
+.heatmap-table td.empty{color:var(--text-quaternary);background:var(--bg-elevated)!important;}
+.hm-total-row td{background:var(--bg-elevated)!important;border-bottom:1px solid var(--border-standard);}
+.hm-total-row td.rl{font-weight:700;color:var(--text-primary);}
+.hm-total-row td.tc{color:var(--text-secondary);font-weight:700;}
+
+.chart-legend{display:flex;gap:14px;margin-bottom:8px;}
+.cleg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary);}
+.cleg-line{width:14px;height:2px;border-radius:1px;}
+.chart-area{position:relative;height:110px;}
+
+.bar-list{display:flex;flex-direction:column;gap:4px;}
+.bar-item{display:grid;grid-template-columns:72px 1fr 28px;align-items:center;gap:6px;font-size:11px;cursor:pointer;}
+.bar-item:hover .bar-label{color:var(--brand);}
+.bar-label{color:var(--text-secondary);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{height:5px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--chart-blue);border-radius:3px;}
+.bar-val{font-weight:600;color:var(--text-tertiary);}
+
+.card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.sys-card{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:6px;padding:9px 11px;cursor:pointer;}
+.sys-card:hover{border-color:var(--brand-border);background:var(--brand-bg);}
+.sys-card-name{font-size:12px;font-weight:600;margin-bottom:3px;}
+.sys-card-stats{display:flex;gap:8px;font-size:10px;color:var(--text-tertiary);}
+.sys-card-stats strong{color:var(--text-secondary);font-size:11px;}
+
+.assign-table{width:100%;border-collapse:collapse;font-size:11px;}
+.assign-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:5px 8px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.assign-table th.rl{text-align:left;}
+.assign-table td{padding:5px 8px;text-align:center;font-weight:600;border-radius:3px;}
+.assign-table td.rl{text-align:left;font-weight:500;color:var(--text-secondary);}
+.assign-table td.unassigned{color:var(--text-quaternary);font-style:italic;}
+.assign-table td.tc{color:var(--text-tertiary);font-weight:700;}
+.assign-row-highlight td{outline:2px solid var(--brand);outline-offset:-2px;background:var(--brand-bg)!important;}
+
+.aging-table{width:100%;border-collapse:collapse;font-size:11px;}
+.aging-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.aging-table td{padding:6px 8px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);}
+.aging-table tr:last-child td{border-bottom:none;}
+.aging-table tr:hover td{background:var(--bg-elevated);cursor:pointer;}
+.aging-table td.code{font-family:'D2Coding',monospace;font-size:10px;color:var(--text-tertiary);}
+.aging-table td.title-col{color:var(--text-primary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap;}
+.badge-urgent{background:oklch(58% .22 25 / .15);color:oklch(58% .22 25);}
+.badge-high{background:oklch(60% .18 45 / .15);color:oklch(60% .18 45);}
+.badge-medium{background:var(--bg-elevated);color:var(--text-tertiary);}
+.badge-amber{background:oklch(70% .16 72 / .15);color:oklch(70% .16 72);}
+.badge-red{background:oklch(58% .22 25 / .15);color:oklch(58% .22 25);}
+
+.dim-selector{display:flex;gap:1px;background:var(--bg-elevated);border-radius:5px;padding:2px;}
+.dim-btn{padding:2px 8px;font-size:10px;font-weight:500;border:none;background:transparent;color:var(--text-quaternary);border-radius:3px;cursor:pointer;}
+.dim-btn.active{background:var(--bg-surface);color:var(--brand);font-weight:600;}
+.dim-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+.menu-selector-wrap{display:none;align-items:center;gap:5px;}
+.menu-selector-wrap .separator{color:var(--text-quaternary);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">🔵 VOCpage</div>
+    <div class="sidebar-section-label">메인</div>
+    <div class="sidebar-item">📋 VOC 목록</div>
+    <div class="sidebar-item">👤 내 VOC</div>
+    <div class="sidebar-item">📌 담당 VOC</div>
+    <div class="sidebar-item active">📊 대시보드</div>
+    <div class="sidebar-section-label" style="margin-top:10px;">시스템</div>
+    <div class="sidebar-item">▸ 채널 A</div>
+    <div class="sidebar-item">▸ 채널 B</div>
+    <div class="sidebar-item">▸ 채널 C</div>
+    <div class="sidebar-divider" style="margin-top:auto;"></div>
+    <div class="sidebar-item">📢 공지사항</div>
+    <div class="sidebar-item">❓ FAQ</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-item">⚙️ Admin</div>
+  </aside>
+
+  <main class="main">
+    <div class="dash-header">
+      <div class="dash-title">대시보드</div>
+      <div class="dash-controls">
+        <!-- 메뉴 드릴다운 — 시스템 탭 선택 시 표시 -->
+        <div class="menu-selector-wrap" id="menuSelectorWrap">
+          <span class="separator">›</span>
+          <select class="filter-select" id="menuSelect" onchange="selectMenu(this.value)">
+            <option value="">메뉴: 전체</option>
+          </select>
+        </div>
+        <!-- 담당자 필터 — 항상 표시 -->
+        <select class="filter-select" id="assigneeSelect" onchange="selectAssignee(this.value)">
+          <option value="">담당자: 전체</option>
+          <option>김지훈</option>
+          <option>이수연</option>
+          <option>박민준</option>
+          <option>최유진</option>
+          <option>정해원</option>
+        </select>
+        <div class="date-btn-group">
+          <button class="date-btn">7일</button>
+          <button class="date-btn active">30일</button>
+          <button class="date-btn">90일</button>
+          <button class="date-btn">커스텀</button>
+        </div>
+        <button class="btn">📅 2025.05.01–05.30 ▾</button>
+        <button class="btn btn-ghost">⚙️ 세션설정</button>
+      </div>
+    </div>
+
+    <!-- 필터 컨텍스트 배너 -->
+    <div class="filter-context" id="filterContext">
+      <span id="filterContextText"></span>
+      <span style="font-size:11px;color:var(--brand);opacity:.7">기준</span>
+    </div>
+
+    <!-- 글로벌 탭: 전체 → 시스템(채널) → 메뉴는 헤더 드롭다운으로 -->
+    <div class="global-tabs" id="globalTabs">
+      <button class="global-tab active" onclick="switchGlobalTab('all',this)">전체</button>
+      <button class="global-tab" onclick="switchGlobalTab('A',this)">채널 A</button>
+      <button class="global-tab" onclick="switchGlobalTab('B',this)">채널 B</button>
+      <button class="global-tab" onclick="switchGlobalTab('C',this)">채널 C</button>
+      <button class="global-tab" onclick="switchGlobalTab('D',this)">채널 D</button>
+      <button class="global-tab" onclick="switchGlobalTab('E',this)">채널 E</button>
+    </div>
+
+    <div class="dash-body">
+
+      <!--
+        [TODO: 스펙 요구사항 — 볼륨/퀄리티 KPI]
+        - 글로벌 필터(전체/시스템/메뉴) 적용 시 KPI 카드 값이 해당 scope 기준으로 변경됨
+        - 담당자 필터 적용 시: 표시할 KPI 종류가 달라질 수 있음 (예: 처리율, 평균응답시간 등 담당자 고유 메트릭)
+        - 시스템/메뉴 탭에서 제거하거나 추가할 카드 종류 별도 정의 필요
+        - 이 TODO는 구현 전 dashboard-feature.md 업데이트 후 제거
+      -->
+
+      <!-- KPI VOLUME -->
+      <div>
+        <div class="section-label" id="kpiVolumeLabel">Volume</div>
+        <div class="kpi-grid" id="kpiVolumeGrid">
+          <div class="kpi-card"><div class="kpi-label">총 VOC</div><div class="kpi-value">1,204</div><div class="kpi-delta delta-pos">▲ 12% vs 전주</div></div>
+          <div class="kpi-card"><div class="kpi-label">미해결</div><div class="kpi-value">87</div><div class="kpi-delta delta-neg">▲ 5% vs 전주</div></div>
+          <div class="kpi-card"><div class="kpi-label">이번주 신규</div><div class="kpi-value">+23</div><div class="kpi-sublabel">3일차</div><div class="kpi-delta delta-pos">▲ 8% vs 전주</div></div>
+          <div class="kpi-card"><div class="kpi-label">이번주 완료</div><div class="kpi-value">+18</div><div class="kpi-sublabel">3일차</div><div class="kpi-delta delta-pos">▲ 20% vs 전주</div></div>
+        </div>
+      </div>
+
+      <!-- KPI QUALITY -->
+      <div>
+        <div class="section-label">Quality</div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">평균 처리시간</div><div class="kpi-value">4.2<span style="font-size:14px;font-weight:400;">일</span></div><div class="kpi-delta delta-pos">▼ 0.3일 vs 전주</div></div>
+          <div class="kpi-card"><div class="kpi-label">해결율</div><div class="kpi-value">78<span style="font-size:14px;font-weight:400;">%</span></div><div class="kpi-delta delta-pos">▲ 4%p vs 전주</div></div>
+          <div class="kpi-card alert-red"><div class="kpi-label">Urgent·High 미해결</div><div class="kpi-value" style="color:oklch(58% .22 25)">12</div><div class="kpi-delta delta-neg">▲ 3건 vs 전주</div></div>
+          <div class="kpi-card alert-amber"><div class="kpi-label">14일+ 미처리</div><div class="kpi-value" style="color:oklch(70% .16 72)">8</div><div class="kpi-delta delta-amb">▲ 2건 vs 전주</div></div>
+        </div>
+      </div>
+
+      <!-- 분포 + 매트릭스 -->
+      <div class="two-col">
+        <div class="widget">
+          <div class="widget-header">
+            <div class="widget-title">분포</div>
+            <div class="dim-selector" id="distDimSel">
+              <button class="dim-btn active" onclick="switchDim('distDimSel',this)">전체</button>
+              <button class="dim-btn" onclick="switchDim('distDimSel',this)" id="distDimSys">시스템별</button>
+              <button class="dim-btn" onclick="switchDim('distDimSel',this)" id="distDimMenu">메뉴별</button>
+            </div>
+          </div>
+          <div class="tabs" id="distTabs">
+            <div class="tab active" onclick="switchDistTab(this,'status')">상태</div>
+            <div class="tab" onclick="switchDistTab(this,'priority')">우선순위</div>
+            <div class="tab" onclick="switchDistTab(this,'type')">유형</div>
+            <div class="tab" onclick="switchDistTab(this,'tag')">태그</div>
+          </div>
+          <div id="distContent"></div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <div class="widget-title">우선순위 × 상태 매트릭스</div>
+            <div class="dim-selector" id="matDimSel">
+              <button class="dim-btn active" onclick="switchDim('matDimSel',this)">전체</button>
+              <button class="dim-btn" onclick="switchDim('matDimSel',this)" id="matDimSys">시스템별</button>
+              <button class="dim-btn" onclick="switchDim('matDimSel',this)" id="matDimMenu">메뉴별</button>
+            </div>
+          </div>
+          <table class="matrix-table">
+            <thead><tr><th class="rh"></th><th>접수됨</th><th>검토중</th><th>처리중</th><th>완료</th><th>보류</th></tr></thead>
+            <tbody>
+              <tr><td class="rh" style="color:oklch(58% .22 25)">Urgent</td><td style="background:oklch(63% .19 258 / .50)">8</td><td style="background:oklch(63% .19 258 / .65)">15</td><td style="background:oklch(63% .19 258 / .40)">6</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">2</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">1</td></tr>
+              <tr><td class="rh" style="color:oklch(60% .18 45)">High</td><td style="background:oklch(63% .19 258 / .28)">22</td><td style="background:oklch(63% .19 258 / .55)">48</td><td style="background:oklch(63% .19 258 / .60)">61</td><td style="background:oklch(63% .19 258 / .15);color:var(--text-tertiary)">9</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">4</td></tr>
+              <tr><td class="rh" style="color:var(--text-tertiary)">Medium</td><td style="background:oklch(63% .19 258 / .18)">55</td><td style="background:oklch(63% .19 258 / .42)">112</td><td style="background:oklch(63% .19 258 / .65)">189</td><td style="background:oklch(63% .19 258 / .22)">67</td><td style="background:oklch(63% .19 258 / .14)">28</td></tr>
+              <tr><td class="rh" style="color:var(--text-quaternary)">Low</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">95</td><td style="background:oklch(63% .19 258 / .18)">165</td><td style="background:oklch(63% .19 258 / .28)">264</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">26</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">27</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">셀 클릭 → 해당 필터로 VOC 목록 이동</div>
+        </div>
+      </div>
+
+      <!-- 히트맵 — table-layout:fixed로 X축 전환 시 크기 고정 -->
+      <div class="widget">
+        <div class="heatmap-top">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="widget-title">드릴다운 히트맵</div>
+            <div class="breadcrumb" id="hmBreadcrumb"></div>
+          </div>
+          <div class="btn-group" id="hmXAxisBtns">
+            <button class="btn active" onclick="switchHmAxis('status',this)">진행 현황</button>
+            <button class="btn" onclick="switchHmAxis('priority',this)">우선순위별</button>
+            <button class="btn" onclick="switchHmAxis('tag',this)">태그별</button>
+          </div>
+        </div>
+        <div id="hmTable"></div>
+      </div>
+
+      <!-- 라인 + 태그 바 -->
+      <div class="two-col">
+        <div class="widget">
+          <div class="widget-header">
+            <div class="widget-title">주간 트렌드 (최근 12주)</div>
+            <div class="dim-selector" id="lineDimSel">
+              <button class="dim-btn active" onclick="switchDim('lineDimSel',this)">전체</button>
+              <button class="dim-btn" onclick="switchDim('lineDimSel',this)" id="lineDimSys">시스템별</button>
+              <button class="dim-btn" onclick="switchDim('lineDimSel',this)" id="lineDimMenu">메뉴별</button>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-blue)"></div>신규(접수)</div>
+            <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-sky)"></div>진행중(검토+처리)</div>
+            <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-emerald)"></div>완료(완료+보류)</div>
+          </div>
+          <div class="chart-area">
+            <svg viewBox="0 0 460 110" width="100%" height="100%" preserveAspectRatio="none">
+              <line x1="0" y1="20" x2="460" y2="20" stroke="var(--border-subtle)" stroke-width=".5"/>
+              <line x1="0" y1="50" x2="460" y2="50" stroke="var(--border-subtle)" stroke-width=".5"/>
+              <line x1="0" y1="80" x2="460" y2="80" stroke="var(--border-subtle)" stroke-width=".5"/>
+              <line x1="0" y1="105" x2="460" y2="105" stroke="var(--border-subtle)" stroke-width=".5"/>
+              <polyline fill="none" stroke="var(--chart-blue)" stroke-width="2" stroke-linejoin="round" points="20,78 58,64 96,68 134,54 172,58 210,44 248,48 286,38 324,52 362,40 400,34 438,36"/>
+              <polyline fill="none" stroke="var(--chart-sky)" stroke-width="2" stroke-linejoin="round" points="20,55 58,48 96,52 134,42 172,46 210,36 248,40 286,32 324,44 362,34 400,28 438,30"/>
+              <polyline fill="none" stroke="var(--chart-emerald)" stroke-width="2" stroke-linejoin="round" points="20,92 58,82 96,86 134,74 172,78 210,64 248,66 286,58 324,70 362,56 400,50 438,53"/>
+            </svg>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-quaternary);margin-top:3px;padding:0 2px;">
+            <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span><span>W9</span><span>W10</span><span>W11</span><span>W12</span>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <div class="widget-title">태그별 분포 (Top 10)</div>
+            <div class="dim-selector" id="tagDimSel">
+              <button class="dim-btn active" onclick="switchDim('tagDimSel',this)">전체</button>
+              <button class="dim-btn" onclick="switchDim('tagDimSel',this)" id="tagDimSys">시스템별</button>
+              <button class="dim-btn" onclick="switchDim('tagDimSel',this)" id="tagDimMenu">메뉴별</button>
+            </div>
+          </div>
+          <div class="bar-list">
+            <div class="bar-item"><span class="bar-label">UI/UX</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">287</span></div>
+            <div class="bar-item"><span class="bar-label">성능</span><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><span class="bar-val">235</span></div>
+            <div class="bar-item"><span class="bar-label">오류/버그</span><div class="bar-track"><div class="bar-fill" style="width:71%"></div></div><span class="bar-val">204</span></div>
+            <div class="bar-item"><span class="bar-label">결제</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div><span class="bar-val">167</span></div>
+            <div class="bar-item"><span class="bar-label">로그인</span><div class="bar-track"><div class="bar-fill" style="width:47%"></div></div><span class="bar-val">135</span></div>
+            <div class="bar-item"><span class="bar-label">알림</span><div class="bar-track"><div class="bar-fill" style="width:39%"></div></div><span class="bar-val">112</span></div>
+            <div class="bar-item"><span class="bar-label">데이터</span><div class="bar-track"><div class="bar-fill" style="width:33%"></div></div><span class="bar-val">95</span></div>
+            <div class="bar-item"><span class="bar-label">API</span><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div><span class="bar-val">78</span></div>
+            <div class="bar-item"><span class="bar-label">보안</span><div class="bar-track"><div class="bar-fill" style="width:21%"></div></div><span class="bar-val">61</span></div>
+            <div class="bar-item"><span class="bar-label">기타</span><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><span class="bar-val">46</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 시스템/메뉴 현황 카드 -->
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title" id="cardSectionTitle">시스템 현황</div>
+        </div>
+        <div class="card-grid" id="sysCardGrid"></div>
+      </div>
+
+      <!-- 담당자별 처리 현황 -->
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">담당자별 처리 현황</div>
+          <div class="btn-group" id="assignXAxisBtns">
+            <button class="btn active" onclick="switchAssignAxis('status',this)">진행 현황</button>
+            <button class="btn" onclick="switchAssignAxis('priority',this)">우선순위별</button>
+            <button class="btn" onclick="switchAssignAxis('tag',this)">태그별</button>
+          </div>
+        </div>
+        <div id="assignTable"></div>
+      </div>
+
+      <!-- 장기 미처리 -->
+      <div class="widget" style="margin-bottom:24px;">
+        <div class="widget-header">
+          <div class="widget-title">장기 미처리 VOC Top 10</div>
+          <div class="dim-selector" id="agingDimSel">
+            <button class="dim-btn active" onclick="switchDim('agingDimSel',this)">전체</button>
+            <!-- 전체 탭: 시스템별 / 시스템 탭: 메뉴별 (switchGlobalTab에서 동적 변경) -->
+            <button class="dim-btn" onclick="switchDim('agingDimSel',this)" id="agingDimSys">시스템별</button>
+          </div>
+        </div>
+        <div id="agingTableWrap"></div>
+      </div>
+
+    </div><!-- /.dash-body -->
+  </main>
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────
+const HM = {
+  status: {
+    headers: ['접수됨','검토중','처리중','완료','보류'],
+    systems: {'채널 A':[42,89,134,28,15],'채널 B':[31,67,156,44,19],'채널 C':[18,48,112,19,0],'채널 D':[14,36,89,13,7],'채널 E':[10,23,62,0,0]},
+    menus: {
+      '채널 A':{'메뉴 1 (홈)':[12,24,38,8,3],'메뉴 2 (검색)':[8,18,42,9,5],'메뉴 3 (마이페이지)':[10,22,29,7,4],'메뉴 4 (결제)':[7,15,18,4,3],'메뉴 5 (설정)':[5,10,7,0,0]},
+      '채널 B':{'메뉴 1 (대시)':[9,20,44,12,6],'메뉴 2 (리포트)':[8,16,38,11,4],'메뉴 3 (알림)':[7,14,32,9,5],'메뉴 4 (설정)':[7,17,42,12,4]},
+      '채널 C':{'메뉴 1 (홈)':[6,18,40,7,0],'메뉴 2 (검색)':[5,14,35,6,0],'메뉴 3 (마이)':[7,16,37,6,0]},
+      '채널 D':{'메뉴 1 (메인)':[5,12,28,5,3],'메뉴 2 (설정)':[4,11,31,4,2],'메뉴 3 (알림)':[5,13,30,4,2]},
+      '채널 E':{'메뉴 1 (홈)':[4,9,22,0,0],'메뉴 2 (검색)':[3,8,20,0,0],'메뉴 3 (프로필)':[3,6,20,0,0]},
+    }
+  },
+  priority: {
+    headers: ['Urgent','High','Medium','Low'],
+    systems: {'채널 A':[28,72,142,66],'채널 B':[24,80,156,57],'채널 C':[12,45,104,36],'채널 D':[8,34,82,35],'채널 E':[5,17,56,17]},
+    menus: {
+      '채널 A':{'메뉴 1 (홈)':[8,20,42,15],'메뉴 2 (검색)':[6,18,40,18],'메뉴 3 (마이페이지)':[5,15,38,14],'메뉴 4 (결제)':[5,12,14,16],'메뉴 5 (설정)':[4,7,8,3]},
+      '채널 B':{'메뉴 1 (대시)':[6,22,42,15],'메뉴 2 (리포트)':[6,20,38,13],'메뉴 3 (알림)':[5,18,38,11],'메뉴 4 (설정)':[7,20,38,18]},
+      '채널 C':{'메뉴 1 (홈)':[4,15,36,16],'메뉴 2 (검색)':[4,13,34,9],'메뉴 3 (마이)':[4,17,34,11]},
+      '채널 D':{'메뉴 1 (메인)':[3,10,28,12],'메뉴 2 (설정)':[2,12,30,8],'메뉴 3 (알림)':[3,12,24,15]},
+      '채널 E':{'메뉴 1 (홈)':[2,6,20,8],'메뉴 2 (검색)':[1,5,18,7],'메뉴 3 (프로필)':[2,6,18,3]},
+    }
+  },
+  tag: {
+    headers: ['UI/UX','성능','오류/버그','결제','로그인'],
+    systems: {'채널 A':[68,52,48,38,24],'채널 B':[72,58,54,42,28],'채널 C':[42,38,32,22,14],'채널 D':[32,28,24,16,12],'채널 E':[22,18,16,0,0]},
+    menus: {
+      '채널 A':{'메뉴 1 (홈)':[20,14,12,8,6],'메뉴 2 (검색)':[16,12,10,8,6],'메뉴 3 (마이페이지)':[14,10,10,6,6],'메뉴 4 (결제)':[10,8,10,14,4],'메뉴 5 (설정)':[8,8,6,2,2]},
+      '채널 B':{'메뉴 1 (대시)':[18,14,12,10,6],'메뉴 2 (리포트)':[18,14,14,10,8],'메뉴 3 (알림)':[16,14,14,10,6],'메뉴 4 (설정)':[20,16,14,12,8]},
+      '채널 C':{'메뉴 1 (홈)':[14,12,10,8,4],'메뉴 2 (검색)':[14,12,12,8,4],'메뉴 3 (마이)':[14,14,10,6,6]},
+      '채널 D':{'메뉴 1 (메인)':[10,10,8,6,4],'메뉴 2 (설정)':[10,8,8,6,4],'메뉴 3 (알림)':[12,10,8,4,4]},
+      '채널 E':{'메뉴 1 (홈)':[8,6,6,0,0],'메뉴 2 (검색)':[6,6,4,0,0],'메뉴 3 (프로필)':[8,6,6,0,0]},
+    }
+  }
+};
+
+const ASSIGN = {
+  status:   {headers:['접수됨','검토중','처리중','완료','보류'],rows:[['김지훈',8,22,34,12,4],['이수연',6,18,28,10,3],['박민준',5,14,24,8,2],['최유진',7,20,30,11,3],['정해원',4,12,20,7,2],['미배정',12,32,48,0,6]]},
+  priority: {headers:['Urgent','High','Medium','Low'],rows:[['김지훈',18,28,36,18],['이수연',14,22,30,14],['박민준',10,18,26,10],['최유진',16,24,32,16],['정해원',8,14,22,8],['미배정',10,38,52,0]]},
+  tag:      {headers:['UI/UX','성능','오류/버그','결제','로그인'],rows:[['김지훈',16,14,12,8,6],['이수연',14,12,10,6,4],['박민준',12,10,8,6,4],['최유진',14,12,10,8,4],['정해원',10,8,8,4,4],['미배정',28,22,18,12,8]]}
+};
+
+const MENU_DATA = {
+  '채널 A': [{name:'메뉴 1 (홈)',total:85,unresolved:8},{name:'메뉴 2 (검색)',total:82,unresolved:7},{name:'메뉴 3 (마이페이지)',total:72,unresolved:6},{name:'메뉴 4 (결제)',total:47,unresolved:5},{name:'메뉴 5 (설정)',total:22,unresolved:2}],
+  '채널 B': [{name:'메뉴 1 (대시)',total:89,unresolved:9},{name:'메뉴 2 (리포트)',total:77,unresolved:8},{name:'메뉴 3 (알림)',total:74,unresolved:7},{name:'메뉴 4 (설정)',total:77,unresolved:7}],
+  '채널 C': [{name:'메뉴 1 (홈)',total:68,unresolved:5},{name:'메뉴 2 (검색)',total:60,unresolved:4},{name:'메뉴 3 (마이)',total:69,unresolved:3}],
+  '채널 D': [{name:'메뉴 1 (메인)',total:55,unresolved:3},{name:'메뉴 2 (설정)',total:50,unresolved:3},{name:'메뉴 3 (알림)',total:54,unresolved:3}],
+  '채널 E': [{name:'메뉴 1 (홈)',total:35,unresolved:3},{name:'메뉴 2 (검색)',total:31,unresolved:2},{name:'메뉴 3 (프로필)',total:29,unresolved:2}],
+};
+
+const SYS_DATA = [
+  {name:'채널 A',total:308,unresolved:28},{name:'채널 B',total:317,unresolved:31},
+  {name:'채널 C',total:197,unresolved:12},{name:'채널 D',total:159,unresolved:9},
+  {name:'채널 E',total:95,unresolved:7},{name:'채널 F',total:72,unresolved:0},{name:'채널 G',total:56,unresolved:0},
+];
+
+const AGING_ALL = [
+  {code:'VOC-0041',title:'결제 모듈 타임아웃 오류 반복',loc:'채널 A',priority:'urgent',days:48,daysCls:'badge-red'},
+  {code:'VOC-0055',title:'모바일 앱 알림 미수신 문제',loc:'채널 B',priority:'high',days:41,daysCls:'badge-red'},
+  {code:'VOC-0063',title:'로그인 세션 자동 만료 이슈',loc:'채널 A',priority:'urgent',days:38,daysCls:'badge-red'},
+  {code:'VOC-0071',title:'CSV 내보내기 한글 깨짐',loc:'채널 C',priority:'medium',days:26,daysCls:'badge-amber'},
+  {code:'VOC-0082',title:'검색 필터 저장 안됨',loc:'채널 B',priority:'high',days:23,daysCls:'badge-amber'},
+  {code:'VOC-0094',title:'대용량 파일 업로드 실패',loc:'채널 D',priority:'high',days:19,daysCls:'badge-amber'},
+  {code:'VOC-0108',title:'API 응답 속도 저하',loc:'채널 A',priority:'medium',days:17,daysCls:'badge-amber'},
+  {code:'VOC-0115',title:'권한 설정 화면 오작동',loc:'채널 C',priority:'medium',days:15,daysCls:'badge-amber'},
+  {code:'VOC-0123',title:'대시보드 로딩 지연',loc:'채널 B',priority:'medium',days:14,daysCls:'badge-amber'},
+  {code:'VOC-0131',title:'이메일 발송 실패 케이스',loc:'채널 E',priority:'high',days:14,daysCls:'badge-amber'},
+];
+
+// 시스템 탭에서 메뉴별 aging 예시
+const AGING_MENU = {
+  '채널 A': [
+    {code:'VOC-0041',title:'결제 모듈 타임아웃 오류 반복',loc:'메뉴 4 (결제)',priority:'urgent',days:48,daysCls:'badge-red'},
+    {code:'VOC-0063',title:'로그인 세션 자동 만료 이슈',loc:'메뉴 1 (홈)',priority:'urgent',days:38,daysCls:'badge-red'},
+    {code:'VOC-0108',title:'API 응답 속도 저하',loc:'메뉴 2 (검색)',priority:'medium',days:17,daysCls:'badge-amber'},
+  ],
+  '채널 B': [
+    {code:'VOC-0055',title:'모바일 앱 알림 미수신 문제',loc:'메뉴 3 (알림)',priority:'high',days:41,daysCls:'badge-red'},
+    {code:'VOC-0082',title:'검색 필터 저장 안됨',loc:'메뉴 2 (리포트)',priority:'high',days:23,daysCls:'badge-amber'},
+    {code:'VOC-0123',title:'대시보드 로딩 지연',loc:'메뉴 1 (대시)',priority:'medium',days:14,daysCls:'badge-amber'},
+  ],
+};
+
+// ── State ─────────────────────────────────────────────────────
+let globalTab = 'all';      // 'all' | 'A'|'B'|'C'|'D'|'E'
+let activeMenu = null;       // e.g. '메뉴 1 (홈)' when menu is selected from dropdown
+let activeAssignee = null;   // e.g. '김지훈'
+let hmAxis = 'status';
+let assignAxis = 'status';
+
+// ── Helpers ───────────────────────────────────────────────────
+function cellStyle(v, max) {
+  if (v === 0) return 'class="empty"';
+  const op = Math.max(0.06, (v / max) * 0.62).toFixed(2);
+  const textColor = op > 0.35 ? 'color:var(--text-primary)' : 'color:var(--text-secondary)';
+  return `style="background:oklch(63% .19 258 / ${op});${textColor}"`;
+}
+
+function priorityBadge(p) {
+  if (p==='urgent') return '<span class="badge badge-urgent">Urgent</span>';
+  if (p==='high')   return '<span class="badge badge-high">High</span>';
+  return '<span class="badge badge-medium">Medium</span>';
+}
+
+// ── Heatmap ───────────────────────────────────────────────────
+function renderHeatmap() {
+  const data = HM[hmAxis];
+  const headers = data.headers;
+  const sysName = globalTab !== 'all' ? '채널 ' + globalTab : null;
+
+  // Determine view level
+  let rows, isMenuView = false, isSingleMenu = false;
+
+  if (activeMenu && sysName) {
+    // 메뉴 탭 — 단일 행만 표시
+    // [구현 주의] 메뉴 선택 시 히트맵은 해당 메뉴 단일 행만 표시.
+    // 드릴다운 없음. 향후 변경 가능성 있음 — 구현 시 이 동작을 별도 플래그로 분리하여 쉽게 수정 가능하도록 할 것.
+    const menuRows = data.menus[sysName] || {};
+    const menuVals = menuRows[activeMenu];
+    rows = menuVals ? [[activeMenu, menuVals]] : [];
+    isMenuView = true;
+    isSingleMenu = true;
+  } else if (sysName) {
+    // 시스템 탭 — 해당 시스템의 메뉴 목록
+    rows = Object.entries(data.menus[sysName] || {});
+    isMenuView = true;
+  } else {
+    // 전체 탭 — 시스템 목록
+    rows = Object.entries(data.systems);
+  }
+
+  // 합계 행 계산 (단일 메뉴 뷰에선 합계 행 불필요)
+  const showTotalRow = !isSingleMenu;
+  const colTotals = headers.map((_, i) => rows.reduce((s, [,v]) => s + v[i], 0));
+  const grandTotal = colTotals.reduce((a,b)=>a+b,0);
+
+  // max는 합계 행 제외하고 계산 (개별 셀 강도만 기준)
+  const allVals = rows.flatMap(([,v]) => v);
+  const max = Math.max(...allVals, 1);
+
+  // colgroup for fixed layout (prevents width jumping on X-axis switch)
+  let html = '<table class="heatmap-table"><colgroup>';
+  html += '<col style="width:130px">';
+  for (let i = 0; i < headers.length + 1; i++) html += '<col>';
+  html += '</colgroup>';
+
+  html += '<thead><tr>';
+  html += `<th class="rl">${isMenuView ? '메뉴' : '시스템'}</th>`;
+  for (const h of headers) html += `<th>${h}</th>`;
+  html += '<th>합계</th></tr></thead><tbody>';
+
+  // 합계 행 (맨 위)
+  if (showTotalRow) {
+    const totalLabel = isMenuView ? `${sysName} 전체` : '전체';
+    html += '<tr class="hm-total-row">';
+    html += `<td class="rl">${totalLabel}</td>`;
+    for (const v of colTotals) {
+      html += `<td style="color:var(--text-secondary);font-weight:700">${v}</td>`;
+    }
+    html += `<td class="tc" style="font-weight:700">${grandTotal}</td></tr>`;
+  }
+
+  // 데이터 행
+  for (const [name, vals] of rows) {
+    const total = vals.reduce((a,b)=>a+b,0);
+    html += '<tr>';
+    if (!isMenuView) {
+      html += `<td class="rl clickable" onclick="drillHeatmap('${name}')" title="클릭 → 메뉴 상세">▶ ${name}</td>`;
+    } else {
+      html += `<td class="rl">${name}</td>`;
+    }
+    for (const v of vals) {
+      if (v === 0) html += `<td class="empty">—</td>`;
+      else html += `<td ${cellStyle(v,max)}>${v}</td>`;
+    }
+    html += `<td class="tc">${total}</td></tr>`;
+  }
+  html += '</tbody></table>';
+
+  if (!isMenuView) {
+    html += '<div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">▶ 시스템명 클릭 → 메뉴별 상세 보기 &nbsp;|&nbsp; 셀 클릭 → VOC 목록 이동</div>';
+  } else if (isSingleMenu) {
+    html += '<div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">메뉴 선택 시 단일 행 표시 &nbsp;|&nbsp; 셀 클릭 → VOC 목록 이동</div>';
+  } else {
+    html += '<div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">셀 클릭 → 해당 메뉴+상태 필터로 VOC 목록 이동</div>';
+  }
+
+  document.getElementById('hmTable').innerHTML = html;
+
+  // 브레드크럼 업데이트: 전체 > 채널 X > 메뉴명
+  const bc = document.getElementById('hmBreadcrumb');
+  if (sysName && activeMenu) {
+    bc.innerHTML = `<span class="crumb" onclick="backToAll()">전체</span><span class="sep">›</span><span class="crumb" onclick="backToSystem()">${sysName}</span><span class="sep">›</span><span>${activeMenu}</span>`;
+  } else if (sysName) {
+    bc.innerHTML = `<span class="crumb" onclick="backToAll()">전체</span><span class="sep">›</span><span>${sysName}</span>`;
+  } else {
+    bc.innerHTML = `<span class="crumb" style="cursor:default">전체</span>`;
+  }
+}
+
+function drillHeatmap(systemName) {
+  // 전체 탭에서 시스템 행 클릭 → 해당 시스템 탭으로 전환 (메뉴 목록 표시)
+  const tabMap = {'채널 A':'A','채널 B':'B','채널 C':'C','채널 D':'D','채널 E':'E'};
+  const key = tabMap[systemName];
+  if (key) {
+    const btn = document.querySelector(`.global-tab:nth-child(${Object.values(tabMap).indexOf(key)+2})`);
+    switchGlobalTabByKey(key, btn);
+  }
+}
+
+function backToAll() {
+  const allBtn = document.querySelector('.global-tab');
+  switchGlobalTab('all', allBtn);
+}
+
+function backToSystem() {
+  activeMenu = null;
+  document.getElementById('menuSelect').value = '';
+  renderHeatmap();
+  updateFilterContext();
+}
+
+function switchHmAxis(axis, btn) {
+  hmAxis = axis;
+  document.querySelectorAll('#hmXAxisBtns .btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHeatmap();
+}
+
+// ── Assignee Table ────────────────────────────────────────────
+function renderAssignTable() {
+  const data = ASSIGN[assignAxis];
+  const allVals = data.rows.flatMap(r => r.slice(1));
+  const max = Math.max(...allVals, 1);
+
+  // 담당자 필터: activeAssignee가 있으면 해당 행만, 없으면 전체
+  const rows = activeAssignee
+    ? data.rows.filter(r => r[0] === activeAssignee || r[0] === '미배정')
+    : data.rows;
+
+  let html = '<table class="assign-table"><thead><tr>';
+  html += '<th class="rl">담당자</th>';
+  for (const h of data.headers) html += `<th>${h}</th>`;
+  html += '<th>합계</th></tr></thead><tbody>';
+
+  for (const row of rows) {
+    const [name, ...vals] = row;
+    const total = vals.reduce((a,b)=>a+b,0);
+    const isHighlighted = activeAssignee && name === activeAssignee;
+    const rowClass = isHighlighted ? ' class="assign-row-highlight"' : '';
+    html += `<tr${rowClass}>`;
+    if (name === '미배정') {
+      html += `<td class="rl unassigned">${name}</td>`;
+    } else {
+      html += `<td class="rl">${name}</td>`;
+    }
+    for (const v of vals) {
+      if (v === 0) html += `<td class="empty">—</td>`;
+      else html += `<td ${cellStyle(v,max)}>${v}</td>`;
+    }
+    html += `<td class="tc">${total}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('assignTable').innerHTML = html;
+}
+
+function switchAssignAxis(axis, btn) {
+  assignAxis = axis;
+  document.querySelectorAll('#assignXAxisBtns .btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAssignTable();
+}
+
+// ── Aging Table ───────────────────────────────────────────────
+function renderAgingTable() {
+  const sysName = globalTab !== 'all' ? '채널 ' + globalTab : null;
+  const agingDimSysBtn = document.getElementById('agingDimSys');
+  const isMenuDim = agingDimSysBtn && agingDimSysBtn.textContent === '메뉴별' && agingDimSysBtn.classList.contains('active');
+
+  let data;
+  let locLabel = '시스템';
+  if (sysName && isMenuDim) {
+    data = (AGING_MENU[sysName] || AGING_ALL.filter(r => r.loc === sysName));
+    locLabel = '메뉴';
+  } else if (sysName) {
+    data = AGING_ALL.filter(r => r.loc === sysName);
+  } else {
+    data = AGING_ALL;
+  }
+
+  let html = `<table class="aging-table"><thead><tr><th>Issue</th><th>제목</th><th>${locLabel}</th><th>우선순위</th><th>경과일</th></tr></thead><tbody>`;
+  for (const r of data) {
+    html += `<tr><td class="code">${r.code}</td><td class="title-col">${r.title}</td><td>${r.loc}</td><td>${priorityBadge(r.priority)}</td><td><span class="badge ${r.daysCls}">${r.days}일</span></td></tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('agingTableWrap').innerHTML = html;
+}
+
+// ── Global Tab ────────────────────────────────────────────────
+function switchGlobalTab(tab, btn) {
+  globalTab = tab;
+  activeMenu = null;  // 탭 전환 시 메뉴 선택 초기화
+  document.getElementById('menuSelect').value = '';
+
+  if (btn) {
+    document.querySelectorAll('.global-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  _applyGlobalTabState();
+}
+
+function switchGlobalTabByKey(tab, btn) {
+  switchGlobalTab(tab, btn);
+}
+
+function _applyGlobalTabState() {
+  const isAll = globalTab === 'all';
+  const sysName = isAll ? null : '채널 ' + globalTab;
+
+  // 시스템별 dim 버튼 숨기기 (시스템 탭에서는 시스템별 옵션 불필요)
+  ['distDimSys','matDimSys','lineDimSys','tagDimSys'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isAll ? '' : 'none';
+  });
+
+  // 메뉴별 dim 버튼 표시 (시스템 탭에서는 메뉴별 활성화)
+  ['distDimMenu','matDimMenu','lineDimMenu','tagDimMenu'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = isAll;
+  });
+
+  // 장기 미처리 dim 버튼: 전체=시스템별 / 시스템탭=메뉴별
+  const agingDimSys = document.getElementById('agingDimSys');
+  if (agingDimSys) agingDimSys.textContent = isAll ? '시스템별' : '메뉴별';
+
+  // 메뉴 드롭다운 표시/숨김 및 옵션 채우기
+  const menuWrap = document.getElementById('menuSelectorWrap');
+  const menuSelect = document.getElementById('menuSelect');
+  if (isAll) {
+    menuWrap.style.display = 'none';
+    menuSelect.innerHTML = '<option value="">메뉴: 전체</option>';
+  } else {
+    menuWrap.style.display = 'flex';
+    const menus = MENU_DATA[sysName] || [];
+    menuSelect.innerHTML = `<option value="">메뉴: 전체</option>` +
+      menus.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+  }
+
+  // 히트맵 업데이트
+  renderHeatmap();
+
+  // 시스템/메뉴 카드 업데이트
+  const titleEl = document.getElementById('cardSectionTitle');
+  const gridEl = document.getElementById('sysCardGrid');
+  if (isAll) {
+    titleEl.textContent = '시스템 현황';
+    let html = SYS_DATA.map(s =>
+      `<div class="sys-card"><div class="sys-card-name">${s.name}</div><div class="sys-card-stats"><span>전체 <strong>${s.total}</strong></span><span>미해결 <strong>${s.unresolved}</strong></span></div></div>`
+    ).join('');
+    html += '<div class="sys-card" style="background:transparent;border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--text-quaternary);font-size:11px;">+ 더보기</div>';
+    gridEl.innerHTML = html;
+  } else {
+    titleEl.textContent = `메뉴 현황 (${sysName})`;
+    const menus = MENU_DATA[sysName] || [];
+    gridEl.innerHTML = menus.map(m =>
+      `<div class="sys-card"><div class="sys-card-name">${m.name}</div><div class="sys-card-stats"><span>전체 <strong>${m.total}</strong></span><span>미해결 <strong>${m.unresolved}</strong></span></div></div>`
+    ).join('');
+  }
+
+  renderAgingTable();
+  updateFilterContext();
+}
+
+// ── 메뉴 드롭다운 선택 ────────────────────────────────────────
+function selectMenu(menuName) {
+  activeMenu = menuName || null;
+  renderHeatmap();
+  updateFilterContext();
+  // 실제 구현에서는 모든 위젯 데이터를 activeMenu로 필터링해야 함
+}
+
+// ── 담당자 필터 ──────────────────────────────────────────────
+function selectAssignee(name) {
+  activeAssignee = name || null;
+  renderAssignTable();
+  updateFilterContext();
+  // 실제 구현에서는 모든 위젯 데이터를 activeAssignee로 필터링해야 함
+}
+
+// ── 필터 컨텍스트 배너 ────────────────────────────────────────
+function updateFilterContext() {
+  const parts = [];
+  if (globalTab !== 'all') parts.push('채널 ' + globalTab);
+  if (activeMenu) parts.push(activeMenu);
+  if (activeAssignee) parts.push('담당자: ' + activeAssignee);
+
+  const banner = document.getElementById('filterContext');
+  const text = document.getElementById('filterContextText');
+  if (parts.length > 0) {
+    text.textContent = parts.join(' › ');
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ── Distribution Tab ──────────────────────────────────────────
+const DIST_CONTENT = {
+  status: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(43% .010 260) 0% 14.9%, oklch(67% .17 240) 14.9% 43.1%, oklch(55% .17 150) 43.1% 86.3%, oklch(62% .19 158) 86.3% 94.9%, oklch(70% .16 72) 94.9% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(43% .010 260)"></div><span class="legend-name">접수됨</span><span class="legend-count">180</span><span class="legend-pct">14.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:30%;background:oklch(43% .010 260)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(67% .17 240)"></div><span class="legend-name">검토중</span><span class="legend-count">340</span><span class="legend-pct">28.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:57%;background:oklch(67% .17 240)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">처리중</span><span class="legend-count">520</span><span class="legend-pct">43.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(62% .19 158)"></div><span class="legend-name">완료</span><span class="legend-count">104</span><span class="legend-pct">8.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:20%;background:oklch(62% .19 158)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">보류</span><span class="legend-count">60</span><span class="legend-pct">5.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:12%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
+  priority: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(58% .22 25) 0% 6.6%, oklch(60% .18 45) 6.6% 29.5%, oklch(59% .012 258) 29.5% 79.1%, oklch(43% .010 260) 79.1% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">Urgent</span><span class="legend-count">80</span><span class="legend-pct">6.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:13%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(60% .18 45)"></div><span class="legend-name">High</span><span class="legend-count">276</span><span class="legend-pct">22.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:46%;background:oklch(60% .18 45)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-tertiary)"></div><span class="legend-name">Medium</span><span class="legend-count">600</span><span class="legend-pct">49.8%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:var(--text-tertiary)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-quaternary)"></div><span class="legend-name">Low</span><span class="legend-count">248</span><span class="legend-pct">20.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:41%;background:var(--text-quaternary)"></div></div></div></div></div>`,
+  type: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(58% .22 25) 0% 28%, oklch(63% .19 258) 28% 54%, oklch(55% .17 150) 54% 76%, oklch(70% .16 72) 76% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">버그</span><span class="legend-count">337</span><span class="legend-pct">28.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(63% .19 258)"></div><span class="legend-name">기능 요청</span><span class="legend-count">313</span><span class="legend-pct">26.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:93%;background:oklch(63% .19 258)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">개선 제안</span><span class="legend-count">265</span><span class="legend-pct">22.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:79%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">문의</span><span class="legend-count">289</span><span class="legend-pct">24.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:86%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
+  tag: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(63% .19 258) 0% 23.8%, oklch(72% .14 235) 23.8% 43.3%, oklch(58% .22 25) 43.3% 60.3%, oklch(60% .18 45) 60.3% 74.2%, oklch(55% .17 150) 74.2% 85.5%, oklch(43% .010 260) 85.5% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(63% .19 258)"></div><span class="legend-name">UI/UX</span><span class="legend-count">287</span><span class="legend-pct">23.8%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(63% .19 258)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(72% .14 235)"></div><span class="legend-name">성능</span><span class="legend-count">235</span><span class="legend-pct">19.5%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:82%;background:oklch(72% .14 235)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">오류/버그</span><span class="legend-count">204</span><span class="legend-pct">16.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:71%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(60% .18 45)"></div><span class="legend-name">결제</span><span class="legend-count">167</span><span class="legend-pct">13.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:58%;background:oklch(60% .18 45)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">로그인</span><span class="legend-count">135</span><span class="legend-pct">11.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:47%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-quaternary)"></div><span class="legend-name">기타</span><span class="legend-count">176</span><span class="legend-pct">14.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:61%;background:var(--text-quaternary)"></div></div></div></div></div>`
+};
+
+function switchDistTab(btn, key) {
+  document.querySelectorAll('#distTabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('distContent').innerHTML = DIST_CONTENT[key];
+}
+
+function switchDim(selId, btn) {
+  document.querySelectorAll(`#${selId} .dim-btn`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // 장기 미처리 dim 변경 시 테이블 재렌더
+  if (selId === 'agingDimSel') renderAgingTable();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+document.getElementById('distContent').innerHTML = DIST_CONTENT['status'];
+renderHeatmap();
+renderAssignTable();
+renderAgingTable();
+_applyGlobalTabState();
+</script>
+</body>
+</html>

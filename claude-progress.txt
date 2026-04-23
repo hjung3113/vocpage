@@ -4,12 +4,11 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ → **다음: Phase 5** (CLAUDE.md 분리) → Phase 6 (구현 전 준비)
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ → **다음: Phase 6** (구현 전 준비)
 
 ### 다음 세션 우선순위
 
-1. **Phase 5: CLAUDE.md 분리** — frontend / backend / prototype / root로 분리 (루트 200줄 이내)
-2. **Phase 6: 구현 전 준비** — 스캐폴딩·인증 mock·DB 마이그레이션 전략 결정
+1. **Phase 6: 구현 전 준비** — 스캐폴딩·인증 mock·DB 마이그레이션 전략 결정
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 
