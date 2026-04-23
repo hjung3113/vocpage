@@ -69,8 +69,17 @@
 - **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe, 전역 UNIQUE)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성. `slug` 제약: `(system_id, slug)` 복합 UNIQUE.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
-  - `status`: 기존 `보류`를 `드랍`으로 대체 (사실상 드랍에 가깝게 운영). 상태 전환 매트릭스(§8.2) 업데이트 필요. 5단계 유지 vs 4단계(`접수/진행중/완료/드랍`)로 단순화는 다음 세션에서 확정.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
+  - `status`: **5단계 유지 확정** (v3 §1.4, 2026-04-24). 기존 `보류`를 `드랍`으로 대체. 4단계 축소 옵션은 폐기 — 분석 업무 특성상 `검토중`(조사) vs `처리중`(착수)의 의미 구분 유지 가치 있음. 상태 전환 매트릭스는 §8.2.
+  - `source`: VOC 생성 출처 구분. `manual` = 웹 UI 폼 입력(User/Manager), `import` = Jira 이관 스크립트(MVP 오픈 전 1회성).
+    - **PG enum 대신 text+CHECK** 선택 — 향후 값 추가/제거 유연성(`chatbot` 등 NextGen 가능성).
+    - **운영 규칙**:
+      - 지표 분리: "신규 VOC" 집계는 `source != 'import'` 필수. 마이그레이션 건을 신규 유입으로 집계 금지.
+      - SLA 제외: `source='import'` VOC는 SLA 타이머·에스컬레이션 제외 (이미 과거 처리 완료). §12 SC-1 분모에서 제외.
+      - 마이그레이션 `created_at`: **Jira 원본 생성일 보존** (이관 실행 시각으로 덮지 않음).
+      - UI 배지: 리스트·상세에서 `source='import'`에 **"Jira Imported"** 배지 노출 (데이터 품질 힌트).
+      - 리스트 필터 UI: MVP는 미포함 (선택지 `import` 단일이라 무의미). NextGen에서 값 추가 시 드롭다운 도입.
+      - API 응답: `GET /api/vocs/:id` 및 목록 응답에 `source` 기본 포함.
   - `structured_payload` 스키마 (완료·드랍 시 정식 제출용, UI는 폼 기반):
     ```json
     {
@@ -85,13 +94,15 @@
       "related_programs":  [...],
       "related_db_tables": [...],
       "related_jobs":      [...],
-      "related_sps":       [...]
+      "related_sps":       [...],
+      "unverified_fields": [...]            // text[] — 저장 시 BE 재검증으로 마스터에 없다고 판정된 필드명
     }
     ```
     - `source(manual|auto)` 메타는 DB 저장 안 함 — 저장 이후엔 전부 담당자 확정 책임.
     - 정식 저장 검증: `equipment`/`maker`/`model`/`process` 중 **최소 1개 배열에 값** + `symptom`/`root_cause`/`resolution` 텍스트 3종 비어있지 않음. 전부 빈 배열이면 저장 차단.
     - 임시저장(`structured_payload_draft`)은 필수 필드 검증 면제, 최신 1건만 유지 (이력 없음).
-  - **외부 참조 검증 정책**: 칩 추가 시점 즉시 외부 마스터 쿼리로 존재 검증 → 실패 시 빨간 경고 + 미추가. 외부 시스템 장애 시 추가 허용 + `review_status='unverified'`로 리뷰 게이트에서 재확인.
+    - `unverified_fields`: **BE가 저장 시점에 자체 메모리(§16.3 외부 마스터 캐시)로 재검증**하여 계산 (FE body 플래그 신뢰 금지). 하나라도 차면 `vocs.review_status='unverified'` 동반 세팅. 리뷰 화면에서 해당 필드에 경고 배지 표시.
+  - **외부 참조 검증 정책**: 편집 세션 동안 FE는 BE 메모리 캐시(§16.3)에서 자동완성·존재 검증. 저장 시 BE가 단일 진실 원천으로 재검증 → 실패 필드는 `unverified_fields`에 기록 + `review_status='unverified'`. 저장 시점 외부 API 호출은 **0건**.
   - `review_status` 라이프사이클: 정식 제출 시 `unverified` → Result Review에서 `approved`/`rejected` → approve 후 "삭제 신청" 시 `pending_deletion` → 승인 시 payload clear + `review_status=NULL` 복귀. 상세 상태머신은 feature-voc.md §8.2 보강본 참조.
   - `embedding` 컬럼은 pgvector 확장 기반. **MVP 단계에서는 쓰기/읽기 모두 미사용(전량 NULL 유지)**. 생성 시점은 `review_status`가 `approved`로 전환되는 순간에만(§16 참조). 차원수 1536은 OpenAI `text-embedding-3-small` 기준 가결정 — 모델 확정 시 재검토. HNSW 인덱스(`vector_cosine_ops`)는 기능 도입 시 별도 마이그레이션으로 추가.
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
@@ -105,10 +116,27 @@
 - **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑. `tags.kind enum('general','menu')` — 기존 `equipment` 카테고리 폐기(설비/공정/메이커/모델은 전부 `structured_payload`로 이동).
   - `general`: 자유 태그 (담당자 분류용 라벨)
   - `menu`: 주메뉴(`vocs.menu_id`) 외 **영향받는 다른 메뉴**를 태깅
+  - `voc_tags` 컬럼: `voc_id`, `tag_id`, `source text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','rule'))`, `created_at`. `source`는 수동 태깅(`manual`)과 `tag_rules` 엔진 자동 부착(`rule`)을 구분. `vocs.source`(Q8, manual/import)와는 별개 축.
   - 초기 마이그레이션 (과거 초안의 `equipment` enum 값이 남아있는 환경 한정): `ALTER TYPE tag_kind RENAME TO tag_kind_old; CREATE TYPE tag_kind AS ENUM ('general','menu'); ALTER TABLE tags ALTER COLUMN kind TYPE tag_kind USING kind::text::tag_kind; DROP TYPE tag_kind_old;` (기존 `equipment` row는 사전 정리 필요).
-- **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소. <!-- NextGen AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
+- **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소. **`kind='general'` 태그 자동 부착 전용** — 엔티티성 단어(설비/모델/메이커/공정)는 `structured_payload` 파이프라인으로 위임. `menu` 태그는 규칙 대상 아님(메뉴 FK 기반). <!-- NextGen AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
+  - **실행 시점**: VOC 접수 + 제목/본문 편집 저장 시. status 변경만으로는 재실행 안 함.
+  - **규칙 충돌**: 같은 본문에 복수 규칙 매칭 시 전부 부착(태그는 다대다, 우선순위·배타 없음).
+  - **멱등성**: 재실행은 해당 VOC의 `voc_tags.source='rule'` 행만 삭제 후 재부착. `source='manual'` 행은 보존(담당자 수동 태깅은 엔진이 건드리지 않음).
 - **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
-- **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`.
+- **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`. **공개 댓글 전용** — 내부 메모는 `voc_internal_notes` 별도 테이블로 분리.
+- **`voc_internal_notes`** (Q7 확정, v3 §3.4): 담당자 전용 내부 메모(트리아지·보류 사유·재현 로그 등). 공개 댓글과 **테이블 자체를 분리**하여 쿼리 누락으로 인한 유출 사고 내성을 구조적으로 확보.
+  - 컬럼: `id(bigserial)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `author_id(FK→users)`, `body text NOT NULL`, `created_at timestamptz default now()`, `updated_at timestamptz default now()`, `deleted_at timestamptz NULL`.
+  - 인덱스: `idx_voc_internal_notes_voc ON voc_internal_notes(voc_id) WHERE deleted_at IS NULL`.
+  - **권한**: Manager/Admin 전용 접근. User는 엔드포인트 도달 자체 차단(404 반환 — 존재 자체 은닉).
+  - **API 계약**:
+    - `GET /api/vocs/:id/notes` — Manager/Admin. User → 404.
+    - `POST /api/vocs/:id/notes` — Manager/Admin.
+    - `PATCH /api/vocs/:id/notes/:noteId` — 작성자 또는 Admin.
+    - `DELETE /api/vocs/:id/notes/:noteId` — soft-delete. 작성자 또는 Admin.
+    - `GET /api/vocs/:id/comments`는 **공개 댓글만** 반환 (기존 유지, 내부 메모 절대 혼입 금지).
+  - **UI**: VOC 상세 우측 패널에 **"Internal Notes"** 섹션을 공개 댓글과 별도 배치. warning/accent 계열 배경으로 시각 구분. User 로그인 시 DOM 자체에 비렌더링.
+  - **Timeline 통합**: Manager/Admin 한정으로 공개 댓글 + internal note + status change를 시간순 혼합 표시하되 배지/배경으로 구분. User role은 internal note 이벤트를 Timeline API 응답에서 수신 불가.
+  - **회귀 테스트 필수**: (1) User가 `/notes` 호출 시 404, (2) 공개 댓글 응답에 internal note 절대 미포함, (3) Timeline API에서 User는 internal note 이벤트 수신 불가.
 - **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
 - **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `default_date_range(enum: 7d/30d/90d/custom)`, `heatmap_default_x_axis(enum: status/priority/tag)`, `locked_fields(jsonb)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
   - JSONB 컬럼 예시 구조:
@@ -222,6 +250,7 @@
 | SC-3 | Due Date 내 처리 | Priority별 Due Date 내 처리율 SLA 기준 동일 | `GET /api/dashboard/processing-speed` slaRate 컬럼 |
 
 - SLA 계산 기준: Due Date = Priority 변경 시점 기준 자동 계산값 (§8.4.1)
+- **SLA 분모 제외**: `vocs.source='import'` VOC는 SLA 타이머·에스컬레이션·SC-1/SC-3 분모에서 모두 제외 (이미 Jira에서 처리 완료된 과거 건).
 - 측정 주기: 월 1회 대시보드 스냅샷 캡처 → 운영팀 리뷰
 
 ---
@@ -360,6 +389,7 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 - 엔티티 해석 결과를 `equipment` 태그로 누적하던 v1 초안은 **폐기**. 설비/공정/메이커/모델은 전부 `structured_payload`로 이동.
 - NextGen AI 엔티티 해석이 도입될 때도 결과 쓰기 대상은 `structured_payload` 4개 배열 필드(담당자 확인/수정 후 확정).
+- 자동 태깅 규칙(`tag_rules`) 역할 한정·실행 규칙은 §4 `tag_rules` 불릿 참조. 요약: `kind='general'` 전용, 엔티티 탐지 금지.
 
 ### 16.2 임베딩 정책
 
@@ -368,17 +398,55 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 - **갱신**: approve 후 payload 재작성(삭제→재작성) 발생 시 `vocs.embed_stale=true` 마킹 → 다음 approve 시 재임베딩 + 플래그 해제.
 - **MVP 범위**: 컬럼·플래그·정책만 예약, 실제 임베딩 생성/검색은 미실행.
 
-### 16.3 외부 마스터 fallback
+### 16.3 외부 마스터 연동 정책 (v3 §7.3, 2026-04-24 확정)
 
-- equipment/maker/model/process 칩 입력 시 외부 마스터 쿼리로 즉시 존재 검증.
-- 마스터 장애 → 경고 + 추가 허용 → `review_status='unverified'`로 리뷰 게이트에서 재확인. 별도 unverified 세부 플래그는 두지 않음.
+**모델**: 편집 세션 중 BE 메모리 기반 검증. 저장 시점 외부 API 호출은 **0건**. 입력은 트리아지 단계(Manager)에서 **드롭다운 선택** 전제(자유 텍스트 아님).
 
-### 16.4 미결 항목 (다음 세션)
+**마스터 3종**: 설비 마스터 · DB 마스터 · 프로그램 마스터. (필드별 원천 시스템 매핑은 "외부 마스터 연동 명세" 별도 문서 — 7B)
 
-- `status` 5단계 유지 vs 4단계 단순화 (Q3)
-- `comments.visibility enum('internal','public')` 채택 여부 (Q7)
-- `is_golden_case` 플래그 (Q5)
-- `source`/`chatbot_session_id`/`linked_code_refs` 예약 컬럼 (Q8·Q9)
-- 유사도 임계치 자리 예약 (Q10)
-- `related_programs/db_tables/jobs/sps` 외부 시스템 검증 쿼리 구현 명세
+**합의 10건**:
+
+| 항목 | 결정 |
+|---|---|
+| 캐시 범위 | 프로세스 전역. BE 부팅 시 3종 통째 1회 로드 (규모 작아 전량 적재 가능). |
+| TTL | 없음. 수동 트리거만. |
+| Refresh 권한 | Manager 이상. |
+| Refresh 진입점 | 관리자 페이지 전역 refresh + 편집 화면 🔄 아이콘. |
+| Refresh 쿨다운 | **동일 사용자 기준 5분** (원천 시스템 보호). |
+| 부팅 시 로드 실패 | **디스크 스냅샷 fallback**. Manager/Admin UI에 **"스냅샷 모드" 배지** 필수. (메타 로그·한도·비동기 쓰기 보조 조건은 미채택, 운영 필요 시 추가) |
+| 수동 Refresh 실패 | **atomic swap** — 3종 전부 성공해야 교체. 실패 시 기존 메모리 유지. 부분 교체 금지. |
+| 저장 시 BE 재검증 | **필수**. FE body 플래그 신뢰 금지. BE 메모리가 단일 진실 원천. override도 BE 재판정. |
+| 입력 모드 | **자유 입력 허용 + unverified 플래그**. 마스터 등록 지연보다 VOC 처리 흐름 보호 우선. 자동완성 UX로 정상 케이스 대부분 커버. |
+| review_status 단위 | `vocs.review_status` row 단일값(Manager 큐 필터) + `structured_payload.unverified_fields text[]`로 필드 병기. 별도 컬럼 승격은 운영 실측 후. |
+
+**API 계약**:
+- `POST /api/admin/masters/refresh` — 전역(관리자 페이지). Manager 이상, 동일 사용자 쿨다운 5분. 응답 `{ swapped: true, loaded_at: <timestamp>, sources: { equipment, db, program } }`. 3종 중 하나라도 실패 시 `{ swapped: false, error: <detail>, kept_loaded_at: <prev> }`.
+- `POST /api/vocs/:id/masters/refresh` — 편집 화면 🔄. 위와 동일 규칙.
+- 사용자 편집/저장 경로(`POST /api/vocs`, `PATCH /api/vocs/:id`)에서는 **외부 API 호출 없음**. BE 메모리 캐시만 사용.
+
+**장애 fallback**: 마스터 시스템 전체 장애 → 스냅샷 모드 배지 노출 + 자유 입력 허용 + 전 필드 `unverified`. 리뷰 게이트에서 재확인.
+
+### 16.4 대시보드 영향
+
+- "필드별 unverified 분포" 위젯은 **MVP 미포함** (v3 §7.3 항목 #9). 운영 중 문제 발생 시 재고.
+
+### 16.5 v3 리뷰 확정 이력 (2026-04-24)
+
+이전 "미결 항목" 목록은 전부 확정됨. 기록용:
+
+| 항목 | 결정 | 반영 위치 |
+|---|---|---|
+| Q3 `status` 5단계 vs 4단계 | **5단계 유지** | §4 vocs, §8.2 매트릭스 유지 |
+| Q5 `is_golden_case` | **도입 유보 (컬럼 예약도 철회)** | 스키마 변경 없음 |
+| Q7 `comments.visibility` | **`voc_internal_notes` 별도 테이블 + API 4개 + UI 분리** | §4 신규 테이블, §6.1 API, UI 규칙 |
+| Q8 `vocs.source` | **MVP 도입** (`text+CHECK`, manual/import) | §4 vocs 컬럼 + 운영 규칙, §12 SLA 제외 |
+| Q9 `chatbot_session_id`/`linked_code_refs` | **도입 유보** (NextGen 재결정) | 스키마 변경 없음 |
+| Q10 유사도 임계치 | **MVP 제외** (환경변수 시작, NextGen에서 B 승격 재논의) | 스키마 변경 없음 |
+| 갭 #6 `tag_rules` 역할 | **한정**: `general` 전용, 엔티티는 `structured_payload` | §4 tag_rules·voc_tags, §16.1 |
+| 외부 검증 §7 (7A) | **편집 세션 BE 메모리 모델 + 10건 합의** | §4 `structured_payload.unverified_fields`, §16.3 |
+
+### 16.6 다음 세션 잔여
+
+- **7B — 필드별 마스터 매핑** (자료 수집 대기, v3 §7.5). `related_programs/db_tables/jobs/sps/equipment/maker/model/process` 각 필드의 원천 시스템·owner·엔드포인트·스키마 수집 후 별도 "외부 마스터 연동 명세" 문서.
+- **Phase 4 5-Expert 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL`, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만).
 

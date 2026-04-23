@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (6차 — v3 리뷰 Q7·Q8·Q9 확정, Q10 이후 다음 세션 예약)
+> 최종 업데이트: 2026-04-24 (10차 — v3 리뷰 전 결정(Q3/Q5/Q7/Q8/Q9/Q10/갭#6/§7A) requirements.md 본문 일괄 반영 완료)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## Reviews 폴더 구조
@@ -121,11 +121,33 @@ docs/specs/reviews/
   - **세션 2026-04-24 추가 진행분 (v3 리뷰 — Q7·Q8·Q9 확정)**:
     - [x] ✅ **Q7 확정 (B안)**: 별도 `voc_internal_notes` 테이블 + UI 섹션 분리. 권한 경계가 테이블 접근 자체라 컬럼 필터 누락 사고 내성 강함. Manager/Admin만 접근, User는 404. Timeline은 Manager/Admin만 배지 구분하여 섞어 표시. (v3 §3.4)
     - [x] ✅ **Q8·Q9 확정**: `source`만 MVP 도입 (`text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import'))`). PG enum 타입 대신 `text+CHECK` 선택 (값 추가/제거 유연성). `chatbot_session_id`·`linked_code_refs`는 NextGen 계획 시점에 재결정(YAGNI). 마이그레이션 `created_at`은 Jira 원본 보존. `source='import'`에 "Jira Imported" 배지. 리스트 필터 UI는 MVP 미포함. (v3 §4)
-  - **다음 세션(v3 리뷰 계속)에서 결정 필요**:
-    - [ ] Q10: 유사도 임계치 자리 예약 (`similarity_threshold` 설정 테이블 vs 환경변수 vs ENUM 상수) ← **시작점**
-    - [ ] 🟡 갭 #6 재정리: `tag_rules` vs NextGen 엔티티 해석(structured_payload 4필드 입력) 역할 경계 — 2-카테고리 태그로 축소된 상태 기준으로 재서술
-    - [ ] `related_programs/db_tables/jobs/sps` 외부 시스템 검증 쿼리 구현 명세 (어떤 시스템에 어떤 API/쿼리로 물을지)
-    - [ ] Phase 4 5-Expert 리뷰 미결 — AD 인증 방식 확정, §2.3 Sub-task 표현 통일, 대시보드 API endpoint 목록, 환경변수, 에러 응답 포맷, 파일명 저장 방식, KPI 목표값
+  - **세션 2026-04-24 추가 진행분 (v3 리뷰 — Q10 확정)**:
+    - [x] ✅ **Q10 확정**: MVP 스코프 제외. **환경변수(A)로 시작**, NextGen 도입 시점에 `system_settings` 테이블(B) 승격 재논의. 근거: 빈 KV 테이블 선생성은 YAGNI 위반, 범용 KV는 jsonb 쓰레기통화 위험, threshold는 초기 튜닝 빈도 낮음(임베딩 모델 교체 이벤트엔 어차피 재배포 동반), C는 갭 #6의 `tag_rules` 역할 한정과 충돌. requirements.md 스키마 변경 없음. (v3 §5.3)
+  - **세션 2026-04-24 추가 진행분 (갭 #6 확정)**:
+    - [x] ✅ **갭 #6 확정**: MVP에 자동 태깅 엔진 실제 동작(대시보드 현황 입력원). `tag_rules`는 `kind='general'` 자동 부착 전용, 엔티티 단어는 `structured_payload` 위임. `voc_tags.source text CHECK ('manual','rule')` 컬럼 추가로 수동/자동 태깅 구분(재실행 시 manual 보존). 실행 시점: 접수 + 제목/본문 편집 시. 충돌 시 전부 부착. requirements.md §4·§16.1 반영. (v3 §6.3)
+  - **세션 2026-04-24 말미 진행분 (v3 §7 외부 검증 — 7A 추상 계약 확정)**:
+    - [x] ✅ **모델 전환**: "저장 시 외부 API 호출"에서 **"편집 세션 중 BE 메모리 기반 검증"**으로 구조 변경. 저장 시점 외부 호출 0. 자유 텍스트 태깅이 아니라 **트리아지 단계(Manager)에서 드롭다운 선택** 전제.
+    - [x] ✅ **캐시 범위**: 프로세스 전역. BE 부팅 시 마스터 3종(설비·DB·프로그램) 1회 로드. 규모 작아 통째 적재 가능.
+    - [x] ✅ **Refresh 정책**: TTL 없음, 수동 트리거. 권한 **Manager 이상**, 관리자 페이지 + 편집 화면 🔄 아이콘 양쪽 배치. **쿨다운 5분** (동일 사용자 기준 원천 시스템 보호).
+    - [x] ✅ **부팅 시 로드 실패**: **C (디스크 스냅샷 fallback)** + **Manager/Admin UI에 "스냅샷 모드" 배지** 필수. 마스터 변동 빈도 낮아 stale 리스크 현저히 낮음. (나머지 보조 조건(메타 로그/한도/비동기 쓰기)은 채택 안 함 — 운영 필요 시 추가)
+    - [x] ✅ **수동 Refresh 실패**: **A (atomic swap)** — 3종 전부 성공해야 교체, 실패 시 기존 메모리 유지. 부분 교체 금지(일관성 시점 틀어짐).
+    - [x] ✅ **저장 시 BE 재검증**: **A (필수)**. FE body 플래그 신뢰 금지. BE 메모리가 단일 진실 원천. override 여부는 BE가 재판정 → `unverified_fields` 재계산.
+    - [x] ✅ **입력 모드**: **B (자유 입력 허용 + unverified 플래그)**. 마스터 등록 지연보다 VOC 처리 흐름 보호 우선. 자동완성 UX로 정상 케이스 대부분 커버.
+    - [x] ✅ **`review_status` 단위**: **C (row 플래그 + payload 상세)**. `vocs.review_status`는 row 단위 단일값(Manager 큐 필터용). 어느 필드가 문제인지는 `structured_payload.unverified_fields text[]`로 병기. 리뷰 화면에서 문제 필드 배지 표시 가능. 컬럼 승격은 운영 중 필요성 실측 후.
+    - [x] ✅ **리뷰 외 용도 처리**: 대시보드 "필드별 unverified 분포" 위젯은 MVP에 미포함. 문제 발생 시 재고.
+  - **세션 2026-04-24 종반 진행분 (문서 청소 + 6건 본문 일괄 반영 완료)**:
+    - [x] ✅ **v3 리뷰 청소**: §1.4(Q3 5단계 유지 최종), §2.4(Q5 도입 유보 확정, 컬럼 예약도 철회), §7 본문 전면 교체(A+C 하이브리드 → 편집 세션 BE 메모리 10건), §9 체크리스트 전부 `[x]` 갱신.
+    - [x] ✅ **requirements.md 본문 반영 (6건 batch)**:
+      - §4 `vocs.source` 컬럼 추가 + 운영 규칙(text+CHECK, 지표 분리, SLA 제외, created_at 보존, "Jira Imported" 배지, 리스트 필터 UI 비포함)
+      - §4 `vocs.status` 불릿: "다음 세션 확정" 문구 제거, "5단계 유지 확정" 주석
+      - §4 `structured_payload.unverified_fields text[]` 필드 추가 + BE 재검증 규칙
+      - §4 `voc_internal_notes` 테이블 신규 (스키마·권한·API 4개·UI·Timeline·회귀 테스트)
+      - §12 SLA 분모에서 `source='import'` 제외 명시
+      - §16.3 외부 마스터 연동 정책 전면 개편 (7A 10건 + API 계약 + 장애 fallback), §16.4 대시보드 영향, §16.5 v3 리뷰 확정 이력 표, §16.6 다음 세션 잔여
+  - **다음 세션 시작점** (우선순위 순):
+    - [ ] **feature-voc.md 정합성 확인**: §8.2 상태 전환 매트릭스가 requirements.md §4와 일치하는지 재검증, Q7 Internal Notes UI/Timeline 규칙을 §9.4 관리자 페이지 상세에 교차 반영 필요 여부 점검.
+    - [ ] **7B 필드별 마스터 매핑** (자료 수집 대기): `related_programs/db_tables/jobs/sps/equipment/maker/model/process` 각 필드의 원천 시스템·owner·엔드포인트·스키마. **담당자 확인 선행** 후 별도 "외부 마스터 연동 명세" 문서로 작성.
+    - [ ] **Phase 4 5-Expert 리뷰 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL` 추가, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만 유지).
 
 ### 6-2. 디자인 일관성 강제 체계
 - [ ] `design.md`에서 CSS 변수 토큰 목록 추출 → 컴포넌트별 토큰 사용 규칙 문서화
