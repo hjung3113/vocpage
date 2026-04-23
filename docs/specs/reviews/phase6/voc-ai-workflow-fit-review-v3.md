@@ -110,37 +110,94 @@ ALTER TABLE vocs ADD COLUMN is_golden_case boolean DEFAULT false;
 - B: 분리가 깔끔하지만 타임라인 통합 표시 시 join 필요.
 - C: 관리자들이 결국 Slack/개인 노트로 흘러 컨텍스트 손실.
 
-### 3.4 권장 (잠정)
+### 3.4 결정 (2026-04-24 확정)
 
-**A**. 근거:
-- 실제로 내부 메모가 필요한 빈도는 높음(특히 재현 불가/정책 거부 드랍 케이스).
-- 단일 테이블 + 권한 필터 방식은 이미 `vocs` soft-delete 조회에서 동일 패턴으로 관리 중이라 운영 부담 추가 없음.
-- API에서 `GET /api/vocs/:id/comments`는 role에 따라 필터링. 테스트 케이스는 §13.2에 추가.
+**B — 별도 `voc_internal_notes` 테이블 + UI 분리**. 근거:
+- 권한 경계가 **컬럼 필터가 아니라 테이블 접근 자체**라 쿼리 누락으로 인한 유출 사고 내성이 구조적으로 강함.
+- 내부 메모가 공개 댓글로 새는 사고는 법적·평판 리스크가 크기 때문에 방어적 설계를 우선.
+- Timeline 통합은 이미 events/comments/status_changes 다중 소스 union 구조라 테이블 하나 추가되어도 비용 차이 미미.
+- Admin/Manager만 접근. User role은 엔드포인트 자체에 도달 불가.
+
+#### 3.4.1 스키마
+
+```sql
+CREATE TABLE voc_internal_notes (
+  id bigserial PRIMARY KEY,
+  voc_id bigint NOT NULL REFERENCES vocs(id) ON DELETE CASCADE,
+  author_id bigint NOT NULL REFERENCES users(id),
+  body text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz NULL
+);
+CREATE INDEX idx_voc_internal_notes_voc ON voc_internal_notes(voc_id) WHERE deleted_at IS NULL;
+```
+
+#### 3.4.2 API
+
+- `GET /api/vocs/:id/notes` — Manager/Admin 전용. User 요청 시 404 (존재 자체를 숨김).
+- `POST /api/vocs/:id/notes` — Manager/Admin.
+- `PATCH /api/vocs/:id/notes/:noteId` — 작성자 또는 Admin.
+- `DELETE /api/vocs/:id/notes/:noteId` — soft-delete. 작성자 또는 Admin.
+- `GET /api/vocs/:id/comments`는 **공개 댓글만** 반환 (기존 유지).
+
+#### 3.4.3 UI 분리
+
+- VOC 상세 페이지 우측 패널(또는 탭)에 **"Internal Notes"** 영역을 공개 댓글과 별도 섹션으로 배치.
+- 배경·테두리 토큰을 warning/accent 계열로 구분해 시각적으로 공개 댓글과 혼동 불가능하게 함.
+- User role 로그인 시 이 섹션 자체가 DOM에 렌더링되지 않음.
+- Timeline 뷰에서는 공개 댓글과 internal note를 **시간순 섞어 표시하되 배지/배경으로 명확히 구분** (Manager/Admin만).
+
+#### 3.4.4 테스트
+
+- `GET /api/vocs/:id/notes`를 User role이 호출하면 404.
+- 공개 댓글 조회 응답에 internal note가 절대 포함되지 않음 (회귀 테스트).
+- Timeline API 응답에서 User role은 internal note 이벤트를 받지 않음.
 
 ---
 
 ## 4. Q8·Q9 — 예약 컬럼
 
-### 4.1 후보 컬럼
+### 4.1 결정 (2026-04-24 확정)
 
-| 컬럼 | 용도 (NextGen+) | MVP 동작 |
+**`source`만 MVP 도입**. `chatbot_session_id`·`linked_code_refs`는 **NextGen 계획 시점에 재결정** (YAGNI — 지금 예약해도 backfill 불필요 컬럼이라 실익 없음).
+
+### 4.2 `source` 컬럼 사양
+
+| 항목 | 값 |
+|---|---|
+| 타입 | `text NOT NULL DEFAULT 'manual'` + `CHECK (source IN ('manual','import'))` |
+| MVP 허용 값 | `manual`, `import` 2종 |
+| 값 추가 방식 | 운영 중 필요 시 **마이그레이션으로 CHECK 제약 재정의** (PG enum 타입 대신 text+CHECK 선택 — 값 추가/제거/이름변경 유연성) |
+| NextGen 예정 값 | `chatbot` (NextGen 로드맵 확정 시 추가) |
+
+### 4.3 `source` 값이 갖는 의미
+
+| 값 | 의미 | 생성 주체 |
 |---|---|---|
-| `vocs.source` enum('manual','chatbot','import') | 입력 경로 추적. 챗봇/마이그레이션 유입 분리. | 전부 'manual' 고정 |
-| `vocs.chatbot_session_id text` | 챗봇 유입 시 원 대화 세션 참조 | NULL 유지 |
-| `vocs.linked_code_refs jsonb` | 관련 PR·커밋·이슈 링크 배열 | NULL 유지 |
+| `manual` | 사람이 웹 UI VOC 작성 폼으로 직접 입력 | User / Manager |
+| `import` | 마이그레이션·일괄 이관 스크립트가 생성 | Jira 이관 스크립트 (MVP 오픈 전 1회성) |
 
-### 4.2 권장
+### 4.4 활용처
 
-세 컬럼 모두 **MVP 스키마에 예약**. 이유:
-- Jira 마이그레이션(§7 확장성)이 오픈 전 일괄 이전이므로 `source='import'` 값이 실제로 필요.
-- 나머지 둘은 NextGen 기능이 들어올 때 backfill 하지 않고 즉시 쓸 수 있게 자리만 확보.
+1. **지표 분리**: "이번 달 신규 VOC"는 `source != 'import'` 필터 필수. 마이그레이션 건이 신규 유입으로 집계되는 왜곡 방지.
+2. **SLA 정책**: `import` VOC는 SLA 타이머·알림 제외 (이미 과거 처리 완료).
+3. **UI 배지**: VOC 리스트·상세에서 `source='import'`에 **"Jira Imported"** 배지 노출 (데이터 품질 표시 — 변환 과정에서 필드 유실 가능성 암시).
+4. **감사 추적**: 사고 조사 시 출처 경로의 시작점.
+5. **일괄 작업 타겟팅**: `WHERE source='import'`로 이관분만 한정해 자동 태깅·재분류 배치.
+
+### 4.5 운영 규칙
+
+- **마이그레이션 `created_at`**: Jira 원본 생성일 보존(이관 실행 시각으로 덮지 않음). 원본 맥락 유지 + 지표는 `source` 기준으로 분리되므로 왜곡 없음.
+- **API 응답**: `GET /api/vocs/:id` 및 리스트 응답에 `source` 필드 기본 포함.
+- **리스트 필터**: MVP는 `source` 필터 UI 미포함 (선택지가 `import` 단일이라 무의미). NextGen에서 `chatbot` 추가 시 드롭다운 도입.
+
+### 4.6 SQL
 
 ```sql
 ALTER TABLE vocs
   ADD COLUMN source text NOT NULL DEFAULT 'manual'
-    CHECK (source IN ('manual','chatbot','import')),
-  ADD COLUMN chatbot_session_id text NULL,
-  ADD COLUMN linked_code_refs jsonb NULL;
+    CHECK (source IN ('manual','import'));
 ```
 
 ---
@@ -265,8 +322,8 @@ CREATE TABLE system_settings (
 
 - [ ] Q3: status 4단계 축소 확정 → §4 enum, §8.2 매트릭스, 대시보드 bucket
 - [ ] Q5: `is_golden_case` 컬럼만 예약
-- [ ] Q7: `comments.visibility` 채택 + 권한 필터 테스트 추가
-- [ ] Q8·Q9: `source`/`chatbot_session_id`/`linked_code_refs` 컬럼 예약
+- [x] Q7: 별도 `voc_internal_notes` 테이블 + UI 섹션 분리 (2026-04-24 확정, §3.4)
+- [x] Q8·Q9: `source`만 MVP 도입(text+CHECK, 값=manual/import). 나머지 2개는 NextGen 재결정 (2026-04-24 확정, §4)
 - [ ] Q10: `system_settings` 테이블 생성
 - [ ] 갭 #6: `tag_rules` 역할 한정 문장 §4·§16 추가
 - [ ] 외부 검증 쿼리: 별도 문서 착수 (담당자 자료 수집 선행)

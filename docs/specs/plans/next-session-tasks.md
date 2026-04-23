@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (5차 — v2 리뷰 결정사항 requirements/feature 반영 완료, v3 리뷰 예약)
+> 최종 업데이트: 2026-04-24 (6차 — v3 리뷰 Q7·Q8·Q9 확정, Q10 이후 다음 세션 예약)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## Reviews 폴더 구조
@@ -118,10 +118,11 @@ docs/specs/reviews/
     - [x] ✅ **Q3 확정**: `status` **5단계 유지**. 근거: `검토중`(문제 파악) vs `처리중`(실제 해결) 의미 구분 가치 있음. Jira 마이그레이션 유입은 전부 접수/검토중으로만 떨어져 enum 매핑 영향 無. review_status는 별개 축.
     - [x] ✅ **Q5 확정**: `is_golden_case` **도입 유보(C)**. 스키마 변경 없음. MVP에서 골든 라벨링 실제 사용 계획 없음. NextGen 진입 시 태그 방식(B) vs 컬럼(A) 재판단.
     - [x] ✅ **용어 통일**: "v2" 혼용 제거 → **NextGen** (차세대 설계) / **v2 리뷰** (회차 표기)로 분리. `requirements.md` 상단 용어 정의 섹션 추가.
+  - **세션 2026-04-24 추가 진행분 (v3 리뷰 — Q7·Q8·Q9 확정)**:
+    - [x] ✅ **Q7 확정 (B안)**: 별도 `voc_internal_notes` 테이블 + UI 섹션 분리. 권한 경계가 테이블 접근 자체라 컬럼 필터 누락 사고 내성 강함. Manager/Admin만 접근, User는 404. Timeline은 Manager/Admin만 배지 구분하여 섞어 표시. (v3 §3.4)
+    - [x] ✅ **Q8·Q9 확정**: `source`만 MVP 도입 (`text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import'))`). PG enum 타입 대신 `text+CHECK` 선택 (값 추가/제거 유연성). `chatbot_session_id`·`linked_code_refs`는 NextGen 계획 시점에 재결정(YAGNI). 마이그레이션 `created_at`은 Jira 원본 보존. `source='import'`에 "Jira Imported" 배지. 리스트 필터 UI는 MVP 미포함. (v3 §4)
   - **다음 세션(v3 리뷰 계속)에서 결정 필요**:
-    - [ ] Q7: `comments.visibility enum('internal','public')` 채택 여부 (작성자 공개 vs 담당자 전용) ← **시작점**
-    - [ ] Q8·Q9: 예약 컬럼 `source(manual|chatbot|import)`, `chatbot_session_id`, `linked_code_refs` 추가 여부 및 스키마 예약
-    - [ ] Q10: 유사도 임계치 자리 예약 (`similarity_threshold` 설정 테이블 vs 환경변수 vs ENUM 상수)
+    - [ ] Q10: 유사도 임계치 자리 예약 (`similarity_threshold` 설정 테이블 vs 환경변수 vs ENUM 상수) ← **시작점**
     - [ ] 🟡 갭 #6 재정리: `tag_rules` vs NextGen 엔티티 해석(structured_payload 4필드 입력) 역할 경계 — 2-카테고리 태그로 축소된 상태 기준으로 재서술
     - [ ] `related_programs/db_tables/jobs/sps` 외부 시스템 검증 쿼리 구현 명세 (어떤 시스템에 어떤 API/쿼리로 물을지)
     - [ ] Phase 4 5-Expert 리뷰 미결 — AD 인증 방식 확정, §2.3 Sub-task 표현 통일, 대시보드 API endpoint 목록, 환경변수, 에러 응답 포맷, 파일명 저장 방식, KPI 목표값
