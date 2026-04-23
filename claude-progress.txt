@@ -1,10 +1,53 @@
 # vocpage — Session Progress
 
+## 다음 세션 할 일
+
+- **대시보드를 prototype.html에 합치기** — `prototype/prototype.html`에 대시보드 뷰를 추가 (기존 prototype 디자인 시스템·네비게이션과 통일성 유지)
+  - `dashboard-v3.html`, `dashboard-v2.html`은 참조용으로만 사용 (수정 금지)
+  - 완성 후 `dashboard-v3.html`과 나란히 브라우저에서 비교·검토
+  - 체크리스트:
+    - [ ] GlobalTabs 3레벨 계층 (전체/시스템/메뉴) + 담당자 직교 필터
+    - [ ] Filter Context Banner
+    - [ ] KPI 카드 8종 (VOLUME/QUALITY 2줄)
+    - [ ] 분포 도넛 4탭 (상태/우선순위/유형/태그)
+    - [ ] 우선순위×상태 매트릭스
+    - [ ] 드릴다운 히트맵 (X축 3종 + 브레드크럼)
+    - [ ] 주간 트렌드 3선
+    - [ ] 태그별 분포 바 차트
+    - [ ] 시스템/메뉴 현황 카드 (더보기 인라인 확장)
+    - [ ] 담당자별 처리현황 테이블
+    - [ ] 장기 미처리 Top 10
+    - [ ] design.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
+
 ## 다음 세션 읽을 문서
 
-- `requirements.md` §11 (대시보드 스펙)
-- `.omc/plans/dashboard-feature.md` (v3 위젯/필터/API 전체 명세)
-- `prototype/prototype.html` (현재 프로토타입 상태)
+- `.omc/plans/dashboard-feature.md` (v3.1 — 707줄, 구현 상세 명세)
+- `requirements.md` §11 (업데이트 완료)
+- `design.md` §11 (대시보드 컴포넌트 신규 추가됨)
+
+## 완료된 작업 (2026-04-23 — 문서 정리·싱크)
+
+- **requirements.md §11** v3.1 기준으로 업데이트
+  - 위젯 테이블: 태그 탭 추가, "Created vs. Resolved" → "주간 트렌드 (3선)", "시스템별 현황 카드" → "시스템/메뉴 현황 카드", 담당자별 처리 현황 추가
+  - §11.3 글로벌 필터 시스템 신규 (계층형 탭 + 담당자 직교 필터 + FilterContextBanner)
+  - §11.4 날짜 필터에 주간 트렌드 12주 고정 명시
+  - §11.3~11.5 → §11.4~11.6 번호 이동
+- **design.md §11 Dashboard Components** 신규 추가
+  - FilterContextBanner, KPI 카드 (alert border 포함), 히트맵 셀 그라디언트, 분포 도넛, 주간 트렌드 3선, Aging badge 스펙
+- **design.md §10 CSS Reference** `--chart-*` 토큰 7종 추가
+
+## 완료된 작업 (2026-04-23 — 대시보드 v3.1 스펙 고도화)
+
+- **dashboard-feature.md** v3.1 업데이트 (660→707줄), TODO 전체 해소
+  - 레벨 3 dim `[전체]` 단일 표시 확정
+  - 주간 트렌드 3선 계산 기준 명확화 (진행중=주말 스냅샷)
+  - 담당자 드롭다운 단일 선택(라디오) 확정
+  - GlobalTabs overflow: 드롭다운 병합 + Admin 순서·표시 관리
+  - 더보기 카드: 인라인 확장 토글
+  - 전체 클릭 파라미터 정의 (KPI·분포·히트맵·트렌드·담당자·태그 바)
+  - FE 상태 `activeSystem` 제거, `globalTab` 단일화
+  - API 2개 추가 (`/menus`, `/assignees`)
+  - DB: `status_changed_at`, `assignee_id` 인덱스 추가
 
 ## 완료된 작업 (2026-04-23 — 대시보드 v3 설계 확정)
 

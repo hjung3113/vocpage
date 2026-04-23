@@ -499,7 +499,107 @@ Full token set — copy into `:root` as the single source of truth.
   --font-ui: "Pretendard Variable", "Pretendard",
     -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
   --font-mono: "D2Coding", "SF Mono", "Menlo", ui-monospace, monospace;
+
+  /* Chart colors (dashboard) */
+  --chart-blue:    oklch(63% 0.19 258);   /* new VOC, primary series */
+  --chart-sky:     oklch(72% 0.14 235);   /* in-progress */
+  --chart-emerald: oklch(62% 0.19 158);   /* completed */
+  --chart-amber:   oklch(70% 0.16 72);    /* on-hold, warning */
+  --chart-red:     oklch(58% 0.22 25);    /* urgent, negative */
+  --chart-teal:    oklch(65% 0.16 195);   /* auxiliary */
+  --chart-indigo:  oklch(55% 0.17 270);   /* auxiliary */
 }
 ```
+
+---
+
+## 11. Dashboard Components
+
+### 11.1 Filter Context Banner
+
+```css
+background: var(--brand-bg);
+color: var(--brand);
+border-bottom: 1px solid var(--brand-border);
+padding: var(--sp-2) var(--sp-5);
+font-size: 13px;
+```
+
+- Separator: `›` (U+203A)
+- Hidden when at default state (level 1 tab + no assignee filter)
+
+### 11.2 KPI Cards
+
+Two rows: **VOLUME** and **QUALITY**. Row labels use `var(--text-quaternary)`, `11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase`.
+
+```css
+/* Card base */
+background: var(--bg-surface);
+border: 1px solid var(--border-subtle);
+border-radius: 8px;
+padding: var(--sp-4);
+
+/* Delta positive (improvement) */
+color: oklch(62% 0.19 158);
+
+/* Delta negative (regression) */
+color: oklch(58% 0.22 25);
+
+/* Note: avg resolution time delta is inverted — decrease = positive */
+```
+
+**Alert borders** (override standard border):
+
+| Card | Condition | Border color |
+|------|-----------|--------------|
+| Urgent·High 미해결 | count increased | `oklch(58% 0.22 25 / 0.35)` |
+| 14일+ 미처리 | count increased | `oklch(70% 0.16 72 / 0.30)` |
+
+### 11.3 Heatmap & Matrix Cell Gradient
+
+Used by both the drilldown heatmap and the priority×status matrix.
+
+```
+cell background = oklch(63% 0.19 258 / α)
+where α = lerp(0.06, 0.62, value / maxValue)
+```
+
+- Zero-value cells: `var(--bg-elevated)` background, display `—`, non-clickable.
+- Table layout: `table-layout: fixed` + `colgroup` for stable column widths across X-axis changes.
+
+### 11.4 Distribution Donut
+
+- Size: 96×96px
+- Technique: `conic-gradient` (no SVG/canvas)
+- Center label: total count + `"총건수"` sub-label in `var(--text-tertiary)`
+- Legend row: color dot · label · count · `%` · mini bar (proportional width, `var(--bg-elevated)` track)
+
+**Color assignments by tab:**
+
+| Tab | Color source |
+|-----|-------------|
+| 상태 | See §3 Status Colors |
+| 우선순위 | `--chart-red` / `oklch(60% 0.18 45)` / `var(--text-tertiary)` / `var(--text-quaternary)` |
+| 유형 | `voc_types.color` field |
+| 태그 | `--chart-blue` → `--chart-sky` → `--chart-red` → `--chart-amber` → `--chart-emerald` → `var(--text-tertiary)` (Top 6 + 기타) |
+
+### 11.5 Weekly Trend Chart (3-line)
+
+| Series | Color token | Data definition |
+|--------|-------------|-----------------|
+| 신규 (new) | `var(--chart-blue)` | VOC created that week (`created_at`) |
+| 진행중 (in-progress) | `var(--chart-sky)` | Snapshot at Sunday 23:59 of that week |
+| 완료 (done) | `var(--chart-emerald)` | Transitioned to 완료/보류 that week (`status_changed_at`) |
+
+- X-axis labels: W1–W12 (W1 = 12 weeks ago, W12 = current week; left → right = past → present)
+- Legend: top-left, color line + label
+- Period: always last 12 weeks, independent of the global date filter
+
+### 11.6 Aging VOC Badge Colors
+
+| Age | Badge style |
+|-----|-------------|
+| 14–29 days | `var(--chart-amber)` background tint |
+| 30+ days | `var(--chart-red)` background tint |
 
 OS/browser dark mode setting automatically switches the entire theme.
