@@ -460,7 +460,7 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 | review_status 단위 | `vocs.review_status` row 단일값(Manager 큐 필터) + `structured_payload.unverified_fields text[]`로 필드 병기. 별도 컬럼 승격은 운영 실측 후. |
 
 **API 계약**:
-- `POST /api/admin/masters/refresh` — 전역(관리자 페이지). Manager 이상, 동일 사용자 쿨다운 5분. 응답 `{ swapped: true, loaded_at: <timestamp>, sources: { equipment, db, program } }`. 3종 중 하나라도 실패 시 `{ swapped: false, error: <detail>, kept_loaded_at: <prev> }`.
+- `POST /api/admin/masters/refresh` — 전역(관리자 페이지). Manager 이상, 동일 사용자 쿨다운 5분. 응답 `{ swapped: true, loaded_at: <timestamp>, sources: { equipment, db } }`. 프로그램 마스터는 JSON 파일 고정 로드로 refresh 대상 제외. 2종 중 하나라도 실패 시 `{ swapped: false, error: <detail>, kept_loaded_at: <prev> }`.
 - `POST /api/vocs/:id/masters/refresh` — 편집 화면 🔄. 위와 동일 규칙.
 - 사용자 편집/저장 경로(`POST /api/vocs`, `PATCH /api/vocs/:id`)에서는 **외부 API 호출 없음**. BE 메모리 캐시만 사용.
 
@@ -485,9 +485,12 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 | 갭 #6 `tag_rules` 역할 | **한정**: `general` 전용, 엔티티는 `structured_payload` | §4 tag_rules·voc_tags, §16.1 |
 | 외부 검증 §7 (7A) | **편집 세션 BE 메모리 모델 + 10건 합의** | §4 `structured_payload.unverified_fields`, §16.3 |
 
-### 16.6 다음 세션 잔여
+### 16.6 외부 마스터 연동 명세
 
-- **7B — 필드별 마스터 매핑** (자료 수집 대기, v3 §7.5). `related_programs/db_tables/jobs/sps/equipment/maker/model/process` 각 필드의 원천 시스템·owner·엔드포인트·스키마 수집 후 별도 "외부 마스터 연동 명세" 문서.
+→ **`docs/specs/requires/external-masters.md`** 참조 (2026-04-24 작성).
+
+필드-마스터 매핑 확정, DB 마스터 MSSQL 쿼리 확정, 프로그램 마스터 JSON 파일 방식 확정.
+**설비 마스터 MSSQL 스키마만 TBD** — 담당자 자료 수집 후 `external-masters.md §3` 보완 + 로더 함수 교체.
 
 Phase 4 5-Expert 잔여 7건은 모두 반영 완료 (2026-04-24):
 
