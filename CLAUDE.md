@@ -60,7 +60,7 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **Parallel tool calls** — independent tool calls go in one message, not sequential
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
-- **Git workflow** — feature branch → PR → merge; never push directly to main
+- **Git workflow** — **항상 feature 브랜치를 먼저 생성**한 뒤 커밋·푸시하고 PR을 열 것. main에 직접 커밋/푸시 절대 금지. 브랜치 네이밍: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - CLAUDE.md stays under 200 lines
