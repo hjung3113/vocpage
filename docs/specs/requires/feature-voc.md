@@ -216,6 +216,46 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - 인증: AD SSO 세션을 공유하여 별도 로그인 없이 진입 가능하도록 구성.
 - iframe 임베드는 현재 범위 밖 — 향후 필요 시 독립 SPA를 iframe으로 감싸는 방향으로 확장.
 
+### 8.16 Internal Notes (내부 메모)
+
+(Q7 확정, v3 §3.4 — requirements.md §4 `voc_internal_notes` 참조)
+
+담당자 전용 내부 메모. 트리아지·보류 사유·재현 로그 등 외부 공개가 불필요한 내용을 기록한다. 공개 댓글(`comments`)과 **테이블 자체를 분리**하여 쿼리 누락에 의한 유출 사고를 구조적으로 차단한다.
+
+#### 권한
+
+- Manager/Admin 전용 읽기·쓰기. User는 엔드포인트 도달 자체 차단 (404 반환 — 존재 자체 은닉).
+- User 로그인 시 Internal Notes 섹션을 **DOM에 렌더링하지 않음** (조건부 렌더 아님 — DOM 생성 자체 차단).
+
+#### API
+
+| 메서드 | 경로 | 권한 | 비고 |
+|---|---|---|---|
+| `GET` | `/api/vocs/:id/notes` | Manager, Admin | User → 404 |
+| `POST` | `/api/vocs/:id/notes` | Manager, Admin | |
+| `PATCH` | `/api/vocs/:id/notes/:noteId` | 작성자, Admin | |
+| `DELETE` | `/api/vocs/:id/notes/:noteId` | 작성자, Admin | Soft Delete |
+
+- `GET /api/vocs/:id/comments` (공개 댓글)는 internal note를 **절대 혼입하지 않음**.
+
+#### UI
+
+- VOC 상세 우측 패널에 **"Internal Notes"** 섹션을 공개 댓글과 **별도 배치**.
+- warning/accent 계열 배경으로 시각 구분 — 공개 댓글과 외관상 명확히 다르게.
+- 수정/삭제 정책: 작성자 본인 수정·삭제 가능, Admin 전체 삭제 가능. Soft Delete. `updated_at` 갱신 및 UI "(수정됨)" 표시.
+
+#### Timeline 통합
+
+- Manager/Admin 전용 Timeline 뷰에서 **공개 댓글 + internal note + status change**를 `created_at` 기준 시간순 혼합 표시.
+- 각 이벤트 타입은 배지/배경으로 구분하여 한눈에 식별 가능하게.
+- User role에게는 Timeline API 응답에서 internal note 이벤트를 **포함하지 않음** (필터링, 404 아님).
+
+#### 회귀 테스트 필수 3건
+
+1. User가 `GET /api/vocs/:id/notes` 호출 시 **404** 반환.
+2. `GET /api/vocs/:id/comments` 응답에 internal note **절대 미포함**.
+3. Timeline API에서 User role은 internal note 이벤트 **수신 불가**.
+
 ---
 
 ## 9. 프로토타입 리뷰 기반 추가 요구사항 (2026-04-21)
