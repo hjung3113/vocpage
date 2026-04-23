@@ -20,17 +20,17 @@
 
 | 현재 상태 | 가능한 다음 상태 | 권한 |
 |:---|:---|:---|
-| 접수됨 | 검토중 | Manager, Admin |
-| 검토중 | 처리중, 보류 | Manager, Admin |
-| 처리중 | 완료, 보류 | Manager, Admin |
+| 접수됨 | 검토중, 드랍 | Manager, Admin |
+| 검토중 | 처리중, 드랍 | Manager, Admin |
+| 처리중 | 완료, 드랍 | Manager, Admin |
 | 완료 | 처리중 (재오픈) | Manager, Admin |
-| 보류 | 검토중, 처리중 | Manager, Admin |
+| 드랍 | 검토중, 처리중 (재오픈) | Manager, Admin |
 
+- 상태 5단계: `접수됨/검토중/처리중/완료/드랍` (v3 §1.4 확정, 2026-04-24 — 5단계 유지, 4단계 축소 폐기).
 - 상태 변경 시 `voc_history`에 이력 기록 (변경 전·후 상태, 변경자, 타임스탬프).
 - 상태 변경 시 VOC 작성자 및 담당자에게 인앱 알림 발송.
 - 미완료 Sub-task가 있는 부모 VOC를 '완료'로 전환 시 경고 메시지 후 강제 진행 가능. Sub-task 상태는 변경되지 않으며 담당자가 개별 처리.
-
-> **참고**: 위 테이블의 `보류`는 requirements.md §4에서 `드랍`으로 대체 결정됨. 5단계 유지 vs 4단계 단순화 결론 시 본 매트릭스도 함께 갱신 예정.
+- `완료`/`드랍` 전환 시점에 `structured_payload` 정식 제출 + `review_status='unverified'` 초기화가 동시에 발생 (§8.2.1).
 
 #### 8.2.1 review_status 서브 상태 머신
 
@@ -105,7 +105,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - 업로드 검증: MIME 스니핑 + 확장자 일치 검증. 실행 파일 헤더 차단. SVG 명시적 차단 (XSS 위험).
 - 파일 서빙: `Content-Disposition: attachment` 강제 (인라인 렌더링 방지).
 - GIF 크기 검증: 원본 파일 바이트 기준 (디코딩 전 raw bytes).
-- **파일명 저장**: 업로드 시 UUID로 rename하여 저장 (path traversal 방어). 원본 파일명은 `attachments.filename` 컬럼에 별도 보존.
+- **파일명 저장** (v3 §8.6 확정): `storage_path = {voc_id}/{uuid}-{원본파일명}` 형식. UUID prefix로 충돌·path traversal 방어, 원본 파일명은 Content-Disposition·`attachments.filename` 컬럼용으로 보존. 다운로드 시 `Content-Disposition: attachment; filename="{원본파일명}"`로 재조립.
 - 오류 응답: 용량 초과 → 413, 형식 불일치 → 415, 5개 초과 → 400.
 
 ### 8.6 인앱 알림

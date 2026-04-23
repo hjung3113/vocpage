@@ -39,7 +39,7 @@
 
 ### 2.3 관리자 요구사항
 - **업무 배정:** VOC별 담당자(Assignee) 지정 및 추적.
-- **계층형 관리:** 하나의 이슈 아래 여러 하위 작업(Sub-task)을 생성하여 관리 (최대 1레벨: root → sub 단일 계층).
+- **계층형 관리:** 하나의 이슈 아래 여러 Sub-task를 생성하여 관리 (최대 1레벨: root → Sub-task 단일 계층). 본 문서 전체에서 "Sub-task" 단일 용어로 통일 — 한국어 문장에서도 "하위 작업"/"child" 등 대체 표현 금지 (v3 §8.2).
 - **자동 분류:** 키워드를 활용한 **자동 태깅(Auto-tagging)** 기능 (규칙 기반, MVP).
 - **상태 전환:** VOC 상태 변경 권한은 Manager/Admin으로 제한.
 - **우선순위 설정:** Priority(Urgent/High/Medium/Low)는 Manager/Admin만 설정 가능.
@@ -154,7 +154,7 @@
 
 ## 5. UI/UX 디자인 가이드 (Samsung Blue Style)
 
-1. **메인 리스트:** 정갈한 테이블 UI. 이슈 ID, 제목, 상태, 담당자, 유형(색상 뱃지), 태그를 한 줄에 표시. 아코디언 형태로 하위 작업 노출.
+1. **메인 리스트:** 정갈한 테이블 UI. 이슈 ID, 제목, 상태, 담당자, 유형(색상 뱃지), 태그를 한 줄에 표시. 아코디언 형태로 Sub-task 노출.
 2. **사이드바:** 시스템 목록이 아코디언 트리로 표시. 시스템 클릭 시 하위 메뉴 펼침. 메뉴 클릭 시 해당 메뉴 VOC 목록 필터링.
 3. **사이드 드로어(Side Drawer):** 리스트 항목 클릭 시 우측에서 상세 화면 슬라이드. (분석 시스템의 맥락 유지)
 4. **등록 모달:** 시스템 → 메뉴 → 유형 순 연계 드롭다운. 시스템 선택 시 해당 시스템의 메뉴만 표시.
@@ -169,6 +169,21 @@
 - `getVOCList`: 계층형 구조(Parent-Child)를 고려한 데이터 조회. 부모 VOC가 필터 조건 일치 시 Sub-task 함께 표시. Sub-task 단독으로는 상위 목록 미노출. 페이지네이션 단위: 부모 VOC 기준.
 - `updateVOCStatus`: 이슈 상태 변경 및 관리자 배정 로직.
 - **에러 응답 표준 포맷**: 모든 API 오류는 `{ "code": "ERROR_CODE", "message": "사람이 읽을 수 있는 설명", "details": {} }` JSON으로 응답.
+- **표준 에러 코드 목록** (v3 §8.5):
+
+  | 코드 | HTTP | 용도 |
+  |---|---|---|
+  | `VALIDATION_FAILED` | 400 | 요청 body/쿼리 유효성 실패. `details`에 필드별 에러 매핑. |
+  | `INVALID_TRANSITION` | 400 | 상태 전환 매트릭스 위반 (feature-voc.md §8.2). |
+  | `UNAUTHENTICATED` | 401 | 세션 없음/만료. FE는 로그인 페이지 리다이렉트. |
+  | `FORBIDDEN` | 403 | 권한 매트릭스(§8.3) 위반. |
+  | `NOT_FOUND` | 404 | 리소스 없음 또는 권한 없는 리소스 은닉(예: internal notes를 User가 요청). |
+  | `CONFLICT` | 409 | 동시성 충돌·유일성 위반(예: `issue_code` 중복, 마지막 Admin 강등 시도). |
+  | `PAYLOAD_TOO_LARGE` | 413 | 파일 업로드 10MB 초과(§8.5). |
+  | `UNSUPPORTED_MEDIA_TYPE` | 415 | 허용 외 MIME(SVG·실행 파일 등). |
+  | `EXTERNAL_MASTER_UNAVAILABLE` | 503 | 외부 마스터 refresh 실패 시(§16.3) BE 메모리 교체 거부. 응답에 `kept_loaded_at` 포함. |
+  | `RATE_LIMITED` | 429 | 마스터 refresh 쿨다운 5분 위반 등(§16.3). |
+  | `INTERNAL_ERROR` | 500 | 위 범주 외 서버 에러. |
 - **헬스체크**: `GET /api/health` → `{ "status": "ok", "db": "ok" }` (DB 연결 포함 확인). 인증 불필요.
 - **공통 쿼리 파라미터**: 대시보드 API는 `?systemId=&menuId=&assigneeId=&from=&to=` 공통 필터 지원 (§11.7 참조).
 
@@ -236,6 +251,29 @@
 - **위젯**: KPI 8종 / 분포 탭(4종) / 우선순위×상태 매트릭스 / 드릴다운 히트맵 / 주간 트렌드(3선) / 태그별 분포 / 현황 카드 / 담당자별 처리 현황 / 장기 미처리 Top 10 / 처리속도 / 에이징
 - **상세 요구사항**: `docs/specs/requires/dashboard.md`
 - **구현 계획**: `docs/specs/plans/dashboard-impl.md`
+
+### 11.7 대시보드 API 엔드포인트 (v3 §8.3)
+
+공통 쿼리 파라미터: `systemId`, `menuId`, `assigneeId`, `startDate`, `endDate` (엔드포인트별 적용 여부는 dashboard.md §API 표 참조).
+
+| 엔드포인트 | 위젯 | 비고 |
+|---|---|---|
+| `GET /api/dashboard/summary` | KPI 8종 + 전주 대비 | 기간 연동 |
+| `GET /api/dashboard/distribution?type=status\|priority\|voc_type\|tag` | 분포 탭 4종 | 기간 연동 |
+| `GET /api/dashboard/priority-status-matrix` | 우선순위×상태 매트릭스 | 기간 연동 |
+| `GET /api/dashboard/heatmap?xAxis=status\|priority\|tag` | 드릴다운 히트맵 | 기간 연동 |
+| `GET /api/dashboard/weekly-trend?weeks=12` | 주간 트렌드 3선(신규/진행중/완료) | 12주 고정 |
+| `GET /api/dashboard/tag-distribution?limit=10` | 태그별 분포 Top 10 | 기간 연동 |
+| `GET /api/dashboard/system-overview` | 현황 카드(시스템/메뉴) | 기간 연동 |
+| `GET /api/dashboard/assignee-stats?xAxis=status\|priority\|tag` | 담당자별 처리 현황 | 기간 연동 |
+| `GET /api/dashboard/processing-speed` | 처리속도(SLA 준수율 표, SC-1/SC-3 소스) | 기간 연동 |
+| `GET /api/dashboard/aging` | 에이징 바 분포(≤7일/8~30일/31일+) | 현재 미완료 기준 |
+| `GET /api/dashboard/aging-vocs?limit=10` | 장기 미처리 Top 10 | 무관 |
+| `GET /api/dashboard/settings` · `PUT /api/dashboard/settings` | 대시보드 설정 조회/저장 | Admin 전용 저장 |
+| `GET /api/dashboard/menus?systemId=` · `GET /api/dashboard/assignees` | 드롭다운용 보조 | — |
+
+- `source='import'` VOC는 SC-1/SC-3 계산 분모에서 제외 (§12, §4 `source` 운영 규칙).
+- 응답·에러 포맷은 §6.1 표준을 따름. 외부 마스터 장애 시 히트맵/분포 집계는 `EXTERNAL_MASTER_UNAVAILABLE` 없이 기존 DB 기준 그대로 동작(마스터 의존 없음).
 
 ---
 
@@ -326,6 +364,8 @@ Then  403 반환, body: { code: 'FORBIDDEN' }
 | `UPLOAD_DIR` | `/uploads` | 파일 업로드 루트 경로 |
 | `PORT` | `3000` | BE 서버 포트 |
 | `NODE_ENV` | `production` | 환경 구분 |
+| `AUTH_MODE` | `mock` \| `oidc` | 인증 모드. 로컬·개발은 `mock`(목 유저 주입), 스테이징·운영은 `oidc`(실 AD 연결). v3 §8.1. |
+| `LOG_LEVEL` | `info` | 로그 레벨 (`error`/`info`/`debug`). 운영=`error`, 개발=`info`, 로컬=`debug`. v3 §8.4. |
 
 ### 14.2 Docker 구성 개요
 
@@ -448,5 +488,16 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 ### 16.6 다음 세션 잔여
 
 - **7B — 필드별 마스터 매핑** (자료 수집 대기, v3 §7.5). `related_programs/db_tables/jobs/sps/equipment/maker/model/process` 각 필드의 원천 시스템·owner·엔드포인트·스키마 수집 후 별도 "외부 마스터 연동 명세" 문서.
-- **Phase 4 5-Expert 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL`, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만).
+
+Phase 4 5-Expert 잔여 7건은 모두 반영 완료 (2026-04-24):
+
+| 항목 | 반영 위치 |
+|---|---|
+| AD 인증 `AUTH_MODE=mock\|oidc` | §14.1 환경변수 표 |
+| Sub-task 용어 통일 | §2.3 + feature-voc.md §8.2 |
+| 대시보드 API endpoint 표 | §11.7 |
+| 환경변수 `AUTH_MODE`/`LOG_LEVEL` | §14.1 |
+| 표준 에러 코드 목록 | §6.1 |
+| 파일명 규칙 `{voc_id}/{uuid}-{원본파일명}` | feature-voc.md §8.5 |
+| KPI 목표값(MVP는 SC-1·SC-2·SC-3만) | §12 (기존 반영 완료) |
 
