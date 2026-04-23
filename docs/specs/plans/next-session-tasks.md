@@ -150,9 +150,11 @@ docs/specs/reviews/
     - [x] **Phase 4 5-Expert 리뷰 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL` 추가, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만 유지). ✅ 2026-04-24
 
 ### 6-2. 디자인 일관성 강제 체계
-- [ ] `design.md`에서 CSS 변수 토큰 목록 추출 → 컴포넌트별 토큰 사용 규칙 문서화
-- [ ] 구현 시 임의 하드코딩 색상/간격 금지 규칙을 CLAUDE.md에 추가
-- [ ] (선택) ESLint 커스텀 룰 또는 Stylelint 설정으로 토큰 이탈 감지
+- [x] `design.md` §10 누락 토큰 추가 — `--status-*` 12개 + `--status-dot-*` 5개 (2026-04-24)
+- [ ] `design.md` §11 신규 — 컴포넌트 유형별 토큰 사용 규칙 매핑 테이블
+- [ ] `frontend/CLAUDE.md` 룰 보강 (토큰 없으면 design.md에 먼저 추가 규칙)
+- [ ] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` → 6-4 스캐폴딩에서 같이 처리
+- ~~`tokens.ts` 별도 파일~~ — 탈락. CSS custom properties가 이미 단일 소스, TS 복제 시 동기화 부담만 추가됨
 
 ### 6-3. 백엔드 테스트 작성 전략
 - [ ] 테스트 범위 정의: 단위(서비스 레이어), 통합(API 엔드포인트), E2E(주요 플로우)

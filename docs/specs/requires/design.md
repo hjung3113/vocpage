@@ -508,6 +508,27 @@ Full token set — copy into `:root` as the single source of truth.
   --chart-red:     oklch(58% 0.22 25);    /* urgent, negative */
   --chart-teal:    oklch(65% 0.16 195);   /* auxiliary */
   --chart-indigo:  oklch(55% 0.17 270);   /* auxiliary */
+
+  /* Status colors — badges, indicators, admin UI */
+  --status-green:  oklch(55% 0.17 150);   /* admin active indicator */
+  --status-amber:  oklch(70% 0.16 72);    /* on-hold badge, role-manager */
+  --status-red:    oklch(58% 0.22 25);    /* urgent, form required */
+  --status-blue:   light-dark(oklch(50% 0.18 242), oklch(67% 0.17 240)); /* info */
+  --status-purple: light-dark(oklch(52% 0.22 290), oklch(72% 0.16 290)); /* regex tag-rule */
+
+  --status-amber-bg:      light-dark(oklch(94% 0.025 72),  oklch(18% 0.05 72));
+  --status-amber-border:  light-dark(oklch(78% 0.09 72),   oklch(30% 0.09 72));
+  --status-red-bg:        light-dark(oklch(94% 0.03 25),   oklch(18% 0.07 25));
+  --status-red-border:    light-dark(oklch(78% 0.10 25),   oklch(30% 0.10 25));
+  --status-purple-bg:     light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
+  --status-purple-border: light-dark(oklch(78% 0.08 290),  oklch(30% 0.09 290));
+
+  /* Status dot colors — VOC list row indicator (matches status enum) */
+  --status-dot-received:   light-dark(oklch(60% 0.010 260), oklch(48% 0.010 260)); /* 접수됨 */
+  --status-dot-reviewing:  light-dark(oklch(48% 0.19 244),  oklch(66% 0.18 242));  /* 검토중 */
+  --status-dot-processing: light-dark(oklch(48% 0.17 152),  oklch(64% 0.19 155));  /* 처리중 */
+  --status-dot-done:       light-dark(oklch(46% 0.19 155),  oklch(63% 0.21 158));  /* 완료 */
+  --status-dot-on-hold:    light-dark(oklch(60% 0.18 70),   oklch(70% 0.17 72));   /* 보류 */
 }
 ```
 
