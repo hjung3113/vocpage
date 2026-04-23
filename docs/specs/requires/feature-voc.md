@@ -30,6 +30,28 @@
 - 상태 변경 시 VOC 작성자 및 담당자에게 인앱 알림 발송.
 - 미완료 Sub-task가 있는 부모 VOC를 '완료'로 전환 시 경고 메시지 후 강제 진행 가능. Sub-task 상태는 변경되지 않으며 담당자가 개별 처리.
 
+> **참고**: 위 테이블의 `보류`는 requirements.md §4에서 `드랍`으로 대체 결정됨. 5단계 유지 vs 4단계 단순화 결론 시 본 매트릭스도 함께 갱신 예정.
+
+#### 8.2.1 review_status 서브 상태 머신 (v2)
+
+`vocs.status`가 완료 또는 드랍으로 전환되는 순간 `structured_payload` 정식 제출 + `review_status='unverified'` 초기화가 동시에 일어난다. 이후 `review_status`는 별도 서브 상태 머신으로 관리한다.
+
+```
+(null) ──완료/드랍 전환 + payload 제출──▶ unverified ──approve──▶ approved
+                                                │
+                                                └─reject──▶ rejected ──재제출──▶ unverified
+
+approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─approve──▶ (payload NULL, review_status=null, 재작성 가능)
+                                                      │
+                                                      └─reject───▶ approved (원복)
+```
+
+- 전환 권한: Manager/Admin + (폐쇄 메뉴 케이스) 담당자 self-review. self-review 시 `voc_payload_reviews.is_self_review=true`로 감사 추적.
+- 제출 스냅샷은 `voc_payload_history`에 `is_current=true`로 insert — 기존 `is_current` row는 false로 내림.
+- 삭제 승인 시: 해당 스냅샷 `final_state='deleted'`, `is_current=false`, `vocs.structured_payload=NULL`, `vocs.review_status=NULL`.
+- 삭제 reject 시: `vocs.review_status='approved'` 원복 + `action='deletion', decision='rejected'` 리뷰 row만 추가.
+- 임베딩(`vocs.embedding`)은 `approved` 전환 시점에만 생성/갱신. 재작성 발생 시 `embed_stale=true` 마킹 후 다음 approve에서 재임베딩 + 플래그 해제. (MVP 단계에서는 정책만 예약, 실제 생성 미실행)
+
 ### 8.3 권한 모델
 
 | 기능 | User | Manager | Admin |
@@ -239,6 +261,23 @@
 - 역할 변경: 인라인 드롭다운으로 즉시 변경
 - 마지막 Admin 강등 불가 (경고 표시)
 - 본인 계정 역할 변경 불가
+
+#### 9.4.5 Result Review (v2 신설)
+- **목적**: 완료/드랍 시 제출된 `structured_payload`를 검증 게이트로 확정/반려. 확정본만 임베딩·유사도 검색 파이프라인에 투입.
+- **대상 행**: `review_status IN ('unverified','pending_deletion')` VOC.
+- **테이블 컬럼**: 이슈 ID | 제목 | 상태(vocs.status) | 리뷰 상태(`review_status`) | 액션 종류(`submission`/`deletion`) | 담당자 | 제출자 | 제출일 | 작업(approve/reject)
+- **탭/필터**: "제출 검토(unverified)" / "삭제 신청(pending_deletion)" 기본 분리. 시스템/메뉴/담당자 공통 필터 지원.
+- **액션 UI**:
+  - 행 선택 → 우측 드로어에 payload diff(현재 `is_current` 스냅샷 vs 신규 제출) + 코멘트 입력창.
+  - `approve` / `reject` 버튼. reject 시 코멘트 필수.
+  - 결정은 `voc_payload_reviews`에 `action` + `decision` + `comment` + `is_self_review` 기록.
+- **self-review**: 폐쇄 메뉴(담당자 본인만 접근 가능한 시스템/메뉴) 케이스 수용. 동일 UI에서 허용하되 `is_self_review=true` 플래그로 감사 추적만 남김. 별도 모니터링 대시보드 없음.
+- **권한**: Manager/Admin + (self-review 허용 시) 해당 VOC 담당자 본인.
+- **연관 갱신 규칙**:
+  - 제출 approve → `vocs.structured_payload` 확정, 해당 history row `is_current=true`/`final_state='approved'` 유지, `vocs.embed_stale=true`면 임베딩 재생성(MVP는 미실행).
+  - 제출 reject → `vocs.review_status='rejected'`, payload 본 컬럼은 유지(담당자 수정/재제출 가능), history row `final_state='rejected'`.
+  - 삭제 approve → `vocs.structured_payload=NULL`, `vocs.review_status=NULL`, 해당 history row `final_state='deleted'`/`is_current=false`. 담당자는 이후 "결과 작성"을 다시 수행 가능.
+  - 삭제 reject → `vocs.review_status='approved'` 원복, `action='deletion', decision='rejected'` 리뷰 row만 추가.
 
 ### 9.5 정렬 옵션 (컬럼 헤더 클릭 정렬)
 - 별도 정렬 버튼/드롭다운 없이 **테이블 헤더 컬럼 클릭**으로 오름차순/내림차순 토글.

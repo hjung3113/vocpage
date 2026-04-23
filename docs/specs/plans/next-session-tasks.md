@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-23 (3차)
+> 최종 업데이트: 2026-04-24 (5차 — v2 결정사항 requirements/feature 반영 완료, v3 리뷰 예약)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## Reviews 폴더 구조
@@ -11,7 +11,8 @@ docs/specs/reviews/
 ├── phase2/   requirements-expert-review-2026-04-23.md, REVIEW-notice-faq.md
 ├── phase4/   requirements-5expert-review-2026-04-23.md
 └── phase6/   design-enforcement.md   ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
-             voc-ai-workflow-fit-review.md  ← Phase 6-1 AI 워크플로우 적합성 리뷰 (스키마 변경 필요)
+             voc-ai-workflow-fit-review.md     ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
+             voc-ai-workflow-fit-review-v2.md  ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
 ```
 
 ---
@@ -101,17 +102,27 @@ docs/specs/reviews/
     - [x] 🔴 갭 #2 (LLM 정규화 저장): `vocs.structured_payload jsonb` 단일 컬럼. 실시간 AI는 v2, MVP는 담당자가 완료/드랍 시 폼으로 입력.
     - [x] 🟠 갭 #3 (root_cause/resolution): `structured_payload` JSON 내부 키로 흡수 (`symptom`/`root_cause`/`resolution` 필수 텍스트).
     - [x] 보류→드랍 이름 변경 + `resolution_quality`/`drop_reason` enum 추가.
-  - **다음 세션에서 결정 필요 (Q3 이후)**:
-    - [ ] ⚠️ **Q1 재리뷰 필요**: 설비 마스터 불채택 + `tags.kind` 3-카테고리 구조 — 다음 세션 시작 시 다시 토론. 고려 포인트: equipment 태그의 중복·표기 흔들림 관리, 주메뉴 FK와 `menu` 태그의 역할 분리 명확화, 외부 마스터 쿼리 실패 시 fallback.
-    - [ ] `status` 5단계 유지 vs 4단계 단순화(`접수/진행중/완료/드랍`) 확정
-    - [ ] 상태 전환 매트릭스(§8.2) 업데이트 — 보류→드랍, 완료/드랍 시 정규화 필수 규칙 추가
-    - [ ] 🟠 갭 #7 `comments.visibility enum('internal','public')` 채택 여부
-    - [ ] 🟡 갭 #4 임베딩 대상·갱신 시점 스펙 문장 추가
-    - [ ] 🟡 갭 #5 `is_golden_case`, `embed_stale` 플래그 필드 추가 여부
-    - [ ] 🟡 갭 #6 `tag_rules` vs 엔티티 해석 역할 경계 명시 (3-카테고리 태그 구조에 맞춰 재정리)
-    - [ ] 🟢 갭 #8~10 예약 컬럼(`source`, `chatbot_session_id`, `linked_code_refs`) 및 유사도 임계치 자리 예약
-    - [ ] Phase 4 5-Expert 리뷰 미결 — AD 인증 방식 확정, §2.3 Sub-task 표현 통일, 대시보드 API endpoint 목록, 환경변수, 에러 응답 포맷, 파일명 저장 방식, KPI 목표값
+  - **세션 2026-04-24 진행분 (v2 재결정 — 문서만 작성, requirements.md 반영 미수행)**:
+    - [x] ✅ **Q1 재리뷰 완료**: `tags.kind` 2-카테고리(`general`/`menu`)로 축소. 설비 관련은 전부 `structured_payload`로 이동. 상세는 `reviews/phase6/voc-ai-workflow-fit-review-v2.md`.
+    - [x] ✅ **Q2 재설계**: `structured_payload`에 `equipment`/`maker`/`model`/`process` 4필드 분리, 칩 입력 UX(실시간 검증 + auto 추가 + cascade), 4개 중 최소 1개 저장 조건.
+    - [x] ✅ **리뷰 플로우 신설**: `review_status enum('unverified','approved','rejected','pending_deletion')` + `voc_payload_reviews`(리뷰 이력) + `voc_payload_history`(제출 스냅샷) 2개 테이블 추가.
+    - [x] ✅ **임시저장**: `structured_payload_draft` 별도 컬럼 + "이전 이력" 버튼 로직 확정.
+    - [x] ✅ **임베딩 정책**: approve 시점 생성 + `embed_stale` 플래그 (MVP는 여전히 미실행).
+  - **세션 2026-04-24 후반 진행분 (v2 requirements/feature 반영 완료)**:
+    - [x] ✅ v2 결정사항 `requirements.md` §4 스키마 반영 (structured_payload 4분리 · draft/review_status/embed_stale · voc_payload_reviews · voc_payload_history · tags.kind 축소)
+    - [x] ✅ `requirements.md` §8.16 Result Review 플로우 요약 + §15 관리자 페이지 + §16 AI 워크플로우 적합성 신규 섹션 추가
+    - [x] ✅ `feature-voc.md` §8.2.1 `review_status` 서브 상태 머신 + §9.4.5 Result Review 관리자 페이지 상세 반영
+    - [x] ✅ `embed_stale` 플래그 결정 완료 — approve 시점 임베딩 재생성 트리거 용도로 `vocs`에 포함
+  - **다음 세션(v3 리뷰)에서 결정 필요**:
+    - [ ] 📌 **v3 리뷰 문서 작성**: `reviews/phase6/voc-ai-workflow-fit-review-v3.md` — 아래 미결 항목 일괄 논의
+    - [ ] Q3: `status` 5단계 유지 vs 4단계 단순화(`접수/진행중/완료/드랍`) 확정 → §8.2 매트릭스 `보류`→`드랍` 갱신 포함
+    - [ ] Q5: `is_golden_case` 플래그 추가 여부 (우수 사례 표식 → 학습 데이터 가중치 용도)
+    - [ ] Q7: `comments.visibility enum('internal','public')` 채택 여부 (작성자 공개 vs 담당자 전용)
+    - [ ] Q8·Q9: 예약 컬럼 `source(manual|chatbot|import)`, `chatbot_session_id`, `linked_code_refs` 추가 여부 및 스키마 예약
+    - [ ] Q10: 유사도 임계치 자리 예약 (`similarity_threshold` 설정 테이블 vs 환경변수 vs ENUM 상수)
+    - [ ] 🟡 갭 #6 재정리: `tag_rules` vs v2 엔티티 해석(structured_payload 4필드 입력) 역할 경계 — 2-카테고리 태그로 축소된 상태 기준으로 재서술
     - [ ] `related_programs/db_tables/jobs/sps` 외부 시스템 검증 쿼리 구현 명세 (어떤 시스템에 어떤 API/쿼리로 물을지)
+    - [ ] Phase 4 5-Expert 리뷰 미결 — AD 인증 방식 확정, §2.3 Sub-task 표현 통일, 대시보드 API endpoint 목록, 환경변수, 에러 응답 포맷, 파일명 저장 방식, KPI 목표값
 
 ### 6-2. 디자인 일관성 강제 체계
 - [ ] `design.md`에서 CSS 변수 토큰 목록 추출 → 컴포넌트별 토큰 사용 규칙 문서화
