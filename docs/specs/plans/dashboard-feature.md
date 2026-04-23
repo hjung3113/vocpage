@@ -1,6 +1,6 @@
 # VOC 대시보드 기능 계획 (v3 — 2026-04-23 확정)
 
-> **참조 시각화**: `.superpowers/brainstorm/71061-1776875230/content/dashboard-v3.html`
+> **참조 시각화**: `prototype/dashboard/dashboard-v3.html`
 > **구현 완료 후**: 위 HTML 파일을 브라우저로 열어 프로토타입과 나란히 비교 리뷰 — 누락된 인터랙션, 디자인 차이 확인 후 보완
 
 ---
@@ -78,7 +78,7 @@
 - 헤더 메뉴 드롭다운: **숨김**
 - 장기 미처리 dim: `[전체 | 시스템별]`
 - 히트맵 Y축: 합계 행(`전체`) + 각 시스템 행 (클릭 가능, 레벨 2로 이동)
-- 시스템/메뉴 현황 섹션 타이틀: **"시스템 현황"**
+- 현황 카드: 시스템별 카드 (가로 스크롤)
 
 #### 레벨 2 — 시스템 탭 (채널 A 등)
 - GlobalTabs에서 특정 시스템 탭 클릭
@@ -87,7 +87,7 @@
 - 헤더 메뉴 드롭다운 **표시**: `메뉴: 전체 ▾` (선택 시 레벨 3으로 진입)
 - 장기 미처리 dim: `[전체 | 메뉴별]`로 버튼 텍스트 변경
 - 히트맵 Y축: 합계 행(`채널 A 전체`) + 해당 시스템의 메뉴 행 (클릭 불가)
-- 시스템/메뉴 현황 섹션 타이틀: **"메뉴 현황 (채널 A)"** (메뉴 카드 목록)
+- 현황 카드: 해당 시스템의 메뉴별 카드 (가로 스크롤)
 
 #### 레벨 3 — 메뉴 탭 (시스템 탭 + 메뉴 선택)
 - 헤더 메뉴 드롭다운에서 특정 메뉴 선택
@@ -371,19 +371,24 @@
 
 ---
 
-### 7. 시스템/메뉴 현황 카드 (v3 변경: 타이틀+내용 연동)
+### 7. 현황 카드 (v3.2 변경: 상태 전체 표시 + 가로 스크롤)
 
-| 글로벌 탭 | 섹션 타이틀 | 카드 내용 |
-|----------|------------|----------|
-| 전체 탭 | "시스템 현황" | 각 시스템 카드 (시스템명, 전체 건수, 미해결 건수) |
-| 시스템 탭 | "메뉴 현황 (채널 A)" | 해당 시스템의 메뉴 카드 (메뉴명, 전체 건수, 미해결 건수) |
-| 메뉴 탭 | "메뉴 현황 (채널 A)" | 해당 시스템의 모든 메뉴 카드 + **선택된 메뉴 카드 하이라이트** (`2px solid var(--brand)`) |
+- 섹션 타이틀: **"현황"** 고정 (탭 전환해도 타이틀 불변)
+- 글로벌 탭에 따라 카드 대상만 달라짐:
 
-- 전체 탭: 최대 8개 + "더보기" 카드 (대시 보더, 투명 배경)
-  - "더보기" 클릭: 나머지 카드 **인라인 확장** (토글), 확장 후 "접기" 버튼으로 복귀
-- 시스템 탭: 해당 시스템의 모든 메뉴 카드 표시
-- 메뉴 탭: 해당 시스템의 모든 메뉴 카드 표시 + 선택된 메뉴 카드 하이라이트 (다른 메뉴 카드 클릭 시 해당 메뉴로 전환)
-- 카드 클릭: 전체 탭에서 시스템 카드 클릭 → 해당 시스템 탭으로 이동 / 시스템 탭에서 메뉴 카드 클릭 → 해당 메뉴 탭으로 이동
+| 글로벌 탭 | 카드 단위 | 카드 내용 |
+|----------|----------|----------|
+| 전체 탭 | 각 시스템 1장 | 시스템명 + 전체·접수됨·검토중·처리중·완료·보류 |
+| 시스템 탭 | 해당 시스템의 각 메뉴 1장 | 메뉴명 + 전체·접수됨·검토중·처리중·완료·보류 |
+
+- **레이아웃**: 가로 스크롤 (flex row, `overflow-x: auto`), 카드 너비 고정 148px
+- **카드 내부**: 2열 (라벨 | 숫자), 라벨 좌측 / 숫자 우측 우측정렬
+  - `전체`: 14px bold, `var(--text-primary)`
+  - `접수됨`: 회색 계열 (`var(--text-tertiary)`)
+  - `검토중`: 파란 계열
+  - `처리중`: 에메랄드 계열
+  - `완료`: 초록 계열, bold
+  - `보류`: 앰버 계열
 
 ---
 
@@ -573,30 +578,57 @@ interface AssigneeTableState {
 
 ---
 
-## 커스터마이징
+## 커스터마이징 (MVP)
 
-### Admin 역할별 기본값 (persistent)
+> 드래그앤드롭 재배치, 위젯 크기 조절, 항목별 잠금은 v2로 이동.  
+> 상세: `docs/specs/plans/dashboard-v2-layout-editor.md`
+
+MVP 범위: **위젯 숨기기/표시** + **기본 날짜 범위** + **히트맵 기본 X축** + **GlobalTabs 순서·숨김(Admin)**
+
+### 설정 계층
+
+`Admin 기본값` → `개인 설정` → `세션 임시` (상위가 하위 오버라이드)
+
+### dashboard_settings 스키마
 
 ```sql
 dashboard_settings (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  role          ENUM('admin','manager') NOT NULL,
-  setting_key   VARCHAR(64) NOT NULL,
-  setting_value JSONB NOT NULL DEFAULT '{}',
-  updated_by    UUID REFERENCES users(id),
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (role, setting_key)
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id               UUID REFERENCES users(id) ON DELETE CASCADE,
+  -- user_id IS NULL = Admin 기본값 (전체 사용자 공통)
+  widget_visibility     JSONB NOT NULL DEFAULT '{}',
+  -- 예: {"kpi": true, "heatmap": true, "aging": false}
+  default_date_range    VARCHAR(8) NOT NULL DEFAULT '30d',
+  -- enum: '7d' | '30d' | '90d' | 'custom'
+  heatmap_default_xaxis VARCHAR(16) NOT NULL DEFAULT 'status',
+  -- enum: 'status' | 'priority' | 'tag'
+  globaltabs_order      JSONB,
+  -- Admin 기본값 행에만 유효: [{ systemId, visible }]
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id)
+  -- user_id IS NULL 행은 단일 행 보장 (partial unique index)
 )
 ```
 
-설정 항목: 기본 날짜 범위, 히트맵 기본 X축, 표시 시스템 목록, 표시 태그 목록
+### 편집 진입점
 
-### ⚙️ 세션 임시 설정 (sessionStorage)
+- 대시보드 헤더 우측 **"설정"** 버튼 → 우측에서 설정 패널 슬라이드인
+- **저장 대상 토글**: "내 설정" (기본) / "기본값 (Admin)" — Admin 권한자만 선택 가능
+- 설정 저장 / 취소 / "기본값으로 초기화" 버튼 제공
 
-- 슬라이드오버 패널, 동일 항목 오버라이드
-- sessionStorage 저장, 탭 닫으면 초기화
-- "기본값으로 초기화" 버튼 제공
+### 편집 가능 항목 (MVP)
+
+| 항목 | 개인 | Admin 기본값 |
+|------|------|------------|
+| 위젯 숨기기/표시 | ✓ | ✓ |
+| 기본 날짜 범위 | ✓ | ✓ |
+| 히트맵 기본 X축 | ✓ | ✓ |
+| GlobalTabs 순서·숨김 | — | ✓ |
+
+### 세션 임시 설정 (sessionStorage)
+
+- 저장 없이 닫으면 초기화
+- 동일 항목 오버라이드 (세션 중 임시 변경 유지)
 
 ---
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-This is a **greenfield VOC (Voice of Customer) management system** currently in the design/requirements phase. No source code exists yet. See `requirements.md` for the product spec and `design.md` for the complete design system.
+This is a **greenfield VOC (Voice of Customer) management system** currently in the design/requirements phase. No source code exists yet. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
 
 ## Planned Tech Stack
 
@@ -20,13 +20,13 @@ This is a **greenfield VOC (Voice of Customer) management system** currently in 
 ## Commands (once scaffolded)
 
 ```bash
-# Frontend (vocpage-frontend/)
+# Frontend (frontend/)
 npm run dev          # Vite dev server
 npm run build        # Production build
 npm run test         # Vitest
 npm run test -- path/to/file.test.ts  # Single test file
 
-# Backend (vocpage-backend/)
+# Backend (backend/)
 npm run dev          # ts-node-dev watch
 npm run test         # Jest
 npm run test -- --testPathPattern=filename  # Single test
@@ -39,14 +39,14 @@ docker compose up    # Start all services (FE + BE + Postgres)
 
 The system is a three-tier app: React SPA → Express REST API → PostgreSQL.
 
-**Frontend** (`vocpage-frontend/`)
+**Frontend** (`frontend/`)
 - VOC list view (table with hierarchical accordion rows)
 - Side drawer for detail view (preserves list context)
 - Modal for VOC creation with Toast UI rich text editor
 - Key hooks: `useVOCFilter`, `useAutoTag`, `useDrawer`
 - State: React Context or Redux for global filter/selection
 
-**Backend** (`vocpage-backend/`)
+**Backend** (`backend/`)
 - REST CRUD for VOCs, comments, attachments, tags
 - `validateADSession` middleware for AD/LDAP authentication
 - Auto-tagging service: matches keywords/regex rules from `tag_rules` table → assigns tags on VOC creation
@@ -66,7 +66,7 @@ The full spec is in `design.md`. Critical tokens:
 - **Brand accent (Samsung Blue):** `var(--brand)` / `var(--accent)` / `var(--accent-hover)` — Linear 인디고(`#5e6ad2`) 구 값 사용 금지
 - **Text:** `var(--text-primary)` / `var(--text-secondary)` / `var(--text-tertiary)` / `var(--text-quaternary)`
 - **Typography:** Pretendard Variable (Korean+Latin UI); D2Coding (issue code, code blocks)
-- **Full token reference:** `design.md §10 CSS Reference` — 항상 CSS 커스텀 프로퍼티 사용
+- **Full token reference:** `docs/specs/requires/design.md §10 CSS Reference` — 항상 CSS 커스텀 프로퍼티 사용
 - **Spacing:** 8px grid base; max-width ~1200px
 - **Elevation:** communicated via background opacity (not shadow darkness) — `rgba(255,255,255,0.05)` for surfaces, multi-layer shadow only for dialogs
 - **Components:** Radix UI primitives as base; ghost buttons, translucent cards, border-focused inputs
@@ -74,8 +74,9 @@ The full spec is in `design.md`. Critical tokens:
 ## Start Every Session
 
 1. Read `claude-progress.txt` (first 30 lines only)
-2. Read relevant spec in `docs/` (selectively — only what's needed)
-3. Continue from progress file — don't re-read what you already know
+2. Read `docs/specs/plans/next-session-tasks.md` to find current Phase and pending tasks
+3. Read relevant spec in `docs/` (selectively — only what's needed)
+4. Continue from progress file — don't re-read what you already know
 
 ## Core Rules
 
@@ -94,16 +95,30 @@ Every design decision → written to spec or ADR before session ends.
 Every phase completion → update `claude-progress.txt` + git commit.
 No implementation without a written spec section covering it.
 
-## Document Roles
+## Document Structure
+
+모든 설계·리뷰·구현 문서는 `docs/specs/` 하위에 관리한다. 루트에 문서 파일을 두지 않는다.
+
+```
+docs/specs/
+├── requires/   # 요구사항·설계 스펙 (requirements.md, design.md 등)
+├── plans/      # 기능별 구현 계획 (dashboard-feature.md 등)
+└── reviews/    # 리뷰·브레인스토밍 결과물
+```
+
+### Document Roles
 
 | File | Language | Scope |
 |------|----------|-------|
-| `design.md` | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
-| `requirements.md` | 한국어 | Functional requirements — feature specs, behavioral rules, data model, API design, business logic |
+| `docs/specs/requires/design.md` | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
+| `docs/specs/requires/requirements.md` | 한국어 | Functional requirements — feature specs, behavioral rules, data model, API design, business logic |
 
+- 새 기능 계획 → `docs/specs/plans/<feature-name>.md`
+- 리뷰·브레인스토밍 → `docs/specs/reviews/<topic>.md`
 - **Never put functional/behavioral spec in `design.md`**
 - **Never put visual design rules in `requirements.md`**
 - `design.md` must always be written in English
+- **`.omc/plans/`, `.superpowers/` 등 툴 작업 디렉토리는 임시 공간 — canonical 문서는 항상 `docs/specs/`**
 
 ## Document Coherence
 

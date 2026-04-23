@@ -41,6 +41,8 @@
 | **Infra** | Docker, Docker Compose | 환경 일치 및 배포 편의성 |
 | **Editor** | Toast UI Editor | 오픈소스 리치 텍스트 에디터 |
 | **Testing** | Vitest (FE), Jest/Supertest (BE) | TDD 개발 수행 |
+| **Data Fetching** | @tanstack/react-query | 대시보드 위젯별 독립 쿼리, staleTime 5분 |
+| **Charts** | recharts | 대시보드 LineChart / BarChart (lazy import) |
 
 ---
 
@@ -57,6 +59,7 @@
 - **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
 - **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`.
 - **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
+- **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `default_date_range(enum: 7d/30d/90d/custom)`, `heatmap_default_x_axis(enum: status/priority/tag)`, `locked_fields(jsonb)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
 
 ---
 
@@ -79,7 +82,6 @@
 
 ### 6.2 Frontend (React)
 - `useVOCFilter`: 메뉴/상태/태그별 복합 필터링 훅.
-- `useAutoTag`: 입력 텍스트 실시간 분석을 통한 태그 추천 UI.
 - `useDrawer`: 상세 보기 드로어 제어 및 상태 동기화.
 
 ---
@@ -158,7 +160,7 @@
 
 ### 8.7 Sub-task
 
-- 최대 2단계: `vocs` → Sub-task. Sub-task의 Sub-task 생성 불가 (DB 제약으로 강제).
+- 1레벨만 허용: `vocs` → Sub-task. Sub-task의 Sub-task 생성 불가 (DB 제약으로 강제).
 - Sub-task ID: `{parent-issue-code}-{N}` (예: `ANALYSIS-2025-0001-1`)
 - Sub-task는 독립적인 상태·담당자·Priority·유형 보유.
 - Sub-task의 시스템/메뉴는 부모 VOC에서 상속 (변경 불가).
@@ -208,7 +210,7 @@
 - VOC 제목: 최대 200자
 - VOC 본문: 최대 64KB (HTML)
 - 댓글: 최대 16KB (HTML), Toast UI Editor 사용
-- 댓글 이미지: 파일당 5MB 이하
+- 댓글 이미지: 파일당 5MB 이하, 최대 5개/댓글
 - 시스템명/메뉴명: 최소 2자·최대 20자 (공백 포함, 한글/영문/숫자/주요특수문자 허용). URL-safe slug(ASCII) 병행 저장.
 
 ### 8.11 VOC 목록 필터/검색/페이지네이션
@@ -216,8 +218,8 @@
 - **필터 항목:** 상태(다중 선택), 시스템(단일), 메뉴(단일, 시스템 선택 시 활성화), 유형(다중 선택), 담당자(단일)
 - **텍스트 검색:** 제목 + 본문 대상 SQL `ILIKE '%keyword%'`. MVP에서는 FTS 미사용.
 - **필터·검색 스코프:** 해당 사용자가 조회 가능한 VOC 범위로 자동 제한 (User는 본인 VOC 내에서만 동작).
-- **페이지네이션:** 오프셋 기반. 페이지당 항목 수는 §9.8 동적 계산 공식 적용. `GET /api/vocs?page=1&limit={N}&status=접수됨&systemId=...&menuId=...&type=bug&assigneeId=...&q=keyword`
-- **정렬:** 기본 `created_at DESC`. `?sort=priority|updated_at` 지원.
+- **페이지네이션:** 오프셋 기반. 페이지당 항목 수는 §9.8 동적 계산 공식 적용. `GET /api/vocs?page=1&limit={N}&status=접수됨&priority=urgent,high&systemId=...&menuId=...&type=bug&assigneeId=...&q=keyword&sort=created_at&order=desc`
+- **정렬:** 기본 `created_at DESC`. `?sort=issue_code|title|status|assignee|priority|created_at&order=asc|desc` 지원.
 
 ### 8.12 파일 저장소
 
@@ -239,9 +241,10 @@
 
 ### 8.15 기존 분석 시스템 통합
 
-- VOC 시스템은 독립 React SPA로 빌드되며, 분석 시스템의 네비게이션 메뉴에서 `<iframe src="https://voc.internal" />` 방식으로 임베드.
-- 인증: 분석 시스템의 AD 세션 쿠키를 동일 도메인 또는 `postMessage`를 통해 VOC BE로 전달.
-- VOC 앱의 `<body>`는 배경색 투명 처리하여 부모 앱의 테마와 일체감 유지.
+- VOC 시스템은 **독립 React SPA**로 별도 빌드·배포 (예: `https://voc.internal`).
+- 분석 시스템의 네비게이션 메뉴에서 VOC 시스템 URL로 **링크 이동** 방식으로 연결.
+- 인증: AD SSO 세션을 공유하여 별도 로그인 없이 진입 가능하도록 구성.
+- iframe 임베드는 현재 범위 밖 — 향후 필요 시 독립 SPA를 iframe으로 감싸는 방향으로 확장.
 
 ---
 
@@ -343,16 +346,25 @@
 
 ```
 [사이드바]
- VOC 목록
- 내 VOC
- 담당 VOC
-──────────────── (시스템 트리 아코디언)
-──────────────── (구분선)
- 공지사항
- FAQ
-──────────────── (구분선)
- Admin (관리자만)
+ ┌─ 상단 고정 ───────────────────┐
+ │  전체 VOC / 내 VOC / 담당 VOC │
+ │  대시보드                     │
+ ├─ 스크롤 영역 (overflow-y:auto) ┤
+ │  ── (구분선) ──               │
+ │  시스템 트리 아코디언          │
+ │  ── (구분선) ──               │
+ │  공지사항 / FAQ               │
+ │  ── (구분선) ──               │
+ │  Admin (관리자만)             │
+ ├───────────────────────────────┤
+ │  하단 고정: 유저 프로필        │
+ └───────────────────────────────┘
 ```
+
+**스크롤 동작 규칙**
+- 상단 "보기" 섹션(전체/내/담당 VOC, 대시보드)과 하단 유저 프로필은 항상 고정
+- 시스템 트리·정보·관리자 영역은 하나의 스크롤 컨테이너로 묶음
+- 아코디언 펼침은 항상 **아래 방향**으로만 확장; 컨테이너가 넘치면 세로 스크롤 활성화
 
 #### 10.2.1 네비게이션 활성 상태 규칙
 
@@ -388,7 +400,10 @@
 - Admin/Manager가 `팝업 여부 = ON`으로 설정한 공지는 로그인 시 팝업 표시
 - 팝업 하단에 **"오늘 하루 보지 않기"** 체크박스 제공
   - 체크 시 당일 재접속에서 해당 공지 팝업 미표시 (localStorage 기반)
-- 복수의 팝업 공지가 있을 경우 중요도 상위(긴급 → 중요 → 일반) 순으로 표시
+- 복수의 팝업 공지가 있을 경우 **2-panel 모달**로 표시:
+  - **좌측 패널**: 팝업 대상 공지 목록 (중요도 내림차순, 제목 + 중요도 배지)
+  - **우측 패널**: 선택된 공지 상세 내용 (기본 선택: 가장 높은 중요도 공지)
+  - 모달 하단 **"오늘 하루 보지 않기"** 체크박스: 현재 팝업 목록 전체 일괄 적용 (localStorage 기반)
 
 #### 10.3.3 공지사항 목록 (사용자 뷰)
 - 노출 기간 내이고 노출 여부 = ON인 공지만 표시
@@ -419,7 +434,7 @@
 
 #### 10.4.3 Admin/Manager 관리 기능
 - FAQ 항목별 **노출 여부 토글** (즉시 반영)
-- **삭제**: 완전 삭제 가능
+- **삭제**: Soft Delete (목록에서 제거, DB에는 유지). Admin은 관리 목록에서 복원 가능.
 - Admin 페이지 내 FAQ 관리 탭 추가 (공지사항 관리와 동일 구조)
 
 ### 10.5 Admin 페이지 확장
@@ -460,7 +475,7 @@
 | 드릴다운 히트맵 | 전체 → 시스템별 → 메뉴별 계층 탐색; X축: 진행현황 / 우선순위별 / 태그별 |
 | 주간 트렌드 (3선) | 최근 12주 신규 / 진행중 / 완료 라인 차트 (날짜 필터 무관, 고정) |
 | 태그별 분포 | Top 10 태그 가로 바 차트 |
-| 시스템/메뉴 현황 카드 | 전체 탭: 시스템 카드 (최대 8개 + 더보기 인라인 확장) / 시스템 탭: 메뉴 카드 |
+| 처리속도 & 에이징 | SLA 준수율 테이블 (시스템명·평균 처리일·SLA 준수율%) + 에이징 바 (≤7일/8~30일/31일+); 전체 탭 → 시스템별, 시스템 탭 → 메뉴별 전환 |
 | 담당자별 처리 현황 | X축: 진행현황 / 우선순위별 / 태그별; 담당자 필터 연동 행 하이라이트 |
 | 장기 미처리 Top 10 | 14일+ 미처리 목록, 클릭 → VOC Drawer |
 
@@ -504,8 +519,46 @@
 
 ### 11.5 커스터마이징
 
-- **Admin 관리 페이지**: 역할별(Admin/Manager) 기본 설정을 `dashboard_settings` 테이블에 저장
-- **세션 임시 설정**: ⚙️ 버튼 → 슬라이드오버 패널 → `sessionStorage` 저장 (탭 닫으면 초기화)
+설정 계층: **Admin 기본값** → **개인 설정** → **세션 임시** (상위가 하위 오버라이드)
+
+#### 인대시보드 편집 모드
+
+별도 관리자 설정 페이지 없이 대시보드 자체에서 직접 편집 (WYSIWYG).
+
+**진입/종료**
+- 대시보드 헤더 우측 "레이아웃 편집" 버튼 하나로 진입 (별도 "내 설정" 버튼 없음)
+- 편집 모드 중 버튼 텍스트 → "완료"로 변경, 헤더 강조 표시
+- 완료 / 취소 버튼으로 종료; 저장하지 않고 닫으면 세션 임시(`sessionStorage`)로만 유지
+
+**편집 모드 UI**
+- 각 위젯 상단에 컨트롤 바 노출: `⠿` 드래그 핸들 / 위젯명 / 눈 아이콘(숨기기) / 잠금 아이콘
+- 위젯 외곽선 점선 표시 (편집 영역 시각화)
+- 우측에서 설정 패널 슬라이드인:
+  - **저장 대상 토글**: "내 설정" (기본) / "기본값 (Admin)" — Admin 권한자만 기본값 선택 가능
+  - 기본 기간 / 히트맵 기본 X축 셀렉터
+  - 설정 저장 / 취소 버튼
+
+**편집 가능 항목**
+
+| 항목 | 개인 | Admin(기본값) | 잠금 가능 |
+|------|------|--------------|-----------|
+| 위젯 순서 (2열 그리드 내 드래그앤드롭) | ✓ | ✓ | ✓ |
+| 위젯 폭 (1열/2열 전환) | ✓ | ✓ | ✓ |
+| 위젯 높이 (단계별) | ✓ | ✓ | ✓ |
+| 위젯 숨기기/표시 | ✓ | ✓ | ✓ |
+| 기본 날짜 범위 | ✓ | ✓ | ✓ |
+| 히트맵 기본 X축 | ✓ | ✓ | — |
+| GlobalTabs 순서·숨김 | — | ✓ | — |
+
+- **항목별 🔒 잠금** (Admin만): 잠긴 항목은 개인 오버라이드 불가
+- KPI 카드·현황 카드는 항상 상단 고정 (위치 잠금)
+
+**저장 방식**
+- **기본값 저장**: Admin 권한 필요, 전체 사용자의 초기 레이아웃으로 적용, DB 저장
+- **내 설정 저장**: 로그인 사용자 개인 레이아웃, 서버 저장 (기기 무관 유지), 잠기지 않은 항목만
+- **세션 임시**: `sessionStorage` — 저장 없이 닫으면 초기화
+
+접근 권한: Manager/Admin 모두 전체 시스템 조회 가능 (시스템별 제한 없음)
 
 ### 11.6 추가 기술 스택
 

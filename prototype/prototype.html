@@ -82,9 +82,10 @@ html, body {
 .sidebar-logo {
   display: flex; align-items: center; gap: var(--sp-2);
   padding: 0 var(--sp-4);
-  height: 56px;
+  height: 56px; flex-shrink: 0;
   border-bottom: 1px solid var(--border-subtle);
 }
+.sidebar-nav { flex: 1; overflow-y: auto; min-height: 0; }
 .logo-mark {
   width: 26px; height: 26px; border-radius: 7px;
   background: var(--brand);
@@ -144,7 +145,7 @@ html, body {
 .sys-menu-item:hover { background: var(--bg-elevated); color: var(--text-secondary); }
 .sys-menu-item.active { color: var(--accent); background: var(--brand-bg); }
 .sidebar-user {
-  margin-top: auto; padding: var(--sp-3) var(--sp-2);
+  flex-shrink: 0; padding: var(--sp-3) var(--sp-2);
   border-top: 1px solid var(--border-subtle);
   display: flex; align-items: center; gap: var(--sp-2);
   cursor: pointer; transition: background 0.12s;
@@ -879,20 +880,37 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 .bar-track{height:5px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;}
 .bar-fill{height:100%;background:var(--chart-blue);border-radius:3px;}
 .bar-val{font-weight:600;color:var(--text-tertiary);}
-.status-card-grid{display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:var(--border-solid) transparent;}
-.status-card{flex:0 0 148px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:11px 13px;cursor:pointer;transition:border-color .15s;}
-.status-card:hover{border-color:var(--brand-border);}
-.status-card-name{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.status-card-rows{display:flex;flex-direction:column;gap:4px;}
-.status-card-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;font-size:11px;}
-.status-card-label{color:var(--text-tertiary);}
-.status-card-val{font-weight:600;color:var(--text-secondary);font-variant-numeric:tabular-nums;text-align:right;}
-.status-card-val.total{font-size:14px;color:var(--text-primary);font-weight:700;}
-.status-card-val.s-접수{color:light-dark(oklch(50% .010 260),oklch(56% .008 260));}
-.status-card-val.s-검토{color:light-dark(oklch(45% .18 245),oklch(68% .17 242));}
-.status-card-val.s-처리{color:light-dark(oklch(42% .17 152),oklch(66% .19 155));}
-.status-card-val.s-완료{color:light-dark(oklch(40% .18 155),oklch(65% .20 158));font-weight:700;}
-.status-card-val.s-보류{color:light-dark(oklch(50% .16 68),oklch(72% .16 72));}
+.sla-section{margin-bottom:14px;}
+.sla-header{display:grid;grid-template-columns:1fr 72px 72px;font-size:10px;font-weight:600;color:var(--text-quaternary);text-transform:uppercase;letter-spacing:.04em;padding-bottom:5px;border-bottom:1px solid var(--border-subtle);margin-bottom:4px;}
+.sla-col-avg,.sla-col-rate{text-align:right;}
+.sla-row{display:grid;grid-template-columns:1fr 72px 72px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-subtle);}
+.sla-row:last-child{border-bottom:none;}
+.sla-name{font-size:12px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sla-avg{font-size:12px;font-weight:600;color:var(--text-primary);text-align:right;font-variant-numeric:tabular-nums;}
+.sla-rate{font-size:11px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;}
+.sla-rate.good{color:light-dark(oklch(42% .17 152),oklch(66% .19 155));}
+.sla-rate.warn{color:light-dark(oklch(50% .16 68),oklch(72% .16 72));}
+.sla-rate.bad{color:light-dark(oklch(50% .18 22),oklch(68% .20 22));}
+.aging-section{padding-top:12px;border-top:1px solid var(--border-subtle);}
+.aging-legend{display:flex;gap:10px;margin-bottom:8px;}
+.aging-legend-item{font-size:10px;font-weight:600;color:var(--text-quaternary);display:flex;align-items:center;gap:4px;}
+.aging-legend-item::before{content:'';width:8px;height:8px;border-radius:2px;display:inline-block;}
+.aging-legend-item.safe::before{background:light-dark(oklch(55% .17 152),oklch(60% .19 155));}
+.aging-legend-item.warn::before{background:light-dark(oklch(55% .15 68),oklch(68% .16 72));}
+.aging-legend-item.crit::before{background:light-dark(oklch(52% .18 22),oklch(62% .20 22));}
+.aging-item{margin-bottom:7px;}
+.aging-item:last-child{margin-bottom:0;}
+.aging-item-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.aging-name{font-size:11.5px;color:var(--text-secondary);}
+.aging-counts{display:flex;gap:6px;font-size:10.5px;font-weight:600;font-variant-numeric:tabular-nums;}
+.aging-counts .aging-safe{color:light-dark(oklch(42% .17 152),oklch(60% .19 155));}
+.aging-counts .aging-warn{color:light-dark(oklch(50% .16 68),oklch(68% .16 72));}
+.aging-counts .aging-crit{color:light-dark(oklch(50% .18 22),oklch(62% .20 22));}
+.aging-bar{height:6px;border-radius:3px;overflow:hidden;display:flex;background:var(--bg-elevated);}
+.aging-seg{height:100%;transition:width .3s ease;}
+.aging-seg.safe{background:light-dark(oklch(55% .17 152),oklch(60% .19 155));}
+.aging-seg.warn{background:light-dark(oklch(55% .15 68),oklch(68% .16 72));}
+.aging-seg.crit{background:light-dark(oklch(52% .18 22),oklch(62% .20 22));}
 .assign-table{width:100%;border-collapse:collapse;font-size:11px;}
 .assign-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:5px 8px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
 .assign-table th.rl{text-align:left;}
@@ -1129,6 +1147,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
     <div class="nav-item" onclick="setNav(this)" data-page="dashboard"><i data-lucide="bar-chart-2"></i> 대시보드</div>
   </div>
+  <div class="sidebar-nav">
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="section-label">시스템</div>
@@ -1149,6 +1168,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <div class="nav-item" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="admin-notices"><i data-lucide="bell"></i> 공지사항 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="admin-faq"><i data-lucide="help-circle"></i> FAQ 관리</div>
+  </div>
   </div>
   <div class="sidebar-user">
     <div class="user-avatar">홍</div>
@@ -1432,10 +1452,10 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
       </div>
     </div>
 
-    <!-- 시스템/메뉴 현황 카드 -->
+    <!-- 처리속도 & 에이징 카드 -->
     <div class="widget">
       <div class="widget-header">
-        <div class="widget-title">현황</div>
+        <div class="widget-title">처리속도 &amp; 에이징</div>
       </div>
       <div id="sysCardGrid"></div>
     </div>
@@ -3629,6 +3649,48 @@ const DASH_SYS_DATA = [
   {name:'채널 E',total:95,unresolved:7},{name:'채널 F',total:72,unresolved:0},{name:'채널 G',total:56,unresolved:0},
 ];
 
+const DASH_SLA = {
+  systems: {
+    '채널 A': { avg: 8.2, sla: 71, safe: 168, warn: 112, crit: 28 },
+    '채널 B': { avg: 9.1, sla: 68, safe: 172, warn: 118, crit: 27 },
+    '채널 C': { avg: 6.4, sla: 81, safe: 118, warn: 68, crit: 11 },
+    '채널 D': { avg: 7.8, sla: 75, safe:  94, warn:  56, crit:  9 },
+    '채널 E': { avg: 5.9, sla: 88, safe:  62, warn:  28, crit:  5 },
+    '채널 F': { avg: 4.2, sla: 94, safe:  52, warn:  18, crit:  2 },
+    '채널 G': { avg: 3.8, sla: 96, safe:  44, warn:  11, crit:  1 },
+  },
+  menus: {
+    '채널 A': {
+      '메뉴 1 (홈)':        { avg: 7.8, sla: 74, safe: 50, warn: 28, crit: 7 },
+      '메뉴 2 (검색)':      { avg: 8.4, sla: 70, safe: 46, warn: 30, crit: 6 },
+      '메뉴 3 (마이페이지)': { avg: 7.2, sla: 76, safe: 42, warn: 24, crit: 6 },
+      '메뉴 4 (결제)':      { avg: 9.8, sla: 62, safe: 22, warn: 18, crit: 7 },
+      '메뉴 5 (설정)':      { avg: 5.6, sla: 88, safe: 14, warn:  7, crit: 1 },
+    },
+    '채널 B': {
+      '메뉴 1 (대시)':   { avg: 8.8, sla: 69, safe: 52, warn: 30, crit: 7 },
+      '메뉴 2 (리포트)': { avg: 9.2, sla: 67, safe: 44, warn: 26, crit: 7 },
+      '메뉴 3 (알림)':   { avg: 9.4, sla: 65, safe: 40, warn: 28, crit: 6 },
+      '메뉴 4 (설정)':   { avg: 9.0, sla: 70, safe: 44, warn: 26, crit: 7 },
+    },
+    '채널 C': {
+      '메뉴 1 (홈)': { avg: 6.1, sla: 83, safe: 42, warn: 22, crit: 4 },
+      '메뉴 2 (검색)': { avg: 6.4, sla: 80, safe: 38, warn: 18, crit: 4 },
+      '메뉴 3 (마이)': { avg: 6.8, sla: 79, safe: 38, warn: 28, crit: 3 },
+    },
+    '채널 D': {
+      '메뉴 1 (메인)': { avg: 7.6, sla: 76, safe: 32, warn: 20, crit: 3 },
+      '메뉴 2 (설정)': { avg: 7.9, sla: 74, safe: 30, warn: 17, crit: 3 },
+      '메뉴 3 (알림)': { avg: 8.0, sla: 73, safe: 32, warn: 19, crit: 3 },
+    },
+    '채널 E': {
+      '메뉴 1 (홈)':    { avg: 5.8, sla: 89, safe: 22, warn: 10, crit: 2 },
+      '메뉴 2 (검색)':  { avg: 5.9, sla: 87, safe: 20, warn:  9, crit: 2 },
+      '메뉴 3 (프로필)': { avg: 6.1, sla: 86, safe: 20, warn:  9, crit: 1 },
+    },
+  },
+};
+
 const DASH_AGING_ALL = [
   {code:'VOC-0041',title:'결제 모듈 타임아웃 오류 반복',loc:'채널 A',priority:'urgent',days:48,daysCls:'d-badge-red'},
   {code:'VOC-0055',title:'모바일 앱 알림 미수신 문제',loc:'채널 B',priority:'high',days:41,daysCls:'d-badge-red'},
@@ -3670,7 +3732,7 @@ let dashAssignAxis = 'status';
 let dashInited = false;
 let dashEditMode = false;
 
-const DASH_WIDGET_NAMES = ['KPI (Volume)','KPI (Quality)','분포 + 매트릭스','드릴다운 히트맵','주간 트렌드 + 태그','현황 카드','담당자별 현황','장기 미처리'];
+const DASH_WIDGET_NAMES = ['KPI (Volume)','KPI (Quality)','분포 + 매트릭스','드릴다운 히트맵','주간 트렌드 + 태그','처리속도 & 에이징','담당자별 현황','장기 미처리'];
 
 function dashToggleEdit() {
   dashEditMode = !dashEditMode;
@@ -3928,38 +3990,38 @@ function dashApplyGlobalTabState() {
   }
   dashRenderHeatmap();
   const gridEl = document.getElementById('sysCardGrid');
-  const statusLabels = [
-    { lbl:'접수됨', cls:'s-접수' },
-    { lbl:'검토중',  cls:'s-검토' },
-    { lbl:'처리중',  cls:'s-처리' },
-    { lbl:'완료',    cls:'s-완료' },
-    { lbl:'보류',    cls:'s-보류' },
-  ];
-  let items;
+  let slaItems;
   if (isAll) {
-    items = DASH_SYS_DATA.map(s => {
-      const sv = DASH_HM.status.systems[s.name] || [];
-      return { name: s.name, total: sv.reduce((a,b)=>a+b,0)||s.total, vals: sv };
-    });
+    slaItems = DASH_SYS_DATA.map(s => ({ name: s.name, d: DASH_SLA.systems[s.name] || { avg:0, sla:0, safe:0, warn:0, crit:0 } }));
   } else {
-    items = (DASH_MENU_DATA[sysName] || []).map(m => {
-      const mv = (DASH_HM.status.menus[sysName] || {})[m.name] || [];
-      return { name: m.name, total: mv.reduce((a,b)=>a+b,0)||m.total, vals: mv };
-    });
+    slaItems = (DASH_MENU_DATA[sysName] || []).map(m => ({ name: m.name, d: (DASH_SLA.menus[sysName] || {})[m.name] || { avg:0, sla:0, safe:0, warn:0, crit:0 } }));
   }
-  const html = '<div class="status-card-grid">' + items.map(item => {
-    const rows = statusLabels.map(({lbl, cls}, i) =>
-      `<div class="status-card-row"><span class="status-card-label">${lbl}</span><span class="status-card-val ${cls}">${item.vals[i] ?? 0}</span></div>`
-    ).join('');
-    return `<div class="status-card">
-      <div class="status-card-name">${item.name}</div>
-      <div class="status-card-rows">
-        <div class="status-card-row"><span class="status-card-label" style="font-weight:600;color:var(--text-secondary)">전체</span><span class="status-card-val total">${item.total}</span></div>
-        ${rows}
+  const slaRows = slaItems.map(({name, d}) => {
+    const cls = d.sla >= 85 ? 'good' : d.sla >= 70 ? 'warn' : 'bad';
+    return `<div class="sla-row"><span class="sla-name">${name}</span><span class="sla-avg">${d.avg.toFixed(1)}일</span><span class="sla-rate ${cls}">${d.sla}%</span></div>`;
+  }).join('');
+  const agingBars = slaItems.map(({name, d}) => {
+    const total = (d.safe + d.warn + d.crit) || 1;
+    const sp = Math.round(d.safe / total * 100);
+    const wp = Math.round(d.warn / total * 100);
+    const cp = 100 - sp - wp;
+    return `<div class="aging-item">
+      <div class="aging-item-label">
+        <span class="aging-name">${name}</span>
+        <span class="aging-counts"><span class="aging-safe">${d.safe}</span><span class="aging-warn">${d.warn}</span><span class="aging-crit">${d.crit}</span></span>
       </div>
+      <div class="aging-bar"><div class="aging-seg safe" style="width:${sp}%"></div><div class="aging-seg warn" style="width:${wp}%"></div><div class="aging-seg crit" style="width:${cp}%"></div></div>
     </div>`;
-  }).join('') + '</div>';
-  gridEl.innerHTML = html;
+  }).join('');
+  gridEl.innerHTML = `
+    <div class="sla-section">
+      <div class="sla-header"><span>시스템</span><span class="sla-col-avg">평균 처리</span><span class="sla-col-rate">SLA 준수</span></div>
+      ${slaRows}
+    </div>
+    <div class="aging-section">
+      <div class="aging-legend"><span class="aging-legend-item safe">≤7일</span><span class="aging-legend-item warn">8~30일</span><span class="aging-legend-item crit">31일+</span></div>
+      ${agingBars}
+    </div>`;
   dashRenderAgingTable();
   dashUpdateFilterContext();
 }
