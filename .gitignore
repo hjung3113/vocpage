@@ -26,6 +26,12 @@ Thumbs.db
 .omc/
 .playwright-mcp/
 .claude/settings.local.json
+.claude/claudeclaw/
+.claude/statusline.cjs
+
+# graphify generated output
+graphify-out/
+**/graphify-out/
 
 # Test screenshots (local only)
 test-*.png

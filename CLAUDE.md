@@ -17,59 +17,35 @@ This is a **greenfield VOC (Voice of Customer) management system** currently in 
 | Container | Docker + Docker Compose |
 | Styling | Linear-inspired design system (custom, dark-mode-first) |
 
-## Commands (once scaffolded)
+## Sub-directory Guides
+
+Each working directory has a focused `CLAUDE.md` with its own commands, architecture, and rules:
+
+- `frontend/CLAUDE.md` — React SPA, hooks, state, full design tokens
+- `backend/CLAUDE.md` — Express REST API, DB schema, middleware
+- `prototype/CLAUDE.md` — visual exploration HTML, full design tokens
+
+**Rule:** when working inside a sub-directory, read its `CLAUDE.md` first. This file covers cross-cutting governance only.
+
+## Docker
 
 ```bash
-# Frontend (frontend/)
-npm run dev          # Vite dev server
-npm run build        # Production build
-npm run test         # Vitest
-npm run test -- path/to/file.test.ts  # Single test file
-
-# Backend (backend/)
-npm run dev          # ts-node-dev watch
-npm run test         # Jest
-npm run test -- --testPathPattern=filename  # Single test
-
-# Docker
 docker compose up    # Start all services (FE + BE + Postgres)
 ```
 
-## Architecture
+## Architecture Overview
 
-The system is a three-tier app: React SPA → Express REST API → PostgreSQL.
+Three-tier app: React SPA → Express REST API → PostgreSQL. Detailed architecture lives in each sub-directory's `CLAUDE.md` and in `docs/specs/requires/`.
 
-**Frontend** (`frontend/`)
-- VOC list view (table with hierarchical accordion rows)
-- Side drawer for detail view (preserves list context)
-- Modal for VOC creation with Toast UI rich text editor
-- Key hooks: `useVOCFilter`, `useAutoTag`, `useDrawer`
-- State: React Context or Redux for global filter/selection
+## Design System (Pointer)
 
-**Backend** (`backend/`)
-- REST CRUD for VOCs, comments, attachments, tags
-- `validateADSession` middleware for AD/LDAP authentication
-- Auto-tagging service: matches keywords/regex rules from `tag_rules` table → assigns tags on VOC creation
-- Hierarchical queries via `parent_id` self-join on the `vocs` table
+Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Reference.
 
-**Database Schema (key tables)**
-- `vocs` — core entity; `parent_id` self-join for sub-tasks
-- `tags` + `voc_tags` — M:N tag relationship
-- `tag_rules` — keyword/regex patterns driving auto-tagging
-- `users`, `comments`, `attachments`
-
-## Design System
-
-The full spec is in `design.md`. Critical tokens:
-
-- **Background palette (OKLCH):** `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--bg-elevated)` — 모두 blue-tinted OKLCH, hex 직접 사용 금지
-- **Brand accent (Samsung Blue):** `var(--brand)` / `var(--accent)` / `var(--accent-hover)` — Linear 인디고(`#5e6ad2`) 구 값 사용 금지
-- **Text:** `var(--text-primary)` / `var(--text-secondary)` / `var(--text-tertiary)` / `var(--text-quaternary)`
-- **Typography:** Pretendard Variable (Korean+Latin UI); D2Coding (issue code, code blocks)
-- **Full token reference:** `docs/specs/requires/design.md §10 CSS Reference` — 항상 CSS 커스텀 프로퍼티 사용
-- **Spacing:** 8px grid base; max-width ~1200px
-- **Elevation:** communicated via background opacity (not shadow darkness) — `rgba(255,255,255,0.05)` for surfaces, multi-layer shadow only for dialogs
-- **Components:** Radix UI primitives as base; ghost buttons, translucent cards, border-focused inputs
+**Hard rule (echoed in `frontend/CLAUDE.md` and `prototype/CLAUDE.md`):**
+- Always use CSS custom properties — `var(--bg-app)`, `var(--brand)`, `var(--text-primary)`, etc.
+- **Never write hex values** (no `#5e6ad2`, no `#ffffff`). No raw OKLCH either — go through the token.
+- Typography: Pretendard Variable (UI), D2Coding (code/issue IDs).
+- 8px spacing grid, max-width ~1200px, elevation via background opacity not shadow darkness.
 
 ## Start Every Session
 
@@ -122,6 +98,15 @@ docs/specs/
 
 ## Document Coherence
 
+**Write decisions to the right file first:**
+
+| Decision made | Write to |
+|---|---|
+| Visual design change (color, layout, spacing, component pattern) | `docs/specs/requires/design.md` (English) |
+| Functional/behavioral change (feature rule, API shape, business logic) | `docs/specs/requires/requirements.md` or relevant `feature-*.md` (한국어) |
+
+**Then check propagation:**
+
 | Changed | Must also check |
 |---|---|
 | Spec (design decision, constraint) | Implementation plan |
@@ -135,9 +120,9 @@ docs/specs/
 
 ## graphify
 
-This project has a graphify knowledge graph at graphify-out/.
+This project has a graphify knowledge graph at `graphify-out/`.
 
 Rules:
-- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- Before answering architecture or codebase questions, read `graphify-out/GRAPH_REPORT.md` for god nodes and community structure
+- If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw files
 - After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
