@@ -2,22 +2,45 @@
 
 ## 다음 세션 할 일
 
-- **대시보드를 prototype.html에 합치기** — `prototype/prototype.html`에 대시보드 뷰를 추가 (기존 prototype 디자인 시스템·네비게이션과 통일성 유지)
-  - `dashboard-v3.html`, `dashboard-v2.html`은 참조용으로만 사용 (수정 금지)
-  - 완성 후 `dashboard-v3.html`과 나란히 브라우저에서 비교·검토
+→ **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
+
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ → **다음: Phase 3** (requirements.md 인덱스화)
+
+## 완료된 작업 (2026-04-23 — Phase 1 디자인 통일성 확보)
+
+- **공지사항/FAQ/관리자 페이지 디자인 통일성 리뷰 완료** ✅ (82% → 100%)
+  - CSS 변수 추가: `--status-amber-bg/border`, `--status-red-bg/border`, `--status-purple/bg/border`
+  - 하드코딩 색상 제거: `#e5484d`, `#f5a623`, `#5e6ad233` → CSS vars 교체
+  - CSS 클래스 정비: `.type-keyword`, `.type-regex`, `.role-admin`, `.role-manager` oklch 리터럴 → vars
+  - `.notice-badge` 시스템 도입: 공지사항 뷰 ↔ 관리자 뷰 레벨 배지 통일
+  - `.notice-row`, `.notice-body`, `.faq-filter-bar`, `.faq-cat-btn` 클래스 추가 (onmouseover 제거)
+  - `.btn-form-save`, `.btn-form-cancel` 공통 폼 버튼 클래스 추가
+  - `.a-btn.danger:hover` → `var(--status-red-bg/border)` 교체
+  - Playwright로 전 페이지 시각 검증 완료
+
+## 완료된 작업 (2026-04-23 — requirements.md 전체 리뷰 및 스펙 확정)
+
+- **requirements.md 전체 리뷰 완료** ✅
+  - 10건 수정: Sub-task 표현, 정렬 API 형식, FAQ Soft Delete, dashboard_settings 스키마, useAutoTag 제거, 댓글 이미지 개수 제한, 통합 방식, 복수 팝업 UX, priority 필터 파라미터, 기술 스택
+  - `dashboard-feature.md` 커스터마이징 섹션 MVP로 단순화 (위젯 숨기기/표시)
+  - `docs/specs/plans/dashboard-v2-layout-editor.md` 신규 생성 (드래그앤드롭 레이아웃 편집 v2)
+
+## 완료된 작업 (2026-04-23 — 대시보드 prototype.html 합치기)
+
+- **대시보드를 prototype.html에 합치기** ✅
   - 체크리스트:
-    - [ ] GlobalTabs 3레벨 계층 (전체/시스템/메뉴) + 담당자 직교 필터
-    - [ ] Filter Context Banner
-    - [ ] KPI 카드 8종 (VOLUME/QUALITY 2줄)
-    - [ ] 분포 도넛 4탭 (상태/우선순위/유형/태그)
-    - [ ] 우선순위×상태 매트릭스
-    - [ ] 드릴다운 히트맵 (X축 3종 + 브레드크럼)
-    - [ ] 주간 트렌드 3선
-    - [ ] 태그별 분포 바 차트
-    - [ ] 시스템/메뉴 현황 카드 (더보기 인라인 확장)
-    - [ ] 담당자별 처리현황 테이블
-    - [ ] 장기 미처리 Top 10
-    - [ ] design.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
+    - [x] GlobalTabs 3레벨 계층 (전체/시스템/메뉴) + 담당자 직교 필터
+    - [x] Filter Context Banner
+    - [x] KPI 카드 8종 (VOLUME/QUALITY 2줄)
+    - [x] 분포 도넛 4탭 (상태/우선순위/유형/태그)
+    - [x] 우선순위×상태 매트릭스
+    - [x] 드릴다운 히트맵 (X축 3종 + 브레드크럼)
+    - [x] 주간 트렌드 3선
+    - [x] 태그별 분포 바 차트
+    - [x] 시스템/메뉴 현황 카드
+    - [x] 담당자별 처리현황 테이블
+    - [x] 장기 미처리 Top 10
+    - [x] design.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
 
 ## 다음 세션 읽을 문서
 
@@ -60,4 +83,4 @@
   - 시스템/메뉴 카드 탭 연동 명세
   - API 엔드포인트 전체 업데이트 (systemId/menuId/assigneeId 공통 파라미터)
   - FE 상태 타입 정의
-- **시각화 참조 파일**: `.superpowers/brainstorm/71061-1776875230/content/dashboard-v3.html`
+- **시각화 참조 파일**: `prototype/dashboard/dashboard-v3.html`

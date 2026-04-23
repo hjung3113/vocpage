@@ -29,6 +29,18 @@
   --status-amber:  oklch(70% 0.16 72);
   --status-red:    oklch(58% 0.22 25);
   --status-blue:   light-dark(oklch(50% 0.18 242), oklch(67% 0.17 240));
+  --status-amber-bg:     light-dark(oklch(94% 0.025 72),  oklch(18% 0.05 72));
+  --status-amber-border: light-dark(oklch(78% 0.09 72),   oklch(30% 0.09 72));
+  --status-red-bg:       light-dark(oklch(94% 0.03 25),   oklch(18% 0.07 25));
+  --status-red-border:   light-dark(oklch(78% 0.10 25),   oklch(30% 0.10 25));
+  --status-purple:       light-dark(oklch(52% 0.22 290),  oklch(72% 0.16 290));
+  --status-purple-bg:    light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
+  --status-purple-border:light-dark(oklch(78% 0.08 290),  oklch(30% 0.09 290));
+  --chart-blue:    light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
+  --chart-emerald: light-dark(oklch(40% 0.20 158), oklch(62% 0.19 158));
+  --chart-amber:   light-dark(oklch(50% 0.17 72),  oklch(70% 0.16 72));
+  --chart-red:     light-dark(oklch(42% 0.22 25),  oklch(58% 0.22 25));
+  --chart-sky:     light-dark(oklch(48% 0.16 235), oklch(72% 0.14 235));
   --border-subtle:   light-dark(oklch(88% 0.012 254), oklch(20% 0.018 261 / 0.8));
   --border-standard: light-dark(oklch(83% 0.016 256), oklch(27% 0.020 259 / 0.85));
   --border-solid:    light-dark(oklch(83% 0.016 256), oklch(25% 0.019 260));
@@ -777,6 +789,138 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 .admin-page { display: none; flex-direction: column; flex: 1; overflow: hidden; }
 .admin-page.active { display: flex; }
 
+/* ─── Dashboard ─── */
+#page-dashboard { flex-direction: column; overflow: hidden; }
+#page-dashboard .section-label { padding: 0; margin-bottom: 8px; }
+.dash-header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px 10px;border-bottom:1px solid var(--border-subtle);position:sticky;top:0;background:var(--bg-app);z-index:20;gap:12px;flex-shrink:0;}
+.dash-title{font-size:17px;font-weight:700;letter-spacing:-.02em;flex-shrink:0;}
+.dash-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.filter-select{padding:4px 8px;border-radius:6px;border:1px solid var(--border-standard);background:var(--bg-surface);color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:inherit;}
+.filter-select:focus{outline:none;border-color:var(--brand);}
+.filter-context-banner{padding:6px 24px;background:var(--brand-bg);border-bottom:1px solid var(--brand-border);font-size:12px;color:var(--brand);display:none;align-items:center;gap:6px;flex-shrink:0;}
+.global-tabs{display:flex;align-items:center;gap:2px;padding:0 24px;border-bottom:1px solid var(--border-subtle);overflow-x:auto;flex-shrink:0;background:var(--bg-app);}
+.global-tab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s;}
+.global-tab:hover{color:var(--text-secondary);}
+.global-tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+.dash-body{padding:20px 24px;display:flex;flex-direction:column;gap:18px;max-width:1200px;overflow-y:auto;flex:1;}
+.dash-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border-standard);background:var(--bg-surface);color:var(--text-secondary);}
+.dash-btn-group{display:flex;gap:1px;background:var(--bg-elevated);border-radius:6px;padding:2px;}
+.dash-btn-group .dash-btn{padding:3px 9px;font-size:11px;border:none;background:transparent;border-radius:4px;color:var(--text-tertiary);}
+.dash-btn-group .dash-btn.active{background:var(--bg-surface);color:var(--brand);font-weight:600;box-shadow:0 1px 3px oklch(0% 0 0 / .1);}
+.date-btn-group{display:flex;gap:1px;background:var(--bg-elevated);border-radius:6px;padding:2px;}
+.date-btn{padding:3px 9px;font-size:11px;border:none;background:transparent;border-radius:4px;color:var(--text-tertiary);cursor:pointer;}
+.date-btn.active{background:var(--bg-surface);color:var(--brand);font-weight:600;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.kpi-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:13px 15px;cursor:pointer;transition:border-color .15s;}
+.kpi-card:hover{border-color:var(--brand-border);}
+.kpi-card.alert-red{border-color:oklch(58% .22 25 / .35);}
+.kpi-card.alert-amber{border-color:oklch(70% .16 72 / .30);}
+.kpi-label{font-size:11px;color:var(--text-tertiary);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-value{font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:3px;}
+.kpi-sublabel{font-size:10px;color:var(--text-quaternary);margin-bottom:3px;}
+.kpi-delta{font-size:11px;font-weight:500;}
+.delta-pos{color:oklch(62% .19 158);}
+.delta-neg{color:oklch(58% .22 25);}
+.delta-amb{color:oklch(70% .16 72);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.widget{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:15px;}
+.widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.widget-title{font-size:13px;font-weight:600;}
+.d-tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border-subtle);}
+.d-tab{padding:5px 11px;font-size:12px;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.d-tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+.donut-wrap{position:relative;width:96px;height:96px;flex-shrink:0;}
+.donut-ring{width:96px;height:96px;border-radius:50%;}
+.donut-hole{position:absolute;inset:20px;border-radius:50%;background:var(--bg-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-total{font-size:17px;font-weight:700;line-height:1;}
+.donut-total-label{font-size:9px;color:var(--text-quaternary);}
+.donut-section{display:flex;align-items:center;gap:16px;}
+.legend{flex:1;display:flex;flex-direction:column;gap:4px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;}
+.legend-item:hover .legend-name{color:var(--brand);}
+.legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.legend-name{flex:1;color:var(--text-secondary);}
+.legend-count{font-weight:600;color:var(--text-primary);min-width:26px;text-align:right;}
+.legend-pct{color:var(--text-quaternary);min-width:30px;text-align:right;}
+.legend-bar-wrap{width:44px;height:3px;background:var(--bg-elevated);border-radius:2px;overflow:hidden;}
+.legend-bar{height:100%;border-radius:2px;}
+.matrix-table{width:100%;border-collapse:collapse;font-size:11px;}
+.matrix-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:4px 5px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.matrix-table th.rh{text-align:left;}
+.matrix-table td{padding:5px 4px;text-align:center;font-weight:600;font-size:12px;cursor:pointer;border-radius:3px;}
+.matrix-table td.rh{text-align:left;font-size:11px;cursor:default;}
+.matrix-table td.rh:hover{opacity:1!important;}
+.matrix-table td:hover{opacity:.8;}
+.heatmap-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.breadcrumb{font-size:11px;color:var(--text-tertiary);}
+.breadcrumb .crumb{cursor:pointer;}
+.breadcrumb .crumb:hover{color:var(--brand);}
+.breadcrumb .sep{color:var(--text-quaternary);margin:0 4px;}
+.heatmap-table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;}
+.heatmap-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:4px 6px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;overflow:hidden;}
+.heatmap-table th.rl{text-align:left;}
+.heatmap-table td{padding:5px 6px;text-align:center;font-size:11px;font-weight:600;border-radius:3px;overflow:hidden;}
+.heatmap-table td.rl{text-align:left;font-weight:500;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.heatmap-table td.rl.clickable{cursor:pointer;}
+.heatmap-table td.rl.clickable:hover{color:var(--brand);}
+.heatmap-table td.tc{color:var(--text-tertiary);font-weight:700;}
+.heatmap-table td.empty{color:var(--text-quaternary);background:var(--bg-elevated)!important;}
+.hm-total-row td{background:var(--bg-elevated)!important;border-bottom:1px solid var(--border-standard);}
+.hm-total-row td.rl{font-weight:700;color:var(--text-primary);}
+.hm-total-row td.tc{color:var(--text-secondary);font-weight:700;}
+.chart-legend{display:flex;gap:14px;margin-bottom:8px;}
+.cleg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary);}
+.cleg-line{width:14px;height:2px;border-radius:1px;}
+.chart-area{position:relative;height:110px;}
+.bar-list{display:flex;flex-direction:column;gap:4px;}
+.bar-item{display:grid;grid-template-columns:72px 1fr 28px;align-items:center;gap:6px;font-size:11px;cursor:pointer;}
+.bar-item:hover .bar-label{color:var(--brand);}
+.bar-label{color:var(--text-secondary);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{height:5px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--chart-blue);border-radius:3px;}
+.bar-val{font-weight:600;color:var(--text-tertiary);}
+.status-card-grid{display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:var(--border-solid) transparent;}
+.status-card{flex:0 0 148px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:11px 13px;cursor:pointer;transition:border-color .15s;}
+.status-card:hover{border-color:var(--brand-border);}
+.status-card-name{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.status-card-rows{display:flex;flex-direction:column;gap:4px;}
+.status-card-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;font-size:11px;}
+.status-card-label{color:var(--text-tertiary);}
+.status-card-val{font-weight:600;color:var(--text-secondary);font-variant-numeric:tabular-nums;text-align:right;}
+.status-card-val.total{font-size:14px;color:var(--text-primary);font-weight:700;}
+.status-card-val.s-접수{color:light-dark(oklch(50% .010 260),oklch(56% .008 260));}
+.status-card-val.s-검토{color:light-dark(oklch(45% .18 245),oklch(68% .17 242));}
+.status-card-val.s-처리{color:light-dark(oklch(42% .17 152),oklch(66% .19 155));}
+.status-card-val.s-완료{color:light-dark(oklch(40% .18 155),oklch(65% .20 158));font-weight:700;}
+.status-card-val.s-보류{color:light-dark(oklch(50% .16 68),oklch(72% .16 72));}
+.assign-table{width:100%;border-collapse:collapse;font-size:11px;}
+.assign-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:5px 8px;text-align:center;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.assign-table th.rl{text-align:left;}
+.assign-table td{padding:5px 8px;text-align:center;font-weight:600;border-radius:3px;}
+.assign-table td.rl{text-align:left;font-weight:500;color:var(--text-secondary);}
+.assign-table td.unassigned{color:var(--text-quaternary);font-style:italic;}
+.assign-table td.tc{color:var(--text-tertiary);font-weight:700;}
+.assign-row-highlight td{outline:2px solid var(--brand);outline-offset:-2px;background:var(--brand-bg)!important;}
+.aging-table{width:100%;border-collapse:collapse;font-size:11px;}
+.aging-table th{font-size:10px;font-weight:600;color:var(--text-quaternary);padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-subtle);white-space:nowrap;}
+.aging-table td{padding:6px 8px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);}
+.aging-table tr:last-child td{border-bottom:none;}
+.aging-table tr:hover td{background:var(--bg-elevated);cursor:pointer;}
+.aging-table td.code{font-family:'D2Coding',monospace;font-size:10px;color:var(--text-tertiary);}
+.aging-table td.title-col{color:var(--text-primary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.d-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap;}
+.d-badge-urgent{background:oklch(58% .22 25 / .15);color:oklch(58% .22 25);}
+.d-badge-high{background:oklch(60% .18 45 / .15);color:oklch(60% .18 45);}
+.d-badge-medium{background:var(--bg-elevated);color:var(--text-tertiary);}
+.d-badge-amber{background:oklch(70% .16 72 / .15);color:oklch(70% .16 72);}
+.d-badge-red{background:oklch(58% .22 25 / .15);color:oklch(58% .22 25);}
+.dim-selector{display:flex;gap:1px;background:var(--bg-elevated);border-radius:5px;padding:2px;}
+.dim-btn{padding:2px 8px;font-size:10px;font-weight:500;border:none;background:transparent;color:var(--text-quaternary);border-radius:3px;cursor:pointer;}
+.dim-btn.active{background:var(--bg-surface);color:var(--brand);font-weight:600;}
+.dim-btn:disabled{opacity:.35;cursor:not-allowed;}
+.menu-selector-wrap{display:none;align-items:center;gap:5px;}
+.menu-selector-wrap .separator{color:var(--text-quaternary);font-size:12px;}
+
 /* ─── Admin shared ─── */
 .admin-topbar {
   display: flex; align-items: center; gap: 10px;
@@ -798,6 +942,49 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   border-radius: 10px; overflow: hidden; margin-bottom: 24px;
 }
 .admin-table { width: 100%; border-collapse: collapse; }
+/* ── Dashboard Settings ── */
+.admin-subtitle { font-size:12px;color:var(--text-tertiary);margin-left:4px; }
+.ds-widget-card { display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;cursor:grab; }
+.ds-widget-card.ds-widget-hidden { opacity:.45; }
+.ds-widget-handle { color:var(--text-quaternary);flex-shrink:0; }
+.ds-widget-handle svg { width:14px;height:14px; }
+.ds-widget-info { display:flex;align-items:center;justify-content:space-between;flex:1;gap:6px;min-width:0; }
+.ds-widget-name { font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.ds-widget-lock { display:flex;align-items:center;gap:3px;font-size:11px;flex-shrink:0;padding:2px 6px;border-radius:4px;white-space:nowrap; }
+.ds-widget-lock svg { width:11px;height:11px; }
+.ds-widget-locked .ds-widget-lock { color:var(--text-tertiary);background:var(--bg-surface); }
+.ds-widget-vis { color:var(--accent);background:var(--brand-bg); }
+.ds-widget-vis-off { color:var(--text-quaternary);background:var(--bg-surface); }
+.ds-setting-group { margin-bottom:14px; }
+.ds-setting-label { display:block;font-size:11px;color:var(--text-tertiary);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em; }
+.ds-setting-select { width:100%;padding:7px 9px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;cursor:pointer; }
+.ds-check-row { display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary);cursor:pointer; }
+.ds-check-row input { accent-color:var(--accent); }
+.ds-save-btn { width:100%;padding:8px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px; }
+.ds-save-btn:hover { background:var(--accent-hover); }
+.ds-reset-btn { width:100%;padding:7px;background:transparent;border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-secondary);font-size:12px;cursor:pointer; }
+.ds-reset-btn:hover { border-color:var(--text-tertiary); }
+/* ── Dashboard Edit Mode ── */
+#page-dashboard { position:relative; }
+.dash-edit-panel { position:absolute;top:0;right:0;bottom:0;width:256px;background:var(--bg-panel);border-left:1px solid var(--border-subtle);z-index:50;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:18px 16px;overflow-y:auto; }
+#page-dashboard.edit-mode .dash-edit-panel { transform:translateX(0); }
+#page-dashboard.edit-mode .dash-body { padding-right:260px; }
+.dash-widget { position:relative;border-radius:8px;transition:box-shadow .15s; }
+#page-dashboard.edit-mode .dash-widget { outline:1.5px dashed oklch(65% .17 242 / .35);outline-offset:2px; }
+#page-dashboard.edit-mode .dash-widget:hover { outline-color:oklch(65% .17 242 / .7);box-shadow:0 0 0 3px oklch(65% .17 242 / .08); }
+.widget-edit-bar { display:none;align-items:center;gap:6px;padding:4px 8px 6px;margin-bottom:4px; }
+#page-dashboard.edit-mode .widget-edit-bar { display:flex; }
+.widget-edit-grip { color:var(--text-quaternary);cursor:grab;font-size:15px;line-height:1; }
+.widget-edit-name { font-size:11px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em; }
+.widget-vis-btn,.widget-lock-btn { display:flex;align-items:center;padding:3px 5px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:4px;color:var(--text-tertiary);cursor:pointer;transition:color .1s,border-color .1s; }
+.widget-vis-btn:hover { color:var(--accent);border-color:var(--accent); }
+.widget-vis-btn svg,.widget-lock-btn svg { width:12px;height:12px; }
+.widget-hidden-overlay { position:absolute;inset:0;background:var(--bg-app);opacity:.6;border-radius:8px;z-index:2;display:none;align-items:center;justify-content:center;font-size:12px;color:var(--text-tertiary); }
+.dash-widget.widget-hidden .widget-hidden-overlay { display:flex; }
+.ds-save-target-group { display:flex;gap:4px;margin-bottom:4px; }
+.ds-save-target { flex:1;padding:6px 0;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:6px;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all .1s; }
+.ds-save-target.active { background:var(--brand-bg);border-color:var(--accent);color:var(--accent);font-weight:600; }
+#page-dashboard.edit-mode .dash-edit-btn-active { color:var(--accent);border-color:var(--accent); }
 .admin-table th {
   text-align: left; padding: 9px 14px; font-size: 11.5px; font-weight: 600;
   color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;
@@ -822,15 +1009,15 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   border: 1px solid var(--border-standard);
 }
 .type-badge-admin { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-.type-keyword { background: oklch(20% 0.06 72); color: oklch(75% 0.14 72); border: 1px solid oklch(30% 0.08 72); }
-.type-regex   { background: oklch(20% 0.06 290); color: oklch(72% 0.16 290); border: 1px solid oklch(30% 0.09 290); }
+.type-keyword { background: var(--status-amber-bg); color: var(--status-amber); border: 1px solid var(--status-amber-border); }
+.type-regex   { background: var(--status-purple-bg); color: var(--status-purple); border: 1px solid var(--status-purple-border); }
 .admin-page .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 .admin-page .status-dot.on  { background: var(--status-green); box-shadow: 0 0 5px oklch(55% 0.17 150 / 0.5); }
 .admin-page .status-dot.off { background: var(--text-quaternary); }
 .color-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 6px; vertical-align: middle; }
 .role-pill { font-size: 11.5px; padding: 2px 9px; border-radius: 4px; font-weight: 600; }
-.role-admin   { background: oklch(20% 0.06 262); color: var(--accent); border: 1px solid var(--brand-border); }
-.role-manager { background: oklch(20% 0.07 72); color: oklch(75% 0.14 72); border: 1px solid oklch(30% 0.09 72); }
+.role-admin   { background: var(--brand-bg); color: var(--accent); border: 1px solid var(--brand-border); }
+.role-manager { background: var(--status-amber-bg); color: var(--status-amber); border: 1px solid var(--status-amber-border); }
 .role-user    { background: var(--bg-elevated); color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
 .user-avatar-sm {
   width: 28px; height: 28px; border-radius: 50%;
@@ -844,12 +1031,33 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   color: var(--text-tertiary); transition: all .12s; white-space: nowrap;
 }
 .a-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
-.a-btn.danger:hover { background: oklch(18% 0.07 25); color: var(--status-red); border-color: oklch(30% 0.10 25); }
+.a-btn.danger:hover { background: var(--status-red-bg); color: var(--status-red); border-color: var(--status-red-border); }
 .admin-add-form {
   display: none; border-bottom: 1px solid var(--border-subtle);
   padding: 16px 20px; background: var(--bg-panel); gap: 12px; flex-wrap: wrap; align-items: flex-end;
 }
 .admin-add-form.open { display: flex; }
+/* ── Notice level badge (공지사항 뷰 + 관리자 뷰 공통) */
+.notice-badge { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 4px; border: 1px solid; flex-shrink: 0; }
+.notice-badge-urgent   { color: var(--status-red);    border-color: var(--status-red-border);    background: var(--status-red-bg); }
+.notice-badge-important{ color: var(--status-amber);  border-color: var(--status-amber-border);  background: var(--status-amber-bg); }
+.notice-badge-normal   { color: var(--text-tertiary); border-color: var(--border-subtle);        background: transparent; }
+.notice-row  { display:flex;align-items:center;gap:10px;padding:14px 24px;cursor:pointer;transition:background .12s; }
+.notice-row:hover { background: var(--bg-elevated); }
+.notice-body { display:none;padding:12px 24px 16px;background:var(--bg-elevated);font-size:13.5px;color:var(--text-secondary);line-height:1.7;border-top:1px solid var(--border-subtle); }
+.faq-item { border-bottom: 1px solid var(--border-subtle); }
+.faq-filter-bar { padding: 12px 24px; display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border-subtle); }
+.faq-search { padding:6px 11px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;width:200px;font-family:var(--font-ui); }
+.faq-search:focus { outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--brand-bg); }
+.faq-cat-group { display:flex;gap:6px;flex-wrap:wrap; }
+.faq-cat-btn { padding:5px 12px;border-radius:9999px;border:1px solid var(--border-subtle);background:transparent;color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-ui);transition:all .12s; }
+.faq-cat-btn.active { border-color:var(--brand-border);background:var(--brand-bg);color:var(--accent);font-weight:600; }
+.faq-cat-btn:not(.active):hover { background:var(--bg-elevated);color:var(--text-primary); }
+/* ── Admin form action buttons */
+.btn-form-save   { padding: 6px 14px; background: var(--brand-bg); border: 1px solid var(--accent); border-radius: 6px; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); }
+.btn-form-cancel { padding: 6px 14px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-tertiary); font-size: 12px; cursor: pointer; font-family: var(--font-ui); }
+.btn-form-save:hover   { border-color: var(--accent-hover); }
+.btn-form-cancel:hover { background: var(--bg-elevated); color: var(--text-secondary); }
 .aform-field { display: flex; flex-direction: column; gap: 5px; }
 .aform-field label { font-size: 11.5px; font-weight: 600; color: var(--text-tertiary); }
 .aform-field input, .aform-field select {
@@ -919,6 +1127,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent" id="allBadge">0</span></div>
     <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC <span class="nav-badge muted" id="mineBadge"></span></div>
     <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
+    <div class="nav-item" onclick="setNav(this)" data-page="dashboard"><i data-lucide="bar-chart-2"></i> 대시보드</div>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
@@ -1044,6 +1253,255 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 
 <!-- ── Admin: FAQ 관리 ── -->
 <div id="page-admin-faq" class="admin-page"></div>
+
+<!-- ── 대시보드 ── -->
+<div id="page-dashboard" class="admin-page">
+  <div class="dash-header">
+    <div class="dash-title">대시보드</div>
+    <div class="dash-controls">
+      <div class="menu-selector-wrap" id="menuSelectorWrap">
+        <span class="separator">›</span>
+        <select class="filter-select" id="menuSelect" onchange="dashSelectMenu(this.value)">
+          <option value="">메뉴: 전체</option>
+        </select>
+      </div>
+      <select class="filter-select" id="assigneeSelect" onchange="dashSelectAssignee(this.value)">
+        <option value="">담당자: 전체</option>
+        <option>김지훈</option><option>이수연</option><option>박민준</option><option>최유진</option><option>정해원</option>
+      </select>
+      <div class="date-btn-group">
+        <button class="date-btn">7일</button>
+        <button class="date-btn active">30일</button>
+        <button class="date-btn">90일</button>
+        <button class="date-btn">커스텀</button>
+      </div>
+      <button class="dash-btn">📅 2025.05.01–05.30 ▾</button>
+      <button class="dash-btn" id="dashEditBtn" onclick="dashToggleEdit()" style="gap:5px;"><i data-lucide="layout-panel-left" style="width:13px;height:13px"></i> 레이아웃 편집</button>
+    </div>
+  </div>
+
+  <div class="filter-context-banner" id="filterContext">
+    <span id="filterContextText"></span>
+    <span style="font-size:11px;color:var(--brand);opacity:.7">기준</span>
+  </div>
+
+  <div class="global-tabs" id="globalTabs">
+    <button class="global-tab active" onclick="switchGlobalTab('all',this)">전체</button>
+    <button class="global-tab" onclick="switchGlobalTab('A',this)">채널 A</button>
+    <button class="global-tab" onclick="switchGlobalTab('B',this)">채널 B</button>
+    <button class="global-tab" onclick="switchGlobalTab('C',this)">채널 C</button>
+    <button class="global-tab" onclick="switchGlobalTab('D',this)">채널 D</button>
+    <button class="global-tab" onclick="switchGlobalTab('E',this)">채널 E</button>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- KPI VOLUME -->
+    <div>
+      <div class="section-label">Volume</div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">총 VOC</div><div class="kpi-value">1,204</div><div class="kpi-delta delta-pos">▲ 12% vs 전주</div></div>
+        <div class="kpi-card"><div class="kpi-label">미해결</div><div class="kpi-value">87</div><div class="kpi-delta delta-neg">▲ 5% vs 전주</div></div>
+        <div class="kpi-card"><div class="kpi-label">이번주 신규</div><div class="kpi-value">+23</div><div class="kpi-sublabel">3일차</div><div class="kpi-delta delta-pos">▲ 8% vs 전주</div></div>
+        <div class="kpi-card"><div class="kpi-label">이번주 완료</div><div class="kpi-value">+18</div><div class="kpi-sublabel">3일차</div><div class="kpi-delta delta-pos">▲ 20% vs 전주</div></div>
+      </div>
+    </div>
+
+    <!-- KPI QUALITY -->
+    <div>
+      <div class="section-label">Quality</div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">평균 처리시간</div><div class="kpi-value">4.2<span style="font-size:14px;font-weight:400;">일</span></div><div class="kpi-delta delta-pos">▼ 0.3일 vs 전주</div></div>
+        <div class="kpi-card"><div class="kpi-label">해결율</div><div class="kpi-value">78<span style="font-size:14px;font-weight:400;">%</span></div><div class="kpi-delta delta-pos">▲ 4%p vs 전주</div></div>
+        <div class="kpi-card alert-red"><div class="kpi-label">Urgent·High 미해결</div><div class="kpi-value" style="color:oklch(58% .22 25)">12</div><div class="kpi-delta delta-neg">▲ 3건 vs 전주</div></div>
+        <div class="kpi-card alert-amber"><div class="kpi-label">14일+ 미처리</div><div class="kpi-value" style="color:oklch(70% .16 72)">8</div><div class="kpi-delta delta-amb">▲ 2건 vs 전주</div></div>
+      </div>
+    </div>
+
+    <!-- 분포 + 매트릭스 -->
+    <div class="two-col">
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">분포</div>
+          <div class="dim-selector" id="distDimSel">
+            <button class="dim-btn active" onclick="dashSwitchDim('distDimSel',this)">전체</button>
+            <button class="dim-btn" onclick="dashSwitchDim('distDimSel',this)" id="distDimSys">시스템별</button>
+            <button class="dim-btn" onclick="dashSwitchDim('distDimSel',this)" id="distDimMenu">메뉴별</button>
+          </div>
+        </div>
+        <div class="d-tabs" id="distTabs">
+          <div class="d-tab active" onclick="dashSwitchDistTab(this,'status')">상태</div>
+          <div class="d-tab" onclick="dashSwitchDistTab(this,'priority')">우선순위</div>
+          <div class="d-tab" onclick="dashSwitchDistTab(this,'type')">유형</div>
+          <div class="d-tab" onclick="dashSwitchDistTab(this,'tag')">태그</div>
+        </div>
+        <div id="distContent"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">우선순위 × 상태 매트릭스</div>
+          <div class="dim-selector" id="matDimSel">
+            <button class="dim-btn active" onclick="dashSwitchDim('matDimSel',this)">전체</button>
+            <button class="dim-btn" onclick="dashSwitchDim('matDimSel',this)" id="matDimSys">시스템별</button>
+            <button class="dim-btn" onclick="dashSwitchDim('matDimSel',this)" id="matDimMenu">메뉴별</button>
+          </div>
+        </div>
+        <table class="matrix-table">
+          <thead><tr><th class="rh"></th><th>접수됨</th><th>검토중</th><th>처리중</th><th>완료</th><th>보류</th></tr></thead>
+          <tbody>
+            <tr><td class="rh" style="color:oklch(58% .22 25)">Urgent</td><td style="background:oklch(63% .19 258 / .50)">8</td><td style="background:oklch(63% .19 258 / .65)">15</td><td style="background:oklch(63% .19 258 / .40)">6</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">2</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">1</td></tr>
+            <tr><td class="rh" style="color:oklch(60% .18 45)">High</td><td style="background:oklch(63% .19 258 / .28)">22</td><td style="background:oklch(63% .19 258 / .55)">48</td><td style="background:oklch(63% .19 258 / .60)">61</td><td style="background:oklch(63% .19 258 / .15);color:var(--text-tertiary)">9</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">4</td></tr>
+            <tr><td class="rh" style="color:var(--text-tertiary)">Medium</td><td style="background:oklch(63% .19 258 / .18)">55</td><td style="background:oklch(63% .19 258 / .42)">112</td><td style="background:oklch(63% .19 258 / .65)">189</td><td style="background:oklch(63% .19 258 / .22)">67</td><td style="background:oklch(63% .19 258 / .14)">28</td></tr>
+            <tr><td class="rh" style="color:var(--text-quaternary)">Low</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">95</td><td style="background:oklch(63% .19 258 / .18)">165</td><td style="background:oklch(63% .19 258 / .28)">264</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">26</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">27</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">셀 클릭 → 해당 필터로 VOC 목록 이동</div>
+      </div>
+    </div>
+
+    <!-- 히트맵 -->
+    <div class="widget">
+      <div class="heatmap-top">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="widget-title">드릴다운 히트맵</div>
+          <div class="breadcrumb" id="hmBreadcrumb"></div>
+        </div>
+        <div class="dash-btn-group" id="hmXAxisBtns">
+          <button class="dash-btn active" onclick="dashSwitchHmAxis('status',this)">진행 현황</button>
+          <button class="dash-btn" onclick="dashSwitchHmAxis('priority',this)">우선순위별</button>
+          <button class="dash-btn" onclick="dashSwitchHmAxis('tag',this)">태그별</button>
+        </div>
+      </div>
+      <div id="hmTable"></div>
+    </div>
+
+    <!-- 주간 트렌드 + 태그 바 -->
+    <div class="two-col">
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">주간 트렌드 (최근 12주)</div>
+          <div class="dim-selector" id="lineDimSel">
+            <button class="dim-btn active" onclick="dashSwitchDim('lineDimSel',this)">전체</button>
+            <button class="dim-btn" onclick="dashSwitchDim('lineDimSel',this)" id="lineDimSys">시스템별</button>
+            <button class="dim-btn" onclick="dashSwitchDim('lineDimSel',this)" id="lineDimMenu">메뉴별</button>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-blue)"></div>신규(접수)</div>
+          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-sky)"></div>진행중(검토+처리)</div>
+          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-emerald)"></div>완료(완료+보류)</div>
+        </div>
+        <div class="chart-area">
+          <svg viewBox="0 0 460 110" width="100%" height="100%" preserveAspectRatio="none">
+            <line x1="0" y1="20" x2="460" y2="20" stroke="var(--border-subtle)" stroke-width=".5"/>
+            <line x1="0" y1="50" x2="460" y2="50" stroke="var(--border-subtle)" stroke-width=".5"/>
+            <line x1="0" y1="80" x2="460" y2="80" stroke="var(--border-subtle)" stroke-width=".5"/>
+            <line x1="0" y1="105" x2="460" y2="105" stroke="var(--border-subtle)" stroke-width=".5"/>
+            <polyline fill="none" stroke="var(--chart-blue)" stroke-width="2" stroke-linejoin="round" points="20,78 58,64 96,68 134,54 172,58 210,44 248,48 286,38 324,52 362,40 400,34 438,36"/>
+            <polyline fill="none" stroke="var(--chart-sky)" stroke-width="2" stroke-linejoin="round" points="20,55 58,48 96,52 134,42 172,46 210,36 248,40 286,32 324,44 362,34 400,28 438,30"/>
+            <polyline fill="none" stroke="var(--chart-emerald)" stroke-width="2" stroke-linejoin="round" points="20,92 58,82 96,86 134,74 172,78 210,64 248,66 286,58 324,70 362,56 400,50 438,53"/>
+          </svg>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-quaternary);margin-top:3px;padding:0 2px;">
+          <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span><span>W9</span><span>W10</span><span>W11</span><span>W12</span>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">태그별 분포 (Top 10)</div>
+          <div class="dim-selector" id="tagDimSel">
+            <button class="dim-btn active" onclick="dashSwitchDim('tagDimSel',this)">전체</button>
+            <button class="dim-btn" onclick="dashSwitchDim('tagDimSel',this)" id="tagDimSys">시스템별</button>
+            <button class="dim-btn" onclick="dashSwitchDim('tagDimSel',this)" id="tagDimMenu">메뉴별</button>
+          </div>
+        </div>
+        <div class="bar-list">
+          <div class="bar-item"><span class="bar-label">UI/UX</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">287</span></div>
+          <div class="bar-item"><span class="bar-label">성능</span><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><span class="bar-val">235</span></div>
+          <div class="bar-item"><span class="bar-label">오류/버그</span><div class="bar-track"><div class="bar-fill" style="width:71%"></div></div><span class="bar-val">204</span></div>
+          <div class="bar-item"><span class="bar-label">결제</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div><span class="bar-val">167</span></div>
+          <div class="bar-item"><span class="bar-label">로그인</span><div class="bar-track"><div class="bar-fill" style="width:47%"></div></div><span class="bar-val">135</span></div>
+          <div class="bar-item"><span class="bar-label">알림</span><div class="bar-track"><div class="bar-fill" style="width:39%"></div></div><span class="bar-val">112</span></div>
+          <div class="bar-item"><span class="bar-label">데이터</span><div class="bar-track"><div class="bar-fill" style="width:33%"></div></div><span class="bar-val">95</span></div>
+          <div class="bar-item"><span class="bar-label">API</span><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div><span class="bar-val">78</span></div>
+          <div class="bar-item"><span class="bar-label">보안</span><div class="bar-track"><div class="bar-fill" style="width:21%"></div></div><span class="bar-val">61</span></div>
+          <div class="bar-item"><span class="bar-label">기타</span><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><span class="bar-val">46</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 시스템/메뉴 현황 카드 -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">현황</div>
+      </div>
+      <div id="sysCardGrid"></div>
+    </div>
+
+    <!-- 담당자별 처리 현황 -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">담당자별 처리 현황</div>
+        <div class="dash-btn-group" id="assignXAxisBtns">
+          <button class="dash-btn active" onclick="dashSwitchAssignAxis('status',this)">진행 현황</button>
+          <button class="dash-btn" onclick="dashSwitchAssignAxis('priority',this)">우선순위별</button>
+          <button class="dash-btn" onclick="dashSwitchAssignAxis('tag',this)">태그별</button>
+        </div>
+      </div>
+      <div id="assignTable"></div>
+    </div>
+
+    <!-- 장기 미처리 -->
+    <div class="widget" style="margin-bottom:24px;">
+      <div class="widget-header">
+        <div class="widget-title">장기 미처리 VOC Top 10</div>
+        <div class="dim-selector" id="agingDimSel">
+          <button class="dim-btn active" onclick="dashSwitchDim('agingDimSel',this)">전체</button>
+          <button class="dim-btn" onclick="dashSwitchDim('agingDimSel',this)" id="agingDimSys">시스템별</button>
+        </div>
+      </div>
+      <div id="agingTableWrap"></div>
+    </div>
+
+  </div><!-- /.dash-body -->
+
+  <!-- 편집 모드 우측 패널 -->
+  <div class="dash-edit-panel" id="dashEditPanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <span style="font-size:13px;font-weight:700;color:var(--accent)">✏️ 레이아웃 편집</span>
+      <button onclick="dashToggleEdit()" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;font-size:18px;line-height:1">×</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px;">위젯을 드래그하여 순서 변경, 눈 아이콘으로 숨기기</div>
+
+    <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">저장 대상</div>
+    <div class="ds-save-target-group" id="dashSaveTarget">
+      <button class="ds-save-target active" data-target="personal">내 설정</button>
+      <button class="ds-save-target" data-target="admin">기본값 (Admin)</button>
+    </div>
+
+    <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;">기본 설정</div>
+    <div class="ds-setting-group">
+      <label class="ds-setting-label">기본 기간</label>
+      <select class="ds-setting-select">
+        <option>최근 30일</option><option>최근 7일</option><option>최근 90일</option><option>올해</option>
+      </select>
+    </div>
+    <div class="ds-setting-group">
+      <label class="ds-setting-label">히트맵 기본 X축</label>
+      <select class="ds-setting-select">
+        <option>시스템</option><option>담당자</option><option>유형</option>
+      </select>
+    </div>
+
+    <div style="flex:1"></div>
+    <div style="border-top:1px solid var(--border-subtle);padding-top:14px;display:flex;flex-direction:column;gap:8px;">
+      <button class="ds-save-btn" onclick="dashSaveLayout()">설정 저장</button>
+      <button class="ds-reset-btn" onclick="dashToggleEdit()">취소</button>
+    </div>
+  </div>
+</div><!-- /#page-dashboard -->
 
 <!-- ── Admin: 태그 규칙 관리 ── -->
 <div id="page-tag-rules" class="admin-page">
@@ -1841,6 +2299,7 @@ function setNav(el) {
     if (page === 'users')          renderUsers();
     if (page === 'admin-notices')  renderAdminNotices();
     if (page === 'admin-faq')      renderAdminFaq();
+    if (page === 'dashboard')      dashboardInit();
     lucide.createIcons();
   }
 }
@@ -2521,20 +2980,19 @@ function renderNotices() {
   const el = document.getElementById('page-notices');
   const visible = NOTICES.filter(n => n.visible && n.from <= today && n.to >= today);
   const levelLabel = { urgent:'긴급', important:'중요', normal:'일반' };
-  const levelColor = { urgent:'#e5484d', important:'#f5a623', normal:'var(--text-tertiary)' };
   el.innerHTML = `
     <div class="admin-topbar"><h2 class="admin-title">공지사항</h2></div>
     <div class="admin-body">
       ${visible.length === 0 ? '<p style="color:var(--text-tertiary);padding:32px 24px">등록된 공지사항이 없습니다.</p>' : ''}
       ${visible.map((n, i) => `
         <div class="notice-item" style="border-bottom:1px solid var(--border-subtle)">
-          <div onclick="toggleNotice(${n.id})" style="display:flex;align-items:center;gap:10px;padding:14px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
-            <span style="font-size:11px;font-weight:600;color:${levelColor[n.level]};border:1px solid ${levelColor[n.level]};border-radius:4px;padding:1px 7px;flex-shrink:0">${levelLabel[n.level]}</span>
+          <div onclick="toggleNotice(${n.id})" class="notice-row">
+            <span class="notice-badge notice-badge-${n.level}">${levelLabel[n.level]}</span>
             <span style="flex:1;font-size:14px;color:var(--text-primary)">${n.title}</span>
             <span style="font-size:12px;color:var(--text-tertiary);flex-shrink:0">${n.from} ~ ${n.to}</span>
             <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="notice-icon-${n.id}"></i>
           </div>
-          <div id="notice-body-${n.id}" style="display:none;padding:12px 24px 16px;background:var(--bg-elevated);font-size:13.5px;color:var(--text-secondary);line-height:1.7;border-top:1px solid var(--border-subtle)">${n.content}</div>
+          <div id="notice-body-${n.id}" class="notice-body">${n.content}</div>
         </div>`).join('')}
     </div>`;
   lucide.createIcons();
@@ -2567,28 +3025,28 @@ function renderFaq() {
   function hl(text) {
     if (!faqQuery) return text;
     const re = new RegExp(`(${faqQuery.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-    return text.replace(re, '<mark style="background:#5e6ad233;color:var(--accent);border-radius:2px">$1</mark>');
+    return text.replace(re, '<mark style="background:var(--brand-bg);color:var(--accent);border-radius:2px">$1</mark>');
   }
   el.innerHTML = `
     <div class="admin-topbar"><h2 class="admin-title">FAQ</h2></div>
     <div class="admin-body">
-      <div style="padding:12px 24px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border-subtle);padding-bottom:12px">
+      <div class="faq-filter-bar">
         <input id="faqSearch" type="text" placeholder="검색..." value="${faqQuery}"
           oninput="faqQuery=this.value;renderFaq()"
-          style="padding:6px 11px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px;width:200px">
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${categories.map(c => `<button onclick="faqCategory='${c}';renderFaq()" style="padding:5px 12px;border-radius:9999px;border:1px solid ${faqCategory===c?'var(--brand-border)':'var(--border-subtle)'};background:${faqCategory===c?'var(--brand-bg)':'transparent'};color:${faqCategory===c?'var(--accent)':'var(--text-secondary)'};font-size:13px;font-weight:${faqCategory===c?'600':'500'};cursor:pointer;font-family:var(--font-ui)">${c}</button>`).join('')}
+          class="faq-search">
+        <div class="faq-cat-group">
+          ${categories.map(c => `<button onclick="faqCategory='${c}';renderFaq()" class="faq-cat-btn${faqCategory===c?' active':''}">${c}</button>`).join('')}
         </div>
       </div>
       ${filtered.length === 0 ? '<p style="color:var(--text-tertiary);padding:16px 24px">검색 결과가 없습니다.</p>' : ''}
       ${filtered.map(f => `
-        <div style="border-bottom:1px solid var(--border-subtle)">
-          <div onclick="toggleFaq(${f.id})" style="display:flex;align-items:center;gap:10px;padding:14px 24px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--bg-elevated)'" onmouseout="this.style.background=''">
-            <span style="font-size:11px;font-weight:600;color:var(--text-tertiary);border:1px solid var(--border-subtle);border-radius:4px;padding:1px 7px;flex-shrink:0">${f.category}</span>
+        <div class="faq-item">
+          <div onclick="toggleFaq(${f.id})" class="notice-row">
+            <span class="notice-badge notice-badge-normal">${f.category}</span>
             <span style="flex:1;font-size:14px;color:var(--text-primary)">${hl(f.q)}</span>
             <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="faq-icon-${f.id}"></i>
           </div>
-          <div id="faq-body-${f.id}" style="display:none;padding:12px 24px 16px;background:var(--bg-elevated);font-size:13.5px;color:var(--text-secondary);line-height:1.7;border-top:1px solid var(--border-subtle)">${hl(f.a)}</div>
+          <div id="faq-body-${f.id}" class="notice-body">${hl(f.a)}</div>
         </div>`).join('')}
     </div>`;
   lucide.createIcons();
@@ -2633,8 +3091,8 @@ function renderAdminNotices() {
           <input id="newNoticeFrom" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
           <span style="line-height:34px;color:var(--text-tertiary)">~</span>
           <input id="newNoticeTo" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-          <button onclick="addAdminNotice()" style="padding:6px 14px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer">저장</button>
-          <button onclick="toggleAdminNoticeForm()" style="padding:6px 14px;background:none;border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-tertiary);font-size:12px;cursor:pointer">취소</button>
+          <button onclick="addAdminNotice()" class="btn-form-save">저장</button>
+          <button onclick="toggleAdminNoticeForm()" class="btn-form-cancel">취소</button>
         </div>
       </div>
       <table class="admin-table">
@@ -2642,11 +3100,11 @@ function renderAdminNotices() {
         <tbody>${NOTICES.map(n => `
           <tr id="anotice-row-${n.id}">
             <td style="color:var(--text-primary)">${n.title}</td>
-            <td><span style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;border:1px solid var(--border-subtle)">${levelLabel[n.level]}</span></td>
+            <td><span class="notice-badge notice-badge-${n.level}">${levelLabel[n.level]}</span></td>
             <td>${n.popup ? '<span style="color:var(--accent);font-size:12px">ON</span>' : '<span style="color:var(--text-tertiary);font-size:12px">—</span>'}</td>
             <td style="font-size:12px;color:var(--text-secondary)">${n.from} ~ ${n.to}</td>
             <td><label class="toggle-switch"><input type="checkbox" ${n.visible?'checked':''} onchange="toggleNoticeVisible(${n.id},this.checked)"><span class="toggle-slider"></span></label></td>
-            <td><button onclick="deleteAdminNotice(${n.id})" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:12px;padding:3px 8px;border-radius:4px" onmouseover="this.style.color='#e5484d'" onmouseout="this.style.color='var(--text-tertiary)'">삭제</button></td>
+            <td><button onclick="deleteAdminNotice(${n.id})" class="a-btn danger">삭제</button></td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -2705,8 +3163,8 @@ function renderAdminFaq() {
           <textarea id="newFaqA" placeholder="답변을 입력하세요 (Markdown 지원, 이미지 드래그&드롭 가능)" rows="4" style="width:100%;padding:8px 10px;background:var(--bg-app);border:none;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box;outline:none"></textarea>
         </div>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button onclick="addAdminFaq()" style="padding:6px 14px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer">저장</button>
-          <button onclick="toggleAdminFaqForm()" style="padding:6px 14px;background:none;border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-tertiary);font-size:12px;cursor:pointer">취소</button>
+          <button onclick="addAdminFaq()" class="btn-form-save">저장</button>
+          <button onclick="toggleAdminFaqForm()" class="btn-form-cancel">취소</button>
         </div>
       </div>
       <table class="admin-table">
@@ -3110,6 +3568,449 @@ function handleHideToday(id, checked) {
 function closeNoticePopup() {
   const el = document.getElementById('noticePopupOverlay');
   if (el) el.remove();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Dashboard
+// ═══════════════════════════════════════════════════════════════
+const DASH_HM = {
+  status: {
+    headers: ['접수됨','검토중','처리중','완료','보류'],
+    systems: {'채널 A':[42,89,134,28,15],'채널 B':[31,67,156,44,19],'채널 C':[18,48,112,19,0],'채널 D':[14,36,89,13,7],'채널 E':[10,23,62,0,0]},
+    menus: {
+      '채널 A':{'메뉴 1 (홈)':[12,24,38,8,3],'메뉴 2 (검색)':[8,18,42,9,5],'메뉴 3 (마이페이지)':[10,22,29,7,4],'메뉴 4 (결제)':[7,15,18,4,3],'메뉴 5 (설정)':[5,10,7,0,0]},
+      '채널 B':{'메뉴 1 (대시)':[9,20,44,12,6],'메뉴 2 (리포트)':[8,16,38,11,4],'메뉴 3 (알림)':[7,14,32,9,5],'메뉴 4 (설정)':[7,17,42,12,4]},
+      '채널 C':{'메뉴 1 (홈)':[6,18,40,7,0],'메뉴 2 (검색)':[5,14,35,6,0],'메뉴 3 (마이)':[7,16,37,6,0]},
+      '채널 D':{'메뉴 1 (메인)':[5,12,28,5,3],'메뉴 2 (설정)':[4,11,31,4,2],'메뉴 3 (알림)':[5,13,30,4,2]},
+      '채널 E':{'메뉴 1 (홈)':[4,9,22,0,0],'메뉴 2 (검색)':[3,8,20,0,0],'메뉴 3 (프로필)':[3,6,20,0,0]},
+    }
+  },
+  priority: {
+    headers: ['Urgent','High','Medium','Low'],
+    systems: {'채널 A':[28,72,142,66],'채널 B':[24,80,156,57],'채널 C':[12,45,104,36],'채널 D':[8,34,82,35],'채널 E':[5,17,56,17]},
+    menus: {
+      '채널 A':{'메뉴 1 (홈)':[8,20,42,15],'메뉴 2 (검색)':[6,18,40,18],'메뉴 3 (마이페이지)':[5,15,38,14],'메뉴 4 (결제)':[5,12,14,16],'메뉴 5 (설정)':[4,7,8,3]},
+      '채널 B':{'메뉴 1 (대시)':[6,22,42,15],'메뉴 2 (리포트)':[6,20,38,13],'메뉴 3 (알림)':[5,18,38,11],'메뉴 4 (설정)':[7,20,38,18]},
+      '채널 C':{'메뉴 1 (홈)':[4,15,36,16],'메뉴 2 (검색)':[4,13,34,9],'메뉴 3 (마이)':[4,17,34,11]},
+      '채널 D':{'메뉴 1 (메인)':[3,10,28,12],'메뉴 2 (설정)':[2,12,30,8],'메뉴 3 (알림)':[3,12,24,15]},
+      '채널 E':{'메뉴 1 (홈)':[2,6,20,8],'메뉴 2 (검색)':[1,5,18,7],'메뉴 3 (프로필)':[2,6,18,3]},
+    }
+  },
+  tag: {
+    headers: ['UI/UX','성능','오류/버그','결제','로그인'],
+    systems: {'채널 A':[68,52,48,38,24],'채널 B':[72,58,54,42,28],'채널 C':[42,38,32,22,14],'채널 D':[32,28,24,16,12],'채널 E':[22,18,16,0,0]},
+    menus: {
+      '채널 A':{'메뉴 1 (홈)':[20,14,12,8,6],'메뉴 2 (검색)':[16,12,10,8,6],'메뉴 3 (마이페이지)':[14,10,10,6,6],'메뉴 4 (결제)':[10,8,10,14,4],'메뉴 5 (설정)':[8,8,6,2,2]},
+      '채널 B':{'메뉴 1 (대시)':[18,14,12,10,6],'메뉴 2 (리포트)':[18,14,14,10,8],'메뉴 3 (알림)':[16,14,14,10,6],'메뉴 4 (설정)':[20,16,14,12,8]},
+      '채널 C':{'메뉴 1 (홈)':[14,12,10,8,4],'메뉴 2 (검색)':[14,12,12,8,4],'메뉴 3 (마이)':[14,14,10,6,6]},
+      '채널 D':{'메뉴 1 (메인)':[10,10,8,6,4],'메뉴 2 (설정)':[10,8,8,6,4],'메뉴 3 (알림)':[12,10,8,4,4]},
+      '채널 E':{'메뉴 1 (홈)':[8,6,6,0,0],'메뉴 2 (검색)':[6,6,4,0,0],'메뉴 3 (프로필)':[8,6,6,0,0]},
+    }
+  }
+};
+
+const DASH_ASSIGN = {
+  status:   {headers:['접수됨','검토중','처리중','완료','보류'],rows:[['김지훈',8,22,34,12,4],['이수연',6,18,28,10,3],['박민준',5,14,24,8,2],['최유진',7,20,30,11,3],['정해원',4,12,20,7,2],['미배정',12,32,48,0,6]]},
+  priority: {headers:['Urgent','High','Medium','Low'],rows:[['김지훈',18,28,36,18],['이수연',14,22,30,14],['박민준',10,18,26,10],['최유진',16,24,32,16],['정해원',8,14,22,8],['미배정',10,38,52,0]]},
+  tag:      {headers:['UI/UX','성능','오류/버그','결제','로그인'],rows:[['김지훈',16,14,12,8,6],['이수연',14,12,10,6,4],['박민준',12,10,8,6,4],['최유진',14,12,10,8,4],['정해원',10,8,8,4,4],['미배정',28,22,18,12,8]]}
+};
+
+const DASH_MENU_DATA = {
+  '채널 A': [{name:'메뉴 1 (홈)',total:85,unresolved:8},{name:'메뉴 2 (검색)',total:82,unresolved:7},{name:'메뉴 3 (마이페이지)',total:72,unresolved:6},{name:'메뉴 4 (결제)',total:47,unresolved:5},{name:'메뉴 5 (설정)',total:22,unresolved:2}],
+  '채널 B': [{name:'메뉴 1 (대시)',total:89,unresolved:9},{name:'메뉴 2 (리포트)',total:77,unresolved:8},{name:'메뉴 3 (알림)',total:74,unresolved:7},{name:'메뉴 4 (설정)',total:77,unresolved:7}],
+  '채널 C': [{name:'메뉴 1 (홈)',total:68,unresolved:5},{name:'메뉴 2 (검색)',total:60,unresolved:4},{name:'메뉴 3 (마이)',total:69,unresolved:3}],
+  '채널 D': [{name:'메뉴 1 (메인)',total:55,unresolved:3},{name:'메뉴 2 (설정)',total:50,unresolved:3},{name:'메뉴 3 (알림)',total:54,unresolved:3}],
+  '채널 E': [{name:'메뉴 1 (홈)',total:35,unresolved:3},{name:'메뉴 2 (검색)',total:31,unresolved:2},{name:'메뉴 3 (프로필)',total:29,unresolved:2}],
+};
+
+const DASH_SYS_DATA = [
+  {name:'채널 A',total:308,unresolved:28},{name:'채널 B',total:317,unresolved:31},
+  {name:'채널 C',total:197,unresolved:12},{name:'채널 D',total:159,unresolved:9},
+  {name:'채널 E',total:95,unresolved:7},{name:'채널 F',total:72,unresolved:0},{name:'채널 G',total:56,unresolved:0},
+];
+
+const DASH_AGING_ALL = [
+  {code:'VOC-0041',title:'결제 모듈 타임아웃 오류 반복',loc:'채널 A',priority:'urgent',days:48,daysCls:'d-badge-red'},
+  {code:'VOC-0055',title:'모바일 앱 알림 미수신 문제',loc:'채널 B',priority:'high',days:41,daysCls:'d-badge-red'},
+  {code:'VOC-0063',title:'로그인 세션 자동 만료 이슈',loc:'채널 A',priority:'urgent',days:38,daysCls:'d-badge-red'},
+  {code:'VOC-0071',title:'CSV 내보내기 한글 깨짐',loc:'채널 C',priority:'medium',days:26,daysCls:'d-badge-amber'},
+  {code:'VOC-0082',title:'검색 필터 저장 안됨',loc:'채널 B',priority:'high',days:23,daysCls:'d-badge-amber'},
+  {code:'VOC-0094',title:'대용량 파일 업로드 실패',loc:'채널 D',priority:'high',days:19,daysCls:'d-badge-amber'},
+  {code:'VOC-0108',title:'API 응답 속도 저하',loc:'채널 A',priority:'medium',days:17,daysCls:'d-badge-amber'},
+  {code:'VOC-0115',title:'권한 설정 화면 오작동',loc:'채널 C',priority:'medium',days:15,daysCls:'d-badge-amber'},
+  {code:'VOC-0123',title:'대시보드 로딩 지연',loc:'채널 B',priority:'medium',days:14,daysCls:'d-badge-amber'},
+  {code:'VOC-0131',title:'이메일 발송 실패 케이스',loc:'채널 E',priority:'high',days:14,daysCls:'d-badge-amber'},
+];
+
+const DASH_AGING_MENU = {
+  '채널 A': [
+    {code:'VOC-0041',title:'결제 모듈 타임아웃 오류 반복',loc:'메뉴 4 (결제)',priority:'urgent',days:48,daysCls:'d-badge-red'},
+    {code:'VOC-0063',title:'로그인 세션 자동 만료 이슈',loc:'메뉴 1 (홈)',priority:'urgent',days:38,daysCls:'d-badge-red'},
+    {code:'VOC-0108',title:'API 응답 속도 저하',loc:'메뉴 2 (검색)',priority:'medium',days:17,daysCls:'d-badge-amber'},
+  ],
+  '채널 B': [
+    {code:'VOC-0055',title:'모바일 앱 알림 미수신 문제',loc:'메뉴 3 (알림)',priority:'high',days:41,daysCls:'d-badge-red'},
+    {code:'VOC-0082',title:'검색 필터 저장 안됨',loc:'메뉴 2 (리포트)',priority:'high',days:23,daysCls:'d-badge-amber'},
+    {code:'VOC-0123',title:'대시보드 로딩 지연',loc:'메뉴 1 (대시)',priority:'medium',days:14,daysCls:'d-badge-amber'},
+  ],
+};
+
+const DASH_DIST_CONTENT = {
+  status: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(43% .010 260) 0% 14.9%, oklch(67% .17 240) 14.9% 43.1%, oklch(55% .17 150) 43.1% 86.3%, oklch(62% .19 158) 86.3% 94.9%, oklch(70% .16 72) 94.9% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(43% .010 260)"></div><span class="legend-name">접수됨</span><span class="legend-count">180</span><span class="legend-pct">14.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:30%;background:oklch(43% .010 260)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(67% .17 240)"></div><span class="legend-name">검토중</span><span class="legend-count">340</span><span class="legend-pct">28.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:57%;background:oklch(67% .17 240)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">처리중</span><span class="legend-count">520</span><span class="legend-pct">43.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(62% .19 158)"></div><span class="legend-name">완료</span><span class="legend-count">104</span><span class="legend-pct">8.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:20%;background:oklch(62% .19 158)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">보류</span><span class="legend-count">60</span><span class="legend-pct">5.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:12%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
+  priority: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(58% .22 25) 0% 6.6%, oklch(60% .18 45) 6.6% 29.5%, oklch(59% .012 258) 29.5% 79.1%, oklch(43% .010 260) 79.1% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">Urgent</span><span class="legend-count">80</span><span class="legend-pct">6.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:13%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(60% .18 45)"></div><span class="legend-name">High</span><span class="legend-count">276</span><span class="legend-pct">22.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:46%;background:oklch(60% .18 45)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-tertiary)"></div><span class="legend-name">Medium</span><span class="legend-count">600</span><span class="legend-pct">49.8%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:var(--text-tertiary)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-quaternary)"></div><span class="legend-name">Low</span><span class="legend-count">248</span><span class="legend-pct">20.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:41%;background:var(--text-quaternary)"></div></div></div></div></div>`,
+  type: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(58% .22 25) 0% 28%, oklch(63% .19 258) 28% 54%, oklch(55% .17 150) 54% 76%, oklch(70% .16 72) 76% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">버그</span><span class="legend-count">337</span><span class="legend-pct">28.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(63% .19 258)"></div><span class="legend-name">기능 요청</span><span class="legend-count">313</span><span class="legend-pct">26.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:93%;background:oklch(63% .19 258)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">개선 제안</span><span class="legend-count">265</span><span class="legend-pct">22.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:79%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">문의</span><span class="legend-count">289</span><span class="legend-pct">24.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:86%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
+  tag: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(63% .19 258) 0% 23.8%, oklch(72% .14 235) 23.8% 43.3%, oklch(58% .22 25) 43.3% 60.3%, oklch(60% .18 45) 60.3% 74.2%, oklch(55% .17 150) 74.2% 85.5%, oklch(43% .010 260) 85.5% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(63% .19 258)"></div><span class="legend-name">UI/UX</span><span class="legend-count">287</span><span class="legend-pct">23.8%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(63% .19 258)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(72% .14 235)"></div><span class="legend-name">성능</span><span class="legend-count">235</span><span class="legend-pct">19.5%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:82%;background:oklch(72% .14 235)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">오류/버그</span><span class="legend-count">204</span><span class="legend-pct">16.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:71%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(60% .18 45)"></div><span class="legend-name">결제</span><span class="legend-count">167</span><span class="legend-pct">13.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:58%;background:oklch(60% .18 45)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">로그인</span><span class="legend-count">135</span><span class="legend-pct">11.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:47%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-quaternary)"></div><span class="legend-name">기타</span><span class="legend-count">176</span><span class="legend-pct">14.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:61%;background:var(--text-quaternary)"></div></div></div></div></div>`
+};
+
+let dashGlobalTab = 'all';
+let dashActiveMenu = null;
+let dashActiveAssignee = null;
+let dashHmAxis = 'status';
+let dashAssignAxis = 'status';
+let dashInited = false;
+let dashEditMode = false;
+
+const DASH_WIDGET_NAMES = ['KPI (Volume)','KPI (Quality)','분포 + 매트릭스','드릴다운 히트맵','주간 트렌드 + 태그','현황 카드','담당자별 현황','장기 미처리'];
+
+function dashToggleEdit() {
+  dashEditMode = !dashEditMode;
+  const page = document.getElementById('page-dashboard');
+  page.classList.toggle('edit-mode', dashEditMode);
+  const btn = document.getElementById('dashEditBtn');
+  if (dashEditMode) {
+    btn.classList.add('dash-edit-btn-active');
+    btn.innerHTML = '<i data-lucide="check" style="width:13px;height:13px"></i> 완료';
+    // Inject edit bars into each widget section
+    document.querySelectorAll('.dash-body > div').forEach((el, i) => {
+      el.classList.add('dash-widget');
+      if (el.querySelector('.widget-edit-bar')) return;
+      const name = DASH_WIDGET_NAMES[i] || '위젯 ' + (i + 1);
+      const isHidden = el.classList.contains('widget-hidden');
+      const bar = document.createElement('div');
+      bar.className = 'widget-edit-bar';
+      bar.innerHTML = `<span class="widget-edit-grip">⠿</span><span class="widget-edit-name">${name}</span><span style="flex:1"></span><button class="widget-vis-btn" title="${isHidden?'표시':'숨기기'}" onclick="dashWidgetToggleVis(this.closest('.dash-widget'))"><i data-lucide="${isHidden?'eye-off':'eye'}"></i></button><button class="widget-lock-btn" title="잠금"><i data-lucide="lock"></i></button>`;
+      const overlay = document.createElement('div');
+      overlay.className = 'widget-hidden-overlay';
+      overlay.textContent = '숨김';
+      el.insertBefore(bar, el.firstChild);
+      el.appendChild(overlay);
+    });
+    lucide.createIcons();
+  } else {
+    btn.classList.remove('dash-edit-btn-active');
+    btn.innerHTML = '<i data-lucide="layout-panel-left" style="width:13px;height:13px"></i> 레이아웃 편집';
+    document.querySelectorAll('.widget-edit-bar,.widget-hidden-overlay').forEach(el => el.remove());
+    document.querySelectorAll('.dash-widget').forEach(el => el.classList.remove('dash-widget'));
+    lucide.createIcons();
+  }
+}
+
+function dashWidgetToggleVis(widget) {
+  widget.classList.toggle('widget-hidden');
+  const isHidden = widget.classList.contains('widget-hidden');
+  const btn = widget.querySelector('.widget-vis-btn');
+  btn.title = isHidden ? '표시' : '숨기기';
+  btn.querySelector('svg')?.remove();
+  const i = document.createElement('i');
+  i.setAttribute('data-lucide', isHidden ? 'eye-off' : 'eye');
+  btn.appendChild(i);
+  lucide.createIcons();
+}
+
+function dashSaveLayout() {
+  const target = document.querySelector('.ds-save-target.active')?.dataset.target;
+  const label = target === 'admin' ? '기본값(전체 사용자)' : '내 설정';
+  alert(`"${label}"으로 저장되었습니다. (프로토타입 — 실제 저장 미구현)`);
+  dashToggleEdit();
+}
+
+function dashToggleSessionSettings() {
+  alert('내 설정 슬라이드오버 (프로토타입 — 미구현)');
+}
+
+document.addEventListener('click', e => {
+  const target = e.target.closest('.ds-save-target');
+  if (!target) return;
+  target.closest('.ds-save-target-group')?.querySelectorAll('.ds-save-target').forEach(b => b.classList.remove('active'));
+  target.classList.add('active');
+});
+
+function dashCellStyle(v, max) {
+  if (v === 0) return 'class="empty"';
+  const op = Math.max(0.06, (v / max) * 0.62).toFixed(2);
+  const textColor = op > 0.35 ? 'color:var(--text-primary)' : 'color:var(--text-secondary)';
+  return `style="background:oklch(63% .19 258 / ${op});${textColor}"`;
+}
+
+function dashPriorityBadge(p) {
+  if (p==='urgent') return '<span class="d-badge d-badge-urgent">Urgent</span>';
+  if (p==='high')   return '<span class="d-badge d-badge-high">High</span>';
+  return '<span class="d-badge d-badge-medium">Medium</span>';
+}
+
+function dashRenderHeatmap() {
+  const data = DASH_HM[dashHmAxis];
+  const headers = data.headers;
+  const sysName = dashGlobalTab !== 'all' ? '채널 ' + dashGlobalTab : null;
+  let rows, isMenuView = false, isSingleMenu = false;
+  if (dashActiveMenu && sysName) {
+    const menuRows = data.menus[sysName] || {};
+    const menuVals = menuRows[dashActiveMenu];
+    rows = menuVals ? [[dashActiveMenu, menuVals]] : [];
+    isMenuView = true; isSingleMenu = true;
+  } else if (sysName) {
+    rows = Object.entries(data.menus[sysName] || {});
+    isMenuView = true;
+  } else {
+    rows = Object.entries(data.systems);
+  }
+  const showTotalRow = !isSingleMenu;
+  const colTotals = headers.map((_, i) => rows.reduce((s, [,v]) => s + v[i], 0));
+  const grandTotal = colTotals.reduce((a,b)=>a+b,0);
+  const allVals = rows.flatMap(([,v]) => v);
+  const max = Math.max(...allVals, 1);
+  let html = '<table class="heatmap-table"><colgroup>';
+  html += '<col style="width:130px">';
+  for (let i = 0; i < headers.length + 1; i++) html += '<col>';
+  html += '</colgroup>';
+  html += '<thead><tr>';
+  html += `<th class="rl">${isMenuView ? '메뉴' : '시스템'}</th>`;
+  for (const h of headers) html += `<th>${h}</th>`;
+  html += '<th>합계</th></tr></thead><tbody>';
+  if (showTotalRow) {
+    const totalLabel = isMenuView ? `${sysName} 전체` : '전체';
+    html += '<tr class="hm-total-row">';
+    html += `<td class="rl">${totalLabel}</td>`;
+    for (const v of colTotals) html += `<td style="color:var(--text-secondary);font-weight:700">${v}</td>`;
+    html += `<td class="tc" style="font-weight:700">${grandTotal}</td></tr>`;
+  }
+  for (const [name, vals] of rows) {
+    const total = vals.reduce((a,b)=>a+b,0);
+    html += '<tr>';
+    if (!isMenuView) {
+      html += `<td class="rl clickable" onclick="dashDrillHeatmap('${name}')" title="클릭 → 메뉴 상세">▶ ${name}</td>`;
+    } else {
+      html += `<td class="rl">${name}</td>`;
+    }
+    for (const v of vals) {
+      if (v === 0) html += `<td class="empty">—</td>`;
+      else html += `<td ${dashCellStyle(v,max)}>${v}</td>`;
+    }
+    html += `<td class="tc">${total}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  if (!isMenuView) html += '<div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">▶ 시스템명 클릭 → 메뉴별 상세 보기 &nbsp;|&nbsp; 셀 클릭 → VOC 목록 이동</div>';
+  else if (isSingleMenu) html += '<div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">메뉴 선택 시 단일 행 표시 &nbsp;|&nbsp; 셀 클릭 → VOC 목록 이동</div>';
+  else html += '<div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">셀 클릭 → 해당 메뉴+상태 필터로 VOC 목록 이동</div>';
+  document.getElementById('hmTable').innerHTML = html;
+  const bc = document.getElementById('hmBreadcrumb');
+  if (sysName && dashActiveMenu) {
+    bc.innerHTML = `<span class="crumb" onclick="dashBackToAll()">전체</span><span class="sep">›</span><span class="crumb" onclick="dashBackToSystem()">${sysName}</span><span class="sep">›</span><span>${dashActiveMenu}</span>`;
+  } else if (sysName) {
+    bc.innerHTML = `<span class="crumb" onclick="dashBackToAll()">전체</span><span class="sep">›</span><span>${sysName}</span>`;
+  } else {
+    bc.innerHTML = `<span class="crumb" style="cursor:default">전체</span>`;
+  }
+}
+
+function dashDrillHeatmap(systemName) {
+  const tabMap = {'채널 A':'A','채널 B':'B','채널 C':'C','채널 D':'D','채널 E':'E'};
+  const key = tabMap[systemName];
+  if (key) {
+    const btns = document.querySelectorAll('.global-tab');
+    const idx = ['all','A','B','C','D','E'].indexOf(key);
+    switchGlobalTab(key, btns[idx] || null);
+  }
+}
+
+function dashBackToAll() {
+  const btn = document.querySelector('.global-tab');
+  switchGlobalTab('all', btn);
+}
+
+function dashBackToSystem() {
+  dashActiveMenu = null;
+  document.getElementById('menuSelect').value = '';
+  dashRenderHeatmap();
+  dashUpdateFilterContext();
+}
+
+function dashSwitchHmAxis(axis, btn) {
+  dashHmAxis = axis;
+  document.querySelectorAll('#hmXAxisBtns .dash-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  dashRenderHeatmap();
+}
+
+function dashRenderAssignTable() {
+  const data = DASH_ASSIGN[dashAssignAxis];
+  const allVals = data.rows.flatMap(r => r.slice(1));
+  const max = Math.max(...allVals, 1);
+  const rows = dashActiveAssignee
+    ? data.rows.filter(r => r[0] === dashActiveAssignee || r[0] === '미배정')
+    : data.rows;
+  let html = '<table class="assign-table"><thead><tr>';
+  html += '<th class="rl">담당자</th>';
+  for (const h of data.headers) html += `<th>${h}</th>`;
+  html += '<th>합계</th></tr></thead><tbody>';
+  for (const row of rows) {
+    const [name, ...vals] = row;
+    const total = vals.reduce((a,b)=>a+b,0);
+    const isHighlighted = dashActiveAssignee && name === dashActiveAssignee;
+    html += `<tr${isHighlighted ? ' class="assign-row-highlight"' : ''}>`;
+    html += name === '미배정' ? `<td class="rl unassigned">${name}</td>` : `<td class="rl">${name}</td>`;
+    for (const v of vals) {
+      if (v === 0) html += `<td class="empty">—</td>`;
+      else html += `<td ${dashCellStyle(v,max)}>${v}</td>`;
+    }
+    html += `<td class="tc">${total}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('assignTable').innerHTML = html;
+}
+
+function dashSwitchAssignAxis(axis, btn) {
+  dashAssignAxis = axis;
+  document.querySelectorAll('#assignXAxisBtns .dash-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  dashRenderAssignTable();
+}
+
+function dashRenderAgingTable() {
+  const sysName = dashGlobalTab !== 'all' ? '채널 ' + dashGlobalTab : null;
+  const agingDimSysBtn = document.getElementById('agingDimSys');
+  const isMenuDim = agingDimSysBtn && agingDimSysBtn.textContent === '메뉴별' && agingDimSysBtn.classList.contains('active');
+  let data, locLabel = '시스템';
+  if (sysName && isMenuDim) { data = (DASH_AGING_MENU[sysName] || DASH_AGING_ALL.filter(r => r.loc === sysName)); locLabel = '메뉴'; }
+  else if (sysName) { data = DASH_AGING_ALL.filter(r => r.loc === sysName); }
+  else { data = DASH_AGING_ALL; }
+  let html = `<table class="aging-table"><thead><tr><th>Issue</th><th>제목</th><th>${locLabel}</th><th>우선순위</th><th>경과일</th></tr></thead><tbody>`;
+  for (const r of data) {
+    html += `<tr><td class="code">${r.code}</td><td class="title-col">${r.title}</td><td>${r.loc}</td><td>${dashPriorityBadge(r.priority)}</td><td><span class="d-badge ${r.daysCls}">${r.days}일</span></td></tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('agingTableWrap').innerHTML = html;
+}
+
+function switchGlobalTab(tab, btn) {
+  dashGlobalTab = tab;
+  dashActiveMenu = null;
+  document.getElementById('menuSelect').value = '';
+  if (btn) {
+    document.querySelectorAll('.global-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  dashApplyGlobalTabState();
+}
+
+function dashApplyGlobalTabState() {
+  const isAll = dashGlobalTab === 'all';
+  const sysName = isAll ? null : '채널 ' + dashGlobalTab;
+  ['distDimSys','matDimSys','lineDimSys','tagDimSys'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isAll ? '' : 'none';
+  });
+  ['distDimMenu','matDimMenu','lineDimMenu','tagDimMenu'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = isAll;
+  });
+  const agingDimSys = document.getElementById('agingDimSys');
+  if (agingDimSys) agingDimSys.textContent = isAll ? '시스템별' : '메뉴별';
+  const menuWrap = document.getElementById('menuSelectorWrap');
+  const menuSelect = document.getElementById('menuSelect');
+  if (isAll) {
+    menuWrap.style.display = 'none';
+    menuSelect.innerHTML = '<option value="">메뉴: 전체</option>';
+  } else {
+    menuWrap.style.display = 'flex';
+    const menus = DASH_MENU_DATA[sysName] || [];
+    menuSelect.innerHTML = `<option value="">메뉴: 전체</option>` + menus.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+  }
+  dashRenderHeatmap();
+  const gridEl = document.getElementById('sysCardGrid');
+  const statusLabels = [
+    { lbl:'접수됨', cls:'s-접수' },
+    { lbl:'검토중',  cls:'s-검토' },
+    { lbl:'처리중',  cls:'s-처리' },
+    { lbl:'완료',    cls:'s-완료' },
+    { lbl:'보류',    cls:'s-보류' },
+  ];
+  let items;
+  if (isAll) {
+    items = DASH_SYS_DATA.map(s => {
+      const sv = DASH_HM.status.systems[s.name] || [];
+      return { name: s.name, total: sv.reduce((a,b)=>a+b,0)||s.total, vals: sv };
+    });
+  } else {
+    items = (DASH_MENU_DATA[sysName] || []).map(m => {
+      const mv = (DASH_HM.status.menus[sysName] || {})[m.name] || [];
+      return { name: m.name, total: mv.reduce((a,b)=>a+b,0)||m.total, vals: mv };
+    });
+  }
+  const html = '<div class="status-card-grid">' + items.map(item => {
+    const rows = statusLabels.map(({lbl, cls}, i) =>
+      `<div class="status-card-row"><span class="status-card-label">${lbl}</span><span class="status-card-val ${cls}">${item.vals[i] ?? 0}</span></div>`
+    ).join('');
+    return `<div class="status-card">
+      <div class="status-card-name">${item.name}</div>
+      <div class="status-card-rows">
+        <div class="status-card-row"><span class="status-card-label" style="font-weight:600;color:var(--text-secondary)">전체</span><span class="status-card-val total">${item.total}</span></div>
+        ${rows}
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+  gridEl.innerHTML = html;
+  dashRenderAgingTable();
+  dashUpdateFilterContext();
+}
+
+function dashSelectMenu(menuName) {
+  dashActiveMenu = menuName || null;
+  dashRenderHeatmap();
+  dashUpdateFilterContext();
+}
+
+function dashSelectAssignee(name) {
+  dashActiveAssignee = name || null;
+  dashRenderAssignTable();
+  dashUpdateFilterContext();
+}
+
+function dashUpdateFilterContext() {
+  const parts = [];
+  if (dashGlobalTab !== 'all') parts.push('채널 ' + dashGlobalTab);
+  if (dashActiveMenu) parts.push(dashActiveMenu);
+  if (dashActiveAssignee) parts.push('담당자: ' + dashActiveAssignee);
+  const banner = document.getElementById('filterContext');
+  const text = document.getElementById('filterContextText');
+  if (parts.length > 0) {
+    text.textContent = parts.join(' › ');
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function dashSwitchDistTab(btn, key) {
+  document.querySelectorAll('#distTabs .d-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('distContent').innerHTML = DASH_DIST_CONTENT[key];
+}
+
+function dashSwitchDim(selId, btn) {
+  document.querySelectorAll(`#${selId} .dim-btn`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (selId === 'agingDimSel') dashRenderAgingTable();
+}
+
+function dashboardInit() {
+  if (dashInited) return;
+  dashInited = true;
+  document.getElementById('distContent').innerHTML = DASH_DIST_CONTENT['status'];
+  dashRenderHeatmap();
+  dashRenderAssignTable();
+  dashRenderAgingTable();
+  dashApplyGlobalTabState();
 }
 </script>
 </body>

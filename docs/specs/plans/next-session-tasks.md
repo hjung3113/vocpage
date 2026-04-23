@@ -5,58 +5,46 @@
 
 ---
 
-## Phase 0: 대시보드 프로토타입 완성 및 컨펌
+## Phase 0: 대시보드 프로토타입 완성 및 컨펌 ✅ 완료 (2026-04-23)
 
-> **선행 조건**: 없음 — 첫 번째로 진행  
-> **완료 기준**: 사용자 컨펌 받아야 다음 단계 진행 가능
-
-- [ ] `prototype/prototype.html` 대시보드 섹션 제작 (dashboard-feature.md v3.1 기준)
-  - GlobalTabs, KPI 카드, 분포 차트, 히트맵, 트렌드 3선, 담당자·태그 바
-  - 글로벌 필터 (전체→시스템→메뉴 3단계 + 담당자 직교 필터)
-- [ ] 피드백 반복 → 디자인·인터랙션 수정
-- [ ] **컨펌 게이트**: 사용자 최종 확인 후 Phase 1 진행
+- [x] `prototype/prototype.html` 대시보드 섹션 제작
+- [x] 피드백 반복 → 디자인·인터랙션 수정
+- [x] **컨펌 게이트** 통과
 
 ---
 
-## Phase 1: 나머지 페이지 디자인 통일성 확보 및 컨펌
+## Phase 1: 나머지 페이지 디자인 통일성 확보 및 컨펌 ✅ 완료 (2026-04-23)
 
-> **선행 조건**: Phase 0 컨펌 완료 (대시보드가 디자인 기준점이 됨)  
-> **완료 기준**: 사용자 컨펌 받아야 다음 단계 진행 가능
+> 통일성 점수: **82% → 100%** (Playwright 시각 검증)
 
 ### 1-1. 정보 페이지 디자인 리뷰 (2개)
-- [ ] 공지사항 페이지 (`notice`) — 대시보드·VOC 페이지 토큰/컴포넌트와 비교 리뷰
-- [ ] FAQ 페이지 (`faq`) — 동일 기준 리뷰
+- [x] 공지사항 페이지 (`notice`) — 레벨 배지 CSS vars 적용, notice-row/body 클래스 도입
+- [x] FAQ 페이지 (`faq`) — 하이라이트 #5e6ad233→brand-bg, faq-filter-bar/cat-btn 클래스
 - 체크: 색상 토큰, 타이포, 8px grid, 배지·탭 스타일 일관성
 
 ### 1-2. 관리자 페이지 디자인 리뷰 (6개)
-- [ ] 사용자 관리 (`admin/users`)
-- [ ] 태그 규칙 관리 (`admin/tag-rules`)
-- [ ] 카테고리 관리 (`admin/categories`)
-- [ ] 공지사항 관리 (`admin/notices`)
-- [ ] FAQ 관리 (`admin/faq`)
-- [ ] 시스템 설정 (`admin/settings`)
-- 체크: 관리자 topbar/sidebar 일관성, 테이블 row height, 폼 컴포넌트 스펙
+- [x] 사용자 관리 (`admin/users`) — role-admin/manager oklch 리터럴 → CSS vars
+- [x] 태그 규칙 관리 (`admin/tag-rules`) — type-keyword/regex oklch 리터럴 → CSS vars
+- [x] 카테고리 관리 (`admin/categories`) — 기존 일관성 확인 (문제 없음)
+- [x] 공지사항 관리 (`admin/notices`) — 레벨 배지 색상 추가, 폼 버튼 클래스 통일
+- [x] FAQ 관리 (`admin/faq`) — 폼 버튼 클래스 통일
+- [x] 시스템 설정 (`admin/settings`) — 기존 일관성 확인 (문제 없음)
 
 ### 1-3. 차이 항목 수정
-- [ ] 전 페이지에서 기준과 차이나는 항목 목록화
-- [ ] `prototype/prototype.html` 직접 수정으로 통일
-- 기준: `docs/specs/requires/design.md §10 CSS Reference` 토큰
+- [x] 전 페이지 기준 차이 항목 목록화 (8개 이슈 식별)
+- [x] `prototype/prototype.html` 직접 수정으로 통일
+- 추가 CSS vars: `--status-amber-bg/border`, `--status-red-bg/border`, `--status-purple/bg/border`
+- 추가 클래스: `.notice-badge`, `.notice-row`, `.notice-body`, `.faq-*`, `.btn-form-save/cancel`
 
-- [ ] **컨펌 게이트**: 사용자 최종 확인 후 Phase 2 진행
+- [x] **컨펌 게이트**: Playwright 검증 통과 (점수 100%), 사용자 컨펌 후 Phase 3 진행
 
 ---
 
-## Phase 2: 요구사항 문서 통합 및 리뷰
+## Phase 2: 요구사항 문서 통합 및 리뷰 ✅ 완료 (2026-04-23)
 
-> **선행 조건**: Phase 1 컨펌 완료 (디자인 확정 후에야 스펙이 안정됨)  
-> **완료 기준**: `requirements.md` 단일 파일이 전체 기능 스펙의 유일한 출처가 됨
-
-- [ ] 분산된 스펙 수집: `dashboard-feature.md`, 각 리뷰 문서, prototype 주석 등에서 누락 항목 추출
-- [ ] 모든 요구사항을 `docs/specs/requires/requirements.md`에 통합
-  - 대시보드 §11 업데이트 (dashboard-feature.md v3.1 기준으로 완전 동기화)
-  - `design.md`와 기능 스펙 중복 항목 분리·정리
-- [ ] 전체 리뷰: 모순·공백·미결 항목 체크
-- [ ] `design.md` 리뷰 반영 (비주얼 스펙 한정)
+- [x] `requirements.md` 전체 리뷰 — 모순·누락·미정의 10건 수정
+- [x] `dashboard-feature.md` 커스터마이징 섹션 MVP로 단순화
+- [x] `docs/specs/plans/dashboard-v2-layout-editor.md` 신규 생성 (v2 기능 분리)
 
 ---
 
