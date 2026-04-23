@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-23  
+> 최종 업데이트: 2026-04-23 (2차)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ---
@@ -48,24 +48,22 @@
 
 ---
 
-## Phase 3: 요구사항 문서 인덱스화
+## Phase 3: 요구사항 문서 인덱스화 ✅ 완료 (2026-04-23)
 
-> **선행 조건**: Phase 2 완료 (내용이 완성돼야 목차가 의미있음)
-
-- [ ] `requirements.md` 상단에 섹션 인덱스(앵커 링크) 추가
-- [ ] 각 섹션에 "읽어야 할 상황" 한 줄 메모 추가 (세션 시작 시 필요한 부분만 선택적으로 읽도록)
-- [ ] `claude-progress.txt` 및 세션 가이드에 "어떤 작업에 어느 섹션을 읽을 것" 매핑 추가
+- [x] `requirements.md` 상단에 문서 인덱스 테이블 추가
+- [x] §8·§9 → `feature-voc.md` 분리 (VOC 핵심 기능 명세)
+- [x] §10 → `feature-notice-faq.md` 분리 (공지·FAQ 기능 명세)
+- [x] `dashboard-feature.md` → `requires/dashboard.md` + `plans/dashboard-impl.md` 분리
+- [x] `requirements.md` §8~§11 요약 + 링크로 교체 (652줄 → 273줄)
 
 ---
 
-## Phase 4: 설계 과정 문서 정리
+## Phase 4: 설계 과정 문서 정리 ✅ 완료 (2026-04-23)
 
-> **선행 조건**: Phase 3 완료 (인덱스 완성 후 어떤 파일이 중복인지 판단 가능)
-
-- [ ] 보존 대상 확정: `docs/specs/requires/requirements.md`, `docs/specs/requires/design.md`
-- [ ] 정리 대상 식별: `docs/specs/plans/dashboard-feature.md`, `docs/specs/reviews/` 내 파일들 등
-- [ ] 정리 대상 파일 아카이브 또는 삭제 (requirements.md에 이미 통합됐으면 삭제)
-- [ ] `docs/specs/plans/`, `docs/specs/reviews/` 디렉토리 내 잔여 파일 정리
+- [x] `docs/next-session-tasks.md` 삭제 (stale 복사본)
+- [x] `docs/explanation/prototype-requirements-review.md` → `docs/specs/reviews/` 이동
+- [x] `docs/specs/plans/dashboard-feature.md` 삭제 (분리 완료)
+- [x] `docs/specs/requires/` 구조: requirements.md / design.md / feature-voc.md / feature-notice-faq.md / dashboard.md
 
 ---
 
