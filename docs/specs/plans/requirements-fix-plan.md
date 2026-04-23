@@ -149,7 +149,7 @@
   - React Context (MVP 규모 충분) vs Redux (확장성 필요 시)
   - 결정 후 requirements.md §6.2에 반영
 - [x] **FIX-29** `§4` AI 전환 대비 `tag_rules` 확장 여지 주석
-  - "v2 AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정"
+  - "NextGen AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정"
 
 ---
 

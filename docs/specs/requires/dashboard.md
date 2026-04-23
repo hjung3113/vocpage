@@ -616,8 +616,8 @@ interface AssigneeTableState {
 
 ## 커스터마이징 (MVP)
 
-> 드래그앤드롭 재배치, 위젯 크기 조절, 항목별 잠금은 v2로 이동.
-> 상세: `docs/specs/plans/dashboard-v2-layout-editor.md`
+> 드래그앤드롭 재배치, 위젯 크기 조절, 항목별 잠금은 NextGen으로 이동.
+> 상세: `docs/specs/plans/dashboard-v2-layout-editor.md` (파일명은 초안 시점 유지 — 내용은 NextGen 기능)
 
 MVP 범위: **위젯 숨기기/표시** + **기본 날짜 범위** + **히트맵 기본 X축** + **GlobalTabs 순서·숨김(Admin)**
 

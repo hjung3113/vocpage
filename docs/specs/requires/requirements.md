@@ -10,6 +10,12 @@
 | `dashboard.md` | 대시보드 요구사항 명세 — 위젯 상세·글로벌 필터·API·상태 관리·수용 기준 |
 | `design.md` | 디자인 시스템 — 색상 토큰·타이포그래피·컴포넌트·레이아웃 규칙 |
 
+### 용어
+
+- **MVP**: 현재 구축 중인 초기 시스템.
+- **NextGen**: MVP 오픈 이후의 차세대 기능(RAG/임베딩 검색, 이메일 연동, AI 엔티티 해석, FTS, SLA 에스컬레이션 등). 이전 문서에서 "v2"로 표기되던 것.
+- 리뷰 문서의 `v1`/`v2`/`v3`는 **리뷰 회차**이며 NextGen과 무관.
+
 ---
 
 ## 1. 프로젝트 개요
@@ -65,10 +71,10 @@
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
 - **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
   - `status`: 기존 `보류`를 `드랍`으로 대체 (사실상 드랍에 가깝게 운영). 상태 전환 매트릭스(§8.2) 업데이트 필요. 5단계 유지 vs 4단계(`접수/진행중/완료/드랍`)로 단순화는 다음 세션에서 확정.
-  - `structured_payload` 스키마 (v2 — 완료·드랍 시 정식 제출용, UI는 폼 기반):
+  - `structured_payload` 스키마 (완료·드랍 시 정식 제출용, UI는 폼 기반):
     ```json
     {
-      "equipment": ["설비A", "설비B"],     // text[], v2 분리
+      "equipment": ["설비A", "설비B"],     // text[]
       "maker":     ["메이커X"],             // text[]
       "model":     ["모델-123"],            // text[]
       "process":   ["공정1"],               // text[]
@@ -89,18 +95,18 @@
   - `review_status` 라이프사이클: 정식 제출 시 `unverified` → Result Review에서 `approved`/`rejected` → approve 후 "삭제 신청" 시 `pending_deletion` → 승인 시 payload clear + `review_status=NULL` 복귀. 상세 상태머신은 feature-voc.md §8.2 보강본 참조.
   - `embedding` 컬럼은 pgvector 확장 기반. **MVP 단계에서는 쓰기/읽기 모두 미사용(전량 NULL 유지)**. 생성 시점은 `review_status`가 `approved`로 전환되는 순간에만(§16 참조). 차원수 1536은 OpenAI `text-embedding-3-small` 기준 가결정 — 모델 확정 시 재검토. HNSW 인덱스(`vector_cosine_ops`)는 기능 도입 시 별도 마이그레이션으로 추가.
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
-- **`voc_payload_reviews`** (v2 신설 — 제출/삭제 리뷰 통합 로그):
+- **`voc_payload_reviews`** (제출/삭제 리뷰 통합 로그):
   - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `is_self_review boolean default false`, `created_at timestamptz default now()`.
   - 폐쇄 메뉴 케이스는 self-review 허용(감사 플래그만 남김, 별도 모니터링 대시보드 없음).
-- **`voc_payload_history`** (v2 신설 — 제출 스냅샷 이력, "이전 이력" 버튼 소스):
+- **`voc_payload_history`** (제출 스냅샷 이력, "이전 이력" 버튼 소스):
   - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `payload jsonb NOT NULL`, `submitted_by(FK→users)`, `submitted_at timestamptz default now()`, `final_state text CHECK IN ('approved','rejected','deleted','active')`, `is_current boolean default false`.
   - 인덱스: `(voc_id, submitted_at DESC)`.
   - 불변 조건: VOC당 `is_current=true` row는 최대 1건(삭제 승인 후 0건 가능). 새 제출 시 기존 is_current를 false로 내리고 새 row insert. 삭제 승인 시 해당 row `final_state='deleted'`, `is_current=false`, `vocs.structured_payload=NULL`, `vocs.review_status=NULL`. 삭제 reject 시 `vocs.review_status='approved'` 원복 + `action='deletion', decision='rejected'` row만 추가.
-- **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑. `tags.kind enum('general','menu')` — v2에서 `equipment` 카테고리 폐기(설비/공정/메이커/모델은 전부 `structured_payload`로 이동).
+- **`tags` & `voc_tags`**: 태그 정보 및 VOC와의 다대다 매핑. `tags.kind enum('general','menu')` — 기존 `equipment` 카테고리 폐기(설비/공정/메이커/모델은 전부 `structured_payload`로 이동).
   - `general`: 자유 태그 (담당자 분류용 라벨)
   - `menu`: 주메뉴(`vocs.menu_id`) 외 **영향받는 다른 메뉴**를 태깅
-  - v2 마이그레이션: `ALTER TYPE tag_kind RENAME TO tag_kind_old; CREATE TYPE tag_kind AS ENUM ('general','menu'); ALTER TABLE tags ALTER COLUMN kind TYPE tag_kind USING kind::text::tag_kind; DROP TYPE tag_kind_old;` (기존 `equipment` row는 사전 정리 필요).
-- **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소. <!-- v2 AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
+  - 초기 마이그레이션 (과거 초안의 `equipment` enum 값이 남아있는 환경 한정): `ALTER TYPE tag_kind RENAME TO tag_kind_old; CREATE TYPE tag_kind AS ENUM ('general','menu'); ALTER TABLE tags ALTER COLUMN kind TYPE tag_kind USING kind::text::tag_kind; DROP TYPE tag_kind_old;` (기존 `equipment` row는 사전 정리 필요).
+- **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소. <!-- NextGen AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
 - **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
 - **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`.
 - **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
@@ -141,16 +147,16 @@
 ### 6.2 Frontend (React)
 - `useVOCFilter`: 메뉴/상태/태그별 복합 필터링 훅.
 - `useDrawer`: 상세 보기 드로어 제어 및 상태 동기화.
-- **상태 관리:** React Context (MVP — 규모 충분). Redux는 확장성 필요 시 v2에서 검토.
+- **상태 관리:** React Context (MVP — 규모 충분). Redux는 확장성 필요 시 NextGen에서 검토.
 
 ---
 
 ## 7. 향후 확장성
 
-- **이메일 알림 (v2):** 사내 이메일 시스템 연동 (사내 시스템 접근 후 구현). 우선순위 1순위. — MVP에서 인앱 알림(30초 폴링)만으로는 Urgent VOC 누락 우려가 있어 v2 1순위로 지정.
-- **AI 자동 분류 (v2):** LLM API를 통한 고도화된 자동 태깅. 우선순위 2순위. (`tag_rules`에 `confidence_threshold float`, `model_version text` 컬럼 추가 예정)
-- **FTS 검색 (v2):** PostgreSQL Full-Text Search 도입. 우선순위 3순위.
-- **SLA 에스컬레이션 (v2):** Due Date 초과 시 자동 알림/에스컬레이션. 우선순위 4순위.
+- **이메일 알림 (NextGen):** 사내 이메일 시스템 연동 (사내 시스템 접근 후 구현). 우선순위 1순위. — MVP에서 인앱 알림(30초 폴링)만으로는 Urgent VOC 누락 우려가 있어 NextGen 1순위로 지정.
+- **AI 자동 분류 (NextGen):** LLM API를 통한 고도화된 자동 태깅. 우선순위 2순위. (`tag_rules`에 `confidence_threshold float`, `model_version text` 컬럼 추가 예정)
+- **FTS 검색 (NextGen):** PostgreSQL Full-Text Search 도입. 우선순위 3순위.
+- **SLA 에스컬레이션 (NextGen):** Due Date 초과 시 자동 알림/에스컬레이션. 우선순위 4순위.
 - **데이터 분석:** VOC 데이터를 기반으로 한 분석 시스템 메뉴별 장애/개선 통계 리포트 생성.
 - **Jira 데이터 마이그레이션:** 기존 Jira 이슈를 VOC 시스템으로 1회성 이전. **타이밍: 오픈 전 일괄 이전** (Jira CSV export → 변환 스크립트 → DB import). 오픈 이후 신규 VOC는 수동 등록. 구현 전 Jira 필드 매핑 확인 필요.
 - **Out of scope (MVP):** 이메일/슬랙 알림, SLA 에스컬레이션, 전문 검색(FTS), 2단계 이상 Sub-task 계층, AI 태깅, 벌크 상태 변경.
@@ -163,7 +169,7 @@
 
 핵심 기능 범위: VOC 식별자(Issue Code) / 상태 전환 / 권한 모델 / Priority & Due Date / 파일 첨부 / 인앱 알림 / Sub-task / 분류 체계(시스템·메뉴·유형·태그) / 삭제 정책 / 입력 제한 / 목록 필터·검색·페이지네이션 / 파일 저장소 / 댓글 정책 / 알림 폴링 / 기존 시스템 통합
 
-### 8.16 Result Review 플로우 (v2 보강 — feature-voc.md 반영 예정)
+### 8.16 Result Review 플로우
 
 - **상태 머신**: `작성중 ──임시저장──▶ draft 보유(review_status=null) ──제출──▶ unverified ──approve──▶ approved`. reject 시 `rejected` → 수정/재제출로 `unverified` 복귀. approved 이후 수정은 "승인 결과 삭제 신청" → `pending_deletion` → approve 시 payload clear로 재작성 가능, reject 시 approved 원복.
 - **완료/드랍 전환 규칙**: `status`가 완료/드랍으로 바뀔 때 `structured_payload` 정식 제출 + `review_status='unverified'` 초기화가 동시에 일어난다. 제출 스냅샷은 `voc_payload_history`에 `is_current=true`로 insert.
@@ -331,9 +337,9 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 ---
 
-## 15. 관리자 페이지: Result Review (v2 신설)
+## 15. 관리자 페이지: Result Review
 
-> v2 리뷰(`docs/specs/reviews/phase6/voc-ai-workflow-fit-review-v2.md` §8) 반영. 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
+> 출처: `docs/specs/reviews/phase6/voc-ai-workflow-fit-review-v2.md` §8. 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
 
 - **대상 행**: `review_status IN ('unverified','pending_deletion')` VOC.
 - **액션**: 각 VOC에 코멘트 + approve/reject. 결정 이력은 `voc_payload_reviews`에 `action='submission'|'deletion'` 구분으로 기록.
@@ -343,7 +349,7 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 ---
 
-## 16. AI 워크플로우 적합성 (v2)
+## 16. AI 워크플로우 적합성 (NextGen 대비)
 
 ### 16.1 태그 vs structured_payload 역할 경계
 
@@ -353,7 +359,7 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 | `structured_payload` | 담당자 정형 입력 + AI 파이프라인 입력 | equipment/maker/model/process + symptom/root_cause/resolution + related_* |
 
 - 엔티티 해석 결과를 `equipment` 태그로 누적하던 v1 초안은 **폐기**. 설비/공정/메이커/모델은 전부 `structured_payload`로 이동.
-- v2 AI 엔티티 해석이 도입될 때도 결과 쓰기 대상은 `structured_payload` 4개 배열 필드(담당자 확인/수정 후 확정).
+- NextGen AI 엔티티 해석이 도입될 때도 결과 쓰기 대상은 `structured_payload` 4개 배열 필드(담당자 확인/수정 후 확정).
 
 ### 16.2 임베딩 정책
 

@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (5차 — v2 결정사항 requirements/feature 반영 완료, v3 리뷰 예약)
+> 최종 업데이트: 2026-04-24 (5차 — v2 리뷰 결정사항 requirements/feature 반영 완료, v3 리뷰 예약)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## Reviews 폴더 구조
@@ -99,28 +99,30 @@ docs/specs/reviews/
 - [ ] **AI 워크플로우 적합성 리뷰 반영** (`reviews/phase6/voc-ai-workflow-fit-review.md`)
   - **세션 2026-04-23 진행분 (결정 완료 — requirements.md §4 반영 O)**:
     - [x] 🔴 갭 #1 (설비 마스터): 별도 테이블 불채택. `tags.kind enum('general','equipment','menu')` 3-카테고리로 대체. 외부 마스터 sync 없음.
-    - [x] 🔴 갭 #2 (LLM 정규화 저장): `vocs.structured_payload jsonb` 단일 컬럼. 실시간 AI는 v2, MVP는 담당자가 완료/드랍 시 폼으로 입력.
+    - [x] 🔴 갭 #2 (LLM 정규화 저장): `vocs.structured_payload jsonb` 단일 컬럼. 실시간 AI는 NextGen, MVP는 담당자가 완료/드랍 시 폼으로 입력.
     - [x] 🟠 갭 #3 (root_cause/resolution): `structured_payload` JSON 내부 키로 흡수 (`symptom`/`root_cause`/`resolution` 필수 텍스트).
     - [x] 보류→드랍 이름 변경 + `resolution_quality`/`drop_reason` enum 추가.
-  - **세션 2026-04-24 진행분 (v2 재결정 — 문서만 작성, requirements.md 반영 미수행)**:
+  - **세션 2026-04-24 진행분 (v2 리뷰 재결정 — 문서만 작성, requirements.md 반영 미수행)**:
     - [x] ✅ **Q1 재리뷰 완료**: `tags.kind` 2-카테고리(`general`/`menu`)로 축소. 설비 관련은 전부 `structured_payload`로 이동. 상세는 `reviews/phase6/voc-ai-workflow-fit-review-v2.md`.
     - [x] ✅ **Q2 재설계**: `structured_payload`에 `equipment`/`maker`/`model`/`process` 4필드 분리, 칩 입력 UX(실시간 검증 + auto 추가 + cascade), 4개 중 최소 1개 저장 조건.
     - [x] ✅ **리뷰 플로우 신설**: `review_status enum('unverified','approved','rejected','pending_deletion')` + `voc_payload_reviews`(리뷰 이력) + `voc_payload_history`(제출 스냅샷) 2개 테이블 추가.
     - [x] ✅ **임시저장**: `structured_payload_draft` 별도 컬럼 + "이전 이력" 버튼 로직 확정.
     - [x] ✅ **임베딩 정책**: approve 시점 생성 + `embed_stale` 플래그 (MVP는 여전히 미실행).
-  - **세션 2026-04-24 후반 진행분 (v2 requirements/feature 반영 완료)**:
-    - [x] ✅ v2 결정사항 `requirements.md` §4 스키마 반영 (structured_payload 4분리 · draft/review_status/embed_stale · voc_payload_reviews · voc_payload_history · tags.kind 축소)
+  - **세션 2026-04-24 후반 진행분 (v2 리뷰 결정 requirements/feature 반영 완료)**:
+    - [x] ✅ v2 리뷰 결정사항 `requirements.md` §4 스키마 반영 (structured_payload 4분리 · draft/review_status/embed_stale · voc_payload_reviews · voc_payload_history · tags.kind 축소)
     - [x] ✅ `requirements.md` §8.16 Result Review 플로우 요약 + §15 관리자 페이지 + §16 AI 워크플로우 적합성 신규 섹션 추가
     - [x] ✅ `feature-voc.md` §8.2.1 `review_status` 서브 상태 머신 + §9.4.5 Result Review 관리자 페이지 상세 반영
     - [x] ✅ `embed_stale` 플래그 결정 완료 — approve 시점 임베딩 재생성 트리거 용도로 `vocs`에 포함
-  - **다음 세션(v3 리뷰)에서 결정 필요**:
-    - [ ] 📌 **v3 리뷰 문서 작성**: `reviews/phase6/voc-ai-workflow-fit-review-v3.md` — 아래 미결 항목 일괄 논의
-    - [ ] Q3: `status` 5단계 유지 vs 4단계 단순화(`접수/진행중/완료/드랍`) 확정 → §8.2 매트릭스 `보류`→`드랍` 갱신 포함
-    - [ ] Q5: `is_golden_case` 플래그 추가 여부 (우수 사례 표식 → 학습 데이터 가중치 용도)
-    - [ ] Q7: `comments.visibility enum('internal','public')` 채택 여부 (작성자 공개 vs 담당자 전용)
+  - **세션 2026-04-24 말미 진행분 (v3 리뷰 토론 — Q3·Q5 확정, 용어 정리)**:
+    - [x] ✅ 📌 v3 리뷰 문서 작성 (`reviews/phase6/voc-ai-workflow-fit-review-v3.md`)
+    - [x] ✅ **Q3 확정**: `status` **5단계 유지**. 근거: `검토중`(문제 파악) vs `처리중`(실제 해결) 의미 구분 가치 있음. Jira 마이그레이션 유입은 전부 접수/검토중으로만 떨어져 enum 매핑 영향 無. review_status는 별개 축.
+    - [x] ✅ **Q5 확정**: `is_golden_case` **도입 유보(C)**. 스키마 변경 없음. MVP에서 골든 라벨링 실제 사용 계획 없음. NextGen 진입 시 태그 방식(B) vs 컬럼(A) 재판단.
+    - [x] ✅ **용어 통일**: "v2" 혼용 제거 → **NextGen** (차세대 설계) / **v2 리뷰** (회차 표기)로 분리. `requirements.md` 상단 용어 정의 섹션 추가.
+  - **다음 세션(v3 리뷰 계속)에서 결정 필요**:
+    - [ ] Q7: `comments.visibility enum('internal','public')` 채택 여부 (작성자 공개 vs 담당자 전용) ← **시작점**
     - [ ] Q8·Q9: 예약 컬럼 `source(manual|chatbot|import)`, `chatbot_session_id`, `linked_code_refs` 추가 여부 및 스키마 예약
     - [ ] Q10: 유사도 임계치 자리 예약 (`similarity_threshold` 설정 테이블 vs 환경변수 vs ENUM 상수)
-    - [ ] 🟡 갭 #6 재정리: `tag_rules` vs v2 엔티티 해석(structured_payload 4필드 입력) 역할 경계 — 2-카테고리 태그로 축소된 상태 기준으로 재서술
+    - [ ] 🟡 갭 #6 재정리: `tag_rules` vs NextGen 엔티티 해석(structured_payload 4필드 입력) 역할 경계 — 2-카테고리 태그로 축소된 상태 기준으로 재서술
     - [ ] `related_programs/db_tables/jobs/sps` 외부 시스템 검증 쿼리 구현 명세 (어떤 시스템에 어떤 API/쿼리로 물을지)
     - [ ] Phase 4 5-Expert 리뷰 미결 — AD 인증 방식 확정, §2.3 Sub-task 표현 통일, 대시보드 API endpoint 목록, 환경변수, 에러 응답 포맷, 파일명 저장 방식, KPI 목표값
 

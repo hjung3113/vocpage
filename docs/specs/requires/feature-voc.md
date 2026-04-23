@@ -32,7 +32,7 @@
 
 > **참고**: 위 테이블의 `보류`는 requirements.md §4에서 `드랍`으로 대체 결정됨. 5단계 유지 vs 4단계 단순화 결론 시 본 매트릭스도 함께 갱신 예정.
 
-#### 8.2.1 review_status 서브 상태 머신 (v2)
+#### 8.2.1 review_status 서브 상태 머신
 
 `vocs.status`가 완료 또는 드랍으로 전환되는 순간 `structured_payload` 정식 제출 + `review_status='unverified'` 초기화가 동시에 일어난다. 이후 `review_status`는 별도 서브 상태 머신으로 관리한다.
 
@@ -262,7 +262,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - 마지막 Admin 강등 불가 (경고 표시)
 - 본인 계정 역할 변경 불가
 
-#### 9.4.5 Result Review (v2 신설)
+#### 9.4.5 Result Review
 - **목적**: 완료/드랍 시 제출된 `structured_payload`를 검증 게이트로 확정/반려. 확정본만 임베딩·유사도 검색 파이프라인에 투입.
 - **대상 행**: `review_status IN ('unverified','pending_deletion')` VOC.
 - **테이블 컬럼**: 이슈 ID | 제목 | 상태(vocs.status) | 리뷰 상태(`review_status`) | 액션 종류(`submission`/`deletion`) | 담당자 | 제출자 | 제출일 | 작업(approve/reject)

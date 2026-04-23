@@ -54,7 +54,7 @@
 **B (4단계)** 권장. 근거:
 - Jira 운영 경험상 "검토중"은 실질적으로 빈 상태로 머물거나 배정 직후 바로 처리중으로 넘어가 통계가 노이즈화됨.
 - SLA(§12 SC-1) 계산은 Priority 변경 시점 기준이라 중간 단계 수가 지표에 영향 없음.
-- AI 자동 분류(v2)가 도입되면 `review_status=unverified`가 "조사 중" 뉘앙스를 대체할 수 있음.
+- AI 자동 분류(NextGen)가 도입되면 `review_status=unverified`가 "조사 중" 뉘앙스를 대체할 수 있음.
 
 **결정 시 파급**:
 - `vocs.status` enum 축소
@@ -67,26 +67,26 @@
 
 ### 2.1 논점
 
-"이 VOC는 해결 사례로서 특히 모범적이다"라는 별도 플래그를 둘지. 용도: (1) FAQ·지식베이스 소스로 우대, (2) v2 RAG에서 retrieval 가중치 상향, (3) 담당자 교육 자료.
+"이 VOC는 해결 사례로서 특히 모범적이다"라는 별도 플래그를 둘지. 용도: (1) FAQ·지식베이스 소스로 우대, (2) NextGen RAG에서 retrieval 가중치 상향, (3) 담당자 교육 자료.
 
 ### 2.2 옵션
 
 **A. `vocs.is_golden_case boolean default false`** 컬럼 추가 (Manager/Admin 수동 토글)
 **B. 플래그 없이 태그(`general:golden`)로 대체**
-**C. 도입 유보** — v2 RAG 실제 운영 후 필요성 판단
+**C. 도입 유보** — NextGen RAG 실제 운영 후 필요성 판단
 
 ### 2.3 트레이드오프
 
 - A: 필드가 1급 시민이 되어 대시보드/임베딩 가중치 쿼리 단순. 오남용(아무거나 golden 체크) 위험.
 - B: 스키마 변경 없음. 태그는 자유 생성이라 권한 거버넌스 약함.
-- C: MVP 범위 보호. v2 도입 시점에 마이그레이션 1회 비용 감수.
+- C: MVP 범위 보호. NextGen 도입 시점에 마이그레이션 1회 비용 감수.
 
 ### 2.4 권장 (잠정)
 
-**C 유보 + C의 대체 조치로 "embed_stale처럼 컬럼 자리만 예약"**. 정책·UI는 v2에서 확정. 스키마 예약만 커밋해두면 나중에 backfill 비용이 줄어든다.
+**C 유보 + C의 대체 조치로 "embed_stale처럼 컬럼 자리만 예약"**. 정책·UI는 NextGen에서 확정. 스키마 예약만 커밋해두면 나중에 backfill 비용이 줄어든다.
 
 ```sql
--- MVP: 컬럼 생성만. UI/API는 v2.
+-- MVP: 컬럼 생성만. UI/API는 NextGen.
 ALTER TABLE vocs ADD COLUMN is_golden_case boolean DEFAULT false;
 ```
 
@@ -123,7 +123,7 @@ ALTER TABLE vocs ADD COLUMN is_golden_case boolean DEFAULT false;
 
 ### 4.1 후보 컬럼
 
-| 컬럼 | 용도 (v2+) | MVP 동작 |
+| 컬럼 | 용도 (NextGen+) | MVP 동작 |
 |---|---|---|
 | `vocs.source` enum('manual','chatbot','import') | 입력 경로 추적. 챗봇/마이그레이션 유입 분리. | 전부 'manual' 고정 |
 | `vocs.chatbot_session_id text` | 챗봇 유입 시 원 대화 세션 참조 | NULL 유지 |
@@ -133,7 +133,7 @@ ALTER TABLE vocs ADD COLUMN is_golden_case boolean DEFAULT false;
 
 세 컬럼 모두 **MVP 스키마에 예약**. 이유:
 - Jira 마이그레이션(§7 확장성)이 오픈 전 일괄 이전이므로 `source='import'` 값이 실제로 필요.
-- 나머지 둘은 v2 기능이 들어올 때 backfill 하지 않고 즉시 쓸 수 있게 자리만 확보.
+- 나머지 둘은 NextGen 기능이 들어올 때 backfill 하지 않고 즉시 쓸 수 있게 자리만 확보.
 
 ```sql
 ALTER TABLE vocs
@@ -149,7 +149,7 @@ ALTER TABLE vocs
 
 ### 5.1 논점
 
-v2 RAG에서 "유사 VOC 자동 연결" 기능이 도입될 때 threshold(예: 0.82)를 어디에 두나.
+NextGen RAG에서 "유사 VOC 자동 연결" 기능이 도입될 때 threshold(예: 0.82)를 어디에 두나.
 
 ### 5.2 옵션
 
@@ -170,7 +170,7 @@ CREATE TABLE system_settings (
   updated_by uuid REFERENCES users(id),
   updated_at timestamptz DEFAULT now()
 );
--- 초기 row는 v2 기능 진입 시 insert. MVP는 테이블만 생성.
+-- 초기 row는 NextGen 기능 진입 시 insert. MVP는 테이블만 생성.
 ```
 
 ---
@@ -179,19 +179,19 @@ CREATE TABLE system_settings (
 
 ### 6.1 현 상태
 
-- v2에서 `tags.kind`는 `general`/`menu` 2종. 설비·모델·메이커·공정은 `structured_payload`로 이동.
+- v2 리뷰 결정에 따라 `tags.kind`는 `general`/`menu` 2종. 설비·모델·메이커·공정은 `structured_payload`로 이동.
 - 그런데 `tag_rules`(자동 태깅)는 여전히 v1 잔재로 "본문 키워드 → 태그" 규칙 기반.
 
 ### 6.2 문제
 
-- 엔티티 해석(v2 AI)이 `structured_payload.equipment`를 채운다. 자동 태깅은 `tags.general`을 채운다.
+- 엔티티 해석(NextGen AI)이 `structured_payload.equipment`를 채운다. 자동 태깅은 `tags.general`을 채운다.
 - 두 경로가 서로 건드리지 않으면 괜찮지만, "고장/긴급/재현불가" 같은 의미 태그는 `tag_rules`에 남기고, "설비명/모델명 등 엔티티성 단어"는 `structured_payload`로 라우팅해야 한다.
 
 ### 6.3 권장 규칙
 
 - **`tag_rules` 역할 한정**: 의미·감정 분류에만 사용(예: "urgent", "duplicate-candidate"). 엔티티 탐지는 금지.
 - **엔티티 해석 파이프라인 출력처 한정**: `structured_payload` 4개 배열 필드만. 태그 쓰기 금지.
-- 마이그레이션 시점: v2 엔티티 해석 도입 시 기존 `tag_rules` 중 설비/모델/메이커 규칙은 삭제 또는 deprecation.
+- 마이그레이션 시점: NextGen 엔티티 해석 도입 시 기존 `tag_rules` 중 설비/모델/메이커 규칙은 삭제 또는 deprecation.
 
 ### 6.4 requirements.md 반영 위치
 
@@ -220,7 +220,7 @@ CREATE TABLE system_settings (
 **A+C 하이브리드**:
 - 마스터 시스템이 REST API를 제공하면 우선 A로 on-demand 검증.
 - 응답 p95 >500ms 또는 장애 잦은 경우 C(야간 sync 캐시)로 전환.
-- 장애 fallback은 v2 §4.5 정책 유지(`review_status='unverified'`).
+- 장애 fallback은 v2 리뷰 §4.5 정책 유지(`review_status='unverified'`).
 
 ### 7.5 다음 액션
 
@@ -244,8 +244,8 @@ CREATE TABLE system_settings (
 - 권장: §11에 `GET /api/dashboard/{widget-slug}` 목록 표 추가 (11종).
 
 ### 8.4 환경변수 누락
-- 현재 §14.1 9종. 추가 필요 후보: `AUTH_MODE`, `SIMILARITY_THRESHOLD`(v2), `EMBEDDING_MODEL_VERSION`(v2), `LOG_LEVEL`.
-- 권장: MVP 기준으로 `AUTH_MODE`, `LOG_LEVEL`만 먼저 추가. v2 값들은 v2 진입 시.
+- 현재 §14.1 9종. 추가 필요 후보: `AUTH_MODE`, `SIMILARITY_THRESHOLD`(NextGen), `EMBEDDING_MODEL_VERSION`(NextGen), `LOG_LEVEL`.
+- 권장: MVP 기준으로 `AUTH_MODE`, `LOG_LEVEL`만 먼저 추가. NextGen 값들은 NextGen 진입 시.
 
 ### 8.5 에러 응답 포맷
 - §6.1에 `{code,message,details}` 정의되어 있음. 갭 없음.
@@ -277,5 +277,5 @@ CREATE TABLE system_settings (
 ## 10. 범위 밖
 
 - 실구현 (Phase 7)
-- 디자인 시스템 변경 (design.md는 v2에서 수정 안 함)
+- 디자인 시스템 변경 (design.md는 NextGen에서 수정 안 함)
 - 대시보드 위젯 사양 변경 (dashboard.md 고정)
