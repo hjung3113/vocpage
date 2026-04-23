@@ -891,7 +891,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 .sla-rate.good{color:light-dark(oklch(42% .17 152),oklch(66% .19 155));}
 .sla-rate.warn{color:light-dark(oklch(50% .16 68),oklch(72% .16 72));}
 .sla-rate.bad{color:light-dark(oklch(50% .18 22),oklch(68% .20 22));}
-.aging-section{padding-top:12px;border-top:1px solid var(--border-subtle);}
+.aging-section{padding-top:0;}
 .aging-legend{display:flex;gap:10px;margin-bottom:8px;}
 .aging-legend-item{font-size:10px;font-weight:600;color:var(--text-quaternary);display:flex;align-items:center;gap:4px;}
 .aging-legend-item::before{content:'';width:8px;height:8px;border-radius:2px;display:inline-block;}
@@ -1452,12 +1452,20 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
       </div>
     </div>
 
-    <!-- 처리속도 & 에이징 카드 -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">처리속도 &amp; 에이징</div>
+    <!-- 처리속도 & 에이징 — 2개 카드 좌우 배치 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">처리속도</div>
+        </div>
+        <div id="slaCardWrap"></div>
       </div>
-      <div id="sysCardGrid"></div>
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">에이징</div>
+        </div>
+        <div id="agingCardWrap"></div>
+      </div>
     </div>
 
     <!-- 담당자별 처리 현황 -->
@@ -3989,7 +3997,8 @@ function dashApplyGlobalTabState() {
     menuSelect.innerHTML = `<option value="">메뉴: 전체</option>` + menus.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
   }
   dashRenderHeatmap();
-  const gridEl = document.getElementById('sysCardGrid');
+  const slaEl = document.getElementById('slaCardWrap');
+  const agingEl = document.getElementById('agingCardWrap');
   let slaItems;
   if (isAll) {
     slaItems = DASH_SYS_DATA.map(s => ({ name: s.name, d: DASH_SLA.systems[s.name] || { avg:0, sla:0, safe:0, warn:0, crit:0 } }));
@@ -4013,11 +4022,12 @@ function dashApplyGlobalTabState() {
       <div class="aging-bar"><div class="aging-seg safe" style="width:${sp}%"></div><div class="aging-seg warn" style="width:${wp}%"></div><div class="aging-seg crit" style="width:${cp}%"></div></div>
     </div>`;
   }).join('');
-  gridEl.innerHTML = `
+  slaEl.innerHTML = `
     <div class="sla-section">
       <div class="sla-header"><span>시스템</span><span class="sla-col-avg">평균 처리</span><span class="sla-col-rate">SLA 준수</span></div>
       ${slaRows}
-    </div>
+    </div>`;
+  agingEl.innerHTML = `
     <div class="aging-section">
       <div class="aging-legend"><span class="aging-legend-item safe">≤7일</span><span class="aging-legend-item warn">8~30일</span><span class="aging-legend-item crit">31일+</span></div>
       ${agingBars}

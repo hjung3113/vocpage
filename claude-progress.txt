@@ -4,7 +4,49 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ → **다음: Phase 3** (requirements.md 인덱스화)
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ → **다음: Phase 5** (구현 착수 준비)
+
+### 다음 세션 우선순위
+
+1. **구현 착수 결정** — requirements.md 85점 달성. 구현 시작 승인 시 프로젝트 스캐폴딩
+2. **prototype.html 추가 수정** — 필요한 경우 Urgent 알림 느낌표 배지 시각화 확인
+
+## 완료된 작업 (2026-04-23 — Phase 4 requirements.md 5-Expert 리뷰 반영)
+
+- **prototype.html 수정** ✅ — 처리속도 & 에이징 위젯 2개 카드로 분리, 좌우 나란히 배치
+- **5-Expert 체크리스트 리뷰** ✅ — `requirements-5expert-review-2026-04-23.md` 작성 (43점 → 85점)
+- **인터뷰 5건 완료** ✅
+  - AD 인증: OIDC / OAuth2 확정
+  - SLA 목표: 준수율 70%, 기한 = Priority Due Date 기준
+  - 이메일 MVP: v2 1순위 이유 명시 + Urgent 느낌표(!) 배지
+  - Jira 마이그레이션: 오픈 전 일괄 이전, 이후 신규 수동
+  - 성공 기준: SLA 70% + Jira 완전 전환 + Due Date 내 처리
+- **requirements.md 대규모 보강** ✅
+  - §2.1: AD OIDC 확정 (TBD 해소)
+  - §3: Node.js 20 LTS, PostgreSQL 16 버전 명시
+  - §6.1: validateADSession OIDC 상세, 에러 응답 포맷, 헬스체크, CSRF, getVOCList 필터 규칙
+  - §7: 이메일 v2 이유 명시, Jira 마이그레이션 타이밍 확정
+  - §8.3: 공지/FAQ 권한 행 추가
+  - §8.5: 파일명 UUID rename 추가
+  - §8.6: Urgent 알림 빨간 느낌표 배지
+  - §8.14: 폴링 ETag + 304 캐시 전략
+  - §9.9: "선택적" → URL 파라미터 우선, 복원 구현 필수 확정
+  - §11.1: SLA 70% 목표, amber 경고 표시
+  - §12: 성공 기준 3가지 (신규)
+  - §13: 테스트 전략 — AC 형식, 커버리지 목표, 성능 기준 (신규)
+  - §14: 운영 설정 — 환경변수, Docker 구성, 헬스체크, 로깅, 백업/롤백 (신규)
+
+## 완료된 작업 (2026-04-23 — Phase 3 requirements.md 전체 수정)
+
+- **인터뷰 A/B/C 완료 및 반영** ✅
+  - A: AD 연동 방식 TBD (사내 시스템 접근 후 확정), A-3 독립 SPA 확정, 개발환경 실 AD 직접 연결
+  - B: Admin/Manager 기능 권한 동일, INIT_ADMIN_EMAIL 환경변수, 역할 회수 수동 처리
+  - C: 일 10건 이내, 이메일 v2, Due Date MVP 포함 (Priority별 기본값: 긴급1주/높음2주/보통1달/낮음3달), Jira CSV 마이그레이션 스크립트 추가
+- **FIX-01~29 전체 완료** ✅ (requirements-fix-plan.md 전체 [x] 처리)
+  - P0 (9건): Sub-task 1레벨, 태그 편집 권한, notices/faqs/faq_categories 스키마, FAQ 카테고리 FK, 파일 보안(SVG/Content-Disposition/GIF), 계층형 목록 표시 규칙, 대시보드 API §11.7
+  - P1 (10건): Sub-task 순번, 댓글 이미지 경로, Soft Delete 첨부파일 접근, 알림 보관 정책, 댓글 Hard Delete 의도, 공지 복원 권한, slug UNIQUE 제약, dashboard_settings JSONB 예시, 마지막 Admin 판정, DB sequence 이름 규칙
+  - P2 (7건): 하이라이팅 대상, 전체화면 전환 방식, 단일/복수 팝업 구분, 빈 메뉴 안내, User 전체VOC 배지 숨김, Manager 잠금 아이콘, 폴링 에러 처리
+  - P3 (3건): 로드맵 우선순위, React Context 상태관리 확정, tag_rules AI 전환 주석
 
 ## 완료된 작업 (2026-04-23 — Phase 1 디자인 통일성 확보)
 
