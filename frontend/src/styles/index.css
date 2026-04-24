@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+
+/*
+  @theme values mirror tokens.ts.
+  In Phase 6-9, generate this block from tokens.ts via a build script.
+  Until then, keep manually in sync.
+*/
+@theme {
+  --color-brand: oklch(56.5% 0.196 261.3);
+  --color-accent: oklch(60% 0.15 200);
+  --color-bg-app: oklch(14% 0.01 264);
+  --color-text-primary: oklch(95% 0.003 264.5);
+  --color-text-secondary: oklch(65% 0.012 264);
+}
+
+:root {
+  --bg-app: oklch(14% 0.01 264);
+  --bg-panel: oklch(17% 0.01 264);
+  --bg-surface: oklch(20% 0.012 264);
+  --brand: oklch(56.5% 0.196 261.3);
+  --text-primary: oklch(95% 0.003 264.5);
+  --text-secondary: oklch(65% 0.012 264);
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+}
