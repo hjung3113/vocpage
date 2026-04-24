@@ -4,14 +4,19 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **6-4 ✅ / 6-5 ✅ / 6-6 ✅ / 6-7 ✅ / 6-3 ✅ → 다음: 6-8 상태 관리 문서화**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **6-4 ✅ / 6-5 ✅ / 6-6 ✅ / 6-7 ✅ / 6-3 ✅ → 다음: Phase 7 진입 전 Preflight 수정**
 
 ### 다음 세션 우선순위
 
-1. **6-8 상태 관리 문서화** — React Context 확정, 전역 상태 범위 목록화 (문서화만)
-2. **6-9 Prototype → 컴포넌트** — prototype.html 컴포넌트 단위 분해, 구현 순서 티켓화
-3. **Phase 7 진입 준비** — Phase 6 전 항목 완료 후 실구현 시작
-   ※ 설비 마스터 MSSQL 스키마(`external-masters.md §3`) — 담당자 자료 수집 후 별도 보완
+⚠️ **Phase 7 진입 전 필수 확인**: `docs/specs/reviews/phase6/phase7-preflight-adversarial-review.md` 참조
+
+1. **migration 003 컬럼 누락 확인 + 수정** — `parent_id` / `issue_code` / `due_date` 존재 여부 확인, 없으면 migration 패치
+2. **enum + 컬럼명 drift 해소** — `'접수'` vs `'접수됨'`, `author_id` vs `reporter_id` 3-way 통일 (migration + openapi.yaml + spec)
+3. **openapi.yaml 누락 엔드포인트 추가** — Result Review, Payload 제출/이력, Timeline, 공지/FAQ Admin CRUD, 파일 다운로드
+4. **세션 스토어 확정** — `connect-pg-simple` 채택 → requirements.md §14.1 반영
+5. 위 완료 후 → **6-8 상태 관리 문서화** (첫 FE PR 동반 가능)
+6. 위 완료 후 → **Phase 7 실구현 시작**
+   ※ 설비 마스터 MSSQL 스키마 TBD — blocking 아님, stub 전략으로 Phase 7 전체 구현 가능
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 
