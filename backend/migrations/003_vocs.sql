@@ -108,3 +108,6 @@ CREATE TABLE voc_payload_history (
   final_state   text        CHECK (final_state IN ('approved','rejected','deleted','active')),
   is_current    boolean     NOT NULL DEFAULT false
 );
+
+-- 동시 제출 경합 방지: VOC당 is_current=true인 row는 최대 1개
+CREATE UNIQUE INDEX ON voc_payload_history (voc_id) WHERE is_current = true;

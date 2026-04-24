@@ -73,7 +73,7 @@
 - **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe, 전역 UNIQUE)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성. `slug` 제약: `(system_id, slug)` 복합 UNIQUE.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수됨/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
   - `status`: **5단계 유지 확정** (v3 §1.4, 2026-04-24). 기존 `보류`를 `드랍`으로 대체. 4단계 축소 옵션은 폐기 — 분석 업무 특성상 `검토중`(조사) vs `처리중`(착수)의 의미 구분 유지 가치 있음. 상태 전환 매트릭스는 §8.2.
   - `source`: VOC 생성 출처 구분. `manual` = 웹 UI 폼 입력(User/Manager), `import` = Jira 이관 스크립트(MVP 오픈 전 1회성).
     - **PG enum 대신 text+CHECK** 선택 — 향후 값 추가/제거 유연성(`chatbot` 등 NextGen 가능성).
@@ -85,6 +85,7 @@
       - 리스트 필터 UI: MVP는 미포함 (선택지 `import` 단일이라 무의미). NextGen에서 값 추가 시 드롭다운 도입.
       - API 응답: `GET /api/vocs/:id` 및 목록 응답에 `source` 기본 포함.
   - `structured_payload` 스키마 (완료·드랍 시 정식 제출용, UI는 폼 기반):
+
     ```json
     {
       "equipment": ["설비A", "설비B"],     // text[]
@@ -107,9 +108,11 @@
     - 정식 저장 검증: `equipment`/`maker`/`model`/`process` 중 **최소 1개 배열에 값** + `symptom`/`root_cause`/`resolution` 텍스트 3종 비어있지 않음. 전부 빈 배열이면 저장 차단.
     - 임시저장(`structured_payload_draft`)은 필수 필드 검증 면제, 최신 1건만 유지 (이력 없음).
     - `unverified_fields`: **BE가 저장 시점에 자체 메모리(§16.3 외부 마스터 캐시)로 재검증**하여 계산 (FE body 플래그 신뢰 금지). 하나라도 차면 `vocs.review_status='unverified'` 동반 세팅. 리뷰 화면에서 해당 필드에 경고 배지 표시.
+
   - **외부 참조 검증 정책**: 편집 세션 동안 FE는 BE 메모리 캐시(§16.3)에서 자동완성·존재 검증. 저장 시 BE가 단일 진실 원천으로 재검증 → 실패 필드는 `unverified_fields`에 기록 + `review_status='unverified'`. 저장 시점 외부 API 호출은 **0건**.
   - `review_status` 라이프사이클: 정식 제출 시 `unverified` → Result Review에서 `approved`/`rejected` → approve 후 "삭제 신청" 시 `pending_deletion` → 승인 시 payload clear + `review_status=NULL` 복귀. 상세 상태머신은 feature-voc.md §8.2 보강본 참조.
   - `embedding` 컬럼은 pgvector 확장 기반. **MVP 단계에서는 쓰기/읽기 모두 미사용(전량 NULL 유지)**. 생성 시점은 `review_status`가 `approved`로 전환되는 순간에만(§16 참조). 차원수 1536은 OpenAI `text-embedding-3-small` 기준 가결정 — 모델 확정 시 재검토. HNSW 인덱스(`vector_cosine_ops`)는 기능 도입 시 별도 마이그레이션으로 추가.
+
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
 - **`voc_payload_reviews`** (제출/삭제 리뷰 통합 로그):
   - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `is_self_review boolean default false`, `created_at timestamptz default now()`.
@@ -339,9 +342,9 @@ Then  [기대 결과/응답]
 예시 (상태 전환):
 
 ```
-Given Manager가 로그인된 상태, VOC가 '접수됨' 상태
+Given Manager가 로그인된 상태, VOC가 '접수' 상태
 When  PATCH /api/vocs/:id/status { status: '처리중' } 요청
-Then  400 반환, body: { code: 'INVALID_TRANSITION', message: '접수됨 → 처리중 전환 불가' }
+Then  400 반환, body: { code: 'INVALID_TRANSITION', message: '접수 → 처리중 전환 불가' }
 ```
 
 예시 (권한):
@@ -392,6 +395,8 @@ Then  403 반환, body: { code: 'FORBIDDEN' }
 | `AUTH_MODE`          | `mock` \| `oidc`                         | 인증 모드. 로컬·개발은 `mock`(목 유저 주입), 스테이징·운영은 `oidc`(실 AD 연결). v3 §8.1. |
 | `VITE_AUTH_MODE`     | `mock` \| `oidc`                         | FE 인증 모드. `mock`이면 `/mock-login` 라우트 활성화. BE `AUTH_MODE`와 값이 동일해야 함.  |
 | `LOG_LEVEL`          | `info`                                   | 로그 레벨 (`error`/`info`/`debug`). 운영=`error`, 개발=`info`, 로컬=`debug`. v3 §8.4.     |
+
+**세션 스토어**: `connect-pg-simple` 채택. 기존 PostgreSQL(`DATABASE_URL`)을 재사용하므로 별도 인프라 불필요. 개발(`MemoryStore`)과 운영(`connect-pg-simple`) 전환은 `NODE_ENV`로 자동 분기. 세션 테이블은 `connect-pg-simple` 내장 DDL로 자동 생성.
 
 ### 14.2 Docker 구성 개요
 
