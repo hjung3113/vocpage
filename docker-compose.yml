@@ -33,10 +33,16 @@ services:
       - "3001:3000"
     volumes:
       - uploads_data:/app/backend/uploads
-      - ./backend/src:/app/backend/src
+      - ./backend:/app/backend
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   frontend:
     build:
@@ -47,9 +53,10 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend/src:/app/frontend/src
+      - ./frontend:/app/frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:

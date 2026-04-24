@@ -232,6 +232,18 @@ docs/specs/reviews/
 > - Docker 내부 컨테이너 간 통신은 서비스명(`backend:3000`) 사용 — 영향 없음
 > - PR 머지 후 팀 환경에 맞게 포트 조정 필요 시 docker-compose.yml 수정
 
+#### PR #14 리뷰 후 defer된 기술부채
+
+> PR #14 코드 리뷰(2026-04-24)에서 식별됐으나 Phase 6-4 스코프 밖으로 분류된 항목.
+
+| 항목                                                                               | 처리 시점                               | 비고                                                                        |
+| ---------------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
+| `frontend/src/styles/index.css` raw OKLCH 중복 — `@theme`과 `:root` 양쪽 정의      | **Phase 6-9** (Prototype→컴포넌트 단계) | `tokens.ts` 단일 소스화 시 정리                                             |
+| `ts-node-dev` → `tsx watch` 교체 — Node 22에서 불안정 이슈 있음                    | **6-6 이전 또는 6-7**                   | `tsx` 설치 후 `package.json` dev 스크립트 교체만으로 완료                   |
+| ESLint hex 정규식 강화 — `TemplateElement` 미커버 (template literal 안 hex 허용됨) | **6-9 또는 첫 FE 컴포넌트 작업 전**     | `.eslintrc.base.js` `no-restricted-syntax` 에 `TemplateElement` 셀렉터 추가 |
+| 구조화 로깅 (pino) 도입 — 현재 `console.log` 기반                                  | **BE 라우트 추가 단계 (7.x~)**          | 첫 라우트 추가 전에 baseline 잡을 것                                        |
+| Dockerfile production stage 추가 — 현재 dev stage만 존재                           | **배포 준비 단계**                      | 지금 `ts-node-dev`가 유일한 시작 경로                                       |
+
 ### 6-5. FE-BE API 계약
 
 - [ ] OpenAPI spec 또는 공유 타입 방식 결정 — 타입 불일치 방지 (예: `shared/types/` 패키지)
