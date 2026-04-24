@@ -31,9 +31,11 @@ docs/specs/reviews/
 ├── phase0/   prototype-requirements-review.md
 ├── phase2/   requirements-expert-review-2026-04-23.md, REVIEW-notice-faq.md
 ├── phase4/   requirements-5expert-review-2026-04-23.md
-└── phase6/   design-enforcement.md   ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
-             voc-ai-workflow-fit-review.md     ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
-             voc-ai-workflow-fit-review-v2.md  ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
+└── phase6/   design-enforcement.md              ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
+             voc-ai-workflow-fit-review.md        ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
+             voc-ai-workflow-fit-review-v2.md     ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
+             voc-ai-workflow-fit-review-v3.md     ← Phase 6-1 v3 (2026-04-24, Q3~Q10 + 갭#6 + 7A 확정)
+             phase7-preflight-adversarial-review.md ← Phase 7 진입 전 적대적 리뷰 (2026-04-24) ★현재
 ```
 
 ---
