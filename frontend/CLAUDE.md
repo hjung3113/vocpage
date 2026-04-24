@@ -4,9 +4,9 @@ React SPA for the VOC management system. Read root `CLAUDE.md` first for cross-c
 
 ## Status
 
-Not yet scaffolded. This file is a spec stub — it captures architectural decisions so design-phase planning stays consistent.
+Phase 6 implementation in progress. `src/` is scaffolded with `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, and `api/`.
 
-## Commands (once scaffolded)
+## Commands
 
 ```bash
 npm run dev                              # Vite dev server
@@ -29,6 +29,7 @@ Token pipeline: `src/tokens.ts` → `tailwind.config.ts` (utility classes) + CSS
 Full token reference: `docs/specs/requires/design.md §10 CSS Reference` and `§12 Token Architecture`.
 
 **When to use which:**
+
 - Layout / spacing / flex / grid → Tailwind utility (`flex gap-2 px-4`)
 - Static color on a standard element → Tailwind utility (`bg-brand text-primary`)
 - Dynamic color passed to JS (charts, Toast UI, canvas) → import from `tokens.ts` directly
@@ -36,6 +37,7 @@ Full token reference: `docs/specs/requires/design.md §10 CSS Reference` and `§
 - Custom CSS / `@apply` → CSS var (`color: var(--text-primary)`)
 
 **Hard rules:**
+
 - Never write hex or raw OKLCH values outside of `src/tokens.ts`
 - If a token doesn't exist for what you need, add it to `src/tokens.ts` + `design.md §12` first, then use it
 - Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)

@@ -4,9 +4,9 @@ Express REST API for the VOC management system. Read root `CLAUDE.md` first for 
 
 ## Status
 
-Not yet scaffolded. This file is a spec stub — it captures architectural decisions so design-phase planning stays consistent.
+Phase 6 implementation in progress. `src/` is scaffolded with `index.ts`, `auth/`, and `routes/`.
 
-## Commands (once scaffolded)
+## Commands
 
 ```bash
 npm run dev                                      # ts-node-dev watch
