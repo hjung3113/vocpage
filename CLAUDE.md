@@ -66,8 +66,10 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
     - `--squash`: destroys commit history
     - `--rebase`: replays commits directly onto main, erasing PR boundaries
     - `--merge`: preserves both the merge commit (PR boundary) and individual commits ✓
+  - After merging, delete the local branch: `git branch -D <branch>`
   - Review fixes follow the same rule: new `fix/<topic>` branch → PR → `--merge`
   - main changes only via PR — direct push and force push are forbidden
+  - These rules are enforced by hookify rules in `.claude/hookify.block-*.local.md`
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - CLAUDE.md stays under 200 lines
