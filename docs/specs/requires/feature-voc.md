@@ -64,7 +64,9 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 | 담당자 배정                    |  ❌  |   ✅    |  ✅   |
 | Priority 설정                  |  ❌  |   ✅    |  ✅   |
 | VOC Soft Delete                |  ❌  |   ❌    |  ✅   |
-| 시스템/메뉴/유형/태그규칙 관리 |  ❌  |   ❌    |  ✅   |
+| 시스템/메뉴/유형 관리          |  ❌  |   ❌    |  ✅   |
+| 태그 규칙 관리(생성/수정/삭제) |  ❌  |   ✅    |  ✅   |
+| 신규 태그 생성                 |  ❌  |   ✅    |  ✅   |
 | 사용자 권한 관리               |  ❌  |   ❌    |  ✅   |
 | 태그 수동 편집                 |  ❌  |   ✅    |  ✅   |
 | 공지사항 작성/관리             |  ❌  |   ✅    |  ✅   |
@@ -72,7 +74,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 | 공지사항 복원                  |  ❌  |   ❌    |  ✅   |
 
 - Admin과 Manager의 기능 권한은 동일. Admin은 Manager 관리(역할 부여/회수) 권한이 추가된 역할.
-- Manager는 Admin과 동일하게 전체 VOC를 조회할 수 있으나, Soft Delete/시스템·메뉴·유형·태그규칙·사용자 권한 관리 기능만 제외.
+- Manager는 Admin과 동일하게 전체 VOC를 조회할 수 있으나, Soft Delete/시스템·메뉴·유형·사용자 권한 관리 기능만 제외. 태그 규칙 관리 및 신규 태그 생성은 Manager도 가능.
 - 최초 Admin 계정: 서버 초기화 시 환경변수 `INIT_ADMIN_EMAIL` 지정 계정을 admin role로 seed.
 - 퇴직·부서이동 시 역할 회수 및 `is_active` 비활성화는 Admin이 수동 처리.
 - 마지막 Admin 강등 불가 판정 기준: `is_active = true AND role = 'admin'` 인 계정 수 ≥ 2일 때만 강등 가능. 권한 변경 API에서 트랜잭션 내 사후 Admin 수 검증.
