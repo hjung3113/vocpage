@@ -15,7 +15,7 @@ This is a **greenfield VOC (Voice of Customer) management system** currently in 
 | Database | PostgreSQL |
 | Testing | Vitest (frontend), Jest + Supertest (backend) |
 | Container | Docker + Docker Compose |
-| Styling | Linear-inspired design system (custom, dark-mode-first) |
+| Styling | Tailwind CSS v4 + CSS custom properties (혼용) — `tokens.ts` 단일 소스 |
 
 ## Sub-directory Guides
 

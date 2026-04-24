@@ -92,6 +92,45 @@ docs/specs/reviews/
 
 > **선행 조건**: Phase 1~5 완료 — 스펙·문서 완비 후 구현 진입
 
+### 권고 실행 순서 (2026-04-24 재조정)
+
+```
+6-4 스캐폴딩 & 개발환경   ← 모든 것의 기반, 가장 먼저
+6-6 인증 Mock 전략        ← 블로킹. AUTH_MODE=mock 없이 API 테스트 불가
+6-7 DB 마이그레이션 & 시드 ← 테이블 없이 통합 테스트 작성 불가
+6-5 FE-BE API 계약        ← DB + Auth 확정 후 API shape 정의
+6-3 BE 테스트 전략         ← API shape 알아야 케이스 목록 작성 가능
+6-8 상태 관리 방식 확정    ← React Context로 이미 확정, 문서화만
+6-9 Prototype → 컴포넌트  ← FE 전용, 언제든 가능
+```
+
+> 기존 번호(6-3~6-9)는 참조 안정성을 위해 유지. 위 순서대로 진행.
+
+### 구현 전 결정 필요 사항 (미결)
+
+> 이 항목들이 미결인 채로 구현에 진입하면 중간에 구조 변경이 강제됩니다.
+
+#### 🔴 고위험 (반드시 6-4 시작 전 결정)
+
+> Phase 6 세션 시작 시 `phase6/CLAUDE.md` 를 먼저 읽을 것 — 미결 항목 현황 및 brainstorming 재개 지침 포함.
+
+| 항목 | 결정 | 상태 |
+|---|---|---|
+| **DB 마이그레이션 도구** | **node-pg-migrate** | ✅ 2026-04-24 확정 |
+| **Mock API 전략** | **MSW (Mock Service Worker)** | ✅ 2026-04-24 확정 |
+| **FE-BE 타입 공유 방식** | **OpenAPI codegen (`openapi-typescript`)** — `openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성, Swagger UI BE dev 마운트 | ✅ 2026-04-24 확정 |
+| **파일 업로드 미들웨어** | **multer + DiskStorage** — Docker named volume(`uploads_data`), `voc_attachments` 메타데이터만 저장, MVP 후 S3 교체 가능 | ✅ 2026-04-24 확정 |
+| **MSSQL 연결 드라이버** | **mssql npm 패키지** — 읽기 전용, BE 부팅 시 pool 1회 생성 | ✅ 2026-04-24 확정 |
+
+#### 🟠 중위험 (나중에 바꾸면 리팩 발생)
+
+| 항목 | 비고 |
+|---|---|
+| **세션 스토어** | 개발: 메모리, 운영: ? — express-session store 결정 필요 |
+| **CORS 정책** | Dev 환경 FE:5173 ↔ BE:3000 — Vite proxy vs BE cors() 미들웨어 |
+| **issue_code prefix** | `ANALYSIS-2025-0001` 고정 prefix인지, systems 테이블 기반인지 불명확 |
+| **React Query staleTime** | 대시보드 5분 확정, VOC 목록 등 나머지 페이지 기본값 미정 |
+
 ### 6-1. 피드백 반영 → 스펙 최종 확정
 - [ ] 리뷰 결과를 `design.md`에 반영 (영어, 비주얼 스펙만)
 - [ ] 기능 변경 시 `requirements.md`에 반영 (한국어, 기능 스펙만)
@@ -145,14 +184,16 @@ docs/specs/reviews/
       - §12 SLA 분모에서 `source='import'` 제외 명시
       - §16.3 외부 마스터 연동 정책 전면 개편 (7A 10건 + API 계약 + 장애 fallback), §16.4 대시보드 영향, §16.5 v3 리뷰 확정 이력 표, §16.6 다음 세션 잔여
   - **다음 세션 시작점** (우선순위 순):
-    - [ ] **feature-voc.md 정합성 확인**: §8.2 상태 전환 매트릭스가 requirements.md §4와 일치하는지 재검증, Q7 Internal Notes UI/Timeline 규칙을 §9.4 관리자 페이지 상세에 교차 반영 필요 여부 점검.
-    - [ ] **7B 필드별 마스터 매핑** (자료 수집 대기): `related_programs/db_tables/jobs/sps/equipment/maker/model/process` 각 필드의 원천 시스템·owner·엔드포인트·스키마. **담당자 확인 선행** 후 별도 "외부 마스터 연동 명세" 문서로 작성.
-    - [ ] **Phase 4 5-Expert 리뷰 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL` 추가, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만 유지).
+    - [x] **feature-voc.md 정합성 확인**: §8.2 상태 전환 매트릭스가 requirements.md §4와 일치하는지 재검증, Q7 Internal Notes UI/Timeline 규칙을 §9.4 관리자 페이지 상세에 교차 반영 필요 여부 점검. ✅ 2026-04-24
+    - [x] **7B 필드별 마스터 매핑**: `docs/specs/requires/external-masters.md` 작성 완료 (커밋 b5836e9). 설비 마스터 MSSQL 스키마는 TBD로 문서 내 명시 — 담당자 자료 수집 후 §3 보완 예정. ✅ 2026-04-24
+    - [x] **Phase 4 5-Expert 리뷰 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL` 추가, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만 유지). ✅ 2026-04-24
 
 ### 6-2. 디자인 일관성 강제 체계
-- [ ] `design.md`에서 CSS 변수 토큰 목록 추출 → 컴포넌트별 토큰 사용 규칙 문서화
-- [ ] 구현 시 임의 하드코딩 색상/간격 금지 규칙을 CLAUDE.md에 추가
-- [ ] (선택) ESLint 커스텀 룰 또는 Stylelint 설정으로 토큰 이탈 감지
+- [x] `design.md` §10 누락 토큰 추가 — `--status-*` 12개 + `--status-dot-*` 5개 (2026-04-24)
+- [x] `design.md` §12 신규 — Token Architecture (tokens.ts 단일 소스, Tailwind/CSS vars 혼용 규칙, 사용 시나리오 매핑, 강제 체계) (2026-04-24)
+- [x] `frontend/CLAUDE.md` 룰 보강 — Tailwind vs CSS vars 사용 규칙, hard rules (2026-04-24)
+- [x] `tokens.ts` 단일 소스 → Tailwind config + CSS vars 자동 전파 **채택** (Tailwind CSS v4 혼용 결정, 2026-04-24)
+- [ ] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` + husky → 6-4 스캐폴딩에서 같이 처리
 
 ### 6-3. 백엔드 테스트 작성 전략
 - [ ] 테스트 범위 정의: 단위(서비스 레이어), 통합(API 엔드포인트), E2E(주요 플로우)
@@ -182,9 +223,10 @@ docs/specs/reviews/
 - [ ] **pgvector 확장 초기 마이그레이션에 포함**: `CREATE EXTENSION IF NOT EXISTS vector;` + `vocs.embedding vector(1536) NULL` 컬럼 생성 (MVP 미사용, 향후 유사검색/RAG용 예약). Docker 이미지는 `pgvector/pgvector:pg16` 사용.
 
 ### 6-8. 상태 관리 방식 확정
-- [ ] React Context vs Redux 결정 — requirements.md에서 열려있는 항목 확정
-- [ ] 전역 상태 범위 정의: filter 상태, 선택된 VOC, drawer 열림 여부
-- [ ] 결정 내용 requirements.md에 반영
+
+> **결정 완료** — requirements.md §6.2에 이미 반영: "React Context (MVP — 규모 충분). Redux는 NextGen 검토."
+
+- [ ] 전역 상태 범위 목록화: filter 상태, 선택된 VOC, drawer 열림 여부 (문서화만 남음)
 
 ### 6-9. Prototype → 실구현 동일 재현 플로우
 - [ ] prototype.html을 컴포넌트 단위로 분해 (섹션별 인벤토리)
