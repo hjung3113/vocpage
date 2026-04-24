@@ -112,13 +112,15 @@ docs/specs/reviews/
 
 #### 🔴 고위험 (반드시 6-4 시작 전 결정)
 
-| 항목 | 옵션 | 비고 |
+> Phase 6 세션 시작 시 `phase6/CLAUDE.md` 를 먼저 읽을 것 — 미결 항목 현황 및 brainstorming 재개 지침 포함.
+
+| 항목 | 결정 | 상태 |
 |---|---|---|
-| **DB 마이그레이션 도구** | 수동 SQL / node-pg-migrate / Flyway | 6-7에서 결정 |
-| **Mock API 전략** | MSW vs json-server | 6-5에서 결정 |
-| **FE-BE 타입 공유 방식** | `shared/types/` 패키지 vs OpenAPI codegen | 6-5에서 결정 |
-| **파일 업로드 미들웨어** | `multer` (de facto) | 스펙에 없음, 확정 필요 |
-| **MSSQL 연결 드라이버** | `mssql` npm 패키지 | external-masters.md MSSQL 연동용 |
+| **DB 마이그레이션 도구** | **node-pg-migrate** | ✅ 2026-04-24 확정 |
+| **Mock API 전략** | **MSW (Mock Service Worker)** | ✅ 2026-04-24 확정 |
+| **FE-BE 타입 공유 방식** | `shared/types/` 패키지 vs OpenAPI codegen | 🔴 미결 |
+| **파일 업로드 미들웨어** | `multer` (de facto) | 🔴 확정 필요 |
+| **MSSQL 연결 드라이버** | `mssql` npm 패키지 | 🔴 확정 필요 |
 
 #### 🟠 중위험 (나중에 바꾸면 리팩 발생)
 
