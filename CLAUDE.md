@@ -8,14 +8,14 @@ This is a **greenfield VOC (Voice of Customer) management system** currently in 
 
 ## Planned Tech Stack
 
-| Layer     | Technology                                                             |
-| --------- | ---------------------------------------------------------------------- |
-| Frontend  | React + TypeScript, Vite, Toast UI Editor                              |
-| Backend   | Node.js + Express + TypeScript                                         |
-| Database  | PostgreSQL                                                             |
-| Testing   | Vitest (frontend), Jest + Supertest (backend)                          |
-| Container | Docker + Docker Compose                                                |
-| Styling   | Tailwind CSS v4 + CSS custom properties (혼용) — `tokens.ts` 단일 소스 |
+| Layer     | Technology                                                                     |
+| --------- | ------------------------------------------------------------------------------ |
+| Frontend  | React + TypeScript, Vite, Toast UI Editor                                      |
+| Backend   | Node.js + Express + TypeScript                                                 |
+| Database  | PostgreSQL                                                                     |
+| Testing   | Vitest (frontend), Jest + Supertest (backend)                                  |
+| Container | Docker + Docker Compose                                                        |
+| Styling   | Tailwind CSS v4 + CSS custom properties (mixed) — `tokens.ts` as single source |
 
 ## Sub-directory Guides
 
@@ -61,13 +61,13 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **Parallel tool calls** — independent tool calls go in one message, not sequential
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
-- **Git workflow** — **항상 feature 브랜치를 먼저 생성**한 뒤 커밋·푸시하고 PR을 열 것. main에 직접 커밋/푸시 절대 금지. 브랜치 네이밍: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
-  - PR 머지는 반드시 `gh pr merge <n> --merge --delete-branch` — `--squash`·`--rebase` 사용 금지
-    - `--squash`: 커밋 히스토리 손실
-    - `--rebase`: 개별 커밋이 main에 직접 replaying → PR 경계 사라짐
-    - `--merge`: 머지 커밋(PR 경계) + 개별 커밋 모두 보존 ✓
-  - 리뷰 수정 사항도 동일: 새 `fix/<topic>` 브랜치에 커밋 → PR → `--merge`
-  - main은 항상 PR을 통해서만 변경 — 직접 push·force push 절대 금지
+- **Git workflow** — always create a feature branch first, commit and push there, then open a PR. Never commit or push directly to main. Branch naming: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
+  - Merge PRs with `gh pr merge <n> --merge --delete-branch` — `--squash` and `--rebase` are forbidden
+    - `--squash`: destroys commit history
+    - `--rebase`: replays commits directly onto main, erasing PR boundaries
+    - `--merge`: preserves both the merge commit (PR boundary) and individual commits ✓
+  - Review fixes follow the same rule: new `fix/<topic>` branch → PR → `--merge`
+  - main changes only via PR — direct push and force push are forbidden
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - CLAUDE.md stays under 200 lines
@@ -80,13 +80,13 @@ No implementation without a written spec section covering it.
 
 ## Document Structure
 
-모든 설계·리뷰·구현 문서는 `docs/specs/` 하위에 관리한다. 루트에 문서 파일을 두지 않는다.
+All design, review, and implementation documents live under `docs/specs/`. No document files at the repo root.
 
 ```
 docs/specs/
-├── requires/   # 요구사항·설계 스펙 (requirements.md, design.md 등)
-├── plans/      # 기능별 구현 계획 (dashboard-feature.md 등)
-└── reviews/    # 리뷰·브레인스토밍 결과물
+├── requires/   # requirements and design specs (requirements.md, design.md, etc.)
+├── plans/      # per-feature implementation plans
+└── reviews/    # review and brainstorming outputs
 ```
 
 ### Document Roles
@@ -94,23 +94,23 @@ docs/specs/
 | File                                  | Language         | Scope                                                                                                              |
 | ------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `docs/specs/requires/design.md`       | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
-| `docs/specs/requires/requirements.md` | 한국어           | Functional requirements — feature specs, behavioral rules, data model, API design, business logic                  |
+| `docs/specs/requires/requirements.md` | Korean           | Functional requirements — feature specs, behavioral rules, data model, API design, business logic                  |
 
-- 새 기능 계획 → `docs/specs/plans/<feature-name>.md`
-- 리뷰·브레인스토밍 → `docs/specs/reviews/<topic>.md`
+- New feature plan → `docs/specs/plans/<feature-name>.md`
+- Review / brainstorming → `docs/specs/reviews/<topic>.md`
 - **Never put functional/behavioral spec in `design.md`**
 - **Never put visual design rules in `requirements.md`**
 - `design.md` must always be written in English
-- **`.omc/plans/`, `.superpowers/` 등 툴 작업 디렉토리는 임시 공간 — canonical 문서는 항상 `docs/specs/`**
+- **Tool scratch dirs (`.omc/plans/`, `.superpowers/`, etc.) are temporary — canonical docs always live in `docs/specs/`**
 
 ## Document Coherence
 
 **Write decisions to the right file first:**
 
-| Decision made                                                          | Write to                                                                  |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Visual design change (color, layout, spacing, component pattern)       | `docs/specs/requires/design.md` (English)                                 |
-| Functional/behavioral change (feature rule, API shape, business logic) | `docs/specs/requires/requirements.md` or relevant `feature-*.md` (한국어) |
+| Decision made                                                          | Write to                                                         |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Visual design change (color, layout, spacing, component pattern)       | `docs/specs/requires/design.md` (English)                        |
+| Functional/behavioral change (feature rule, API shape, business logic) | `docs/specs/requires/requirements.md` or relevant `feature-*.md` |
 
 **Then check propagation:**
 
@@ -124,7 +124,7 @@ docs/specs/
 
 - **No completion claims** — Never mark a task as done until the user explicitly says so
 - **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
-- **Debate, don't defer** — 사용자 말이 항상 정답이라고 가정하지 말 것. 스펙·설계 결정에서 반대 논거·트레이드오프·놓친 케이스가 보이면 동의하기 전에 짚고 토론한다. 수동적 "네" 금지 — 엔지니어 대 엔지니어로 반박/확인/대안 제시.
+- **Debate, don't defer** — Do not assume the user is always right. When you see a counterargument, trade-off, or missed case in a spec or design decision, raise it before agreeing. No passive "yes" — push back, verify, or propose alternatives as a peer engineer would.
 
 ## graphify
 
