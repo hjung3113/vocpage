@@ -19,8 +19,7 @@
 
 ## 다음 세션 시작점
 
-1. **6-8 상태 관리 방식 문서화** — React Context 확정 이미 됨, 전역 상태 범위 목록화만 남음 (Phase 7 첫 FE PR 동반 가능)
-2. **Phase 7 실구현 시작**
+1. **Phase 7 실구현 시작** — 6-8 ✅ 완료. feat/6-8-state-management 브랜치 PR 머지 후 진입
 
 ## Reviews 폴더 구조
 
@@ -312,11 +311,15 @@ docs/specs/reviews/
 - [x] 테스트 DB: 6-3에서 결정
 - [x] **구현 완료** ✅ 2026-04-24 (PR #25) — node-pg-migrate 설치, 마이그레이션 파일 6개, entrypoint.sh, dev_seed.sql, 스모크 테스트 통과 (21테이블, 시드 데이터 확인, sequence_no 트리거 검증)
 
-### 6-8. 상태 관리 방식 확정
+### 6-8. 상태 관리 방식 확정 ✅ 완료 (2026-04-24)
 
-> **결정 완료** — requirements.md §6.2에 이미 반영: "React Context (MVP — 규모 충분). Redux는 NextGen 검토."
+> 설계: `docs/specs/plans/phase6-8-state-management.md`
+> 브랜치: `feat/6-8-state-management` (커밋 835a201)
 
-- [ ] 전역 상태 범위 목록화: filter 상태, 선택된 VOC, drawer 열림 여부 (문서화만 남음)
+- [x] 전역 상태 범위 목록화 + 5개 Context (Auth/VOCFilter/VOCDrawer/Notification/MasterCache)
+- [x] 5개 커스텀 훅 (useAuth/useVOCFilter/useDrawer/useNotifications/useMasterCache)
+- [x] AppProviders 조합 + main.tsx 마운트
+- [x] 테스트 26/26 통과 (Vitest + React Testing Library)
 
 ### 6-9. Prototype → 실구현 동일 재현 플로우
 
