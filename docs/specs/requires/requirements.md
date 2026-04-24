@@ -107,7 +107,7 @@
     - `source(manual|auto)` 메타는 DB 저장 안 함 — 저장 이후엔 전부 담당자 확정 책임.
     - 정식 저장 검증: `equipment`/`maker`/`model`/`process` 중 **최소 1개 배열에 값** + `symptom`/`root_cause`/`resolution` 텍스트 3종 비어있지 않음. 전부 빈 배열이면 저장 차단.
     - 임시저장(`structured_payload_draft`)은 필수 필드 검증 면제, 최신 1건만 유지 (이력 없음).
-    - `unverified_fields`: **BE가 저장 시점에 자체 메모리(§16.3 외부 마스터 캐시)로 재검증**하여 계산 (FE body 플래그 신뢰 금지). 하나라도 차면 `vocs.review_status='unverified'` 동반 세팅. 리뷰 화면에서 해당 필드에 경고 배지 표시.
+    - `unverified_fields`: **BE가 저장 시점에 자체 메모리(§16.3 외부 마스터 캐시)로 재검증**하여 계산 (FE body 플래그 신뢰 금지). 비교 방식: `value.trim().toLowerCase()` 정규화 후 완전 일치(exact match) — 앞뒤 공백 제거 + 대소문자 무시, 부분 매칭 없음. 하나라도 차면 `vocs.review_status='unverified'` 동반 세팅. 리뷰 화면에서 해당 필드에 경고 배지 표시.
 
   - **외부 참조 검증 정책**: 편집 세션 동안 FE는 BE 메모리 캐시(§16.3)에서 자동완성·존재 검증. 저장 시 BE가 단일 진실 원천으로 재검증 → 실패 필드는 `unverified_fields`에 기록 + `review_status='unverified'`. 저장 시점 외부 API 호출은 **0건**.
   - `review_status` 라이프사이클: 정식 제출 시 `unverified` → Result Review에서 `approved`/`rejected` → approve 후 "삭제 신청" 시 `pending_deletion` → 승인 시 payload clear + `review_status=NULL` 복귀. 상세 상태머신은 feature-voc.md §8.2 보강본 참조.
