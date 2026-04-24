@@ -98,9 +98,9 @@ docs/specs/reviews/
 ### 권고 실행 순서 (2026-04-24 재조정)
 
 ```
-6-4 스캐폴딩 & 개발환경   ← 모든 것의 기반, 가장 먼저
-6-6 인증 Mock 전략        ← 블로킹. AUTH_MODE=mock 없이 API 테스트 불가
-6-7 DB 마이그레이션 & 시드 ← 테이블 없이 통합 테스트 작성 불가
+6-4 스캐폴딩 & 개발환경   ✅ 완료 (2026-04-24)
+6-6 인증 Mock 전략        ✅ 완료 (2026-04-24) — AUTH_MODE=mock, BE 7/FE 8 테스트
+6-7 DB 마이그레이션 & 시드 ← 다음 블로킹. 테이블 없이 통합 테스트 작성 불가
 6-5 FE-BE API 계약        ← DB + Auth 확정 후 API shape 정의
 6-3 BE 테스트 전략         ← API shape 알아야 케이스 목록 작성 가능
 6-8 상태 관리 방식 확정    ← React Context로 이미 확정, 문서화만
@@ -250,11 +250,19 @@ docs/specs/reviews/
 - [ ] BE 완성 전 FE 개발용 Mock API 전략 결정 (MSW vs json-server)
 - [ ] 주요 API 엔드포인트 응답 형태 사전 정의 (requirements.md §API 기반)
 
-### 6-6. 인증 Mock 전략 ⚠️ 블로킹 위험
+### 6-6. 인증 Mock 전략 ✅ 완료 (2026-04-24)
 
-- [ ] `validateADSession` 미들웨어 환경별 bypass 방식 결정 (`NODE_ENV=development` 시 mock user 주입)
-- [ ] 개발용 mock 사용자 픽스처 정의 (role: admin / user 각 1개)
-- [ ] 실 AD 없이 전체 플로우 개발 가능한 상태 확인
+> 구현 계획: `docs/specs/plans/2026-04-24-phase6-6-auth-mock.md`
+> 커밋 범위: `489af19`..`6e5979b` (8 commits, main 머지 완료)
+> 테스트: BE 7/7 (Jest+Supertest), FE 8/8 (Vitest+@testing-library/react)
+
+- [x] `AUTH_MODE=mock` 환경변수 기반 미들웨어 팩토리 (`createAuthMiddleware`)
+- [x] `mockAuth` 세션 미들웨어 — `req.session.user` → `req.user` 주입, 미인증 시 401
+- [x] `oidcAuth` throw stub — prod 진입 시 빠른 실패
+- [x] `POST /api/auth/mock-login` / `POST /api/auth/logout` / `GET /api/auth/me` 엔드포인트
+- [x] mock user fixtures 3개 (admin/manager/user, 고정 UUID)
+- [x] FE `/mock-login` 페이지 — `VITE_AUTH_MODE=mock` 시에만 등록, prod bundle tree-shaken
+- [x] FE auth API client (`mockLogin`, `logout`, `getMe`)
 
 ### 6-7. DB 마이그레이션 & 시드 전략
 
