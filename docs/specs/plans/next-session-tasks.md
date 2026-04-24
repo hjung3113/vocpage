@@ -45,7 +45,8 @@ docs/specs/reviews/
              voc-ai-workflow-fit-review.md        ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
              voc-ai-workflow-fit-review-v2.md     ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
              voc-ai-workflow-fit-review-v3.md     ← Phase 6-1 v3 (2026-04-24, Q3~Q10 + 갭#6 + 7A 확정)
-             phase7-preflight-adversarial-review.md ← Phase 7 진입 전 적대적 리뷰 (2026-04-24) ★현재
+             phase7-preflight-adversarial-review.md ← Phase 7 진입 전 적대적 리뷰 (2026-04-24)
+             phase7-entry-review-2026-04-24.md     ← Phase 7 진입 전 종합 리뷰 (2026-04-24) ★현재
 ```
 
 ---
