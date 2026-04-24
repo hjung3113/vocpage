@@ -4,19 +4,19 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **6-4 ✅ / 6-5 ✅ / 6-6 ✅ / 6-7 ✅ / 6-3 ✅ / Preflight ✅ / 6-8 ✅ → 다음: Phase 7 실구현**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ → **Phase 7 진입 전 스펙 픽스 진행 중**
 
 ### 다음 세션 우선순위
 
-⚠️ **Phase 7 진입 전 필수 확인**: `docs/specs/reviews/phase6/phase7-preflight-adversarial-review.md` 참조
+※ 리뷰 문서: `docs/specs/reviews/phase7-entry-review-2026-04-24.md` (블로커 5건 + 중위험 10건)
 
-1. **migration 003 컬럼 누락 확인 + 수정** — `parent_id` / `issue_code` / `due_date` 존재 여부 확인, 없으면 migration 패치
-2. **enum + 컬럼명 drift 해소** — `'접수'` vs `'접수됨'`, `author_id` vs `reporter_id` 3-way 통일 (migration + openapi.yaml + spec)
-3. **openapi.yaml 누락 엔드포인트 추가** — Result Review, Payload 제출/이력, Timeline, 공지/FAQ Admin CRUD, 파일 다운로드
-4. **세션 스토어 확정** — `connect-pg-simple` 채택 → requirements.md §14.1 반영
-5. 위 완료 후 → **6-8 상태 관리 문서화** (첫 FE PR 동반 가능)
+1. **G-2 CORS 정책 확정** — B안(BE cors()) `.env.example` + `backend/src/index.ts`
+2. **G-3 issue_code prefix 명시** — `feature-voc.md §8.1` 한 줄 추가
+3. **G-4 폐쇄 메뉴 정의** — 방식 선택 후 `requirements.md §4` + `feature-voc.md §8.2.1` 반영
+4. **G-5 Cold Start 시나리오** — A안 명시 `requirements.md §16.3` + `external-masters.md §7`
+5. **env 수정** — `LOG_LEVEL`, `VITE_AUTH_MODE` `.env.example` + `docker-compose.yml`
 6. 위 완료 후 → **Phase 7 실구현 시작**
-   ※ 설비 마스터 MSSQL 스키마 TBD — blocking 아님, stub 전략으로 Phase 7 전체 구현 가능
+   ※ G-1 설비 마스터 스키마 TBD — 담당자 자료 수집 후 `external-masters.md §3` 업데이트
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 

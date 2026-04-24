@@ -1,11 +1,9 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (16차 — Preflight 수정 완료, Phase 7 진입 가능)
+> 최종 업데이트: 2026-04-24 (17차 — Phase 7 진입 전 종합 리뷰 완료)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
-
-> 상세: `docs/specs/reviews/phase6/phase7-preflight-adversarial-review.md`
 
 | 순서 | 항목                                                                                                                 | 상태 |
 | ---- | -------------------------------------------------------------------------------------------------------------------- | ---- |
@@ -18,6 +16,21 @@
 추가 완료: heatmap 컬럼명 통일, `voc_payload_history` unique partial index, codegen 재실행
 
 ## 다음 세션 시작점
+
+> 리뷰 문서: `docs/specs/reviews/phase7-entry-review-2026-04-24.md`
+
+### Phase 7 진입 전 스펙 픽스 (블로커 순)
+
+| 순서 | 항목                                                                                           | 위치                                              |
+| ---- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| 1    | **G-2 CORS 정책 확정** — B안(BE cors()) 채택, `.env.example` + `backend/src/index.ts` 반영     | `.env.example`, `backend/src/index.ts`            |
+| 2    | **G-3 issue_code prefix 규칙 명시** — 시스템 slug 대문자 방식 확정                             | `feature-voc.md §8.1`                             |
+| 3    | **G-4 폐쇄 메뉴 정의** — 방식 선택 후 스키마·spec 반영                                         | `requirements.md §4`, `feature-voc.md §8.2.1`     |
+| 4    | **G-5 Cold Start 시나리오** — A안(전 필드 unverified로 계속 기동) 명시                         | `requirements.md §16.3`, `external-masters.md §7` |
+| 5    | **env 파일 수정** — `LOG_LEVEL`, `VITE_AUTH_MODE` docker-compose 주입                          | `.env.example`, `docker-compose.yml`              |
+| 6    | **G-1 설비 마스터 스키마** — 담당자 자료 수집 후 `external-masters.md §3` 업데이트 (외부 의존) |
+
+### 위 완료 후 → Phase 7 실구현 시작
 
 1. **Phase 7 실구현 시작** — 6-8 ✅ 완료. feat/6-8-state-management 브랜치 PR 머지 후 진입
 
