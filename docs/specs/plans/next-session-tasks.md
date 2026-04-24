@@ -30,11 +30,13 @@ docs/specs/reviews/
 > 통일성 점수: **82% → 100%** (Playwright 시각 검증)
 
 ### 1-1. 정보 페이지 디자인 리뷰 (2개)
+
 - [x] 공지사항 페이지 (`notice`) — 레벨 배지 CSS vars 적용, notice-row/body 클래스 도입
 - [x] FAQ 페이지 (`faq`) — 하이라이트 #5e6ad233→brand-bg, faq-filter-bar/cat-btn 클래스
 - 체크: 색상 토큰, 타이포, 8px grid, 배지·탭 스타일 일관성
 
 ### 1-2. 관리자 페이지 디자인 리뷰 (6개)
+
 - [x] 사용자 관리 (`admin/users`) — role-admin/manager oklch 리터럴 → CSS vars
 - [x] 태그 규칙 관리 (`admin/tag-rules`) — type-keyword/regex oklch 리터럴 → CSS vars
 - [x] 카테고리 관리 (`admin/categories`) — 기존 일관성 확인 (문제 없음)
@@ -43,6 +45,7 @@ docs/specs/reviews/
 - [x] 시스템 설정 (`admin/settings`) — 기존 일관성 확인 (문제 없음)
 
 ### 1-3. 차이 항목 수정
+
 - [x] 전 페이지 기준 차이 항목 목록화 (8개 이슈 식별)
 - [x] `prototype/prototype.html` 직접 수정으로 통일
 - 추가 CSS vars: `--status-amber-bg/border`, `--status-red-bg/border`, `--status-purple/bg/border`
@@ -114,24 +117,25 @@ docs/specs/reviews/
 
 > Phase 6 세션 시작 시 `phase6/CLAUDE.md` 를 먼저 읽을 것 — 미결 항목 현황 및 brainstorming 재개 지침 포함.
 
-| 항목 | 결정 | 상태 |
-|---|---|---|
-| **DB 마이그레이션 도구** | **node-pg-migrate** | ✅ 2026-04-24 확정 |
-| **Mock API 전략** | **MSW (Mock Service Worker)** | ✅ 2026-04-24 확정 |
+| 항목                     | 결정                                                                                                                              | 상태               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| **DB 마이그레이션 도구** | **node-pg-migrate**                                                                                                               | ✅ 2026-04-24 확정 |
+| **Mock API 전략**        | **MSW (Mock Service Worker)**                                                                                                     | ✅ 2026-04-24 확정 |
 | **FE-BE 타입 공유 방식** | **OpenAPI codegen (`openapi-typescript`)** — `openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성, Swagger UI BE dev 마운트 | ✅ 2026-04-24 확정 |
-| **파일 업로드 미들웨어** | **multer + DiskStorage** — Docker named volume(`uploads_data`), `voc_attachments` 메타데이터만 저장, MVP 후 S3 교체 가능 | ✅ 2026-04-24 확정 |
-| **MSSQL 연결 드라이버** | **mssql npm 패키지** — 읽기 전용, BE 부팅 시 pool 1회 생성 | ✅ 2026-04-24 확정 |
+| **파일 업로드 미들웨어** | **multer + DiskStorage** — Docker named volume(`uploads_data`), `voc_attachments` 메타데이터만 저장, MVP 후 S3 교체 가능          | ✅ 2026-04-24 확정 |
+| **MSSQL 연결 드라이버**  | **mssql npm 패키지** — 읽기 전용, BE 부팅 시 pool 1회 생성                                                                        | ✅ 2026-04-24 확정 |
 
 #### 🟠 중위험 (나중에 바꾸면 리팩 발생)
 
-| 항목 | 비고 |
-|---|---|
-| **세션 스토어** | 개발: 메모리, 운영: ? — express-session store 결정 필요 |
-| **CORS 정책** | Dev 환경 FE:5173 ↔ BE:3000 — Vite proxy vs BE cors() 미들웨어 |
-| **issue_code prefix** | `ANALYSIS-2025-0001` 고정 prefix인지, systems 테이블 기반인지 불명확 |
-| **React Query staleTime** | 대시보드 5분 확정, VOC 목록 등 나머지 페이지 기본값 미정 |
+| 항목                      | 비고                                                                 |
+| ------------------------- | -------------------------------------------------------------------- |
+| **세션 스토어**           | 개발: 메모리, 운영: ? — express-session store 결정 필요              |
+| **CORS 정책**             | Dev 환경 FE:5173 ↔ BE:3000 — Vite proxy vs BE cors() 미들웨어        |
+| **issue_code prefix**     | `ANALYSIS-2025-0001` 고정 prefix인지, systems 테이블 기반인지 불명확 |
+| **React Query staleTime** | 대시보드 5분 확정, VOC 목록 등 나머지 페이지 기본값 미정             |
 
 ### 6-1. 피드백 반영 → 스펙 최종 확정
+
 - [ ] 리뷰 결과를 `design.md`에 반영 (영어, 비주얼 스펙만)
 - [ ] 기능 변경 시 `requirements.md`에 반영 (한국어, 기능 스펙만)
 - [ ] `prototype/prototype.html` 최종 상태 = 확정 디자인 기준점으로 커밋
@@ -189,6 +193,7 @@ docs/specs/reviews/
     - [x] **Phase 4 5-Expert 리뷰 잔여 7건** (v3 §8.1~8.7): AD 인증(`AUTH_MODE=mock|oidc`), Sub-task 용어 통일, 대시보드 API endpoint 표, 환경변수 `AUTH_MODE`/`LOG_LEVEL` 추가, 표준 에러 코드 목록(`INVALID_TRANSITION`/`FORBIDDEN`/`NOT_FOUND`/`VALIDATION_FAILED`/`EXTERNAL_MASTER_UNAVAILABLE` 등), 파일명 규칙(`{voc_id}/{uuid}-{원본파일명}`), KPI 목표값(MVP는 SC-1·SC-2·SC-3만 유지). ✅ 2026-04-24
 
 ### 6-2. 디자인 일관성 강제 체계
+
 - [x] `design.md` §10 누락 토큰 추가 — `--status-*` 12개 + `--status-dot-*` 5개 (2026-04-24)
 - [x] `design.md` §12 신규 — Token Architecture (tokens.ts 단일 소스, Tailwind/CSS vars 혼용 규칙, 사용 시나리오 매핑, 강제 체계) (2026-04-24)
 - [x] `frontend/CLAUDE.md` 룰 보강 — Tailwind vs CSS vars 사용 규칙, hard rules (2026-04-24)
@@ -196,43 +201,51 @@ docs/specs/reviews/
 - [x] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` + husky → 6-4 구현 계획에 포함 완료 (2026-04-24)
 
 ### 6-3. 백엔드 테스트 작성 전략
+
 - [ ] 테스트 범위 정의: 단위(서비스 레이어), 통합(API 엔드포인트), E2E(주요 플로우)
 - [ ] 테스트 픽스처/시드 전략 결정 (PostgreSQL 테스트 DB vs 인메모리)
 - [ ] 각 API 엔드포인트별 테스트 케이스 목록 작성 (requirements.md §API 참조)
 - [ ] Jest + Supertest 설정 파일 + 샘플 테스트 1개 작성 (구현 전 틀만)
 
-### 6-4. 스캐폴딩 & 개발환경 설정 ← **다음 세션 시작점**
+### 6-4. 스캐폴딩 & 개발환경 설정 ✅ 완료 (2026-04-24)
 
 > ✅ 설계 확정 (2026-04-24): `docs/specs/plans/phase6-4-scaffolding-design.md`
-> ✅ 구현 계획 작성 완료: `docs/specs/plans/phase6-4-scaffolding-plan.md`
-> 브랜치: `docs/phase6-4-scaffolding-design` (미머지)
+> ✅ 구현 완료: PR #14 (`docs/phase6-4-scaffolding-design` → main, 미머지)
 
-**다음 세션**: `/superpowers:executing-plans` 또는 subagent-driven-development로 10-task 계획 실행.
-실행 방식: **Subagent-Driven** (Task별 서브에이전트 디스패치, 사용자 확정)
+- [x] 설계 결정: npm workspaces(A) + 루트 단일 `.env`(A) + lint-staged+tsc husky(B)
+- [x] **Task 1**: 루트 workspace 파일 (commit: dbf1c76 일부)
+- [x] **Task 2**: Frontend scaffold (Vite+React+Tailwind v4+tokens.ts skeleton)
+- [x] **Task 3**: Backend scaffold (Express+ts-node-dev+/health)
+- [x] **Task 4**: npm install + workspace 연결 확인 + commit dbf1c76
+- [x] **Task 5**: frontend ESLint + Stylelint (hex 금지) — `.cjs` 확장자 사용 (ESM type:module 때문)
+- [x] **Task 6**: backend ESLint (commit b227f69)
+- [x] **Task 7**: husky + lint-staged (commit 6e8f136) — pre-commit hex 차단 검증 완료
+- [x] **Task 8**: Dockerfiles (FE + BE)
+- [x] **Task 9**: docker-compose.yml + .env.example + .gitignore (commit c505df0)
+- [x] **Task 10**: `docker compose up` 스모크 테스트 + PR #14
 
-- [x] 설계 결정: npm workspaces(A) + 루트 단일 `.env`(A) + lint-staged+tsc husky(B) (2026-04-24)
-- [ ] **Task 1**: 루트 workspace 파일 (package.json, .nvmrc, .eslintrc.base.js, .prettierrc)
-- [ ] **Task 2**: Frontend scaffold (Vite+React+Tailwind v4+tokens.ts skeleton)
-- [ ] **Task 3**: Backend scaffold (Express+ts-node-dev+/health)
-- [ ] **Task 4**: npm install + workspace 연결 확인 + commit
-- [ ] **Task 5**: frontend ESLint + Stylelint (hex 금지)
-- [ ] **Task 6**: backend ESLint
-- [ ] **Task 7**: husky + lint-staged (pre-commit 차단 확인)
-- [ ] **Task 8**: Dockerfiles (FE + BE)
-- [ ] **Task 9**: docker-compose.yml + .env.example + .gitignore
-- [ ] **Task 10**: `docker compose up` 스모크 테스트 + PR
+> ⚠️ **포트 충돌 해결 (로컬 환경)**: 스모크 테스트 중 로컬 서비스와 충돌로 포트 리맵핑됨
+>
+> - postgres: `5433:5432` (호스트 5433 → 컨테이너 5432)
+> - backend: `3001:3000` (호스트 3001 → 컨테이너 3000)
+> - `.env.example`의 `VITE_API_BASE_URL=http://localhost:3000`은 **Docker 외부(로컬 dev) 기준**이라 그대로 유지
+> - Docker 내부 컨테이너 간 통신은 서비스명(`backend:3000`) 사용 — 영향 없음
+> - PR 머지 후 팀 환경에 맞게 포트 조정 필요 시 docker-compose.yml 수정
 
 ### 6-5. FE-BE API 계약
+
 - [ ] OpenAPI spec 또는 공유 타입 방식 결정 — 타입 불일치 방지 (예: `shared/types/` 패키지)
 - [ ] BE 완성 전 FE 개발용 Mock API 전략 결정 (MSW vs json-server)
 - [ ] 주요 API 엔드포인트 응답 형태 사전 정의 (requirements.md §API 기반)
 
 ### 6-6. 인증 Mock 전략 ⚠️ 블로킹 위험
+
 - [ ] `validateADSession` 미들웨어 환경별 bypass 방식 결정 (`NODE_ENV=development` 시 mock user 주입)
 - [ ] 개발용 mock 사용자 픽스처 정의 (role: admin / user 각 1개)
 - [ ] 실 AD 없이 전체 플로우 개발 가능한 상태 확인
 
 ### 6-7. DB 마이그레이션 & 시드 전략
+
 - [ ] 마이그레이션 방식 결정 (수동 SQL 파일 vs node-pg-migrate vs Flyway)
 - [ ] 마이그레이션 파일 구조 및 명명 규칙 결정
 - [ ] prototype.html 예시 데이터 기반 시드 fixture 작성 계획
@@ -245,6 +258,7 @@ docs/specs/reviews/
 - [ ] 전역 상태 범위 목록화: filter 상태, 선택된 VOC, drawer 열림 여부 (문서화만 남음)
 
 ### 6-9. Prototype → 실구현 동일 재현 플로우
+
 - [ ] prototype.html을 컴포넌트 단위로 분해 (섹션별 인벤토리)
 - [ ] 각 컴포넌트의 HTML 구조 + CSS 클래스 → React 컴포넌트 매핑 규칙 문서화
 - [ ] Storybook 또는 컴포넌트 체크리스트로 prototype vs 구현 비교 방법 결정
@@ -257,6 +271,7 @@ docs/specs/reviews/
 > **선행 조건**: Phase 6 전 항목 완료 — 스펙·테스트 전략·스캐폴딩·인증 mock·DB 전략 확정 후에만 진입
 
 ### 7-1. 요구사항 ↔ 프로토타입 불일치 처리 규칙 ⚠️ 구현 중 상시
+
 - [ ] 구현 중 `requirements.md` (및 `feature-*.md`, `dashboard.md`) 와 `prototype/prototype.html` 사이에 **불일치를 발견하면 임의로 결정하지 말고 사용자에게 먼저 질문**한다
 - [ ] 질문 형식: "요구사항 §X: A / 프로토타입: B — 어느 쪽 기준으로 구현할까요?" (양쪽 근거 라인/섹션 명시)
 - [ ] 사용자 답변 확정 후 → 정답 쪽을 정본으로 두고 나머지 문서/프로토타입을 동기화 커밋
