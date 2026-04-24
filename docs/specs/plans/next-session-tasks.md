@@ -1,13 +1,13 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (12차 — PR #21 머지 완료, PR #22 충돌 해소 완료·머지 대기, 다음 세션: Codex 리뷰 + 6-7)
+> 최종 업데이트: 2026-04-24 (13차 — PR #24 머지(6-7 설계+구현 계획), PR #25 머지(6-7 구현), 다음 세션: 6-5 FE-BE API 계약 또는 6-3 BE 테스트 전략)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## 다음 세션 시작점
 
-1. **PR #22 머지** (`docs/sync-phase6-impl-to-requirements`) — 충돌 해소 완료, 머지 준비됨
-2. **Codex 리뷰** — Phase 6-6 구현 코드베이스 전체 리뷰 (`/review` 스킬)
-3. **다음 블로킹**: 6-7 DB 마이그레이션 & 시드 전략
+1. **6-5 FE-BE API 계약** — OpenAPI codegen (`openapi-typescript`), `openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성, Swagger UI BE dev 마운트
+2. **6-3 BE 테스트 전략** — Jest + Supertest 설정, 테스트 픽스처/시드 전략, 테스트 DB 전략 결정 (6-7 완료로 블로킹 해제)
+3. **6-8 상태 관리 방식 문서화** — React Context 확정 이미 됨, 전역 상태 범위 목록화만 남음
 
 ## Reviews 폴더 구조
 
@@ -273,14 +273,15 @@ docs/specs/reviews/
 ### 6-7. DB 마이그레이션 & 시드 전략
 
 > 설계 확정: `docs/specs/plans/2026-04-24-phase6-7-db-migration-design.md`
-> 브랜치: `docs/phase6-7-db-migration-design` (PR 머지 대기)
+> 구현 계획: `docs/specs/plans/2026-04-24-phase6-7-db-migration-impl.md`
+> PR #24 (설계+계획) · PR #25 (구현) — 모두 main 머지 완료 (2026-04-24)
 
 - [x] 마이그레이션 도구: **node-pg-migrate**
 - [x] 실행 시점: **자동** (Docker entrypoint.sh — migrate → dev)
 - [x] 파일 구조: **도메인별 6파일** (001_extensions ~ 006_settings)
 - [x] 시드 전략: **별도 스크립트** (`npm run db:seed`, 최초 1회 수동)
 - [x] 테스트 DB: 6-3에서 결정
-- [ ] **구현**: node-pg-migrate 설치 + 마이그레이션 파일 6개 + entrypoint.sh + dev_seed.sql
+- [x] **구현 완료** ✅ 2026-04-24 (PR #25) — node-pg-migrate 설치, 마이그레이션 파일 6개, entrypoint.sh, dev_seed.sql, 스모크 테스트 통과 (21테이블, 시드 데이터 확인, sequence_no 트리거 검증)
 
 ### 6-8. 상태 관리 방식 확정
 

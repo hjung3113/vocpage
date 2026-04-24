@@ -4,15 +4,13 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **다음: 6-7 설계 문서 PR 머지 → writing-plans → 구현**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **6-4 ✅ / 6-6 ✅ / 6-7 ✅ → 다음: 6-5 FE-BE API 계약 또는 6-3 BE 테스트 전략**
 
 ### 다음 세션 우선순위
 
-1. **6-7 설계 문서 PR 머지** — `docs/phase6-7-db-migration-design` 브랜치, 설계 확정
-2. **6-7 구현 계획 작성** (writing-plans 스킬) — 설계 문서 기반 구현 태스크 분해
-3. **6-7 구현** — node-pg-migrate 설치, 마이그레이션 파일 6개, entrypoint.sh, dev_seed.sql
-4. **6-5 FE-BE API 계약** (OpenAPI codegen)
-5. **6-3 BE 테스트 전략** (Jest + Supertest)
+1. **6-5 FE-BE API 계약** — OpenAPI codegen (`openapi-typescript`), `openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성, Swagger UI BE dev 마운트
+2. **6-3 BE 테스트 전략** — Jest + Supertest, 테스트 DB 전략 결정, 엔드포인트별 케이스 목록
+3. **6-8 상태 관리 문서화** — React Context 확정, 전역 상태 범위 목록화
    ※ 설비 마스터 MSSQL 스키마(`external-masters.md §3`) — 담당자 자료 수집 후 별도 보완
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
