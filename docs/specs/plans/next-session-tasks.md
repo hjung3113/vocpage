@@ -250,11 +250,16 @@ docs/specs/reviews/
 - [ ] BE 완성 전 FE 개발용 Mock API 전략 결정 (MSW vs json-server)
 - [ ] 주요 API 엔드포인트 응답 형태 사전 정의 (requirements.md §API 기반)
 
-### 6-6. 인증 Mock 전략 ⚠️ 블로킹 위험
+### 6-6. 인증 Mock 전략 ✅ 설계 완료 (2026-04-24)
 
-- [ ] `validateADSession` 미들웨어 환경별 bypass 방식 결정 (`NODE_ENV=development` 시 mock user 주입)
-- [ ] 개발용 mock 사용자 픽스처 정의 (role: admin / user 각 1개)
-- [ ] 실 AD 없이 전체 플로우 개발 가능한 상태 확인
+> 설계 문서: `docs/specs/plans/phase6-6-auth-mock-design.md` (PR #21)
+> 다음 세션: `writing-plans` 스킬로 구현 계획 작성 후 구현 진입
+
+- [x] `validateADSession` 미들웨어 — 팩토리 패턴 (`auth/index.ts` → `mockAuth.ts` / `oidcAuth.ts` 선택)
+- [x] 개발용 mock 사용자 픽스처 — Admin/Manager/User 3개, 고정 UUID (`...0001~0003`), 6-7 시드 공유
+- [x] FE `/mock-login` React 라우트 — `VITE_AUTH_MODE=mock`일 때만 활성화, dynamic import로 prod 번들 격리
+- [ ] **구현 계획 작성** (`writing-plans` 스킬) — 다음 세션 시작점
+- [ ] 실 AD 없이 전체 플로우 개발 가능한 상태 확인 (구현 후)
 
 ### 6-7. DB 마이그레이션 & 시드 전략
 
