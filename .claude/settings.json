@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.command // empty' | grep -q 'gh pr merge' && graphify update . || true"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Write",
@@ -35,14 +46,14 @@
     "command": "node .claude/statusline.cjs"
   },
   "enabledPlugins": {
-    "dev-browser@dev-browser-marketplace": true,
-    "claude-mem@thedotmack": true,
+    "dev-browser@dev-browser-marketplace": false,
+    "claude-mem@thedotmack": false,
     "superpowers@superpowers-marketplace": true,
-    "ralph-loop@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": false,
     "hookify@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
+    "code-review@claude-plugins-official": false,
+    "pr-review-toolkit@claude-plugins-official": false,
     "commit-commands@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true
+    "plugin-dev@claude-plugins-official": false
   }
 }

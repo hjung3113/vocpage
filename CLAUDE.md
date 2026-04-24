@@ -54,6 +54,7 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 2. Read `docs/specs/plans/next-session-tasks.md` to find current Phase and pending tasks
 3. Read relevant spec in `docs/` (selectively — only what's needed)
 4. Continue from progress file — don't re-read what you already know
+5. Review `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — archive any entries whose "next steps" are already done (move file to `memory/archive/`, remove from index)
 
 ## Core Rules
 
