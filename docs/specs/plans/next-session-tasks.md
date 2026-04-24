@@ -1,28 +1,26 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (15차 — Phase 7 진입 전 적대적 리뷰 완료, preflight 수정 항목 도출)
+> 최종 업데이트: 2026-04-24 (16차 — Preflight 수정 완료, Phase 7 진입 가능)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
-## ⚠️ Phase 7 진입 전 Preflight (현재 최우선)
+## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
 
 > 상세: `docs/specs/reviews/phase6/phase7-preflight-adversarial-review.md`
 
-적대적 리뷰(oh-my-claudecode:critic vs analyst) 결과, Phase 7 착수 전 반드시 처리해야 할 항목:
+| 순서 | 항목                                                                                                                 | 상태 |
+| ---- | -------------------------------------------------------------------------------------------------------------------- | ---- |
+| 1    | `backend/migrations/003_vocs.sql` — `parent_id` / `issue_code`(트리거) / `due_date` 추가 + `reporter_id`→`author_id` | ✅   |
+| 2    | `vocs.status` enum `'접수됨'`→`'접수'` 3-way 통일 (spec 2곳 수정, migration/openapi 이미 `'접수'`)                   | ✅   |
+| 3    | `author_id` vs `reporter_id` 통일 + openapi nullable:false                                                           | ✅   |
+| 4    | openapi.yaml 누락 엔드포인트 14개 추가 + schema drift 6건 교정                                                       | ✅   |
+| 5    | 세션 스토어 `connect-pg-simple` → requirements.md §14.1 반영                                                         | ✅   |
 
-| 순서 | 항목                                                                                                               | 파일            | 난이도  |
-| ---- | ------------------------------------------------------------------------------------------------------------------ | --------------- | ------- |
-| 1    | `backend/migrations/003_vocs.sql` — `parent_id` / `issue_code` / `due_date` 컬럼 누락 확인 + 패치                  | migrations/003  | 반나절  |
-| 2    | `vocs.status` enum `'접수'` vs `'접수됨'` 3-way 통일 (migration + openapi.yaml + spec)                             | 3곳             | 1시간   |
-| 3    | `author_id` vs `reporter_id` 컬럼명 통일 (migration NOT NULL + openapi nullable:false)                             | 2곳             | 1시간   |
-| 4    | openapi.yaml 누락 엔드포인트 추가 (Result Review, Payload 제출/이력, Timeline, 공지/FAQ Admin CRUD, 파일 다운로드) | openapi.yaml    | 2~3시간 |
-| 5    | 세션 스토어 확정 (`connect-pg-simple` 권장) → requirements.md §14.1 반영                                           | requirements.md | 30분    |
-
-> Preflight 완료 후 → **6-8 상태 관리 문서화** (첫 FE PR 동반 가능) → **Phase 7 실구현**
+추가 완료: heatmap 컬럼명 통일, `voc_payload_history` unique partial index, codegen 재실행
 
 ## 다음 세션 시작점
 
-1. **Preflight 수정** — 위 표 1~5번 순서대로 처리 (상세: `reviews/phase6/phase7-preflight-adversarial-review.md`)
-2. **6-8 상태 관리 방식 문서화** — React Context 확정 이미 됨, 전역 상태 범위 목록화만 남음 (blocking 아님, Phase 7 첫 FE PR 동반 가능)
+1. **6-8 상태 관리 방식 문서화** — React Context 확정 이미 됨, 전역 상태 범위 목록화만 남음 (Phase 7 첫 FE PR 동반 가능)
+2. **Phase 7 실구현 시작**
 
 ## Reviews 폴더 구조
 

@@ -4,7 +4,7 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **6-4 ✅ / 6-5 ✅ / 6-6 ✅ / 6-7 ✅ / 6-3 ✅ → 다음: Phase 7 진입 전 Preflight 수정**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **6-4 ✅ / 6-5 ✅ / 6-6 ✅ / 6-7 ✅ / 6-3 ✅ / Preflight ✅ → 다음: 6-8 상태 관리 문서화 → Phase 7 실구현**
 
 ### 다음 세션 우선순위
 
