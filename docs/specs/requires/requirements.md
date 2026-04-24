@@ -54,16 +54,16 @@
 
 ## 3. 기술 스택 (Tech Stack)
 
-| 구분              | 기술 스택                                | 비고                                               |
-| :---------------- | :--------------------------------------- | :------------------------------------------------- |
-| **Frontend**      | Vite, React, TypeScript, Tailwind CSS v4 | `tokens.ts` → Tailwind config + CSS vars 단일 소스 |
-| **Backend**       | Node.js 20 LTS (Express), TypeScript     | OIDC 인증 미들웨어                                 |
-| **Database**      | PostgreSQL 16                            | Self-join 및 M:N 관계 설계                         |
-| **Infra**         | Docker, Docker Compose                   | 환경 일치 및 배포 편의성                           |
-| **Editor**        | Toast UI Editor                          | 오픈소스 리치 텍스트 에디터                        |
-| **Testing**       | Vitest (FE), Jest/Supertest (BE)         | TDD 개발 수행                                      |
-| **Data Fetching** | @tanstack/react-query                    | 대시보드 위젯별 독립 쿼리, staleTime 5분           |
-| **Charts**        | recharts                                 | 대시보드 LineChart / BarChart (lazy import)        |
+| 구분              | 기술 스택                                | 비고                                                                                                |
+| :---------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------------------- |
+| **Frontend**      | Vite, React, TypeScript, Tailwind CSS v4 | `tokens.ts` → Tailwind config + CSS vars 단일 소스                                                  |
+| **Backend**       | Node.js 20 LTS (Express), TypeScript     | OIDC 인증 미들웨어                                                                                  |
+| **Database**      | PostgreSQL 16                            | Self-join 및 M:N 관계 설계                                                                          |
+| **Infra**         | Docker, Docker Compose                   | 환경 일치 및 배포 편의성                                                                            |
+| **Editor**        | Toast UI Editor                          | 오픈소스 리치 텍스트 에디터                                                                         |
+| **Testing**       | Vitest (FE), Jest/Supertest (BE)         | TDD 개발 수행                                                                                       |
+| **Data Fetching** | @tanstack/react-query                    | staleTime 페이지별 확정: 대시보드·관리자 5분, VOC 목록 30초, VOC 상세·댓글 0(항상 fresh), 알림 30초 |
+| **Charts**        | recharts                                 | 대시보드 LineChart / BarChart (lazy import)                                                         |
 
 ---
 
@@ -130,6 +130,7 @@
   - **실행 시점**: VOC 접수 + 제목/본문 편집 저장 시. status 변경만으로는 재실행 안 함.
   - **규칙 충돌**: 같은 본문에 복수 규칙 매칭 시 전부 부착(태그는 다대다, 우선순위·배타 없음).
   - **멱등성**: 재실행은 해당 VOC의 `voc_tags.source='rule'` 행만 삭제 후 재부착. `source='manual'` 행은 보존(담당자 수동 태깅은 엔진이 건드리지 않음).
+  - **복원 시 재실행**: Soft Delete VOC 복원(`deleted_at=NULL`) 시 `tag_rules` 엔진 재실행 대상. 삭제 기간 중 규칙 변경이 반영됨. `source='manual'` 태그 보존.
 - **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
 - **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`. **공개 댓글 전용** — 내부 메모는 `voc_internal_notes` 별도 테이블로 분리.
 - **`voc_internal_notes`** (Q7 확정, v3 §3.4): 담당자 전용 내부 메모(트리아지·보류 사유·재현 로그 등). 공개 댓글과 **테이블 자체를 분리**하여 쿼리 누락으로 인한 유출 사고 내성을 구조적으로 확보.
@@ -452,7 +453,7 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 ## 15. 관리자 페이지: Result Review
 
-> 출처: `docs/specs/reviews/phase6/voc-ai-workflow-fit-review-v2.md` §8. 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
+> 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
 
 - **대상 행**: `review_status IN ('unverified','pending_deletion')` VOC.
 - **액션**: 각 VOC에 코멘트 + approve/reject. 결정 이력은 `voc_payload_reviews`에 `action='submission'|'deletion'` 구분으로 기록.
@@ -490,18 +491,19 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 **합의 10건**:
 
-| 항목               | 결정                                                                                                                                           |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 캐시 범위          | 프로세스 전역. BE 부팅 시 3종 통째 1회 로드 (규모 작아 전량 적재 가능).                                                                        |
-| TTL                | 없음. 수동 트리거만.                                                                                                                           |
-| Refresh 권한       | Manager 이상.                                                                                                                                  |
-| Refresh 진입점     | 관리자 페이지 전역 refresh + 편집 화면 🔄 아이콘.                                                                                              |
-| Refresh 쿨다운     | **동일 사용자 기준 5분** (원천 시스템 보호).                                                                                                   |
-| 부팅 시 로드 실패  | **디스크 스냅샷 fallback**. Manager/Admin UI에 **"스냅샷 모드" 배지** 필수. (메타 로그·한도·비동기 쓰기 보조 조건은 미채택, 운영 필요 시 추가) |
-| 수동 Refresh 실패  | **atomic swap** — 3종 전부 성공해야 교체. 실패 시 기존 메모리 유지. 부분 교체 금지.                                                            |
-| 저장 시 BE 재검증  | **필수**. FE body 플래그 신뢰 금지. BE 메모리가 단일 진실 원천. override도 BE 재판정.                                                          |
-| 입력 모드          | **자유 입력 허용 + unverified 플래그**. 마스터 등록 지연보다 VOC 처리 흐름 보호 우선. 자동완성 UX로 정상 케이스 대부분 커버.                   |
-| review_status 단위 | `vocs.review_status` row 단일값(Manager 큐 필터) + `structured_payload.unverified_fields text[]`로 필드 병기. 별도 컬럼 승격은 운영 실측 후.   |
+| 항목                     | 결정                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 캐시 범위                | 프로세스 전역. BE 부팅 시 3종 통째 1회 로드 (규모 작아 전량 적재 가능).                                                                                                                                                                           |
+| TTL                      | 없음. 수동 트리거만.                                                                                                                                                                                                                              |
+| Refresh 권한             | Manager 이상.                                                                                                                                                                                                                                     |
+| Refresh 진입점           | 관리자 페이지 전역 refresh + 편집 화면 🔄 아이콘.                                                                                                                                                                                                 |
+| Refresh 쿨다운           | **동일 사용자 기준 5분** (원천 시스템 보호).                                                                                                                                                                                                      |
+| 부팅 시 로드 실패        | **디스크 스냅샷 fallback**. Manager/Admin UI에 **"스냅샷 모드" 배지** 필수. (메타 로그·한도·비동기 쓰기 보조 조건은 미채택, 운영 필요 시 추가)                                                                                                    |
+| Cold Start (스냅샷 없음) | 스냅샷 파일도 없는 최초 배포 시 — **전 필드 unverified 모드로 계속 기동** (기동 실패 없음). 모든 외부 마스터 필드를 unverified로 판정. Manager/Admin UI에 **"콜드 스타트 모드" 배지** 노출.                                                       |
+| 수동 Refresh 실패        | **atomic swap** — 3종 전부 성공해야 교체. 실패 시 기존 메모리 유지. 부분 교체 금지.                                                                                                                                                               |
+| 저장 시 BE 재검증        | **필수**. FE body 플래그 신뢰 금지. BE 메모리가 단일 진실 원천. override도 BE 재판정.                                                                                                                                                             |
+| 입력 모드                | **자유 입력 허용 + unverified 플래그**. 마스터 등록 지연보다 VOC 처리 흐름 보호 우선. 자동완성 UX로 정상 케이스 대부분 커버. **unverified 필드가 있어도 VOC 저장은 허용** — 저장 후 리뷰 게이트(`review_status='unverified'`)에서 Manager가 검토. |
+| review_status 단위       | `vocs.review_status` row 단일값(Manager 큐 필터) + `structured_payload.unverified_fields text[]`로 필드 병기. 별도 컬럼 승격은 운영 실측 후.                                                                                                      |
 
 **API 계약**:
 

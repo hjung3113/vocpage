@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import fs from 'fs';
@@ -18,6 +19,7 @@ if (isProduction && !process.env.SESSION_SECRET) {
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
+app.use(cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173' }));
 app.use(express.json({ limit: '1mb' }));
 app.use(
   session({

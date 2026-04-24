@@ -9,7 +9,7 @@
 ### 8.1 VOC 식별자 (Issue Code)
 
 - 형식: `{시스템슬러그}-{yyyy}-{순번4자리}` (예: `ANALYSIS-2025-0001`)
-- 시스템 슬러그는 ASCII URL-safe 문자열로 저장 (예: `analysis`, `pipeline`). `issue_code`에는 슬러그 값을 대문자로 사용.
+- 시스템 슬러그는 ASCII URL-safe 문자열로 저장 (예: `analysis`, `pipeline`). `issue_code`에는 슬러그 값을 대문자로 사용. **prefix는 고정값이 아닌 시스템별 동적 변환** — `analysis` → `ANALYSIS-`, `pipeline` → `PIPELINE-` 등 시스템 slug에 따라 결정됨.
 - 시스템별·연도별 독립 순번. 삭제된 VOC의 순번은 재사용하지 않음 (증가 전용).
 - 시스템명 변경 후에도 기존 VOC의 `issue_code`는 불변.
 - 동시 생성 경합은 DB sequence로 원자성 보장.
@@ -128,6 +128,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - Sub-task는 독립적인 상태·담당자·Priority·유형 보유.
 - Sub-task의 시스템/메뉴는 부모 VOC에서 상속 (변경 불가).
 - 부모 VOC Soft Delete 시 Sub-task도 cascade soft delete.
+- **자동 태깅 cascade 없음**: 부모 VOC 편집 시 Sub-task에 `tag_rules` 재실행하지 않음. 각 VOC는 자신의 `title`/`body` 변경 시에만 독립적으로 태그 재계산됨.
 
 ### 8.8 분류 체계 (시스템 / 메뉴 / 유형)
 
@@ -195,7 +196,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 
 - 첨부 파일은 BE 컨테이너의 Docker volume(`/uploads/{voc_id}/`)에 저장.
 - 댓글 이미지 저장 경로: `/uploads/comments/{comment_id}/`. `attachments` 행 별도 생성 없음 (Toast UI Editor 업로드 엔드포인트 별도 운영).
-  - 댓글 이미지: 파일당 5MB, 최대 5개/댓글 (§8.10과 동일).
+  - 댓글 이미지: 파일당 5MB, 최대 5개/댓글. 허용 형식: PNG, JPG, GIF, WebP (VOC 본문 첨부와 동일).
 - 정적 파일 서빙: Express `static` 미들웨어 또는 별도 `/files/:id` 엔드포인트로 인증 후 제공.
 - 운영 환경에서는 volume을 호스트 경로에 마운트하여 백업 대상 포함.
 

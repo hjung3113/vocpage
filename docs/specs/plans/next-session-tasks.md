@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (17차 — Phase 7 진입 전 종합 리뷰 완료)
+> 최종 업데이트: 2026-04-25 (18차 — Phase 7 진입 전 스펙 픽스 완료, 사용자 결정 3건 대기)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
@@ -19,18 +19,33 @@
 
 > 리뷰 문서: `docs/specs/reviews/phase7-entry-review-2026-04-24.md`
 
-### Phase 7 진입 전 스펙 픽스 (블로커 순)
+### Phase 7 진입 전 스펙 픽스 — 완료 (2026-04-25)
 
-| 순서 | 항목                                                                                           | 위치                                              |
-| ---- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| 1    | **G-2 CORS 정책 확정** — B안(BE cors()) 채택, `.env.example` + `backend/src/index.ts` 반영     | `.env.example`, `backend/src/index.ts`            |
-| 2    | **G-3 issue_code prefix 규칙 명시** — 시스템 slug 대문자 방식 확정                             | `feature-voc.md §8.1`                             |
-| 3    | **G-4 폐쇄 메뉴 정의** — 방식 선택 후 스키마·spec 반영                                         | `requirements.md §4`, `feature-voc.md §8.2.1`     |
-| 4    | **G-5 Cold Start 시나리오** — A안(전 필드 unverified로 계속 기동) 명시                         | `requirements.md §16.3`, `external-masters.md §7` |
-| 5    | **env 파일 수정** — `LOG_LEVEL`, `VITE_AUTH_MODE` docker-compose 주입                          | `.env.example`, `docker-compose.yml`              |
-| 6    | **G-1 설비 마스터 스키마** — 담당자 자료 수집 후 `external-masters.md §3` 업데이트 (외부 의존) |
+| 항목                                                                                             | 상태 |
+| ------------------------------------------------------------------------------------------------ | ---- |
+| G-2 CORS B안 — `cors()` 미들웨어, `.env.example` + `backend/src/index.ts` + `docker-compose.yml` | ✅   |
+| G-3 issue_code prefix 동적 변환 명시 — `feature-voc.md §8.1`                                     | ✅   |
+| G-5 Cold Start A안 — `requirements.md §16.3` 테이블 + `external-masters.md §8` 신규 섹션         | ✅   |
+| env: `LOG_LEVEL`, `SESSION_STORE_URL`, `VITE_AUTH_MODE` 추가                                     | ✅   |
+| M-2 unverified 필드 저장 허용 명시 — `requirements.md §16.3`                                     | ✅   |
+| M-3 React Query staleTime 일괄 확정 — `requirements.md §3`                                       | ✅   |
+| M-4 SESSION_STORE_URL 변수명 확정 — `.env.example`                                               | ✅   |
+| M-7 댓글 이미지 형식 명시 (PNG/JPG/GIF/WebP) — `feature-voc.md §8.12`                            | ✅   |
+| M-8 Sub-task 태그 cascade 없음 명시 — `feature-voc.md §8.7`                                      | ✅   |
+| M-9 복원 VOC 태그 재실행 명시 — `requirements.md §4 tag_rules`                                   | ✅   |
+| M-10 대시보드 복합 필터 AND 조건 명시 — `dashboard.md §B`                                        | ✅   |
 
-### 위 완료 후 → Phase 7 실구현 시작
+### 사용자 결정 필요 (Phase 7 착수 전)
+
+| #   | 항목                                                                                 | 선택지                                                         |
+| --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| G-1 | **설비 마스터 MSSQL 스키마** — 담당자 자료 수집 후 `external-masters.md §3` 업데이트 | 외부 의존 (담당자)                                             |
+| G-4 | **폐쇄 메뉴 정의** — `requirements.md §4` 스키마 + `feature-voc.md §8.2.1` 반영 필요 | A: `systems.is_closed` / B: `menus.is_closed` / C: 런타임 판단 |
+| M-1 | **unverified_fields 검증 세부 규칙** — 대소문자·공백 정규화, 완전 일치 vs 부분 매칭  | `requirements.md §4`                                           |
+| M-5 | **태그 규칙 삭제 권한** — Admin 전용인가, Manager도 가능한가                         | `feature-voc.md §8.3`                                          |
+| M-6 | **신규 태그 생성 주체** — Admin 전용인가, Manager도 가능한가                         | `feature-voc.md §8.8`                                          |
+
+### 위 사용자 결정 완료 후 → Phase 7 실구현 시작
 
 1. **Phase 7 실구현 시작** — 6-8 ✅ 완료. feat/6-8-state-management 브랜치 PR 머지 후 진입
 
