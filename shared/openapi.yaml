@@ -19,6 +19,7 @@ tags:
   - name: notifications
   - name: dashboard
   - name: admin
+  - name: files
 
 paths:
   /health:
@@ -1420,6 +1421,397 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /vocs/{id}/payload:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [vocs]
+      operationId: submitVocPayload
+      summary: Submit structured payload for a VOC
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [equipment, maker, model, process, symptom, root_cause, resolution]
+              properties:
+                equipment:
+                  type: string
+                maker:
+                  type: string
+                model:
+                  type: string
+                process:
+                  type: string
+                symptom:
+                  type: string
+                root_cause:
+                  type: string
+                resolution:
+                  type: string
+                unverified_fields:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Submitted payload history entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocPayloadHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/payload-history:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [vocs]
+      operationId: getVocPayloadHistory
+      summary: Get payload submission history for a VOC
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payload history list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VocPayloadHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/payload-review:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [vocs]
+      operationId: reviewVocPayload
+      summary: Approve or reject a VOC payload (Result Review)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: ['approved', 'rejected']
+                comment:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Review recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/timeline:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [vocs]
+      operationId: getVocTimeline
+      summary: Get VOC timeline events (Manager/Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Timeline event list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/notices:
+    get:
+      tags: [admin]
+      operationId: adminListNotices
+      summary: List notices (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notice list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notice'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateNotice
+      summary: Create notice (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoticeInput'
+      responses:
+        '201':
+          description: Created notice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/notices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [admin]
+      operationId: adminGetNotice
+      summary: Get notice by ID (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [admin]
+      operationId: adminUpdateNotice
+      summary: Update notice (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoticeInput'
+      responses:
+        '200':
+          description: Updated notice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [admin]
+      operationId: adminDeleteNotice
+      summary: Delete notice (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/faqs:
+    get:
+      tags: [admin]
+      operationId: adminListFaqs
+      summary: List FAQs (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: FAQ list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Faq'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateFaq
+      summary: Create FAQ (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaqInput'
+      responses:
+        '201':
+          description: Created FAQ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faq'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/faqs/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [admin]
+      operationId: adminGetFaq
+      summary: Get FAQ by ID (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: FAQ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faq'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [admin]
+      operationId: adminUpdateFaq
+      summary: Update FAQ (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaqInput'
+      responses:
+        '200':
+          description: Updated FAQ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Faq'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [admin]
+      operationId: adminDeleteFaq
+      summary: Delete FAQ (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /files/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [files]
+      operationId: downloadFile
+      summary: Download file by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: File binary content
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   parameters:
     id:
@@ -1528,13 +1920,14 @@ components:
 
     AuthUser:
       type: object
-      required: [id, ad_username, display_name, email, role]
+      required: [id, display_name, email, role]
       properties:
         id:
           type: string
           format: uuid
         ad_username:
           type: string
+          nullable: true
         display_name:
           type: string
         email:
@@ -1613,7 +2006,6 @@ components:
         author_id:
           type: string
           format: uuid
-          nullable: true
         parent_id:
           type: string
           format: uuid
@@ -1641,6 +2033,10 @@ components:
         updated_at:
           type: string
           format: date-time
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
         deleted_at:
           type: string
           format: date-time
@@ -1730,10 +2126,6 @@ components:
         updated_at:
           type: string
           format: date-time
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
 
     Note:
       type: object
@@ -1990,6 +2382,7 @@ components:
           format: uuid
         type:
           type: string
+          enum: ['status_change', 'comment', 'mention', 'assignment', 'urgent']
         voc_id:
           type: string
           format: uuid
@@ -2097,3 +2490,82 @@ components:
         loaded_at:
           type: string
           format: date-time
+
+    VocPayloadHistory:
+      type: object
+      required: [id, voc_id, payload, submitted_by, submitted_at, is_current]
+      properties:
+        id:
+          type: string
+          format: uuid
+        voc_id:
+          type: string
+          format: uuid
+        payload:
+          type: object
+          additionalProperties: true
+        submitted_by:
+          type: string
+          format: uuid
+        submitted_at:
+          type: string
+          format: date-time
+        final_state:
+          type: string
+          nullable: true
+        is_current:
+          type: boolean
+
+    Notice:
+      type: object
+      required: [id, title, body, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    NoticeInput:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+
+    Faq:
+      type: object
+      required: [id, question, answer, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        question:
+          type: string
+        answer:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    FaqInput:
+      type: object
+      required: [question, answer]
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
