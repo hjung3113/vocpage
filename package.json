@@ -1,9 +1,13 @@
 {
   "name": "vocpage",
   "private": true,
-  "workspaces": ["frontend", "backend"],
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\""
+    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "prepare": "husky"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
@@ -19,9 +23,19 @@
     "stylelint-declaration-strict-value": "^1.9.2"
   },
   "lint-staged": {
-    "**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
-    "**/*.{js,cjs,mjs}": ["prettier --write"],
-    "**/*.{json,md}": ["prettier --write"],
-    "**/*.{css,scss}": ["stylelint --fix", "prettier --write"]
+    "**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{js,cjs,mjs}": [
+      "prettier --write"
+    ],
+    "**/*.{json,md}": [
+      "prettier --write"
+    ],
+    "**/*.{css,scss}": [
+      "stylelint --fix",
+      "prettier --write"
+    ]
   }
 }
