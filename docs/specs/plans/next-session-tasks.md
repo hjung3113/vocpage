@@ -1,13 +1,28 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (14차 — 6-5 FE-BE API 계약 완료(openapi.yaml+codegen+SwaggerUI), 6-3 BE 테스트 전략 완료(pg-mem+31테스트), 다음 세션: 6-8 상태 관리 문서화)
+> 최종 업데이트: 2026-04-24 (15차 — Phase 7 진입 전 적대적 리뷰 완료, preflight 수정 항목 도출)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
+
+## ⚠️ Phase 7 진입 전 Preflight (현재 최우선)
+
+> 상세: `docs/specs/reviews/phase6/phase7-preflight-adversarial-review.md`
+
+적대적 리뷰(oh-my-claudecode:critic vs analyst) 결과, Phase 7 착수 전 반드시 처리해야 할 항목:
+
+| 순서 | 항목                                                                                                               | 파일            | 난이도  |
+| ---- | ------------------------------------------------------------------------------------------------------------------ | --------------- | ------- |
+| 1    | `backend/migrations/003_vocs.sql` — `parent_id` / `issue_code` / `due_date` 컬럼 누락 확인 + 패치                  | migrations/003  | 반나절  |
+| 2    | `vocs.status` enum `'접수'` vs `'접수됨'` 3-way 통일 (migration + openapi.yaml + spec)                             | 3곳             | 1시간   |
+| 3    | `author_id` vs `reporter_id` 컬럼명 통일 (migration NOT NULL + openapi nullable:false)                             | 2곳             | 1시간   |
+| 4    | openapi.yaml 누락 엔드포인트 추가 (Result Review, Payload 제출/이력, Timeline, 공지/FAQ Admin CRUD, 파일 다운로드) | openapi.yaml    | 2~3시간 |
+| 5    | 세션 스토어 확정 (`connect-pg-simple` 권장) → requirements.md §14.1 반영                                           | requirements.md | 30분    |
+
+> Preflight 완료 후 → **6-8 상태 관리 문서화** (첫 FE PR 동반 가능) → **Phase 7 실구현**
 
 ## 다음 세션 시작점
 
-1. **6-5 FE-BE API 계약** — OpenAPI codegen (`openapi-typescript`), `openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성, Swagger UI BE dev 마운트
-2. **6-3 BE 테스트 전략** — Jest + Supertest 설정, 테스트 픽스처/시드 전략, 테스트 DB 전략 결정 (6-7 완료로 블로킹 해제)
-3. **6-8 상태 관리 방식 문서화** — React Context 확정 이미 됨, 전역 상태 범위 목록화만 남음
+1. **Preflight 수정** — 위 표 1~5번 순서대로 처리 (상세: `reviews/phase6/phase7-preflight-adversarial-review.md`)
+2. **6-8 상태 관리 방식 문서화** — React Context 확정 이미 됨, 전역 상태 범위 목록화만 남음 (blocking 아님, Phase 7 첫 FE PR 동반 가능)
 
 ## Reviews 폴더 구조
 
@@ -16,9 +31,11 @@ docs/specs/reviews/
 ├── phase0/   prototype-requirements-review.md
 ├── phase2/   requirements-expert-review-2026-04-23.md, REVIEW-notice-faq.md
 ├── phase4/   requirements-5expert-review-2026-04-23.md
-└── phase6/   design-enforcement.md   ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
-             voc-ai-workflow-fit-review.md     ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
-             voc-ai-workflow-fit-review-v2.md  ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
+└── phase6/   design-enforcement.md              ← Phase 6-2 디자인 일관성 강제 체계 브레인스토밍
+             voc-ai-workflow-fit-review.md        ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
+             voc-ai-workflow-fit-review-v2.md     ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
+             voc-ai-workflow-fit-review-v3.md     ← Phase 6-1 v3 (2026-04-24, Q3~Q10 + 갭#6 + 7A 확정)
+             phase7-preflight-adversarial-review.md ← Phase 7 진입 전 적대적 리뷰 (2026-04-24) ★현재
 ```
 
 ---
