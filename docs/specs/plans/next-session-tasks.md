@@ -272,10 +272,15 @@ docs/specs/reviews/
 
 ### 6-7. DB 마이그레이션 & 시드 전략
 
-- [ ] 마이그레이션 방식 결정 (수동 SQL 파일 vs node-pg-migrate vs Flyway)
-- [ ] 마이그레이션 파일 구조 및 명명 규칙 결정
-- [ ] prototype.html 예시 데이터 기반 시드 fixture 작성 계획
-- [ ] **pgvector 확장 초기 마이그레이션에 포함**: `CREATE EXTENSION IF NOT EXISTS vector;` + `vocs.embedding vector(1536) NULL` 컬럼 생성 (MVP 미사용, 향후 유사검색/RAG용 예약). Docker 이미지는 `pgvector/pgvector:pg16` 사용.
+> 설계 확정: `docs/specs/plans/2026-04-24-phase6-7-db-migration-design.md`
+> 브랜치: `docs/phase6-7-db-migration-design` (PR 머지 대기)
+
+- [x] 마이그레이션 도구: **node-pg-migrate**
+- [x] 실행 시점: **자동** (Docker entrypoint.sh — migrate → dev)
+- [x] 파일 구조: **도메인별 6파일** (001_extensions ~ 006_settings)
+- [x] 시드 전략: **별도 스크립트** (`npm run db:seed`, 최초 1회 수동)
+- [x] 테스트 DB: 6-3에서 결정
+- [ ] **구현**: node-pg-migrate 설치 + 마이그레이션 파일 6개 + entrypoint.sh + dev_seed.sql
 
 ### 6-8. 상태 관리 방식 확정
 

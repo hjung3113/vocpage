@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project Status
 
-This is a **VOC (Voice of Customer) management system** currently in **Phase 6 implementation** — frontend and backend are scaffolded with working source code. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
+This is a **greenfield VOC (Voice of Customer) management system** currently in the design/requirements phase. No source code exists yet. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
 
 ## Planned Tech Stack
 
@@ -19,13 +19,13 @@ This is a **VOC (Voice of Customer) management system** currently in **Phase 6 i
 
 ## Sub-directory Guides
 
-Each working directory has a focused `CLAUDE.md` with its own commands, architecture, and rules:
+Each working directory has a focused `AGENTS.md` with its own commands, architecture, and rules:
 
-- `frontend/CLAUDE.md` — React SPA, hooks, state, full design tokens
-- `backend/CLAUDE.md` — Express REST API, DB schema, middleware
-- `prototype/CLAUDE.md` — visual exploration HTML, full design tokens
+- `frontend/AGENTS.md` — React SPA, hooks, state, full design tokens
+- `backend/AGENTS.md` — Express REST API, DB schema, middleware
+- `prototype/AGENTS.md` — visual exploration HTML, full design tokens
 
-**Rule:** when working inside a sub-directory, read its `CLAUDE.md` first. This file covers cross-cutting governance only.
+**Rule:** when working inside a sub-directory, read its `AGENTS.md` first. This file covers cross-cutting governance only.
 
 ## Docker
 
@@ -35,13 +35,13 @@ docker compose up    # Start all services (FE + BE + Postgres)
 
 ## Architecture Overview
 
-Three-tier app: React SPA → Express REST API → PostgreSQL. Detailed architecture lives in each sub-directory's `CLAUDE.md` and in `docs/specs/requires/`.
+Three-tier app: React SPA → Express REST API → PostgreSQL. Detailed architecture lives in each sub-directory's `AGENTS.md` and in `docs/specs/requires/`.
 
 ## Design System (Pointer)
 
 Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Reference.
 
-**Hard rule (echoed in `frontend/CLAUDE.md` and `prototype/CLAUDE.md`):**
+**Hard rule (echoed in `frontend/AGENTS.md` and `prototype/AGENTS.md`):**
 
 - Always use CSS custom properties — `var(--bg-app)`, `var(--brand)`, `var(--text-primary)`, etc.
 - **Never write hex values** (no `#5e6ad2`, no `#ffffff`). No raw OKLCH either — go through the token.
@@ -50,11 +50,10 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 
 ## Start Every Session
 
-1. Read `claude-progress.txt` (first 30 lines only)
+1. Read `Codex-progress.txt` (first 30 lines only)
 2. Read `docs/specs/plans/next-session-tasks.md` to find current Phase and pending tasks
 3. Read relevant spec in `docs/` (selectively — only what's needed)
 4. Continue from progress file — don't re-read what you already know
-5. Review `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — delete any entries whose work is already reflected in specs or git (delete file + remove from index; do not archive)
 
 ## Core Rules
 
@@ -63,22 +62,22 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
 - **Git workflow** — always create a feature branch first, commit and push there. Never commit or push directly to main. Branch naming: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
-  - PRs are opened by the user, not by Claude
+  - PRs are opened by the user, not by Codex
   - Merge PRs with `gh pr merge <n> --merge --delete-branch` — `--squash` and `--rebase` are forbidden
     - `--squash`: destroys commit history
     - `--rebase`: replays commits directly onto main, erasing PR boundaries
     - `--merge`: preserves both the merge commit (PR boundary) and individual commits ✓
   - After merging, delete the local branch: `git branch -D <branch>`
   - main changes only via PR — direct push and force push are forbidden
-  - These rules are enforced by hookify rules in `.claude/hookify.block-*.local.md`
+  - These rules are enforced by hookify rules in `.Codex/hookify.block-*.local.md`
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
-- CLAUDE.md stays under 200 lines
+- AGENTS.md stays under 200 lines
 
 ## Session Continuity
 
 Every design decision → written to spec or ADR before session ends.
-Every phase completion → update `claude-progress.txt` + git commit.
+Every phase completion → update `Codex-progress.txt` + git commit.
 No implementation without a written spec section covering it.
 
 ## Document Structure
@@ -121,7 +120,7 @@ docs/specs/
 | ---------------------------------------- | ----------------------------- |
 | Spec (design decision, constraint)       | Implementation plan           |
 | Implementation plan (task added/removed) | Spec section it implements    |
-| CLAUDE.md (new rule)                     | Spec if rule affects behavior |
+| AGENTS.md (new rule)                     | Spec if rule affects behavior |
 
 ## Session Rules
 
