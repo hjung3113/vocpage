@@ -115,8 +115,7 @@
 
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
 - **`voc_payload_reviews`** (제출/삭제 리뷰 통합 로그):
-  - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `is_self_review boolean default false`, `created_at timestamptz default now()`.
-  - 폐쇄 메뉴 케이스는 self-review 허용(감사 플래그만 남김, 별도 모니터링 대시보드 없음).
+  - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `created_at timestamptz default now()`.
 - **`voc_payload_history`** (제출 스냅샷 이력, "이전 이력" 버튼 소스):
   - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `payload jsonb NOT NULL`, `submitted_by(FK→users)`, `submitted_at timestamptz default now()`, `final_state text CHECK IN ('approved','rejected','deleted','active')`, `is_current boolean default false`.
   - 인덱스: `(voc_id, submitted_at DESC)`.
@@ -249,7 +248,6 @@
 - **임시저장**: 편집 모달 내 별도 버튼. `structured_payload_draft`만 기록, 필수 필드 검증 면제, `vocs.status`/`review_status` 변동 없음. 모달 무저장 닫힘 시 프롬프트. 최신 draft 1건만 유지(이력 없음). 담당자 재할당 시 draft는 VOC에 종속되어 새 담당자가 그대로 이어받음.
 - **이전 이력 버튼**: 모달 내에서 `voc_payload_history` 목록 표시, 선택 시 draft 덮어쓰기 확인 후 로드. `final_state='deleted'` 스냅샷도 복원 선택 가능("삭제됨" 라벨).
 - **칩 입력 cascade**: 설비 입력 시 공정+메이커+모델 auto 추가, 모델 입력 시 공정+메이커 auto 추가, 메이커/공정 단독 입력 시 auto 없음. auto 칩 UI는 점선 테두리+`auto` 배지. cascade는 세션 메모리에서만 추적 — 페이지 리로드·임시저장 후 재진입 시 auto 구분 소실(수동 칩으로 복원).
-- **폐쇄 메뉴 self-review**: 허용하되 `voc_payload_reviews.is_self_review=true`로 감사 추적.
 
 ---
 
@@ -457,8 +455,7 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 - **대상 행**: `review_status IN ('unverified','pending_deletion')` VOC.
 - **액션**: 각 VOC에 코멘트 + approve/reject. 결정 이력은 `voc_payload_reviews`에 `action='submission'|'deletion'` 구분으로 기록.
-- **self-review**: 폐쇄 메뉴 케이스 수용. 동일 UI에서 허용하되 `is_self_review=true` 플래그로 감사 추적만 남김(별도 모니터링 대시보드 없음).
-- **권한**: Manager/Admin + (self-review 허용 시) 본인 담당자.
+- **권한**: Manager/Admin.
 - **연관 갱신**: approve 시 `vocs.structured_payload` 확정 / `voc_payload_history.is_current=true` 스냅샷 유지 / 임베딩 정책(§16) 트리거.
 
 ---

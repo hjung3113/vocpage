@@ -47,7 +47,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
                                                       └─reject───▶ approved (원복)
 ```
 
-- 전환 권한: Manager/Admin + (폐쇄 메뉴 케이스) 담당자 self-review. self-review 시 `voc_payload_reviews.is_self_review=true`로 감사 추적.
+- 전환 권한: Manager/Admin.
 - 제출 스냅샷은 `voc_payload_history`에 `is_current=true`로 insert — 기존 `is_current` row는 false로 내림.
 - 삭제 승인 시: 해당 스냅샷 `final_state='deleted'`, `is_current=false`, `vocs.structured_payload=NULL`, `vocs.review_status=NULL`.
 - 삭제 reject 시: `vocs.review_status='approved'` 원복 + `action='deletion', decision='rejected'` 리뷰 row만 추가.
@@ -324,9 +324,8 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - **액션 UI**:
   - 행 선택 → 우측 드로어에 payload diff(현재 `is_current` 스냅샷 vs 신규 제출) + 코멘트 입력창.
   - `approve` / `reject` 버튼. reject 시 코멘트 필수.
-  - 결정은 `voc_payload_reviews`에 `action` + `decision` + `comment` + `is_self_review` 기록.
-- **self-review**: 폐쇄 메뉴(담당자 본인만 접근 가능한 시스템/메뉴) 케이스 수용. 동일 UI에서 허용하되 `is_self_review=true` 플래그로 감사 추적만 남김. 별도 모니터링 대시보드 없음.
-- **권한**: Manager/Admin + (self-review 허용 시) 해당 VOC 담당자 본인.
+  - 결정은 `voc_payload_reviews`에 `action` + `decision` + `comment` 기록.
+- **권한**: Manager/Admin.
 - **연관 갱신 규칙**:
   - 제출 approve → `vocs.structured_payload` 확정, 해당 history row `is_current=true`/`final_state='approved'` 유지, `vocs.embed_stale=true`면 임베딩 재생성(MVP는 미실행).
   - 제출 reject → `vocs.review_status='rejected'`, payload 본 컬럼은 유지(담당자 수정/재제출 가능), history row `final_state='rejected'`.
