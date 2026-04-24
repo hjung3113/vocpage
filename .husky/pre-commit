@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 npx lint-staged
 npm run typecheck -w frontend
 npm run typecheck -w backend
