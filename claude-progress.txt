@@ -4,14 +4,15 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **다음: 6-6 인증 Mock 전략**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **다음: PR #22 머지 → Codex 리뷰 → 6-7 DB 마이그레이션**
 
 ### 다음 세션 우선순위
 
-1. **6-6 인증 Mock 전략** (`AUTH_MODE=mock`) — 블로킹, 다음 우선
-2. **6-7 DB 마이그레이션 & 시드** (node-pg-migrate)
-3. **6-5 FE-BE API 계약** (OpenAPI codegen)
-4. **6-3 BE 테스트 전략** (Jest + Supertest)
+1. **PR #22 머지** (`docs/sync-phase6-impl-to-requirements`) — 충돌 해소 완료, 머지 대기
+2. **Codex 리뷰** — Phase 6-6 구현 코드베이스 전체 리뷰
+3. **6-7 DB 마이그레이션 & 시드** (node-pg-migrate) — 다음 블로킹
+4. **6-5 FE-BE API 계약** (OpenAPI codegen)
+5. **6-3 BE 테스트 전략** (Jest + Supertest)
    ※ 설비 마스터 MSSQL 스키마(`external-masters.md §3`) — 담당자 자료 수집 후 별도 보완
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)

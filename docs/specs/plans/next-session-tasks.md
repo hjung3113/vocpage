@@ -1,7 +1,13 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (10차 — v3 리뷰 전 결정(Q3/Q5/Q7/Q8/Q9/Q10/갭#6/§7A) requirements.md 본문 일괄 반영 완료)
+> 최종 업데이트: 2026-04-24 (12차 — PR #21 머지 완료, PR #22 충돌 해소 완료·머지 대기, 다음 세션: Codex 리뷰 + 6-7)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
+
+## 다음 세션 시작점
+
+1. **PR #22 머지** (`docs/sync-phase6-impl-to-requirements`) — 충돌 해소 완료, 머지 준비됨
+2. **Codex 리뷰** — Phase 6-6 구현 코드베이스 전체 리뷰 (`/review` 스킬)
+3. **다음 블로킹**: 6-7 DB 마이그레이션 & 시드 전략
 
 ## Reviews 폴더 구조
 
@@ -98,9 +104,9 @@ docs/specs/reviews/
 ### 권고 실행 순서 (2026-04-24 재조정)
 
 ```
-6-4 스캐폴딩 & 개발환경   ← 모든 것의 기반, 가장 먼저
-6-6 인증 Mock 전략        ← 블로킹. AUTH_MODE=mock 없이 API 테스트 불가
-6-7 DB 마이그레이션 & 시드 ← 테이블 없이 통합 테스트 작성 불가
+6-4 스캐폴딩 & 개발환경   ✅ 완료 (2026-04-24)
+6-6 인증 Mock 전략        ✅ 완료 (2026-04-24) — AUTH_MODE=mock, BE 7/FE 8 테스트
+6-7 DB 마이그레이션 & 시드 ← 다음 블로킹. 테이블 없이 통합 테스트 작성 불가
 6-5 FE-BE API 계약        ← DB + Auth 확정 후 API shape 정의
 6-3 BE 테스트 전략         ← API shape 알아야 케이스 목록 작성 가능
 6-8 상태 관리 방식 확정    ← React Context로 이미 확정, 문서화만
@@ -250,16 +256,19 @@ docs/specs/reviews/
 - [ ] BE 완성 전 FE 개발용 Mock API 전략 결정 (MSW vs json-server)
 - [ ] 주요 API 엔드포인트 응답 형태 사전 정의 (requirements.md §API 기반)
 
-### 6-6. 인증 Mock 전략 ✅ 설계 완료 (2026-04-24)
+### 6-6. 인증 Mock 전략 ✅ 완료 (2026-04-24)
 
-> 설계 문서: `docs/specs/plans/phase6-6-auth-mock-design.md` (PR #21)
-> 다음 세션: `writing-plans` 스킬로 구현 계획 작성 후 구현 진입
+> 구현 계획: `docs/specs/plans/2026-04-24-phase6-6-auth-mock.md`
+> 커밋 범위: `489af19`..`6e5979b` (8 commits, main 머지 완료)
+> 테스트: BE 7/7 (Jest+Supertest), FE 8/8 (Vitest+@testing-library/react)
 
-- [x] `validateADSession` 미들웨어 — 팩토리 패턴 (`auth/index.ts` → `mockAuth.ts` / `oidcAuth.ts` 선택)
-- [x] 개발용 mock 사용자 픽스처 — Admin/Manager/User 3개, 고정 UUID (`...0001~0003`), 6-7 시드 공유
-- [x] FE `/mock-login` React 라우트 — `VITE_AUTH_MODE=mock`일 때만 활성화, dynamic import로 prod 번들 격리
-- [ ] **구현 계획 작성** (`writing-plans` 스킬) — 다음 세션 시작점
-- [ ] 실 AD 없이 전체 플로우 개발 가능한 상태 확인 (구현 후)
+- [x] `AUTH_MODE=mock` 환경변수 기반 미들웨어 팩토리 (`createAuthMiddleware`)
+- [x] `mockAuth` 세션 미들웨어 — `req.session.user` → `req.user` 주입, 미인증 시 401
+- [x] `oidcAuth` throw stub — prod 진입 시 빠른 실패
+- [x] `POST /api/auth/mock-login` / `POST /api/auth/logout` / `GET /api/auth/me` 엔드포인트
+- [x] mock user fixtures 3개 (admin/manager/user, 고정 UUID)
+- [x] FE `/mock-login` 페이지 — `VITE_AUTH_MODE=mock` 시에만 등록, prod bundle tree-shaken
+- [x] FE auth API client (`mockLogin`, `logout`, `getMe`)
 
 ### 6-7. DB 마이그레이션 & 시드 전략
 

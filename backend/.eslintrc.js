@@ -4,6 +4,7 @@ module.exports = {
   env: { node: true },
   rules: {
     'n/no-missing-require': 'off',
+    'n/no-missing-import': 'off',
     'n/no-unsupported-features/es-syntax': 'off',
   },
   overrides: [
