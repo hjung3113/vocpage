@@ -62,9 +62,12 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
 - **Git workflow** — **항상 feature 브랜치를 먼저 생성**한 뒤 커밋·푸시하고 PR을 열 것. main에 직접 커밋/푸시 절대 금지. 브랜치 네이밍: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
-  - PR 머지는 반드시 `gh pr merge <n> --rebase --delete-branch` — `--squash` 사용 금지 (커밋 히스토리 손실)
-  - 리뷰 수정 사항도 동일: 새 `fix/<topic>` 브랜치에 커밋 → PR → rebase 머지
-  - main은 항상 PR을 통해서만 변경 — force push 금지 (히스토리 복구 목적 외)
+  - PR 머지는 반드시 `gh pr merge <n> --merge --delete-branch` — `--squash`·`--rebase` 사용 금지
+    - `--squash`: 커밋 히스토리 손실
+    - `--rebase`: 개별 커밋이 main에 직접 replaying → PR 경계 사라짐
+    - `--merge`: 머지 커밋(PR 경계) + 개별 커밋 모두 보존 ✓
+  - 리뷰 수정 사항도 동일: 새 `fix/<topic>` 브랜치에 커밋 → PR → `--merge`
+  - main은 항상 PR을 통해서만 변경 — 직접 push·force push 절대 금지
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - CLAUDE.md stays under 200 lines
