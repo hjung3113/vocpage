@@ -151,10 +151,10 @@ docs/specs/reviews/
 
 ### 6-2. 디자인 일관성 강제 체계
 - [x] `design.md` §10 누락 토큰 추가 — `--status-*` 12개 + `--status-dot-*` 5개 (2026-04-24)
-- [ ] `design.md` §11 신규 — 컴포넌트 유형별 토큰 사용 규칙 매핑 테이블
-- [ ] `frontend/CLAUDE.md` 룰 보강 (토큰 없으면 design.md에 먼저 추가 규칙)
-- [ ] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` → 6-4 스캐폴딩에서 같이 처리
-- ~~`tokens.ts` 별도 파일~~ — 탈락. CSS custom properties가 이미 단일 소스, TS 복제 시 동기화 부담만 추가됨
+- [x] `design.md` §12 신규 — Token Architecture (tokens.ts 단일 소스, Tailwind/CSS vars 혼용 규칙, 사용 시나리오 매핑, 강제 체계) (2026-04-24)
+- [x] `frontend/CLAUDE.md` 룰 보강 — Tailwind vs CSS vars 사용 규칙, hard rules (2026-04-24)
+- [x] `tokens.ts` 단일 소스 → Tailwind config + CSS vars 자동 전파 **채택** (Tailwind CSS v4 혼용 결정, 2026-04-24)
+- [ ] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` + husky → 6-4 스캐폴딩에서 같이 처리
 
 ### 6-3. 백엔드 테스트 작성 전략
 - [ ] 테스트 범위 정의: 단위(서비스 레이어), 통합(API 엔드포인트), E2E(주요 플로우)

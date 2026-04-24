@@ -52,7 +52,7 @@
 
 | 구분 | 기술 스택 | 비고 |
 | :--- | :--- | :--- |
-| **Frontend** | Vite, React, TypeScript | Design md 스타일 적용 |
+| **Frontend** | Vite, React, TypeScript, Tailwind CSS v4 | `tokens.ts` → Tailwind config + CSS vars 단일 소스 |
 | **Backend** | Node.js 20 LTS (Express), TypeScript | OIDC 인증 미들웨어 |
 | **Database** | PostgreSQL 16 | Self-join 및 M:N 관계 설계 |
 | **Infra** | Docker, Docker Compose | 환경 일치 및 배포 편의성 |

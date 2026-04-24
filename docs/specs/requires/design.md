@@ -623,4 +623,56 @@ where α = lerp(0.06, 0.62, value / maxValue)
 | 14–29 days | `var(--chart-amber)` background tint |
 | 30+ days | `var(--chart-red)` background tint |
 
+---
+
+## 12. Token Architecture
+
+### 12.1 Single Source of Truth
+
+All design tokens originate from `frontend/src/tokens.ts`. This file is the only place where raw values (hex, OKLCH, px) are allowed to appear.
+
+```
+tokens.ts  (raw values live here — only place hex/OKLCH is permitted)
+    ├── tailwind.config.ts   → utility classes  (bg-brand, text-primary, …)
+    └── CSS custom properties → var(--brand), var(--bg-app), …
+```
+
+Both Tailwind utilities and CSS vars are generated from `tokens.ts`. Editing a token in `tokens.ts` propagates to both surfaces automatically.
+
+### 12.2 When to Use Tailwind Utilities vs CSS Vars
+
+| Situation | Use | Example |
+|-----------|-----|---------|
+| Layout, spacing, flex, grid | Tailwind utility | `flex gap-2 px-4` |
+| Static color on a standard element | Tailwind utility | `bg-brand text-primary` |
+| Dynamic color via JS (charts, Toast UI, canvas) | CSS var via JS | `tokens.brand` imported from `tokens.ts` |
+| Inline style override in JSX | CSS var | `style={{ color: 'var(--text-secondary)' }}` |
+| Theme-aware color in custom CSS / `@apply` | CSS var | `color: var(--text-primary)` |
+
+**Rule:** never write a raw hex or OKLCH value outside of `tokens.ts`. If a token does not exist for what you need, add it to `tokens.ts` + this file first, then use it.
+
+### 12.3 Token File Structure
+
+```ts
+// frontend/src/tokens.ts
+export const colors = {
+  brand:        '#0f62fe',   // Samsung Blue
+  bgApp:        'oklch(12% 0.01 250)',
+  // …
+} as const;
+
+export const spacing = { … } as const;
+export const fontSize = { … } as const;
+
+// Re-export flat map for Tailwind config consumption
+export default { colors, spacing, fontSize };
+```
+
+### 12.4 Enforcement
+
+- **Stylelint `declaration-strict-value`** — rejects raw color/font values in `.css` / `.module.css` files; only `var(--*)` or Tailwind utility classes pass.
+- **ESLint `no-restricted-syntax`** — rejects inline `style={{ color: '#...' }}` in JSX.
+- **Pre-commit hook (husky + lint-staged)** — runs both linters; commit is rejected if violations exist.
+- CI runs the same lint check and blocks merge on failure.
+
 OS/browser dark mode setting automatically switches the entire theme.

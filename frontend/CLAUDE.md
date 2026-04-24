@@ -22,18 +22,25 @@ npm run test -- path/to/file.test.ts     # Single test file
 - **State:** React Context or Redux for global filter/selection.
 - **Base components:** Radix UI primitives — ghost buttons, translucent cards, border-focused inputs.
 
-## Design Tokens (authoritative surface — echoed here because this is where UI is rendered)
+## Styling Architecture
 
-Full reference: `docs/specs/requires/design.md §10 CSS Reference`. Use CSS custom properties only:
+Token pipeline: `src/tokens.ts` → `tailwind.config.ts` (utility classes) + CSS custom properties (`var(--*)`)
 
-- **Background (OKLCH, blue-tinted):** `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--bg-elevated)`
-- **Brand accent (Samsung Blue):** `var(--brand)` / `var(--accent)` / `var(--accent-hover)` — **do not use the old Linear indigo `#5e6ad2`**
-- **Text:** `var(--text-primary)` / `var(--text-secondary)` / `var(--text-tertiary)` / `var(--text-quaternary)`
-- **Typography:** Pretendard Variable (Korean + Latin UI), D2Coding (code blocks, issue IDs)
-- **Spacing:** 8px grid base; max content width ~1200px
-- **Elevation:** background opacity — `rgba(255,255,255,0.05)` for surfaces; multi-layer shadow reserved for dialogs
+Full token reference: `docs/specs/requires/design.md §10 CSS Reference` and `§12 Token Architecture`.
 
-**Hard rule:** never write hex or raw OKLCH values in component CSS. Always go through a token. If a token doesn't exist for what you need, add it to `design.md` first.
+**When to use which:**
+- Layout / spacing / flex / grid → Tailwind utility (`flex gap-2 px-4`)
+- Static color on a standard element → Tailwind utility (`bg-brand text-primary`)
+- Dynamic color passed to JS (charts, Toast UI, canvas) → import from `tokens.ts` directly
+- Inline style in JSX → CSS var (`style={{ color: 'var(--text-secondary)' }}`)
+- Custom CSS / `@apply` → CSS var (`color: var(--text-primary)`)
+
+**Hard rules:**
+- Never write hex or raw OKLCH values outside of `src/tokens.ts`
+- If a token doesn't exist for what you need, add it to `src/tokens.ts` + `design.md §12` first, then use it
+- Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)
+
+Key tokens: `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--brand)` / `var(--accent)` / `var(--text-primary)` / `var(--text-secondary)`
 
 ## Safety Echoes (also in root)
 
