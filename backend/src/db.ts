@@ -10,11 +10,21 @@ export function getPool(): Pool {
 }
 
 export function setPool(pool: Pool): void {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('setPool() is forbidden in production');
+  }
   _pool = pool;
+}
+
+export function resetPool(): void {
+  _pool = null;
 }
 
 export const pool = new Proxy({} as Pool, {
   get(_target, prop) {
-    return getPool()[prop as keyof Pool];
+    const value = getPool()[prop as keyof Pool];
+    return typeof value === 'function'
+      ? (value as (...args: unknown[]) => unknown).bind(getPool())
+      : value;
   },
 });

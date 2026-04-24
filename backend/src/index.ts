@@ -10,10 +10,15 @@ import { authRouter } from './routes/auth';
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
 createAuthMiddleware();
 
+const isProduction = process.env.NODE_ENV === 'production';
+if (isProduction && !process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET must be set in production');
+}
+
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET ?? 'dev-only-secret-change-in-prod',
@@ -22,12 +27,13 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: 'strict',
+      secure: isProduction,
       maxAge: 8 * 60 * 60 * 1000,
     },
   }),
 );
 
-if (process.env.NODE_ENV !== 'production') {
+if (!isProduction) {
   const specPath = path.resolve(__dirname, '../../shared/openapi.yaml');
   const spec = yaml.load(fs.readFileSync(specPath, 'utf8')) as object;
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(spec));
@@ -39,8 +45,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRouter);
 
-const isMain = process.argv[1] && __filename.endsWith(process.argv[1].replace(/\.js$/, ''));
-if (isMain || require.main === module) {
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Backend running on port ${PORT}`);
   });

@@ -858,7 +858,7 @@ export interface components {
       is_active: boolean;
     };
     /** @enum {string} */
-    VocStatus: '접수됨' | '검토중' | '처리중' | '완료' | '드랍';
+    VocStatus: '접수' | '검토중' | '처리중' | '완료' | '드랍';
     /** @enum {string} */
     VocPriority: 'urgent' | 'high' | 'medium' | 'low';
     /** @enum {string} */
@@ -889,8 +889,10 @@ export interface components {
       structured_payload?: {
         [key: string]: unknown;
       } | null;
-      resolution_quality?: number | null;
-      drop_reason?: string | null;
+      /** @enum {string|null} */
+      resolution_quality?: '근본해결' | '임시조치' | null;
+      /** @enum {string|null} */
+      drop_reason?: '중복' | '정책거부' | '재현불가' | '범위외' | '기타' | null;
       /** Format: date-time */
       created_at: string;
       /** Format: date-time */
@@ -928,9 +930,12 @@ export interface components {
       menu_id?: string;
       /** Format: uuid */
       assignee_id?: string;
-      review_status?: string;
-      resolution_quality?: number;
-      drop_reason?: string;
+      /** @enum {string} */
+      review_status?: 'unverified' | 'approved' | 'rejected' | 'pending_deletion';
+      /** @enum {string} */
+      resolution_quality?: '근본해결' | '임시조치';
+      /** @enum {string} */
+      drop_reason?: '중복' | '정책거부' | '재현불가' | '범위외' | '기타';
     };
     Comment: {
       /** Format: uuid */
@@ -1050,7 +1055,7 @@ export interface components {
       name: string;
       pattern: string;
       /** @enum {string} */
-      kind: 'keyword' | 'regex';
+      kind: 'general';
       /** Format: uuid */
       tag_id: string;
       is_active: boolean;
@@ -1058,8 +1063,11 @@ export interface components {
     TagRuleInput: {
       name: string;
       pattern: string;
-      /** @enum {string} */
-      kind: 'keyword' | 'regex';
+      /**
+       * @default general
+       * @enum {string}
+       */
+      kind: 'general';
       /** Format: uuid */
       tag_id: string;
       is_active?: boolean;
@@ -1068,7 +1076,7 @@ export interface components {
       name?: string;
       pattern?: string;
       /** @enum {string} */
-      kind?: 'keyword' | 'regex';
+      kind?: 'general';
       /** Format: uuid */
       tag_id?: string;
       is_active?: boolean;

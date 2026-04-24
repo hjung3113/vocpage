@@ -1564,7 +1564,7 @@ components:
 
     VocStatus:
       type: string
-      enum: ['접수됨', '검토중', '처리중', '완료', '드랍']
+      enum: ['접수', '검토중', '처리중', '완료', '드랍']
 
     VocPriority:
       type: string
@@ -1628,10 +1628,12 @@ components:
           additionalProperties: true
           nullable: true
         resolution_quality:
-          type: integer
+          type: string
+          enum: ['근본해결', '임시조치']
           nullable: true
         drop_reason:
           type: string
+          enum: ['중복', '정책거부', '재현불가', '범위외', '기타']
           nullable: true
         created_at:
           type: string
@@ -1699,10 +1701,13 @@ components:
           format: uuid
         review_status:
           type: string
+          enum: ['unverified', 'approved', 'rejected', 'pending_deletion']
         resolution_quality:
-          type: integer
+          type: string
+          enum: ['근본해결', '임시조치']
         drop_reason:
           type: string
+          enum: ['중복', '정책거부', '재현불가', '범위외', '기타']
 
     Comment:
       type: object
@@ -1932,7 +1937,7 @@ components:
           type: string
         kind:
           type: string
-          enum: [keyword, regex]
+          enum: ['general']
         tag_id:
           type: string
           format: uuid
@@ -1941,7 +1946,7 @@ components:
 
     TagRuleInput:
       type: object
-      required: [name, pattern, kind, tag_id]
+      required: [name, pattern, tag_id]
       properties:
         name:
           type: string
@@ -1949,7 +1954,8 @@ components:
           type: string
         kind:
           type: string
-          enum: [keyword, regex]
+          enum: ['general']
+          default: general
         tag_id:
           type: string
           format: uuid
@@ -1965,7 +1971,7 @@ components:
           type: string
         kind:
           type: string
-          enum: [keyword, regex]
+          enum: ['general']
         tag_id:
           type: string
           format: uuid
