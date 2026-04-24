@@ -8,14 +8,14 @@ This is a **greenfield VOC (Voice of Customer) management system** currently in 
 
 ## Planned Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React + TypeScript, Vite, Toast UI Editor |
-| Backend | Node.js + Express + TypeScript |
-| Database | PostgreSQL |
-| Testing | Vitest (frontend), Jest + Supertest (backend) |
-| Container | Docker + Docker Compose |
-| Styling | Tailwind CSS v4 + CSS custom properties (혼용) — `tokens.ts` 단일 소스 |
+| Layer     | Technology                                                             |
+| --------- | ---------------------------------------------------------------------- |
+| Frontend  | React + TypeScript, Vite, Toast UI Editor                              |
+| Backend   | Node.js + Express + TypeScript                                         |
+| Database  | PostgreSQL                                                             |
+| Testing   | Vitest (frontend), Jest + Supertest (backend)                          |
+| Container | Docker + Docker Compose                                                |
+| Styling   | Tailwind CSS v4 + CSS custom properties (혼용) — `tokens.ts` 단일 소스 |
 
 ## Sub-directory Guides
 
@@ -42,6 +42,7 @@ Three-tier app: React SPA → Express REST API → PostgreSQL. Detailed architec
 Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Reference.
 
 **Hard rule (echoed in `frontend/CLAUDE.md` and `prototype/CLAUDE.md`):**
+
 - Always use CSS custom properties — `var(--bg-app)`, `var(--brand)`, `var(--text-primary)`, etc.
 - **Never write hex values** (no `#5e6ad2`, no `#ffffff`). No raw OKLCH either — go through the token.
 - Typography: Pretendard Variable (UI), D2Coding (code/issue IDs).
@@ -61,6 +62,9 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
 - **Git workflow** — **항상 feature 브랜치를 먼저 생성**한 뒤 커밋·푸시하고 PR을 열 것. main에 직접 커밋/푸시 절대 금지. 브랜치 네이밍: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
+  - PR 머지는 반드시 `gh pr merge <n> --rebase --delete-branch` — `--squash` 사용 금지 (커밋 히스토리 손실)
+  - 리뷰 수정 사항도 동일: 새 `fix/<topic>` 브랜치에 커밋 → PR → rebase 머지
+  - main은 항상 PR을 통해서만 변경 — force push 금지 (히스토리 복구 목적 외)
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - CLAUDE.md stays under 200 lines
@@ -84,10 +88,10 @@ docs/specs/
 
 ### Document Roles
 
-| File | Language | Scope |
-|------|----------|-------|
-| `docs/specs/requires/design.md` | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
-| `docs/specs/requires/requirements.md` | 한국어 | Functional requirements — feature specs, behavioral rules, data model, API design, business logic |
+| File                                  | Language         | Scope                                                                                                              |
+| ------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `docs/specs/requires/design.md`       | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
+| `docs/specs/requires/requirements.md` | 한국어           | Functional requirements — feature specs, behavioral rules, data model, API design, business logic                  |
 
 - 새 기능 계획 → `docs/specs/plans/<feature-name>.md`
 - 리뷰·브레인스토밍 → `docs/specs/reviews/<topic>.md`
@@ -100,18 +104,18 @@ docs/specs/
 
 **Write decisions to the right file first:**
 
-| Decision made | Write to |
-|---|---|
-| Visual design change (color, layout, spacing, component pattern) | `docs/specs/requires/design.md` (English) |
+| Decision made                                                          | Write to                                                                  |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Visual design change (color, layout, spacing, component pattern)       | `docs/specs/requires/design.md` (English)                                 |
 | Functional/behavioral change (feature rule, API shape, business logic) | `docs/specs/requires/requirements.md` or relevant `feature-*.md` (한국어) |
 
 **Then check propagation:**
 
-| Changed | Must also check |
-|---|---|
-| Spec (design decision, constraint) | Implementation plan |
-| Implementation plan (task added/removed) | Spec section it implements |
-| CLAUDE.md (new rule) | Spec if rule affects behavior |
+| Changed                                  | Must also check               |
+| ---------------------------------------- | ----------------------------- |
+| Spec (design decision, constraint)       | Implementation plan           |
+| Implementation plan (task added/removed) | Spec section it implements    |
+| CLAUDE.md (new rule)                     | Spec if rule affects behavior |
 
 ## Session Rules
 
@@ -124,6 +128,7 @@ docs/specs/
 This project has a graphify knowledge graph at `graphify-out/`.
 
 Rules:
+
 - Before answering architecture or codebase questions, read `graphify-out/GRAPH_REPORT.md` for god nodes and community structure
 - If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw files
 - After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
