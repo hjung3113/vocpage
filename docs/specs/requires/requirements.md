@@ -27,7 +27,7 @@
 
 ### 2.1 비즈니스 및 인프라 요구사항
 - **시스템 통합:** 기존 분석 시스템의 왼쪽 네비게이션 구조를 유지하며 서브 페이지 형태로 작동.
-- **인증 자동화:** 사내 AD(Active Directory) 연동을 통한 SSO(Single Sign-On) 구현. 연동 방식: **OIDC(OpenID Connect) / OAuth2** — 사내 Identity Provider(IdP)를 Authorization Server로 사용. 개발 환경: 실 AD 직접 연결 (mock 없음). 세션: httpOnly + SameSite=Strict 쿠키, 세션 만료 시 로그인 페이지 리다이렉트.
+- **인증 자동화:** 사내 AD(Active Directory) 연동을 통한 SSO(Single Sign-On) 구현. 연동 방식: **OIDC(OpenID Connect) / OAuth2** — 사내 Identity Provider(IdP)를 Authorization Server로 사용. 개발 환경: `AUTH_MODE=mock`으로 목 유저 주입(§14.1), 스테이징·운영은 `AUTH_MODE=oidc`로 실 AD 연결. 세션: httpOnly + SameSite=Strict 쿠키, 세션 만료 시 로그인 페이지 리다이렉트.
 - **데이터 무결성:** PostgreSQL을 활용한 정규화된 DB 설계 및 확장성 확보.
 - **품질 관리:** **TDD(Test-Driven Development)** 기반 개발을 통해 서비스 안정성 극대화.
 - **인프라:** Docker 기반의 컨테이너화로 개발 및 운영 환경 일원화.

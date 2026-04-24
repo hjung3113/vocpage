@@ -92,6 +92,43 @@ docs/specs/reviews/
 
 > **선행 조건**: Phase 1~5 완료 — 스펙·문서 완비 후 구현 진입
 
+### 권고 실행 순서 (2026-04-24 재조정)
+
+```
+6-4 스캐폴딩 & 개발환경   ← 모든 것의 기반, 가장 먼저
+6-6 인증 Mock 전략        ← 블로킹. AUTH_MODE=mock 없이 API 테스트 불가
+6-7 DB 마이그레이션 & 시드 ← 테이블 없이 통합 테스트 작성 불가
+6-5 FE-BE API 계약        ← DB + Auth 확정 후 API shape 정의
+6-3 BE 테스트 전략         ← API shape 알아야 케이스 목록 작성 가능
+6-8 상태 관리 방식 확정    ← React Context로 이미 확정, 문서화만
+6-9 Prototype → 컴포넌트  ← FE 전용, 언제든 가능
+```
+
+> 기존 번호(6-3~6-9)는 참조 안정성을 위해 유지. 위 순서대로 진행.
+
+### 구현 전 결정 필요 사항 (미결)
+
+> 이 항목들이 미결인 채로 구현에 진입하면 중간에 구조 변경이 강제됩니다.
+
+#### 🔴 고위험 (반드시 6-4 시작 전 결정)
+
+| 항목 | 옵션 | 비고 |
+|---|---|---|
+| **DB 마이그레이션 도구** | 수동 SQL / node-pg-migrate / Flyway | 6-7에서 결정 |
+| **Mock API 전략** | MSW vs json-server | 6-5에서 결정 |
+| **FE-BE 타입 공유 방식** | `shared/types/` 패키지 vs OpenAPI codegen | 6-5에서 결정 |
+| **파일 업로드 미들웨어** | `multer` (de facto) | 스펙에 없음, 확정 필요 |
+| **MSSQL 연결 드라이버** | `mssql` npm 패키지 | external-masters.md MSSQL 연동용 |
+
+#### 🟠 중위험 (나중에 바꾸면 리팩 발생)
+
+| 항목 | 비고 |
+|---|---|
+| **세션 스토어** | 개발: 메모리, 운영: ? — express-session store 결정 필요 |
+| **CORS 정책** | Dev 환경 FE:5173 ↔ BE:3000 — Vite proxy vs BE cors() 미들웨어 |
+| **issue_code prefix** | `ANALYSIS-2025-0001` 고정 prefix인지, systems 테이블 기반인지 불명확 |
+| **React Query staleTime** | 대시보드 5분 확정, VOC 목록 등 나머지 페이지 기본값 미정 |
+
 ### 6-1. 피드백 반영 → 스펙 최종 확정
 - [ ] 리뷰 결과를 `design.md`에 반영 (영어, 비주얼 스펙만)
 - [ ] 기능 변경 시 `requirements.md`에 반영 (한국어, 기능 스펙만)
@@ -184,9 +221,10 @@ docs/specs/reviews/
 - [ ] **pgvector 확장 초기 마이그레이션에 포함**: `CREATE EXTENSION IF NOT EXISTS vector;` + `vocs.embedding vector(1536) NULL` 컬럼 생성 (MVP 미사용, 향후 유사검색/RAG용 예약). Docker 이미지는 `pgvector/pgvector:pg16` 사용.
 
 ### 6-8. 상태 관리 방식 확정
-- [ ] React Context vs Redux 결정 — requirements.md에서 열려있는 항목 확정
-- [ ] 전역 상태 범위 정의: filter 상태, 선택된 VOC, drawer 열림 여부
-- [ ] 결정 내용 requirements.md에 반영
+
+> **결정 완료** — requirements.md §6.2에 이미 반영: "React Context (MVP — 규모 충분). Redux는 NextGen 검토."
+
+- [ ] 전역 상태 범위 목록화: filter 상태, 선택된 VOC, drawer 열림 여부 (문서화만 남음)
 
 ### 6-9. Prototype → 실구현 동일 재현 플로우
 - [ ] prototype.html을 컴포넌트 단위로 분해 (섹션별 인벤토리)
