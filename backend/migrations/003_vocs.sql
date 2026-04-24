@@ -94,7 +94,6 @@ CREATE TABLE voc_payload_reviews (
   reviewer_id     uuid        NOT NULL REFERENCES users(id),
   decision        text        NOT NULL CHECK (decision IN ('approved','rejected')),
   comment         text,
-  is_self_review  boolean     NOT NULL DEFAULT false,
   created_at      timestamptz NOT NULL DEFAULT now()
 );
 

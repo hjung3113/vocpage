@@ -9,7 +9,7 @@
 ### 8.1 VOC 식별자 (Issue Code)
 
 - 형식: `{시스템슬러그}-{yyyy}-{순번4자리}` (예: `ANALYSIS-2025-0001`)
-- 시스템 슬러그는 ASCII URL-safe 문자열로 저장 (예: `analysis`, `pipeline`). `issue_code`에는 슬러그 값을 대문자로 사용.
+- 시스템 슬러그는 ASCII URL-safe 문자열로 저장 (예: `analysis`, `pipeline`). `issue_code`에는 슬러그 값을 대문자로 사용. **prefix는 고정값이 아닌 시스템별 동적 변환** — `analysis` → `ANALYSIS-`, `pipeline` → `PIPELINE-` 등 시스템 slug에 따라 결정됨.
 - 시스템별·연도별 독립 순번. 삭제된 VOC의 순번은 재사용하지 않음 (증가 전용).
 - 시스템명 변경 후에도 기존 VOC의 `issue_code`는 불변.
 - 동시 생성 경합은 DB sequence로 원자성 보장.
@@ -47,7 +47,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
                                                       └─reject───▶ approved (원복)
 ```
 
-- 전환 권한: Manager/Admin + (폐쇄 메뉴 케이스) 담당자 self-review. self-review 시 `voc_payload_reviews.is_self_review=true`로 감사 추적.
+- 전환 권한: Manager/Admin.
 - 제출 스냅샷은 `voc_payload_history`에 `is_current=true`로 insert — 기존 `is_current` row는 false로 내림.
 - 삭제 승인 시: 해당 스냅샷 `final_state='deleted'`, `is_current=false`, `vocs.structured_payload=NULL`, `vocs.review_status=NULL`.
 - 삭제 reject 시: `vocs.review_status='approved'` 원복 + `action='deletion', decision='rejected'` 리뷰 row만 추가.
@@ -64,7 +64,9 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 | 담당자 배정                    |  ❌  |   ✅    |  ✅   |
 | Priority 설정                  |  ❌  |   ✅    |  ✅   |
 | VOC Soft Delete                |  ❌  |   ❌    |  ✅   |
-| 시스템/메뉴/유형/태그규칙 관리 |  ❌  |   ❌    |  ✅   |
+| 시스템/메뉴/유형 관리          |  ❌  |   ❌    |  ✅   |
+| 태그 규칙 관리(생성/수정/삭제) |  ❌  |   ✅    |  ✅   |
+| 신규 태그 생성                 |  ❌  |   ✅    |  ✅   |
 | 사용자 권한 관리               |  ❌  |   ❌    |  ✅   |
 | 태그 수동 편집                 |  ❌  |   ✅    |  ✅   |
 | 공지사항 작성/관리             |  ❌  |   ✅    |  ✅   |
@@ -72,7 +74,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 | 공지사항 복원                  |  ❌  |   ❌    |  ✅   |
 
 - Admin과 Manager의 기능 권한은 동일. Admin은 Manager 관리(역할 부여/회수) 권한이 추가된 역할.
-- Manager는 Admin과 동일하게 전체 VOC를 조회할 수 있으나, Soft Delete/시스템·메뉴·유형·태그규칙·사용자 권한 관리 기능만 제외.
+- Manager는 Admin과 동일하게 전체 VOC를 조회할 수 있으나, Soft Delete/시스템·메뉴·유형·사용자 권한 관리 기능만 제외. 태그 규칙 관리 및 신규 태그 생성은 Manager도 가능.
 - 최초 Admin 계정: 서버 초기화 시 환경변수 `INIT_ADMIN_EMAIL` 지정 계정을 admin role로 seed.
 - 퇴직·부서이동 시 역할 회수 및 `is_active` 비활성화는 Admin이 수동 처리.
 - 마지막 Admin 강등 불가 판정 기준: `is_active = true AND role = 'admin'` 인 계정 수 ≥ 2일 때만 강등 가능. 권한 변경 API에서 트랜잭션 내 사후 Admin 수 검증.
@@ -128,6 +130,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - Sub-task는 독립적인 상태·담당자·Priority·유형 보유.
 - Sub-task의 시스템/메뉴는 부모 VOC에서 상속 (변경 불가).
 - 부모 VOC Soft Delete 시 Sub-task도 cascade soft delete.
+- **자동 태깅 cascade 없음**: 부모 VOC 편집 시 Sub-task에 `tag_rules` 재실행하지 않음. 각 VOC는 자신의 `title`/`body` 변경 시에만 독립적으로 태그 재계산됨.
 
 ### 8.8 분류 체계 (시스템 / 메뉴 / 유형)
 
@@ -195,7 +198,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 
 - 첨부 파일은 BE 컨테이너의 Docker volume(`/uploads/{voc_id}/`)에 저장.
 - 댓글 이미지 저장 경로: `/uploads/comments/{comment_id}/`. `attachments` 행 별도 생성 없음 (Toast UI Editor 업로드 엔드포인트 별도 운영).
-  - 댓글 이미지: 파일당 5MB, 최대 5개/댓글 (§8.10과 동일).
+  - 댓글 이미지: 파일당 5MB, 최대 5개/댓글. 허용 형식: PNG, JPG, GIF, WebP (VOC 본문 첨부와 동일).
 - 정적 파일 서빙: Express `static` 미들웨어 또는 별도 `/files/:id` 엔드포인트로 인증 후 제공.
 - 운영 환경에서는 volume을 호스트 경로에 마운트하여 백업 대상 포함.
 
@@ -323,9 +326,8 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - **액션 UI**:
   - 행 선택 → 우측 드로어에 payload diff(현재 `is_current` 스냅샷 vs 신규 제출) + 코멘트 입력창.
   - `approve` / `reject` 버튼. reject 시 코멘트 필수.
-  - 결정은 `voc_payload_reviews`에 `action` + `decision` + `comment` + `is_self_review` 기록.
-- **self-review**: 폐쇄 메뉴(담당자 본인만 접근 가능한 시스템/메뉴) 케이스 수용. 동일 UI에서 허용하되 `is_self_review=true` 플래그로 감사 추적만 남김. 별도 모니터링 대시보드 없음.
-- **권한**: Manager/Admin + (self-review 허용 시) 해당 VOC 담당자 본인.
+  - 결정은 `voc_payload_reviews`에 `action` + `decision` + `comment` 기록.
+- **권한**: Manager/Admin.
 - **연관 갱신 규칙**:
   - 제출 approve → `vocs.structured_payload` 확정, 해당 history row `is_current=true`/`final_state='approved'` 유지, `vocs.embed_stale=true`면 임베딩 재생성(MVP는 미실행).
   - 제출 reject → `vocs.review_status='rejected'`, payload 본 컬럼은 유지(담당자 수정/재제출 가능), history row `final_state='rejected'`.

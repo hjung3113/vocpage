@@ -1,11 +1,9 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (16차 — Preflight 수정 완료, Phase 7 진입 가능)
+> 최종 업데이트: 2026-04-25 (18차 — Phase 7 진입 전 스펙 픽스 완료, 사용자 결정 3건 대기)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
-
-> 상세: `docs/specs/reviews/phase6/phase7-preflight-adversarial-review.md`
 
 | 순서 | 항목                                                                                                                 | 상태 |
 | ---- | -------------------------------------------------------------------------------------------------------------------- | ---- |
@@ -18,6 +16,36 @@
 추가 완료: heatmap 컬럼명 통일, `voc_payload_history` unique partial index, codegen 재실행
 
 ## 다음 세션 시작점
+
+> 리뷰 문서: `docs/specs/reviews/phase7-entry-review-2026-04-24.md`
+
+### Phase 7 진입 전 스펙 픽스 — 완료 (2026-04-25)
+
+| 항목                                                                                             | 상태 |
+| ------------------------------------------------------------------------------------------------ | ---- |
+| G-2 CORS B안 — `cors()` 미들웨어, `.env.example` + `backend/src/index.ts` + `docker-compose.yml` | ✅   |
+| G-3 issue_code prefix 동적 변환 명시 — `feature-voc.md §8.1`                                     | ✅   |
+| G-5 Cold Start A안 — `requirements.md §16.3` 테이블 + `external-masters.md §8` 신규 섹션         | ✅   |
+| env: `LOG_LEVEL`, `SESSION_STORE_URL`, `VITE_AUTH_MODE` 추가                                     | ✅   |
+| M-2 unverified 필드 저장 허용 명시 — `requirements.md §16.3`                                     | ✅   |
+| M-3 React Query staleTime 일괄 확정 — `requirements.md §3`                                       | ✅   |
+| M-4 SESSION_STORE_URL 변수명 확정 — `.env.example`                                               | ✅   |
+| M-7 댓글 이미지 형식 명시 (PNG/JPG/GIF/WebP) — `feature-voc.md §8.12`                            | ✅   |
+| M-8 Sub-task 태그 cascade 없음 명시 — `feature-voc.md §8.7`                                      | ✅   |
+| M-9 복원 VOC 태그 재실행 명시 — `requirements.md §4 tag_rules`                                   | ✅   |
+| M-10 대시보드 복합 필터 AND 조건 명시 — `dashboard.md §B`                                        | ✅   |
+
+### 사용자 결정 필요 (Phase 7 착수 전)
+
+| #   | 항목                                                                                   | 선택지                        |
+| --- | -------------------------------------------------------------------------------------- | ----------------------------- |
+| G-1 | **설비 마스터 MSSQL 스키마** — 담당자 자료 수집 후 `external-masters.md §3` 업데이트   | 외부 의존 (담당자)            |
+| G-4 | **폐쇄 메뉴 제거** — 개념 불필요 판단, 스펙 전체에서 삭제 (`is_self_review` 컬럼 포함) | ✅ 삭제 완료                  |
+| M-1 | **unverified_fields 검증 세부 규칙** — `trim().toLowerCase()` 정규화 후 완전 일치 확정 | ✅ `requirements.md §4` 반영  |
+| M-5 | **태그 규칙 삭제 권한** — Manager/Admin 모두 가능 확정                                 | ✅ `feature-voc.md §8.3` 반영 |
+| M-6 | **신규 태그 생성 주체** — Manager/Admin 모두 가능 확정                                 | ✅ `feature-voc.md §8.3` 반영 |
+
+### 위 사용자 결정 완료 후 → Phase 7 실구현 시작
 
 1. **Phase 7 실구현 시작** — 6-8 ✅ 완료. feat/6-8-state-management 브랜치 PR 머지 후 진입
 
@@ -32,7 +60,8 @@ docs/specs/reviews/
              voc-ai-workflow-fit-review.md        ← Phase 6-1 v1 (2026-04-23, 일부 폐기됨)
              voc-ai-workflow-fit-review-v2.md     ← Phase 6-1 v2 (2026-04-24, Q1·Q2 재결정 — canonical)
              voc-ai-workflow-fit-review-v3.md     ← Phase 6-1 v3 (2026-04-24, Q3~Q10 + 갭#6 + 7A 확정)
-             phase7-preflight-adversarial-review.md ← Phase 7 진입 전 적대적 리뷰 (2026-04-24) ★현재
+             phase7-preflight-adversarial-review.md ← Phase 7 진입 전 적대적 리뷰 (2026-04-24)
+             phase7-entry-review-2026-04-24.md     ← Phase 7 진입 전 종합 리뷰 (2026-04-24) ★현재
 ```
 
 ---

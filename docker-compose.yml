@@ -24,6 +24,9 @@ services:
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
       AUTH_MODE: ${AUTH_MODE}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      LOG_LEVEL: ${LOG_LEVEL}
+      SESSION_STORE_URL: ${SESSION_STORE_URL}
       MSSQL_HOST: ${MSSQL_HOST}
       MSSQL_USER: ${MSSQL_USER}
       MSSQL_PASSWORD: ${MSSQL_PASSWORD}
@@ -50,6 +53,7 @@ services:
       dockerfile: frontend/Dockerfile
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+      VITE_AUTH_MODE: ${VITE_AUTH_MODE}
     ports:
       - "5173:5173"
     volumes:

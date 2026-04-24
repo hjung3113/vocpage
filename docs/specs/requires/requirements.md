@@ -54,16 +54,16 @@
 
 ## 3. 기술 스택 (Tech Stack)
 
-| 구분              | 기술 스택                                | 비고                                               |
-| :---------------- | :--------------------------------------- | :------------------------------------------------- |
-| **Frontend**      | Vite, React, TypeScript, Tailwind CSS v4 | `tokens.ts` → Tailwind config + CSS vars 단일 소스 |
-| **Backend**       | Node.js 20 LTS (Express), TypeScript     | OIDC 인증 미들웨어                                 |
-| **Database**      | PostgreSQL 16                            | Self-join 및 M:N 관계 설계                         |
-| **Infra**         | Docker, Docker Compose                   | 환경 일치 및 배포 편의성                           |
-| **Editor**        | Toast UI Editor                          | 오픈소스 리치 텍스트 에디터                        |
-| **Testing**       | Vitest (FE), Jest/Supertest (BE)         | TDD 개발 수행                                      |
-| **Data Fetching** | @tanstack/react-query                    | 대시보드 위젯별 독립 쿼리, staleTime 5분           |
-| **Charts**        | recharts                                 | 대시보드 LineChart / BarChart (lazy import)        |
+| 구분              | 기술 스택                                | 비고                                                                                                |
+| :---------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------------------- |
+| **Frontend**      | Vite, React, TypeScript, Tailwind CSS v4 | `tokens.ts` → Tailwind config + CSS vars 단일 소스                                                  |
+| **Backend**       | Node.js 20 LTS (Express), TypeScript     | OIDC 인증 미들웨어                                                                                  |
+| **Database**      | PostgreSQL 16                            | Self-join 및 M:N 관계 설계                                                                          |
+| **Infra**         | Docker, Docker Compose                   | 환경 일치 및 배포 편의성                                                                            |
+| **Editor**        | Toast UI Editor                          | 오픈소스 리치 텍스트 에디터                                                                         |
+| **Testing**       | Vitest (FE), Jest/Supertest (BE)         | TDD 개발 수행                                                                                       |
+| **Data Fetching** | @tanstack/react-query                    | staleTime 페이지별 확정: 대시보드·관리자 5분, VOC 목록 30초, VOC 상세·댓글 0(항상 fresh), 알림 30초 |
+| **Charts**        | recharts                                 | 대시보드 LineChart / BarChart (lazy import)                                                         |
 
 ---
 
@@ -107,7 +107,7 @@
     - `source(manual|auto)` 메타는 DB 저장 안 함 — 저장 이후엔 전부 담당자 확정 책임.
     - 정식 저장 검증: `equipment`/`maker`/`model`/`process` 중 **최소 1개 배열에 값** + `symptom`/`root_cause`/`resolution` 텍스트 3종 비어있지 않음. 전부 빈 배열이면 저장 차단.
     - 임시저장(`structured_payload_draft`)은 필수 필드 검증 면제, 최신 1건만 유지 (이력 없음).
-    - `unverified_fields`: **BE가 저장 시점에 자체 메모리(§16.3 외부 마스터 캐시)로 재검증**하여 계산 (FE body 플래그 신뢰 금지). 하나라도 차면 `vocs.review_status='unverified'` 동반 세팅. 리뷰 화면에서 해당 필드에 경고 배지 표시.
+    - `unverified_fields`: **BE가 저장 시점에 자체 메모리(§16.3 외부 마스터 캐시)로 재검증**하여 계산 (FE body 플래그 신뢰 금지). 비교 방식: `value.trim().toLowerCase()` 정규화 후 완전 일치(exact match) — 앞뒤 공백 제거 + 대소문자 무시, 부분 매칭 없음. 하나라도 차면 `vocs.review_status='unverified'` 동반 세팅. 리뷰 화면에서 해당 필드에 경고 배지 표시.
 
   - **외부 참조 검증 정책**: 편집 세션 동안 FE는 BE 메모리 캐시(§16.3)에서 자동완성·존재 검증. 저장 시 BE가 단일 진실 원천으로 재검증 → 실패 필드는 `unverified_fields`에 기록 + `review_status='unverified'`. 저장 시점 외부 API 호출은 **0건**.
   - `review_status` 라이프사이클: 정식 제출 시 `unverified` → Result Review에서 `approved`/`rejected` → approve 후 "삭제 신청" 시 `pending_deletion` → 승인 시 payload clear + `review_status=NULL` 복귀. 상세 상태머신은 feature-voc.md §8.2 보강본 참조.
@@ -115,8 +115,7 @@
 
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
 - **`voc_payload_reviews`** (제출/삭제 리뷰 통합 로그):
-  - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `is_self_review boolean default false`, `created_at timestamptz default now()`.
-  - 폐쇄 메뉴 케이스는 self-review 허용(감사 플래그만 남김, 별도 모니터링 대시보드 없음).
+  - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `created_at timestamptz default now()`.
 - **`voc_payload_history`** (제출 스냅샷 이력, "이전 이력" 버튼 소스):
   - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `payload jsonb NOT NULL`, `submitted_by(FK→users)`, `submitted_at timestamptz default now()`, `final_state text CHECK IN ('approved','rejected','deleted','active')`, `is_current boolean default false`.
   - 인덱스: `(voc_id, submitted_at DESC)`.
@@ -130,6 +129,7 @@
   - **실행 시점**: VOC 접수 + 제목/본문 편집 저장 시. status 변경만으로는 재실행 안 함.
   - **규칙 충돌**: 같은 본문에 복수 규칙 매칭 시 전부 부착(태그는 다대다, 우선순위·배타 없음).
   - **멱등성**: 재실행은 해당 VOC의 `voc_tags.source='rule'` 행만 삭제 후 재부착. `source='manual'` 행은 보존(담당자 수동 태깅은 엔진이 건드리지 않음).
+  - **복원 시 재실행**: Soft Delete VOC 복원(`deleted_at=NULL`) 시 `tag_rules` 엔진 재실행 대상. 삭제 기간 중 규칙 변경이 반영됨. `source='manual'` 태그 보존.
 - **`attachments`**: 컬럼: `id`, `voc_id`, `uploader_id`, `filename`, `mime_type`, `size_bytes`, `storage_path`, `created_at`. VOC당 최대 5개. 파일은 Docker volume(`/uploads`)에 로컬 저장.
 - **`comments`**: 평면 구조(스레드 미지원). 컬럼: `id`, `voc_id`, `author_id`, `body(HTML)`, `created_at`, `updated_at`. **공개 댓글 전용** — 내부 메모는 `voc_internal_notes` 별도 테이블로 분리.
 - **`voc_internal_notes`** (Q7 확정, v3 §3.4): 담당자 전용 내부 메모(트리아지·보류 사유·재현 로그 등). 공개 댓글과 **테이블 자체를 분리**하여 쿼리 누락으로 인한 유출 사고 내성을 구조적으로 확보.
@@ -248,7 +248,6 @@
 - **임시저장**: 편집 모달 내 별도 버튼. `structured_payload_draft`만 기록, 필수 필드 검증 면제, `vocs.status`/`review_status` 변동 없음. 모달 무저장 닫힘 시 프롬프트. 최신 draft 1건만 유지(이력 없음). 담당자 재할당 시 draft는 VOC에 종속되어 새 담당자가 그대로 이어받음.
 - **이전 이력 버튼**: 모달 내에서 `voc_payload_history` 목록 표시, 선택 시 draft 덮어쓰기 확인 후 로드. `final_state='deleted'` 스냅샷도 복원 선택 가능("삭제됨" 라벨).
 - **칩 입력 cascade**: 설비 입력 시 공정+메이커+모델 auto 추가, 모델 입력 시 공정+메이커 auto 추가, 메이커/공정 단독 입력 시 auto 없음. auto 칩 UI는 점선 테두리+`auto` 배지. cascade는 세션 메모리에서만 추적 — 페이지 리로드·임시저장 후 재진입 시 auto 구분 소실(수동 칩으로 복원).
-- **폐쇄 메뉴 self-review**: 허용하되 `voc_payload_reviews.is_self_review=true`로 감사 추적.
 
 ---
 
@@ -452,12 +451,11 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 ## 15. 관리자 페이지: Result Review
 
-> 출처: `docs/specs/reviews/phase6/voc-ai-workflow-fit-review-v2.md` §8. 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
+> 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
 
 - **대상 행**: `review_status IN ('unverified','pending_deletion')` VOC.
 - **액션**: 각 VOC에 코멘트 + approve/reject. 결정 이력은 `voc_payload_reviews`에 `action='submission'|'deletion'` 구분으로 기록.
-- **self-review**: 폐쇄 메뉴 케이스 수용. 동일 UI에서 허용하되 `is_self_review=true` 플래그로 감사 추적만 남김(별도 모니터링 대시보드 없음).
-- **권한**: Manager/Admin + (self-review 허용 시) 본인 담당자.
+- **권한**: Manager/Admin.
 - **연관 갱신**: approve 시 `vocs.structured_payload` 확정 / `voc_payload_history.is_current=true` 스냅샷 유지 / 임베딩 정책(§16) 트리거.
 
 ---
@@ -490,18 +488,19 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 **합의 10건**:
 
-| 항목               | 결정                                                                                                                                           |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 캐시 범위          | 프로세스 전역. BE 부팅 시 3종 통째 1회 로드 (규모 작아 전량 적재 가능).                                                                        |
-| TTL                | 없음. 수동 트리거만.                                                                                                                           |
-| Refresh 권한       | Manager 이상.                                                                                                                                  |
-| Refresh 진입점     | 관리자 페이지 전역 refresh + 편집 화면 🔄 아이콘.                                                                                              |
-| Refresh 쿨다운     | **동일 사용자 기준 5분** (원천 시스템 보호).                                                                                                   |
-| 부팅 시 로드 실패  | **디스크 스냅샷 fallback**. Manager/Admin UI에 **"스냅샷 모드" 배지** 필수. (메타 로그·한도·비동기 쓰기 보조 조건은 미채택, 운영 필요 시 추가) |
-| 수동 Refresh 실패  | **atomic swap** — 3종 전부 성공해야 교체. 실패 시 기존 메모리 유지. 부분 교체 금지.                                                            |
-| 저장 시 BE 재검증  | **필수**. FE body 플래그 신뢰 금지. BE 메모리가 단일 진실 원천. override도 BE 재판정.                                                          |
-| 입력 모드          | **자유 입력 허용 + unverified 플래그**. 마스터 등록 지연보다 VOC 처리 흐름 보호 우선. 자동완성 UX로 정상 케이스 대부분 커버.                   |
-| review_status 단위 | `vocs.review_status` row 단일값(Manager 큐 필터) + `structured_payload.unverified_fields text[]`로 필드 병기. 별도 컬럼 승격은 운영 실측 후.   |
+| 항목                     | 결정                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 캐시 범위                | 프로세스 전역. BE 부팅 시 3종 통째 1회 로드 (규모 작아 전량 적재 가능).                                                                                                                                                                           |
+| TTL                      | 없음. 수동 트리거만.                                                                                                                                                                                                                              |
+| Refresh 권한             | Manager 이상.                                                                                                                                                                                                                                     |
+| Refresh 진입점           | 관리자 페이지 전역 refresh + 편집 화면 🔄 아이콘.                                                                                                                                                                                                 |
+| Refresh 쿨다운           | **동일 사용자 기준 5분** (원천 시스템 보호).                                                                                                                                                                                                      |
+| 부팅 시 로드 실패        | **디스크 스냅샷 fallback**. Manager/Admin UI에 **"스냅샷 모드" 배지** 필수. (메타 로그·한도·비동기 쓰기 보조 조건은 미채택, 운영 필요 시 추가)                                                                                                    |
+| Cold Start (스냅샷 없음) | 스냅샷 파일도 없는 최초 배포 시 — **전 필드 unverified 모드로 계속 기동** (기동 실패 없음). 모든 외부 마스터 필드를 unverified로 판정. Manager/Admin UI에 **"콜드 스타트 모드" 배지** 노출.                                                       |
+| 수동 Refresh 실패        | **atomic swap** — 3종 전부 성공해야 교체. 실패 시 기존 메모리 유지. 부분 교체 금지.                                                                                                                                                               |
+| 저장 시 BE 재검증        | **필수**. FE body 플래그 신뢰 금지. BE 메모리가 단일 진실 원천. override도 BE 재판정.                                                                                                                                                             |
+| 입력 모드                | **자유 입력 허용 + unverified 플래그**. 마스터 등록 지연보다 VOC 처리 흐름 보호 우선. 자동완성 UX로 정상 케이스 대부분 커버. **unverified 필드가 있어도 VOC 저장은 허용** — 저장 후 리뷰 게이트(`review_status='unverified'`)에서 Manager가 검토. |
+| review_status 단위       | `vocs.review_status` row 단일값(Manager 큐 필터) + `structured_payload.unverified_fields text[]`로 필드 병기. 별도 컬럼 승격은 운영 실측 후.                                                                                                      |
 
 **API 계약**:
 
