@@ -193,7 +193,7 @@ docs/specs/reviews/
 - [x] `design.md` §12 신규 — Token Architecture (tokens.ts 단일 소스, Tailwind/CSS vars 혼용 규칙, 사용 시나리오 매핑, 강제 체계) (2026-04-24)
 - [x] `frontend/CLAUDE.md` 룰 보강 — Tailwind vs CSS vars 사용 규칙, hard rules (2026-04-24)
 - [x] `tokens.ts` 단일 소스 → Tailwind config + CSS vars 자동 전파 **채택** (Tailwind CSS v4 혼용 결정, 2026-04-24)
-- [ ] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` + husky → 6-4 스캐폴딩에서 같이 처리
+- [x] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` + husky → 6-4 구현 계획에 포함 완료 (2026-04-24)
 
 ### 6-3. 백엔드 테스트 작성 전략
 - [ ] 테스트 범위 정의: 단위(서비스 레이어), 통합(API 엔드포인트), E2E(주요 플로우)
@@ -201,10 +201,26 @@ docs/specs/reviews/
 - [ ] 각 API 엔드포인트별 테스트 케이스 목록 작성 (requirements.md §API 참조)
 - [ ] Jest + Supertest 설정 파일 + 샘플 테스트 1개 작성 (구현 전 틀만)
 
-### 6-4. 스캐폴딩 & 개발환경 설정
-- [ ] 프로젝트 초기 셋업 순서 확정 (Docker Compose → BE → FE 순서 권장)
-- [ ] ESLint + Prettier 공통 설정 (FE/BE 각각, 공통 규칙 공유)
-- [ ] `.env` 구조 설계 및 Docker Compose 환경변수 관리 방식 결정 (`.env.example` 작성)
+### 6-4. 스캐폴딩 & 개발환경 설정 ← **다음 세션 시작점**
+
+> ✅ 설계 확정 (2026-04-24): `docs/specs/plans/phase6-4-scaffolding-design.md`
+> ✅ 구현 계획 작성 완료: `docs/specs/plans/phase6-4-scaffolding-plan.md`
+> 브랜치: `docs/phase6-4-scaffolding-design` (미머지)
+
+**다음 세션**: `/superpowers:executing-plans` 또는 subagent-driven-development로 10-task 계획 실행.
+실행 방식: **Subagent-Driven** (Task별 서브에이전트 디스패치, 사용자 확정)
+
+- [x] 설계 결정: npm workspaces(A) + 루트 단일 `.env`(A) + lint-staged+tsc husky(B) (2026-04-24)
+- [ ] **Task 1**: 루트 workspace 파일 (package.json, .nvmrc, .eslintrc.base.js, .prettierrc)
+- [ ] **Task 2**: Frontend scaffold (Vite+React+Tailwind v4+tokens.ts skeleton)
+- [ ] **Task 3**: Backend scaffold (Express+ts-node-dev+/health)
+- [ ] **Task 4**: npm install + workspace 연결 확인 + commit
+- [ ] **Task 5**: frontend ESLint + Stylelint (hex 금지)
+- [ ] **Task 6**: backend ESLint
+- [ ] **Task 7**: husky + lint-staged (pre-commit 차단 확인)
+- [ ] **Task 8**: Dockerfiles (FE + BE)
+- [ ] **Task 9**: docker-compose.yml + .env.example + .gitignore
+- [ ] **Task 10**: `docker compose up` 스모크 테스트 + PR
 
 ### 6-5. FE-BE API 계약
 - [ ] OpenAPI spec 또는 공유 타입 방식 결정 — 타입 불일치 방지 (예: `shared/types/` 패키지)
