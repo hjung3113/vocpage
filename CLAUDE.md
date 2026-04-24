@@ -61,13 +61,13 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **Parallel tool calls** — independent tool calls go in one message, not sequential
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
-- **Git workflow** — always create a feature branch first, commit and push there, then open a PR. Never commit or push directly to main. Branch naming: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
+- **Git workflow** — always create a feature branch first, commit and push there. Never commit or push directly to main. Branch naming: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
+  - PRs are opened by the user, not by Claude
   - Merge PRs with `gh pr merge <n> --merge --delete-branch` — `--squash` and `--rebase` are forbidden
     - `--squash`: destroys commit history
     - `--rebase`: replays commits directly onto main, erasing PR boundaries
     - `--merge`: preserves both the merge commit (PR boundary) and individual commits ✓
   - After merging, delete the local branch: `git branch -D <branch>`
-  - Review fixes follow the same rule: new `fix/<topic>` branch → PR → `--merge`
   - main changes only via PR — direct push and force push are forbidden
   - These rules are enforced by hookify rules in `.claude/hookify.block-*.local.md`
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
