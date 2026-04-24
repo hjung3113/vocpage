@@ -4,14 +4,16 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **다음: 6-4 구현**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 진행 중 → **다음: 6-4 PR 머지 후 6-6**
 
 ### 다음 세션 우선순위
 
-1. **6-4 스캐폴딩 구현 시작** — `/superpowers:subagent-driven-development` 사용
-   - 계획 파일: `docs/specs/plans/phase6-4-scaffolding-plan.md` (10 tasks)
-   - 브랜치: `docs/phase6-4-scaffolding-design` 체크아웃 후 진행
-2. **6-4 완료 후**: 6-6(인증 Mock) → 6-7(DB) → 6-5(API 계약) → 6-3(BE 테스트) 순서
+1. **PR #14 머지** (`docs/phase6-4-scaffolding-design`) — 스캐폴딩 완료
+   - ⚠️ 머지 전 포트 확인: docker-compose.yml에 `5433:5432` / `3001:3000` 리맵핑 적용됨 (로컬 충돌 회피)
+2. **6-6 인증 Mock 전략** (`AUTH_MODE=mock`) — 블로킹, 다음 우선
+3. **6-7 DB 마이그레이션 & 시드** (node-pg-migrate)
+4. **6-5 FE-BE API 계약** (OpenAPI codegen)
+5. **6-3 BE 테스트 전략** (Jest + Supertest)
    ※ 설비 마스터 MSSQL 스키마(`external-masters.md §3`) — 담당자 자료 수집 후 별도 보완
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
