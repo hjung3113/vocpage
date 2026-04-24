@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (13차 — PR #24 머지(6-7 설계+구현 계획), PR #25 머지(6-7 구현), 다음 세션: 6-5 FE-BE API 계약 또는 6-3 BE 테스트 전략)
+> 최종 업데이트: 2026-04-24 (14차 — 6-5 FE-BE API 계약 완료(openapi.yaml+codegen+SwaggerUI), 6-3 BE 테스트 전략 완료(pg-mem+31테스트), 다음 세션: 6-8 상태 관리 문서화)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## 다음 세션 시작점
@@ -206,12 +206,21 @@ docs/specs/reviews/
 - [x] `tokens.ts` 단일 소스 → Tailwind config + CSS vars 자동 전파 **채택** (Tailwind CSS v4 혼용 결정, 2026-04-24)
 - [x] Stylelint (`stylelint-declaration-strict-value`) + ESLint `no-restricted-syntax` + husky → 6-4 구현 계획에 포함 완료 (2026-04-24)
 
-### 6-3. 백엔드 테스트 작성 전략
+### 6-3. 백엔드 테스트 작성 전략 ✅ 완료 (2026-04-24)
 
-- [ ] 테스트 범위 정의: 단위(서비스 레이어), 통합(API 엔드포인트), E2E(주요 플로우)
-- [ ] 테스트 픽스처/시드 전략 결정 (PostgreSQL 테스트 DB vs 인메모리)
-- [ ] 각 API 엔드포인트별 테스트 케이스 목록 작성 (requirements.md §API 참조)
-- [ ] Jest + Supertest 설정 파일 + 샘플 테스트 1개 작성 (구현 전 틀만)
+> ✅ 구현 완료: PR #feat/6-5-6-3 브랜치
+
+- [x] 테스트 DB 전략: **pg-mem (인메모리 PostgreSQL)** + MSSQL `jest.mock` — 실 DB 연결 없이 테스트
+  - pgvector DDL 자동 스트리핑 (`embedding vector(1536)`, `CREATE EXTENSION vector`)
+  - `uuid_generate_v4()` → `gen_random_uuid()` 자동 치환
+- [x] `backend/src/db.ts` — pg Pool 싱글턴 + `setPool()` 테스트 주입 인터페이스
+- [x] `backend/src/__tests__/helpers/db.ts` — pg-mem 기반 마이그레이션 헬퍼
+- [x] `backend/src/__tests__/helpers/app.ts` — 테스트용 Express app 팩토리
+- [x] 테스트 케이스 31개 (6 suite) — 31/31 통과
+  - `health.test.ts`: `GET /api/health` 기본 응답
+  - `auth.test.ts`: mock-login (3 role, bad role, oidc-mode 404), /me, logout + 세션 무효화
+  - `vocs.test.ts`: 미인증 401, 권한 위반 403/404 (TDD 스타일 — 라우트 구현 시 tighten)
+  - `permission.test.ts`: 역할 매트릭스 (user→notes 404, user→admin API 403/404)
 
 ### 6-4. 스캐폴딩 & 개발환경 설정 ✅ 완료 (2026-04-24)
 
@@ -250,11 +259,16 @@ docs/specs/reviews/
 | 구조화 로깅 (pino) 도입 — 현재 `console.log` 기반                                  | **BE 라우트 추가 단계 (7.x~)**          | 첫 라우트 추가 전에 baseline 잡을 것                                        |
 | Dockerfile production stage 추가 — 현재 dev stage만 존재                           | **배포 준비 단계**                      | 지금 `ts-node-dev`가 유일한 시작 경로                                       |
 
-### 6-5. FE-BE API 계약
+### 6-5. FE-BE API 계약 ✅ 완료 (2026-04-24)
 
-- [ ] OpenAPI spec 또는 공유 타입 방식 결정 — 타입 불일치 방지 (예: `shared/types/` 패키지)
-- [ ] BE 완성 전 FE 개발용 Mock API 전략 결정 (MSW vs json-server)
-- [ ] 주요 API 엔드포인트 응답 형태 사전 정의 (requirements.md §API 기반)
+> ✅ 구현 완료: feat/6-5-6-3-api-contract-and-tests 브랜치
+
+- [x] **타입 방식 결정**: `openapi-typescript` codegen — `shared/openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성
+- [x] `@vocpage/shared` workspace 생성 (`shared/package.json`)
+- [x] `shared/openapi.yaml` — OpenAPI 3.1.0, 60+ 엔드포인트 전체 정의 (auth/vocs/comments/notes/attachments/tags/notifications/dashboard/admin)
+- [x] `shared/types/api.ts` — 2746줄 자동 생성 (codegen 42ms)
+- [x] 루트 `package.json` `"codegen"` 스크립트 추가 — `openapi-typescript shared/openapi.yaml -o shared/types/api.ts`
+- [x] BE dev 서버 `/api/docs` — `swagger-ui-express` 마운트 (`NODE_ENV !== 'production'`만)
 
 ### 6-6. 인증 Mock 전략 ✅ 완료 (2026-04-24)
 
