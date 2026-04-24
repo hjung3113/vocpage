@@ -12,6 +12,7 @@ build/
 
 # Logs
 *.log
+npm-debug.log*
 logs/
 
 # OS
@@ -36,3 +37,6 @@ graphify-out/
 # Test screenshots (local only)
 test-*.png
 admin-*.png
+
+# Uploads (multer)
+uploads/
