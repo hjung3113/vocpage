@@ -1,12 +1,13 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (11차 — Phase 6-4/6-6 구현 결정 requirements.md 반영 완료, PR #22 리뷰 대기)
+> 최종 업데이트: 2026-04-24 (12차 — PR #21 머지 완료, PR #22 충돌 해소 완료·머지 대기, 다음 세션: Codex 리뷰 + 6-7)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## 다음 세션 시작점
 
-1. **PR #22 리뷰 & 머지** (`docs/sync-phase6-impl-to-requirements`): requirements.md Phase 6-4/6-6 반영 (§6.1 auth 미들웨어·API 엔드포인트·AuthUser, §6.2 FE /mock-login·auth API 클라이언트, §14.1 VITE_AUTH_MODE, §14.2 Docker 포트, §14.5 Mock user fixtures, .env.example VITE_AUTH_MODE 추가)
-2. **다음 블로킹**: 6-7 DB 마이그레이션 & 시드 전략
+1. **PR #22 머지** (`docs/sync-phase6-impl-to-requirements`) — 충돌 해소 완료, 머지 준비됨
+2. **Codex 리뷰** — Phase 6-6 구현 코드베이스 전체 리뷰 (`/review` 스킬)
+3. **다음 블로킹**: 6-7 DB 마이그레이션 & 시드 전략
 
 ## Reviews 폴더 구조
 
