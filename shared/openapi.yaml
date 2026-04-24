@@ -1,0 +1,2093 @@
+openapi: 3.1.0
+info:
+  title: VOCPage API
+  version: 0.0.1
+  description: VOC (Voice of Customer) management system REST API
+
+servers:
+  - url: /api
+    description: Local dev
+
+tags:
+  - name: auth
+  - name: health
+  - name: vocs
+  - name: comments
+  - name: notes
+  - name: attachments
+  - name: tags
+  - name: notifications
+  - name: dashboard
+  - name: admin
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, db, uptime]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  db:
+                    type: string
+                    enum: [ok]
+                  uptime:
+                    type: number
+
+  /auth/mock-login:
+    post:
+      tags: [auth]
+      operationId: mockLogin
+      summary: Mock login (dev only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [admin, manager, user]
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user]
+                properties:
+                  user:
+                    $ref: '#/components/schemas/AuthUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      operationId: logout
+      summary: Logout
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+
+  /auth/me:
+    get:
+      tags: [auth]
+      operationId: getMe
+      summary: Get current user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vocs:
+    get:
+      tags: [vocs]
+      operationId: listVocs
+      summary: List VOCs (paginated)
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/VocStatus'
+        - name: priority
+          in: query
+          schema:
+            $ref: '#/components/schemas/VocPriority'
+        - name: systemId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: menuId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: assigneeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: includeDeleted
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Paginated VOC list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVocs'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [vocs]
+      operationId: createVoc
+      summary: Create VOC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VocInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voc'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vocs/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [vocs]
+      operationId: getVoc
+      summary: Get VOC detail
+      responses:
+        '200':
+          description: VOC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voc'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [vocs]
+      operationId: updateVoc
+      summary: Update VOC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VocPatch'
+      responses:
+        '200':
+          description: Updated VOC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voc'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [vocs]
+      operationId: deleteVoc
+      summary: Soft-delete VOC (admin only)
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/status:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [vocs]
+      operationId: updateVocStatus
+      summary: Update VOC status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: '#/components/schemas/VocStatus'
+      responses:
+        '200':
+          description: Updated VOC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voc'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/comments:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [comments]
+      operationId: listComments
+      summary: List comments for VOC
+      responses:
+        '200':
+          description: Comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [comments]
+      operationId: createComment
+      summary: Add comment to VOC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        '201':
+          description: Created comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vocs/{id}/comments/{commentId}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [comments]
+      operationId: updateComment
+      summary: Update comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        '200':
+          description: Updated comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [comments]
+      operationId: deleteComment
+      summary: Delete comment
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/notes:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [notes]
+      operationId: listNotes
+      summary: List internal notes (manager/admin only)
+      responses:
+        '200':
+          description: Notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [notes]
+      operationId: createNote
+      summary: Add internal note (manager/admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        '201':
+          description: Created note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /vocs/{id}/notes/{noteId}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [notes]
+      operationId: updateNote
+      summary: Update internal note (manager/admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        '200':
+          description: Updated note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [notes]
+      operationId: deleteNote
+      summary: Delete internal note (manager/admin only)
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/attachments:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [attachments]
+      operationId: listAttachments
+      summary: List attachments for VOC
+      responses:
+        '200':
+          description: Attachments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attachment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [attachments]
+      operationId: uploadAttachment
+      summary: Upload attachment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Created attachment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vocs/{id}/attachments/{attachmentId}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags: [attachments]
+      operationId: deleteAttachment
+      summary: Delete attachment
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tags:
+    get:
+      tags: [tags]
+      operationId: listTags
+      summary: List all tags
+      responses:
+        '200':
+          description: Tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vocs/{id}/tags:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [tags]
+      operationId: addVocTag
+      summary: Add tag to VOC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tagId]
+              properties:
+                tagId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Tag added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vocs/{id}/tags/{tagId}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags: [tags]
+      operationId: removeVocTag
+      summary: Remove tag from VOC
+      responses:
+        '200':
+          description: Tag removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notifications:
+    get:
+      tags: [notifications]
+      operationId: listNotifications
+      summary: List notifications for current user
+      responses:
+        '200':
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/unread-count:
+    get:
+      tags: [notifications]
+      operationId: getUnreadCount
+      summary: Get unread notification count
+      responses:
+        '200':
+          description: Count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count]
+                properties:
+                  count:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/{id}/read:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [notifications]
+      operationId: markNotificationRead
+      summary: Mark notification as read
+      responses:
+        '200':
+          description: Marked read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /dashboard/summary:
+    get:
+      tags: [dashboard]
+      operationId: getDashboardSummary
+      summary: Get KPI summary (8 metrics)
+      parameters:
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: KPI summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/distribution:
+    get:
+      tags: [dashboard]
+      operationId: getDashboardDistribution
+      summary: Get distribution by type
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [status, priority, voc_type, tag]
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Distribution array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DistributionItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/priority-status-matrix:
+    get:
+      tags: [dashboard]
+      operationId: getPriorityStatusMatrix
+      summary: Get priority-status matrix
+      parameters:
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Matrix
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/heatmap:
+    get:
+      tags: [dashboard]
+      operationId: getDashboardHeatmap
+      summary: Get heatmap data
+      parameters:
+        - name: xAxis
+          in: query
+          schema:
+            type: string
+            enum: [status, priority, tag]
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Heatmap
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/weekly-trend:
+    get:
+      tags: [dashboard]
+      operationId: getWeeklyTrend
+      summary: Get weekly trend
+      parameters:
+        - name: weeks
+          in: query
+          schema:
+            type: integer
+            default: 12
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Trend array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeeklyTrendItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/tag-distribution:
+    get:
+      tags: [dashboard]
+      operationId: getTagDistribution
+      summary: Get tag distribution
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Tag stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagStatItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/system-overview:
+    get:
+      tags: [dashboard]
+      operationId: getSystemOverview
+      summary: Get system overview stats
+      parameters:
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: System stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemStatItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/assignee-stats:
+    get:
+      tags: [dashboard]
+      operationId: getAssigneeStats
+      summary: Get assignee stats
+      parameters:
+        - name: xAxis
+          in: query
+          schema:
+            type: string
+            enum: [status, priority, tag]
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Assignee stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/processing-speed:
+    get:
+      tags: [dashboard]
+      operationId: getProcessingSpeed
+      summary: Get processing speed (SLA table)
+      parameters:
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: SLA table
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/aging:
+    get:
+      tags: [dashboard]
+      operationId: getAging
+      summary: Get aging bar data
+      parameters:
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Aging bar data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/aging-vocs:
+    get:
+      tags: [dashboard]
+      operationId: getAgingVocs
+      summary: Get top aging VOCs
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - $ref: '#/components/parameters/dashboardSystemId'
+        - $ref: '#/components/parameters/dashboardMenuId'
+        - $ref: '#/components/parameters/dashboardAssigneeId'
+        - $ref: '#/components/parameters/dashboardStartDate'
+        - $ref: '#/components/parameters/dashboardEndDate'
+      responses:
+        '200':
+          description: Top aging VOCs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Voc'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/settings:
+    get:
+      tags: [dashboard]
+      operationId: getDashboardSettings
+      summary: Get dashboard settings
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [dashboard]
+      operationId: updateDashboardSettings
+      summary: Update dashboard settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardSettings'
+      responses:
+        '200':
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/menus:
+    get:
+      tags: [dashboard]
+      operationId: getDashboardMenus
+      summary: Get menus for dashboard filter
+      parameters:
+        - name: systemId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Menus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dashboard/assignees:
+    get:
+      tags: [dashboard]
+      operationId: getDashboardAssignees
+      summary: Get assignees for dashboard filter
+      responses:
+        '200':
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users:
+    get:
+      tags: [admin]
+      operationId: adminListUsers
+      summary: List all users (admin)
+      responses:
+        '200':
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/users/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminUpdateUser
+      summary: Update user role/status (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  $ref: '#/components/schemas/UserRole'
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/systems:
+    get:
+      tags: [admin]
+      operationId: adminListSystems
+      summary: List systems (admin)
+      responses:
+        '200':
+          description: Systems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/System'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateSystem
+      summary: Create system (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemInput'
+      responses:
+        '201':
+          description: Created system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/System'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/systems/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminUpdateSystem
+      summary: Update system (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemPatch'
+      responses:
+        '200':
+          description: Updated system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/System'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/menus:
+    get:
+      tags: [admin]
+      operationId: adminListMenus
+      summary: List menus (admin)
+      parameters:
+        - name: systemId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Menus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateMenu
+      summary: Create menu (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuInput'
+      responses:
+        '201':
+          description: Created menu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/menus/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminUpdateMenu
+      summary: Update menu (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuPatch'
+      responses:
+        '200':
+          description: Updated menu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/voc-types:
+    get:
+      tags: [admin]
+      operationId: adminListVocTypes
+      summary: List VOC types (admin)
+      responses:
+        '200':
+          description: VOC types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VocType'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateVocType
+      summary: Create VOC type (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VocTypeInput'
+      responses:
+        '201':
+          description: Created VOC type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocType'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/voc-types/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminUpdateVocType
+      summary: Update VOC type (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VocTypePatch'
+      responses:
+        '200':
+          description: Updated VOC type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocType'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/tag-rules:
+    get:
+      tags: [admin]
+      operationId: adminListTagRules
+      summary: List tag rules (admin)
+      responses:
+        '200':
+          description: Tag rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagRule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateTagRule
+      summary: Create tag rule (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRuleInput'
+      responses:
+        '201':
+          description: Created tag rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/tag-rules/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminUpdateTagRule
+      summary: Update tag rule (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRulePatch'
+      responses:
+        '200':
+          description: Updated tag rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [admin]
+      operationId: adminDeleteTagRule
+      summary: Delete tag rule (admin)
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/masters/refresh:
+    post:
+      tags: [admin]
+      operationId: adminRefreshMasters
+      summary: Refresh master data cache
+      responses:
+        '200':
+          description: Refresh result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MasterRefreshResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /vocs/{id}/masters/refresh:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [vocs]
+      operationId: refreshVocMasters
+      summary: Refresh master data for a VOC
+      responses:
+        '200':
+          description: Refresh result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MasterRefreshResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+    dashboardSystemId:
+      name: systemId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    dashboardMenuId:
+      name: menuId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    dashboardAssigneeId:
+      name: assigneeId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    dashboardStartDate:
+      name: startDate
+      in: query
+      schema:
+        type: string
+        format: date
+    dashboardEndDate:
+      name: endDate
+      in: query
+      schema:
+        type: string
+        format: date
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    OkResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    UserRole:
+      type: string
+      enum: [user, manager, admin]
+
+    AuthUser:
+      type: object
+      required: [id, ad_username, display_name, email, role]
+      properties:
+        id:
+          type: string
+          format: uuid
+        ad_username:
+          type: string
+        display_name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+
+    User:
+      type: object
+      required: [id, ad_username, display_name, email, role, is_active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        ad_username:
+          type: string
+        display_name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+        is_active:
+          type: boolean
+
+    VocStatus:
+      type: string
+      enum: ['접수됨', '검토중', '처리중', '완료', '드랍']
+
+    VocPriority:
+      type: string
+      enum: [urgent, high, medium, low]
+
+    VocSource:
+      type: string
+      enum: [manual, import]
+
+    Voc:
+      type: object
+      required: [id, issue_code, sequence_no, title, status, priority, source, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        issue_code:
+          type: string
+        sequence_no:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/VocStatus'
+        priority:
+          $ref: '#/components/schemas/VocPriority'
+        type_id:
+          type: string
+          format: uuid
+          nullable: true
+        system_id:
+          type: string
+          format: uuid
+          nullable: true
+        menu_id:
+          type: string
+          format: uuid
+          nullable: true
+        assignee_id:
+          type: string
+          format: uuid
+          nullable: true
+        author_id:
+          type: string
+          format: uuid
+          nullable: true
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        source:
+          $ref: '#/components/schemas/VocSource'
+        review_status:
+          type: string
+          nullable: true
+        structured_payload:
+          type: object
+          additionalProperties: true
+          nullable: true
+        resolution_quality:
+          type: integer
+          nullable: true
+        drop_reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    VocInput:
+      type: object
+      required: [title, status, priority]
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        status:
+          $ref: '#/components/schemas/VocStatus'
+        priority:
+          $ref: '#/components/schemas/VocPriority'
+        type_id:
+          type: string
+          format: uuid
+        system_id:
+          type: string
+          format: uuid
+        menu_id:
+          type: string
+          format: uuid
+        assignee_id:
+          type: string
+          format: uuid
+        parent_id:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/VocSource'
+
+    VocPatch:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        status:
+          $ref: '#/components/schemas/VocStatus'
+        priority:
+          $ref: '#/components/schemas/VocPriority'
+        type_id:
+          type: string
+          format: uuid
+        system_id:
+          type: string
+          format: uuid
+        menu_id:
+          type: string
+          format: uuid
+        assignee_id:
+          type: string
+          format: uuid
+        review_status:
+          type: string
+        resolution_quality:
+          type: integer
+        drop_reason:
+          type: string
+
+    Comment:
+      type: object
+      required: [id, voc_id, author_id, body, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        voc_id:
+          type: string
+          format: uuid
+        author_id:
+          type: string
+          format: uuid
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    Note:
+      type: object
+      required: [id, voc_id, author_id, body, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        voc_id:
+          type: string
+          format: uuid
+        author_id:
+          type: string
+          format: uuid
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    Attachment:
+      type: object
+      required: [id, voc_id, filename, original_name, mime_type, size, url, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        voc_id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        original_name:
+          type: string
+        mime_type:
+          type: string
+        size:
+          type: integer
+        url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Tag:
+      type: object
+      required: [id, name, slug, kind, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        kind:
+          type: string
+          enum: [general, menu]
+        color:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    System:
+      type: object
+      required: [id, name, slug, is_archived]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        is_archived:
+          type: boolean
+
+    SystemInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+
+    SystemPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        is_archived:
+          type: boolean
+
+    Menu:
+      type: object
+      required: [id, system_id, name, slug, is_archived]
+      properties:
+        id:
+          type: string
+          format: uuid
+        system_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        is_archived:
+          type: boolean
+
+    MenuInput:
+      type: object
+      required: [system_id, name, slug]
+      properties:
+        system_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+
+    MenuPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        is_archived:
+          type: boolean
+
+    VocType:
+      type: object
+      required: [id, name, slug, sort_order, is_archived]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        color:
+          type: string
+          nullable: true
+        sort_order:
+          type: integer
+        is_archived:
+          type: boolean
+
+    VocTypeInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        color:
+          type: string
+        sort_order:
+          type: integer
+
+    VocTypePatch:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        color:
+          type: string
+        sort_order:
+          type: integer
+        is_archived:
+          type: boolean
+
+    TagRule:
+      type: object
+      required: [id, name, pattern, kind, tag_id, is_active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        pattern:
+          type: string
+        kind:
+          type: string
+          enum: [keyword, regex]
+        tag_id:
+          type: string
+          format: uuid
+        is_active:
+          type: boolean
+
+    TagRuleInput:
+      type: object
+      required: [name, pattern, kind, tag_id]
+      properties:
+        name:
+          type: string
+        pattern:
+          type: string
+        kind:
+          type: string
+          enum: [keyword, regex]
+        tag_id:
+          type: string
+          format: uuid
+        is_active:
+          type: boolean
+
+    TagRulePatch:
+      type: object
+      properties:
+        name:
+          type: string
+        pattern:
+          type: string
+        kind:
+          type: string
+          enum: [keyword, regex]
+        tag_id:
+          type: string
+          format: uuid
+        is_active:
+          type: boolean
+
+    Notification:
+      type: object
+      required: [id, user_id, type, message, is_read, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        voc_id:
+          type: string
+          format: uuid
+          nullable: true
+        message:
+          type: string
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    PaginatedVocs:
+      type: object
+      required: [items, total, page, limit, totalPages]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Voc'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+
+    DashboardSummary:
+      type: object
+      required: [total, open, in_progress, completed, dropped, urgent, overdue, avg_resolution_days]
+      properties:
+        total:
+          type: integer
+        open:
+          type: integer
+        in_progress:
+          type: integer
+        completed:
+          type: integer
+        dropped:
+          type: integer
+        urgent:
+          type: integer
+        overdue:
+          type: integer
+        avg_resolution_days:
+          type: number
+
+    DashboardSettings:
+      type: object
+      additionalProperties: true
+
+    DistributionItem:
+      type: object
+      required: [label, count]
+      properties:
+        label:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+
+    WeeklyTrendItem:
+      type: object
+      required: [week, count]
+      properties:
+        week:
+          type: string
+        count:
+          type: integer
+
+    TagStatItem:
+      type: object
+      required: [tag_id, name, count]
+      properties:
+        tag_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        count:
+          type: integer
+
+    SystemStatItem:
+      type: object
+      required: [system_id, name, count]
+      properties:
+        system_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        count:
+          type: integer
+
+    MasterRefreshResult:
+      type: object
+      required: [swapped, loaded_at]
+      properties:
+        swapped:
+          type: boolean
+        loaded_at:
+          type: string
+          format: date-time
