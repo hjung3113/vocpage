@@ -1,7 +1,12 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-24 (10차 — v3 리뷰 전 결정(Q3/Q5/Q7/Q8/Q9/Q10/갭#6/§7A) requirements.md 본문 일괄 반영 완료)
+> 최종 업데이트: 2026-04-24 (11차 — Phase 6-4/6-6 구현 결정 requirements.md 반영 완료, PR #22 리뷰 대기)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
+
+## 다음 세션 시작점
+
+1. **PR #22 리뷰 & 머지** (`docs/sync-phase6-impl-to-requirements`): requirements.md Phase 6-4/6-6 반영 (§6.1 auth 미들웨어·API 엔드포인트·AuthUser, §6.2 FE /mock-login·auth API 클라이언트, §14.1 VITE_AUTH_MODE, §14.2 Docker 포트, §14.5 Mock user fixtures, .env.example VITE_AUTH_MODE 추가)
+2. **다음 블로킹**: 6-7 DB 마이그레이션 & 시드 전략
 
 ## Reviews 폴더 구조
 
