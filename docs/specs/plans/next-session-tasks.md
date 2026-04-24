@@ -118,9 +118,9 @@ docs/specs/reviews/
 |---|---|---|
 | **DB 마이그레이션 도구** | **node-pg-migrate** | ✅ 2026-04-24 확정 |
 | **Mock API 전략** | **MSW (Mock Service Worker)** | ✅ 2026-04-24 확정 |
-| **FE-BE 타입 공유 방식** | `shared/types/` 패키지 vs OpenAPI codegen | 🔴 미결 |
-| **파일 업로드 미들웨어** | `multer` (de facto) | 🔴 확정 필요 |
-| **MSSQL 연결 드라이버** | `mssql` npm 패키지 | 🔴 확정 필요 |
+| **FE-BE 타입 공유 방식** | **OpenAPI codegen (`openapi-typescript`)** — `openapi.yaml` 단일 소스 → `shared/types/api.ts` 자동 생성, Swagger UI BE dev 마운트 | ✅ 2026-04-24 확정 |
+| **파일 업로드 미들웨어** | **multer + DiskStorage** — Docker named volume(`uploads_data`), `voc_attachments` 메타데이터만 저장, MVP 후 S3 교체 가능 | ✅ 2026-04-24 확정 |
+| **MSSQL 연결 드라이버** | **mssql npm 패키지** — 읽기 전용, BE 부팅 시 pool 1회 생성 | ✅ 2026-04-24 확정 |
 
 #### 🟠 중위험 (나중에 바꾸면 리팩 발생)
 
