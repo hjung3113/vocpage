@@ -6,13 +6,14 @@ CREATE TABLE voc_sequence_counters (
   PRIMARY KEY (system_id, year)
 );
 
--- sequence_no 자동 채번 트리거 함수
+-- sequence_no + issue_code 자동 채번 트리거 함수
 -- BEFORE INSERT 시점에 실행 → created_at DEFAULT(now())가 이미 적용된 상태
 CREATE OR REPLACE FUNCTION generate_voc_sequence_no()
 RETURNS TRIGGER AS $$
 DECLARE
   v_year int;
   v_seq  int;
+  v_slug text;
 BEGIN
   v_year := EXTRACT(YEAR FROM NEW.created_at)::int;
 
@@ -23,6 +24,10 @@ BEGIN
   RETURNING last_seq INTO v_seq;
 
   NEW.sequence_no := v_seq;
+
+  SELECT slug INTO v_slug FROM systems WHERE id = NEW.system_id;
+  NEW.issue_code := UPPER(v_slug) || '-' || LPAD(v_year::text, 4, '0') || '-' || LPAD(v_seq::text, 4, '0');
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -36,12 +41,14 @@ CREATE TABLE vocs (
                                         CHECK (status IN ('접수','검토중','처리중','완료','드랍')),
   priority                  text        NOT NULL DEFAULT 'medium'
                                         CHECK (priority IN ('low','medium','high','urgent')),
-  reporter_id               uuid        NOT NULL REFERENCES users(id),
+  author_id                 uuid        NOT NULL REFERENCES users(id),
   assignee_id               uuid        REFERENCES users(id),
+  parent_id                 uuid        REFERENCES vocs(id),
   system_id                 uuid        NOT NULL REFERENCES systems(id),
   menu_id                   uuid        REFERENCES menus(id),
   voc_type_id               uuid        REFERENCES voc_types(id),
   sequence_no               int,
+  issue_code                text        UNIQUE,
   structured_payload        jsonb,
   structured_payload_draft  jsonb,
   review_status             text        CHECK (review_status IN ('unverified','approved','rejected','pending_deletion')),
@@ -49,6 +56,7 @@ CREATE TABLE vocs (
   embedding                 vector(1536),
   resolution_quality        text        CHECK (resolution_quality IN ('근본해결','임시조치')),
   drop_reason               text        CHECK (drop_reason IN ('중복','정책거부','재현불가','범위외','기타')),
+  due_date                  timestamptz,
   source                    text        NOT NULL DEFAULT 'manual'
                                         CHECK (source IN ('manual','import')),
   deleted_at                timestamptz,
@@ -100,3 +108,6 @@ CREATE TABLE voc_payload_history (
   final_state   text        CHECK (final_state IN ('approved','rejected','deleted','active')),
   is_current    boolean     NOT NULL DEFAULT false
 );
+
+-- 동시 제출 경합 방지: VOC당 is_current=true인 row는 최대 1개
+CREATE UNIQUE INDEX ON voc_payload_history (voc_id) WHERE is_current = true;
