@@ -156,6 +156,11 @@ paths:
           in: query
           schema:
             type: boolean
+        - name: review_status
+          in: query
+          description: Filter by review_status (comma-separated for multiple)
+          schema:
+            type: string
       responses:
         '200':
           description: Paginated VOC list
@@ -1488,6 +1493,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VocPayloadHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/payload-draft:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [vocs]
+      operationId: saveVocPayloadDraft
+      summary: Save structured payload draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                draft:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Draft saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/payload-delete-request:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [vocs]
+      operationId: requestVocPayloadDeletion
+      summary: Request deletion of approved payload
+      responses:
+        '200':
+          description: Deletion request recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':

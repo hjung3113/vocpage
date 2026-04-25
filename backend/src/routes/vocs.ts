@@ -113,6 +113,18 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
     conditions.push(`v.assignee_id = $${idx++}`);
     params.push(assignee_id);
   }
+  const reviewStatusRaw = (req.query as Record<string, string | undefined>).review_status;
+  if (reviewStatusRaw) {
+    const values = reviewStatusRaw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (values.length > 0) {
+      const placeholders = values.map(() => `$${idx++}`).join(',');
+      conditions.push(`v.review_status IN (${placeholders})`);
+      params.push(...values);
+    }
+  }
   if (keyword) {
     conditions.push(`(v.title ILIKE $${idx} OR v.body ILIKE $${idx})`);
     params.push(`%${keyword}%`);
@@ -373,6 +385,294 @@ vocRouter.patch(
       }).catch(() => {});
     } catch (err) {
       logger.error({ err }, 'PATCH /api/vocs/:id/status failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── POST /api/vocs/:id/payload ────────────────────────────────────────────────
+
+vocRouter.post(
+  '/:id/payload',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as AuthUser;
+    const { id } = req.params;
+    const {
+      equipment,
+      maker,
+      model,
+      process: proc,
+      symptom,
+      root_cause,
+      resolution,
+      unverified_fields,
+    } = req.body as {
+      equipment?: string;
+      maker?: string;
+      model?: string;
+      process?: string;
+      symptom?: string;
+      root_cause?: string;
+      resolution?: string;
+      unverified_fields?: string[];
+    };
+
+    if (!symptom || !root_cause || !resolution) {
+      res.status(400).json({ error: 'VALIDATION_FAILED' });
+      return;
+    }
+
+    try {
+      const { rows } = await pool.query(`SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL`, [
+        id,
+      ]);
+      if (rows.length === 0) {
+        res.status(404).json({ error: 'NOT_FOUND' });
+        return;
+      }
+      const voc = rows[0] as {
+        status: string;
+        assignee_id: string | null;
+        review_status: string | null;
+      };
+
+      if (voc.status !== '완료' && voc.status !== '드랍') {
+        res.status(400).json({ error: 'INVALID_STATUS_FOR_PAYLOAD' });
+        return;
+      }
+      if (user.role !== 'admin' && voc.assignee_id !== user.id) {
+        res.status(403).json({ error: 'FORBIDDEN' });
+        return;
+      }
+
+      const payload = {
+        equipment,
+        maker,
+        model,
+        process: proc,
+        symptom,
+        root_cause,
+        resolution,
+        unverified_fields: unverified_fields ?? [],
+      };
+      const wasApproved = voc.review_status === 'approved';
+
+      await pool.query('BEGIN');
+      try {
+        await pool.query(
+          `UPDATE voc_payload_history SET is_current = false WHERE voc_id = $1 AND is_current = true`,
+          [id],
+        );
+        const histResult = await pool.query(
+          `INSERT INTO voc_payload_history (voc_id, payload, submitted_by, final_state, is_current)
+           VALUES ($1, $2, $3, 'active', true) RETURNING *`,
+          [id, JSON.stringify(payload), user.id],
+        );
+        await pool.query(
+          `UPDATE vocs SET structured_payload = $1, review_status = 'unverified', embed_stale = $2, updated_at = now() WHERE id = $3`,
+          [JSON.stringify(payload), wasApproved, id],
+        );
+        await pool.query('COMMIT');
+        res.json(histResult.rows[0]);
+      } catch (err) {
+        await pool.query('ROLLBACK');
+        throw err;
+      }
+    } catch (err) {
+      logger.error({ err }, 'POST /api/vocs/:id/payload failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── PATCH /api/vocs/:id/payload-draft ─────────────────────────────────────────
+
+vocRouter.patch(
+  '/:id/payload-draft',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as AuthUser;
+    const { id } = req.params;
+    const { draft } = req.body as { draft?: Record<string, unknown> };
+
+    try {
+      const { rows } = await pool.query(
+        `SELECT id, assignee_id FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+        [id],
+      );
+      if (rows.length === 0) {
+        res.status(404).json({ error: 'NOT_FOUND' });
+        return;
+      }
+      const voc = rows[0] as { assignee_id: string | null };
+      if (user.role !== 'admin' && voc.assignee_id !== user.id) {
+        res.status(403).json({ error: 'FORBIDDEN' });
+        return;
+      }
+      await pool.query(
+        `UPDATE vocs SET structured_payload_draft = $1, updated_at = now() WHERE id = $2`,
+        [JSON.stringify(draft ?? {}), id],
+      );
+      res.json({ ok: true });
+    } catch (err) {
+      logger.error({ err }, 'PATCH /api/vocs/:id/payload-draft failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── GET /api/vocs/:id/payload-history ─────────────────────────────────────────
+
+vocRouter.get(
+  '/:id/payload-history',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    try {
+      const { rows } = await pool.query(
+        `SELECT id FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+        [id],
+      );
+      if (rows.length === 0) {
+        res.status(404).json({ error: 'NOT_FOUND' });
+        return;
+      }
+      const histResult = await pool.query(
+        `SELECT * FROM voc_payload_history WHERE voc_id = $1 ORDER BY submitted_at DESC`,
+        [id],
+      );
+      res.json(histResult.rows);
+    } catch (err) {
+      logger.error({ err }, 'GET /api/vocs/:id/payload-history failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── POST /api/vocs/:id/payload-review ─────────────────────────────────────────
+
+vocRouter.post(
+  '/:id/payload-review',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as AuthUser;
+    const { id } = req.params;
+    const { decision, comment } = req.body as { decision?: string; comment?: string | null };
+
+    if (decision !== 'approved' && decision !== 'rejected') {
+      res.status(400).json({ error: 'VALIDATION_FAILED' });
+      return;
+    }
+
+    try {
+      const { rows } = await pool.query(`SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL`, [
+        id,
+      ]);
+      if (rows.length === 0) {
+        res.status(404).json({ error: 'NOT_FOUND' });
+        return;
+      }
+      const voc = rows[0] as { review_status: string | null };
+      const rs = voc.review_status;
+      if (rs !== 'unverified' && rs !== 'pending_deletion') {
+        res.status(400).json({ error: 'INVALID_REVIEW_STATUS' });
+        return;
+      }
+      const action = rs === 'unverified' ? 'submission' : 'deletion';
+
+      await pool.query('BEGIN');
+      try {
+        await pool.query(
+          `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [id, action, user.id, decision, comment ?? null],
+        );
+
+        if (action === 'submission') {
+          if (decision === 'approved') {
+            await pool.query(
+              `UPDATE vocs SET review_status = 'approved', embed_stale = false, updated_at = now() WHERE id = $1`,
+              [id],
+            );
+            await pool.query(
+              `UPDATE voc_payload_history SET final_state = 'approved' WHERE voc_id = $1 AND is_current = true`,
+              [id],
+            );
+          } else {
+            await pool.query(
+              `UPDATE vocs SET review_status = 'rejected', updated_at = now() WHERE id = $1`,
+              [id],
+            );
+            await pool.query(
+              `UPDATE voc_payload_history SET final_state = 'rejected', is_current = false WHERE voc_id = $1 AND is_current = true`,
+              [id],
+            );
+          }
+        } else {
+          // deletion
+          if (decision === 'approved') {
+            await pool.query(
+              `UPDATE vocs SET structured_payload = NULL, review_status = NULL, updated_at = now() WHERE id = $1`,
+              [id],
+            );
+            await pool.query(
+              `UPDATE voc_payload_history SET final_state = 'deleted', is_current = false WHERE voc_id = $1 AND is_current = true`,
+              [id],
+            );
+          } else {
+            await pool.query(
+              `UPDATE vocs SET review_status = 'approved', updated_at = now() WHERE id = $1`,
+              [id],
+            );
+          }
+        }
+
+        await pool.query('COMMIT');
+        res.json({ ok: true });
+      } catch (err) {
+        await pool.query('ROLLBACK');
+        throw err;
+      }
+    } catch (err) {
+      logger.error({ err }, 'POST /api/vocs/:id/payload-review failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── POST /api/vocs/:id/payload-delete-request ─────────────────────────────────
+
+vocRouter.post(
+  '/:id/payload-delete-request',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    try {
+      const { rows } = await pool.query(
+        `SELECT review_status FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+        [id],
+      );
+      if (rows.length === 0) {
+        res.status(404).json({ error: 'NOT_FOUND' });
+        return;
+      }
+      if (rows[0].review_status !== 'approved') {
+        res.status(400).json({ error: 'INVALID_REVIEW_STATUS' });
+        return;
+      }
+      await pool.query(
+        `UPDATE vocs SET review_status = 'pending_deletion', updated_at = now() WHERE id = $1`,
+        [id],
+      );
+      res.json({ ok: true });
+    } catch (err) {
+      logger.error({ err }, 'POST /api/vocs/:id/payload-delete-request failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
     }
   },

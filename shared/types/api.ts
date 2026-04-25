@@ -859,6 +859,44 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/vocs/{id}/payload-draft': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Save structured payload draft */
+    patch: operations['saveVocPayloadDraft'];
+    trace?: never;
+  };
+  '/vocs/{id}/payload-delete-request': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Request deletion of approved payload */
+    post: operations['requestVocPayloadDeletion'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/vocs/{id}/payload-review': {
     parameters: {
       query?: never;
@@ -1525,6 +1563,8 @@ export interface operations {
         sort?: string;
         order?: 'asc' | 'desc';
         includeDeleted?: boolean;
+        /** @description Filter by review_status (comma-separated for multiple) */
+        review_status?: string;
       };
       header?: never;
       path?: never;
@@ -3025,6 +3065,64 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['VocPayloadHistory'][];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  saveVocPayloadDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          draft?: {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Draft saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OkResponse'];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  requestVocPayloadDeletion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deletion request recorded */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OkResponse'];
         };
       };
       401: components['responses']['Unauthorized'];

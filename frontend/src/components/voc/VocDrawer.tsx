@@ -14,6 +14,7 @@ import { PriorityBadge } from '../common/PriorityBadge';
 import { CommentList } from './CommentList';
 import { AttachmentList } from './AttachmentList';
 import { InternalNotesSection } from './InternalNotesSection';
+import { PayloadSection } from './PayloadSection';
 import { TagChip } from './TagChip';
 
 interface VocDrawerProps {
@@ -40,6 +41,13 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
   const [showTagSelect, setShowTagSelect] = useState(false);
 
   const canEditTags = user?.role === 'manager' || user?.role === 'admin';
+
+  const refreshVoc = () => {
+    if (!vocId) return;
+    getVoc(vocId)
+      .then(setVoc)
+      .catch(() => setError('VOC를 불러오지 못했습니다.'));
+  };
 
   useEffect(() => {
     if (!vocId) {
@@ -321,6 +329,9 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
                   currentUserRole={user.role}
                 />
               )}
+
+              {/* Payload section — only shown when VOC is in 완료 or 드랍 status */}
+              {user && <PayloadSection voc={voc} userRole={user.role} onUpdate={refreshVoc} />}
             </>
           )}
         </div>

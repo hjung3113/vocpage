@@ -6,6 +6,7 @@ export interface VocFilters {
   assignee_id?: string;
   keyword?: string;
   tag_id?: string;
+  review_status?: string;
   page?: number;
   limit?: number;
   sort?: string;
@@ -31,6 +32,7 @@ export interface VocSummary {
 export interface VocDetail extends VocSummary {
   body: string;
   structured_payload: Record<string, unknown> | null;
+  structured_payload_draft: Record<string, unknown> | null;
   review_status: string | null;
   source: string;
 }
