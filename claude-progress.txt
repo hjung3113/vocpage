@@ -4,27 +4,31 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ → 5-Expert 리뷰 H1~H7 수정 완료 → **Phase 8 착수 가능**
+현재 위치: Phase 0~7 ✅ → 프로토타입 갭 리뷰 완료 → **Phase 7 잔여 갭 수정 착수 필요**
 
-브랜치: `fix/phase7-5expert-h1-h7` → push 완료 (PR 대기)
+브랜치: `docs/screenshot-preview` (현재 세션)
 테스트: BE 17 suites 229 passed, FE 6 files 25 passed
-리뷰: `docs/specs/reviews/phase7-5expert-review-2026-04-25.md`
+갭 리뷰: `docs/specs/reviews/phase7-prototype-design-gap-2026-04-26.md`
 
 ### 다음 세션 우선순위
 
-**[1순위] Phase 8 착수**:
+**[1순위] Phase 7 잔여 갭 수정 — Step 1~4** (갭 리뷰 문서 §6 참조):
 
-**[2순위] Phase 8 착수**:
+| Step | 내용                                                              | 난이도 |
+| ---- | ----------------------------------------------------------------- | ------ |
+| 1    | 토큰 보강 — `--font-code` / `--font-ui` 신설 + hex/rgba 위반 수정 | 반나절 |
+| 2    | AppShell + Sidebar 골격 구현 (정적 섹션)                          | 1~2일  |
+| 3    | VOC 목록 — 담당자 컬럼 / 정렬 / 필터 탭 순서                     | 0.5일  |
+| 4    | VocDrawer + Sub-task UI 전체 구현                                 | 2일    |
 
-| 단계 | 내용                                                            |
-| ---- | --------------------------------------------------------------- |
-| 8-1  | `connect-pg-simple` 세션 스토어 — `NODE_ENV=production` 시 적용 |
-| 8-2  | OIDC 인증 실구현 (`oidcAuthMiddleware`)                         |
-| 8-3  | Production Dockerfile + 빌드 파이프라인                         |
-| 8-5  | 실 MSSQL 연동 (설비 마스터 — 담당자 자료 수집 후)               |
-| 8-6  | 배포 + smoke test                                               |
-| 8-7  | Playwright E2E 설정 + 핵심 3플로우 테스트                       |
-| 8-8  | Jira 마이그레이션 스크립트 작성 + 실행                         |
+**[2순위] Phase 7 잔여 갭 수정 — Step 5~8**:
+
+| Step | 내용                                                       |
+| ---- | ---------------------------------------------------------- |
+| 5    | Sidebar 동적 시스템 메뉴 + SidebarUser 영역                |
+| 6    | 대시보드 재구성 (KPI 8종 / GlobalTabs / 도넛차트)          |
+| 7    | Admin 공지/FAQ 관리 탭 + 공지 로그인 팝업                 |
+| 8    | 알림 패널 UI + Urgent 배지                                 |
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 
