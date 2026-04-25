@@ -394,13 +394,13 @@ html, body {
 }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-/* 접수됨: neutral — not started yet */
-.s-접수됨 {
+/* 접수: neutral — not started yet */
+.s-접수 {
   background: light-dark(oklch(91% 0.006 260), oklch(22% 0.008 262));
   color: light-dark(oklch(50% 0.010 260), oklch(56% 0.008 260));
   border: 1px solid light-dark(oklch(84% 0.010 260), oklch(28% 0.012 262));
 }
-.s-접수됨 .status-dot { background: light-dark(oklch(60% 0.010 260), oklch(48% 0.010 260)); }
+.s-접수 .status-dot { background: light-dark(oklch(60% 0.010 260), oklch(48% 0.010 260)); }
 
 /* 검토중: blue — in review */
 .s-검토중 {
@@ -426,13 +426,13 @@ html, body {
 }
 .s-완료 .status-dot { background: light-dark(oklch(46% 0.19 155), oklch(63% 0.21 158)); }
 
-/* 보류: amber — blocked/on hold */
-.s-보류 {
+/* 드랍: amber — blocked/on hold */
+.s-드랍 {
   background: light-dark(oklch(93% 0.040 72), oklch(21% 0.048 68));
   color: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
   border: 1px solid light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
 }
-.s-보류 .status-dot { background: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); }
+.s-드랍 .status-dot { background: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); }
 
 /* Priority badge: tier-2 — same size as status, weight as differentiator */
 .pri-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 400; }
@@ -1200,10 +1200,10 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
   <div class="filterbar">
     <span class="filter-label">필터</span>
     <div class="pill active" onclick="togglePill(this,'전체')"><i data-lucide="layers"></i> 전체</div>
-    <div class="pill" onclick="togglePill(this,'접수됨')"><i data-lucide="circle"></i> 접수됨</div>
+    <div class="pill" onclick="togglePill(this,'접수')"><i data-lucide="circle"></i> 접수</div>
     <div class="pill" onclick="togglePill(this,'검토중')"><i data-lucide="search"></i> 검토중</div>
     <div class="pill" onclick="togglePill(this,'처리중')"><i data-lucide="zap"></i> 처리중</div>
-    <div class="pill" onclick="togglePill(this,'보류')"><i data-lucide="pause-circle"></i> 보류</div>
+    <div class="pill" onclick="togglePill(this,'드랍')"><i data-lucide="pause-circle"></i> 드랍</div>
     <div class="pill" onclick="togglePill(this,'완료')"><i data-lucide="check-circle-2"></i> 완료</div>
     <div class="spacer"></div>
     <button class="btn-ghost" id="filterMoreBtn" onclick="toggleAdvFilter()">
@@ -1368,7 +1368,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
           </div>
         </div>
         <table class="matrix-table">
-          <thead><tr><th class="rh"></th><th>접수됨</th><th>검토중</th><th>처리중</th><th>완료</th><th>보류</th></tr></thead>
+          <thead><tr><th class="rh"></th><th>접수</th><th>검토중</th><th>처리중</th><th>완료</th><th>드랍</th></tr></thead>
           <tbody>
             <tr><td class="rh" style="color:oklch(58% .22 25)">Urgent</td><td style="background:oklch(63% .19 258 / .50)">8</td><td style="background:oklch(63% .19 258 / .65)">15</td><td style="background:oklch(63% .19 258 / .40)">6</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">2</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">1</td></tr>
             <tr><td class="rh" style="color:oklch(60% .18 45)">High</td><td style="background:oklch(63% .19 258 / .28)">22</td><td style="background:oklch(63% .19 258 / .55)">48</td><td style="background:oklch(63% .19 258 / .60)">61</td><td style="background:oklch(63% .19 258 / .15);color:var(--text-tertiary)">9</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">4</td></tr>
@@ -1410,7 +1410,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
         <div class="chart-legend">
           <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-blue)"></div>신규(접수)</div>
           <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-sky)"></div>진행중(검토+처리)</div>
-          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-emerald)"></div>완료(완료+보류)</div>
+          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-emerald)"></div>완료(완료+드랍)</div>
         </div>
         <div class="chart-area">
           <svg viewBox="0 0 460 110" width="100%" height="100%" preserveAspectRatio="none">
@@ -1892,7 +1892,7 @@ const VOCDATA = [
    subs:[]},
 
   {id:'voc3',code:'파이프라인-2025-0008',title:'ETL 배치 작업이 매일 새벽 2시 이후 실패 — 타임아웃 관련',
-   status:'접수됨',priority:'medium',assignee:'홍길동',assigneeInit:'홍',assigneeCls:'',
+   status:'접수',priority:'medium',assignee:'홍길동',assigneeInit:'홍',assigneeCls:'',
    systemId:'sys3',menuId:'m7',type:'bug',tags:['ETL','오류'],
    author:'최분석',authorInit:'최',authorCls:'',
    date:'2025.06.10',
@@ -1910,7 +1910,7 @@ const VOCDATA = [
    subs:[]},
 
   {id:'voc5',code:'파이프라인-2025-0002',title:'실시간 데이터 수집 파이프라인에서 중복 레코드 삽입 발생',
-   status:'보류',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
+   status:'드랍',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
    systemId:'sys3',menuId:'m8',type:'bug',tags:['ETL','데이터','오류'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.06.07',
@@ -1919,7 +1919,7 @@ const VOCDATA = [
    subs:[]},
 
   {id:'voc6',code:'분석-2025-0031',title:'사용자별 접속 통계에서 중복 카운트 발생',
-   status:'접수됨',priority:'medium',assignee:'',assigneeInit:'',assigneeCls:'',
+   status:'접수',priority:'medium',assignee:'',assigneeInit:'',assigneeCls:'',
    systemId:'sys2',menuId:'m5',type:'feature',tags:['데이터','통계'],
    author:'이분석',authorInit:'이',authorCls:'p',
    date:'2025.06.05',
@@ -1955,7 +1955,7 @@ const VOCDATA = [
    subs:[]},
 
   {id:'voc10',code:'분석-2025-0052',title:'분기별 목표 달성률 리포트 다운로드 시 빈 파일 생성',
-   status:'접수됨',priority:'low',assignee:'',assigneeInit:'',assigneeCls:'',
+   status:'접수',priority:'low',assignee:'',assigneeInit:'',assigneeCls:'',
    systemId:'sys2',menuId:'m5',type:'inquiry',tags:['통계'],
    author:'박사용자',authorInit:'박',authorCls:'g',
    date:'2025.05.30',
@@ -1964,7 +1964,7 @@ const VOCDATA = [
    subs:[]},
 
   {id:'voc11',code:'대시보드-2025-0021',title:'KPI 목표값 편집 저장 후 새로고침하면 이전 값으로 복원',
-   status:'보류',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
+   status:'드랍',priority:'high',assignee:'이분석',assigneeInit:'이',assigneeCls:'p',
    systemId:'sys4',menuId:'m10',type:'improvement',tags:['KPI','위젯'],
    author:'정팀장',authorInit:'정',authorCls:'p',
    date:'2025.05.28',
@@ -2541,7 +2541,7 @@ function confirmSub(vocId) {
   const newSub = {
     id: newId, parentId: vocId,
     code: (voc?.code || vocId) + '-' + newSubCounter,
-    title, type, status: '접수됨', priority: 'medium',
+    title, type, status: '접수', priority: 'medium',
     assignee:'', assigneeInit:'', assigneeCls:'',
     author:'김관리', authorInit:'김', authorCls:'', tags:[], date:'', body:'',
   };
@@ -2552,7 +2552,7 @@ function confirmSub(vocId) {
   if (list) {
     const div = document.createElement('div');
     div.innerHTML = `<div class="sub-row" onclick="openDrawer('${newId}')">
-      ${statusHTML('접수됨')}
+      ${statusHTML('접수')}
       <span class="sub-row-title">${title}</span>
       <div class="mini-av" style="width:20px;height:20px;font-size:9px;flex-shrink:0">—</div>
     </div>`;
@@ -2748,11 +2748,11 @@ function openDrawer(id) {
       <div class="meta-item">
         <div class="meta-lbl">상태</div>
         <select class="meta-sel">
-          <option ${d.status==='접수됨'?'selected':''}>접수됨</option>
+          <option ${d.status==='접수'?'selected':''}>접수</option>
           <option ${d.status==='검토중'?'selected':''}>검토중</option>
           <option ${d.status==='처리중'?'selected':''}>처리중</option>
           <option ${d.status==='완료'?'selected':''}>완료</option>
-          <option ${d.status==='보류'?'selected':''}>보류</option>
+          <option ${d.status==='드랍'?'selected':''}>드랍</option>
         </select>
       </div>
       <div class="meta-item">
@@ -3603,7 +3603,7 @@ function closeNoticePopup() {
 // ═══════════════════════════════════════════════════════════════
 const DASH_HM = {
   status: {
-    headers: ['접수됨','검토중','처리중','완료','보류'],
+    headers: ['접수','검토중','처리중','완료','드랍'],
     systems: {'채널 A':[42,89,134,28,15],'채널 B':[31,67,156,44,19],'채널 C':[18,48,112,19,0],'채널 D':[14,36,89,13,7],'채널 E':[10,23,62,0,0]},
     menus: {
       '채널 A':{'메뉴 1 (홈)':[12,24,38,8,3],'메뉴 2 (검색)':[8,18,42,9,5],'메뉴 3 (마이페이지)':[10,22,29,7,4],'메뉴 4 (결제)':[7,15,18,4,3],'메뉴 5 (설정)':[5,10,7,0,0]},
@@ -3638,7 +3638,7 @@ const DASH_HM = {
 };
 
 const DASH_ASSIGN = {
-  status:   {headers:['접수됨','검토중','처리중','완료','보류'],rows:[['김지훈',8,22,34,12,4],['이수연',6,18,28,10,3],['박민준',5,14,24,8,2],['최유진',7,20,30,11,3],['정해원',4,12,20,7,2],['미배정',12,32,48,0,6]]},
+  status:   {headers:['접수','검토중','처리중','완료','드랍'],rows:[['김지훈',8,22,34,12,4],['이수연',6,18,28,10,3],['박민준',5,14,24,8,2],['최유진',7,20,30,11,3],['정해원',4,12,20,7,2],['미배정',12,32,48,0,6]]},
   priority: {headers:['Urgent','High','Medium','Low'],rows:[['김지훈',18,28,36,18],['이수연',14,22,30,14],['박민준',10,18,26,10],['최유진',16,24,32,16],['정해원',8,14,22,8],['미배정',10,38,52,0]]},
   tag:      {headers:['UI/UX','성능','오류/버그','결제','로그인'],rows:[['김지훈',16,14,12,8,6],['이수연',14,12,10,6,4],['박민준',12,10,8,6,4],['최유진',14,12,10,8,4],['정해원',10,8,8,4,4],['미배정',28,22,18,12,8]]}
 };
@@ -3726,7 +3726,7 @@ const DASH_AGING_MENU = {
 };
 
 const DASH_DIST_CONTENT = {
-  status: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(43% .010 260) 0% 14.9%, oklch(67% .17 240) 14.9% 43.1%, oklch(55% .17 150) 43.1% 86.3%, oklch(62% .19 158) 86.3% 94.9%, oklch(70% .16 72) 94.9% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(43% .010 260)"></div><span class="legend-name">접수됨</span><span class="legend-count">180</span><span class="legend-pct">14.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:30%;background:oklch(43% .010 260)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(67% .17 240)"></div><span class="legend-name">검토중</span><span class="legend-count">340</span><span class="legend-pct">28.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:57%;background:oklch(67% .17 240)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">처리중</span><span class="legend-count">520</span><span class="legend-pct">43.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(62% .19 158)"></div><span class="legend-name">완료</span><span class="legend-count">104</span><span class="legend-pct">8.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:20%;background:oklch(62% .19 158)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">보류</span><span class="legend-count">60</span><span class="legend-pct">5.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:12%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
+  status: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(43% .010 260) 0% 14.9%, oklch(67% .17 240) 14.9% 43.1%, oklch(55% .17 150) 43.1% 86.3%, oklch(62% .19 158) 86.3% 94.9%, oklch(70% .16 72) 94.9% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(43% .010 260)"></div><span class="legend-name">접수</span><span class="legend-count">180</span><span class="legend-pct">14.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:30%;background:oklch(43% .010 260)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(67% .17 240)"></div><span class="legend-name">검토중</span><span class="legend-count">340</span><span class="legend-pct">28.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:57%;background:oklch(67% .17 240)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">처리중</span><span class="legend-count">520</span><span class="legend-pct">43.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(62% .19 158)"></div><span class="legend-name">완료</span><span class="legend-count">104</span><span class="legend-pct">8.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:20%;background:oklch(62% .19 158)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">드랍</span><span class="legend-count">60</span><span class="legend-pct">5.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:12%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
   priority: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(58% .22 25) 0% 6.6%, oklch(60% .18 45) 6.6% 29.5%, oklch(59% .012 258) 29.5% 79.1%, oklch(43% .010 260) 79.1% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">Urgent</span><span class="legend-count">80</span><span class="legend-pct">6.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:13%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(60% .18 45)"></div><span class="legend-name">High</span><span class="legend-count">276</span><span class="legend-pct">22.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:46%;background:oklch(60% .18 45)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-tertiary)"></div><span class="legend-name">Medium</span><span class="legend-count">600</span><span class="legend-pct">49.8%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:var(--text-tertiary)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-quaternary)"></div><span class="legend-name">Low</span><span class="legend-count">248</span><span class="legend-pct">20.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:41%;background:var(--text-quaternary)"></div></div></div></div></div>`,
   type: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(58% .22 25) 0% 28%, oklch(63% .19 258) 28% 54%, oklch(55% .17 150) 54% 76%, oklch(70% .16 72) 76% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">버그</span><span class="legend-count">337</span><span class="legend-pct">28.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(63% .19 258)"></div><span class="legend-name">기능 요청</span><span class="legend-count">313</span><span class="legend-pct">26.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:93%;background:oklch(63% .19 258)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">개선 제안</span><span class="legend-count">265</span><span class="legend-pct">22.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:79%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(70% .16 72)"></div><span class="legend-name">문의</span><span class="legend-count">289</span><span class="legend-pct">24.0%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:86%;background:oklch(70% .16 72)"></div></div></div></div></div>`,
   tag: `<div class="donut-section"><div class="donut-wrap"><div class="donut-ring" style="background:conic-gradient(oklch(63% .19 258) 0% 23.8%, oklch(72% .14 235) 23.8% 43.3%, oklch(58% .22 25) 43.3% 60.3%, oklch(60% .18 45) 60.3% 74.2%, oklch(55% .17 150) 74.2% 85.5%, oklch(43% .010 260) 85.5% 100%);"></div><div class="donut-hole"><div class="donut-total">1,204</div><div class="donut-total-label">총건수</div></div></div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:oklch(63% .19 258)"></div><span class="legend-name">UI/UX</span><span class="legend-count">287</span><span class="legend-pct">23.8%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:100%;background:oklch(63% .19 258)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(72% .14 235)"></div><span class="legend-name">성능</span><span class="legend-count">235</span><span class="legend-pct">19.5%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:82%;background:oklch(72% .14 235)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(58% .22 25)"></div><span class="legend-name">오류/버그</span><span class="legend-count">204</span><span class="legend-pct">16.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:71%;background:oklch(58% .22 25)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(60% .18 45)"></div><span class="legend-name">결제</span><span class="legend-count">167</span><span class="legend-pct">13.9%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:58%;background:oklch(60% .18 45)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:oklch(55% .17 150)"></div><span class="legend-name">로그인</span><span class="legend-count">135</span><span class="legend-pct">11.2%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:47%;background:oklch(55% .17 150)"></div></div></div><div class="legend-item"><div class="legend-dot" style="background:var(--text-quaternary)"></div><span class="legend-name">기타</span><span class="legend-count">176</span><span class="legend-pct">14.6%</span><div class="legend-bar-wrap"><div class="legend-bar" style="width:61%;background:var(--text-quaternary)"></div></div></div></div></div>`

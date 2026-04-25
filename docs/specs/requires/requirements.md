@@ -395,7 +395,7 @@ Then  403 반환, body: { code: 'FORBIDDEN' }
 | `VITE_AUTH_MODE`     | `mock` \| `oidc`                         | FE 인증 모드. `mock`이면 `/mock-login` 라우트 활성화. BE `AUTH_MODE`와 값이 동일해야 함.  |
 | `LOG_LEVEL`          | `info`                                   | 로그 레벨 (`error`/`info`/`debug`). 운영=`error`, 개발=`info`, 로컬=`debug`. v3 §8.4.     |
 
-**세션 스토어**: `connect-pg-simple` 채택. 기존 PostgreSQL(`DATABASE_URL`)을 재사용하므로 별도 인프라 불필요. 개발(`MemoryStore`)과 운영(`connect-pg-simple`) 전환은 `NODE_ENV`로 자동 분기. 세션 테이블은 `connect-pg-simple` 내장 DDL로 자동 생성.
+**세션 스토어**: `connect-pg-simple` 채택. 기존 PostgreSQL(`DATABASE_URL`)을 재사용하므로 별도 인프라 불필요. 개발(`MemoryStore`)과 운영(`connect-pg-simple`) 전환은 `NODE_ENV`로 자동 분기. 세션 테이블은 `connect-pg-simple` 내장 DDL로 자동 생성. **⚠ Phase 8-1 구현 예정 — 현재 MemoryStore 사용 중.**
 
 ### 14.2 Docker 구성 개요
 
