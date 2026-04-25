@@ -277,7 +277,7 @@ payloadRouter.post(
             [id],
           );
           await client.query(
-            `UPDATE voc_payload_history SET final_state = 'rejected', is_current = false WHERE voc_id = $1 AND is_current = true`,
+            `UPDATE voc_payload_history SET final_state = 'rejected' WHERE voc_id = $1 AND is_current = true`,
             [id],
           );
         }

@@ -87,7 +87,14 @@ subtasksRouter.post(
         issue_code: string;
         system_id: string;
         menu_id: string;
+        author_id: string;
       };
+
+      if (user.role === 'user' && parent.author_id !== user.id) {
+        await client.query('ROLLBACK');
+        res.status(404).json({ error: 'NOT_FOUND' });
+        return;
+      }
 
       if (parent.parent_id) {
         await client.query('ROLLBACK');

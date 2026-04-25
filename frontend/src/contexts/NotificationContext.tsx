@@ -17,6 +17,7 @@ export interface NotificationContextValue {
   unreadCount: number;
   hasUrgentUnread: boolean;
   isPolling: boolean;
+  panelError: string | null;
   markAsRead: (id: string) => Promise<void>;
   refetchPanel: () => Promise<void>;
 }
@@ -39,6 +40,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [hasUrgentUnread, setHasUrgentUnread] = useState(false);
   const [isPolling, setIsPolling] = useState(false);
   const etagRef = useRef<string | undefined>(undefined);
+  const [panelError, setPanelError] = useState<string | null>(null);
 
   const markAsRead = useCallback(async (id: string) => {
     await markRead(id);
@@ -47,18 +49,19 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, []);
 
   const refetchPanel = useCallback(async () => {
+    setPanelError(null);
     try {
-      // R7-7: explicit PATCH /read-all before fetching (GET is now read-only)
-      await markAllRead();
       const data = await getNotifications();
       setNotifications(data);
       setUnreadCount(0);
       setHasUrgentUnread(false);
+      await markAllRead().catch(() => {});
     } catch (err) {
       if (is401(err)) {
         window.location.href = '/mock-login';
+      } else {
+        setPanelError('알림을 불러오지 못했습니다.');
       }
-      // otherwise silently ignore
     }
   }, []);
 
@@ -137,10 +140,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       unreadCount,
       hasUrgentUnread,
       isPolling,
+      panelError,
       markAsRead,
       refetchPanel,
     }),
-    [notifications, unreadCount, hasUrgentUnread, isPolling, markAsRead, refetchPanel],
+    [notifications, unreadCount, hasUrgentUnread, isPolling, panelError, markAsRead, refetchPanel],
   );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;

@@ -346,7 +346,7 @@ describe('VOC Payload endpoints', () => {
         [vocId],
       );
       expect(h.rows[0].final_state).toBe('rejected');
-      expect(h.rows[0].is_current).toBe(false);
+      expect(h.rows[0].is_current).toBe(true);
     });
 
     it('review_status=null VOC → 400', async () => {
