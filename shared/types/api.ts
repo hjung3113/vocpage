@@ -1046,11 +1046,11 @@ export interface components {
       status: components['schemas']['VocStatus'];
       priority: components['schemas']['VocPriority'];
       /** Format: uuid */
-      voc_type_id: string;
+      voc_type_id?: string;
       /** Format: uuid */
       system_id?: string | null;
       /** Format: uuid */
-      menu_id: string;
+      menu_id?: string;
       /** Format: uuid */
       assignee_id?: string | null;
       /** Format: uuid */
@@ -1260,11 +1260,12 @@ export interface components {
       /** Format: uuid */
       user_id: string;
       /** @enum {string} */
-      type: 'status_change' | 'comment' | 'mention' | 'assignment' | 'urgent';
+      type: 'comment' | 'status_change' | 'assigned';
       /** Format: uuid */
       voc_id?: string | null;
       message: string;
       is_read: boolean;
+      voc_priority?: string | null;
       /** Format: date-time */
       created_at: string;
     };

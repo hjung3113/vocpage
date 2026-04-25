@@ -3,6 +3,7 @@ import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
 import { applyTagRules } from '../services/autoTag';
+import { emitNotification } from '../services/notifications';
 
 export const vocRouter = Router();
 
@@ -296,11 +297,17 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
       params,
     );
 
-    const updated = result.rows[0] as { title: string; body: string };
+    const updated = result.rows[0] as { title: string; body: string; assignee_id: string | null };
     res.json(updated);
     if (title !== undefined || body !== undefined) {
       applyTagRules(id, updated.title, updated.body ?? '', pool).catch((err) =>
         logger.warn({ err }, 'auto-tag failed on patch'),
+      );
+    }
+    // fire-and-forget: notify new assignee
+    if (assignee_id !== undefined && assignee_id !== null && updated.assignee_id) {
+      emitNotification({ pool, userId: updated.assignee_id, type: 'assigned', vocId: id }).catch(
+        () => {},
       );
     }
   } catch (err) {
@@ -347,7 +354,16 @@ vocRouter.patch(
         id,
       ]);
 
+      const updatedVoc = result.rows[0] as { author_id: string };
       res.json(result.rows[0]);
+
+      // fire-and-forget: notify VOC author of status change
+      emitNotification({
+        pool,
+        userId: updatedVoc.author_id,
+        type: 'status_change',
+        vocId: id,
+      }).catch(() => {});
     } catch (err) {
       logger.error({ err }, 'PATCH /api/vocs/:id/status failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });

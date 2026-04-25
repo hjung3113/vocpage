@@ -2380,7 +2380,7 @@ components:
           format: uuid
         type:
           type: string
-          enum: ['status_change', 'comment', 'mention', 'assignment', 'urgent']
+          enum: ['comment', 'status_change', 'assigned']
         voc_id:
           type: string
           format: uuid
@@ -2389,6 +2389,9 @@ components:
           type: string
         is_read:
           type: boolean
+        voc_priority:
+          type: string
+          nullable: true
         created_at:
           type: string
           format: date-time

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { NotificationBell } from '../common/NotificationBell';
 
 interface VocTopbarProps {
   total: number;
@@ -55,13 +56,7 @@ export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
 
       {/* Right: notification + create */}
       <div className="flex items-center gap-2 shrink-0">
-        <button
-          className="px-3 py-1.5 rounded text-sm"
-          style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
-          aria-label="알림"
-        >
-          🔔
-        </button>
+        <NotificationBell />
         <button
           onClick={onCreateClick}
           className="px-4 py-1.5 rounded text-sm font-medium"
