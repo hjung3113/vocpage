@@ -18,8 +18,20 @@
   --bg-panel: oklch(17% 0.01 264);
   --bg-surface: oklch(20% 0.012 264);
   --brand: oklch(56.5% 0.196 261.3);
+  --accent: oklch(60% 0.15 200);
   --text-primary: oklch(95% 0.003 264.5);
   --text-secondary: oklch(65% 0.012 264);
+  --text-muted: oklch(45% 0.01 264);
+  --text-on-brand: oklch(98% 0.002 264);
+  --border: oklch(28% 0.012 264);
+  --danger: oklch(62% 0.22 25);
+  --overlay-bg: oklch(0% 0 0 / 0.5);
+  /* Status colors */
+  --status-blue: oklch(65% 0.18 240);
+  --status-amber: oklch(75% 0.18 80);
+  --status-purple: oklch(62% 0.18 295);
+  --status-green: oklch(68% 0.18 145);
+  --status-red: oklch(62% 0.22 25);
 }
 
 body {

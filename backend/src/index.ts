@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
+import { vocRouter } from './routes/vocs';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -49,6 +50,9 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+
+const authMiddleware = createAuthMiddleware();
+app.use('/api/vocs', authMiddleware, vocRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {

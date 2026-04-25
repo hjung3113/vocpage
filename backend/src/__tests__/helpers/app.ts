@@ -1,7 +1,9 @@
 import express from 'express';
 import session from 'express-session';
 import { authRouter } from '../../routes/auth';
+import { vocRouter } from '../../routes/vocs';
 import { setPool } from '../../db';
+import { createAuthMiddleware } from '../../auth';
 import type { Pool } from 'pg';
 
 export function createTestApp(pool?: Pool, authMode = 'mock') {
@@ -31,6 +33,9 @@ export function createTestApp(pool?: Pool, authMode = 'mock') {
   });
 
   app.use('/api/auth', authRouter);
+
+  const authMiddleware = createAuthMiddleware();
+  app.use('/api/vocs', authMiddleware, vocRouter);
 
   return app;
 }

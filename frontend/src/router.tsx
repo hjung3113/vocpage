@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { VocPage } from './pages/VocPage';
 
 const MockLoginPage =
   import.meta.env.VITE_AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
@@ -16,7 +17,7 @@ function MockLoginRoute() {
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <div className="p-4">VOC 관리 시스템</div>,
+    element: <VocPage />,
   },
   {
     path: '/mock-login',

@@ -8,6 +8,7 @@ export const tokens = {
   bgApp: 'oklch(14% 0.01 264)',
   textPrimary: 'oklch(95% 0.003 264.5)',
   textSecondary: 'oklch(65% 0.012 264)',
+  overlayBg: 'oklch(0% 0 0 / 0.5)',
 } as const;
 
 export type TokenKey = keyof typeof tokens;
