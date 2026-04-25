@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-25 (18차 — Phase 7 진입 전 스펙 픽스 완료, 사용자 결정 3건 대기)
+> 최종 업데이트: 2026-04-25 (19차 — Phase 7 착수 전 종합 리뷰 완료, 문서 수정 사항 정리)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
@@ -49,17 +49,17 @@
 
 1. **Phase 7 실구현 시작** — 6-8 ✅ 완료. feat/6-8-state-management 브랜치 PR 머지 후 진입
 
-## ⚠️ Phase 7 착수 전 코드 결함 수정 (2026-04-25 적대적 리뷰 확인)
+## Phase 7 착수 전 코드 결함 수정 (2026-04-25 적대적 리뷰 확인)
 
 리뷰 문서: `docs/specs/reviews/phase7-pre-impl-adversarial-review-2026-04-25.md`
 
-| 우선순위 | ID  | 결함                                                  | 파일                                        | 작업량 |
-| -------- | --- | ----------------------------------------------------- | ------------------------------------------- | ------ |
-| 1 (즉시) | F-1 | seed `reporter_id` → `author_id` 드리프트             | `backend/seeds/dev_seed.sql:49`             | 1줄    |
-| 2 (즉시) | F-5 | `voc_type_id` vs `type_id` 스키마/OpenAPI 불일치      | `003_vocs.sql` + `openapi.yaml` + 생성 타입 | 소규모 |
-| 3 (즉시) | F-2 | Vite `/api` 프록시 누락 — 로컬 dev에서 auth 불가      | `frontend/vite.config.ts`                   | 5줄    |
-| 4 (권장) | F-3 | AUTH_MODE 신뢰 경계 — `createAuthMiddleware()` 미사용 | `backend/src/index.ts`, `routes/auth.ts`    | 소규모 |
-| 5 (협의) | F-4 | MemoryStore — production 재시작 시 세션 소실          | `backend/src/index.ts` + package.json       | 중간   |
+| ID  | 결함                                                  | 상태                                   |
+| --- | ----------------------------------------------------- | -------------------------------------- |
+| F-1 | seed `reporter_id` → `author_id` 드리프트             | ✅ 수정 완료 (fix/pre-phase7-defects)  |
+| F-5 | `voc_type_id` vs `type_id` 스키마/OpenAPI 불일치      | ✅ 수정 완료 (fix/pre-phase7-defects)  |
+| F-2 | Vite `/api` 프록시 누락 — 로컬 dev에서 auth 불가      | ✅ 수정 완료 (fix/pre-phase7-defects)  |
+| F-3 | AUTH_MODE 신뢰 경계 — `createAuthMiddleware()` 미사용 | ✅ 수정 완료 (fix/pre-phase7-defects)  |
+| F-4 | MemoryStore — production 재시작 시 세션 소실          | ➡️ Phase 8-1로 defer 확정 (2026-04-25) |
 
 ## Reviews 폴더 구조
 
@@ -371,16 +371,68 @@ docs/specs/reviews/
 
 ---
 
-## Phase 7: 실구현 (추후 진입)
+## Phase 7 착수 전 문서 수정 필수 (2026-04-25 리뷰 결과)
 
-> **선행 조건**: Phase 6 전 항목 완료 — 스펙·테스트 전략·스캐폴딩·인증 mock·DB 전략 확정 후에만 진입
+> 리뷰 문서: `docs/specs/reviews/phase7-pre-start-review-2026-04-25.md`
 
-### 7-1. 요구사항 ↔ 프로토타입 불일치 처리 규칙 ⚠️ 구현 중 상시
+| ID  | 항목                                                                                    | 상태 |
+| --- | --------------------------------------------------------------------------------------- | ---- |
+| R-1 | `dashboard.md` — `보류→드랍`, `접수됨→접수` 일괄 치환 (openapi/migration과 정합)        | -    |
+| R-2 | `dashboard_settings` — `globaltabs_order` migration 추가 여부 결정 + dashboard.md 정합  | -    |
+| R-3 | `requirements.md §14.1` 세션 스토어 — "Phase 8-1 구현 예정, 현재 MemoryStore" 주석 추가 | -    |
+| R-4 | `ts-node-dev → tsx watch` 교체 (backend/package.json `dev` 스크립트)                    | -    |
+| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                                             | ✅   |
+| R-6 | prototype 섹션별 인벤토리 + React 매핑 규칙 문서화 (구 6-9, 7-1 착수 전)                | ✅   |
+
+---
+
+## Phase 7: 개발 스켈레톤
+
+> **목표**: 로컬 dev 환경에서 전체 기능 동작 확인. production 고려 없음.
+> **선행 조건**: Phase 6 전 항목 완료 + Phase 7 착수 전 코드 결함 수정(F-1~F-3, F-5) 완료 + 위 R-1~R-6 완료
+
+### 상시 규칙 ⚠️ 구현 중 항상 적용
 
 - [ ] 구현 중 `requirements.md` (및 `feature-*.md`, `dashboard.md`) 와 `prototype/prototype.html` 사이에 **불일치를 발견하면 임의로 결정하지 말고 사용자에게 먼저 질문**한다
 - [ ] 질문 형식: "요구사항 §X: A / 프로토타입: B — 어느 쪽 기준으로 구현할까요?" (양쪽 근거 라인/섹션 명시)
 - [ ] 사용자 답변 확정 후 → 정답 쪽을 정본으로 두고 나머지 문서/프로토타입을 동기화 커밋
 - [ ] 동기화 없이 구현만 먼저 진행하지 않는다 (doc drift 금지)
+
+### 기능 단계
+
+| 단계 | 내용                                                                        | 상태 |
+| ---- | --------------------------------------------------------------------------- | ---- |
+| 7-0  | prototype 섹션 인벤토리 + React 매핑 문서화 (R-6 완료 후 7-1 착수 가능)     | ✅   |
+| 7-1  | VOC 핵심 플로우 — CRUD, 상태 전환 (접수→검토→처리→완료/드랍)                | -    |
+| 7-2  | 댓글 + 첨부파일                                                             | -    |
+| 7-2a | Internal Notes (`voc_internal_notes`) — 보안 필수 3건 포함 (User→404 등)    | -    |
+| 7-3  | 태그 + 태그 규칙 자동화 (갭 #6)                                             | -    |
+| 7-4  | 대시보드 (위젯 데이터 API + 프론트) — `dashboard-v3.html` primary reference | -    |
+| 7-5  | 공지사항 / FAQ                                                              | -    |
+| 7-6  | 관리자 페이지 (사용자·카테고리·태그규칙·설정)                               | -    |
+| 7-7  | 알림                                                                        | -    |
+| 7-8  | Result Review 플로우 (review_status, voc_payload_reviews)                   | -    |
+| 7-9  | Sub-task                                                                    | -    |
+| 7-10 | 외부 마스터 연동 (stub JSON 기반, 실 MSSQL 아님)                            | -    |
+| 7-11 | Storybook or 체크리스트 비교 방법 결정 + 전 컴포넌트 티켓화                 | -    |
+
+---
+
+## Phase 8: 운영 실구현 + 배포
+
+> **목표**: production 준비 완료 + 실 환경 배포.
+> **선행 조건**: Phase 7 전 항목 완료
+
+| 단계 | 내용                                                            | 비고                          |
+| ---- | --------------------------------------------------------------- | ----------------------------- |
+| 8-1  | `connect-pg-simple` 세션 스토어 — `NODE_ENV=production` 시 적용 | F-4                           |
+| 8-2  | OIDC 인증 실구현 (`oidcAuthMiddleware`)                         |                               |
+| 8-3  | Production Dockerfile + 빌드 파이프라인                         | defer된 기술부채              |
+| 8-4  | 구조화 로깅 (`pino`) — Phase 7 착수 전으로 앞당기기 권고        | defer된 기술부채 → R-5로 이동 |
+| 8-5  | 실 MSSQL 연동 (설비 마스터 — 담당자 자료 수집 후)               | G-1 외부 의존                 |
+| 8-6  | 배포 + smoke test                                               |                               |
+| 8-7  | Playwright E2E 설정 + 핵심 3플로우 테스트 (requirements §13.3)  | 신규 (2026-04-25 리뷰)        |
+| 8-8  | Jira 마이그레이션 스크립트 작성 + 실행 (오픈 전 필수)           | 신규 (2026-04-25 리뷰)        |
 
 ---
 

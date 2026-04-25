@@ -4,20 +4,23 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 스펙 픽스 ✅ → **Phase 7 실구현 착수 대기**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ → **Phase 7 착수(7-1 VOC CRUD) 대기**
 
 ### 다음 세션 우선순위
 
-※ 적대적 리뷰: `docs/specs/reviews/phase7-pre-impl-adversarial-review-2026-04-25.md`
-   (코드 대조 검증 완료 — 5개 결함 확인, 우선순위 정렬)
+**R-5·R-6 완료 후 7-0 착수**:
 
-Phase 7 착수 전 반드시 수정할 결함 (코드 레벨):
+| ID  | 항목                                                                      | 상태      |
+| --- | ------------------------------------------------------------------------- | --------- |
+| R-1 | `dashboard.md` — `보류→드랍`, `접수됨→접수` 일괄 치환                    | ✅ 완료   |
+| R-2 | `dashboard_settings` — `globaltabs_order` 추가 + 3파일 스키마 정합       | ✅ 완료   |
+| R-3 | `requirements.md §14.1` 세션 스토어 주석 추가                             | ✅ 완료   |
+| R-4 | `ts-node-dev → tsx watch` 교체                                            | ✅ 완료   |
+| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                               | 대기      |
+| R-6 | prototype 섹션 인벤토리 + React 매핑 문서화 (7-0, 7-1 착수 전)            | 대기      |
 
-1. **F-1 [critical]** seed 드리프트 — `dev_seed.sql:49` `reporter_id` → `author_id` (1줄)
-2. **F-5 [high]** VOC 스키마 불일치 — `voc_type_id` vs `type_id` 통일 (migration + openapi + 타입)
-3. **F-2 [high]** Vite 프록시 누락 — `vite.config.ts`에 `/api → localhost:3001` 프록시 추가
-4. **F-3 [high]** AUTH_MODE 신뢰 경계 — `createAuthMiddleware()` 반환값을 라우트에 적용
-5. **F-4 [high]** MemoryStore → production 배포 전 `connect-pg-simple` 연결 (Phase 7 범위 협의)
+- F-4 MemoryStore → `connect-pg-simple`: **Phase 8-1로 defer 확정** (2026-04-25)
+- Phase 7 = 개발 스켈레톤 (로컬 dev 기능 동작), Phase 8 = 운영 실구현 + 배포
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 

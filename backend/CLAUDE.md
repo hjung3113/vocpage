@@ -9,7 +9,7 @@ Phase 6 implementation in progress. `src/` is scaffolded with `index.ts`, `auth/
 ## Commands
 
 ```bash
-npm run dev                                      # ts-node-dev watch
+npm run dev                                      # tsx watch
 npm run test                                     # Jest
 npm run test -- --testPathPattern=filename       # Single test
 ```

@@ -146,7 +146,7 @@
   - **Timeline 통합**: Manager/Admin 한정으로 공개 댓글 + internal note + status change를 시간순 혼합 표시하되 배지/배경으로 구분. User role은 internal note 이벤트를 Timeline API 응답에서 수신 불가.
   - **회귀 테스트 필수**: (1) User가 `/notes` 호출 시 404, (2) 공개 댓글 응답에 internal note 절대 미포함, (3) Timeline API에서 User는 internal note 이벤트 수신 불가.
 - **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
-- **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `default_date_range(enum: 7d/30d/90d/custom)`, `heatmap_default_x_axis(enum: status/priority/tag)`, `locked_fields(jsonb)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
+- **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `locked_fields(jsonb)`, `default_date_range(enum: 7d/30d/90d/custom)`, `heatmap_default_x_axis(enum: status/priority/tag)`, `globaltabs_order(jsonb, Admin 기본값 행에만 유효)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
   - JSONB 컬럼 예시 구조:
     ```json
     {
@@ -395,7 +395,7 @@ Then  403 반환, body: { code: 'FORBIDDEN' }
 | `VITE_AUTH_MODE`     | `mock` \| `oidc`                         | FE 인증 모드. `mock`이면 `/mock-login` 라우트 활성화. BE `AUTH_MODE`와 값이 동일해야 함.  |
 | `LOG_LEVEL`          | `info`                                   | 로그 레벨 (`error`/`info`/`debug`). 운영=`error`, 개발=`info`, 로컬=`debug`. v3 §8.4.     |
 
-**세션 스토어**: `connect-pg-simple` 채택. 기존 PostgreSQL(`DATABASE_URL`)을 재사용하므로 별도 인프라 불필요. 개발(`MemoryStore`)과 운영(`connect-pg-simple`) 전환은 `NODE_ENV`로 자동 분기. 세션 테이블은 `connect-pg-simple` 내장 DDL로 자동 생성.
+**세션 스토어**: `connect-pg-simple` 채택. 기존 PostgreSQL(`DATABASE_URL`)을 재사용하므로 별도 인프라 불필요. 개발(`MemoryStore`)과 운영(`connect-pg-simple`) 전환은 `NODE_ENV`로 자동 분기. 세션 테이블은 `connect-pg-simple` 내장 DDL로 자동 생성. **⚠ Phase 8-1 구현 예정 — 현재 MemoryStore 사용 중.**
 
 ### 14.2 Docker 구성 개요
 
