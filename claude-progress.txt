@@ -4,15 +4,28 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ → 프로토타입 갭 리뷰 완료 → **Phase 7 잔여 갭 수정 착수 필요**
+현재 위치: Phase 0~7 ✅ → 프로토타입 갭 리뷰 완료 → **Phase 7 잔여 갭 수정 완료 (Step 1~8)** → Phase 8 착수 가능
 
-브랜치: `docs/screenshot-preview` (현재 세션)
-테스트: BE 17 suites 229 passed, FE 6 files 25 passed
+브랜치: `docs/screenshot-preview` (커밋 d79dd61)
+테스트: BE 17 suites 229 passed, FE 빌드 통과 (tsc + vite)
 갭 리뷰: `docs/specs/reviews/phase7-prototype-design-gap-2026-04-26.md`
 
-### 다음 세션 우선순위
+### Phase 7 갭 수정 완료 (2026-04-26)
 
-**[1순위] Phase 7 잔여 갭 수정 — Step 1~4** (갭 리뷰 문서 §6 참조):
+| Step | 내용 | 상태 |
+|------|------|------|
+| 1 | 토큰 보강 --font-code/--font-ui/--shadow-elevated/--text-quaternary, hex/rgba 위반 수정 | ✅ |
+| 2 | AppShell + Sidebar 골격 (layout/AppShell.tsx, layout/Sidebar.tsx) | ✅ |
+| 3 | VOC 목록 — 담당자 필터, 컬럼 정렬, 필터 탭 순서(드랍↔완료) | ✅ |
+| 4 | VocDrawer 탭 재구성 (서브태스크/내부노트 탭 추가) | ✅ |
+| 5 | Sidebar 동적 시스템 메뉴 + SidebarUser 역할 표시 | ✅ |
+| 6 | 대시보드 재구성 — GlobalTabs, KPI 8종, StatusDonut | ✅ |
+| 7 | Admin 공지/FAQ 탭 CRUD + NoticePopup dismiss 완성 | ✅ |
+| 8 | 알림 패널 헤더+빈상태 + UrgentBadge + markAllAsRead | ✅ |
+
+### 다음 세션 우선순위 → Phase 8
+
+**[1순위] Phase 7 잔여 갭 수정 — Step 1~4** (완료됨 — 아래는 구 내용):
 
 | Step | 내용                                                              | 난이도 |
 | ---- | ----------------------------------------------------------------- | ------ |
