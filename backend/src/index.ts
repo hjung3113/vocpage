@@ -3,10 +3,12 @@ import express from 'express';
 import session from 'express-session';
 import fs from 'fs';
 import path from 'path';
+import pinoHttp from 'pino-http';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
+import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
 createAuthMiddleware();
@@ -19,6 +21,7 @@ if (isProduction && !process.env.SESSION_SECRET) {
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
+app.use(pinoHttp({ logger }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173' }));
 app.use(express.json({ limit: '1mb' }));
 app.use(
@@ -49,7 +52,7 @@ app.use('/api/auth', authRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Backend running on port ${PORT}`);
+    logger.info(`Backend running on port ${PORT}`);
   });
 }
 
