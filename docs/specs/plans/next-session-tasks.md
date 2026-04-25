@@ -49,17 +49,17 @@
 
 1. **Phase 7 실구현 시작** — 6-8 ✅ 완료. feat/6-8-state-management 브랜치 PR 머지 후 진입
 
-## ⚠️ Phase 7 착수 전 코드 결함 수정 (2026-04-25 적대적 리뷰 확인)
+## Phase 7 착수 전 코드 결함 수정 (2026-04-25 적대적 리뷰 확인)
 
 리뷰 문서: `docs/specs/reviews/phase7-pre-impl-adversarial-review-2026-04-25.md`
 
-| 우선순위 | ID  | 결함                                                  | 파일                                        | 작업량 |
-| -------- | --- | ----------------------------------------------------- | ------------------------------------------- | ------ |
-| 1 (즉시) | F-1 | seed `reporter_id` → `author_id` 드리프트             | `backend/seeds/dev_seed.sql:49`             | 1줄    |
-| 2 (즉시) | F-5 | `voc_type_id` vs `type_id` 스키마/OpenAPI 불일치      | `003_vocs.sql` + `openapi.yaml` + 생성 타입 | 소규모 |
-| 3 (즉시) | F-2 | Vite `/api` 프록시 누락 — 로컬 dev에서 auth 불가      | `frontend/vite.config.ts`                   | 5줄    |
-| 4 (권장) | F-3 | AUTH_MODE 신뢰 경계 — `createAuthMiddleware()` 미사용 | `backend/src/index.ts`, `routes/auth.ts`    | 소규모 |
-| 5 (협의) | F-4 | MemoryStore — production 재시작 시 세션 소실          | `backend/src/index.ts` + package.json       | 중간   |
+| ID  | 결함                                                  | 상태                                  |
+| --- | ----------------------------------------------------- | ------------------------------------- |
+| F-1 | seed `reporter_id` → `author_id` 드리프트             | ✅ 수정 완료 (fix/pre-phase7-defects) |
+| F-5 | `voc_type_id` vs `type_id` 스키마/OpenAPI 불일치      | ✅ 수정 완료 (fix/pre-phase7-defects) |
+| F-2 | Vite `/api` 프록시 누락 — 로컬 dev에서 auth 불가      | ✅ 수정 완료 (fix/pre-phase7-defects) |
+| F-3 | AUTH_MODE 신뢰 경계 — `createAuthMiddleware()` 미사용 | ✅ 수정 완료 (fix/pre-phase7-defects) |
+| F-4 | MemoryStore — production 재시작 시 세션 소실          | ⚠️ 결정 필요 (Phase 7 vs 8 범위)      |
 
 ## Reviews 폴더 구조
 

@@ -4,20 +4,13 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 스펙 픽스 ✅ → **Phase 7 실구현 착수 대기**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ → **Phase 7 실구현 착수 대기**
 
 ### 다음 세션 우선순위
 
-※ 적대적 리뷰: `docs/specs/reviews/phase7-pre-impl-adversarial-review-2026-04-25.md`
-   (코드 대조 검증 완료 — 5개 결함 확인, 우선순위 정렬)
-
-Phase 7 착수 전 반드시 수정할 결함 (코드 레벨):
-
-1. **F-1 [critical]** seed 드리프트 — `dev_seed.sql:49` `reporter_id` → `author_id` (1줄)
-2. **F-5 [high]** VOC 스키마 불일치 — `voc_type_id` vs `type_id` 통일 (migration + openapi + 타입)
-3. **F-2 [high]** Vite 프록시 누락 — `vite.config.ts`에 `/api → localhost:3001` 프록시 추가
-4. **F-3 [high]** AUTH_MODE 신뢰 경계 — `createAuthMiddleware()` 반환값을 라우트에 적용
-5. **F-4 [high]** MemoryStore → production 배포 전 `connect-pg-simple` 연결 (Phase 7 범위 협의)
+**F-4 [high]** MemoryStore → `connect-pg-simple` 연결 범위 결정 필요:
+- Phase 7 내 production 배포가 있으면 이번 Phase에서 구현
+- 배포 없으면 Phase 8으로 미룰 수 있음
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 
