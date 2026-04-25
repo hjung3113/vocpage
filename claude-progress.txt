@@ -4,10 +4,10 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~6 ✅ / Phase 7-1 ✅ / 7-2/2a ✅ / 7-3 ✅ / 7-4 ✅ / 7-5 ✅ / 7-6 ✅ / 7-7 ✅ / 7-8 ✅ → **다음: Phase 7-9 Sub-task**
+현재 위치: Phase 0~6 ✅ / Phase 7-1 ✅ / 7-2/2a ✅ / 7-3 ✅ / 7-4 ✅ / 7-5 ✅ / 7-6 ✅ / 7-7 ✅ / 7-8 ✅ / 7-9 ✅ → **다음: Phase 7-10 외부 마스터 연동**
 
 브랜치: `feat/phase7-7-notifications` (미머지 — PR 오픈 후 머지 필요)
-테스트: 15 suites, 194 passed, 0 failures
+테스트: 16 suites, 214 passed, 0 failures
 
 ### 다음 세션 우선순위
 
