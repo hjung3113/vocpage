@@ -49,6 +49,13 @@ function statusLabel(rs: string | null): { text: string; bg: string; color: stri
   }
 }
 
+const finalStateLabel: Record<string, string> = {
+  approved: '승인됨',
+  rejected: '반려됨',
+  deleted: '삭제됨',
+  active: '검토 대기',
+};
+
 function readField(src: Record<string, unknown> | null | undefined, key: string): string {
   if (!src) return '';
   const v = src[key];
@@ -365,7 +372,8 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                        {new Date(item.submitted_at).toLocaleString()} — {item.final_state ?? '—'}
+                        {new Date(item.submitted_at).toLocaleString()} —{' '}
+                        {finalStateLabel[item.final_state ?? ''] ?? item.final_state ?? '—'}
                       </div>
                       <div
                         style={{

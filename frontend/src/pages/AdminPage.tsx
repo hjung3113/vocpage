@@ -867,12 +867,17 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
 
 // ─── Result Review Tab ───────────────────────────────────────────────────
 
-type ReviewVoc = VocSummary & { review_status?: string | null };
+type ReviewVoc = VocSummary & {
+  review_status?: string | null;
+  structured_payload?: Record<string, unknown> | null;
+  assignee_name?: string | null;
+};
 
 function ResultReviewTab() {
   const [vocs, setVocs] = useState<ReviewVoc[]>([]);
   const [error, setError] = useState('');
   const [comments, setComments] = useState<Record<string, string>>({});
+  const [selectedVoc, setSelectedVoc] = useState<ReviewVoc | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -898,9 +903,21 @@ function ResultReviewTab() {
         delete n[vocId];
         return n;
       });
+      setSelectedVoc((prev) => (prev?.id === vocId ? null : prev));
       await load();
     } catch {
       setError('리뷰 처리 실패');
+    }
+  };
+
+  const actionLabel = (rs: string | null | undefined): string => {
+    switch (rs) {
+      case 'unverified':
+        return '제출 검토';
+      case 'pending_deletion':
+        return '삭제 검토';
+      default:
+        return '—';
     }
   };
 
@@ -949,6 +966,7 @@ function ResultReviewTab() {
             <th style={thStyle}>이슈 ID</th>
             <th style={thStyle}>제목</th>
             <th style={thStyle}>VOC 상태</th>
+            <th style={thStyle}>액션 종류</th>
             <th style={thStyle}>리뷰 상태</th>
             <th style={thStyle}>담당자</th>
             <th style={thStyle}>제출일</th>
@@ -960,7 +978,7 @@ function ResultReviewTab() {
           {vocs.length === 0 && (
             <tr>
               <td
-                colSpan={8}
+                colSpan={9}
                 style={{ ...tdStyle, textAlign: 'center', color: 'var(--text-muted)' }}
               >
                 리뷰할 항목이 없습니다.
@@ -968,20 +986,30 @@ function ResultReviewTab() {
             </tr>
           )}
           {vocs.map((voc) => (
-            <tr key={voc.id}>
+            <tr
+              key={voc.id}
+              onClick={() => setSelectedVoc(selectedVoc?.id === voc.id ? null : voc)}
+              style={{
+                cursor: 'pointer',
+                background: selectedVoc?.id === voc.id ? 'var(--bg-surface)' : 'transparent',
+              }}
+            >
               <td style={{ ...tdStyle, fontFamily: 'monospace', color: 'var(--text-muted)' }}>
                 {voc.issue_code ?? '—'}
               </td>
               <td style={tdStyle}>{voc.title}</td>
               <td style={tdStyle}>{voc.status}</td>
+              <td style={tdStyle}>{actionLabel(voc.review_status)}</td>
               <td style={tdStyle}>
                 <span style={{ color: reviewColor(voc.review_status) }}>
                   {reviewLabel(voc.review_status)}
                 </span>
               </td>
-              <td style={tdStyle}>{voc.assignee_id ?? '—'}</td>
-              <td style={tdStyle}>{voc.updated_at?.slice(0, 10) ?? '—'}</td>
               <td style={tdStyle}>
+                {voc.assignee_name ?? (voc.assignee_id ? '담당자 정보 없음' : '—')}
+              </td>
+              <td style={tdStyle}>{voc.updated_at?.slice(0, 10) ?? '—'}</td>
+              <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <input
                   style={inputStyle}
                   placeholder="코멘트 (선택)"
@@ -989,7 +1017,7 @@ function ResultReviewTab() {
                   onChange={(e) => setComments((p) => ({ ...p, [voc.id]: e.target.value }))}
                 />
               </td>
-              <td style={tdStyle}>
+              <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button
                     style={{
@@ -1017,6 +1045,88 @@ function ResultReviewTab() {
           ))}
         </tbody>
       </table>
+
+      {selectedVoc && <PayloadPreview voc={selectedVoc} onClose={() => setSelectedVoc(null)} />}
+    </div>
+  );
+}
+
+function PayloadPreview({ voc, onClose }: { voc: ReviewVoc; onClose: () => void }) {
+  const payload = voc.structured_payload ?? null;
+  const unverified = Array.isArray(
+    (payload as { unverified_fields?: unknown } | null)?.unverified_fields,
+  )
+    ? ((payload as { unverified_fields?: string[] }).unverified_fields ?? [])
+    : [];
+
+  const field = (k: string): string => {
+    const v = payload?.[k];
+    return typeof v === 'string' && v.length > 0 ? v : '—';
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: '16px',
+        padding: '16px',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '6px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '12px',
+        }}
+      >
+        <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          내용 미리보기 — {voc.issue_code ?? voc.title}
+        </h4>
+        <button style={btnStyle} onClick={onClose}>
+          닫기
+        </button>
+      </div>
+
+      {payload === null ? (
+        <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>저장된 payload가 없습니다.</p>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '90px 1fr',
+            rowGap: '6px',
+            columnGap: '12px',
+            fontSize: '12px',
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <strong style={{ color: 'var(--text-muted)' }}>증상</strong>
+          <span>{field('symptom')}</span>
+          <strong style={{ color: 'var(--text-muted)' }}>근본원인</strong>
+          <span>{field('root_cause')}</span>
+          <strong style={{ color: 'var(--text-muted)' }}>조치</strong>
+          <span>{field('resolution')}</span>
+        </div>
+      )}
+
+      {unverified.length > 0 && (
+        <div
+          style={{
+            marginTop: '10px',
+            fontSize: '11px',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            background: 'var(--status-amber-bg)',
+            color: 'var(--status-amber)',
+            display: 'inline-block',
+          }}
+        >
+          미검증 필드: {unverified.join(', ')}
+        </div>
+      )}
     </div>
   );
 }

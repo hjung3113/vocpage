@@ -407,7 +407,7 @@ vocRouter.post(
       symptom,
       root_cause,
       resolution,
-      unverified_fields,
+      status: newStatus,
     } = req.body as {
       equipment?: string;
       maker?: string;
@@ -416,6 +416,7 @@ vocRouter.post(
       symptom?: string;
       root_cause?: string;
       resolution?: string;
+      status?: string;
       unverified_fields?: string[];
     };
 
@@ -424,11 +425,17 @@ vocRouter.post(
       return;
     }
 
+    const client = await pool.connect();
     try {
-      const { rows } = await pool.query(`SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL`, [
-        id,
-      ]);
+      await client.query('BEGIN');
+
+      // C2: row-level lock to serialize concurrent payload submissions on the same VOC.
+      const { rows } = await client.query(
+        `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        [id],
+      );
       if (rows.length === 0) {
+        await client.query('ROLLBACK');
         res.status(404).json({ error: 'NOT_FOUND' });
         return;
       }
@@ -438,15 +445,26 @@ vocRouter.post(
         review_status: string | null;
       };
 
-      if (voc.status !== '완료' && voc.status !== '드랍') {
+      // M1: status may be transitioned together with payload submission.
+      const effectiveStatus = newStatus ?? voc.status;
+      if (effectiveStatus !== '완료' && effectiveStatus !== '드랍') {
+        await client.query('ROLLBACK');
         res.status(400).json({ error: 'INVALID_STATUS_FOR_PAYLOAD' });
         return;
       }
+      if (newStatus && !STATUS_TRANSITIONS[voc.status]?.includes(newStatus)) {
+        await client.query('ROLLBACK');
+        res.status(400).json({ error: 'INVALID_TRANSITION' });
+        return;
+      }
       if (user.role !== 'admin' && voc.assignee_id !== user.id) {
+        await client.query('ROLLBACK');
         res.status(403).json({ error: 'FORBIDDEN' });
         return;
       }
 
+      // M2: requirements.md §4 — never trust FE's unverified_fields flags. BE will recompute
+      // after §16.3 external master cache lands (Phase 7-10). MVP: force empty array.
       const payload = {
         equipment,
         maker,
@@ -455,34 +473,39 @@ vocRouter.post(
         symptom,
         root_cause,
         resolution,
-        unverified_fields: unverified_fields ?? [],
+        unverified_fields: [] as string[],
       };
+      // M5: wasApproved derived from the FOR UPDATE row inside the transaction.
       const wasApproved = voc.review_status === 'approved';
 
-      await pool.query('BEGIN');
-      try {
-        await pool.query(
-          `UPDATE voc_payload_history SET is_current = false WHERE voc_id = $1 AND is_current = true`,
-          [id],
-        );
-        const histResult = await pool.query(
-          `INSERT INTO voc_payload_history (voc_id, payload, submitted_by, final_state, is_current)
-           VALUES ($1, $2, $3, 'active', true) RETURNING *`,
-          [id, JSON.stringify(payload), user.id],
-        );
-        await pool.query(
-          `UPDATE vocs SET structured_payload = $1, review_status = 'unverified', embed_stale = $2, updated_at = now() WHERE id = $3`,
-          [JSON.stringify(payload), wasApproved, id],
-        );
-        await pool.query('COMMIT');
-        res.json(histResult.rows[0]);
-      } catch (err) {
-        await pool.query('ROLLBACK');
-        throw err;
+      await client.query(
+        `UPDATE voc_payload_history SET is_current = false WHERE voc_id = $1 AND is_current = true`,
+        [id],
+      );
+      const histResult = await client.query(
+        `INSERT INTO voc_payload_history (voc_id, payload, submitted_by, final_state, is_current)
+         VALUES ($1, $2, $3, 'active', true) RETURNING *`,
+        [id, JSON.stringify(payload), user.id],
+      );
+      await client.query(
+        `UPDATE vocs SET structured_payload = $1, review_status = 'unverified', embed_stale = $2,
+           status = COALESCE($3, status), updated_at = now() WHERE id = $4`,
+        [JSON.stringify(payload), wasApproved, newStatus ?? null, id],
+      );
+      await client.query('COMMIT');
+      res.json(histResult.rows[0]);
+    } catch (err: unknown) {
+      await client.query('ROLLBACK').catch(() => {});
+      // C2: UNIQUE INDEX on voc_payload_history(voc_id) WHERE is_current=true
+      // can still race in transaction overlap; surface 409 instead of 500.
+      if ((err as { code?: string }).code === '23505') {
+        res.status(409).json({ error: 'CONCURRENT_SUBMISSION' });
+        return;
       }
-    } catch (err) {
       logger.error({ err }, 'POST /api/vocs/:id/payload failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
+    } finally {
+      client.release();
     }
   },
 );
@@ -500,21 +523,27 @@ vocRouter.patch(
 
     try {
       const { rows } = await pool.query(
-        `SELECT id, assignee_id FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+        `SELECT id, status, assignee_id FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
         [id],
       );
       if (rows.length === 0) {
         res.status(404).json({ error: 'NOT_FOUND' });
         return;
       }
-      const voc = rows[0] as { assignee_id: string | null };
+      const voc = rows[0] as { status: string; assignee_id: string | null };
       if (user.role !== 'admin' && voc.assignee_id !== user.id) {
         res.status(403).json({ error: 'FORBIDDEN' });
         return;
       }
+      // M4: draft only meaningful while VOC is in a payload-eligible state.
+      if (voc.status !== '완료' && voc.status !== '드랍') {
+        res.status(400).json({ error: 'INVALID_STATUS_FOR_DRAFT' });
+        return;
+      }
+      const draftValue = draft && Object.keys(draft).length > 0 ? JSON.stringify(draft) : null;
       await pool.query(
         `UPDATE vocs SET structured_payload_draft = $1, updated_at = now() WHERE id = $2`,
-        [JSON.stringify(draft ?? {}), id],
+        [draftValue, id],
       );
       res.json({ ok: true });
     } catch (err) {
@@ -569,78 +598,83 @@ vocRouter.post(
       return;
     }
 
+    // C4: TODO(MVP): 제출자(voc_payload_history.submitted_by) === reviewer 셀프 리뷰 방지 미구현.
+    // Phase 8 이후 voc_payload_history.submitted_by != req.user.id 체크 추가 예정.
+
+    const client = await pool.connect();
     try {
-      const { rows } = await pool.query(`SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL`, [
-        id,
-      ]);
+      await client.query('BEGIN');
+      const { rows } = await client.query(
+        `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        [id],
+      );
       if (rows.length === 0) {
+        await client.query('ROLLBACK');
         res.status(404).json({ error: 'NOT_FOUND' });
         return;
       }
       const voc = rows[0] as { review_status: string | null };
       const rs = voc.review_status;
       if (rs !== 'unverified' && rs !== 'pending_deletion') {
+        await client.query('ROLLBACK');
         res.status(400).json({ error: 'INVALID_REVIEW_STATUS' });
         return;
       }
       const action = rs === 'unverified' ? 'submission' : 'deletion';
 
-      await pool.query('BEGIN');
-      try {
-        await pool.query(
-          `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [id, action, user.id, decision, comment ?? null],
-        );
+      await client.query(
+        `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [id, action, user.id, decision, comment ?? null],
+      );
 
-        if (action === 'submission') {
-          if (decision === 'approved') {
-            await pool.query(
-              `UPDATE vocs SET review_status = 'approved', embed_stale = false, updated_at = now() WHERE id = $1`,
-              [id],
-            );
-            await pool.query(
-              `UPDATE voc_payload_history SET final_state = 'approved' WHERE voc_id = $1 AND is_current = true`,
-              [id],
-            );
-          } else {
-            await pool.query(
-              `UPDATE vocs SET review_status = 'rejected', updated_at = now() WHERE id = $1`,
-              [id],
-            );
-            await pool.query(
-              `UPDATE voc_payload_history SET final_state = 'rejected', is_current = false WHERE voc_id = $1 AND is_current = true`,
-              [id],
-            );
-          }
+      if (action === 'submission') {
+        if (decision === 'approved') {
+          await client.query(
+            `UPDATE vocs SET review_status = 'approved', embed_stale = false, updated_at = now() WHERE id = $1`,
+            [id],
+          );
+          await client.query(
+            `UPDATE voc_payload_history SET final_state = 'approved' WHERE voc_id = $1 AND is_current = true`,
+            [id],
+          );
         } else {
-          // deletion
-          if (decision === 'approved') {
-            await pool.query(
-              `UPDATE vocs SET structured_payload = NULL, review_status = NULL, updated_at = now() WHERE id = $1`,
-              [id],
-            );
-            await pool.query(
-              `UPDATE voc_payload_history SET final_state = 'deleted', is_current = false WHERE voc_id = $1 AND is_current = true`,
-              [id],
-            );
-          } else {
-            await pool.query(
-              `UPDATE vocs SET review_status = 'approved', updated_at = now() WHERE id = $1`,
-              [id],
-            );
-          }
+          await client.query(
+            `UPDATE vocs SET review_status = 'rejected', updated_at = now() WHERE id = $1`,
+            [id],
+          );
+          await client.query(
+            `UPDATE voc_payload_history SET final_state = 'rejected', is_current = false WHERE voc_id = $1 AND is_current = true`,
+            [id],
+          );
         }
-
-        await pool.query('COMMIT');
-        res.json({ ok: true });
-      } catch (err) {
-        await pool.query('ROLLBACK');
-        throw err;
+      } else {
+        // deletion
+        if (decision === 'approved') {
+          await client.query(
+            `UPDATE vocs SET structured_payload = NULL, review_status = NULL, updated_at = now() WHERE id = $1`,
+            [id],
+          );
+          await client.query(
+            `UPDATE voc_payload_history SET final_state = 'deleted', is_current = false WHERE voc_id = $1 AND is_current = true`,
+            [id],
+          );
+        } else {
+          await client.query(
+            `UPDATE vocs SET review_status = 'approved', updated_at = now() WHERE id = $1`,
+            [id],
+          );
+        }
       }
+
+      await client.query('COMMIT');
+      res.json({ ok: true });
     } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
       logger.error({ err }, 'POST /api/vocs/:id/payload-review failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
+    } finally {
+      client.release();
     }
   },
 );

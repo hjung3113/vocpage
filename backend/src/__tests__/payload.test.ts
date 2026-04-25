@@ -123,6 +123,83 @@ describe('VOC Payload endpoints', () => {
       const res = await agent.post(`/api/vocs/${vocId}/payload`).send({ equipment: 'X' }); // missing symptom, root_cause, resolution
       expect(res.status).toBe(400);
     });
+
+    it('is_current invariant: 2회 제출 후 is_current=true row가 1건만 존재', async () => {
+      const vocId = await createCompletedVoc(pool, fixtures);
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
+      await agent.post(`/api/vocs/${vocId}/payload`).send({ ...BASE_PAYLOAD, symptom: '두번째' });
+
+      const r = await pool.query(
+        `SELECT COUNT(*)::int AS n FROM voc_payload_history WHERE voc_id = $1 AND is_current = true`,
+        [vocId],
+      );
+      expect(r.rows[0].n).toBe(1);
+    });
+
+    it('Manager (assignee 아님) → 403', async () => {
+      // assignee를 admin(다른 사용자)로 둔 VOC를 생성 후, 일반 manager 세션으로 제출 시도.
+      const vocId = await createCompletedVoc(pool, fixtures, { assigneeId: fixtures.adminId });
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      const res = await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
+      expect(res.status).toBe(403);
+    });
+
+    it('embed_stale: approved VOC에 재제출하면 embed_stale=true', async () => {
+      const vocId = await createCompletedVoc(pool, fixtures);
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
+      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+
+      // 재진입(처리중 → 완료)을 위해 status를 처리중으로 한 번 내렸다가 다시 완료로 올릴 수 없으므로
+      // 직접 status='완료'(이미 완료)에 또 한 번 제출(허용됨).
+      const res = await agent
+        .post(`/api/vocs/${vocId}/payload`)
+        .send({ ...BASE_PAYLOAD, symptom: '수정' });
+      expect(res.status).toBe(200);
+
+      const v = await pool.query(`SELECT embed_stale FROM vocs WHERE id = $1`, [vocId]);
+      expect(v.rows[0].embed_stale).toBe(true);
+    });
+
+    it('deletion approve 후 재제출 가능', async () => {
+      const vocId = await createCompletedVoc(pool, fixtures);
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
+      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      await agent.post(`/api/vocs/${vocId}/payload-delete-request`);
+      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+
+      // review_status=NULL 상태에서 다시 제출 가능해야 함.
+      const res = await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
+      expect(res.status).toBe(200);
+
+      const v = await pool.query(`SELECT review_status FROM vocs WHERE id = $1`, [vocId]);
+      expect(v.rows[0].review_status).toBe('unverified');
+    });
+
+    it('처리중 VOC에 status=완료 + payload 동시 전환 → 200', async () => {
+      const vocId = await createCompletedVoc(pool, fixtures, { status: '처리중' });
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      const res = await agent
+        .post(`/api/vocs/${vocId}/payload`)
+        .send({ ...BASE_PAYLOAD, status: '완료' });
+      expect(res.status).toBe(200);
+
+      const v = await pool.query(`SELECT status, review_status FROM vocs WHERE id = $1`, [vocId]);
+      expect(v.rows[0].status).toBe('완료');
+      expect(v.rows[0].review_status).toBe('unverified');
+    });
   });
 
   // ── PATCH /payload-draft ──────────────────────────────────────────────────
@@ -154,6 +231,17 @@ describe('VOC Payload endpoints', () => {
         .patch('/api/vocs/00000000-0000-0000-0000-000000000099/payload-draft')
         .send({ draft: {} });
       expect(res.status).toBe(404);
+    });
+
+    it('접수 상태 VOC draft → 400', async () => {
+      const vocId = await createCompletedVoc(pool, fixtures, { status: '접수' });
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'admin' });
+
+      const res = await agent
+        .patch(`/api/vocs/${vocId}/payload-draft`)
+        .send({ draft: { symptom: 'x' } });
+      expect(res.status).toBe(400);
     });
   });
 
