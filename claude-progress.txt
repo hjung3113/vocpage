@@ -4,14 +4,27 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ (리뷰 결함 수정 R7-1~R7-10 완료) → **다음: Phase 8 운영 실구현**
+현재 위치: Phase 0~7 ✅ → **5-Expert 리뷰 534/750 B** → R7-H1~H7 수정 후 Phase 8 착수
 
 브랜치: `fix/phase7-review-r7-1-r7-11` → main 머지 완료 (PR #35)
 테스트: 17 suites, 229 passed, 0 failures
+리뷰: `docs/specs/reviews/phase7-5expert-review-2026-04-25.md`
 
 ### 다음 세션 우선순위
 
-**Phase 8 착수**:
+**[1순위] Phase 7 리뷰 결함 수정 (HIGH 7건)**:
+
+| # | 위치 | 수정 내용 |
+| -- | ---- | --------- |
+| H1 | `subtasks.ts:79-90` | POST sub-task 부모 소유권 검증 (user role) |
+| H2 | `admin.ts:386-431` | role 허용목록 `['user','manager','admin']` + 감사 로그 |
+| H3 | `notifications.ts:33` | interval 파라미터화 (`$2::int * interval '1 day'`) |
+| H4 | `autoTag.ts:55-80` | INSERT+DELETE 트랜잭션 래핑 |
+| H5 | `payload.ts:279-299` | 거절 시 `is_current` 상태 보정 |
+| H6 | `VocDrawer.tsx:86-103` | ignore flag 또는 AbortController |
+| H7 | `NotificationContext.tsx:49-63` | GET 먼저 → 성공 후 PATCH + 에러 UI 추가 |
+
+**[2순위] Phase 8 착수**:
 
 | 단계 | 내용                                                            |
 | ---- | --------------------------------------------------------------- |
