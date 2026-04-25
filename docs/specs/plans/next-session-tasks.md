@@ -410,7 +410,7 @@ docs/specs/reviews/
 | 7-4  | 대시보드 (위젯 데이터 API + 프론트) — `dashboard-v3.html` primary reference | ✅   |
 | 7-5  | 공지사항 / FAQ                                                              | ✅   |
 | 7-6  | 관리자 페이지 (사용자·카테고리·태그규칙·설정)                               | ✅   |
-| 7-7  | 알림                                                                        | -    |
+| 7-7  | 알림                                                                        | ✅   |
 | 7-8  | Result Review 플로우 (review_status, voc_payload_reviews)                   | -    |
 | 7-9  | Sub-task                                                                    | -    |
 | 7-10 | 외부 마스터 연동 (stub JSON 기반, 실 MSSQL 아님)                            | -    |
