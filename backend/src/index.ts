@@ -13,6 +13,7 @@ import { commentRouter } from './routes/comments';
 import { noteRouter } from './routes/notes';
 import { attachmentRouter } from './routes/attachments';
 import { tagsRouter, tagRulesRouter, vocTagsRouter } from './routes/tags';
+import { dashboardRouter } from './routes/dashboard';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -63,6 +64,7 @@ app.use('/api/vocs/:id/tags', authMiddleware, vocTagsRouter);
 app.use('/api/vocs/:vocId/comments', authMiddleware, commentRouter);
 app.use('/api/vocs/:vocId/notes', authMiddleware, noteRouter);
 app.use('/api/vocs/:vocId/attachments', authMiddleware, attachmentRouter);
+app.use('/api/dashboard', authMiddleware, dashboardRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {
