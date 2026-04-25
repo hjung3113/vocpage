@@ -4,7 +4,7 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-4 문서 수정 ✅ → **R-5·R-6 + Phase 7 착수(7-0) 대기**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ → **Phase 7 착수(7-1 VOC CRUD) 대기**
 
 ### 다음 세션 우선순위
 

@@ -381,8 +381,8 @@ docs/specs/reviews/
 | R-2 | `dashboard_settings` — `globaltabs_order` migration 추가 여부 결정 + dashboard.md 정합  | -    |
 | R-3 | `requirements.md §14.1` 세션 스토어 — "Phase 8-1 구현 예정, 현재 MemoryStore" 주석 추가 | -    |
 | R-4 | `ts-node-dev → tsx watch` 교체 (backend/package.json `dev` 스크립트)                    | -    |
-| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                                             | -    |
-| R-6 | prototype 섹션별 인벤토리 + React 매핑 규칙 문서화 (구 6-9, 7-1 착수 전)                | -    |
+| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                                             | ✅   |
+| R-6 | prototype 섹션별 인벤토리 + React 매핑 규칙 문서화 (구 6-9, 7-1 착수 전)                | ✅   |
 
 ---
 
@@ -402,7 +402,7 @@ docs/specs/reviews/
 
 | 단계 | 내용                                                                        | 상태 |
 | ---- | --------------------------------------------------------------------------- | ---- |
-| 7-0  | prototype 섹션 인벤토리 + React 매핑 문서화 (R-6 완료 후 7-1 착수 가능)     | -    |
+| 7-0  | prototype 섹션 인벤토리 + React 매핑 문서화 (R-6 완료 후 7-1 착수 가능)     | ✅   |
 | 7-1  | VOC 핵심 플로우 — CRUD, 상태 전환 (접수→검토→처리→완료/드랍)                | -    |
 | 7-2  | 댓글 + 첨부파일                                                             | -    |
 | 7-2a | Internal Notes (`voc_internal_notes`) — 보안 필수 3건 포함 (User→404 등)    | -    |
