@@ -181,9 +181,14 @@ describe('Notification endpoints', () => {
     });
   });
 
-  // ── Bulk read on GET ───────────────────────────────────────────────────────
+  // ── PATCH /api/notifications/read-all (R7-7) ──────────────────────────────
 
-  describe('Bulk-read on GET /api/notifications', () => {
+  describe('PATCH /api/notifications/read-all', () => {
+    it('returns 401 when not authenticated', async () => {
+      const res = await request(app).patch('/api/notifications/read-all');
+      expect(res.status).toBe(401);
+    });
+
     it('marks all unread as read so unread-count becomes 0', async () => {
       const agent = request.agent(app);
       await agent.post('/api/auth/mock-login').send({ role: 'admin' });
@@ -195,11 +200,28 @@ describe('Notification endpoints', () => {
       const before = await agent.get('/api/notifications/unread-count');
       expect(before.body.count).toBeGreaterThan(0);
 
-      const list = await agent.get('/api/notifications');
-      expect(list.status).toBe(200);
+      const patch = await agent.patch('/api/notifications/read-all');
+      expect(patch.status).toBe(200);
+      expect(patch.body.ok).toBe(true);
 
       const after = await agent.get('/api/notifications/unread-count');
       expect(after.body.count).toBe(0);
+    });
+
+    it('is idempotent: calling read-all twice returns 200 both times', async () => {
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'admin' });
+      await clearNotifications(pool, fixtures.adminId);
+
+      await insertNotification(pool, { userId: fixtures.adminId, type: 'comment', vocId });
+
+      const first = await agent.patch('/api/notifications/read-all');
+      expect(first.status).toBe(200);
+      const second = await agent.patch('/api/notifications/read-all');
+      expect(second.status).toBe(200);
+
+      const count = await agent.get('/api/notifications/unread-count');
+      expect(count.body.count).toBe(0);
     });
   });
 
@@ -257,8 +279,7 @@ describe('Notification endpoints', () => {
       expect(res.status).toBe(200);
       const types = (res.body as Array<{ type: string }>).map((n) => n.type);
       expect(types).toContain('assigned');
-      // The bulk-read on GET means the old one might also be filtered before SELECT runs;
-      // either way, only 1 row should be returned.
+      // Old notification: filtered by read_at < 30 days ago. Recent unread: included.
       expect(res.body.length).toBe(1);
     });
   });

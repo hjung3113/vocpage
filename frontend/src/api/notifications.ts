@@ -58,3 +58,12 @@ export async function markRead(id: string): Promise<void> {
   // 404 is acceptable (already-deleted notification); other failures bubble up.
   if (!res.ok && res.status !== 404) throw new Error('markRead failed');
 }
+
+// R7-7: explicit bulk mark-as-read — call when opening the notification panel
+export async function markAllRead(): Promise<void> {
+  const res = await fetch(`${BASE}/notifications/read-all`, {
+    method: 'PATCH',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('markAllRead failed');
+}

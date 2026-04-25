@@ -1,30 +1,12 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
+import { requireAuth, requireAdmin } from '../middleware/auth';
 
 export const adminRouter = Router();
 export const systemsPublicRouter = Router();
 export const vocTypesPublicRouter = Router();
-
-// ── Auth middleware helpers ──────────────────────────────────────────────────
-
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user) {
-    res.status(401).json({ error: 'UNAUTHORIZED' });
-    return;
-  }
-  next();
-}
-
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const user = req.user as AuthUser | undefined;
-  if (!user || user.role !== 'admin') {
-    res.status(403).json({ error: 'FORBIDDEN' });
-    return;
-  }
-  next();
-}
 
 // ── Systems (Admin) ──────────────────────────────────────────────────────────
 
@@ -62,23 +44,30 @@ adminRouter.post(
       return;
     }
 
+    // R7-5: wrap in transaction — orphan system impossible if menu insert fails
+    const client = await pool.connect();
     try {
-      const sysResult = await pool.query(
+      await client.query('BEGIN');
+      const sysResult = await client.query(
         `INSERT INTO systems (name, slug) VALUES ($1, $2) RETURNING *`,
         [name, slug],
       );
       const system = sysResult.rows[0] as { id: string };
 
-      const menuResult = await pool.query(
+      const menuResult = await client.query(
         `INSERT INTO menus (system_id, name, slug) VALUES ($1, $2, $3) RETURNING *`,
         [system.id, '기타', 'other'],
       );
       const menu = menuResult.rows[0];
 
+      await client.query('COMMIT');
       res.status(201).json({ system, menu });
     } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
       logger.error({ err }, 'POST /api/admin/systems failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
+    } finally {
+      client.release();
     }
   },
 );

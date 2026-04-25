@@ -1,28 +1,10 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
+import { requireAuth, requireManager } from '../middleware/auth';
 
 export const dashboardRouter = Router();
-
-// ── Auth middleware helpers ──────────────────────────────────────────────────
-
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user) {
-    res.status(401).json({ error: 'UNAUTHORIZED' });
-    return;
-  }
-  next();
-}
-
-function requireManager(req: Request, res: Response, next: NextFunction): void {
-  const user = req.user as AuthUser | undefined;
-  if (!user || (user.role !== 'manager' && user.role !== 'admin')) {
-    res.status(403).json({ error: 'FORBIDDEN' });
-    return;
-  }
-  next();
-}
 
 // ── Filter helpers ───────────────────────────────────────────────────────────
 
