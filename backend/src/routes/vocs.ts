@@ -227,7 +227,9 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
     const voc = existing.rows[0] as {
       author_id: string;
       priority: string;
+      assignee_id: string | null;
     };
+    const prevAssigneeId = voc.assignee_id;
 
     if (user.role === 'user' && voc.author_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
@@ -304,8 +306,13 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
         logger.warn({ err }, 'auto-tag failed on patch'),
       );
     }
-    // fire-and-forget: notify new assignee
-    if (assignee_id !== undefined && assignee_id !== null && updated.assignee_id) {
+    // fire-and-forget: notify new assignee — skip self-assign and no-op re-assignments.
+    if (
+      assignee_id !== undefined &&
+      updated.assignee_id &&
+      updated.assignee_id !== user.id &&
+      updated.assignee_id !== prevAssigneeId
+    ) {
       emitNotification({ pool, userId: updated.assignee_id, type: 'assigned', vocId: id }).catch(
         () => {},
       );
