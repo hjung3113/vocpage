@@ -8,9 +8,9 @@
 
 ### 다음 세션 우선순위
 
-**F-4 [high]** MemoryStore → `connect-pg-simple` 연결 범위 결정 필요:
-- Phase 7 내 production 배포가 있으면 이번 Phase에서 구현
-- 배포 없으면 Phase 8으로 미룰 수 있음
+**Phase 7 기능 단계 착수** (7-1 VOC 핵심 플로우부터 시작):
+- F-4 MemoryStore → `connect-pg-simple`: **Phase 8-1로 defer 확정** (2026-04-25)
+- Phase 7 = 개발 스켈레톤 (로컬 dev 기능 동작), Phase 8 = 운영 실구현 + 배포
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 
