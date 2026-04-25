@@ -30,10 +30,10 @@ notificationRouter.get('/', requireAuth, async (req: Request, res: Response): Pr
        FROM notifications n
        INNER JOIN vocs v ON v.id = n.voc_id AND v.deleted_at IS NULL
        WHERE n.user_id = $1
-         AND NOT (n.read_at IS NOT NULL AND n.read_at < now() - interval '${RETENTION_DAYS} days')
+         AND NOT (n.read_at IS NOT NULL AND n.read_at < now() - ($2::text || ' days')::interval)
        ORDER BY n.created_at DESC
        LIMIT 50`,
-      [user.id],
+      [user.id, RETENTION_DAYS],
     );
 
     const notifications = result.rows.map(

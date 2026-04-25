@@ -389,6 +389,12 @@ adminRouter.patch(
       is_active?: boolean;
     };
 
+    const VALID_ROLES = ['user', 'manager', 'admin'] as const;
+    if (role !== undefined && !(VALID_ROLES as readonly string[]).includes(role)) {
+      res.status(400).json({ error: 'INVALID_ROLE' });
+      return;
+    }
+
     // Cannot modify self
     if (user.id === id) {
       res.status(400).json({ error: 'CANNOT_MODIFY_SELF' });
@@ -449,6 +455,9 @@ adminRouter.patch(
       if (result.rowCount === 0) {
         res.status(404).json({ error: 'NOT_FOUND' });
         return;
+      }
+      if (role !== undefined) {
+        logger.info({ adminId: user.id, targetId: id, newRole: role }, 'admin: user role changed');
       }
       res.json(result.rows[0]);
     } catch (err) {

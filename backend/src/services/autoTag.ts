@@ -51,31 +51,43 @@ export async function applyTagRules(
     }
   }
 
-  // R7-8: batch INSERT via VALUES list instead of per-tag loop
-  if (matchedTagIds.size > 0) {
-    const tagIdArray = [...matchedTagIds];
-    const placeholders = tagIdArray.map((_, i) => `($1, $${i + 2}, 'rule')`).join(', ');
-    await pool.query(
-      `INSERT INTO voc_tags (voc_id, tag_id, source) VALUES ${placeholders}
-       ON CONFLICT (voc_id, tag_id) DO NOTHING`,
-      [vocId, ...tagIdArray],
-    );
-  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-  // Remove stale rule-sourced tags that no longer match
-  const existing = await pool.query(
-    `SELECT tag_id FROM voc_tags WHERE voc_id = $1 AND source = 'rule'`,
-    [vocId],
-  );
-  const toDelete = (existing.rows as { tag_id: string }[])
-    .map((r) => r.tag_id)
-    .filter((id) => !matchedTagIds.has(id));
+    // R7-8: batch INSERT via VALUES list instead of per-tag loop
+    if (matchedTagIds.size > 0) {
+      const tagIdArray = [...matchedTagIds];
+      const placeholders = tagIdArray.map((_, i) => `($1, $${i + 2}, 'rule')`).join(', ');
+      await client.query(
+        `INSERT INTO voc_tags (voc_id, tag_id, source) VALUES ${placeholders}
+         ON CONFLICT (voc_id, tag_id) DO NOTHING`,
+        [vocId, ...tagIdArray],
+      );
+    }
 
-  if (toDelete.length > 0) {
-    const delPlaceholders = toDelete.map((_, i) => `$${i + 2}`).join(', ');
-    await pool.query(
-      `DELETE FROM voc_tags WHERE voc_id = $1 AND tag_id IN (${delPlaceholders}) AND source = 'rule'`,
-      [vocId, ...toDelete],
+    // Remove stale rule-sourced tags that no longer match
+    const existing = await client.query(
+      `SELECT tag_id FROM voc_tags WHERE voc_id = $1 AND source = 'rule'`,
+      [vocId],
     );
+    const toDelete = (existing.rows as { tag_id: string }[])
+      .map((r) => r.tag_id)
+      .filter((id) => !matchedTagIds.has(id));
+
+    if (toDelete.length > 0) {
+      const delPlaceholders = toDelete.map((_, i) => `$${i + 2}`).join(', ');
+      await client.query(
+        `DELETE FROM voc_tags WHERE voc_id = $1 AND tag_id IN (${delPlaceholders}) AND source = 'rule'`,
+        [vocId, ...toDelete],
+      );
+    }
+
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
   }
 }

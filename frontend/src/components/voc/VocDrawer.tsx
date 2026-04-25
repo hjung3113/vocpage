@@ -89,17 +89,29 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
       setVocTags([]);
       return;
     }
+    let ignored = false;
     setIsLoading(true);
     setError(null);
     setActiveTab('body');
     setShowTagSelect(false);
     getVoc(vocId)
-      .then(setVoc)
-      .catch(() => setError('VOC를 불러오지 못했습니다.'))
-      .finally(() => setIsLoading(false));
+      .then((data) => {
+        if (!ignored) setVoc(data);
+      })
+      .catch(() => {
+        if (!ignored) setError('VOC를 불러오지 못했습니다.');
+      })
+      .finally(() => {
+        if (!ignored) setIsLoading(false);
+      });
     listVocTags(vocId)
-      .then(setVocTags)
+      .then((data) => {
+        if (!ignored) setVocTags(data);
+      })
       .catch(() => {});
+    return () => {
+      ignored = true;
+    };
   }, [vocId]);
 
   useEffect(() => {
