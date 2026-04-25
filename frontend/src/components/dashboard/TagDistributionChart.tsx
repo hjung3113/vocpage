@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { fetchTagDistribution, type DashboardFilters } from '../../api/dashboard';
+import { tokens } from '../../tokens';
 
 interface Props {
   apiFilters: DashboardFilters;
@@ -29,22 +30,22 @@ export function TagDistributionChart({ apiFilters }: Props) {
       </h3>
       <ResponsiveContainer width="100%" height={220}>
         <BarChart layout="vertical" data={data ?? []}>
-          <CartesianGrid strokeDasharray="3 3" stroke="oklch(28% 0.012 264)" />
-          <XAxis type="number" tick={{ fill: 'oklch(45% 0.01 264)', fontSize: 11 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke={tokens.borderDefault} />
+          <XAxis type="number" tick={{ fill: tokens.textTertiary, fontSize: 11 }} />
           <YAxis
             type="category"
             dataKey="tag"
             width={80}
-            tick={{ fill: 'oklch(65% 0.012 264)', fontSize: 11 }}
+            tick={{ fill: tokens.textSecondary, fontSize: 11 }}
           />
           <Tooltip
             contentStyle={{
-              background: 'oklch(17% 0.01 264)',
-              border: '1px solid oklch(28% 0.012 264)',
-              color: 'oklch(95% 0.003 264.5)',
+              background: tokens.bgPanel,
+              border: `1px solid ${tokens.borderDefault}`,
+              color: tokens.textPrimary,
             }}
           />
-          <Bar dataKey="count" name="건수" fill="oklch(56.5% 0.196 261.3)" radius={[0, 3, 3, 0]} />
+          <Bar dataKey="count" name="건수" fill={tokens.brand} radius={[0, 3, 3, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

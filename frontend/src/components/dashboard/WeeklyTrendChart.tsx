@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { fetchWeeklyTrend, type DashboardFilters } from '../../api/dashboard';
+import { tokens } from '../../tokens';
 
 interface Props {
   apiFilters: DashboardFilters;
@@ -38,22 +39,22 @@ export function WeeklyTrendChart({ apiFilters }: Props) {
       </h3>
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data?.weeks ?? []}>
-          <CartesianGrid strokeDasharray="3 3" stroke="oklch(28% 0.012 264)" />
-          <XAxis dataKey="week" tick={{ fill: 'oklch(45% 0.01 264)', fontSize: 11 }} />
-          <YAxis tick={{ fill: 'oklch(45% 0.01 264)', fontSize: 11 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke={tokens.borderDefault} />
+          <XAxis dataKey="week" tick={{ fill: tokens.textTertiary, fontSize: 11 }} />
+          <YAxis tick={{ fill: tokens.textTertiary, fontSize: 11 }} />
           <Tooltip
             contentStyle={{
-              background: 'oklch(17% 0.01 264)',
-              border: '1px solid oklch(28% 0.012 264)',
-              color: 'oklch(95% 0.003 264.5)',
+              background: tokens.bgPanel,
+              border: `1px solid ${tokens.borderDefault}`,
+              color: tokens.textPrimary,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: '12px', color: 'oklch(65% 0.012 264)' }} />
+          <Legend wrapperStyle={{ fontSize: '12px', color: tokens.textSecondary }} />
           <Line
             type="monotone"
             dataKey="new"
             name="신규"
-            stroke="oklch(63% 0.19 258)"
+            stroke={tokens.chartBlue}
             strokeWidth={2}
             dot={false}
           />
@@ -61,7 +62,7 @@ export function WeeklyTrendChart({ apiFilters }: Props) {
             type="monotone"
             dataKey="in_progress"
             name="진행중"
-            stroke="oklch(72% 0.14 235)"
+            stroke={tokens.chartSky}
             strokeWidth={2}
             dot={false}
           />
@@ -69,7 +70,7 @@ export function WeeklyTrendChart({ apiFilters }: Props) {
             type="monotone"
             dataKey="completed"
             name="완료"
-            stroke="oklch(62% 0.19 158)"
+            stroke={tokens.chartEmerald}
             strokeWidth={2}
             dot={false}
           />

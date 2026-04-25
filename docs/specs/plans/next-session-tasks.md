@@ -413,7 +413,7 @@ docs/specs/reviews/
 | 7-7  | 알림                                                                        | ✅   |
 | 7-8  | Result Review 플로우 (review_status, voc_payload_reviews)                   | ✅   |
 | 7-9  | Sub-task                                                                    | ✅   |
-| 7-10 | 외부 마스터 연동 (stub JSON 기반, 실 MSSQL 아님)                            | -    |
+| 7-10 | 외부 마스터 연동 (stub JSON 기반, 실 MSSQL 아님)                            | ✅   |
 | 7-11 | Storybook or 체크리스트 비교 방법 결정 + 전 컴포넌트 티켓화                 | -    |
 
 ---
