@@ -52,21 +52,14 @@ export function NotificationBell() {
           <span
             style={{
               position: 'absolute',
-              bottom: '-4px',
-              right: '-4px',
-              width: '12px',
-              height: '12px',
+              top: '-2px',
+              right: '-2px',
+              width: '8px',
+              height: '8px',
               borderRadius: '50%',
-              background: 'var(--status-red)',
-              color: 'var(--text-on-brand)',
-              fontSize: '8px',
-              fontWeight: 700,
-              lineHeight: '12px',
-              textAlign: 'center',
+              background: 'var(--danger)',
             }}
-          >
-            !
-          </span>
+          />
         )}
       </button>
       {open && <NotificationPanel onClose={() => setOpen(false)} />}

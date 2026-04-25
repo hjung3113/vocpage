@@ -34,7 +34,7 @@ export function VocRow({ voc, onClick, tags }: VocRowProps) {
       </td>
       <td
         className="px-4 py-3 text-sm"
-        style={{ color: 'var(--text-muted)', fontFamily: 'D2Coding, monospace' }}
+        style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-code)' }}
       >
         {voc.issue_code ?? '—'}
       </td>

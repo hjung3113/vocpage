@@ -1,5 +1,6 @@
 import { lazy, Suspense, useContext } from 'react';
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { AppShell } from './components/layout/AppShell';
 import { VocPage } from './pages/VocPage';
 import { NoticePopup } from './components/common/NoticePopup';
 import { useNoticePopup } from './hooks/useNoticePopup';
@@ -44,7 +45,7 @@ function RootLayout() {
   const { popupNotices, isVisible, closePopup } = useNoticePopup();
   return (
     <>
-      <Outlet />
+      <AppShell />
       {isVisible && <NoticePopup notices={popupNotices} onClose={closePopup} />}
     </>
   );

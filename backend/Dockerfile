@@ -15,6 +15,7 @@ RUN npm ci
 
 # 소스 복사
 COPY backend/ ./backend/
+COPY shared/ ./shared/
 
 WORKDIR /app/backend
 

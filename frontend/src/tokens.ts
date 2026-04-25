@@ -12,8 +12,7 @@ export const tokens = {
   textTertiary: 'oklch(45% 0.01 264)',
   borderDefault: 'oklch(28% 0.012 264)',
   overlayBg: 'oklch(0% 0 0 / 0.5)',
-  // eslint-disable-next-line no-restricted-syntax
-  defaultTypeColor: '#888888',
+  defaultTypeColor: 'oklch(38% 0.01 264)',
   // Chart series — mirrors --chart-* CSS vars in index.css
   chartBlue: 'oklch(63% 0.19 258)',
   chartSky: 'oklch(72% 0.14 235)',

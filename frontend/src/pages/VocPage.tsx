@@ -27,6 +27,21 @@ export function VocPage() {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [sortColumn, setSortColumn] = useState<'created_at' | 'due_date' | 'priority' | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  const handleSort = useCallback(
+    (column: string) => {
+      const col = column as 'created_at' | 'due_date' | 'priority';
+      if (col === sortColumn) {
+        setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      } else {
+        setSortColumn(col);
+        setSortOrder('desc');
+      }
+    },
+    [sortColumn],
+  );
 
   const fetchVocs = useCallback(async () => {
     setIsLoading(true);
@@ -38,6 +53,8 @@ export function VocPage() {
         assignee_id: filters.assigneeId ?? undefined,
         page,
         limit: LIMIT,
+        sort: sortColumn ?? undefined,
+        order: sortColumn ? sortOrder : undefined,
       });
       setVocs(result.data);
       setTotal(result.total);
@@ -46,7 +63,15 @@ export function VocPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [filters.status, filters.priority, filters.keyword, filters.assigneeId, page]);
+  }, [
+    filters.status,
+    filters.priority,
+    filters.keyword,
+    filters.assigneeId,
+    page,
+    sortColumn,
+    sortOrder,
+  ]);
 
   useEffect(() => {
     void fetchVocs();
@@ -71,6 +96,20 @@ export function VocPage() {
     [setFilter],
   );
 
+  const handleTagChange = useCallback(
+    (tagId: string | null) => {
+      setFilter('tagId', tagId);
+    },
+    [setFilter],
+  );
+
+  const handleAssigneeChange = useCallback(
+    (assigneeId: string | null) => {
+      setFilter('assigneeId', assigneeId);
+    },
+    [setFilter],
+  );
+
   const handleCreated = useCallback(() => {
     void fetchVocs();
   }, [fetchVocs]);
@@ -80,7 +119,7 @@ export function VocPage() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
+        flex: 1,
         background: 'var(--bg-app)',
         overflow: 'hidden',
       }}
@@ -90,7 +129,14 @@ export function VocPage() {
         onSearch={handleSearch}
         onCreateClick={() => setCreateModalOpen(true)}
       />
-      <VocFilterBar activeStatus={filters.status} onStatusChange={handleStatusChange} />
+      <VocFilterBar
+        activeStatus={filters.status}
+        onStatusChange={handleStatusChange}
+        activeTagId={filters.tagId}
+        onTagChange={handleTagChange}
+        activeAssigneeId={filters.assigneeId}
+        onAssigneeChange={handleAssigneeChange}
+      />
       <VocList
         vocs={vocs}
         total={total}
@@ -99,6 +145,9 @@ export function VocPage() {
         onPageChange={setPage}
         onVocClick={openDrawer}
         isLoading={isLoading}
+        sortColumn={sortColumn}
+        sortOrder={sortOrder}
+        onSort={handleSort}
       />
       <VocDrawer vocId={selectedVocId} isOpen={isOpen} onClose={closeDrawer} />
       <VocCreateModal

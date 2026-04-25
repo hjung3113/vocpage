@@ -29,6 +29,16 @@ import {
 } from '../api/tags';
 import { listVocs, type VocSummary } from '../api/vocs';
 import { reviewPayload } from '../api/payload';
+import { listNotices, createNotice, updateNotice, deleteNotice, type Notice } from '../api/notices';
+import {
+  listFaqs,
+  listFaqCategories,
+  createFaq,
+  updateFaq,
+  deleteFaq,
+  type Faq,
+  type FaqCategory,
+} from '../api/faqs';
 
 function useAuth() {
   const ctx = useContext(AuthContext);
@@ -215,7 +225,9 @@ function SystemsTab() {
               }}
             >
               <td style={tdStyle}>{sys.name}</td>
-              <td style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+              <td
+                style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'var(--font-code)' }}
+              >
                 {sys.slug}
               </td>
               <td style={tdStyle}>{sys.voc_count}</td>
@@ -307,7 +319,13 @@ function SystemsTab() {
               {menus.map((menu) => (
                 <tr key={menu.id}>
                   <td style={tdStyle}>{menu.name}</td>
-                  <td style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                  <td
+                    style={{
+                      ...tdStyle,
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--font-code)',
+                    }}
+                  >
                     {menu.slug}
                   </td>
                   <td style={tdStyle}>{menu.voc_count}</td>
@@ -454,7 +472,9 @@ function VocTypesTab() {
           {types.map((t) => (
             <tr key={t.id}>
               <td style={tdStyle}>{t.name}</td>
-              <td style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+              <td
+                style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'var(--font-code)' }}
+              >
                 {t.slug}
               </td>
               <td style={tdStyle}>
@@ -474,7 +494,7 @@ function VocTypesTab() {
                     style={{
                       color: 'var(--text-muted)',
                       fontSize: '12px',
-                      fontFamily: 'monospace',
+                      fontFamily: 'var(--font-code)',
                     }}
                   >
                     {t.color}
@@ -532,7 +552,7 @@ function VocTypesTab() {
                     style={{
                       fontSize: '12px',
                       color: 'var(--text-muted)',
-                      fontFamily: 'monospace',
+                      fontFamily: 'var(--font-code)',
                     }}
                   >
                     {newType.color}
@@ -657,7 +677,9 @@ function TagRulesTab() {
           {rules.map((rule) => (
             <tr key={rule.id}>
               <td style={tdStyle}>{rule.name}</td>
-              <td style={{ ...tdStyle, fontFamily: 'monospace', color: 'var(--text-muted)' }}>
+              <td
+                style={{ ...tdStyle, fontFamily: 'var(--font-code)', color: 'var(--text-muted)' }}
+              >
                 {rule.pattern}
               </td>
               <td style={tdStyle}>{tagName(rule.tag_id)}</td>
@@ -833,7 +855,9 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
                 )}
               </td>
               <td style={tdStyle}>{user.email}</td>
-              <td style={{ ...tdStyle, fontFamily: 'monospace', color: 'var(--text-muted)' }}>
+              <td
+                style={{ ...tdStyle, fontFamily: 'var(--font-code)', color: 'var(--text-muted)' }}
+              >
                 {user.ad_account}
               </td>
               <td style={tdStyle}>
@@ -994,7 +1018,9 @@ function ResultReviewTab() {
                 background: selectedVoc?.id === voc.id ? 'var(--bg-surface)' : 'transparent',
               }}
             >
-              <td style={{ ...tdStyle, fontFamily: 'monospace', color: 'var(--text-muted)' }}>
+              <td
+                style={{ ...tdStyle, fontFamily: 'var(--font-code)', color: 'var(--text-muted)' }}
+              >
                 {voc.issue_code ?? '—'}
               </td>
               <td style={tdStyle}>{voc.title}</td>
@@ -1131,6 +1157,625 @@ function PayloadPreview({ voc, onClose }: { voc: ReviewVoc; onClose: () => void 
   );
 }
 
+// ─── Notices Tab ─────────────────────────────────────────────────────────
+
+const NOTICE_LEVEL_LABELS: Record<Notice['level'], string> = {
+  normal: '일반',
+  important: '중요',
+  urgent: '긴급',
+};
+
+function NoticesTab() {
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [error, setError] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<{
+    title: string;
+    body: string;
+    level: Notice['level'];
+    is_popup: boolean;
+    is_visible: boolean;
+    visible_from: string;
+    visible_to: string;
+  }>({
+    title: '',
+    body: '',
+    level: 'normal',
+    is_popup: false,
+    is_visible: true,
+    visible_from: '',
+    visible_to: '',
+  });
+
+  const resetForm = () => {
+    setForm({
+      title: '',
+      body: '',
+      level: 'normal',
+      is_popup: false,
+      is_visible: true,
+      visible_from: '',
+      visible_to: '',
+    });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const load = useCallback(async () => {
+    try {
+      const data = await listNotices();
+      setNotices(data);
+    } catch {
+      setError('공지사항 목록을 불러오지 못했습니다.');
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const handleEdit = (n: Notice) => {
+    setForm({
+      title: n.title,
+      body: n.body,
+      level: n.level,
+      is_popup: n.is_popup,
+      is_visible: n.is_visible,
+      visible_from: n.visible_from ?? '',
+      visible_to: n.visible_to ?? '',
+    });
+    setEditingId(n.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('이 공지사항을 삭제하시겠습니까?')) return;
+    try {
+      await deleteNotice(id);
+      setNotices((prev) => prev.filter((n) => n.id !== id));
+    } catch {
+      setError('공지사항 삭제 실패');
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.title.trim()) return;
+    try {
+      const payload = {
+        title: form.title,
+        body: form.body,
+        level: form.level,
+        is_popup: form.is_popup,
+        is_visible: form.is_visible,
+        visible_from: form.visible_from || null,
+        visible_to: form.visible_to || null,
+      };
+      if (editingId) {
+        const updated = await updateNotice(editingId, payload);
+        setNotices((prev) => prev.map((n) => (n.id === editingId ? updated : n)));
+      } else {
+        const created = await createNotice(payload);
+        setNotices((prev) => [...prev, created]);
+      }
+      resetForm();
+    } catch {
+      setError(editingId ? '공지사항 수정 실패' : '공지사항 등록 실패');
+    }
+  };
+
+  const handleToggleVisible = async (n: Notice) => {
+    try {
+      const updated = await updateNotice(n.id, { is_visible: !n.is_visible });
+      setNotices((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+    } catch {
+      setError('공지사항 상태 변경 실패');
+    }
+  };
+
+  return (
+    <div>
+      {error && (
+        <p style={{ color: 'var(--danger)', marginBottom: '12px', fontSize: '13px' }}>{error}</p>
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px',
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          공지사항 관리
+        </h3>
+        {!showForm && (
+          <button style={btnPrimaryStyle} onClick={() => setShowForm(true)}>
+            + 새 공지 작성
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <div
+          style={{
+            marginBottom: '20px',
+            padding: '16px',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+          }}
+        >
+          <h4
+            style={{
+              margin: '0 0 12px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {editingId ? '공지 수정' : '새 공지 작성'}
+          </h4>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '8px',
+              marginBottom: '8px',
+            }}
+          >
+            <div style={{ gridColumn: '1 / -1' }}>
+              <input
+                style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' }}
+                placeholder="제목"
+                value={form.title}
+                onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
+              />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <textarea
+                style={{
+                  ...inputStyle,
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  minHeight: '80px',
+                  resize: 'vertical',
+                }}
+                placeholder="내용 (HTML 가능)"
+                value={form.body}
+                onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  color: 'var(--text-muted)',
+                  marginBottom: '4px',
+                }}
+              >
+                레벨
+              </label>
+              <select
+                style={inputStyle}
+                value={form.level}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, level: e.target.value as Notice['level'] }))
+                }
+              >
+                <option value="normal">일반</option>
+                <option value="important">중요</option>
+                <option value="urgent">긴급</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingTop: '18px' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={form.is_popup}
+                  onChange={(e) => setForm((p) => ({ ...p, is_popup: e.target.checked }))}
+                />
+                팝업
+              </label>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={form.is_visible}
+                  onChange={(e) => setForm((p) => ({ ...p, is_visible: e.target.checked }))}
+                />
+                활성
+              </label>
+            </div>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  color: 'var(--text-muted)',
+                  marginBottom: '4px',
+                }}
+              >
+                게시일
+              </label>
+              <input
+                type="date"
+                style={inputStyle}
+                value={form.visible_from}
+                onChange={(e) => setForm((p) => ({ ...p, visible_from: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  color: 'var(--text-muted)',
+                  marginBottom: '4px',
+                }}
+              >
+                만료일
+              </label>
+              <input
+                type="date"
+                style={inputStyle}
+                value={form.visible_to}
+                onChange={(e) => setForm((p) => ({ ...p, visible_to: e.target.value }))}
+              />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button style={btnPrimaryStyle} onClick={() => void handleSubmit()}>
+              {editingId ? '수정' : '등록'}
+            </button>
+            <button style={btnStyle} onClick={resetForm}>
+              취소
+            </button>
+          </div>
+        </div>
+      )}
+
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thStyle}>제목</th>
+            <th style={thStyle}>레벨</th>
+            <th style={thStyle}>팝업</th>
+            <th style={thStyle}>게시일</th>
+            <th style={thStyle}>만료일</th>
+            <th style={thStyle}>활성상태</th>
+            <th style={thStyle}>작업</th>
+          </tr>
+        </thead>
+        <tbody>
+          {notices.length === 0 && (
+            <tr>
+              <td
+                colSpan={7}
+                style={{ ...tdStyle, textAlign: 'center', color: 'var(--text-muted)' }}
+              >
+                등록된 공지사항이 없습니다.
+              </td>
+            </tr>
+          )}
+          {notices.map((n) => (
+            <tr key={n.id}>
+              <td style={tdStyle}>{n.title}</td>
+              <td style={tdStyle}>{NOTICE_LEVEL_LABELS[n.level]}</td>
+              <td style={tdStyle}>{n.is_popup ? '예' : '아니오'}</td>
+              <td
+                style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'var(--font-code)' }}
+              >
+                {n.visible_from ?? '—'}
+              </td>
+              <td
+                style={{ ...tdStyle, color: 'var(--text-muted)', fontFamily: 'var(--font-code)' }}
+              >
+                {n.visible_to ?? '—'}
+              </td>
+              <td style={tdStyle}>
+                <span style={{ color: n.is_visible ? 'var(--accent)' : 'var(--text-muted)' }}>
+                  {n.is_visible ? '활성' : '비활성'}
+                </span>
+              </td>
+              <td style={tdStyle}>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button style={btnStyle} onClick={() => handleEdit(n)}>
+                    수정
+                  </button>
+                  <button style={btnStyle} onClick={() => void handleToggleVisible(n)}>
+                    {n.is_visible ? '비활성화' : '활성화'}
+                  </button>
+                  <button
+                    style={{ ...btnStyle, color: 'var(--danger)', borderColor: 'var(--danger)' }}
+                    onClick={() => void handleDelete(n.id)}
+                  >
+                    삭제
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ─── FAQ Tab ──────────────────────────────────────────────────────────────
+
+function FaqTab() {
+  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [categories, setCategories] = useState<FaqCategory[]>([]);
+  const [error, setError] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<{
+    question: string;
+    answer: string;
+    category_id: string;
+    is_visible: boolean;
+  }>({
+    question: '',
+    answer: '',
+    category_id: '',
+    is_visible: true,
+  });
+
+  const resetForm = () => {
+    setForm({ question: '', answer: '', category_id: '', is_visible: true });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const load = useCallback(async () => {
+    try {
+      const [faqData, catData] = await Promise.all([listFaqs(), listFaqCategories()]);
+      setFaqs(faqData);
+      setCategories(catData);
+    } catch {
+      setError('FAQ 목록을 불러오지 못했습니다.');
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? '—';
+
+  const handleEdit = (f: Faq) => {
+    setForm({
+      question: f.question,
+      answer: f.answer,
+      category_id: f.category_id,
+      is_visible: f.is_visible,
+    });
+    setEditingId(f.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('이 FAQ를 삭제하시겠습니까?')) return;
+    try {
+      await deleteFaq(id);
+      setFaqs((prev) => prev.filter((f) => f.id !== id));
+    } catch {
+      setError('FAQ 삭제 실패');
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.question.trim()) return;
+    try {
+      const payload = {
+        question: form.question,
+        answer: form.answer,
+        category_id: form.category_id || undefined,
+        is_visible: form.is_visible,
+      };
+      if (editingId) {
+        const updated = await updateFaq(editingId, payload);
+        setFaqs((prev) => prev.map((f) => (f.id === editingId ? updated : f)));
+      } else {
+        const created = await createFaq(payload);
+        setFaqs((prev) => [...prev, created]);
+      }
+      resetForm();
+    } catch {
+      setError(editingId ? 'FAQ 수정 실패' : 'FAQ 등록 실패');
+    }
+  };
+
+  const handleToggleVisible = async (f: Faq) => {
+    try {
+      const updated = await updateFaq(f.id, { is_visible: !f.is_visible });
+      setFaqs((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+    } catch {
+      setError('FAQ 상태 변경 실패');
+    }
+  };
+
+  return (
+    <div>
+      {error && (
+        <p style={{ color: 'var(--danger)', marginBottom: '12px', fontSize: '13px' }}>{error}</p>
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px',
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          FAQ 관리
+        </h3>
+        {!showForm && (
+          <button style={btnPrimaryStyle} onClick={() => setShowForm(true)}>
+            + FAQ 추가
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <div
+          style={{
+            marginBottom: '20px',
+            padding: '16px',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+          }}
+        >
+          <h4
+            style={{
+              margin: '0 0 12px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {editingId ? 'FAQ 수정' : 'FAQ 추가'}
+          </h4>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }}
+          >
+            <input
+              style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' }}
+              placeholder="질문"
+              value={form.question}
+              onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
+            />
+            <textarea
+              style={{
+                ...inputStyle,
+                width: '100%',
+                boxSizing: 'border-box',
+                minHeight: '80px',
+                resize: 'vertical',
+              }}
+              placeholder="답변 (HTML 가능)"
+              value={form.answer}
+              onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
+            />
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <select
+                style={inputStyle}
+                value={form.category_id}
+                onChange={(e) => setForm((p) => ({ ...p, category_id: e.target.value }))}
+              >
+                <option value="">카테고리 선택</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={form.is_visible}
+                  onChange={(e) => setForm((p) => ({ ...p, is_visible: e.target.checked }))}
+                />
+                활성
+              </label>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button style={btnPrimaryStyle} onClick={() => void handleSubmit()}>
+              {editingId ? '수정' : '등록'}
+            </button>
+            <button style={btnStyle} onClick={resetForm}>
+              취소
+            </button>
+          </div>
+        </div>
+      )}
+
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thStyle}>질문</th>
+            <th style={thStyle}>카테고리</th>
+            <th style={thStyle}>활성상태</th>
+            <th style={thStyle}>작업</th>
+          </tr>
+        </thead>
+        <tbody>
+          {faqs.length === 0 && (
+            <tr>
+              <td
+                colSpan={4}
+                style={{ ...tdStyle, textAlign: 'center', color: 'var(--text-muted)' }}
+              >
+                등록된 FAQ가 없습니다.
+              </td>
+            </tr>
+          )}
+          {faqs.map((f) => (
+            <tr key={f.id}>
+              <td style={tdStyle}>{f.question}</td>
+              <td style={tdStyle}>{categoryName(f.category_id)}</td>
+              <td style={tdStyle}>
+                <span style={{ color: f.is_visible ? 'var(--accent)' : 'var(--text-muted)' }}>
+                  {f.is_visible ? '활성' : '비활성'}
+                </span>
+              </td>
+              <td style={tdStyle}>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button style={btnStyle} onClick={() => handleEdit(f)}>
+                    수정
+                  </button>
+                  <button style={btnStyle} onClick={() => void handleToggleVisible(f)}>
+                    {f.is_visible ? '비활성화' : '활성화'}
+                  </button>
+                  <button
+                    style={{ ...btnStyle, color: 'var(--danger)', borderColor: 'var(--danger)' }}
+                    onClick={() => void handleDelete(f.id)}
+                  >
+                    삭제
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ─── Main AdminPage ───────────────────────────────────────────────────────
 
 type TabId = 'systems' | 'types' | 'tags' | 'users' | 'review' | 'notices' | 'faq';
@@ -1217,28 +1862,8 @@ export function AdminPage() {
         {activeTab === 'tags' && <TagRulesTab />}
         {activeTab === 'users' && user && <UsersTab currentUserId={user.id} />}
         {activeTab === 'review' && <ResultReviewTab />}
-        {(activeTab === 'notices' || activeTab === 'faq') && (
-          <div style={{ padding: '16px 0' }}>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '14px' }}>
-              관리 기능은 해당 페이지에서 사용하세요.
-            </p>
-            <a
-              href={activeTab === 'notices' ? '/notices' : '/faq'}
-              style={{
-                display: 'inline-block',
-                padding: '8px 16px',
-                background: 'var(--brand)',
-                color: 'var(--bg-app)',
-                borderRadius: '6px',
-                fontSize: '13px',
-                fontWeight: 600,
-                textDecoration: 'none',
-              }}
-            >
-              {activeTab === 'notices' ? '공지사항 페이지로 이동' : 'FAQ 페이지로 이동'}
-            </a>
-          </div>
-        )}
+        {activeTab === 'notices' && <NoticesTab />}
+        {activeTab === 'faq' && <FaqTab />}
       </div>
     </div>
   );

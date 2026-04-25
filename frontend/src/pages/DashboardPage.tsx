@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSummary, fetchAssignees } from '../api/dashboard';
+import { listAdminSystems } from '../api/admin';
 import { KpiCard } from '../components/dashboard/KpiCard';
 import { DistributionSection } from '../components/dashboard/DistributionSection';
 import { PriorityStatusMatrix } from '../components/dashboard/PriorityStatusMatrix';
@@ -17,7 +18,8 @@ const queryClient = new QueryClient({
 });
 
 function DashboardInner() {
-  const { filterState, setAssigneeId, setDateRange, apiFilters } = useDashboardFilter();
+  const { filterState, setAssigneeId, setDateRange, setGlobalTab, apiFilters } =
+    useDashboardFilter();
 
   const { data: summary } = useQuery({
     queryKey: ['dashboard', 'summary', apiFilters],
@@ -29,11 +31,21 @@ function DashboardInner() {
     queryFn: fetchAssignees,
   });
 
+  const { data: systems } = useQuery({
+    queryKey: ['admin', 'systems'],
+    queryFn: listAdminSystems,
+  });
+
   const DATE_RANGES: { key: '7d' | '30d' | '90d'; label: string }[] = [
     { key: '7d', label: '7일' },
     { key: '30d', label: '30일' },
     { key: '90d', label: '90일' },
   ];
+
+  const resolutionRate =
+    summary != null && summary.total > 0
+      ? Math.round((summary.completed / summary.total) * 100)
+      : null;
 
   return (
     <div
@@ -46,6 +58,53 @@ function DashboardInner() {
         gap: '24px',
       }}
     >
+      {/* GlobalTabs — channel tab bar */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <button
+          onClick={() => setGlobalTab('all')}
+          style={{
+            padding: '6px 16px',
+            borderRadius: '20px',
+            border: '1px solid var(--border)',
+            background: filterState.globalTab === 'all' ? 'var(--brand)' : 'transparent',
+            color:
+              filterState.globalTab === 'all' ? 'var(--text-on-brand)' : 'var(--text-secondary)',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: filterState.globalTab === 'all' ? 600 : 400,
+          }}
+        >
+          전체
+        </button>
+        {(systems ?? [])
+          .filter((s) => !s.is_archived)
+          .map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setGlobalTab(s.id)}
+              style={{
+                padding: '6px 16px',
+                borderRadius: '20px',
+                border: '1px solid var(--border)',
+                background: filterState.globalTab === s.id ? 'var(--brand)' : 'transparent',
+                color:
+                  filterState.globalTab === s.id ? 'var(--text-on-brand)' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: filterState.globalTab === s.id ? 600 : 400,
+              }}
+            >
+              {s.name}
+            </button>
+          ))}
+      </div>
+
       {/* Global filter bar */}
       <div
         style={{
@@ -97,25 +156,43 @@ function DashboardInner() {
         </select>
       </div>
 
-      {/* KPI row — 4+4 layout */}
+      {/* KPI rows — VOLUME (4) + QUALITY (4) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <KpiCard label="전체 VOC" value={summary?.total ?? '—'} />
-          <KpiCard label="미해결" value={summary?.unresolved ?? '—'} />
-          <KpiCard label="완료" value={summary?.completed ?? '—'} />
-          <KpiCard label="처리중" value={summary?.in_progress ?? '—'} />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span
+            style={{ color: 'var(--text-muted)', fontSize: '11px', width: '56px', flexShrink: 0 }}
+          >
+            VOLUME
+          </span>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
+            <KpiCard label="총 VOC" value={summary?.total ?? '—'} />
+            <KpiCard label="미해결" value={summary?.unresolved ?? '—'} />
+            <KpiCard label="이번주 신규" value={summary?.new_this_week ?? '—'} />
+            <KpiCard label="이번주 완료" value={'—'} />
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <KpiCard label="긴급" value={summary?.urgent ?? '—'} />
-          <KpiCard label="기한초과" value={summary?.overdue ?? '—'} />
-          <KpiCard
-            label="평균처리일"
-            value={
-              summary?.avg_resolution_days != null ? Math.round(summary.avg_resolution_days) : '—'
-            }
-            unit="일"
-          />
-          <KpiCard label="이번주 신규" value={summary?.new_this_week ?? '—'} />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span
+            style={{ color: 'var(--text-muted)', fontSize: '11px', width: '56px', flexShrink: 0 }}
+          >
+            QUALITY
+          </span>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
+            <KpiCard
+              label="평균처리시간"
+              value={
+                summary?.avg_resolution_days != null ? Math.round(summary.avg_resolution_days) : '—'
+              }
+              unit={summary?.avg_resolution_days != null ? '일' : undefined}
+            />
+            <KpiCard
+              label="해결율"
+              value={resolutionRate != null ? resolutionRate : '—'}
+              unit={resolutionRate != null ? '%' : undefined}
+            />
+            <KpiCard label="Urgent·High 미해결" value={summary?.urgent ?? '—'} />
+            <KpiCard label="14일+ 미처리" value={summary?.overdue ?? '—'} />
+          </div>
         </div>
       </div>
 
