@@ -4,7 +4,10 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ → **Phase 7 착수(7-1 VOC CRUD) 대기**
+현재 위치: Phase 0~6 ✅ / Phase 7-1 ✅ / 7-2/2a ✅ / 7-3 ✅ / 7-4 ✅ / 7-5 ✅ / 7-6 ✅ → **다음: Phase 7-7 알림**
+
+브랜치: `feat/phase7-voc-crud` (미머지 — PR 오픈 후 머지 필요)
+테스트: 13 suites, 158 passed, 0 failures
 
 ### 다음 세션 우선순위
 

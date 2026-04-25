@@ -8,6 +8,15 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
+import { vocRouter } from './routes/vocs';
+import { commentRouter } from './routes/comments';
+import { noteRouter } from './routes/notes';
+import { attachmentRouter } from './routes/attachments';
+import { tagsRouter, tagRulesRouter, vocTagsRouter } from './routes/tags';
+import { dashboardRouter } from './routes/dashboard';
+import { noticesRouter } from './routes/notices';
+import { faqCategoriesRouter, faqsRouter } from './routes/faqs';
+import { adminRouter, systemsPublicRouter, vocTypesPublicRouter } from './routes/admin';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -49,6 +58,22 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+
+const authMiddleware = createAuthMiddleware();
+app.use('/api/tags', authMiddleware, tagsRouter);
+app.use('/api/tag-rules', authMiddleware, tagRulesRouter);
+app.use('/api/vocs', authMiddleware, vocRouter);
+app.use('/api/vocs/:id/tags', authMiddleware, vocTagsRouter);
+app.use('/api/vocs/:vocId/comments', authMiddleware, commentRouter);
+app.use('/api/vocs/:vocId/notes', authMiddleware, noteRouter);
+app.use('/api/vocs/:vocId/attachments', authMiddleware, attachmentRouter);
+app.use('/api/dashboard', authMiddleware, dashboardRouter);
+app.use('/api/notices', authMiddleware, noticesRouter);
+app.use('/api/faq-categories', authMiddleware, faqCategoriesRouter);
+app.use('/api/faqs', authMiddleware, faqsRouter);
+app.use('/api/admin', authMiddleware, adminRouter);
+app.use('/api/systems', authMiddleware, systemsPublicRouter);
+app.use('/api/voc-types', authMiddleware, vocTypesPublicRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {

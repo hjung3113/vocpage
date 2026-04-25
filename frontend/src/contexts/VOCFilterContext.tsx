@@ -1,12 +1,14 @@
 import React, { createContext, useCallback, useMemo, useState } from 'react';
 
-export type VocStatus = 'draft' | '접수' | '검토중' | '처리중' | '완료' | '드랍';
+export type VocStatus = '접수' | '검토중' | '처리중' | '완료' | '드랍';
 
 export interface VOCFilters {
   systemId: string | null;
   menuId: string | null;
   status: VocStatus | null;
+  priority: string | null;
   tagIds: string[];
+  tagId: string | null;
   assigneeId: string | null;
   from: string | null;
   to: string | null;
@@ -26,7 +28,9 @@ const DEFAULT_FILTERS: VOCFilters = {
   systemId: null,
   menuId: null,
   status: null,
+  priority: null,
   tagIds: [],
+  tagId: null,
   assigneeId: null,
   from: null,
   to: null,
