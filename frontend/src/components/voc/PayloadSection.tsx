@@ -114,6 +114,14 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
     setForm(next);
   }, [voc.id, voc.structured_payload, voc.structured_payload_draft]);
 
+  // Cleanup debounce timers on unmount
+  useEffect(() => {
+    const timers = debounceTimers.current;
+    return () => {
+      Object.values(timers).forEach(clearTimeout);
+    };
+  }, []);
+
   if (!isFinalStatus) return null;
 
   const badge = statusLabel(voc.review_status);
@@ -207,7 +215,11 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
           </h3>
           {canEdit && (
             <button
-              onClick={() => void triggerRefresh(voc.id)}
+              onClick={() =>
+                triggerRefresh(voc.id).catch((err: unknown) => {
+                  setError(err instanceof Error ? err.message : '마스터 새로고침 실패');
+                })
+              }
               title="마스터 새로고침"
               style={{
                 background: 'transparent',
@@ -258,42 +270,55 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
         {FIELDS.map((f) => {
           const hasAutocomplete = f.key in AUTOCOMPLETE_TYPE;
           const datalistId = hasAutocomplete ? `suggestions-${f.key}` : undefined;
+          const inputStyle = {
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '4px',
+            padding: '6px 8px',
+            fontSize: '13px',
+            color: 'var(--text-primary)',
+            outline: 'none',
+            fontFamily: 'inherit',
+            width: '100%',
+            boxSizing: 'border-box' as const,
+          };
           return (
             <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                 {f.label}
                 {f.required && <span style={{ color: 'var(--danger)' }}> *</span>}
               </span>
-              <textarea
-                {...(datalistId ? { list: datalistId } : {})}
-                value={form[f.key] ?? ''}
-                disabled={!canEdit || busy}
-                rows={
-                  f.key === 'symptom' || f.key === 'root_cause' || f.key === 'resolution' ? 2 : 1
-                }
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setForm((p) => ({ ...p, [f.key]: val }));
-                  if (hasAutocomplete) handleFieldChange(f.key, val);
-                }}
-                style={{
-                  background: 'var(--bg-surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  padding: '6px 8px',
-                  fontSize: '13px',
-                  color: 'var(--text-primary)',
-                  outline: 'none',
-                  resize: 'vertical',
-                  fontFamily: 'inherit',
-                }}
-              />
-              {hasAutocomplete && datalistId && (
-                <datalist id={datalistId}>
-                  {(suggestions[f.key] ?? []).map((item) => (
-                    <option key={item} value={item} />
-                  ))}
-                </datalist>
+              {hasAutocomplete && datalistId ? (
+                <>
+                  <input
+                    type="text"
+                    list={datalistId}
+                    value={form[f.key] ?? ''}
+                    disabled={!canEdit || busy}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setForm((p) => ({ ...p, [f.key]: val }));
+                      handleFieldChange(f.key, val);
+                    }}
+                    style={inputStyle}
+                  />
+                  <datalist id={datalistId}>
+                    {(suggestions[f.key] ?? []).map((item) => (
+                      <option key={item} value={item} />
+                    ))}
+                  </datalist>
+                </>
+              ) : (
+                <textarea
+                  value={form[f.key] ?? ''}
+                  disabled={!canEdit || busy}
+                  rows={2}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setForm((p) => ({ ...p, [f.key]: val }));
+                  }}
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                />
               )}
             </label>
           );

@@ -33,16 +33,15 @@ export function MasterCacheProvider({ children }: { children: React.ReactNode })
   }, [auth?.user]);
 
   const triggerRefresh = useCallback(async (vocId?: string) => {
-    if (vocId) {
-      await triggerVocRefresh(vocId);
-    } else {
-      await triggerAdminRefresh();
-    }
+    const result = vocId ? await triggerVocRefresh(vocId) : await triggerAdminRefresh();
     try {
       const status = await getMasterStatus();
       setMode(status.mode);
     } catch {
       // ignore status re-fetch failure
+    }
+    if (!result.swapped) {
+      throw new Error(result.error || 'refresh failed');
     }
   }, []);
 

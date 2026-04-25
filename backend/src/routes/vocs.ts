@@ -468,6 +468,8 @@ vocRouter.post(
 
       // M2: requirements.md §4 — never trust FE's unverified_fields flags.
       // BE recomputes via external master cache (§16.3, Phase 7-10).
+      // §16.3: unverified_fields is part of structured_payload by spec design.
+      // FE display may be stale until next submit — acceptable per MVP spec.
       const payloadForVerify = { equipment, maker, model, process: proc };
       const payload = {
         equipment,
@@ -967,12 +969,10 @@ vocRouter.post(
         'code' in err &&
         (err as { code: string }).code === 'RATE_LIMITED'
       ) {
-        res
-          .status(429)
-          .json({
-            error: 'RATE_LIMITED',
-            retryAfter: (err as unknown as { retryAfter: number }).retryAfter,
-          });
+        res.status(429).json({
+          error: 'RATE_LIMITED',
+          retryAfter: (err as unknown as { retryAfter: number }).retryAfter,
+        });
         return;
       }
       logger.error({ err }, 'POST /api/vocs/:id/masters/refresh failed');

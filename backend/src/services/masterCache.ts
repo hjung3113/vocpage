@@ -119,28 +119,29 @@ class MasterCacheService {
         logger.warn({ err }, 'masterCache: writeSnapshot failed (non-fatal)'),
       );
       return;
-    } catch (_err) {
-      // stub load failed — try snapshot
+    } catch (err) {
+      console.warn('[masterCache] stub load failed, trying snapshot:', err);
     }
 
     try {
       const snap = this.readSnapshot();
       this.state = { ...snap, mode: 'snapshot' };
       return;
-    } catch (_err) {
-      // snapshot load failed — cold start
+    } catch (err) {
+      console.warn('[masterCache] snapshot load failed, falling back to cold_start:', err);
     }
 
-    this.state = { equipment: null, db: null, program: null, mode: 'cold_start' };
+    // Only set cold_start if not already in a valid live/snapshot state
+    if (this.state.mode === 'cold_start') {
+      this.state = { equipment: null, db: null, program: null, mode: 'cold_start' };
+    }
   }
 
   get(): MasterState {
     return this.state;
   }
 
-  async refresh(
-    userId: string,
-  ): Promise<
+  async refresh(userId: string): Promise<
     | {
         swapped: true;
         loaded_at: string;
@@ -148,6 +149,12 @@ class MasterCacheService {
       }
     | { swapped: false; error: string; kept_loaded_at: string | undefined }
   > {
+    // GC expired cooldown entries
+    const gcBefore = Date.now() - COOLDOWN_MS * 2;
+    for (const [uid, ts] of Object.entries(this.lastRefreshByUser)) {
+      if (ts < gcBefore) delete this.lastRefreshByUser[uid];
+    }
+
     const now = Date.now();
     const last = this.lastRefreshByUser[userId] ?? 0;
     const elapsed = now - last;
@@ -279,8 +286,10 @@ class MasterCacheService {
 
   private async writeSnapshot(): Promise<void> {
     const snapshotPath = path.join(this.configDir, 'snapshot.json');
+    const tmpPath = `${snapshotPath}.tmp`;
     const data = JSON.stringify(this.state, null, 2);
-    fs.writeFileSync(snapshotPath, data, 'utf8');
+    await fs.promises.writeFile(tmpPath, data, 'utf8');
+    await fs.promises.rename(tmpPath, snapshotPath);
   }
 
   private readSnapshot(): MasterState {
