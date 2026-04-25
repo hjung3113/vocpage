@@ -1,10 +1,18 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { VocPage } from './pages/VocPage';
+import { NoticePopup } from './components/common/NoticePopup';
+import { useNoticePopup } from './hooks/useNoticePopup';
 
 const DashboardPage = lazy(() =>
   import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 );
+
+const NoticePage = lazy(() =>
+  import('./pages/NoticePage').then((m) => ({ default: m.NoticePage })),
+);
+
+const FaqPage = lazy(() => import('./pages/FaqPage').then((m) => ({ default: m.FaqPage })));
 
 const MockLoginPage =
   import.meta.env.VITE_AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
@@ -18,21 +26,52 @@ function MockLoginRoute() {
   );
 }
 
+function RootLayout() {
+  const { popupNotices, isVisible, closePopup } = useNoticePopup();
+  return (
+    <>
+      <Outlet />
+      {isVisible && <NoticePopup notices={popupNotices} onClose={closePopup} />}
+    </>
+  );
+}
+
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <VocPage />,
-  },
-  {
-    path: '/mock-login',
-    element: <MockLoginRoute />,
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <Suspense fallback={null}>
-        <DashboardPage />
-      </Suspense>
-    ),
+    element: <RootLayout />,
+    children: [
+      {
+        path: '/',
+        element: <VocPage />,
+      },
+      {
+        path: '/mock-login',
+        element: <MockLoginRoute />,
+      },
+      {
+        path: '/dashboard',
+        element: (
+          <Suspense fallback={null}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/notices',
+        element: (
+          <Suspense fallback={null}>
+            <NoticePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/faq',
+        element: (
+          <Suspense fallback={null}>
+            <FaqPage />
+          </Suspense>
+        ),
+      },
+    ],
   },
 ]);
