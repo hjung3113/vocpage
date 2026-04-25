@@ -673,20 +673,21 @@ MVP 범위: **위젯 숨기기/표시** + **기본 날짜 범위** + **히트맵
 
 ```sql
 dashboard_settings (
-  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id               UUID REFERENCES users(id) ON DELETE CASCADE,
+  id                     UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                UUID        REFERENCES users(id) ON DELETE CASCADE UNIQUE,
   -- user_id IS NULL = Admin 기본값 (전체 사용자 공통)
-  widget_visibility     JSONB NOT NULL DEFAULT '{}',
+  widget_order           JSONB       NOT NULL DEFAULT '[]',
+  widget_visibility      JSONB       NOT NULL DEFAULT '{}',
   -- 예: {"kpi": true, "heatmap": true, "aging": false}
-  default_date_range    VARCHAR(8) NOT NULL DEFAULT '30d',
+  widget_sizes           JSONB       NOT NULL DEFAULT '{}',
+  locked_fields          JSONB       NOT NULL DEFAULT '[]',
+  default_date_range     VARCHAR(8)  NOT NULL DEFAULT '30d',
   -- enum: '7d' | '30d' | '90d' | 'custom'
   heatmap_default_x_axis VARCHAR(16) NOT NULL DEFAULT 'status',
   -- enum: 'status' | 'priority' | 'tag'
-  globaltabs_order      JSONB,
+  globaltabs_order       JSONB,
   -- Admin 기본값 행에만 유효: [{ systemId, visible }]
-  updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (user_id)
-  -- user_id IS NULL 행은 단일 행 보장 (partial unique index)
+  updated_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )
 ```
 
