@@ -1987,10 +1987,9 @@ components:
           $ref: '#/components/schemas/VocStatus'
         priority:
           $ref: '#/components/schemas/VocPriority'
-        type_id:
+        voc_type_id:
           type: string
           format: uuid
-          nullable: true
         system_id:
           type: string
           format: uuid
@@ -1998,7 +1997,6 @@ components:
         menu_id:
           type: string
           format: uuid
-          nullable: true
         assignee_id:
           type: string
           format: uuid
@@ -2054,7 +2052,7 @@ components:
           $ref: '#/components/schemas/VocStatus'
         priority:
           $ref: '#/components/schemas/VocPriority'
-        type_id:
+        voc_type_id:
           type: string
           format: uuid
         system_id:
@@ -2083,7 +2081,7 @@ components:
           $ref: '#/components/schemas/VocStatus'
         priority:
           $ref: '#/components/schemas/VocPriority'
-        type_id:
+        voc_type_id:
           type: string
           format: uuid
         system_id:

@@ -46,7 +46,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- vocs (10건 — status·priority 다양 분포, 대시보드 위젯이 유의미하게 표시되도록)
 -- sequence_no는 트리거가 자동 채번
-INSERT INTO vocs (id, title, body, status, priority, reporter_id, assignee_id, system_id, menu_id, voc_type_id, source) VALUES
+INSERT INTO vocs (id, title, body, status, priority, author_id, assignee_id, system_id, menu_id, voc_type_id, source) VALUES
   ('50000000-0000-0000-0000-000000000001', '대시보드 로딩 속도 개선 요청', '분석 시스템 대시보드가 데이터 로드 시 10초 이상 걸립니다.',
    '접수', 'high',   '00000000-0000-0000-0000-000000000003', NULL, '10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'manual'),
   ('50000000-0000-0000-0000-000000000002', '리포트 다운로드 오류', 'CSV 다운로드 버튼 클릭 시 500 에러가 발생합니다.',

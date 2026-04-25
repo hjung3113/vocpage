@@ -1,8 +1,11 @@
-import { Router } from 'express';
-import { mockAuthMiddleware } from '../auth/mockAuth';
+import { Router, RequestHandler } from 'express';
+import { createAuthMiddleware } from '../auth';
 import { MOCK_USERS } from '../auth/mockUsers';
 
 export const authRouter = Router();
+
+// Lazy: resolves AUTH_MODE at request time so tests can set it before the first call
+const authMiddleware: RequestHandler = (req, res, next) => createAuthMiddleware()(req, res, next);
 
 authRouter.post('/mock-login', (req, res): void => {
   if (process.env.AUTH_MODE !== 'mock') {
@@ -27,6 +30,6 @@ authRouter.post('/logout', (req, res): void => {
   });
 });
 
-authRouter.get('/me', mockAuthMiddleware, (req, res): void => {
+authRouter.get('/me', authMiddleware, (req, res): void => {
   res.json(req.user);
 });
