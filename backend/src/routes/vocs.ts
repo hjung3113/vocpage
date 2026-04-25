@@ -41,15 +41,6 @@ function requireManager(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const user = req.user as AuthUser | undefined;
-  if (!user || user.role !== 'admin') {
-    res.status(403).json({ error: 'FORBIDDEN' });
-    return;
-  }
-  next();
-}
-
 function calcDueDate(priority: string): string {
   const days = DUE_DATE_DAYS[priority] ?? 30;
   const d = new Date();
@@ -240,11 +231,22 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
       author_id: string;
       priority: string;
       assignee_id: string | null;
+      parent_id: string | null;
     };
     const prevAssigneeId = voc.assignee_id;
 
     if (user.role === 'user' && voc.author_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
+      return;
+    }
+
+    // M2: Sub-task system_id/menu_id are immutable
+    const patchBody = req.body as {
+      system_id?: string;
+      menu_id?: string;
+    };
+    if (voc.parent_id && (patchBody.system_id !== undefined || patchBody.menu_id !== undefined)) {
+      res.status(400).json({ error: 'SUBTASK_SYSTEM_MENU_IMMUTABLE' });
       return;
     }
 
@@ -714,37 +716,59 @@ vocRouter.post(
 
 // ── DELETE /api/vocs/:id ──────────────────────────────────────────────────────
 
-vocRouter.delete(
-  '/:id',
-  requireAuth,
-  requireAdmin,
-  async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promise<void> => {
+  const user = req.user as AuthUser;
+  const { id } = req.params;
 
-    try {
-      const result = await pool.query(
-        `UPDATE vocs SET deleted_at = NOW() WHERE id = $1 AND deleted_at IS NULL RETURNING id`,
-        [id],
-      );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-      if (result.rowCount === 0) {
-        res.status(404).json({ error: 'NOT_FOUND' });
-        return;
-      }
+    const { rows: vocRows } = await client.query(
+      `SELECT id, author_id FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+      [id],
+    );
 
-      // Sub-task cascade soft delete
-      await pool.query(
-        `UPDATE vocs SET deleted_at = NOW() WHERE parent_id = $1 AND deleted_at IS NULL`,
-        [id],
-      );
-
-      res.status(204).send();
-    } catch (err) {
-      logger.error({ err }, 'DELETE /api/vocs/:id failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    if (vocRows.length === 0) {
+      await client.query('ROLLBACK');
+      res.status(404).json({ error: 'NOT_FOUND' });
+      return;
     }
-  },
-);
+
+    const voc = vocRows[0] as { id: string; author_id: string };
+
+    // C2: users may only delete their own VOCs; manager/admin can delete any
+    if (user.role === 'user' && voc.author_id !== user.id) {
+      await client.query('ROLLBACK');
+      res.status(403).json({ error: 'FORBIDDEN' });
+      return;
+    }
+    if (user.role === 'manager') {
+      await client.query('ROLLBACK');
+      res.status(403).json({ error: 'FORBIDDEN' });
+      return;
+    }
+
+    await client.query(`UPDATE vocs SET deleted_at = NOW() WHERE id = $1 AND deleted_at IS NULL`, [
+      id,
+    ]);
+
+    // Sub-task cascade soft delete
+    await client.query(
+      `UPDATE vocs SET deleted_at = NOW() WHERE parent_id = $1 AND deleted_at IS NULL`,
+      [id],
+    );
+
+    await client.query('COMMIT');
+    res.status(204).send();
+  } catch (err) {
+    await client.query('ROLLBACK');
+    logger.error({ err }, 'DELETE /api/vocs/:id failed');
+    res.status(500).json({ error: 'INTERNAL_ERROR' });
+  } finally {
+    client.release();
+  }
+});
 
 // ── GET /api/vocs/:id/subtasks ────────────────────────────────────────────────
 
@@ -791,12 +815,17 @@ vocRouter.post('/:id/subtasks', requireAuth, async (req: Request, res: Response)
     return;
   }
 
+  const client = await pool.connect();
   try {
-    const { rows: parentRows } = await pool.query(
-      `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+    await client.query('BEGIN');
+
+    // Lock parent row to serialize concurrent sub-task creation
+    const { rows: parentRows } = await client.query(
+      `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
       [id],
     );
     if (parentRows.length === 0) {
+      await client.query('ROLLBACK');
       res.status(404).json({ error: 'NOT_FOUND' });
       return;
     }
@@ -810,12 +839,36 @@ vocRouter.post('/:id/subtasks', requireAuth, async (req: Request, res: Response)
 
     // 1-level limit
     if (parent.parent_id) {
+      await client.query('ROLLBACK');
       res.status(400).json({ error: 'SUBTASK_NESTING_NOT_ALLOWED' });
       return;
     }
 
+    // M4: voc_type_id existence check (inside transaction)
+    const { rows: typeRows } = await client.query(
+      `SELECT id FROM voc_types WHERE id = $1 AND is_archived = false`,
+      [voc_type_id],
+    );
+    if (!typeRows[0]) {
+      await client.query('ROLLBACK');
+      res.status(400).json({ error: 'INVALID_VOC_TYPE' });
+      return;
+    }
+
+    // M4: assignee_id existence check (if provided)
+    if (assignee_id) {
+      const { rows: userRows } = await client.query(`SELECT id FROM users WHERE id = $1`, [
+        assignee_id,
+      ]);
+      if (!userRows[0]) {
+        await client.query('ROLLBACK');
+        res.status(400).json({ error: 'INVALID_ASSIGNEE' });
+        return;
+      }
+    }
+
     // Sequential numbering — include soft-deleted to prevent reuse
-    const { rows: countRows } = await pool.query(
+    const { rows: countRows } = await client.query(
       `SELECT COUNT(*)::int + 1 AS next_n FROM vocs WHERE parent_id = $1`,
       [id],
     );
@@ -825,7 +878,7 @@ vocRouter.post('/:id/subtasks', requireAuth, async (req: Request, res: Response)
     const dueDate = calcDueDate(effectivePriority);
 
     // Pre-populate sequence_no & issue_code so the BEFORE INSERT trigger (WHEN sequence_no IS NULL) does not fire.
-    const { rows: createdRows } = await pool.query(
+    const { rows: createdRows } = await client.query(
       `INSERT INTO vocs (title, body, status, priority, author_id, system_id, menu_id, voc_type_id, assignee_id, parent_id, issue_code, sequence_no, due_date, source)
          VALUES ($1, $2, '접수', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'manual')
          RETURNING *`,
@@ -844,17 +897,27 @@ vocRouter.post('/:id/subtasks', requireAuth, async (req: Request, res: Response)
         dueDate,
       ],
     );
+
+    await client.query('COMMIT');
+
     const created = createdRows[0] as { id: string; title: string; body: string | null };
 
-    // Sub-task auto-tagging (independent from parent)
+    // Sub-task auto-tagging — fire-and-forget outside transaction
     applyTagRules(created.id, created.title, created.body ?? '', pool).catch((err) =>
       logger.warn({ err }, 'subtask auto-tag failed'),
     );
 
     res.status(201).json(created);
-  } catch (err) {
+  } catch (err: unknown) {
+    await client.query('ROLLBACK');
+    if ((err as { code?: string }).code === '23505') {
+      res.status(409).json({ error: 'CONCURRENT_SUBTASK_CREATION' });
+      return;
+    }
     logger.error({ err }, 'POST /api/vocs/:id/subtasks failed');
     res.status(500).json({ error: 'INTERNAL_ERROR' });
+  } finally {
+    client.release();
   }
 });
 

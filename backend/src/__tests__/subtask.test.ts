@@ -210,6 +210,81 @@ describe('Sub-task endpoints', () => {
     });
   });
 
+  // ── C2: Sub-task 삭제 권한 ─────────────────────────────────────────────────
+
+  describe('C2: Sub-task 삭제 권한', () => {
+    it('User가 본인이 만든 Sub-task 삭제 → 204', async () => {
+      const parent = await createParentVoc(pool, fixtures);
+      const adminAgent = request.agent(app);
+      await adminAgent.post('/api/auth/mock-login').send({ role: 'admin' });
+
+      // Create sub-task as user
+      const userAgent = request.agent(app);
+      await userAgent.post('/api/auth/mock-login').send({ role: 'user' });
+      const sub = await userAgent
+        .post(`/api/vocs/${parent.id}/subtasks`)
+        .send({ title: 'my sub', voc_type_id: fixtures.vocTypeId });
+      expect(sub.status).toBe(201);
+
+      const del = await userAgent.delete(`/api/vocs/${sub.body.id}`);
+      expect(del.status).toBe(204);
+    });
+
+    it('User가 타인이 만든 Sub-task 삭제 → 403', async () => {
+      const parent = await createParentVoc(pool, fixtures);
+      const adminAgent = request.agent(app);
+      await adminAgent.post('/api/auth/mock-login').send({ role: 'admin' });
+
+      // Create sub-task as admin (author_id = adminId)
+      const sub = await adminAgent
+        .post(`/api/vocs/${parent.id}/subtasks`)
+        .send({ title: 'admin sub', voc_type_id: fixtures.vocTypeId });
+      expect(sub.status).toBe(201);
+
+      // Try to delete as different user
+      const userAgent = request.agent(app);
+      await userAgent.post('/api/auth/mock-login').send({ role: 'user' });
+      const del = await userAgent.delete(`/api/vocs/${sub.body.id}`);
+      expect(del.status).toBe(403);
+    });
+  });
+
+  // ── M2: Sub-task system_id/menu_id 변경 차단 ──────────────────────────────
+
+  describe('M2: Sub-task system_id/menu_id 변경 차단', () => {
+    it('Sub-task에 system_id 변경 시도 → 400', async () => {
+      const parent = await createParentVoc(pool, fixtures);
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      const sub = await agent
+        .post(`/api/vocs/${parent.id}/subtasks`)
+        .send({ title: 'sub', voc_type_id: fixtures.vocTypeId });
+      expect(sub.status).toBe(201);
+
+      const res = await agent
+        .patch(`/api/vocs/${sub.body.id}`)
+        .send({ system_id: fixtures.systemId });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('SUBTASK_SYSTEM_MENU_IMMUTABLE');
+    });
+
+    it('Sub-task에 menu_id 변경 시도 → 400', async () => {
+      const parent = await createParentVoc(pool, fixtures);
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      const sub = await agent
+        .post(`/api/vocs/${parent.id}/subtasks`)
+        .send({ title: 'sub', voc_type_id: fixtures.vocTypeId });
+      expect(sub.status).toBe(201);
+
+      const res = await agent.patch(`/api/vocs/${sub.body.id}`).send({ menu_id: fixtures.menuId });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('SUBTASK_SYSTEM_MENU_IMMUTABLE');
+    });
+  });
+
   // ── GET /vocs/:id/incomplete-subtasks ────────────────────────────────────
 
   describe('GET /api/vocs/:id/incomplete-subtasks', () => {
