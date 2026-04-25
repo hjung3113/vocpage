@@ -10,6 +10,7 @@ import { dashboardRouter } from '../../routes/dashboard';
 import { noticesRouter } from '../../routes/notices';
 import { faqCategoriesRouter, faqsRouter } from '../../routes/faqs';
 import { adminRouter, systemsPublicRouter, vocTypesPublicRouter } from '../../routes/admin';
+import { notificationRouter } from '../../routes/notifications';
 import { setPool } from '../../db';
 import { createAuthMiddleware } from '../../auth';
 import type { Pool } from 'pg';
@@ -57,6 +58,7 @@ export function createTestApp(pool?: Pool, authMode = 'mock') {
   app.use('/api/admin', authMiddleware, adminRouter);
   app.use('/api/systems', authMiddleware, systemsPublicRouter);
   app.use('/api/voc-types', authMiddleware, vocTypesPublicRouter);
+  app.use('/api/notifications', authMiddleware, notificationRouter);
 
   return app;
 }

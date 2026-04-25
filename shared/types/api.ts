@@ -821,6 +821,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/vocs/{id}/subtasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    /** List sub-tasks of a VOC */
+    get: operations['listSubtasks'];
+    put?: never;
+    /** Create a sub-task under a VOC */
+    post: operations['createSubtask'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/vocs/{id}/incomplete-subtasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    /** Get count of incomplete sub-tasks */
+    get: operations['getIncompleteSubtaskCount'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/vocs/{id}/payload': {
     parameters: {
       query?: never;
@@ -853,6 +892,44 @@ export interface paths {
     get: operations['getVocPayloadHistory'];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/vocs/{id}/payload-draft': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Save structured payload draft */
+    patch: operations['saveVocPayloadDraft'];
+    trace?: never;
+  };
+  '/vocs/{id}/payload-delete-request': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Request deletion of approved payload */
+    post: operations['requestVocPayloadDeletion'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1046,11 +1123,11 @@ export interface components {
       status: components['schemas']['VocStatus'];
       priority: components['schemas']['VocPriority'];
       /** Format: uuid */
-      voc_type_id: string;
+      voc_type_id?: string;
       /** Format: uuid */
       system_id?: string | null;
       /** Format: uuid */
-      menu_id: string;
+      menu_id?: string;
       /** Format: uuid */
       assignee_id?: string | null;
       /** Format: uuid */
@@ -1260,11 +1337,12 @@ export interface components {
       /** Format: uuid */
       user_id: string;
       /** @enum {string} */
-      type: 'status_change' | 'comment' | 'mention' | 'assignment' | 'urgent';
+      type: 'comment' | 'status_change' | 'assigned';
       /** Format: uuid */
       voc_id?: string | null;
       message: string;
       is_read: boolean;
+      voc_priority?: string | null;
       /** Format: date-time */
       created_at: string;
     };
@@ -1524,6 +1602,8 @@ export interface operations {
         sort?: string;
         order?: 'asc' | 'desc';
         includeDeleted?: boolean;
+        /** @description Filter by review_status (comma-separated for multiple) */
+        review_status?: string;
       };
       header?: never;
       path?: never;
@@ -2968,6 +3048,93 @@ export interface operations {
       404: components['responses']['NotFound'];
     };
   };
+  listSubtasks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Sub-task list */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Voc'][];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  createSubtask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          title: string;
+          body?: string | null;
+          priority?: components['schemas']['VocPriority'];
+          /** Format: uuid */
+          voc_type_id: string;
+          /** Format: uuid */
+          assignee_id?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description Created sub-task */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Voc'];
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  getIncompleteSubtaskCount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Incomplete sub-task count */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            count: number;
+          };
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      404: components['responses']['NotFound'];
+    };
+  };
   submitVocPayload: {
     parameters: {
       query?: never;
@@ -3024,6 +3191,64 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['VocPayloadHistory'][];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  saveVocPayloadDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          draft?: {
+            [key: string]: unknown;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Draft saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OkResponse'];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      403: components['responses']['Forbidden'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  requestVocPayloadDeletion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deletion request recorded */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OkResponse'];
         };
       };
       401: components['responses']['Unauthorized'];

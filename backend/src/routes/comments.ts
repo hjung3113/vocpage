@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
+import { emitNotification } from '../services/notifications';
 
 export const commentRouter = Router({ mergeParams: true });
 
@@ -80,6 +81,11 @@ commentRouter.post('/', async (req: Request, res: Response): Promise<void> => {
     );
 
     res.status(201).json(result.rows[0]);
+
+    // fire-and-forget: notify VOC author if commenter is different
+    if (user.id !== voc.author_id) {
+      emitNotification({ pool, userId: voc.author_id, type: 'comment', vocId }).catch(() => {});
+    }
   } catch (err) {
     logger.error({ err }, 'POST /api/vocs/:vocId/comments failed');
     res.status(500).json({ error: 'INTERNAL_ERROR' });

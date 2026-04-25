@@ -17,6 +17,9 @@ import { dashboardRouter } from './routes/dashboard';
 import { noticesRouter } from './routes/notices';
 import { faqCategoriesRouter, faqsRouter } from './routes/faqs';
 import { adminRouter, systemsPublicRouter, vocTypesPublicRouter } from './routes/admin';
+import { notificationRouter } from './routes/notifications';
+import { mastersRouter, adminMastersRouter } from './routes/masters';
+import { masterCache } from './services/masterCache';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -72,10 +75,14 @@ app.use('/api/notices', authMiddleware, noticesRouter);
 app.use('/api/faq-categories', authMiddleware, faqCategoriesRouter);
 app.use('/api/faqs', authMiddleware, faqsRouter);
 app.use('/api/admin', authMiddleware, adminRouter);
+app.use('/api/admin/masters', authMiddleware, adminMastersRouter);
 app.use('/api/systems', authMiddleware, systemsPublicRouter);
 app.use('/api/voc-types', authMiddleware, vocTypesPublicRouter);
+app.use('/api/notifications', authMiddleware, notificationRouter);
+app.use('/api/masters', authMiddleware, mastersRouter);
 
 if (require.main === module) {
+  masterCache.init().catch((err) => logger.warn({ err }, 'masterCache.init failed (non-fatal)'));
   app.listen(PORT, () => {
     logger.info(`Backend running on port ${PORT}`);
   });

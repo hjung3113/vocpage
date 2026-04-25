@@ -156,6 +156,11 @@ paths:
           in: query
           schema:
             type: boolean
+        - name: review_status
+          in: query
+          description: Filter by review_status (comma-separated for multiple)
+          schema:
+            type: string
       responses:
         '200':
           description: Paginated VOC list
@@ -1421,6 +1426,89 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /vocs/{id}/subtasks:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [vocs]
+      operationId: listSubtasks
+      summary: List sub-tasks of a VOC
+      responses:
+        '200':
+          description: Sub-task list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Voc'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [vocs]
+      operationId: createSubtask
+      summary: Create a sub-task under a VOC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, voc_type_id]
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                  nullable: true
+                priority:
+                  $ref: '#/components/schemas/VocPriority'
+                voc_type_id:
+                  type: string
+                  format: uuid
+                assignee_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        '201':
+          description: Created sub-task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voc'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/incomplete-subtasks:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [vocs]
+      operationId: getIncompleteSubtaskCount
+      summary: Get count of incomplete sub-tasks
+      responses:
+        '200':
+          description: Incomplete sub-task count
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count]
+                properties:
+                  count:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /vocs/{id}/payload:
     parameters:
       - $ref: '#/components/parameters/id'
@@ -1488,6 +1576,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VocPayloadHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/payload-draft:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [vocs]
+      operationId: saveVocPayloadDraft
+      summary: Save structured payload draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                draft:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Draft saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/payload-delete-request:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [vocs]
+      operationId: requestVocPayloadDeletion
+      summary: Request deletion of approved payload
+      responses:
+        '200':
+          description: Deletion request recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2380,7 +2520,7 @@ components:
           format: uuid
         type:
           type: string
-          enum: ['status_change', 'comment', 'mention', 'assignment', 'urgent']
+          enum: ['comment', 'status_change', 'assigned']
         voc_id:
           type: string
           format: uuid
@@ -2389,6 +2529,9 @@ components:
           type: string
         is_read:
           type: boolean
+        voc_priority:
+          type: string
+          nullable: true
         created_at:
           type: string
           format: date-time

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getVoc, type VocDetail } from '../../api/vocs';
+import { getVoc, updateVocStatus, getIncompleteSubtaskCount, type VocDetail } from '../../api/vocs';
 import {
   listVocTags,
   listTags,
@@ -14,12 +14,15 @@ import { PriorityBadge } from '../common/PriorityBadge';
 import { CommentList } from './CommentList';
 import { AttachmentList } from './AttachmentList';
 import { InternalNotesSection } from './InternalNotesSection';
+import { PayloadSection } from './PayloadSection';
+import { SubtaskSection } from './SubtaskSection';
 import { TagChip } from './TagChip';
 
 interface VocDrawerProps {
   vocId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  onOpenVoc?: (id: string) => void;
 }
 
 type Tab = 'body' | 'comments' | 'attachments';
@@ -29,7 +32,7 @@ function formatDate(iso: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
+export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps) {
   const { user } = useAuth();
   const [voc, setVoc] = useState<VocDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +43,45 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
   const [showTagSelect, setShowTagSelect] = useState(false);
 
   const canEditTags = user?.role === 'manager' || user?.role === 'admin';
+  const canChangeStatus = user?.role === 'manager' || user?.role === 'admin';
+
+  const STATUS_TRANSITIONS: Record<string, string[]> = {
+    접수: ['검토중', '드랍'],
+    검토중: ['처리중', '드랍'],
+    처리중: ['완료', '드랍'],
+    완료: ['처리중'],
+    드랍: ['검토중', '처리중'],
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!voc) return;
+    if (newStatus === '완료' && !voc.parent_id) {
+      try {
+        const count = await getIncompleteSubtaskCount(voc.id);
+        if (count > 0) {
+          const confirmed = window.confirm(
+            `미완료 Sub-task가 ${count}건 있습니다.\n계속 진행하시겠습니까?`,
+          );
+          if (!confirmed) return;
+        }
+      } catch {
+        // warning fetch failure does not block status change
+      }
+    }
+    try {
+      const updated = await updateVocStatus(voc.id, newStatus);
+      setVoc(updated);
+    } catch {
+      // status change error — silently ignore for now
+    }
+  };
+
+  const refreshVoc = () => {
+    if (!vocId) return;
+    getVoc(vocId)
+      .then(setVoc)
+      .catch(() => setError('VOC를 불러오지 못했습니다.'));
+  };
 
   useEffect(() => {
     if (!vocId) {
@@ -171,10 +213,38 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
                   <span style={{ color: 'var(--text-muted)', width: '64px', flexShrink: 0 }}>
                     상태
                   </span>
-                  <div className="flex items-center gap-2">
-                    <StatusDot status={voc.status} />
-                    <span style={{ color: 'var(--text-primary)' }}>{voc.status}</span>
-                  </div>
+                  {canChangeStatus ? (
+                    <div className="flex items-center gap-2">
+                      <StatusDot status={voc.status} />
+                      <select
+                        value={voc.status}
+                        onChange={(e) => {
+                          void handleStatusChange(e.target.value);
+                        }}
+                        style={{
+                          background: 'var(--bg-surface)',
+                          color: 'var(--text-primary)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '4px',
+                          padding: '2px 6px',
+                          fontSize: 'inherit',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <option value={voc.status}>{voc.status}</option>
+                        {(STATUS_TRANSITIONS[voc.status] ?? []).map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <StatusDot status={voc.status} />
+                      <span style={{ color: 'var(--text-primary)' }}>{voc.status}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span style={{ color: 'var(--text-muted)', width: '64px', flexShrink: 0 }}>
@@ -321,6 +391,12 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
                   currentUserRole={user.role}
                 />
               )}
+
+              {/* Payload section — only shown when VOC is in 완료 or 드랍 status */}
+              {user && <PayloadSection voc={voc} userRole={user.role} onUpdate={refreshVoc} />}
+
+              {/* Sub-task section — list & inline create form */}
+              <SubtaskSection voc={voc} onOpenVoc={onOpenVoc} onUpdate={refreshVoc} />
             </>
           )}
         </div>

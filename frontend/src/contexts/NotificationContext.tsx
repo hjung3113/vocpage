@@ -1,51 +1,139 @@
-import React, { createContext, useCallback, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { AppNotification, getNotifications, getUnreadCount, markRead } from '../api/notifications';
 
-export interface AppNotification {
-  id: string;
-  vocId: string;
-  message: string;
-  isRead: boolean;
-  createdAt: string;
-}
+export type { AppNotification };
+
+const POLLING_INTERVAL_MS = 30_000;
 
 export interface NotificationContextValue {
   notifications: AppNotification[];
   unreadCount: number;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  /** Phase 7: 실제 API 폴링은 Phase 7에서 구현 */
-  isPolling: false;
+  hasUrgentUnread: boolean;
+  isPolling: boolean;
+  markAsRead: (id: string) => Promise<void>;
+  refetchPanel: () => Promise<void>;
 }
 
 export const NotificationContext = createContext<NotificationContextValue | null>(null);
 
+function is401(err: unknown): boolean {
+  if (err instanceof Error && err.message.includes('401')) return true;
+  if (typeof err === 'object' && err !== null && 'status' in err) {
+    return (err as { status?: number }).status === 401;
+  }
+  return false;
+}
+
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  // user 정보는 보유하되, Phase 7 폴링 구현 시 사용
   const { user } = useAuth();
-  void user; // Phase 7에서 폴링 트리거용으로 사용 예정
 
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [hasUrgentUnread, setHasUrgentUnread] = useState(false);
+  const [isPolling, setIsPolling] = useState(false);
+  const etagRef = useRef<string | undefined>(undefined);
 
-  const markAsRead = useCallback((id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+  const markAsRead = useCallback(async (id: string) => {
+    await markRead(id);
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+    setUnreadCount((c) => Math.max(0, c - 1));
   }, []);
 
-  const markAllAsRead = useCallback(() => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  const refetchPanel = useCallback(async () => {
+    try {
+      const data = await getNotifications();
+      setNotifications(data);
+      // Bulk-read happens server-side on this endpoint; reset unread state locally.
+      setUnreadCount(0);
+      setHasUrgentUnread(false);
+    } catch (err) {
+      if (is401(err)) {
+        window.location.href = '/mock-login';
+      }
+      // otherwise silently ignore
+    }
   }, []);
 
-  const unreadCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
+  useEffect(() => {
+    if (!user) return;
+
+    let retries = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let inflight = false;
+    let cancelled = false;
+
+    setIsPolling(true);
+
+    const schedule = (delay: number) => {
+      if (cancelled) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(poll, delay);
+    };
+
+    const poll = async () => {
+      if (cancelled || inflight) return;
+      if (document.visibilityState === 'hidden') {
+        schedule(POLLING_INTERVAL_MS);
+        return;
+      }
+      inflight = true;
+      try {
+        const result = await getUnreadCount(etagRef.current);
+        if (!cancelled && result !== null) {
+          etagRef.current = result.etag;
+          setUnreadCount(result.count);
+          setHasUrgentUnread(result.hasUrgent);
+        }
+        retries = 0;
+      } catch (err: unknown) {
+        if (is401(err)) {
+          inflight = false;
+          window.location.href = '/mock-login';
+          return;
+        }
+        if (!cancelled && retries < 3) {
+          retries++;
+          inflight = false;
+          schedule(1000 * Math.pow(2, retries - 1));
+          return;
+        }
+        retries = 0; // reset after max failures so the next tick still fires
+      } finally {
+        inflight = false;
+      }
+      schedule(POLLING_INTERVAL_MS);
+    };
+
+    void poll();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        if (timer) clearTimeout(timer);
+        void poll();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      setIsPolling(false);
+    };
+  }, [user]);
 
   const value = useMemo(
     () => ({
       notifications,
       unreadCount,
+      hasUrgentUnread,
+      isPolling,
       markAsRead,
-      markAllAsRead,
-      isPolling: false as const,
+      refetchPanel,
     }),
-    [notifications, unreadCount, markAsRead, markAllAsRead],
+    [notifications, unreadCount, hasUrgentUnread, isPolling, markAsRead, refetchPanel],
   );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;

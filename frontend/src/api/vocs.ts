@@ -6,6 +6,7 @@ export interface VocFilters {
   assignee_id?: string;
   keyword?: string;
   tag_id?: string;
+  review_status?: string;
   page?: number;
   limit?: number;
   sort?: string;
@@ -31,8 +32,10 @@ export interface VocSummary {
 export interface VocDetail extends VocSummary {
   body: string;
   structured_payload: Record<string, unknown> | null;
+  structured_payload_draft: Record<string, unknown> | null;
   review_status: string | null;
   source: string;
+  parent_id: string | null;
 }
 
 export interface VocListResponse {
@@ -113,4 +116,37 @@ export async function updateVocStatus(
 export async function deleteVoc(id: string): Promise<void> {
   const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(`deleteVoc: ${res.status}`);
+}
+
+export async function listSubtasks(parentId: string): Promise<VocDetail[]> {
+  const res = await fetch(`${BASE}/${parentId}/subtasks`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`listSubtasks: ${res.status}`);
+  return res.json() as Promise<VocDetail[]>;
+}
+
+export async function createSubtask(
+  parentId: string,
+  data: {
+    title: string;
+    body?: string;
+    priority?: string;
+    voc_type_id: string;
+    assignee_id?: string;
+  },
+): Promise<VocDetail> {
+  const res = await fetch(`${BASE}/${parentId}/subtasks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`createSubtask: ${res.status}`);
+  return res.json() as Promise<VocDetail>;
+}
+
+export async function getIncompleteSubtaskCount(vocId: string): Promise<number> {
+  const res = await fetch(`${BASE}/${vocId}/incomplete-subtasks`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`getIncompleteSubtaskCount: ${res.status}`);
+  const data = (await res.json()) as { count: number };
+  return data.count;
 }
