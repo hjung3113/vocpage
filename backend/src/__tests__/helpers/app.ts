@@ -2,6 +2,9 @@ import express from 'express';
 import session from 'express-session';
 import { authRouter } from '../../routes/auth';
 import { vocRouter } from '../../routes/vocs';
+import { commentRouter } from '../../routes/comments';
+import { noteRouter } from '../../routes/notes';
+import { attachmentRouter } from '../../routes/attachments';
 import { setPool } from '../../db';
 import { createAuthMiddleware } from '../../auth';
 import type { Pool } from 'pg';
@@ -36,6 +39,9 @@ export function createTestApp(pool?: Pool, authMode = 'mock') {
 
   const authMiddleware = createAuthMiddleware();
   app.use('/api/vocs', authMiddleware, vocRouter);
+  app.use('/api/vocs/:vocId/comments', authMiddleware, commentRouter);
+  app.use('/api/vocs/:vocId/notes', authMiddleware, noteRouter);
+  app.use('/api/vocs/:vocId/attachments', authMiddleware, attachmentRouter);
 
   return app;
 }

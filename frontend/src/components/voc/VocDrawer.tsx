@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getVoc, type VocDetail } from '../../api/vocs';
+import { useAuth } from '../../hooks/useAuth';
 import { StatusDot } from '../common/StatusDot';
 import { PriorityBadge } from '../common/PriorityBadge';
+import { CommentList } from './CommentList';
+import { AttachmentList } from './AttachmentList';
+import { InternalNotesSection } from './InternalNotesSection';
 
 interface VocDrawerProps {
   vocId: string | null;
@@ -9,15 +13,19 @@ interface VocDrawerProps {
   onClose: () => void;
 }
 
+type Tab = 'body' | 'comments' | 'attachments';
+
 function formatDate(iso: string): string {
   const d = new Date(iso);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
+  const { user } = useAuth();
   const [voc, setVoc] = useState<VocDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>('body');
 
   useEffect(() => {
     if (!vocId) {
@@ -26,11 +34,18 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
     }
     setIsLoading(true);
     setError(null);
+    setActiveTab('body');
     getVoc(vocId)
       .then(setVoc)
       .catch(() => setError('VOC를 불러오지 못했습니다.'))
       .finally(() => setIsLoading(false));
   }, [vocId]);
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'body', label: '본문' },
+    { key: 'comments', label: '댓글' },
+    { key: 'attachments', label: '첨부파일' },
+  ];
 
   return (
     <>
@@ -143,22 +158,67 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
                 )}
               </div>
 
-              {/* Body */}
-              <div>
-                <p className="text-xs font-medium mb-2" style={{ color: 'var(--text-muted)' }}>
-                  내용
-                </p>
-                <pre
-                  className="text-sm whitespace-pre-wrap break-words"
-                  style={{
-                    color: 'var(--text-primary)',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.6',
-                  }}
-                >
-                  {voc.body}
-                </pre>
+              {/* Tabs */}
+              <div
+                className="flex gap-0 mb-4 shrink-0"
+                style={{ borderBottom: '1px solid var(--border)' }}
+              >
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className="px-4 py-2 text-sm font-medium"
+                    style={{
+                      color: activeTab === tab.key ? 'var(--brand)' : 'var(--text-secondary)',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom:
+                        activeTab === tab.key ? '2px solid var(--brand)' : '2px solid transparent',
+                      cursor: 'pointer',
+                      marginBottom: '-1px',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
+
+              {/* Tab content */}
+              {activeTab === 'body' && (
+                <div>
+                  <pre
+                    className="text-sm whitespace-pre-wrap break-words"
+                    style={{
+                      color: 'var(--text-primary)',
+                      fontFamily: 'inherit',
+                      lineHeight: '1.6',
+                    }}
+                  >
+                    {voc.body}
+                  </pre>
+                </div>
+              )}
+
+              {activeTab === 'comments' && user && (
+                <CommentList vocId={voc.id} currentUserId={user.id} currentUserRole={user.role} />
+              )}
+
+              {activeTab === 'attachments' && user && (
+                <AttachmentList
+                  vocId={voc.id}
+                  currentUserId={user.id}
+                  currentUserRole={user.role}
+                />
+              )}
+
+              {/* Internal notes — always shown below tabs for manager/admin */}
+              {user && (
+                <InternalNotesSection
+                  vocId={voc.id}
+                  currentUserId={user.id}
+                  currentUserRole={user.role}
+                />
+              )}
             </>
           )}
         </div>

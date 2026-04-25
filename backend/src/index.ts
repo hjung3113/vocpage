@@ -9,6 +9,9 @@ import yaml from 'js-yaml';
 import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
 import { vocRouter } from './routes/vocs';
+import { commentRouter } from './routes/comments';
+import { noteRouter } from './routes/notes';
+import { attachmentRouter } from './routes/attachments';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -53,6 +56,9 @@ app.use('/api/auth', authRouter);
 
 const authMiddleware = createAuthMiddleware();
 app.use('/api/vocs', authMiddleware, vocRouter);
+app.use('/api/vocs/:vocId/comments', authMiddleware, commentRouter);
+app.use('/api/vocs/:vocId/notes', authMiddleware, noteRouter);
+app.use('/api/vocs/:vocId/attachments', authMiddleware, attachmentRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {
