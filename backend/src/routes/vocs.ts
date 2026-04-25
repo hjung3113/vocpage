@@ -732,9 +732,148 @@ vocRouter.delete(
         return;
       }
 
+      // Sub-task cascade soft delete
+      await pool.query(
+        `UPDATE vocs SET deleted_at = NOW() WHERE parent_id = $1 AND deleted_at IS NULL`,
+        [id],
+      );
+
       res.status(204).send();
     } catch (err) {
       logger.error({ err }, 'DELETE /api/vocs/:id failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── GET /api/vocs/:id/subtasks ────────────────────────────────────────────────
+
+vocRouter.get('/:id/subtasks', requireAuth, async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const parent = await pool.query(`SELECT id FROM vocs WHERE id = $1 AND deleted_at IS NULL`, [
+      id,
+    ]);
+    if (parent.rowCount === 0) {
+      res.status(404).json({ error: 'NOT_FOUND' });
+      return;
+    }
+    const { rows } = await pool.query(
+      `SELECT * FROM vocs WHERE parent_id = $1 AND deleted_at IS NULL ORDER BY created_at ASC`,
+      [id],
+    );
+    res.json(rows);
+  } catch (err) {
+    logger.error({ err }, 'GET /api/vocs/:id/subtasks failed');
+    res.status(500).json({ error: 'INTERNAL_ERROR' });
+  }
+});
+
+// ── POST /api/vocs/:id/subtasks ───────────────────────────────────────────────
+
+vocRouter.post('/:id/subtasks', requireAuth, async (req: Request, res: Response): Promise<void> => {
+  const user = req.user as AuthUser;
+  const { id } = req.params;
+  const { title, body, priority, voc_type_id, assignee_id } = req.body as {
+    title?: string;
+    body?: string;
+    priority?: string;
+    voc_type_id?: string;
+    assignee_id?: string;
+  };
+
+  if (!title || !title.trim()) {
+    res.status(400).json({ error: 'VALIDATION_FAILED' });
+    return;
+  }
+  if (!voc_type_id) {
+    res.status(400).json({ error: 'VALIDATION_FAILED' });
+    return;
+  }
+
+  try {
+    const { rows: parentRows } = await pool.query(
+      `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+      [id],
+    );
+    if (parentRows.length === 0) {
+      res.status(404).json({ error: 'NOT_FOUND' });
+      return;
+    }
+    const parent = parentRows[0] as {
+      id: string;
+      parent_id: string | null;
+      issue_code: string;
+      system_id: string;
+      menu_id: string;
+    };
+
+    // 1-level limit
+    if (parent.parent_id) {
+      res.status(400).json({ error: 'SUBTASK_NESTING_NOT_ALLOWED' });
+      return;
+    }
+
+    // Sequential numbering — include soft-deleted to prevent reuse
+    const { rows: countRows } = await pool.query(
+      `SELECT COUNT(*)::int + 1 AS next_n FROM vocs WHERE parent_id = $1`,
+      [id],
+    );
+    const nextN = countRows[0].next_n as number;
+    const issueCode = `${parent.issue_code}-${nextN}`;
+    const effectivePriority = priority ?? 'medium';
+    const dueDate = calcDueDate(effectivePriority);
+
+    // Pre-populate sequence_no & issue_code so the BEFORE INSERT trigger (WHEN sequence_no IS NULL) does not fire.
+    const { rows: createdRows } = await pool.query(
+      `INSERT INTO vocs (title, body, status, priority, author_id, system_id, menu_id, voc_type_id, assignee_id, parent_id, issue_code, sequence_no, due_date, source)
+         VALUES ($1, $2, '접수', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'manual')
+         RETURNING *`,
+      [
+        title,
+        body ?? '',
+        effectivePriority,
+        user.id,
+        parent.system_id,
+        parent.menu_id,
+        voc_type_id,
+        assignee_id ?? null,
+        id,
+        issueCode,
+        nextN,
+        dueDate,
+      ],
+    );
+    const created = createdRows[0] as { id: string; title: string; body: string | null };
+
+    // Sub-task auto-tagging (independent from parent)
+    applyTagRules(created.id, created.title, created.body ?? '', pool).catch((err) =>
+      logger.warn({ err }, 'subtask auto-tag failed'),
+    );
+
+    res.status(201).json(created);
+  } catch (err) {
+    logger.error({ err }, 'POST /api/vocs/:id/subtasks failed');
+    res.status(500).json({ error: 'INTERNAL_ERROR' });
+  }
+});
+
+// ── GET /api/vocs/:id/incomplete-subtasks ─────────────────────────────────────
+
+vocRouter.get(
+  '/:id/incomplete-subtasks',
+  requireAuth,
+  async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    try {
+      const { rows } = await pool.query(
+        `SELECT COUNT(*)::int AS count FROM vocs
+         WHERE parent_id = $1 AND deleted_at IS NULL AND status NOT IN ('완료','드랍')`,
+        [id],
+      );
+      res.json({ count: rows[0].count });
+    } catch (err) {
+      logger.error({ err }, 'GET /api/vocs/:id/incomplete-subtasks failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
     }
   },

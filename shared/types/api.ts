@@ -821,6 +821,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/vocs/{id}/subtasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    /** List sub-tasks of a VOC */
+    get: operations['listSubtasks'];
+    put?: never;
+    /** Create a sub-task under a VOC */
+    post: operations['createSubtask'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/vocs/{id}/incomplete-subtasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    /** Get count of incomplete sub-tasks */
+    get: operations['getIncompleteSubtaskCount'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/vocs/{id}/payload': {
     parameters: {
       query?: never;
@@ -3003,6 +3042,93 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['MasterRefreshResult'];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  listSubtasks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Sub-task list */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Voc'][];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  createSubtask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          title: string;
+          body?: string | null;
+          priority?: components['schemas']['VocPriority'];
+          /** Format: uuid */
+          voc_type_id: string;
+          /** Format: uuid */
+          assignee_id?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description Created sub-task */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Voc'];
+        };
+      };
+      400: components['responses']['BadRequest'];
+      401: components['responses']['Unauthorized'];
+      404: components['responses']['NotFound'];
+    };
+  };
+  getIncompleteSubtaskCount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['id'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Incomplete sub-task count */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            count: number;
+          };
         };
       };
       401: components['responses']['Unauthorized'];

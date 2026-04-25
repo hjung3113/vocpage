@@ -15,12 +15,14 @@ import { CommentList } from './CommentList';
 import { AttachmentList } from './AttachmentList';
 import { InternalNotesSection } from './InternalNotesSection';
 import { PayloadSection } from './PayloadSection';
+import { SubtaskSection } from './SubtaskSection';
 import { TagChip } from './TagChip';
 
 interface VocDrawerProps {
   vocId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  onOpenVoc?: (id: string) => void;
 }
 
 type Tab = 'body' | 'comments' | 'attachments';
@@ -30,7 +32,7 @@ function formatDate(iso: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
+export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps) {
   const { user } = useAuth();
   const [voc, setVoc] = useState<VocDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -332,6 +334,9 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
 
               {/* Payload section — only shown when VOC is in 완료 or 드랍 status */}
               {user && <PayloadSection voc={voc} userRole={user.role} onUpdate={refreshVoc} />}
+
+              {/* Sub-task section — list & inline create form */}
+              <SubtaskSection voc={voc} onOpenVoc={onOpenVoc} onUpdate={refreshVoc} />
             </>
           )}
         </div>
