@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   submitPayload,
   savePayloadDraft,
@@ -7,6 +7,7 @@ import {
   type StructuredPayload,
   type VocPayloadHistoryItem,
 } from '../../api/payload';
+import { useMasterCache } from '../../hooks/useMasterCache';
 
 interface PayloadSectionProps {
   voc: {
@@ -29,6 +30,14 @@ const FIELDS: Array<{ key: keyof StructuredPayload; label: string; required: boo
   { key: 'root_cause', label: '근본원인', required: true },
   { key: 'resolution', label: '조치', required: true },
 ];
+
+// Fields that support master autocomplete and their search type
+const AUTOCOMPLETE_TYPE: Record<string, string> = {
+  equipment: 'equipment',
+  maker: 'maker',
+  model: 'model',
+  process: 'process',
+};
 
 function statusLabel(rs: string | null): { text: string; bg: string; color: string } | null {
   switch (rs) {
@@ -77,6 +86,26 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
   const [busy, setBusy] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<VocPayloadHistoryItem[]>([]);
+  const [suggestions, setSuggestions] = useState<Record<string, string[]>>({});
+  const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const { search, triggerRefresh } = useMasterCache();
+
+  const handleFieldChange = useCallback(
+    (fieldName: string, value: string) => {
+      const searchType = AUTOCOMPLETE_TYPE[fieldName as keyof StructuredPayload];
+      if (!searchType || value.length < 1) return;
+      if (debounceTimers.current[fieldName]) clearTimeout(debounceTimers.current[fieldName]);
+      debounceTimers.current[fieldName] = setTimeout(() => {
+        search(searchType, value)
+          .then((results) => setSuggestions((prev) => ({ ...prev, [fieldName]: results })))
+          .catch(() => {
+            // ignore search errors silently
+          });
+      }, 200);
+    },
+    [search],
+  );
 
   useEffect(() => {
     const src = voc.structured_payload ?? voc.structured_payload_draft ?? null;
@@ -170,9 +199,30 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
           marginBottom: '12px',
         }}
       >
-        <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-          처리 결과 (Structured Payload)
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3
+            style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}
+          >
+            처리 결과 (Structured Payload)
+          </h3>
+          {canEdit && (
+            <button
+              onClick={() => void triggerRefresh(voc.id)}
+              title="마스터 새로고침"
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border)',
+                borderRadius: '4px',
+                padding: '1px 6px',
+                fontSize: '11px',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+              }}
+            >
+              &#x21BA;
+            </button>
+          )}
+        </div>
         {badge && (
           <span
             style={{
@@ -205,31 +255,49 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {FIELDS.map((f) => (
-          <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              {f.label}
-              {f.required && <span style={{ color: 'var(--danger)' }}> *</span>}
-            </span>
-            <textarea
-              value={form[f.key] ?? ''}
-              disabled={!canEdit || busy}
-              rows={f.key === 'symptom' || f.key === 'root_cause' || f.key === 'resolution' ? 2 : 1}
-              onChange={(e) => setForm((p) => ({ ...p, [f.key]: e.target.value }))}
-              style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: '4px',
-                padding: '6px 8px',
-                fontSize: '13px',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                resize: 'vertical',
-                fontFamily: 'inherit',
-              }}
-            />
-          </label>
-        ))}
+        {FIELDS.map((f) => {
+          const hasAutocomplete = f.key in AUTOCOMPLETE_TYPE;
+          const datalistId = hasAutocomplete ? `suggestions-${f.key}` : undefined;
+          return (
+            <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                {f.label}
+                {f.required && <span style={{ color: 'var(--danger)' }}> *</span>}
+              </span>
+              <textarea
+                {...(datalistId ? { list: datalistId } : {})}
+                value={form[f.key] ?? ''}
+                disabled={!canEdit || busy}
+                rows={
+                  f.key === 'symptom' || f.key === 'root_cause' || f.key === 'resolution' ? 2 : 1
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setForm((p) => ({ ...p, [f.key]: val }));
+                  if (hasAutocomplete) handleFieldChange(f.key, val);
+                }}
+                style={{
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '4px',
+                  padding: '6px 8px',
+                  fontSize: '13px',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
+                }}
+              />
+              {hasAutocomplete && datalistId && (
+                <datalist id={datalistId}>
+                  {(suggestions[f.key] ?? []).map((item) => (
+                    <option key={item} value={item} />
+                  ))}
+                </datalist>
+              )}
+            </label>
+          );
+        })}
       </div>
 
       {error && (

@@ -1,5 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { NotificationBell } from '../common/NotificationBell';
+import { useMasterCache } from '../../hooks/useMasterCache';
+import { useAuth } from '../../hooks/useAuth';
 
 interface VocTopbarProps {
   total: number;
@@ -9,6 +11,9 @@ interface VocTopbarProps {
 
 export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { user } = useAuth();
+  const { isColdStartMode, isSnapshotMode } = useMasterCache();
+  const isManagerOrAdmin = user?.role === 'manager' || user?.role === 'admin';
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +31,7 @@ export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
       className="flex items-center gap-4 px-6 py-3 shrink-0"
       style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}
     >
-      {/* Left: title + count */}
+      {/* Left: title + count + master mode badge */}
       <div className="flex items-center gap-2 shrink-0">
         <h1 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
           VOC 목록
@@ -37,6 +42,34 @@ export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
         >
           {total}
         </span>
+        {isManagerOrAdmin && isColdStartMode && (
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              background: 'var(--status-amber-bg)',
+              border: '1px solid var(--status-amber-border)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            콜드 스타트 모드
+          </span>
+        )}
+        {isManagerOrAdmin && !isColdStartMode && isSnapshotMode && (
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              background: 'var(--status-amber-bg)',
+              border: '1px solid var(--status-amber-border)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            스냅샷 모드
+          </span>
+        )}
       </div>
 
       {/* Center: search */}
