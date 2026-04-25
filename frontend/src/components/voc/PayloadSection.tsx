@@ -124,6 +124,7 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
 
   if (!isFinalStatus) return null;
 
+  const isPendingDeletion = voc.review_status === 'pending_deletion';
   const badge = statusLabel(voc.review_status);
   const unverifiedFields = Array.isArray(
     (voc.structured_payload as { unverified_fields?: unknown } | null)?.unverified_fields,
@@ -333,7 +334,8 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
         <div style={{ display: 'flex', gap: '6px', marginTop: '12px', flexWrap: 'wrap' }}>
           <button
             onClick={() => void handleDraftSave()}
-            disabled={busy}
+            disabled={isPendingDeletion || busy}
+            title={isPendingDeletion ? '삭제 검토 중에는 임시저장할 수 없습니다' : undefined}
             style={{
               background: 'transparent',
               border: '1px solid var(--border)',
@@ -341,14 +343,15 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
               padding: '4px 12px',
               fontSize: '12px',
               color: 'var(--text-secondary)',
-              cursor: busy ? 'not-allowed' : 'pointer',
+              cursor: isPendingDeletion || busy ? 'not-allowed' : 'pointer',
             }}
           >
             임시저장
           </button>
           <button
             onClick={() => void handleSubmit()}
-            disabled={busy}
+            disabled={isPendingDeletion || busy}
+            title={isPendingDeletion ? '삭제 검토 중에는 제출할 수 없습니다' : undefined}
             style={{
               background: 'var(--brand)',
               border: '1px solid var(--brand)',
@@ -357,7 +360,7 @@ export function PayloadSection({ voc, userRole, onUpdate }: PayloadSectionProps)
               fontSize: '12px',
               color: 'var(--bg-app)',
               fontWeight: 600,
-              cursor: busy ? 'not-allowed' : 'pointer',
+              cursor: isPendingDeletion || busy ? 'not-allowed' : 'pointer',
             }}
           >
             제출

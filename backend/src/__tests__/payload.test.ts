@@ -155,7 +155,10 @@ describe('VOC Payload endpoints', () => {
       await agent.post('/api/auth/mock-login').send({ role: 'manager' });
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
-      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      await reviewer.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
 
       // 재진입(처리중 → 완료)을 위해 status를 처리중으로 한 번 내렸다가 다시 완료로 올릴 수 없으므로
       // 직접 status='완료'(이미 완료)에 또 한 번 제출(허용됨).
@@ -174,9 +177,14 @@ describe('VOC Payload endpoints', () => {
       await agent.post('/api/auth/mock-login').send({ role: 'manager' });
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
-      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      await reviewer.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
       await agent.post(`/api/vocs/${vocId}/payload-delete-request`);
-      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      // 재제출 후 manager가 다시 제출 → admin이 리뷰
+      await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
+      await reviewer.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
 
       // review_status=NULL 상태에서 다시 제출 가능해야 함.
       const res = await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
@@ -243,6 +251,18 @@ describe('VOC Payload endpoints', () => {
         .send({ draft: { symptom: 'x' } });
       expect(res.status).toBe(400);
     });
+
+    it('Manager (non-assignee) PATCH /payload-draft → 403', async () => {
+      // VOC with adminId as assignee; manager (managerId) should be forbidden.
+      const vocId = await createCompletedVoc(pool, fixtures, { assigneeId: fixtures.adminId });
+      const agent = request.agent(app);
+      await agent.post('/api/auth/mock-login').send({ role: 'manager' });
+
+      const res = await agent
+        .patch(`/api/vocs/${vocId}/payload-draft`)
+        .send({ draft: { symptom: '임시' } });
+      expect(res.status).toBe(403);
+    });
   });
 
   // ── GET /payload-history ──────────────────────────────────────────────────
@@ -285,7 +305,10 @@ describe('VOC Payload endpoints', () => {
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
 
-      const res = await agent
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      const res = await reviewer
         .post(`/api/vocs/${vocId}/payload-review`)
         .send({ decision: 'approved' });
       expect(res.status).toBe(200);
@@ -307,7 +330,10 @@ describe('VOC Payload endpoints', () => {
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
 
-      const res = await agent
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      const res = await reviewer
         .post(`/api/vocs/${vocId}/payload-review`)
         .send({ decision: 'rejected', comment: '근거 부족' });
       expect(res.status).toBe(200);
@@ -340,10 +366,13 @@ describe('VOC Payload endpoints', () => {
       await agent.post('/api/auth/mock-login').send({ role: 'manager' });
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
-      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      await reviewer.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
       await agent.post(`/api/vocs/${vocId}/payload-delete-request`);
 
-      const res = await agent
+      const res = await reviewer
         .post(`/api/vocs/${vocId}/payload-review`)
         .send({ decision: 'approved' });
       expect(res.status).toBe(200);
@@ -368,10 +397,13 @@ describe('VOC Payload endpoints', () => {
       await agent.post('/api/auth/mock-login').send({ role: 'manager' });
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
-      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      await reviewer.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
       await agent.post(`/api/vocs/${vocId}/payload-delete-request`);
 
-      const res = await agent
+      const res = await reviewer
         .post(`/api/vocs/${vocId}/payload-review`)
         .send({ decision: 'rejected' });
       expect(res.status).toBe(200);
@@ -390,7 +422,10 @@ describe('VOC Payload endpoints', () => {
       await agent.post('/api/auth/mock-login').send({ role: 'manager' });
 
       await agent.post(`/api/vocs/${vocId}/payload`).send(BASE_PAYLOAD);
-      await agent.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
+      // self-review 방지: admin 세션으로 리뷰
+      const reviewer = request.agent(app);
+      await reviewer.post('/api/auth/mock-login').send({ role: 'admin' });
+      await reviewer.post(`/api/vocs/${vocId}/payload-review`).send({ decision: 'approved' });
 
       const res = await agent.post(`/api/vocs/${vocId}/payload-delete-request`);
       expect(res.status).toBe(200);

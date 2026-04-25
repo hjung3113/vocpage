@@ -423,7 +423,7 @@ vocRouter.post(
       unverified_fields?: string[];
     };
 
-    if (!symptom || !root_cause || !resolution) {
+    if (!symptom?.trim() || !root_cause?.trim() || !resolution?.trim()) {
       res.status(400).json({ error: 'VALIDATION_FAILED' });
       return;
     }
@@ -448,6 +448,25 @@ vocRouter.post(
         review_status: string | null;
       };
 
+      // MEDIUM-2: permission check before transition check to prevent info leakage.
+      if (user.role !== 'admin' && voc.assignee_id !== user.id) {
+        await client.query('ROLLBACK');
+        res.status(403).json({ error: 'FORBIDDEN' });
+        return;
+      }
+
+      // LOW-1: block submission while deletion is pending.
+      if (voc.review_status === 'pending_deletion') {
+        await client.query('ROLLBACK');
+        res
+          .status(400)
+          .json({
+            error: 'INVALID_STATUS_FOR_PAYLOAD',
+            message: 'Cannot submit payload while deletion is pending',
+          });
+        return;
+      }
+
       // M1: status may be transitioned together with payload submission.
       const effectiveStatus = newStatus ?? voc.status;
       if (effectiveStatus !== '완료' && effectiveStatus !== '드랍') {
@@ -458,11 +477,6 @@ vocRouter.post(
       if (newStatus && !STATUS_TRANSITIONS[voc.status]?.includes(newStatus)) {
         await client.query('ROLLBACK');
         res.status(400).json({ error: 'INVALID_TRANSITION' });
-        return;
-      }
-      if (user.role !== 'admin' && voc.assignee_id !== user.id) {
-        await client.query('ROLLBACK');
-        res.status(403).json({ error: 'FORBIDDEN' });
         return;
       }
 
@@ -604,9 +618,6 @@ vocRouter.post(
       return;
     }
 
-    // C4: TODO(MVP): 제출자(voc_payload_history.submitted_by) === reviewer 셀프 리뷰 방지 미구현.
-    // Phase 8 이후 voc_payload_history.submitted_by != req.user.id 체크 추가 예정.
-
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -626,6 +637,18 @@ vocRouter.post(
         res.status(400).json({ error: 'INVALID_REVIEW_STATUS' });
         return;
       }
+
+      // MEDIUM-1: MVP self-review prevention — check submitted_by against reviewer.
+      const histRow = await client.query(
+        `SELECT submitted_by FROM voc_payload_history WHERE voc_id = $1 AND is_current = true`,
+        [id],
+      );
+      if (histRow.rows.length > 0 && histRow.rows[0].submitted_by === user.id) {
+        await client.query('ROLLBACK');
+        res.status(403).json({ error: 'SELF_REVIEW_NOT_ALLOWED' });
+        return;
+      }
+
       const action = rs === 'unverified' ? 'submission' : 'deletion';
 
       await client.query(
@@ -693,27 +716,37 @@ vocRouter.post(
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
+    const client = await pool.connect();
     try {
-      const { rows } = await pool.query(
-        `SELECT review_status FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
+      await client.query('BEGIN');
+      const { rows } = await client.query(
+        `SELECT review_status FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
         [id],
       );
       if (rows.length === 0) {
+        await client.query('ROLLBACK');
         res.status(404).json({ error: 'NOT_FOUND' });
         return;
       }
       if (rows[0].review_status !== 'approved') {
-        res.status(400).json({ error: 'INVALID_REVIEW_STATUS' });
+        await client.query('ROLLBACK');
+        res
+          .status(400)
+          .json({ error: 'INVALID_STATUS', message: 'review_status must be approved' });
         return;
       }
-      await pool.query(
+      await client.query(
         `UPDATE vocs SET review_status = 'pending_deletion', updated_at = now() WHERE id = $1`,
         [id],
       );
+      await client.query('COMMIT');
       res.json({ ok: true });
     } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
       logger.error({ err }, 'POST /api/vocs/:id/payload-delete-request failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
+    } finally {
+      client.release();
     }
   },
 );
