@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
+import { applyTagRules } from '../services/autoTag';
 
 export const vocRouter = Router();
 
@@ -164,7 +165,11 @@ vocRouter.post('/', requireAuth, async (req: Request, res: Response): Promise<vo
       [title, body, status, priority, user.id, system_id, menu_id, voc_type_id, due_date, 'manual'],
     );
 
-    res.status(201).json(result.rows[0]);
+    const newVoc = result.rows[0];
+    await applyTagRules(newVoc.id, newVoc.title, newVoc.body ?? '', pool).catch((err) =>
+      logger.warn({ err }, 'auto-tag failed on create'),
+    );
+    res.status(201).json(newVoc);
   } catch (err) {
     logger.error({ err }, 'POST /api/vocs failed');
     res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -291,7 +296,13 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
       params,
     );
 
-    res.json(result.rows[0]);
+    const updated = result.rows[0] as { title: string; body: string };
+    res.json(updated);
+    if (title !== undefined || body !== undefined) {
+      applyTagRules(id, updated.title, updated.body ?? '', pool).catch((err) =>
+        logger.warn({ err }, 'auto-tag failed on patch'),
+      );
+    }
   } catch (err) {
     logger.error({ err }, 'PATCH /api/vocs/:id failed');
     res.status(500).json({ error: 'INTERNAL_ERROR' });

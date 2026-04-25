@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 import { getVoc, type VocDetail } from '../../api/vocs';
+import {
+  listVocTags,
+  listTags,
+  addVocTag,
+  removeVocTag,
+  type VocTag,
+  type Tag,
+} from '../../api/tags';
 import { useAuth } from '../../hooks/useAuth';
 import { StatusDot } from '../common/StatusDot';
 import { PriorityBadge } from '../common/PriorityBadge';
 import { CommentList } from './CommentList';
 import { AttachmentList } from './AttachmentList';
 import { InternalNotesSection } from './InternalNotesSection';
+import { TagChip } from './TagChip';
 
 interface VocDrawerProps {
   vocId: string | null;
@@ -26,20 +35,55 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('body');
+  const [vocTags, setVocTags] = useState<VocTag[]>([]);
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [showTagSelect, setShowTagSelect] = useState(false);
+
+  const canEditTags = user?.role === 'manager' || user?.role === 'admin';
 
   useEffect(() => {
     if (!vocId) {
       setVoc(null);
+      setVocTags([]);
       return;
     }
     setIsLoading(true);
     setError(null);
     setActiveTab('body');
+    setShowTagSelect(false);
     getVoc(vocId)
       .then(setVoc)
       .catch(() => setError('VOC를 불러오지 못했습니다.'))
       .finally(() => setIsLoading(false));
+    listVocTags(vocId)
+      .then(setVocTags)
+      .catch(() => {});
   }, [vocId]);
+
+  useEffect(() => {
+    if (canEditTags) {
+      listTags()
+        .then(setAllTags)
+        .catch(() => {});
+    }
+  }, [canEditTags]);
+
+  function handleRemoveTag(tagId: string) {
+    if (!vocId) return;
+    removeVocTag(vocId, tagId)
+      .then(() => setVocTags((prev) => prev.filter((t) => t.tag_id !== tagId)))
+      .catch(() => {});
+  }
+
+  function handleAddTag(tagId: string) {
+    if (!vocId) return;
+    addVocTag(vocId, tagId)
+      .then((added) => {
+        setVocTags((prev) => [...prev, added]);
+        setShowTagSelect(false);
+      })
+      .catch(() => {});
+  }
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'body', label: '본문' },
@@ -196,6 +240,64 @@ export function VocDrawer({ vocId, isOpen, onClose }: VocDrawerProps) {
                   >
                     {voc.body}
                   </pre>
+
+                  <div className="mt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+                        태그
+                      </span>
+                      {canEditTags && (
+                        <button
+                          onClick={() => setShowTagSelect((v) => !v)}
+                          className="text-xs px-2 py-0.5 rounded"
+                          style={{
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-secondary)',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          + 태그 추가
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {vocTags.map((t) => (
+                        <TagChip
+                          key={t.tag_id}
+                          name={t.name}
+                          source={t.source}
+                          onRemove={canEditTags ? () => handleRemoveTag(t.tag_id) : undefined}
+                        />
+                      ))}
+                    </div>
+                    {showTagSelect && canEditTags && (
+                      <select
+                        className="mt-2 text-sm px-2 py-1 rounded"
+                        style={{
+                          border: '1px solid var(--border)',
+                          background: 'var(--bg-surface)',
+                          color: 'var(--text-primary)',
+                          width: '100%',
+                        }}
+                        defaultValue=""
+                        onChange={(e) => {
+                          if (e.target.value) handleAddTag(e.target.value);
+                        }}
+                      >
+                        <option value="" disabled>
+                          태그 선택
+                        </option>
+                        {allTags
+                          .filter((t) => !vocTags.some((vt) => vt.tag_id === t.id))
+                          .map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.name}
+                            </option>
+                          ))}
+                      </select>
+                    )}
+                  </div>
                 </div>
               )}
 

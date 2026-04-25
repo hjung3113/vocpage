@@ -12,6 +12,7 @@ import { vocRouter } from './routes/vocs';
 import { commentRouter } from './routes/comments';
 import { noteRouter } from './routes/notes';
 import { attachmentRouter } from './routes/attachments';
+import { tagsRouter, tagRulesRouter, vocTagsRouter } from './routes/tags';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -55,7 +56,10 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/auth', authRouter);
 
 const authMiddleware = createAuthMiddleware();
+app.use('/api/tags', authMiddleware, tagsRouter);
+app.use('/api/tag-rules', authMiddleware, tagRulesRouter);
 app.use('/api/vocs', authMiddleware, vocRouter);
+app.use('/api/vocs/:id/tags', authMiddleware, vocTagsRouter);
 app.use('/api/vocs/:vocId/comments', authMiddleware, commentRouter);
 app.use('/api/vocs/:vocId/notes', authMiddleware, noteRouter);
 app.use('/api/vocs/:vocId/attachments', authMiddleware, attachmentRouter);

@@ -5,6 +5,7 @@ export interface VocFilters {
   menu_id?: string;
   assignee_id?: string;
   keyword?: string;
+  tag_id?: string;
   page?: number;
   limit?: number;
   sort?: string;

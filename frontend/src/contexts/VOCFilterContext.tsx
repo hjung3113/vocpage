@@ -8,6 +8,7 @@ export interface VOCFilters {
   status: VocStatus | null;
   priority: string | null;
   tagIds: string[];
+  tagId: string | null;
   assigneeId: string | null;
   from: string | null;
   to: string | null;
@@ -29,6 +30,7 @@ const DEFAULT_FILTERS: VOCFilters = {
   status: null,
   priority: null,
   tagIds: [],
+  tagId: null,
   assigneeId: null,
   from: null,
   to: null,

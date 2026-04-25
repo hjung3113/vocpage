@@ -1,10 +1,12 @@
 import type { VocSummary } from '../../api/vocs';
 import { StatusDot } from '../common/StatusDot';
 import { PriorityBadge } from '../common/PriorityBadge';
+import { TagChip } from './TagChip';
 
 interface VocRowProps {
   voc: VocSummary;
   onClick: () => void;
+  tags?: Array<{ name: string }>;
 }
 
 function formatDate(iso: string): string {
@@ -12,7 +14,7 @@ function formatDate(iso: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function VocRow({ voc, onClick }: VocRowProps) {
+export function VocRow({ voc, onClick, tags }: VocRowProps) {
   return (
     <tr
       onClick={onClick}
@@ -41,6 +43,13 @@ export function VocRow({ voc, onClick }: VocRowProps) {
         style={{ color: 'var(--text-primary)', maxWidth: '320px' }}
       >
         <span className="block truncate">{voc.title}</span>
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {tags.map((t) => (
+              <TagChip key={t.name} name={t.name} />
+            ))}
+          </div>
+        )}
       </td>
       <td className="px-4 py-3">
         <PriorityBadge priority={voc.priority} />
