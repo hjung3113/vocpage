@@ -1,8 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useContext } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { VocPage } from './pages/VocPage';
 import { NoticePopup } from './components/common/NoticePopup';
 import { useNoticePopup } from './hooks/useNoticePopup';
+import { AuthContext } from './contexts/AuthContext';
 
 const DashboardPage = lazy(() =>
   import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
@@ -14,6 +15,8 @@ const NoticePage = lazy(() =>
 
 const FaqPage = lazy(() => import('./pages/FaqPage').then((m) => ({ default: m.FaqPage })));
 
+const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
+
 const MockLoginPage =
   import.meta.env.VITE_AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
 
@@ -22,6 +25,17 @@ function MockLoginRoute() {
   return (
     <Suspense fallback={null}>
       <MockLoginPage />
+    </Suspense>
+  );
+}
+
+function AdminGuard() {
+  const ctx = useContext(AuthContext);
+  if (!ctx || ctx.isLoading) return null;
+  if (ctx.user?.role !== 'admin') return <Navigate to="/" replace />;
+  return (
+    <Suspense fallback={null}>
+      <AdminPage />
     </Suspense>
   );
 }
@@ -71,6 +85,10 @@ export const router = createBrowserRouter([
             <FaqPage />
           </Suspense>
         ),
+      },
+      {
+        path: '/admin',
+        element: <AdminGuard />,
       },
     ],
   },
