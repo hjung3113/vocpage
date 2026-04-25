@@ -4,26 +4,24 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~6 ✅ / Phase 7 전체 ✅ (리뷰 완료 80/100 B+) → **다음: Phase 7 리뷰 결함 수정 R7-1~R7-7 → Phase 8 운영 실구현**
+현재 위치: Phase 0~7 ✅ (리뷰 결함 수정 R7-1~R7-10 완료) → **다음: Phase 8 운영 실구현**
 
-브랜치: `feat/phase7-7-notifications` → main 머지 완료
-테스트: 17 suites, 227 passed, 0 failures
+브랜치: `fix/phase7-review-r7-1-r7-11` → main 머지 완료 (PR #35)
+테스트: 17 suites, 229 passed, 0 failures
 
 ### 다음 세션 우선순위
 
-**R-5·R-6 완료 후 7-0 착수**:
+**Phase 8 착수**:
 
-| ID  | 항목                                                                      | 상태      |
-| --- | ------------------------------------------------------------------------- | --------- |
-| R-1 | `dashboard.md` — `보류→드랍`, `접수됨→접수` 일괄 치환                    | ✅ 완료   |
-| R-2 | `dashboard_settings` — `globaltabs_order` 추가 + 3파일 스키마 정합       | ✅ 완료   |
-| R-3 | `requirements.md §14.1` 세션 스토어 주석 추가                             | ✅ 완료   |
-| R-4 | `ts-node-dev → tsx watch` 교체                                            | ✅ 완료   |
-| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                               | 대기      |
-| R-6 | prototype 섹션 인벤토리 + React 매핑 문서화 (7-0, 7-1 착수 전)            | 대기      |
-
-- F-4 MemoryStore → `connect-pg-simple`: **Phase 8-1로 defer 확정** (2026-04-25)
-- Phase 7 = 개발 스켈레톤 (로컬 dev 기능 동작), Phase 8 = 운영 실구현 + 배포
+| 단계 | 내용                                                            |
+| ---- | --------------------------------------------------------------- |
+| 8-1  | `connect-pg-simple` 세션 스토어 — `NODE_ENV=production` 시 적용 |
+| 8-2  | OIDC 인증 실구현 (`oidcAuthMiddleware`)                         |
+| 8-3  | Production Dockerfile + 빌드 파이프라인                         |
+| 8-5  | 실 MSSQL 연동 (설비 마스터 — 담당자 자료 수집 후)               |
+| 8-6  | 배포 + smoke test                                               |
+| 8-7  | Playwright E2E 설정 + 핵심 3플로우 테스트                       |
+| 8-8  | Jira 마이그레이션 스크립트 작성 + 실행                         |
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 

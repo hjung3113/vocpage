@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-25 (20차 — Phase 7-1~7-6 구현 완료, 7-7~7-11 대기)
+> 최종 업데이트: 2026-04-25 (21차 — Phase 7 전체 완료 + 리뷰 결함 R7-1~R7-10 수정 완료, Phase 8 대기)
 > 목표: 프로토타입 확정 → 문서 정비 → 구현 준비
 
 ## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
@@ -424,24 +424,24 @@ docs/specs/reviews/
 > 종합 점수: **80/100 (B+)** — Critical 없음, Important 6건, 특이 API 설계 결함 1건
 > **Phase 8 착수 전** 아래 항목 처리 권장 (순서대로 우선순위)
 
-| ID   | 위치                                                        | 문제                                                                                                      | 심각도    |
-| ---- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------- |
-| R7-1 | `vocs.ts` — `GET /:id/subtasks`, `/:id/incomplete-subtasks` | `requireAuth`만 있고 부모 VOC 소유권 검증 없음 → 타 user의 subtask 조회 가능                              | Important |
-| R7-2 | `vocs.ts`, `admin.ts`, `notifications.ts`, `dashboard.ts`   | `requireAuth/Manager/Admin` 4파일 중복 정의 → `backend/src/middleware/auth.ts` 추출                       | Important |
-| R7-3 | `masterCache.ts:66-67`                                      | `fs.readFileSync` (동기 블로킹 I/O) → `fs.promises.readFile` 교체                                         | Important |
-| R7-4 | `masterCache.ts:123,131`                                    | `console.warn` → `logger.warn` (pino 구조화 로깅 불일치)                                                  | Important |
-| R7-5 | `admin.ts:76-88`                                            | system 생성 + 기본 메뉴("기타") 생성이 트랜잭션 없이 분리 → 고아 system 가능                              | Important |
-| R7-6 | `masterCache.verifyPayload`                                 | 매 호출마다 `eq.equipment.map(normalize)` 전체 변환 → 캐시 시점 Set 빌드로 O(1)화                         | Important |
-| R7-7 | `notifications.ts:33-36`                                    | `GET /api/notifications` 에서 `UPDATE` 실행 (멱등성 위반) → `PATCH /api/notifications/read-all` 분리 권장 | API 설계  |
+| ID   | 위치                                                        | 문제                                                                                                      | 심각도    | 상태 |
+| ---- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------- | ---- |
+| R7-1 | `vocs.ts` — `GET /:id/subtasks`, `/:id/incomplete-subtasks` | `requireAuth`만 있고 부모 VOC 소유권 검증 없음 → 타 user의 subtask 조회 가능                              | Important | ✅   |
+| R7-2 | `vocs.ts`, `admin.ts`, `notifications.ts`, `dashboard.ts`   | `requireAuth/Manager/Admin` 4파일 중복 정의 → `backend/src/middleware/auth.ts` 추출                       | Important | ✅   |
+| R7-3 | `masterCache.ts:66-67`                                      | `fs.readFileSync` (동기 블로킹 I/O) → `fs.promises.readFile` 교체                                         | Important | ✅   |
+| R7-4 | `masterCache.ts:123,131`                                    | `console.warn` → `logger.warn` (pino 구조화 로깅 불일치)                                                  | Important | ✅   |
+| R7-5 | `admin.ts:76-88`                                            | system 생성 + 기본 메뉴("기타") 생성이 트랜잭션 없이 분리 → 고아 system 가능                              | Important | ✅   |
+| R7-6 | `masterCache.verifyPayload`                                 | 매 호출마다 `eq.equipment.map(normalize)` 전체 변환 → 캐시 시점 Set 빌드로 O(1)화                         | Important | ✅   |
+| R7-7 | `notifications.ts:33-36`                                    | `GET /api/notifications` 에서 `UPDATE` 실행 (멱등성 위반) → `PATCH /api/notifications/read-all` 분리 권장 | API 설계  | ✅   |
 
-### 추가 개선 (여유 시 처리)
+### 추가 개선
 
-| ID    | 내용                                                              |
-| ----- | ----------------------------------------------------------------- |
-| R7-8  | `autoTag.ts` 단건 INSERT 루프 → UNNEST 배치 INSERT                |
-| R7-9  | `autoTag.ts` tag_rules 조회 인메모리 캐싱                         |
-| R7-10 | `vocs.ts` 1015줄 → `routes/subtasks.ts`, `routes/payload.ts` 분리 |
-| R7-11 | `VocPage.tsx` React Query `staleTime` 명시적 설정 추가            |
+| ID    | 내용                                                                           | 상태 |
+| ----- | ------------------------------------------------------------------------------ | ---- |
+| R7-8  | `autoTag.ts` 단건 INSERT 루프 → VALUES 배치 INSERT (pg-mem 호환)               | ✅   |
+| R7-9  | `autoTag.ts` tag_rules 조회 5분 TTL 인메모리 캐싱                              | ✅   |
+| R7-10 | `vocs.ts` 1015줄 → `routes/subtasks.ts`, `routes/payload.ts` 분리              | ✅   |
+| R7-11 | `VocPage.tsx` React Query `staleTime` 명시적 설정 — React Query 미사용으로 N/A | skip |
 
 ---
 
