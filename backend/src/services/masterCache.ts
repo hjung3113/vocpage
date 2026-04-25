@@ -34,7 +34,6 @@ export interface MasterState {
   loaded_at?: string;
 }
 
-// Payload shape used for verifyPayload
 export interface StructuredPayload {
   equipment?: string;
   maker?: string;
@@ -47,24 +46,56 @@ export interface StructuredPayload {
   [key: string]: unknown;
 }
 
+// R7-6: pre-computed normalized Sets for O(1) membership checks in verifyPayload
+interface VerifySets {
+  equipment: Set<string>;
+  maker: Set<string>;
+  model: Set<string>;
+  process: Set<string>;
+  db_tables: Set<string>;
+  jobs: Set<string>;
+  sps: Set<string>;
+  programs: Set<string>;
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+const COOLDOWN_MS = 5 * 60 * 1000;
 
-// ── Stub loaders ──────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function normalize(s: string): string {
   return s.trim().toLowerCase();
 }
 
+// R7-6: build Sets once at cache-load time; reused on every verifyPayload call
+function buildVerifySets(state: MasterState): VerifySets {
+  const { equipment: eq, db, program: prog } = state;
+  return {
+    equipment: new Set((eq?.equipment ?? []).map(normalize)),
+    maker: new Set((eq?.maker ?? []).map(normalize)),
+    model: new Set((eq?.model ?? []).map(normalize)),
+    process: new Set((eq?.process ?? []).map(normalize)),
+    db_tables: new Set((db?.db_tables ?? []).map(normalize)),
+    jobs: new Set((db?.jobs ?? []).map(normalize)),
+    sps: new Set((db?.sps ?? []).map(normalize)),
+    programs: new Set((prog?.programs ?? []).map(normalize)),
+  };
+}
+
+// ── Stub loaders ──────────────────────────────────────────────────────────────
+
+// R7-3: async I/O — no blocking reads on the event loop
 async function loadFromStub(
   configDir: string,
 ): Promise<{ equipment: EquipmentCache; program: ProgramCache }> {
   const eqPath = path.join(configDir, 'equipment-stub.json');
   const progPath = path.join(configDir, 'programs.json');
 
-  const eqRaw = fs.readFileSync(eqPath, 'utf8');
-  const progRaw = fs.readFileSync(progPath, 'utf8');
+  const [eqRaw, progRaw] = await Promise.all([
+    fs.promises.readFile(eqPath, 'utf8'),
+    fs.promises.readFile(progPath, 'utf8'),
+  ]);
 
   const eq = JSON.parse(eqRaw) as {
     equipment: string[];
@@ -100,6 +131,9 @@ class MasterCacheService {
     mode: 'cold_start',
   };
 
+  // R7-6: pre-computed sets, rebuilt on every state swap
+  private verifySets: VerifySets = buildVerifySets(this.state);
+
   private lastRefreshByUser: Record<string, number> = {};
   private configDir: string;
 
@@ -115,25 +149,29 @@ class MasterCacheService {
       const db = await loadDbStub();
       const now = new Date().toISOString();
       this.state = { equipment, db, program, mode: 'live', loaded_at: now };
+      this.verifySets = buildVerifySets(this.state); // R7-6
       this.writeSnapshot().catch((err) =>
         logger.warn({ err }, 'masterCache: writeSnapshot failed (non-fatal)'),
       );
       return;
     } catch (err) {
-      console.warn('[masterCache] stub load failed, trying snapshot:', err);
+      // R7-4: structured logging
+      logger.warn({ err }, 'masterCache: stub load failed, trying snapshot');
     }
 
     try {
-      const snap = this.readSnapshot();
+      const snap = await this.readSnapshot(); // R7-3: async
       this.state = { ...snap, mode: 'snapshot' };
+      this.verifySets = buildVerifySets(this.state); // R7-6
       return;
     } catch (err) {
-      console.warn('[masterCache] snapshot load failed, falling back to cold_start:', err);
+      // R7-4: structured logging
+      logger.warn({ err }, 'masterCache: snapshot load failed, falling back to cold_start');
     }
 
-    // Only set cold_start if not already in a valid live/snapshot state
     if (this.state.mode === 'cold_start') {
       this.state = { equipment: null, db: null, program: null, mode: 'cold_start' };
+      this.verifySets = buildVerifySets(this.state); // R7-6
     }
   }
 
@@ -149,7 +187,6 @@ class MasterCacheService {
       }
     | { swapped: false; error: string; kept_loaded_at: string | undefined }
   > {
-    // GC expired cooldown entries
     const gcBefore = Date.now() - COOLDOWN_MS * 2;
     for (const [uid, ts] of Object.entries(this.lastRefreshByUser)) {
       if (ts < gcBefore) delete this.lastRefreshByUser[uid];
@@ -170,6 +207,7 @@ class MasterCacheService {
       const loaded_at = new Date().toISOString();
 
       this.state = { equipment, db, program, mode: 'live', loaded_at };
+      this.verifySets = buildVerifySets(this.state); // R7-6
       this.lastRefreshByUser[userId] = now;
 
       this.writeSnapshot().catch((err) =>
@@ -194,28 +232,26 @@ class MasterCacheService {
     }
   }
 
+  // R7-6: O(1) Set lookups instead of O(n) .map(normalize).includes() per call
   verifyPayload(payload: StructuredPayload): string[] {
     const unverified: string[] = [];
     const { equipment: eq, db, program: prog } = this.state;
+    const sets = this.verifySets;
 
-    // Equipment master fields
     if (!eq) {
       if (payload.equipment) unverified.push('equipment');
       if (payload.maker) unverified.push('maker');
       if (payload.model) unverified.push('model');
       if (payload.process) unverified.push('process');
     } else {
-      if (payload.equipment && !eq.equipment.map(normalize).includes(normalize(payload.equipment)))
+      if (payload.equipment && !sets.equipment.has(normalize(payload.equipment)))
         unverified.push('equipment');
-      if (payload.maker && !eq.maker.map(normalize).includes(normalize(payload.maker)))
-        unverified.push('maker');
-      if (payload.model && !eq.model.map(normalize).includes(normalize(payload.model)))
-        unverified.push('model');
-      if (payload.process && !eq.process.map(normalize).includes(normalize(payload.process)))
+      if (payload.maker && !sets.maker.has(normalize(payload.maker))) unverified.push('maker');
+      if (payload.model && !sets.model.has(normalize(payload.model))) unverified.push('model');
+      if (payload.process && !sets.process.has(normalize(payload.process)))
         unverified.push('process');
     }
 
-    // DB master fields
     const relDbTables = payload.related_db_tables;
     const relJobs = payload.related_jobs;
     const relSps = payload.related_sps;
@@ -224,20 +260,17 @@ class MasterCacheService {
       if (relJobs?.length) unverified.push('related_jobs');
       if (relSps?.length) unverified.push('related_sps');
     } else {
-      if (relDbTables?.some((v) => !db.db_tables.map(normalize).includes(normalize(v))))
+      if (relDbTables?.some((v) => !sets.db_tables.has(normalize(v))))
         unverified.push('related_db_tables');
-      if (relJobs?.some((v) => !db.jobs.map(normalize).includes(normalize(v))))
-        unverified.push('related_jobs');
-      if (relSps?.some((v) => !db.sps.map(normalize).includes(normalize(v))))
-        unverified.push('related_sps');
+      if (relJobs?.some((v) => !sets.jobs.has(normalize(v)))) unverified.push('related_jobs');
+      if (relSps?.some((v) => !sets.sps.has(normalize(v)))) unverified.push('related_sps');
     }
 
-    // Program master fields
     const relProgs = payload.related_programs;
     if (!prog) {
       if (relProgs?.length) unverified.push('related_programs');
     } else {
-      if (relProgs?.some((v) => !prog.programs.map(normalize).includes(normalize(v))))
+      if (relProgs?.some((v) => !sets.programs.has(normalize(v))))
         unverified.push('related_programs');
     }
 
@@ -292,9 +325,10 @@ class MasterCacheService {
     await fs.promises.rename(tmpPath, snapshotPath);
   }
 
-  private readSnapshot(): MasterState {
+  // R7-3: async readFile instead of blocking readFileSync
+  private async readSnapshot(): Promise<MasterState> {
     const snapshotPath = path.join(this.configDir, 'snapshot.json');
-    const raw = fs.readFileSync(snapshotPath, 'utf8');
+    const raw = await fs.promises.readFile(snapshotPath, 'utf8');
     return JSON.parse(raw) as MasterState;
   }
 }

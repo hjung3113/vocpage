@@ -1,6 +1,12 @@
 import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { AppNotification, getNotifications, getUnreadCount, markRead } from '../api/notifications';
+import {
+  AppNotification,
+  getNotifications,
+  getUnreadCount,
+  markRead,
+  markAllRead,
+} from '../api/notifications';
 
 export type { AppNotification };
 
@@ -42,9 +48,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const refetchPanel = useCallback(async () => {
     try {
+      // R7-7: explicit PATCH /read-all before fetching (GET is now read-only)
+      await markAllRead();
       const data = await getNotifications();
       setNotifications(data);
-      // Bulk-read happens server-side on this endpoint; reset unread state locally.
       setUnreadCount(0);
       setHasUrgentUnread(false);
     } catch (err) {

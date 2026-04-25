@@ -1,53 +1,15 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
+import { requireAuth, requireManager } from '../middleware/auth';
 import { applyTagRules } from '../services/autoTag';
 import { emitNotification } from '../services/notifications';
-import { masterCache } from '../services/masterCache';
+import { calcDueDate, STATUS_TRANSITIONS } from '../utils/voc';
+import { subtasksRouter } from './subtasks';
+import { payloadRouter } from './payload';
 
 export const vocRouter = Router();
-
-const DUE_DATE_DAYS: Record<string, number> = {
-  urgent: 7,
-  high: 14,
-  medium: 30,
-  low: 90,
-};
-
-const STATUS_TRANSITIONS: Record<string, string[]> = {
-  접수: ['검토중', '드랍'],
-  검토중: ['처리중', '드랍'],
-  처리중: ['완료', '드랍'],
-  완료: ['처리중'],
-  드랍: ['검토중', '처리중'],
-};
-
-// ── Auth middleware helpers ──────────────────────────────────────────────────
-
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user) {
-    res.status(401).json({ error: 'UNAUTHORIZED' });
-    return;
-  }
-  next();
-}
-
-function requireManager(req: Request, res: Response, next: NextFunction): void {
-  const user = req.user as AuthUser | undefined;
-  if (!user || (user.role !== 'manager' && user.role !== 'admin')) {
-    res.status(403).json({ error: 'FORBIDDEN' });
-    return;
-  }
-  next();
-}
-
-function calcDueDate(priority: string): string {
-  const days = DUE_DATE_DAYS[priority] ?? 30;
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString(); // UTC 'Z' format — avoids local-timezone offset strings that confuse pg-mem
-}
 
 // ── GET /api/vocs ─────────────────────────────────────────────────────────────
 
@@ -79,7 +41,6 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
   const params: unknown[] = [];
   let idx = 1;
 
-  // Role-based filter
   if (user.role === 'user') {
     conditions.push(`v.author_id = $${idx++}`);
     params.push(user.id);
@@ -199,7 +160,6 @@ vocRouter.get('/:id', requireAuth, async (req: Request, res: Response): Promise<
 
     const voc = result.rows[0] as { author_id: string };
 
-    // User can only access their own VOCs
     if (user.role === 'user' && voc.author_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
       return;
@@ -242,10 +202,7 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
     }
 
     // M2: Sub-task system_id/menu_id are immutable
-    const patchBody = req.body as {
-      system_id?: string;
-      menu_id?: string;
-    };
+    const patchBody = req.body as { system_id?: string; menu_id?: string };
     if (voc.parent_id && (patchBody.system_id !== undefined || patchBody.menu_id !== undefined)) {
       res.status(400).json({ error: 'SUBTASK_SYSTEM_MENU_IMMUTABLE' });
       return;
@@ -265,7 +222,6 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
     const params: unknown[] = [];
     let idx = 1;
 
-    // User: only title and body
     if (title !== undefined) {
       updates.push(`title = $${idx++}`);
       params.push(title);
@@ -275,7 +231,6 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
       params.push(body);
     }
 
-    // Manager/Admin: additional fields
     if (user.role === 'manager' || user.role === 'admin') {
       if (assignee_id !== undefined) {
         updates.push(`assignee_id = $${idx++}`);
@@ -285,7 +240,6 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
         updates.push(`priority = $${idx++}`);
         params.push(priority);
       }
-      // due_date: explicit value wins; otherwise recalculate from priority change
       if (due_date !== undefined) {
         updates.push(`due_date = $${idx++}`);
         params.push(due_date);
@@ -321,7 +275,6 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
         logger.warn({ err }, 'auto-tag failed on patch'),
       );
     }
-    // fire-and-forget: notify new assignee — skip self-assign and no-op re-assignments.
     if (
       assignee_id !== undefined &&
       updated.assignee_id &&
@@ -346,7 +299,7 @@ vocRouter.patch(
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    const { status } = req.body as { status?: string; comment?: string };
+    const { status } = req.body as { status?: string };
 
     if (!status) {
       res.status(400).json({ error: 'MISSING_STATUS' });
@@ -379,7 +332,6 @@ vocRouter.patch(
       const updatedVoc = result.rows[0] as { author_id: string };
       res.json(result.rows[0]);
 
-      // fire-and-forget: notify VOC author of status change
       emitNotification({
         pool,
         userId: updatedVoc.author_id,
@@ -389,364 +341,6 @@ vocRouter.patch(
     } catch (err) {
       logger.error({ err }, 'PATCH /api/vocs/:id/status failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
-    }
-  },
-);
-
-// ── POST /api/vocs/:id/payload ────────────────────────────────────────────────
-
-vocRouter.post(
-  '/:id/payload',
-  requireAuth,
-  requireManager,
-  async (req: Request, res: Response): Promise<void> => {
-    const user = req.user as AuthUser;
-    const { id } = req.params;
-    const {
-      equipment,
-      maker,
-      model,
-      process: proc,
-      symptom,
-      root_cause,
-      resolution,
-      status: newStatus,
-    } = req.body as {
-      equipment?: string;
-      maker?: string;
-      model?: string;
-      process?: string;
-      symptom?: string;
-      root_cause?: string;
-      resolution?: string;
-      status?: string;
-      unverified_fields?: string[];
-    };
-
-    if (!symptom?.trim() || !root_cause?.trim() || !resolution?.trim()) {
-      res.status(400).json({ error: 'VALIDATION_FAILED' });
-      return;
-    }
-
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
-      // C2: row-level lock to serialize concurrent payload submissions on the same VOC.
-      const { rows } = await client.query(
-        `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
-        [id],
-      );
-      if (rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.status(404).json({ error: 'NOT_FOUND' });
-        return;
-      }
-      const voc = rows[0] as {
-        status: string;
-        assignee_id: string | null;
-        review_status: string | null;
-      };
-
-      // MEDIUM-2: permission check before transition check to prevent info leakage.
-      if (user.role !== 'admin' && voc.assignee_id !== user.id) {
-        await client.query('ROLLBACK');
-        res.status(403).json({ error: 'FORBIDDEN' });
-        return;
-      }
-
-      // LOW-1: block submission while deletion is pending.
-      if (voc.review_status === 'pending_deletion') {
-        await client.query('ROLLBACK');
-        res
-          .status(400)
-          .json({
-            error: 'INVALID_STATUS_FOR_PAYLOAD',
-            message: 'Cannot submit payload while deletion is pending',
-          });
-        return;
-      }
-
-      // M1: status may be transitioned together with payload submission.
-      const effectiveStatus = newStatus ?? voc.status;
-      if (effectiveStatus !== '완료' && effectiveStatus !== '드랍') {
-        await client.query('ROLLBACK');
-        res.status(400).json({ error: 'INVALID_STATUS_FOR_PAYLOAD' });
-        return;
-      }
-      if (newStatus && !STATUS_TRANSITIONS[voc.status]?.includes(newStatus)) {
-        await client.query('ROLLBACK');
-        res.status(400).json({ error: 'INVALID_TRANSITION' });
-        return;
-      }
-
-      // M2: requirements.md §4 — never trust FE's unverified_fields flags.
-      // BE recomputes via external master cache (§16.3, Phase 7-10).
-      // §16.3: unverified_fields is part of structured_payload by spec design.
-      // FE display may be stale until next submit — acceptable per MVP spec.
-      const payloadForVerify = { equipment, maker, model, process: proc };
-      const payload = {
-        equipment,
-        maker,
-        model,
-        process: proc,
-        symptom,
-        root_cause,
-        resolution,
-        unverified_fields: masterCache.verifyPayload(payloadForVerify),
-      };
-      // M5: wasApproved derived from the FOR UPDATE row inside the transaction.
-      const wasApproved = voc.review_status === 'approved';
-
-      await client.query(
-        `UPDATE voc_payload_history SET is_current = false WHERE voc_id = $1 AND is_current = true`,
-        [id],
-      );
-      const histResult = await client.query(
-        `INSERT INTO voc_payload_history (voc_id, payload, submitted_by, final_state, is_current)
-         VALUES ($1, $2, $3, 'active', true) RETURNING *`,
-        [id, JSON.stringify(payload), user.id],
-      );
-      await client.query(
-        `UPDATE vocs SET structured_payload = $1, review_status = 'unverified', embed_stale = $2,
-           status = COALESCE($3, status), updated_at = now() WHERE id = $4`,
-        [JSON.stringify(payload), wasApproved, newStatus ?? null, id],
-      );
-      await client.query('COMMIT');
-      res.json(histResult.rows[0]);
-    } catch (err: unknown) {
-      await client.query('ROLLBACK').catch(() => {});
-      // C2: UNIQUE INDEX on voc_payload_history(voc_id) WHERE is_current=true
-      // can still race in transaction overlap; surface 409 instead of 500.
-      if ((err as { code?: string }).code === '23505') {
-        res.status(409).json({ error: 'CONCURRENT_SUBMISSION' });
-        return;
-      }
-      logger.error({ err }, 'POST /api/vocs/:id/payload failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    } finally {
-      client.release();
-    }
-  },
-);
-
-// ── PATCH /api/vocs/:id/payload-draft ─────────────────────────────────────────
-
-vocRouter.patch(
-  '/:id/payload-draft',
-  requireAuth,
-  requireManager,
-  async (req: Request, res: Response): Promise<void> => {
-    const user = req.user as AuthUser;
-    const { id } = req.params;
-    const { draft } = req.body as { draft?: Record<string, unknown> };
-
-    try {
-      const { rows } = await pool.query(
-        `SELECT id, status, assignee_id FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
-        [id],
-      );
-      if (rows.length === 0) {
-        res.status(404).json({ error: 'NOT_FOUND' });
-        return;
-      }
-      const voc = rows[0] as { status: string; assignee_id: string | null };
-      if (user.role !== 'admin' && voc.assignee_id !== user.id) {
-        res.status(403).json({ error: 'FORBIDDEN' });
-        return;
-      }
-      // M4: draft only meaningful while VOC is in a payload-eligible state.
-      if (voc.status !== '완료' && voc.status !== '드랍') {
-        res.status(400).json({ error: 'INVALID_STATUS_FOR_DRAFT' });
-        return;
-      }
-      const draftValue = draft && Object.keys(draft).length > 0 ? JSON.stringify(draft) : null;
-      await pool.query(
-        `UPDATE vocs SET structured_payload_draft = $1, updated_at = now() WHERE id = $2`,
-        [draftValue, id],
-      );
-      res.json({ ok: true });
-    } catch (err) {
-      logger.error({ err }, 'PATCH /api/vocs/:id/payload-draft failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    }
-  },
-);
-
-// ── GET /api/vocs/:id/payload-history ─────────────────────────────────────────
-
-vocRouter.get(
-  '/:id/payload-history',
-  requireAuth,
-  requireManager,
-  async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    try {
-      const { rows } = await pool.query(
-        `SELECT id FROM vocs WHERE id = $1 AND deleted_at IS NULL`,
-        [id],
-      );
-      if (rows.length === 0) {
-        res.status(404).json({ error: 'NOT_FOUND' });
-        return;
-      }
-      const histResult = await pool.query(
-        `SELECT * FROM voc_payload_history WHERE voc_id = $1 ORDER BY submitted_at DESC`,
-        [id],
-      );
-      res.json(histResult.rows);
-    } catch (err) {
-      logger.error({ err }, 'GET /api/vocs/:id/payload-history failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    }
-  },
-);
-
-// ── POST /api/vocs/:id/payload-review ─────────────────────────────────────────
-
-vocRouter.post(
-  '/:id/payload-review',
-  requireAuth,
-  requireManager,
-  async (req: Request, res: Response): Promise<void> => {
-    const user = req.user as AuthUser;
-    const { id } = req.params;
-    const { decision, comment } = req.body as { decision?: string; comment?: string | null };
-
-    if (decision !== 'approved' && decision !== 'rejected') {
-      res.status(400).json({ error: 'VALIDATION_FAILED' });
-      return;
-    }
-
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const { rows } = await client.query(
-        `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
-        [id],
-      );
-      if (rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.status(404).json({ error: 'NOT_FOUND' });
-        return;
-      }
-      const voc = rows[0] as { review_status: string | null };
-      const rs = voc.review_status;
-      if (rs !== 'unverified' && rs !== 'pending_deletion') {
-        await client.query('ROLLBACK');
-        res.status(400).json({ error: 'INVALID_REVIEW_STATUS' });
-        return;
-      }
-
-      // MEDIUM-1: MVP self-review prevention — check submitted_by against reviewer.
-      const histRow = await client.query(
-        `SELECT submitted_by FROM voc_payload_history WHERE voc_id = $1 AND is_current = true`,
-        [id],
-      );
-      if (histRow.rows.length > 0 && histRow.rows[0].submitted_by === user.id) {
-        await client.query('ROLLBACK');
-        res.status(403).json({ error: 'SELF_REVIEW_NOT_ALLOWED' });
-        return;
-      }
-
-      const action = rs === 'unverified' ? 'submission' : 'deletion';
-
-      await client.query(
-        `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [id, action, user.id, decision, comment ?? null],
-      );
-
-      if (action === 'submission') {
-        if (decision === 'approved') {
-          await client.query(
-            `UPDATE vocs SET review_status = 'approved', embed_stale = false, updated_at = now() WHERE id = $1`,
-            [id],
-          );
-          await client.query(
-            `UPDATE voc_payload_history SET final_state = 'approved' WHERE voc_id = $1 AND is_current = true`,
-            [id],
-          );
-        } else {
-          await client.query(
-            `UPDATE vocs SET review_status = 'rejected', updated_at = now() WHERE id = $1`,
-            [id],
-          );
-          await client.query(
-            `UPDATE voc_payload_history SET final_state = 'rejected', is_current = false WHERE voc_id = $1 AND is_current = true`,
-            [id],
-          );
-        }
-      } else {
-        // deletion
-        if (decision === 'approved') {
-          await client.query(
-            `UPDATE vocs SET structured_payload = NULL, review_status = NULL, updated_at = now() WHERE id = $1`,
-            [id],
-          );
-          await client.query(
-            `UPDATE voc_payload_history SET final_state = 'deleted', is_current = false WHERE voc_id = $1 AND is_current = true`,
-            [id],
-          );
-        } else {
-          await client.query(
-            `UPDATE vocs SET review_status = 'approved', updated_at = now() WHERE id = $1`,
-            [id],
-          );
-        }
-      }
-
-      await client.query('COMMIT');
-      res.json({ ok: true });
-    } catch (err) {
-      await client.query('ROLLBACK').catch(() => {});
-      logger.error({ err }, 'POST /api/vocs/:id/payload-review failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    } finally {
-      client.release();
-    }
-  },
-);
-
-// ── POST /api/vocs/:id/payload-delete-request ─────────────────────────────────
-
-vocRouter.post(
-  '/:id/payload-delete-request',
-  requireAuth,
-  requireManager,
-  async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const { rows } = await client.query(
-        `SELECT review_status FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
-        [id],
-      );
-      if (rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.status(404).json({ error: 'NOT_FOUND' });
-        return;
-      }
-      if (rows[0].review_status !== 'approved') {
-        await client.query('ROLLBACK');
-        res
-          .status(400)
-          .json({ error: 'INVALID_STATUS', message: 'review_status must be approved' });
-        return;
-      }
-      await client.query(
-        `UPDATE vocs SET review_status = 'pending_deletion', updated_at = now() WHERE id = $1`,
-        [id],
-      );
-      await client.query('COMMIT');
-      res.json({ ok: true });
-    } catch (err) {
-      await client.query('ROLLBACK').catch(() => {});
-      logger.error({ err }, 'POST /api/vocs/:id/payload-delete-request failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    } finally {
-      client.release();
     }
   },
 );
@@ -774,7 +368,6 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
 
     const voc = vocRows[0] as { id: string; author_id: string };
 
-    // C2: users may only delete their own VOCs; manager/admin can delete any
     if (user.role === 'user' && voc.author_id !== user.id) {
       await client.query('ROLLBACK');
       res.status(403).json({ error: 'FORBIDDEN' });
@@ -789,8 +382,6 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
     await client.query(`UPDATE vocs SET deleted_at = NOW() WHERE id = $1 AND deleted_at IS NULL`, [
       id,
     ]);
-
-    // Sub-task cascade soft delete
     await client.query(
       `UPDATE vocs SET deleted_at = NOW() WHERE parent_id = $1 AND deleted_at IS NULL`,
       [id],
@@ -807,209 +398,7 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
   }
 });
 
-// ── GET /api/vocs/:id/subtasks ────────────────────────────────────────────────
+// ── Sub-routers (R7-10) ───────────────────────────────────────────────────────
 
-vocRouter.get('/:id/subtasks', requireAuth, async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
-  try {
-    const parent = await pool.query(`SELECT id FROM vocs WHERE id = $1 AND deleted_at IS NULL`, [
-      id,
-    ]);
-    if (parent.rowCount === 0) {
-      res.status(404).json({ error: 'NOT_FOUND' });
-      return;
-    }
-    const { rows } = await pool.query(
-      `SELECT * FROM vocs WHERE parent_id = $1 AND deleted_at IS NULL ORDER BY created_at ASC`,
-      [id],
-    );
-    res.json(rows);
-  } catch (err) {
-    logger.error({ err }, 'GET /api/vocs/:id/subtasks failed');
-    res.status(500).json({ error: 'INTERNAL_ERROR' });
-  }
-});
-
-// ── POST /api/vocs/:id/subtasks ───────────────────────────────────────────────
-
-vocRouter.post('/:id/subtasks', requireAuth, async (req: Request, res: Response): Promise<void> => {
-  const user = req.user as AuthUser;
-  const { id } = req.params;
-  const { title, body, priority, voc_type_id, assignee_id } = req.body as {
-    title?: string;
-    body?: string;
-    priority?: string;
-    voc_type_id?: string;
-    assignee_id?: string;
-  };
-
-  if (!title || !title.trim()) {
-    res.status(400).json({ error: 'VALIDATION_FAILED' });
-    return;
-  }
-  if (!voc_type_id) {
-    res.status(400).json({ error: 'VALIDATION_FAILED' });
-    return;
-  }
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-
-    // Lock parent row to serialize concurrent sub-task creation
-    const { rows: parentRows } = await client.query(
-      `SELECT * FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
-      [id],
-    );
-    if (parentRows.length === 0) {
-      await client.query('ROLLBACK');
-      res.status(404).json({ error: 'NOT_FOUND' });
-      return;
-    }
-    const parent = parentRows[0] as {
-      id: string;
-      parent_id: string | null;
-      issue_code: string;
-      system_id: string;
-      menu_id: string;
-    };
-
-    // 1-level limit
-    if (parent.parent_id) {
-      await client.query('ROLLBACK');
-      res.status(400).json({ error: 'SUBTASK_NESTING_NOT_ALLOWED' });
-      return;
-    }
-
-    // M4: voc_type_id existence check (inside transaction)
-    const { rows: typeRows } = await client.query(
-      `SELECT id FROM voc_types WHERE id = $1 AND is_archived = false`,
-      [voc_type_id],
-    );
-    if (!typeRows[0]) {
-      await client.query('ROLLBACK');
-      res.status(400).json({ error: 'INVALID_VOC_TYPE' });
-      return;
-    }
-
-    // M4: assignee_id existence check (if provided)
-    if (assignee_id) {
-      const { rows: userRows } = await client.query(`SELECT id FROM users WHERE id = $1`, [
-        assignee_id,
-      ]);
-      if (!userRows[0]) {
-        await client.query('ROLLBACK');
-        res.status(400).json({ error: 'INVALID_ASSIGNEE' });
-        return;
-      }
-    }
-
-    // Sequential numbering — include soft-deleted to prevent reuse
-    const { rows: countRows } = await client.query(
-      `SELECT COUNT(*)::int + 1 AS next_n FROM vocs WHERE parent_id = $1`,
-      [id],
-    );
-    const nextN = countRows[0].next_n as number;
-    const issueCode = `${parent.issue_code}-${nextN}`;
-    const effectivePriority = priority ?? 'medium';
-    const dueDate = calcDueDate(effectivePriority);
-
-    // Pre-populate sequence_no & issue_code so the BEFORE INSERT trigger (WHEN sequence_no IS NULL) does not fire.
-    const { rows: createdRows } = await client.query(
-      `INSERT INTO vocs (title, body, status, priority, author_id, system_id, menu_id, voc_type_id, assignee_id, parent_id, issue_code, sequence_no, due_date, source)
-         VALUES ($1, $2, '접수', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'manual')
-         RETURNING *`,
-      [
-        title,
-        body ?? '',
-        effectivePriority,
-        user.id,
-        parent.system_id,
-        parent.menu_id,
-        voc_type_id,
-        assignee_id ?? null,
-        id,
-        issueCode,
-        nextN,
-        dueDate,
-      ],
-    );
-
-    await client.query('COMMIT');
-
-    const created = createdRows[0] as { id: string; title: string; body: string | null };
-
-    // Sub-task auto-tagging — fire-and-forget outside transaction
-    applyTagRules(created.id, created.title, created.body ?? '', pool).catch((err) =>
-      logger.warn({ err }, 'subtask auto-tag failed'),
-    );
-
-    res.status(201).json(created);
-  } catch (err: unknown) {
-    await client.query('ROLLBACK');
-    if ((err as { code?: string }).code === '23505') {
-      res.status(409).json({ error: 'CONCURRENT_SUBTASK_CREATION' });
-      return;
-    }
-    logger.error({ err }, 'POST /api/vocs/:id/subtasks failed');
-    res.status(500).json({ error: 'INTERNAL_ERROR' });
-  } finally {
-    client.release();
-  }
-});
-
-// ── GET /api/vocs/:id/incomplete-subtasks ─────────────────────────────────────
-
-vocRouter.get(
-  '/:id/incomplete-subtasks',
-  requireAuth,
-  async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    try {
-      const { rows } = await pool.query(
-        `SELECT COUNT(*)::int AS count FROM vocs
-         WHERE parent_id = $1 AND deleted_at IS NULL AND status NOT IN ('완료','드랍')`,
-        [id],
-      );
-      res.json({ count: rows[0].count });
-    } catch (err) {
-      logger.error({ err }, 'GET /api/vocs/:id/incomplete-subtasks failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    }
-  },
-);
-
-// ── POST /api/vocs/:id/masters/refresh ──────────────────────────────────────
-// :id is accepted but ignored — triggers global master cache refresh (§16.3).
-
-vocRouter.post(
-  '/:id/masters/refresh',
-  requireAuth,
-  requireManager,
-  async (req: Request, res: Response): Promise<void> => {
-    const user = req.user as AuthUser;
-    try {
-      const result = await masterCache.refresh(user.id);
-      if (!result.swapped) {
-        res.status(503).json(result);
-        return;
-      }
-      res.json(result);
-    } catch (err: unknown) {
-      if (
-        err !== null &&
-        typeof err === 'object' &&
-        'code' in err &&
-        (err as { code: string }).code === 'RATE_LIMITED'
-      ) {
-        res.status(429).json({
-          error: 'RATE_LIMITED',
-          retryAfter: (err as unknown as { retryAfter: number }).retryAfter,
-        });
-        return;
-      }
-      logger.error({ err }, 'POST /api/vocs/:id/masters/refresh failed');
-      res.status(500).json({ error: 'INTERNAL_ERROR' });
-    }
-  },
-);
+vocRouter.use('/', subtasksRouter);
+vocRouter.use('/', payloadRouter);

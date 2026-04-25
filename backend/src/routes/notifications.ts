@@ -1,18 +1,11 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { pool } from '../db';
 import logger from '../logger';
 import type { AuthUser } from '../auth/types';
+import { requireAuth } from '../middleware/auth';
 import { RETENTION_DAYS } from '../services/notifications';
 
 export const notificationRouter = Router();
-
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user) {
-    res.status(401).json({ error: 'UNAUTHORIZED' });
-    return;
-  }
-  next();
-}
 
 function buildMessage(type: string, vocTitle: string, newStatus?: string): string {
   if (type === 'comment') return `"${vocTitle}" VOC에 새 댓글이 달렸습니다.`;
@@ -22,21 +15,11 @@ function buildMessage(type: string, vocTitle: string, newStatus?: string): strin
   return '';
 }
 
-// GET /api/notifications — opening the panel marks all as read in bulk (spec §8.14).
+// GET /api/notifications — returns recent notifications (read-only, spec §8.14 bulk-read is explicit via PATCH /read-all)
 notificationRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<void> => {
   const user = req.user as AuthUser;
 
   try {
-    // 1. Bulk-mark all unread as read for this user.
-    await pool.query(
-      `UPDATE notifications SET read_at = NOW() WHERE user_id = $1 AND read_at IS NULL`,
-      [user.id],
-    );
-
-    // 2. Select recent notifications, excluding soft-deleted VOCs and notifications
-    //    that have been read for more than RETENTION_DAYS days.
-    //    NOTE: status_change messages currently use the VOC's *current* status from the
-    //    join — point-in-time accuracy is a known limitation (no metadata column yet).
     const result = await pool.query(
       `SELECT n.id, n.user_id, n.type, n.voc_id,
               n.read_at IS NOT NULL AS is_read,
@@ -83,6 +66,25 @@ notificationRouter.get('/', requireAuth, async (req: Request, res: Response): Pr
   }
 });
 
+// PATCH /api/notifications/read-all — idempotent bulk mark-as-read (R7-7: split from GET)
+notificationRouter.patch(
+  '/read-all',
+  requireAuth,
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as AuthUser;
+    try {
+      await pool.query(
+        `UPDATE notifications SET read_at = NOW() WHERE user_id = $1 AND read_at IS NULL`,
+        [user.id],
+      );
+      res.json({ ok: true });
+    } catch (err) {
+      logger.error({ err }, 'PATCH /api/notifications/read-all failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
 // GET /api/notifications/unread-count
 notificationRouter.get(
   '/unread-count',
@@ -109,7 +111,6 @@ notificationRouter.get(
       const count = typeof row.count === 'string' ? parseInt(row.count, 10) : (row.count ?? 0);
       const maxTs = row.max_ts == null ? '0' : String(row.max_ts);
       const hasUrgent = row.has_urgent ?? false;
-      // ETag includes max_ts so a new alert with the same count still busts caches.
       const etag = `W/"${count}-${maxTs}"`;
 
       const ifNoneMatch = req.headers['if-none-match'];
@@ -127,7 +128,7 @@ notificationRouter.get(
   },
 );
 
-// PATCH /api/notifications/:id/read — idempotent, only flips when still unread.
+// PATCH /api/notifications/:id/read — idempotent single-notification mark-as-read
 notificationRouter.patch(
   '/:id/read',
   requireAuth,
@@ -151,7 +152,6 @@ notificationRouter.patch(
         return;
       }
 
-      // Idempotent: only update unread rows; already-read rows preserve their original read_at.
       await pool.query(
         `UPDATE notifications SET read_at = NOW() WHERE id = $1 AND user_id = $2 AND read_at IS NULL`,
         [id, user.id],
