@@ -1,0 +1,6 @@
+{
+  "equipment": ["Press-A", "Lathe-B", "Mill-C"],
+  "maker": ["OEM Korea", "기계공업", "Alpha Tech"],
+  "model": ["PR-100", "LT-200", "ML-300"],
+  "process": ["용접", "절삭", "조립"]
+}

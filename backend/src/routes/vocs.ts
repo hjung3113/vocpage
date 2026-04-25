@@ -4,6 +4,7 @@ import logger from '../logger';
 import type { AuthUser } from '../auth/types';
 import { applyTagRules } from '../services/autoTag';
 import { emitNotification } from '../services/notifications';
+import { masterCache } from '../services/masterCache';
 
 export const vocRouter = Router();
 
@@ -465,8 +466,9 @@ vocRouter.post(
         return;
       }
 
-      // M2: requirements.md §4 — never trust FE's unverified_fields flags. BE will recompute
-      // after §16.3 external master cache lands (Phase 7-10). MVP: force empty array.
+      // M2: requirements.md §4 — never trust FE's unverified_fields flags.
+      // BE recomputes via external master cache (§16.3, Phase 7-10).
+      const payloadForVerify = { equipment, maker, model, process: proc };
       const payload = {
         equipment,
         maker,
@@ -475,7 +477,7 @@ vocRouter.post(
         symptom,
         root_cause,
         resolution,
-        unverified_fields: [] as string[],
+        unverified_fields: masterCache.verifyPayload(payloadForVerify),
       };
       // M5: wasApproved derived from the FOR UPDATE row inside the transaction.
       const wasApproved = voc.review_status === 'approved';
@@ -937,6 +939,43 @@ vocRouter.get(
       res.json({ count: rows[0].count });
     } catch (err) {
       logger.error({ err }, 'GET /api/vocs/:id/incomplete-subtasks failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── POST /api/vocs/:id/masters/refresh ──────────────────────────────────────
+// :id is accepted but ignored — triggers global master cache refresh (§16.3).
+
+vocRouter.post(
+  '/:id/masters/refresh',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as AuthUser;
+    try {
+      const result = await masterCache.refresh(user.id);
+      if (!result.swapped) {
+        res.status(503).json(result);
+        return;
+      }
+      res.json(result);
+    } catch (err: unknown) {
+      if (
+        err !== null &&
+        typeof err === 'object' &&
+        'code' in err &&
+        (err as { code: string }).code === 'RATE_LIMITED'
+      ) {
+        res
+          .status(429)
+          .json({
+            error: 'RATE_LIMITED',
+            retryAfter: (err as unknown as { retryAfter: number }).retryAfter,
+          });
+        return;
+      }
+      logger.error({ err }, 'POST /api/vocs/:id/masters/refresh failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
     }
   },

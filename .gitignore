@@ -40,3 +40,6 @@ admin-*.png
 
 # Uploads (multer)
 uploads/
+
+# External master snapshot (auto-generated at runtime)
+backend/config/masters/snapshot.json
