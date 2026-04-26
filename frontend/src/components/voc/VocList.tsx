@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 import { listSubtasks, type VocSummary } from '../../api/vocs';
 import { VocRow } from './VocRow';
 import { Pagination } from '../common/Pagination';
@@ -25,11 +25,11 @@ interface HeaderDef {
 
 const HEADERS: HeaderDef[] = [
   { label: '이슈 ID', width: '180px' },
-  { label: '제목' },
-  { label: '상태', width: '76px' },
+  { label: '제목', sortKey: 'title' },
+  { label: '상태', sortKey: 'status', width: '76px' },
   { label: '담당자', width: '96px' },
-  { label: '우선순위', sortKey: 'priority', width: '76px' },
-  { label: '등록일', sortKey: 'created_at', width: '86px' },
+  { label: '우선순위', sortKey: 'priority', width: '80px' },
+  { label: '등록일', sortKey: 'created_at', width: '96px' },
 ];
 
 type VocListItem = VocSummary & {
@@ -168,8 +168,16 @@ export function VocList({
                   >
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
                       {label}
-                      {isActive &&
-                        (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      {isSortable &&
+                        (isActive ? (
+                          sortOrder === 'asc' ? (
+                            <ChevronUp size={13} />
+                          ) : (
+                            <ChevronDown size={13} />
+                          )
+                        ) : (
+                          <ChevronsUpDown size={13} style={{ opacity: 0.35 }} />
+                        ))}
                     </span>
                   </th>
                 );

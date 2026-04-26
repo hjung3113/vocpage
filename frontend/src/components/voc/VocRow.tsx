@@ -203,7 +203,10 @@ export function VocRow({
       </td>
 
       {/* 제목 (type badge + title + tags) */}
-      <td className="px-3 py-2.5" style={{ minWidth: 0 }}>
+      <td
+        className="px-3 py-2.5"
+        style={{ minWidth: 0, paddingLeft: isChild ? '28px' : undefined }}
+      >
         <div
           style={{
             display: 'grid',
@@ -227,17 +230,17 @@ export function VocRow({
                   flexShrink: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  padding: '2px 7px',
-                  borderRadius: '9999px',
-                  fontSize: '12px',
+                  padding: '1px 6px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
                   fontWeight: 600,
                   background: typeBadge.bg,
                   border: `1px solid ${typeBadge.border}`,
                   color: typeBadge.color,
                   whiteSpace: 'nowrap',
+                  lineHeight: '18px',
                 }}
               >
-                <span style={{ marginRight: '4px', fontSize: '9px', lineHeight: 1 }}>●</span>
                 {voc.voc_type_name}
               </span>
             )}
@@ -305,7 +308,7 @@ export function VocRow({
       {/* 등록일 */}
       <td
         className="px-3 py-2.5 text-xs"
-        style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}
+        style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', paddingRight: '20px' }}
       >
         {formatDate(voc.created_at)}
       </td>
