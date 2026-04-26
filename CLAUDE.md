@@ -62,6 +62,9 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 - **Parallel tool calls** — independent tool calls go in one message, not sequential
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe test output through `| tail -20`; never print full traces
+- **No Read before delete** — files being deleted must never be Read first; just `rm`
+- **Broad grep first pass** — use `--all` and wide keywords on first `git log` grep; never retry with a narrower pattern
+- **Minimum context for decisions** — "문서 업데이트" and similar judgment tasks: use only the single most relevant file (e.g. `claude-progress.txt`); do not open supporting files (next-session-tasks, git log, etc.) unless the first file is insufficient
 - **Git workflow** — always create a feature branch first, commit and push there. Never commit or push directly to main. Branch naming: `docs/<topic>`, `feat/<topic>`, `fix/<topic>`.
   - PRs are opened by the user, not by Claude
   - Merge PRs with `gh pr merge <n> --merge --delete-branch` — `--squash` and `--rebase` are forbidden
