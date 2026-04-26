@@ -1,0 +1,21 @@
+{
+  "equipment": {
+    "equipment": ["Press-A", "Lathe-B", "Mill-C"],
+    "maker": ["OEM Korea", "기계공업", "Alpha Tech"],
+    "model": ["PR-100", "LT-200", "ML-300"],
+    "process": ["용접", "절삭", "조립"],
+    "loaded_at": "2026-04-26T12:36:07.262Z"
+  },
+  "db": {
+    "db_tables": ["users", "vocs", "comments"],
+    "jobs": ["nightly_backup", "weekly_report"],
+    "sps": ["sp_get_voc", "sp_update_status"],
+    "loaded_at": "2026-04-26T12:36:07.262Z"
+  },
+  "program": {
+    "programs": ["ERP_BATCH_DAILY", "MES_SYNC_HOURLY", "REPORT_WEEKLY"],
+    "loaded_at": "2026-04-26T12:36:07.262Z"
+  },
+  "mode": "live",
+  "loaded_at": "2026-04-26T12:36:07.262Z"
+}
