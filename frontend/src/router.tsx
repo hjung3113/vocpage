@@ -6,10 +6,6 @@ import { NoticePopup } from './components/common/NoticePopup';
 import { useNoticePopup } from './hooks/useNoticePopup';
 import { AuthContext } from './contexts/AuthContext';
 
-const DashboardPage = lazy(() =>
-  import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
-);
-
 const NoticePage = lazy(() =>
   import('./pages/NoticePage').then((m) => ({ default: m.NoticePage })),
 );
@@ -62,14 +58,6 @@ export const router = createBrowserRouter([
       {
         path: '/mock-login',
         element: <MockLoginRoute />,
-      },
-      {
-        path: '/dashboard',
-        element: (
-          <Suspense fallback={null}>
-            <DashboardPage />
-          </Suspense>
-        ),
       },
       {
         path: '/notices',
