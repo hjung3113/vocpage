@@ -4,11 +4,17 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~8 ✅ 완료 → 네비바/상태배지 버그픽스 PR #41 merge 완료 → VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료 → role 기반 목록 필터 제거 → **VOC 목록 세밀 UI 갭 수정 완료 (feat/align-seed-to-prototype) → PR 열고 Phase 9 시작**
+현재 위치: Phase 0~8 ✅ 완료 → 네비바/상태배지 버그픽스 PR #41 merge 완료 → VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료 → role 기반 목록 필터 제거 → VOC 목록 세밀 UI 갭 수정 완료 → **feat/align-seed-to-prototype PR merge 완료 → Phase 9 시작**
 
 브랜치: feat/align-seed-to-prototype
 
-최근 작업 (2026-04-26):
+최근 작업 (2026-04-26, feat/align-seed-to-prototype 브랜치):
+- VOC 테이블 세밀 UI 수정 (benchmark/01, benchmark/11 기준):
+  - 타입 배지: pill(9999px) → 사각형(4px radius), ● dot 제거, 11px font
+  - 테이블 오른쪽 여백: 등록일 컬럼 paddingRight 20px 추가
+  - 서브태스크 인덴트: child row 이슈ID·제목 셀 각각 paddingLeft 28px
+  - 컬럼 정렬: 제목(title)·상태(status) 정렬 추가, 비활성 컬럼 ↕ muted 아이콘
+  - 등록일 컬럼 width 86→96px (날짜 잘림 방지)
 - VOC 목록 UI/UX 세밀 갭 분석 완료 → docs/specs/reviews/voc-list-ui-ux-gaps.md
   - 5개 에이전트 병렬 분석 (글자크기/색상, 태그·상태 모양, 유형 배지, 이슈ID, 테이블 여백·열 넓이)
   - 다음 세션에 수정 예정 (목록은 아래 next-session-tasks.md 참조)
