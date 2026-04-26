@@ -1,5 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Editor } from '@toast-ui/react-editor';
+import '@toast-ui/editor/dist/toastui-editor.css';
 import { createVoc } from '../../api/vocs';
+import {
+  listAdminSystems,
+  listAdminMenus,
+  listVocTypes,
+  type SystemItem,
+  type MenuItem,
+  type VocType,
+} from '../../api/admin';
 
 interface VocCreateModalProps {
   isOpen: boolean;
@@ -7,57 +17,49 @@ interface VocCreateModalProps {
   onCreated: () => void;
 }
 
-// Dummy data — will be replaced with real API in Phase 7-6
-const DUMMY_SYSTEMS = [
-  { id: 'sys-001', name: '고객지원 시스템' },
-  { id: 'sys-002', name: '주문 관리 시스템' },
-  { id: 'sys-003', name: '재고 관리 시스템' },
-];
-
-const DUMMY_MENUS: Record<string, Array<{ id: string; name: string }>> = {
-  'sys-001': [
-    { id: 'menu-001', name: '문의 접수' },
-    { id: 'menu-002', name: '반품/교환' },
-  ],
-  'sys-002': [
-    { id: 'menu-003', name: '주문 조회' },
-    { id: 'menu-004', name: '주문 취소' },
-  ],
-  'sys-003': [
-    { id: 'menu-005', name: '재고 조회' },
-    { id: 'menu-006', name: '입출고 관리' },
-  ],
-};
-
-const DUMMY_TYPES = [
-  { id: 'type-001', name: '버그 신고' },
-  { id: 'type-002', name: '기능 개선' },
-  { id: 'type-003', name: '사용 문의' },
-];
-
 export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalProps) {
   const [title, setTitle] = useState('');
   const [systemId, setSystemId] = useState('');
   const [menuId, setMenuId] = useState('');
   const [vocTypeId, setVocTypeId] = useState('');
-  const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const menus = systemId ? (DUMMY_MENUS[systemId] ?? []) : [];
+  const [systems, setSystems] = useState<SystemItem[]>([]);
+  const [menus, setMenus] = useState<MenuItem[]>([]);
+  const [vocTypes, setVocTypes] = useState<VocType[]>([]);
 
-  function handleSystemChange(value: string) {
-    setSystemId(value);
+  const editorRef = useRef<Editor>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    listAdminSystems()
+      .then(setSystems)
+      .catch(() => {});
+    listVocTypes()
+      .then(setVocTypes)
+      .catch(() => {});
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!systemId) {
+      setMenus([]);
+      setMenuId('');
+      return;
+    }
+    listAdminMenus(systemId)
+      .then(setMenus)
+      .catch(() => setMenus([]));
     setMenuId('');
-  }
+  }, [systemId]);
 
   function resetForm() {
     setTitle('');
     setSystemId('');
     setMenuId('');
     setVocTypeId('');
-    setBody('');
     setError(null);
+    editorRef.current?.getInstance().reset();
   }
 
   function handleClose() {
@@ -84,6 +86,8 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
       return;
     }
 
+    const body = editorRef.current?.getInstance().getMarkdown() ?? '';
+
     setIsSubmitting(true);
     setError(null);
     try {
@@ -106,27 +110,29 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
 
   if (!isOpen) return null;
 
+  const selectStyle = {
+    background: 'var(--bg-surface)',
+    color: 'var(--text-primary)',
+    border: '1px solid var(--border)',
+    borderRadius: '6px',
+    padding: '6px 10px',
+    fontSize: '13px',
+    width: '100%',
+  };
+
   return (
     <>
-      {/* Overlay */}
       <div
         onClick={handleClose}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'var(--overlay-bg)',
-          zIndex: 60,
-        }}
+        style={{ position: 'fixed', inset: 0, background: 'var(--overlay-bg)', zIndex: 60 }}
       />
-
-      {/* Modal */}
       <div
         style={{
           position: 'fixed',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '560px',
+          width: '640px',
           maxWidth: 'calc(100vw - 32px)',
           maxHeight: 'calc(100vh - 64px)',
           background: 'var(--bg-panel)',
@@ -141,7 +147,7 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
         aria-modal="true"
         aria-labelledby="voc-create-title"
       >
-        {/* Modal header */}
+        {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-4 shrink-0"
           style={{ borderBottom: '1px solid var(--border)' }}
@@ -155,20 +161,20 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
           </h2>
           <button
             onClick={handleClose}
-            className="px-2 py-1 rounded text-sm"
-            style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+            style={{ color: 'var(--text-tertiary)', lineHeight: 1, fontSize: '18px' }}
             aria-label="닫기"
           >
             ✕
           </button>
         </div>
 
-        {/* Form */}
+        {/* Body */}
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4 px-6 py-4 overflow-auto flex-1"
+          className="flex flex-col gap-4 px-6 py-5 overflow-y-auto"
+          style={{ flex: 1 }}
         >
-          {/* Title */}
+          {/* 제목 */}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
               제목 <span style={{ color: 'var(--danger)' }}>*</span>
@@ -187,56 +193,46 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
             />
           </div>
 
-          {/* System */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-              시스템 <span style={{ color: 'var(--danger)' }}>*</span>
-            </label>
-            <select
-              value={systemId}
-              onChange={(e) => handleSystemChange(e.target.value)}
-              className="px-3 py-2 rounded text-sm"
-              style={{
-                background: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <option value="">시스템 선택</option>
-              {DUMMY_SYSTEMS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+          {/* 시스템 + 메뉴 */}
+          <div className="flex gap-3">
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                시스템 <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <select
+                value={systemId}
+                onChange={(e) => setSystemId(e.target.value)}
+                style={selectStyle}
+              >
+                <option value="">시스템 선택</option>
+                {systems.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                메뉴 <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <select
+                value={menuId}
+                onChange={(e) => setMenuId(e.target.value)}
+                style={selectStyle}
+                disabled={!systemId}
+              >
+                <option value="">메뉴 선택</option>
+                {menus.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Menu */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-              메뉴 <span style={{ color: 'var(--danger)' }}>*</span>
-            </label>
-            <select
-              value={menuId}
-              onChange={(e) => setMenuId(e.target.value)}
-              disabled={!systemId}
-              className="px-3 py-2 rounded text-sm"
-              style={{
-                background: 'var(--bg-surface)',
-                color: systemId ? 'var(--text-primary)' : 'var(--text-muted)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <option value="">{systemId ? '메뉴 선택' : '시스템을 먼저 선택하세요'}</option>
-              {menus.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* VOC Type */}
+          {/* VOC 유형 */}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
               유형 <span style={{ color: 'var(--danger)' }}>*</span>
@@ -244,15 +240,10 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
             <select
               value={vocTypeId}
               onChange={(e) => setVocTypeId(e.target.value)}
-              className="px-3 py-2 rounded text-sm"
-              style={{
-                background: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              style={selectStyle}
             >
               <option value="">유형 선택</option>
-              {DUMMY_TYPES.map((t) => (
+              {vocTypes.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
                 </option>
@@ -260,24 +251,23 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
             </select>
           </div>
 
-          {/* Body */}
+          {/* 내용 — Toast UI Editor */}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
               내용
             </label>
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="VOC 내용을 입력하세요"
-              rows={5}
-              className="px-3 py-2 rounded text-sm resize-y"
-              style={{
-                background: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-                fontFamily: 'inherit',
-              }}
-            />
+            <div
+              style={{ border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}
+            >
+              <Editor
+                ref={editorRef}
+                initialEditType="wysiwyg"
+                previewStyle="vertical"
+                height="220px"
+                placeholder="VOC 내용을 입력하세요 (Markdown 지원)"
+                hideModeSwitch={true}
+              />
+            </div>
           </div>
 
           {error && (
@@ -292,10 +282,7 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
               type="button"
               onClick={handleClose}
               className="px-4 py-2 rounded text-sm"
-              style={{
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
+              style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
             >
               취소
             </button>

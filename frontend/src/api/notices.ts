@@ -15,7 +15,8 @@ export interface Notice {
 export async function listNotices(): Promise<Notice[]> {
   const res = await fetch('/api/notices');
   if (!res.ok) throw new Error(`listNotices: ${res.status}`);
-  return res.json();
+  const json = (await res.json()) as { data: Notice[] };
+  return json.data;
 }
 
 export async function listPopupNotices(): Promise<{ notices: Notice[] }> {

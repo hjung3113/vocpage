@@ -26,9 +26,9 @@ export interface VocType {
 
 export interface UserItem {
   id: string;
-  name: string;
+  display_name: string;
   email: string;
-  ad_account: string;
+  ad_username: string;
   role: 'user' | 'manager' | 'admin';
   is_active: boolean;
   created_at: string;

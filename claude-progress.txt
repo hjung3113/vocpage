@@ -4,11 +4,37 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ → 프로토타입 갭 리뷰 완료 → **Phase 7 잔여 갭 수정 완료 (Step 1~8)** → Phase 8 착수 가능
+현재 위치: Phase 0~7 ✅ → **feat/voc-seeds-toastui-fix PR 대기** → Phase 8 직전 버그 수정 필요
 
-브랜치: `docs/screenshot-preview` (커밋 d79dd61)
-테스트: BE 17 suites 229 passed, FE 빌드 통과 (tsc + vite)
+브랜치: `feat/voc-seeds-toastui-fix` (커밋 2edd0d0) — PR 미머지
+테스트: Playwright E2E 전체 기능 검증 완료 (2026-04-26)
 갭 리뷰: `docs/specs/reviews/phase7-prototype-design-gap-2026-04-26.md`
+
+### 다음 세션 — Phase 7 Playwright 테스트 발견 버그 수정 (우선순위 순)
+
+| # | 위치 | 내용 | 심각도 |
+|---|------|------|--------|
+| B-1 | VOC 목록 | 이슈 코드 전체 "—" — DB 트리거 미작동 또는 시드 issue_code 누락 | 🔴 |
+| B-2 | VOC Drawer | 내부노트 탭 없음 — Admin/Manager 로그인 시 표시되어야 함 | 🔴 |
+| B-3 | 대시보드 KPI | 총 VOC·이번주 완료·해결율·14일+ 미처리 "—" — API 쿼리 문제 | 🟡 |
+| B-4 | 대시보드 드릴다운 | 시스템명 대신 UUID 표시 — 히트맵 row 조인 누락 | 🟡 |
+| B-5 | 새 VOC 등록 | Toast UI Editor Write/Preview 텍스트 중복 노출 | 🟡 |
+| B-6 | 사용자 관리 | 이름·AD계정 열 비어있음 — 시드 users 데이터 미포함 | 🟢 |
+| B-7 | 알림 버튼 | Sidebar div가 포인터 이벤트 차단 — z-index/overlay 이슈 | 🟢 |
+
+이번 세션 수정 완료 (feat/voc-seeds-toastui-fix 브랜치):
+- `frontend/src/api/notices.ts` — `listNotices()` `{ data }` 언래핑
+- `frontend/src/api/faqs.ts` — `listFaqCategories()`, `listFaqs()` `{ data }` 언래핑
+- `frontend/vite.config.ts` — proxy `localhost:3001` → `backend:3000` (Docker 내부 통신)
+- `.env` — `VITE_AUTH_MODE=mock` 추가 (누락으로 /mock-login 리다이렉트 버그)
+
+### 2026-04-26 작업 (feat/voc-seeds-toastui-fix)
+
+| 항목 | 내용 | 상태 |
+|------|------|------|
+| 시드 데이터 | VOC 10건 → 30건 (status/priority 다양 분포) + seed의 reporter_id 오탈자 수정 | ✅ |
+| VOC 등록 오류 | tsx watch 구버전 캐시 문제 → 백엔드 재시작 + vocs.ts GET author_id→reporter_id 수정 | ✅ |
+| Toast UI Editor | @toast-ui/react-editor 설치, VocCreateModal 실 API 연동 + WYSIWYG 에디터 적용 | ✅ |
 
 ### Phase 7 갭 수정 완료 (2026-04-26)
 

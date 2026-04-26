@@ -42,8 +42,9 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [showTagSelect, setShowTagSelect] = useState(false);
 
-  const canEditTags = user?.role === 'manager' || user?.role === 'admin';
-  const canChangeStatus = user?.role === 'manager' || user?.role === 'admin';
+  const role = user?.role?.toLowerCase();
+  const canEditTags = role === 'manager' || role === 'admin';
+  const canChangeStatus = role === 'manager' || role === 'admin';
 
   const STATUS_TRANSITIONS: Record<string, string[]> = {
     접수: ['검토중', '드랍'],
@@ -139,7 +140,7 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
       .catch(() => {});
   }
 
-  const canSeeNotes = user?.role === 'manager' || user?.role === 'admin';
+  const canSeeNotes = role === 'manager' || role === 'admin';
   const tabs: { key: Tab; label: string }[] = [
     { key: 'body', label: '본문' },
     { key: 'subtasks', label: '서브태스크' },

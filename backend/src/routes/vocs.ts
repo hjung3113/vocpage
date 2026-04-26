@@ -5,7 +5,7 @@ import type { AuthUser } from '../auth/types';
 import { requireAuth, requireManager } from '../middleware/auth';
 import { applyTagRules } from '../services/autoTag';
 import { emitNotification } from '../services/notifications';
-import { calcDueDate, STATUS_TRANSITIONS } from '../utils/voc';
+import { STATUS_TRANSITIONS } from '../utils/voc';
 import { subtasksRouter } from './subtasks';
 import { payloadRouter } from './payload';
 
@@ -42,7 +42,7 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
   let idx = 1;
 
   if (user.role === 'user') {
-    conditions.push(`v.author_id = $${idx++}`);
+    conditions.push(`v.reporter_id = $${idx++}`);
     params.push(user.id);
   }
 
@@ -121,14 +121,13 @@ vocRouter.post('/', requireAuth, async (req: Request, res: Response): Promise<vo
 
   const priority = 'medium';
   const status = '접수';
-  const due_date = calcDueDate(priority);
 
   try {
     const result = await pool.query(
-      `INSERT INTO vocs (title, body, status, priority, author_id, system_id, menu_id, voc_type_id, due_date, source)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO vocs (title, body, status, priority, reporter_id, system_id, menu_id, voc_type_id, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [title, body, status, priority, user.id, system_id, menu_id, voc_type_id, due_date, 'manual'],
+      [title, body, status, priority, user.id, system_id, menu_id, voc_type_id, 'manual'],
     );
 
     const newVoc = result.rows[0];
@@ -158,9 +157,9 @@ vocRouter.get('/:id', requireAuth, async (req: Request, res: Response): Promise<
       return;
     }
 
-    const voc = result.rows[0] as { author_id: string };
+    const voc = result.rows[0] as { reporter_id: string };
 
-    if (user.role === 'user' && voc.author_id !== user.id) {
+    if (user.role === 'user' && voc.reporter_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
       return;
     }
@@ -189,14 +188,14 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
     }
 
     const voc = existing.rows[0] as {
-      author_id: string;
+      reporter_id: string;
       priority: string;
       assignee_id: string | null;
       parent_id: string | null;
     };
     const prevAssigneeId = voc.assignee_id;
 
-    if (user.role === 'user' && voc.author_id !== user.id) {
+    if (user.role === 'user' && voc.reporter_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
       return;
     }
@@ -208,12 +207,11 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
       return;
     }
 
-    const { title, body, assignee_id, priority, due_date, voc_type_id, menu_id } = req.body as {
+    const { title, body, assignee_id, priority, voc_type_id, menu_id } = req.body as {
       title?: string;
       body?: string;
       assignee_id?: string;
       priority?: string;
-      due_date?: string;
       voc_type_id?: string;
       menu_id?: string;
     };
@@ -239,13 +237,6 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
       if (priority !== undefined) {
         updates.push(`priority = $${idx++}`);
         params.push(priority);
-      }
-      if (due_date !== undefined) {
-        updates.push(`due_date = $${idx++}`);
-        params.push(due_date);
-      } else if (priority !== undefined) {
-        updates.push(`due_date = $${idx++}`);
-        params.push(calcDueDate(priority));
       }
       if (voc_type_id !== undefined) {
         updates.push(`voc_type_id = $${idx++}`);
@@ -329,12 +320,12 @@ vocRouter.patch(
         id,
       ]);
 
-      const updatedVoc = result.rows[0] as { author_id: string };
+      const updatedVoc = result.rows[0] as { reporter_id: string };
       res.json(result.rows[0]);
 
       emitNotification({
         pool,
-        userId: updatedVoc.author_id,
+        userId: updatedVoc.reporter_id,
         type: 'status_change',
         vocId: id,
       }).catch(() => {});
@@ -356,7 +347,7 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
     await client.query('BEGIN');
 
     const { rows: vocRows } = await client.query(
-      `SELECT id, author_id FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+      `SELECT id, reporter_id FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
       [id],
     );
 
@@ -366,9 +357,9 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
       return;
     }
 
-    const voc = vocRows[0] as { id: string; author_id: string };
+    const voc = vocRows[0] as { id: string; reporter_id: string };
 
-    if (user.role === 'user' && voc.author_id !== user.id) {
+    if (user.role === 'user' && voc.reporter_id !== user.id) {
       await client.query('ROLLBACK');
       res.status(403).json({ error: 'FORBIDDEN' });
       return;

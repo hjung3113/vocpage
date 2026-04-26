@@ -847,7 +847,7 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
               }}
             >
               <td style={tdStyle}>
-                {user.name}
+                {user.display_name}
                 {user.id === currentUserId && (
                   <span style={{ marginLeft: '6px', fontSize: '11px', color: 'var(--brand)' }}>
                     (나)
@@ -858,7 +858,7 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
               <td
                 style={{ ...tdStyle, fontFamily: 'var(--font-code)', color: 'var(--text-muted)' }}
               >
-                {user.ad_account}
+                {user.ad_username}
               </td>
               <td style={tdStyle}>
                 <select
