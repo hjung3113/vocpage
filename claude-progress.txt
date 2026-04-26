@@ -6,9 +6,21 @@
 
 현재 위치: Phase 0~8 ✅ 완료 → **Phase 9 운영 실구현 + 배포 대기**
 
-브랜치: `fix/phase8-design-theme-fix` (PR 후 머지 필요)
+브랜치: fix/navbar-highlight-and-voc-filter (push 완료, PR 대기)
 
 최근 작업 (2026-04-26):
 - Phase 8 디자인 재작업 완료
 - benchmark/ 폴더 생성: prototype 전 페이지·인터렉션 스크린샷 24장 + INDEX.md
 - dashboard-v3.html 삭제 + docs 참조 제거
+
+네비바 버그픽스 (2026-04-26, 커밋 완료):
+- Sidebar.tsx: 사이드바 배지(카운트) 완전 제거 + NavLink active 정확히 하이라이트
+- VocPage.tsx: view=mine/assigned 시 filters.assigneeId 무시 (타이밍 버그 수정)
+- api/vocs.ts: VocFilters에 view 필드 추가
+- backend/vocs.ts: view 파라미터 처리 추가 (mine→author_id, assigned→assignee_id)
+- DB 마이그레이션: ALTER TABLE vocs RENAME COLUMN reporter_id TO author_id
+  (코드는 author_id로 바꿨으나 DB 마이그레이션 누락 → view=mine 500 에러의 실제 원인)
+- Playwright로 전 네비 항목 검증 완료:
+  - 전체 VOC 32개, 내 VOC 5개, 담당 VOC 18개 (독립 필터 확인)
+  - 시스템/메뉴 클릭 → 해당 VOC만 표시
+  - 어떤 뷰에서 내 VOC 눌러도 항상 전체 내 VOC 표시
