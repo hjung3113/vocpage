@@ -7,6 +7,7 @@ import { GlobalTabs } from '../components/dashboard/GlobalTabs';
 import { KpiSection } from '../components/dashboard/KpiSection';
 import { DistributionWidget } from '../components/dashboard/DistributionWidget';
 import { PriorityStatusMatrix } from '../components/dashboard/PriorityStatusMatrix';
+import { DrilldownHeatmap } from '../components/dashboard/DrilldownHeatmap';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
 import './DashboardPage.css';
 
@@ -109,6 +110,15 @@ export function DashboardPage() {
         >
           <DistributionWidget filter={filter} buildQueryParams={buildQueryParams} />
           <PriorityStatusMatrix filter={filter} buildQueryParams={buildQueryParams} />
+        </div>
+        <div style={{ padding: '12px 24px 0' }}>
+          <DrilldownHeatmap
+            filter={filter}
+            buildQueryParams={buildQueryParams}
+            onSwitchTab={setGlobalTab}
+            systemName={systems.find((s) => s.id === filter.globalTab)?.name}
+            menuName={menus.find((m) => m.id === filter.activeMenu)?.name}
+          />
         </div>
       </div>
     </div>
