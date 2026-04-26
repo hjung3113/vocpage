@@ -54,6 +54,26 @@
   --drawer-w:  528px;
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
   --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
+
+  /* Text on brand-tinted backgrounds (badges, count pills, brand CTA) */
+  --text-on-brand: oklch(100% 0 0);
+
+  /* Status Badge — bg / fg / border per VOC status (matches design.md §5/§10) */
+  --status-received-bg:     light-dark(oklch(91% 0.006 260), oklch(22% 0.008 262));
+  --status-received-fg:     light-dark(oklch(50% 0.010 260), oklch(56% 0.008 260));
+  --status-received-border: light-dark(oklch(84% 0.010 260), oklch(28% 0.012 262));
+  --status-reviewing-bg:     light-dark(oklch(91% 0.035 242), oklch(21% 0.050 245));
+  --status-reviewing-fg:     light-dark(oklch(45% 0.18 245),  oklch(68% 0.17 242));
+  --status-reviewing-border: light-dark(oklch(78% 0.060 242), oklch(32% 0.070 244));
+  --status-processing-bg:     light-dark(oklch(91% 0.040 152), oklch(20% 0.055 154));
+  --status-processing-fg:     light-dark(oklch(42% 0.17 152),  oklch(66% 0.19 155));
+  --status-processing-border: light-dark(oklch(76% 0.065 152), oklch(30% 0.075 154));
+  --status-done-bg:     light-dark(oklch(91% 0.038 155), oklch(20% 0.050 158));
+  --status-done-fg:     light-dark(oklch(40% 0.18 155),  oklch(65% 0.20 158));
+  --status-done-border: light-dark(oklch(75% 0.065 155), oklch(30% 0.072 158));
+  --status-drop-bg:     light-dark(oklch(93% 0.040 72),  oklch(21% 0.048 68));
+  --status-drop-fg:     light-dark(oklch(50% 0.16 68),   oklch(72% 0.16 72));
+  --status-drop-border: light-dark(oklch(80% 0.065 72),  oklch(33% 0.068 70));
 }
 
 html, body {
@@ -92,7 +112,7 @@ html, body {
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; box-shadow: var(--shadow-sm);
 }
-.logo-mark svg { width: 14px; height: 14px; color: #fff; }
+.logo-mark svg { width: 14px; height: 14px; color: var(--text-on-brand); }
 .logo-text { font-size: 14px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
 .logo-badge {
   font-size: 9px; font-weight: 600; padding: 1px 5px;
@@ -154,7 +174,7 @@ html, body {
 .user-avatar {
   width: 28px; height: 28px; border-radius: 50%; background: var(--brand);
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+  font-size: 11px; font-weight: 700; color: var(--text-on-brand); flex-shrink: 0;
 }
 .user-name { font-size: 12.5px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-role { font-size: 11px; color: var(--text-quaternary); }
@@ -396,43 +416,43 @@ html, body {
 
 /* 접수: neutral — not started yet */
 .s-접수 {
-  background: light-dark(oklch(91% 0.006 260), oklch(22% 0.008 262));
-  color: light-dark(oklch(50% 0.010 260), oklch(56% 0.008 260));
-  border: 1px solid light-dark(oklch(84% 0.010 260), oklch(28% 0.012 262));
+  background: var(--status-received-bg);
+  color: var(--status-received-fg);
+  border: 1px solid var(--status-received-border);
 }
-.s-접수 .status-dot { background: light-dark(oklch(60% 0.010 260), oklch(48% 0.010 260)); }
+.s-접수 .status-dot { background: var(--status-received-fg); }
 
 /* 검토중: blue — in review */
 .s-검토중 {
-  background: light-dark(oklch(91% 0.035 242), oklch(21% 0.050 245));
-  color: light-dark(oklch(45% 0.18 245), oklch(68% 0.17 242));
-  border: 1px solid light-dark(oklch(78% 0.060 242), oklch(32% 0.070 244));
+  background: var(--status-reviewing-bg);
+  color: var(--status-reviewing-fg);
+  border: 1px solid var(--status-reviewing-border);
 }
-.s-검토중 .status-dot { background: light-dark(oklch(48% 0.19 244), oklch(66% 0.18 242)); }
+.s-검토중 .status-dot { background: var(--status-reviewing-fg); }
 
 /* 처리중: emerald — actively being worked */
 .s-처리중 {
-  background: light-dark(oklch(91% 0.040 152), oklch(20% 0.055 154));
-  color: light-dark(oklch(42% 0.17 152), oklch(66% 0.19 155));
-  border: 1px solid light-dark(oklch(76% 0.065 152), oklch(30% 0.075 154));
+  background: var(--status-processing-bg);
+  color: var(--status-processing-fg);
+  border: 1px solid var(--status-processing-border);
 }
-.s-처리중 .status-dot { background: light-dark(oklch(48% 0.17 152), oklch(64% 0.19 155)); }
+.s-처리중 .status-dot { background: var(--status-processing-fg); }
 
 /* 완료: green — done */
 .s-완료 {
-  background: light-dark(oklch(91% 0.038 155), oklch(20% 0.050 158));
-  color: light-dark(oklch(40% 0.18 155), oklch(65% 0.20 158));
-  border: 1px solid light-dark(oklch(75% 0.065 155), oklch(30% 0.072 158));
+  background: var(--status-done-bg);
+  color: var(--status-done-fg);
+  border: 1px solid var(--status-done-border);
 }
-.s-완료 .status-dot { background: light-dark(oklch(46% 0.19 155), oklch(63% 0.21 158)); }
+.s-완료 .status-dot { background: var(--status-done-fg); }
 
 /* 드랍: amber — blocked/on hold */
 .s-드랍 {
-  background: light-dark(oklch(93% 0.040 72), oklch(21% 0.048 68));
-  color: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
-  border: 1px solid light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
+  background: var(--status-drop-bg);
+  color: var(--status-drop-fg);
+  border: 1px solid var(--status-drop-border);
 }
-.s-드랍 .status-dot { background: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); }
+.s-드랍 .status-dot { background: var(--status-drop-fg); }
 
 /* Priority badge: tier-2 — same size as status, weight as differentiator */
 .pri-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 400; }
@@ -1166,8 +1186,6 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
     <div class="nav-item" onclick="setNav(this)" data-page="system-menu"><i data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="admin-notices"><i data-lucide="bell"></i> 공지사항 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="admin-faq"><i data-lucide="help-circle"></i> FAQ 관리</div>
   </div>
   </div>
   <div class="sidebar-user">
@@ -1268,11 +1286,10 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
 <!-- ── FAQ ── -->
 <div id="page-faq" class="info-page admin-page"></div>
 
-<!-- ── Admin: 공지사항 관리 ── -->
-<div id="page-admin-notices" class="admin-page"></div>
-
-<!-- ── Admin: FAQ 관리 ── -->
-<div id="page-admin-faq" class="admin-page"></div>
+<!--
+  공지/FAQ 관리(Admin) 전용 페이지는 D19에 따라 제거.
+  진입점 = 공지/FAQ 페이지 우측 상단 버튼 + `?mode=admin` URL 쿼리 (P-9에서 시연 추가 예정).
+-->
 
 <!-- ── 대시보드 ── -->
 <div id="page-dashboard" class="admin-page">
@@ -2326,8 +2343,6 @@ function setNav(el) {
     if (page === 'system-menu')    renderSystemMenu();
     if (page === 'voc-type')       renderVocTypes();
     if (page === 'users')          renderUsers();
-    if (page === 'admin-notices')  renderAdminNotices();
-    if (page === 'admin-faq')      renderAdminFaq();
     if (page === 'dashboard')      dashboardInit();
     lucide.createIcons();
   }
@@ -3096,148 +3111,9 @@ function toggleFaq(id) {
   icon.style.transform = open ? '' : 'rotate(180deg)';
 }
 
-// ── Admin: 공지사항 관리
-let noticeNextId = NOTICES.length + 1;
-function renderAdminNotices() {
-  const el = document.getElementById('page-admin-notices');
-  const levelLabel = { urgent:'긴급', important:'중요', normal:'일반' };
-  el.innerHTML = `
-    <div class="admin-topbar">
-      <h2 class="admin-title">공지사항 관리</h2>
-      <button class="admin-btn" onclick="toggleAdminNoticeForm()"><i data-lucide="plus"></i> 공지 추가</button>
-    </div>
-    <div class="admin-body">
-      <div id="adminNoticeForm" style="display:none;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:16px;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end">
-          <input id="newNoticeTitle" placeholder="제목" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-          <select id="newNoticeLevel" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-            <option value="normal">일반</option><option value="important">중요</option><option value="urgent">긴급</option>
-          </select>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary);white-space:nowrap"><input type="checkbox" id="newNoticePopup"> 팝업</label>
-        </div>
-        <div style="margin-top:8px;border:1px solid var(--brand-border);border-radius:6px;overflow:hidden">
-          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--brand-bg);border-bottom:1px solid var(--brand-border)">
-            <i data-lucide="pen-line" style="width:12px;height:12px;color:var(--accent)"></i>
-            <span style="font-size:11px;font-weight:600;color:var(--accent)">Toast UI Editor</span>
-            <span style="font-size:10.5px;color:var(--text-tertiary)">— 실제 구현 시 에디터가 마운트됩니다</span>
-          </div>
-          <textarea id="newNoticeContent" placeholder="내용을 입력하세요 (Markdown 지원, 이미지 드래그&드롭 가능)" rows="4" style="width:100%;padding:8px 10px;background:var(--bg-app);border:none;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box;outline:none"></textarea>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <input id="newNoticeFrom" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-          <span style="line-height:34px;color:var(--text-tertiary)">~</span>
-          <input id="newNoticeTo" type="date" style="padding:6px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-          <button onclick="addAdminNotice()" class="btn-form-save">저장</button>
-          <button onclick="toggleAdminNoticeForm()" class="btn-form-cancel">취소</button>
-        </div>
-      </div>
-      <table class="admin-table">
-        <thead><tr><th>제목</th><th>중요도</th><th>팝업</th><th>노출 기간</th><th>노출</th><th>작업</th></tr></thead>
-        <tbody>${NOTICES.map(n => `
-          <tr id="anotice-row-${n.id}">
-            <td style="color:var(--text-primary)">${n.title}</td>
-            <td><span class="notice-badge notice-badge-${n.level}">${levelLabel[n.level]}</span></td>
-            <td>${n.popup ? '<span style="color:var(--accent);font-size:12px">ON</span>' : '<span style="color:var(--text-tertiary);font-size:12px">—</span>'}</td>
-            <td style="font-size:12px;color:var(--text-secondary)">${n.from} ~ ${n.to}</td>
-            <td><label class="toggle-switch"><input type="checkbox" ${n.visible?'checked':''} onchange="toggleNoticeVisible(${n.id},this.checked)"><span class="toggle-slider"></span></label></td>
-            <td><button onclick="deleteAdminNotice(${n.id})" class="a-btn danger">삭제</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
-  lucide.createIcons();
-}
-
-function toggleAdminNoticeForm() {
-  const f = document.getElementById('adminNoticeForm');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-}
-function addAdminNotice() {
-  const title = document.getElementById('newNoticeTitle').value.trim();
-  const content = document.getElementById('newNoticeContent').value.trim();
-  const level = document.getElementById('newNoticeLevel').value;
-  const popup = document.getElementById('newNoticePopup').checked;
-  const from = document.getElementById('newNoticeFrom').value;
-  const to = document.getElementById('newNoticeTo').value;
-  if (!title || !from || !to) return;
-  NOTICES.push({ id: noticeNextId++, title, content: `<p>${content}</p>`, level, popup, from, to, visible: true });
-  renderAdminNotices();
-}
-function toggleNoticeVisible(id, val) {
-  const n = NOTICES.find(x => x.id === id);
-  if (n) n.visible = val;
-}
-function deleteAdminNotice(id) {
-  const row = document.getElementById('anotice-row-' + id);
-  if (row) { row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(() => { NOTICES.splice(NOTICES.findIndex(x=>x.id===id), 1); renderAdminNotices(); }, 200); }
-}
-
-// ── Admin: FAQ 관리
-let faqNextId = FAQS.length + 1;
-function renderAdminFaq() {
-  const el = document.getElementById('page-admin-faq');
-  const cats = ['사용법','오류','정책','기타'];
-  el.innerHTML = `
-    <div class="admin-topbar">
-      <h2 class="admin-title">FAQ 관리</h2>
-      <button class="admin-btn" onclick="toggleAdminFaqForm()"><i data-lucide="plus"></i> FAQ 추가</button>
-    </div>
-    <div class="admin-body">
-      <div id="adminFaqForm" style="display:none;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:16px;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:1fr auto;gap:10px">
-          <input id="newFaqQ" placeholder="질문 (Q)" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-          <select id="newFaqCat" style="padding:7px 10px;background:var(--bg-app);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-primary);font-size:13px">
-            ${cats.map(c=>`<option>${c}</option>`).join('')}
-          </select>
-        </div>
-        <div style="margin-top:8px;border:1px solid var(--brand-border);border-radius:6px;overflow:hidden">
-          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--brand-bg);border-bottom:1px solid var(--brand-border)">
-            <i data-lucide="pen-line" style="width:12px;height:12px;color:var(--accent)"></i>
-            <span style="font-size:11px;font-weight:600;color:var(--accent)">Toast UI Editor</span>
-            <span style="font-size:10.5px;color:var(--text-tertiary)">— 실제 구현 시 에디터가 마운트됩니다</span>
-          </div>
-          <textarea id="newFaqA" placeholder="답변을 입력하세요 (Markdown 지원, 이미지 드래그&드롭 가능)" rows="4" style="width:100%;padding:8px 10px;background:var(--bg-app);border:none;color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box;outline:none"></textarea>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button onclick="addAdminFaq()" class="btn-form-save">저장</button>
-          <button onclick="toggleAdminFaqForm()" class="btn-form-cancel">취소</button>
-        </div>
-      </div>
-      <table class="admin-table">
-        <thead><tr><th>질문</th><th>카테고리</th><th>노출</th><th>작업</th></tr></thead>
-        <tbody>${FAQS.map(f => `
-          <tr id="afaq-row-${f.id}">
-            <td style="color:var(--text-primary)">${f.q}</td>
-            <td><span style="font-size:11px;padding:2px 7px;border-radius:4px;border:1px solid var(--border-subtle);color:var(--text-secondary)">${f.category}</span></td>
-            <td><label class="toggle-switch"><input type="checkbox" ${f.visible?'checked':''} onchange="toggleFaqVisible(${f.id},this.checked)"><span class="toggle-slider"></span></label></td>
-            <td><button onclick="deleteAdminFaq(${f.id})" style="background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:12px;padding:3px 8px;border-radius:4px" onmouseover="this.style.color='#e5484d'" onmouseout="this.style.color='var(--text-tertiary)'">삭제</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
-  lucide.createIcons();
-}
-
-function toggleAdminFaqForm() {
-  const f = document.getElementById('adminFaqForm');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-}
-function addAdminFaq() {
-  const q = document.getElementById('newFaqQ').value.trim();
-  const a = document.getElementById('newFaqA').value.trim();
-  const category = document.getElementById('newFaqCat').value;
-  if (!q || !a) return;
-  FAQS.push({ id: faqNextId++, category, q, a: `<p>${a}</p>`, visible: true });
-  renderAdminFaq();
-}
-function toggleFaqVisible(id, val) {
-  const f = FAQS.find(x => x.id === id);
-  if (f) f.visible = val;
-}
-function deleteAdminFaq(id) {
-  const row = document.getElementById('afaq-row-' + id);
-  if (row) { row.style.opacity='0'; row.style.transition='opacity .2s'; setTimeout(() => { FAQS.splice(FAQS.findIndex(x=>x.id===id), 1); renderAdminFaq(); }, 200); }
-}
+// 공지/FAQ 관리는 D19에 따라 별도 admin 페이지가 아니라
+// 공지/FAQ 페이지의 `?mode=admin` 토글로 통합됩니다 (P-9에서 시연 추가 예정).
+// 기존 renderAdminNotices/renderAdminFaq + 헬퍼는 D19와 모순되어 제거 (cross-review R-10).
 
 // ── Admin Renders
 function renderTagRules() {

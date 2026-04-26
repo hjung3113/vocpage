@@ -4,7 +4,7 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + design.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) → **Phase 7 (prototype 고도화)** — 기존 Phase 7/8 코드 구현은 8/9로 이관
+현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + design.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) / 4-도메인 cross-review ✅ (2026-04-27) / Q1~Q5 결정 + R-5/R-7/R-10/R-11/R-12 docs 패치 ✅ (2026-04-27, 단일 커밋) → **Phase 7 (prototype 고도화)**
 
 ### 관리자 UI 커버리지 리뷰 (2026-04-27, 브랜치 docs/admin-ui-gaps)
 

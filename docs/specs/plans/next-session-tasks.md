@@ -60,6 +60,58 @@
 
 ---
 
+## 다음 세션 — 결정 + 적용 (2026-04-27 cross-review 후속)
+
+> 출처: `docs/specs/reviews/cross-review-2026-04-27.md`. 4개 도메인 리뷰 결과 식별된 **결정 5건 + 즉시 적용 5건**. **2026-04-27 일괄 처리 완료**.
+
+### 결정 (Open Questions) — ✅ 2026-04-27 확정
+
+| #   | 결정 항목                                                                            | 결정                                                                      |
+| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| Q1  | dashboard.md `7d/30d/90d` ↔ req §4 `1m/3m/1y/all/custom` ↔ migration 011 충돌        | **마이그·req 정본 → dashboard.md 수정** (R-5 적용 완료)                   |
+| Q2  | requirements.md §15 본문에 D22/D23 진입점 서브섹션 vs 포인터만 유지                  | **포인터 한 줄** — feature-voc.md §9.4.6/9.4.7 단일 출처 (R-7 적용)       |
+| Q3  | dashboard 위젯 수용 기준 23개 → §13.1.1 Given/When/Then 일괄 변환 vs 체크리스트 허용 | **일괄 변환** — Phase 8 이후 R-8에서 처리                                 |
+| Q4  | §13.4 "VOC 1,000건" vs dashboard.md:661 "10만 건"                                    | **10만 건 통일** — production-scale 기준, R-9 적용 시점 dashboard.md 정본 |
+| Q5  | external-masters atomic swap: 전체 트랜잭션 vs source별 독립                         | **source별 독립** — 운영 인시던트 격리 우선, 8-M3 spec 반영               |
+
+### 즉시 적용 (docs-only) — ✅ 2026-04-27 일괄 커밋 완료
+
+| ID   | 항목                                                                                                                     | 상태 |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | ---- |
+| R-5  | dashboard.md `7d/30d/90d` → `1m/3m/1y/all/custom` (L13, L607, L688-689)                                                  | ✅   |
+| R-7  | requirements.md §15.3 태그 마스터 + §15.4 휴지통 진입점 포인터 한 줄                                                     | ✅   |
+| R-10 | prototype.html 사이드바 "공지사항/FAQ 관리" 메뉴 + `renderAdminNotices/Faq()` 제거 (D19 정합)                            | ✅   |
+| R-11 | prototype.html L95/157 `#fff` 2건 → `var(--text-on-brand)` + L399~435 status badge raw oklch → token (5 status × 3 prop) | ✅   |
+| R-12 | design.md §5 "Empty / Error / Loading States" 패턴 + §13.11 admin page non-data states 정식화                            | ✅   |
+
+> R-11 부수 산출: design.md §10 + prototype :root 에 `--status-{received,reviewing,processing,done,drop}-{bg,fg,border}` 토큰 15종 신설 → F11 (Phase F follow-up) 자동 해소.
+
+### 이연 — Phase 7 (prototype 고도화) 항목 추가
+
+| ID  | 항목                                                                  |
+| --- | --------------------------------------------------------------------- |
+| P-9 | `?mode=admin` 토글 prototype 시연 추가 (D19/ADR #4 검증 — 현재 0 hit) |
+
+### 이연 — Phase 8 (개발 스켈레톤) 신규/우선순위 항목
+
+| ID    | 항목                                                                                                                | 묶음             |
+| ----- | ------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 8-PR1 | **권한 인프라 PR** = migration 012 실파일(F1) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 헬퍼 단일화(F3) | 첫 PR — critical |
+| 8-PR2 | migration 013 = `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` (D22 운영 차단 해소)      | -                |
+| 8-PR3 | migration 014 = `vocs.deleted_by`, `voc_restore_log` (D23 운영 차단 해소)                                           | -                |
+| 8-M1  | `005_content.sql` `faq_categories.slug UNIQUE`/`is_archived` 명세 §10.4 보완 (스키마 선행 잔재)                     | -                |
+| 8-M2  | `notices.visible_from/to` → `timestamptz` + KST 자정 경계 명문화                                                    | -                |
+| 8-M3  | external-masters refresh 스케줄러/실패 처리 spec (Q5 결정 반영)                                                     | Q5               |
+| 8-M4  | FE 미정의 토큰 사용 정리 — `MockLoginPage.tsx:48,57` `--border` → `--border-standard`, `--danger` → `--status-red`  | -                |
+
+### 이연 — Phase 9 또는 NextGen
+
+- §13.4 성능 측정 환경/툴 정의 → Phase 9 (배포 직전 벤치마크 환경 구성 시점)
+- §17 D3·D4·D5·D6 메모 → 명세 본문 흡수 → Phase 8 각 기능 단계 진입 시점에 분산 처리
+- N-1/N-2 (admin-ui-coverage GAP-3·4) → NextGen 유지
+
+---
+
 ## Phase 8 착수 전 문서 수정 필수
 
 | ID  | 항목                                                                 | 상태 |
