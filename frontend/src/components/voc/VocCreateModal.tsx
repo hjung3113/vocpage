@@ -262,10 +262,10 @@ export function VocCreateModal({ isOpen, onClose, onCreated }: VocCreateModalPro
               <Editor
                 ref={editorRef}
                 initialEditType="wysiwyg"
-                previewStyle="tab"
+                previewStyle="vertical"
                 height="220px"
                 placeholder="VOC 내용을 입력하세요 (Markdown 지원)"
-                hideModeSwitch={false}
+                hideModeSwitch={true}
               />
             </div>
           </div>

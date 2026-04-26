@@ -96,9 +96,9 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
       <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={onClose} />
       <div
         style={{
-          position: 'absolute',
-          top: 'calc(100% + 8px)',
-          right: 0,
+          position: 'fixed',
+          bottom: '56px',
+          left: '222px',
           width: '320px',
           maxHeight: '400px',
           overflowY: 'auto',

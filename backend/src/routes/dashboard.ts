@@ -92,14 +92,14 @@ dashboardRouter.get(
       const resolutionRate = total > 0 ? (completed / total) * 100 : 0;
 
       res.json({
-        total_voc: total,
+        total,
         unresolved: parseInt(row.unresolved, 10),
         new_this_week: parseInt(row.new_this_week, 10),
-        completed_this_week: completed,
-        avg_resolution_hours: null,
+        completed: completed,
+        avg_resolution_days: null,
         resolution_rate: resolutionRate,
-        urgent_high_unresolved: parseInt(row.urgent_high_unresolved, 10),
-        overdue_14d: parseInt(row.overdue_14d, 10),
+        urgent: parseInt(row.urgent_high_unresolved, 10),
+        overdue: parseInt(row.overdue_14d, 10),
       });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/summary failed');
@@ -201,19 +201,25 @@ dashboardRouter.get(
 
     try {
       let yGroupCol: string;
+      let yLabelCol: string;
+      let yJoinClause: string;
 
       if (filters.systemId) {
         yGroupCol = 'v.menu_id';
+        yLabelCol = 'm.name';
+        yJoinClause = 'JOIN menus m ON v.menu_id = m.id';
       } else {
         yGroupCol = 'v.system_id';
+        yLabelCol = 's.name';
+        yJoinClause = 'JOIN systems s ON v.system_id = s.id';
       }
 
       let xLabelCol: string;
-      let joinClause = '';
+      let xJoinClause = '';
 
       if (xAxis === 'tag') {
         xLabelCol = 't.name';
-        joinClause = 'JOIN voc_tags vt ON v.id = vt.voc_id JOIN tags t ON vt.tag_id = t.id';
+        xJoinClause = 'JOIN voc_tags vt ON v.id = vt.voc_id JOIN tags t ON vt.tag_id = t.id';
       } else if (xAxis === 'priority') {
         xLabelCol = 'v.priority';
       } else {
@@ -221,12 +227,13 @@ dashboardRouter.get(
       }
 
       const result = await pool.query(
-        `SELECT ${yGroupCol} AS y_label, ${xLabelCol} AS x_label, COUNT(*) AS count
+        `SELECT ${yLabelCol} AS y_label, ${xLabelCol} AS x_label, COUNT(*) AS count
          FROM vocs v
-         ${joinClause}
+         ${yJoinClause}
+         ${xJoinClause}
          ${clause}
-         GROUP BY ${yGroupCol}, ${xLabelCol}
-         ORDER BY ${yGroupCol}, ${xLabelCol}`,
+         GROUP BY ${yGroupCol}, ${yLabelCol}, ${xLabelCol}
+         ORDER BY ${yLabelCol}, ${xLabelCol}`,
         params,
       );
 
