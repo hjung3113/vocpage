@@ -1,27 +1,22 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26 (24차 — 프로토타입 vs 실구현 갭 리뷰 완료, Phase 7 잔여 갭 수정 착수 필요)
-> 목표: 프로토타입 정합성 확보 → 갭 수정 → Phase 8
+> 최종 업데이트: 2026-04-26 (25차 — Phase 7 잔여 갭 수정 완료, PR #37 머지, Phase 8 착수 가능)
+> 목표: Phase 8 — 백엔드 고도화 + 프로덕션 준비
 
-## 🔴 다음 세션 시작점 — Phase 7 잔여 갭 수정
+## ✅ Phase 7 잔여 갭 수정 — 완료 (2026-04-26, PR #37)
 
-> 리뷰 문서: `docs/specs/reviews/phase7-prototype-design-gap-2026-04-26.md`
+| Step  | 내용                                                                          | 상태 |
+| ----- | ----------------------------------------------------------------------------- | ---- |
+| **1** | 토큰 보강 — `--font-code`/`--font-ui` 신설, `#888888` → 토큰, `rgba()` → 토큰 | ✅   |
+| **2** | AppShell + Sidebar 골격 — `components/layout/` 신규, RootLayout 재구성        | ✅   |
+| **3** | VOC 목록 — 담당자 필터, 컬럼 정렬, 필터 탭 순서(드랍↔완료)                    | ✅   |
+| **4** | VocDrawer 탭 재구성 — 서브태스크/내부노트 탭 추가                             | ✅   |
+| **5** | Sidebar 동적 시스템 메뉴 + SidebarUser                                        | ✅   |
+| **6** | 대시보드 재구성 — KPI 8종, GlobalTabs, StatusDonut                            | ✅   |
+| **7** | Admin 공지/FAQ 관리 탭 CRUD + NoticePopup dismiss                             | ✅   |
+| **8** | 알림 패널 UI + UrgentBadge + markAllAsRead                                    | ✅   |
 
-Playwright로 프로토타입/실구현 스크린샷 비교 결과, 3개 CRITICAL + 다수 HIGH 갭 발견.  
-Phase 8 착수 전에 아래 Step을 순서대로 처리한다.
-
-| Step  | 내용                                                                          | 우선순위   | 예상   |
-| ----- | ----------------------------------------------------------------------------- | ---------- | ------ |
-| **1** | 토큰 보강 — `--font-code`/`--font-ui` 신설, `#888888` → 토큰, `rgba()` → 토큰 | LOW 선처리 | 반나절 |
-| **2** | AppShell + Sidebar 골격 — `components/layout/` 신규, RootLayout 재구성        | CRITICAL   | 1~2일  |
-| **3** | VOC 목록 — 담당자 컬럼, 컬럼 정렬, 필터 탭 순서(드랍↔완료)                    | HIGH       | 0.5일  |
-| **4** | VocDrawer + Sub-task UI 전체 구현                                             | CRITICAL   | 2일    |
-| **5** | Sidebar 동적 시스템 메뉴 + SidebarUser                                        | HIGH       | 0.5일  |
-| **6** | 대시보드 재구성 — KPI 8종 수정, GlobalTabs, 도넛차트, 클릭 네비               | HIGH       | 2~3일  |
-| **7** | Admin 공지/FAQ 관리 탭 + 공지 로그인 팝업                                     | MEDIUM     | 1~2일  |
-| **8** | 알림 패널 UI + Urgent 배지                                                    | HIGH       | 1일    |
-
-**각 Step 완료 후**: Playwright 스크린샷으로 프로토타입과 시각 비교 → 이상 없으면 PR
+## 🔴 다음 세션 시작점 — Phase 8
 
 ## ✅ Phase 7 진입 전 Preflight — 완료 (2026-04-24, PR #28)
 
