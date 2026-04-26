@@ -100,6 +100,7 @@ const userAreaStyle: React.CSSProperties = {
   borderTop: '1px solid var(--border-subtle)',
   padding: '12px 14px',
   flexShrink: 0,
+  minWidth: 0,
 };
 
 const userNameStyle: React.CSSProperties = {
@@ -377,7 +378,7 @@ export function Sidebar() {
           >
             {user?.name ? user.name.charAt(0) : <User size={13} color="white" />}
           </div>
-          <div style={{ overflow: 'hidden', flex: 1 }}>
+          <div style={{ overflow: 'hidden', flex: 1, minWidth: 0 }}>
             <div style={userNameStyle}>{user?.name ?? '—'}</div>
             <div style={userRoleStyle}>{user?.role ?? ''}</div>
           </div>

@@ -1,10 +1,15 @@
-import { UserX } from 'lucide-react';
+import { ChevronDown, ChevronRight, CornerDownRight, UserX } from 'lucide-react';
 import type { VocSummary } from '../../api/vocs';
 import { StatusBadge } from '../common/StatusBadge';
 import { PriorityBadge } from '../common/PriorityBadge';
 
 interface VocRowProps {
   voc: VocSummary;
+  isChild?: boolean;
+  hasChildren?: boolean;
+  isExpanded?: boolean;
+  isLoadingChildren?: boolean;
+  onToggleExpand?: () => void;
   onClick: () => void;
 }
 
@@ -14,12 +19,12 @@ function formatDate(iso: string): string {
 }
 
 const AVATAR_COLORS = [
-  { bg: 'var(--brand)', text: 'white' },
-  { bg: 'var(--status-green)', text: 'white' },
-  { bg: 'var(--status-purple)', text: 'white' },
-  { bg: 'var(--status-amber)', text: 'white' },
-  { bg: 'var(--status-red)', text: 'white' },
-  { bg: 'var(--status-emerald)', text: 'white' },
+  { bg: 'var(--brand)', text: 'var(--text-on-brand)' },
+  { bg: 'var(--status-green)', text: 'var(--text-on-brand)' },
+  { bg: 'var(--status-purple)', text: 'var(--text-on-brand)' },
+  { bg: 'var(--status-amber)', text: 'var(--text-on-brand)' },
+  { bg: 'var(--status-red)', text: 'var(--text-on-brand)' },
+  { bg: 'var(--status-emerald)', text: 'var(--text-on-brand)' },
 ];
 
 function avatarColor(name: string) {
@@ -77,7 +82,7 @@ function AssigneeCell({ name }: { name: string | null }) {
   }
   const { bg, text } = avatarColor(name);
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
       <span
         style={{
           width: '22px',
@@ -95,18 +100,36 @@ function AssigneeCell({ name }: { name: string | null }) {
       >
         {name.charAt(0)}
       </span>
-      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{name}</span>
+      <span
+        className="truncate"
+        style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: 0 }}
+      >
+        {name}
+      </span>
     </span>
   );
 }
 
-export function VocRow({ voc, onClick }: VocRowProps) {
+export function VocRow({
+  voc,
+  isChild = false,
+  hasChildren = false,
+  isExpanded = false,
+  isLoadingChildren = false,
+  onToggleExpand,
+  onClick,
+}: VocRowProps) {
   const typeBadge = getTypeBadgeStyle(voc.voc_type_name ?? null);
+  const titleColor = isChild ? 'var(--text-secondary)' : 'var(--text-primary)';
 
   return (
     <tr
       onClick={onClick}
-      style={{ borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+      style={{
+        borderBottom: '1px solid var(--border-subtle)',
+        cursor: 'pointer',
+        background: isChild ? 'color-mix(in srgb, var(--bg-surface) 62%, transparent)' : undefined,
+      }}
       className="hover:bg-[var(--bg-surface)] transition-colors"
     >
       {/* 이슈 ID */}
@@ -114,45 +137,133 @@ export function VocRow({ voc, onClick }: VocRowProps) {
         className="px-4 py-2.5 text-sm"
         style={{
           fontFamily: 'var(--font-code)',
-          color: 'var(--text-secondary)',
+          color: isChild ? 'var(--text-tertiary)' : 'var(--text-secondary)',
           whiteSpace: 'nowrap',
-          width: '168px',
         }}
       >
-        {voc.issue_code ?? '—'}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+          {isChild ? (
+            <span
+              aria-hidden="true"
+              style={{
+                width: '22px',
+                display: 'inline-flex',
+                justifyContent: 'center',
+                color: 'var(--text-quaternary)',
+                flexShrink: 0,
+              }}
+            >
+              <CornerDownRight size={14} />
+            </span>
+          ) : (
+            <button
+              type="button"
+              aria-label={isExpanded ? 'Sub-task 접기' : 'Sub-task 펼치기'}
+              aria-expanded={hasChildren ? isExpanded : undefined}
+              disabled={!hasChildren}
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleExpand?.();
+              }}
+              style={{
+                width: '22px',
+                height: '22px',
+                border: 0,
+                padding: 0,
+                borderRadius: '4px',
+                background: 'transparent',
+                color: hasChildren ? 'var(--text-tertiary)' : 'var(--text-quaternary)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: hasChildren ? 'pointer' : 'default',
+                opacity: hasChildren ? 1 : 0.35,
+                flexShrink: 0,
+              }}
+            >
+              {isLoadingChildren ? (
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: '5px',
+                    height: '5px',
+                    borderRadius: '50%',
+                    background: 'var(--text-quaternary)',
+                  }}
+                />
+              ) : isExpanded ? (
+                <ChevronDown size={15} />
+              ) : (
+                <ChevronRight size={15} />
+              )}
+            </button>
+          )}
+          <span className="truncate">{voc.issue_code ?? '—'}</span>
+        </span>
       </td>
 
       {/* 제목 (type badge + title + tags) */}
-      <td className="px-4 py-2.5" style={{ maxWidth: '0', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-          {typeBadge && voc.voc_type_name && (
+      <td className="px-4 py-2.5" style={{ minWidth: 0 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) auto',
+            alignItems: 'center',
+            gap: '12px',
+            minWidth: 0,
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              minWidth: 0,
+            }}
+          >
+            {!isChild && typeBadge && voc.voc_type_name && (
+              <span
+                style={{
+                  flexShrink: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '1px 7px',
+                  borderRadius: '9999px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  background: typeBadge.bg,
+                  border: `1px solid ${typeBadge.border}`,
+                  color: typeBadge.color,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span style={{ marginRight: '3px', fontSize: '8px', lineHeight: 1 }}>●</span>
+                {voc.voc_type_name}
+              </span>
+            )}
             <span
+              className="truncate"
               style={{
-                flexShrink: 0,
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '1px 7px',
-                borderRadius: '9999px',
-                fontSize: '11px',
-                fontWeight: 600,
-                background: typeBadge.bg,
-                border: `1px solid ${typeBadge.border}`,
-                color: typeBadge.color,
-                whiteSpace: 'nowrap',
+                color: titleColor,
+                fontSize: '14px',
+                fontWeight: isChild ? 500 : 600,
+                lineHeight: 1.45,
+                minWidth: 0,
               }}
             >
-              <span style={{ marginRight: '3px', fontSize: '8px', lineHeight: 1 }}>●</span>
-              {voc.voc_type_name}
+              {voc.title}
             </span>
-          )}
-          <span
-            className="text-sm font-medium truncate"
-            style={{ color: 'var(--text-primary)', flexShrink: 1 }}
-          >
-            {voc.title}
           </span>
           {voc.tags && voc.tags.length > 0 && (
-            <span style={{ display: 'inline-flex', gap: '4px', flexShrink: 0 }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                justifyContent: 'flex-end',
+                gap: '4px',
+                minWidth: 0,
+                overflow: 'hidden',
+              }}
+            >
               {voc.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag.id}
@@ -165,6 +276,7 @@ export function VocRow({ voc, onClick }: VocRowProps) {
                     color: 'var(--text-tertiary)',
                     border: '1px solid var(--border-subtle)',
                     whiteSpace: 'nowrap',
+                    flexShrink: 0,
                   }}
                 >
                   {tag.name}
@@ -176,24 +288,24 @@ export function VocRow({ voc, onClick }: VocRowProps) {
       </td>
 
       {/* 상태 */}
-      <td className="px-4 py-2.5" style={{ whiteSpace: 'nowrap', width: '100px' }}>
+      <td className="px-3 py-2.5" style={{ whiteSpace: 'nowrap' }}>
         <StatusBadge status={voc.status} />
       </td>
 
       {/* 담당자 */}
-      <td className="px-4 py-2.5" style={{ whiteSpace: 'nowrap', width: '120px' }}>
+      <td className="px-3 py-2.5" style={{ whiteSpace: 'nowrap', minWidth: 0 }}>
         <AssigneeCell name={voc.assignee_name ?? null} />
       </td>
 
       {/* 우선순위 */}
-      <td className="px-4 py-2.5" style={{ whiteSpace: 'nowrap', width: '90px' }}>
+      <td className="px-3 py-2.5" style={{ whiteSpace: 'nowrap' }}>
         <PriorityBadge priority={voc.priority} />
       </td>
 
       {/* 등록일 */}
       <td
         className="px-4 py-2.5 text-xs"
-        style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', width: '88px' }}
+        style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}
       >
         {formatDate(voc.created_at)}
       </td>

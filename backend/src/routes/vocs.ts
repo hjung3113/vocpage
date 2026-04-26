@@ -8,6 +8,7 @@ import { emitNotification } from '../services/notifications';
 import { STATUS_TRANSITIONS } from '../utils/voc';
 import { subtasksRouter } from './subtasks';
 import { payloadRouter } from './payload';
+import { attachListMetadata, hasParentIdColumn, type VocRow } from './vocMetadata';
 
 export const vocRouter = Router();
 
@@ -38,7 +39,11 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
   const sortCol = allowedSorts.includes(sort ?? '') ? sort : 'created_at';
   const orderDir = order === 'asc' ? 'ASC' : 'DESC';
 
+  const canUseParentId = await hasParentIdColumn();
   const conditions: string[] = ['v.deleted_at IS NULL'];
+  if (canUseParentId) {
+    conditions.push('v.parent_id IS NULL');
+  }
   const params: unknown[] = [];
   let idx = 1;
 
@@ -98,22 +103,17 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
     const total = parseInt(countResult.rows[0].count, 10);
 
     const dataResult = await pool.query(
-      `SELECT v.*, u.display_name AS assignee_name, vt.name AS voc_type_name,
-              COALESCE(
-                json_agg(json_build_object('id', t.id, 'name', t.name)) FILTER (WHERE t.id IS NOT NULL),
-                '[]'
-              ) AS tags
+      `SELECT v.*, u.display_name AS assignee_name, vt.name AS voc_type_name
        FROM vocs v
        LEFT JOIN users u ON v.assignee_id = u.id
        LEFT JOIN voc_types vt ON v.voc_type_id = vt.id
-       LEFT JOIN voc_tags vtg ON v.id = vtg.voc_id
-       LEFT JOIN tags t ON vtg.tag_id = t.id
-       ${where} GROUP BY v.id, u.display_name, vt.name
+       ${where}
        ORDER BY v.${sortCol} ${orderDir} LIMIT $${idx} OFFSET $${idx + 1}`,
       [...params, limitNum, offset],
     );
 
-    res.json({ data: dataResult.rows, total, page: pageNum, limit: limitNum });
+    const data = await attachListMetadata(dataResult.rows as VocRow[]);
+    res.json({ data, total, page: pageNum, limit: limitNum });
   } catch (err) {
     logger.error({ err }, 'GET /api/vocs failed');
     res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -172,21 +172,14 @@ vocRouter.get('/:id', requireAuth, async (req: Request, res: Response): Promise<
               au.display_name AS author_name,
               vt.name AS voc_type_name,
               s.name AS system_name,
-              m.name AS menu_name,
-              COALESCE(
-                json_agg(json_build_object('id', t.id, 'name', t.name)) FILTER (WHERE t.id IS NOT NULL),
-                '[]'
-              ) AS tags
+              m.name AS menu_name
        FROM vocs v
        LEFT JOIN users u ON v.assignee_id = u.id
        LEFT JOIN users au ON v.author_id = au.id
        LEFT JOIN voc_types vt ON v.voc_type_id = vt.id
        LEFT JOIN systems s ON v.system_id = s.id
        LEFT JOIN menus m ON v.menu_id = m.id
-       LEFT JOIN voc_tags vtg ON v.id = vtg.voc_id
-       LEFT JOIN tags t ON vtg.tag_id = t.id
-       WHERE v.id = $1 AND v.deleted_at IS NULL
-       GROUP BY v.id, u.display_name, au.display_name, vt.name, s.name, m.name`,
+       WHERE v.id = $1 AND v.deleted_at IS NULL`,
       [id],
     );
 
@@ -195,7 +188,9 @@ vocRouter.get('/:id', requireAuth, async (req: Request, res: Response): Promise<
       return;
     }
 
-    const voc = result.rows[0] as { author_id: string };
+    const [voc] = (await attachListMetadata(result.rows as VocRow[])) as Array<
+      VocRow & { author_id: string }
+    >;
 
     if (user.role === 'user' && voc.author_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });

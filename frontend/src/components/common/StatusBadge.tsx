@@ -43,11 +43,11 @@ export function StatusBadge({ status }: { status: string }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '5px',
-        minHeight: '20px',
-        padding: '1px 8px',
+        gap: '4px',
+        minHeight: '19px',
+        padding: '1px 7px',
         borderRadius: '9999px',
-        fontSize: '12px',
+        fontSize: '11.5px',
         fontWeight: 600,
         backgroundColor: cfg.bg,
         border: `1px solid ${cfg.border}`,
@@ -57,8 +57,8 @@ export function StatusBadge({ status }: { status: string }) {
     >
       <span
         style={{
-          width: '6px',
-          height: '6px',
+          width: '5px',
+          height: '5px',
           borderRadius: '50%',
           backgroundColor: cfg.dot,
           flexShrink: 0,
