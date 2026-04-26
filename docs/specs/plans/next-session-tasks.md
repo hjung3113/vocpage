@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-27 (Phase G — 설계 잔여 17건 마무리)
-> 현재 위치: Phase 7 (코드 구현)
+> 최종 업데이트: 2026-04-27 (PR #54 머지 + Phase 재정렬: prototype 고도화를 Phase 7로 신설)
+> 현재 위치: Phase 7 (prototype 고도화)
 
 ---
 
@@ -60,7 +60,7 @@
 
 ---
 
-## Phase 7 착수 전 문서 수정 필수
+## Phase 8 착수 전 문서 수정 필수
 
 | ID  | 항목                                                                 | 상태 |
 | --- | -------------------------------------------------------------------- | ---- |
@@ -78,7 +78,7 @@
 | C2  | Internal Notes 섹션 드로어 추가                    | -    |
 | C3  | 공지 팝업 2-panel 레이아웃 구현                    | -    |
 
-> C10(퍼머링크), C11(사용자 초대), C12(서브태스크 인라인 펼침) 명세는 Phase E에서 완료 — `feature-voc.md §8.17`, `requirements.md §15.2`, `feature-voc.md §9.2.2` 참조. Phase 7에서는 명세대로 구현만 하면 됨.
+> C10(퍼머링크), C11(사용자 초대), C12(서브태스크 인라인 펼침) 명세는 Phase E에서 완료 — `feature-voc.md §8.17`, `requirements.md §15.2`, `feature-voc.md §9.2.2` 참조. Phase 8에서는 명세대로 구현만 하면 됨.
 
 ---
 
@@ -91,10 +91,27 @@
 
 ---
 
-## Phase 7: 개발 스켈레톤
+## Phase 7: Prototype 고도화
+
+> **목표**: 코드 구현 진입 전 `prototype/prototype.html`을 모든 화면·상태·역할에 대해 1:1 재현 가능한 수준으로 끌어올려, Phase 8 구현 시 시각적 정답을 확정한다.
+> **선행 조건**: PR #54 머지 완료 (2026-04-27)
+> **산출물**: 갱신된 `prototype/prototype.html` + 컴포넌트 인벤토리 + 갭 리스트.
+
+| ID  | 항목                                                                                       | 상태 |
+| --- | ------------------------------------------------------------------------------------------ | ---- |
+| P-1 | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel) | -    |
+| P-2 | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글               | -    |
+| P-3 | design.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                | -    |
+| P-4 | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                           | -    |
+| P-5 | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                      | -    |
+| P-6 | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                       | -    |
+
+---
+
+## Phase 8: 개발 스켈레톤
 
 > **목표**: 로컬 dev 환경에서 전체 기능 동작 확인. production 고려 없음.
-> **선행 조건**: R-1~R-4 완료 + 6-9 완료
+> **선행 조건**: Phase 7 (prototype 고도화) 완료 + R-1~R-4 완료 + 6-9 완료
 
 ### 상시 규칙 ⚠️ 구현 중 항상 적용
 
@@ -107,35 +124,35 @@
 
 | 단계 | 내용                                                                                   | 상태 |
 | ---- | -------------------------------------------------------------------------------------- | ---- |
-| 7-1  | VOC 핵심 플로우 — CRUD, 상태 전환 (접수→검토→처리→완료/드랍)                           | -    |
-| 7-2  | 댓글 + 첨부파일                                                                        | -    |
-| 7-2a | Internal Notes (`voc_internal_notes`) — 보안 필수 3건 포함 (User→404 등)               | -    |
-| 7-3  | 태그 + 태그 규칙 자동화 (갭 #6)                                                        | -    |
-| 7-4  | 대시보드 (위젯 데이터 API + 프론트) — `dashboard.md` + `prototype/prototype.html` 참조 | -    |
-| 7-5  | 공지사항 / FAQ                                                                         | -    |
-| 7-6  | 관리자 페이지 (사용자·카테고리·태그규칙·설정)                                          | -    |
-| 7-7  | 알림                                                                                   | -    |
-| 7-8  | Result Review 플로우 (review_status, voc_payload_reviews)                              | -    |
-| 7-9  | Sub-task                                                                               | -    |
-| 7-10 | 외부 마스터 연동 (stub JSON 기반, 실 MSSQL 아님)                                       | -    |
-| 7-11 | Storybook or 체크리스트 비교 방법 결정 + 전 컴포넌트 티켓화                            | -    |
+| 8-1  | VOC 핵심 플로우 — CRUD, 상태 전환 (접수→검토→처리→완료/드랍)                           | -    |
+| 8-2  | 댓글 + 첨부파일                                                                        | -    |
+| 8-2a | Internal Notes (`voc_internal_notes`) — 보안 필수 3건 포함 (User→404 등)               | -    |
+| 8-3  | 태그 + 태그 규칙 자동화 (갭 #6)                                                        | -    |
+| 8-4  | 대시보드 (위젯 데이터 API + 프론트) — `dashboard.md` + `prototype/prototype.html` 참조 | -    |
+| 8-5  | 공지사항 / FAQ                                                                         | -    |
+| 8-6  | 관리자 페이지 (사용자·카테고리·태그규칙·설정)                                          | -    |
+| 8-7  | 알림                                                                                   | -    |
+| 8-8  | Result Review 플로우 (review_status, voc_payload_reviews)                              | -    |
+| 8-9  | Sub-task                                                                               | -    |
+| 8-10 | 외부 마스터 연동 (stub JSON 기반, 실 MSSQL 아님)                                       | -    |
+| 8-11 | Storybook or 체크리스트 비교 방법 결정 + 전 컴포넌트 티켓화                            | -    |
 
 ---
 
-## Phase 8: 운영 실구현 + 배포
+## Phase 9: 운영 실구현 + 배포
 
 > **목표**: production 준비 완료 + 실 환경 배포.
-> **선행 조건**: Phase 7 전 항목 완료
+> **선행 조건**: Phase 8 전 항목 완료
 
 | 단계 | 내용                                                            | 비고          |
 | ---- | --------------------------------------------------------------- | ------------- |
-| 8-1  | `connect-pg-simple` 세션 스토어 — `NODE_ENV=production` 시 적용 | F-4 defer     |
-| 8-2  | OIDC 인증 실구현 (`oidcAuthMiddleware`)                         |               |
-| 8-3  | Production Dockerfile + 빌드 파이프라인                         |               |
-| 8-5  | 실 MSSQL 연동 (설비 마스터 — 담당자 자료 수집 후)               | G-1 외부 의존 |
-| 8-6  | 배포 + smoke test                                               |               |
-| 8-7  | Playwright E2E 설정 + 핵심 3플로우 테스트 (requirements §13.3)  |               |
-| 8-8  | Jira 마이그레이션 스크립트 작성 + 실행 (오픈 전 필수)           |               |
+| 9-1  | `connect-pg-simple` 세션 스토어 — `NODE_ENV=production` 시 적용 | F-4 defer     |
+| 9-2  | OIDC 인증 실구현 (`oidcAuthMiddleware`)                         |               |
+| 9-3  | Production Dockerfile + 빌드 파이프라인                         |               |
+| 9-5  | 실 MSSQL 연동 (설비 마스터 — 담당자 자료 수집 후)               | G-1 외부 의존 |
+| 9-6  | 배포 + smoke test                                               |               |
+| 9-7  | Playwright E2E 설정 + 핵심 3플로우 테스트 (requirements §13.3)  |               |
+| 9-8  | Jira 마이그레이션 스크립트 작성 + 실행 (오픈 전 필수)           |               |
 
 ---
 
