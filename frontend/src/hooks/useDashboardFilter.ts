@@ -1,60 +1,94 @@
-import { useState, useMemo } from 'react';
-import type { DashboardFilters } from '../api/dashboard';
+import { useState } from 'react';
+import { DashboardQueryParams } from '../api/dashboard';
 
 export interface DashboardFilterState {
+  dateRange: { startDate: string; endDate: string };
+  datePreset: '7d' | '30d' | '90d' | 'custom';
   globalTab: 'all' | string;
   activeMenu: string | null;
-  assigneeId: string | null;
-  dateRange: '7d' | '30d' | '90d';
+  activeAssignee: string | null;
 }
 
-function toStartDate(dateRange: '7d' | '30d' | '90d'): string {
-  const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90;
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
+export interface UseDashboardFilter {
+  filter: DashboardFilterState;
+  setDatePreset: (preset: '7d' | '30d' | '90d' | 'custom') => void;
+  setDateRange: (startDate: string, endDate: string) => void;
+  setGlobalTab: (tab: string) => void;
+  setActiveMenu: (menuId: string | null) => void;
+  setActiveAssignee: (assigneeId: string | null) => void;
+  buildQueryParams: () => DashboardQueryParams;
 }
 
-export function useDashboardFilter() {
-  const [filterState, setFilterState] = useState<DashboardFilterState>({
-    globalTab: 'all',
-    activeMenu: null,
-    assigneeId: null,
-    dateRange: '30d',
-  });
+function toISODate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
-  const apiFilters: DashboardFilters = useMemo(() => {
-    return {
-      systemId: filterState.globalTab !== 'all' ? filterState.globalTab : undefined,
-      menuId: filterState.activeMenu ?? undefined,
-      assigneeId: filterState.assigneeId ?? undefined,
-      startDate: toStartDate(filterState.dateRange),
-      endDate: new Date().toISOString().slice(0, 10),
-    };
-  }, [filterState]);
+function calcDateRange(preset: '7d' | '30d' | '90d'): { startDate: string; endDate: string } {
+  const today = new Date();
+  const days = preset === '7d' ? 7 : preset === '30d' ? 30 : 90;
+  const start = new Date(today);
+  start.setDate(today.getDate() - days);
+  return { startDate: toISODate(start), endDate: toISODate(today) };
+}
+
+const initial30d = calcDateRange('30d');
+
+const initialState: DashboardFilterState = {
+  dateRange: initial30d,
+  datePreset: '30d',
+  globalTab: 'all',
+  activeMenu: null,
+  activeAssignee: null,
+};
+
+export function useDashboardFilter(): UseDashboardFilter {
+  const [filter, setFilter] = useState<DashboardFilterState>(initialState);
+
+  function setDatePreset(preset: '7d' | '30d' | '90d' | 'custom') {
+    setFilter((prev) => {
+      const dateRange = preset === 'custom' ? prev.dateRange : calcDateRange(preset);
+      return { ...prev, datePreset: preset, dateRange };
+    });
+  }
+
+  function setDateRange(startDate: string, endDate: string) {
+    setFilter((prev) => ({
+      ...prev,
+      dateRange: { startDate, endDate },
+      datePreset: 'custom',
+    }));
+  }
 
   function setGlobalTab(tab: string) {
-    setFilterState((prev) => ({ ...prev, globalTab: tab, activeMenu: null }));
+    setFilter((prev) => ({ ...prev, globalTab: tab, activeMenu: null }));
   }
 
   function setActiveMenu(menuId: string | null) {
-    setFilterState((prev) => ({ ...prev, activeMenu: menuId }));
+    setFilter((prev) => ({ ...prev, activeMenu: menuId }));
   }
 
-  function setAssigneeId(assigneeId: string | null) {
-    setFilterState((prev) => ({ ...prev, assigneeId }));
+  function setActiveAssignee(assigneeId: string | null) {
+    setFilter((prev) => ({ ...prev, activeAssignee: assigneeId }));
   }
 
-  function setDateRange(dateRange: '7d' | '30d' | '90d') {
-    setFilterState((prev) => ({ ...prev, dateRange }));
+  function buildQueryParams(): DashboardQueryParams {
+    const params: DashboardQueryParams = {
+      startDate: filter.dateRange.startDate,
+      endDate: filter.dateRange.endDate,
+    };
+    if (filter.globalTab !== 'all') params.systemId = filter.globalTab;
+    if (filter.activeMenu !== null) params.menuId = filter.activeMenu;
+    if (filter.activeAssignee !== null) params.assigneeId = filter.activeAssignee;
+    return params;
   }
 
   return {
-    filterState,
+    filter,
+    setDatePreset,
+    setDateRange,
     setGlobalTab,
     setActiveMenu,
-    setAssigneeId,
-    setDateRange,
-    apiFilters,
+    setActiveAssignee,
+    buildQueryParams,
   };
 }

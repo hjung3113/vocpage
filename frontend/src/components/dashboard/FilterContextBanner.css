@@ -1,0 +1,14 @@
+.filter-context-banner {
+  padding: 6px 24px;
+  background: var(--brand-bg);
+  border-bottom: 1px solid var(--brand-border);
+  font-size: 12px;
+  color: var(--brand);
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.filter-context-banner.visible {
+  display: flex;
+}

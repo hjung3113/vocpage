@@ -1,257 +1,292 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { useDashboardFilter } from '../hooks/useDashboardFilter';
-import { useVOCFilter } from '../hooks/useVOCFilter';
-import { useQuery } from '@tanstack/react-query';
-import { fetchSummary, fetchAssignees } from '../api/dashboard';
-import { listAdminSystems } from '../api/admin';
-import { KpiCard } from '../components/dashboard/KpiCard';
-import { DistributionSection } from '../components/dashboard/DistributionSection';
+import { useContext, useEffect, useState } from 'react';
+import { listSystems } from '../api/masters';
+import { getDashboardAssignees, getDashboardMenus, putDashboardSettings } from '../api/dashboard';
+import type { DashboardSettingsPayload } from '../api/dashboard';
+import { AuthContext } from '../contexts/AuthContext';
+import { DashboardHeader } from '../components/dashboard/DashboardHeader';
+import { FilterContextBanner } from '../components/dashboard/FilterContextBanner';
+import { GlobalTabs } from '../components/dashboard/GlobalTabs';
+import { KpiSection } from '../components/dashboard/KpiSection';
+import { DistributionWidget } from '../components/dashboard/DistributionWidget';
 import { PriorityStatusMatrix } from '../components/dashboard/PriorityStatusMatrix';
 import { DrilldownHeatmap } from '../components/dashboard/DrilldownHeatmap';
 import { WeeklyTrendChart } from '../components/dashboard/WeeklyTrendChart';
 import { TagDistributionChart } from '../components/dashboard/TagDistributionChart';
-import { SystemMenuCards } from '../components/dashboard/SystemMenuCards';
+import { ProcessingSpeedWidget } from '../components/dashboard/ProcessingSpeedWidget';
+import { AgingWidget } from '../components/dashboard/AgingWidget';
 import { AssigneeTable } from '../components/dashboard/AssigneeTable';
 import { AgingVocList } from '../components/dashboard/AgingVocList';
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 5 * 60 * 1000 } },
-});
-
-function DashboardInner() {
-  const navigate = useNavigate();
-  const { setFilters, resetFilters } = useVOCFilter();
-  const { filterState, setAssigneeId, setDateRange, setGlobalTab, apiFilters } =
-    useDashboardFilter();
-
-  const { data: summary } = useQuery({
-    queryKey: ['dashboard', 'summary', apiFilters],
-    queryFn: () => fetchSummary(apiFilters),
-  });
-
-  const { data: assignees } = useQuery({
-    queryKey: ['dashboard', 'assignees'],
-    queryFn: fetchAssignees,
-  });
-
-  const { data: systems } = useQuery({
-    queryKey: ['admin', 'systems'],
-    queryFn: listAdminSystems,
-  });
-
-  const DATE_RANGES: { key: '7d' | '30d' | '90d'; label: string }[] = [
-    { key: '7d', label: '7일' },
-    { key: '30d', label: '30일' },
-    { key: '90d', label: '90일' },
-  ];
-
-  const resolutionRate =
-    summary != null && summary.total > 0
-      ? Math.round((summary.completed / summary.total) * 100)
-      : null;
-
-  return (
-    <div
-      style={{
-        padding: '24px',
-        background: 'var(--bg-app)',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px',
-      }}
-    >
-      {/* GlobalTabs — channel tab bar */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <button
-          onClick={() => setGlobalTab('all')}
-          style={{
-            padding: '6px 16px',
-            borderRadius: '20px',
-            border: '1px solid var(--border)',
-            background: filterState.globalTab === 'all' ? 'var(--brand)' : 'transparent',
-            color:
-              filterState.globalTab === 'all' ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-            cursor: 'pointer',
-            fontSize: '13px',
-            fontWeight: filterState.globalTab === 'all' ? 600 : 400,
-          }}
-        >
-          전체
-        </button>
-        {(systems ?? [])
-          .filter((s) => !s.is_archived)
-          .map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setGlobalTab(s.id)}
-              style={{
-                padding: '6px 16px',
-                borderRadius: '20px',
-                border: '1px solid var(--border)',
-                background: filterState.globalTab === s.id ? 'var(--brand)' : 'transparent',
-                color:
-                  filterState.globalTab === s.id ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: filterState.globalTab === s.id ? 600 : 400,
-              }}
-            >
-              {s.name}
-            </button>
-          ))}
-      </div>
-
-      {/* Global filter bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>기간</span>
-        {DATE_RANGES.map((dr) => (
-          <button
-            key={dr.key}
-            onClick={() => setDateRange(dr.key)}
-            style={{
-              padding: '5px 14px',
-              borderRadius: '4px',
-              border: '1px solid var(--border)',
-              background: filterState.dateRange === dr.key ? 'var(--brand)' : 'transparent',
-              color:
-                filterState.dateRange === dr.key ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-              cursor: 'pointer',
-              fontSize: '13px',
-            }}
-          >
-            {dr.label}
-          </button>
-        ))}
-
-        <select
-          value={filterState.assigneeId ?? ''}
-          onChange={(e) => setAssigneeId(e.target.value || null)}
-          style={{
-            padding: '5px 10px',
-            borderRadius: '4px',
-            border: '1px solid var(--border)',
-            background: 'var(--bg-surface)',
-            color: 'var(--text-primary)',
-            fontSize: '13px',
-            cursor: 'pointer',
-          }}
-        >
-          <option value="">담당자 전체</option>
-          {(assignees ?? []).map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* KPI rows — VOLUME (4) + QUALITY (4) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span
-            style={{ color: 'var(--text-muted)', fontSize: '11px', width: '56px', flexShrink: 0 }}
-          >
-            VOLUME
-          </span>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
-            <KpiCard label="총 VOC" value={summary?.total ?? '—'} />
-            <KpiCard
-              label="미해결"
-              value={summary?.unresolved ?? '—'}
-              onClick={() => {
-                setFilters({ status: '접수', priority: null });
-                navigate('/');
-              }}
-            />
-            <KpiCard
-              label="이번주 신규"
-              value={summary?.new_this_week ?? '—'}
-              onClick={() => {
-                resetFilters();
-                navigate('/');
-              }}
-            />
-            <KpiCard
-              label="이번주 완료"
-              value={'—'}
-              onClick={() => {
-                setFilters({ status: '완료', priority: null });
-                navigate('/');
-              }}
-            />
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span
-            style={{ color: 'var(--text-muted)', fontSize: '11px', width: '56px', flexShrink: 0 }}
-          >
-            QUALITY
-          </span>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
-            <KpiCard
-              label="평균처리시간"
-              value={
-                summary?.avg_resolution_days != null ? Math.round(summary.avg_resolution_days) : '—'
-              }
-              unit={summary?.avg_resolution_days != null ? '일' : undefined}
-            />
-            <KpiCard
-              label="해결율"
-              value={resolutionRate != null ? resolutionRate : '—'}
-              unit={resolutionRate != null ? '%' : undefined}
-            />
-            <KpiCard label="Urgent·High 미해결" value={summary?.urgent ?? '—'} />
-            <KpiCard label="14일+ 미처리" value={summary?.overdue ?? '—'} />
-          </div>
-        </div>
-      </div>
-
-      {/* Distribution + Matrix */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-        <DistributionSection apiFilters={apiFilters} />
-        <PriorityStatusMatrix apiFilters={apiFilters} />
-      </div>
-
-      {/* Drilldown heatmap */}
-      <DrilldownHeatmap apiFilters={apiFilters} />
-
-      {/* Weekly trend + Tag distribution */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-        <WeeklyTrendChart apiFilters={apiFilters} />
-        <TagDistributionChart apiFilters={apiFilters} />
-      </div>
-
-      {/* System cards */}
-      <SystemMenuCards apiFilters={apiFilters} />
-
-      {/* Assignee table */}
-      <AssigneeTable apiFilters={apiFilters} />
-
-      {/* Aging */}
-      <AgingVocList apiFilters={apiFilters} />
-    </div>
-  );
-}
+import { LayoutEditPanel } from '../components/dashboard/LayoutEditPanel';
+import { WidgetEditBar } from '../components/dashboard/WidgetEditBar';
+import { useDashboardFilter } from '../hooks/useDashboardFilter';
+import './DashboardPage.css';
 
 export function DashboardPage() {
+  const {
+    filter,
+    setGlobalTab,
+    setActiveMenu,
+    setActiveAssignee,
+    setDatePreset,
+    setDateRange,
+    buildQueryParams,
+  } = useDashboardFilter();
+
+  const authCtx = useContext(AuthContext);
+  const userRole = authCtx?.user?.role;
+
+  const [editMode, setEditMode] = useState(false);
+  const [widgetVisibility, setWidgetVisibility] = useState<Record<string, boolean>>({
+    'kpi-volume': true,
+    'kpi-quality': true,
+    distribution: true,
+    matrix: true,
+    heatmap: true,
+    'weekly-trend': true,
+    'tag-distribution': true,
+    'processing-speed': true,
+    aging: true,
+    assignee: true,
+    'aging-vocs': true,
+  });
+
+  function toggleWidget(key: string) {
+    setWidgetVisibility((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function handleSaveSettings(payload: DashboardSettingsPayload) {
+    putDashboardSettings(payload).catch(() => {});
+    setEditMode(false);
+  }
+
+  const [systems, setSystems] = useState<{ id: string; name: string }[]>([]);
+  const [menus, setMenus] = useState<{ id: string; name: string }[]>([]);
+  const [assignees, setAssignees] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    listSystems()
+      .then((items) => {
+        if (!cancelled) setSystems(items.map((s) => ({ id: s.id, name: s.name })));
+      })
+      .catch(() => {});
+    getDashboardAssignees()
+      .then((data) => {
+        if (!cancelled) setAssignees(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (filter.globalTab === 'all') {
+      setMenus([]);
+      return;
+    }
+    let cancelled = false;
+    getDashboardMenus(filter.globalTab)
+      .then((data) => {
+        if (!cancelled) setMenus(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [filter.globalTab]);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <DashboardInner />
-    </QueryClientProvider>
+    <div id="page-dashboard" className={editMode ? 'edit-mode' : ''}>
+      <DashboardHeader
+        filter={filter}
+        menus={menus}
+        assignees={assignees}
+        onSetDatePreset={setDatePreset}
+        onSetDateRange={setDateRange}
+        onSetActiveMenu={setActiveMenu}
+        onSetActiveAssignee={setActiveAssignee}
+        onEditLayout={() => setEditMode(true)}
+      />
+      <GlobalTabs systems={systems} activeTab={filter.globalTab} onTabChange={setGlobalTab} />
+      <FilterContextBanner
+        filter={filter}
+        systemName={systems.find((s) => s.id === filter.globalTab)?.name}
+        menuName={menus.find((m) => m.id === filter.activeMenu)?.name}
+        assigneeName={assignees.find((a) => a.id === filter.activeAssignee)?.name}
+      />
+      <div className="dash-body" style={{ padding: '0 0 24px', paddingRight: editMode ? 260 : 0 }}>
+        <div style={{ padding: '0 0 8px' }}>
+          <div className={`dash-widget${!widgetVisibility['kpi-volume'] ? ' widget-hidden' : ''}`}>
+            {editMode && (
+              <WidgetEditBar
+                name="KPI"
+                visible={widgetVisibility['kpi-volume']}
+                onToggleVisibility={() => toggleWidget('kpi-volume')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <KpiSection filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            padding: '12px 24px 0',
+          }}
+        >
+          <div
+            className={`dash-widget${!widgetVisibility['distribution'] ? ' widget-hidden' : ''}`}
+          >
+            {editMode && (
+              <WidgetEditBar
+                name="분포"
+                visible={widgetVisibility['distribution']}
+                onToggleVisibility={() => toggleWidget('distribution')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <DistributionWidget filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+          <div className={`dash-widget${!widgetVisibility['matrix'] ? ' widget-hidden' : ''}`}>
+            {editMode && (
+              <WidgetEditBar
+                name="우선순위 매트릭스"
+                visible={widgetVisibility['matrix']}
+                onToggleVisibility={() => toggleWidget('matrix')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <PriorityStatusMatrix filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+        </div>
+        <div style={{ padding: '12px 24px 0' }}>
+          <div className={`dash-widget${!widgetVisibility['heatmap'] ? ' widget-hidden' : ''}`}>
+            {editMode && (
+              <WidgetEditBar
+                name="히트맵"
+                visible={widgetVisibility['heatmap']}
+                onToggleVisibility={() => toggleWidget('heatmap')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <DrilldownHeatmap
+              filter={filter}
+              buildQueryParams={buildQueryParams}
+              onSwitchTab={setGlobalTab}
+              systemName={systems.find((s) => s.id === filter.globalTab)?.name}
+              menuName={menus.find((m) => m.id === filter.activeMenu)?.name}
+            />
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            padding: '12px 24px 0',
+          }}
+        >
+          <div
+            className={`dash-widget${!widgetVisibility['weekly-trend'] ? ' widget-hidden' : ''}`}
+          >
+            {editMode && (
+              <WidgetEditBar
+                name="주간 트렌드"
+                visible={widgetVisibility['weekly-trend']}
+                onToggleVisibility={() => toggleWidget('weekly-trend')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <WeeklyTrendChart filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+          <div
+            className={`dash-widget${!widgetVisibility['tag-distribution'] ? ' widget-hidden' : ''}`}
+          >
+            {editMode && (
+              <WidgetEditBar
+                name="태그 분포"
+                visible={widgetVisibility['tag-distribution']}
+                onToggleVisibility={() => toggleWidget('tag-distribution')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <TagDistributionChart filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            padding: '12px 24px 0',
+          }}
+        >
+          <div
+            className={`dash-widget${!widgetVisibility['processing-speed'] ? ' widget-hidden' : ''}`}
+          >
+            {editMode && (
+              <WidgetEditBar
+                name="처리 속도"
+                visible={widgetVisibility['processing-speed']}
+                onToggleVisibility={() => toggleWidget('processing-speed')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <ProcessingSpeedWidget filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+          <div className={`dash-widget${!widgetVisibility['aging'] ? ' widget-hidden' : ''}`}>
+            {editMode && (
+              <WidgetEditBar
+                name="에이징"
+                visible={widgetVisibility['aging']}
+                onToggleVisibility={() => toggleWidget('aging')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <AgingWidget filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+        </div>
+        <div style={{ padding: '12px 24px 0' }}>
+          <div className={`dash-widget${!widgetVisibility['assignee'] ? ' widget-hidden' : ''}`}>
+            {editMode && (
+              <WidgetEditBar
+                name="담당자"
+                visible={widgetVisibility['assignee']}
+                onToggleVisibility={() => toggleWidget('assignee')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <AssigneeTable filter={filter} buildQueryParams={buildQueryParams} />
+          </div>
+        </div>
+        <div style={{ padding: '12px 24px 24px' }}>
+          <div className={`dash-widget${!widgetVisibility['aging-vocs'] ? ' widget-hidden' : ''}`}>
+            {editMode && (
+              <WidgetEditBar
+                name="장기 미처리 VOC"
+                visible={widgetVisibility['aging-vocs']}
+                onToggleVisibility={() => toggleWidget('aging-vocs')}
+              />
+            )}
+            <div className="widget-hidden-overlay">숨겨진 위젯</div>
+            <AgingVocList
+              filter={filter}
+              buildQueryParams={buildQueryParams}
+              onOpenDrawer={() => {}}
+            />
+          </div>
+        </div>
+      </div>
+      <LayoutEditPanel
+        editMode={editMode}
+        widgetVisibility={widgetVisibility}
+        onClose={() => setEditMode(false)}
+        onSave={handleSaveSettings}
+        userRole={userRole}
+      />
+    </div>
   );
 }

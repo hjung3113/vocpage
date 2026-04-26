@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26 (VOC 목록 세밀 UI 갭 분석 완료)
-> 목표: **VOC 목록 UI 갭 수정 → Phase 9 운영 실구현 + 배포**
+> 최종 업데이트: 2026-04-26 (대시보드 구현 계획 완료)
+> 목표: **대시보드 처음부터 구현 → Phase 9 운영 실구현 + 배포**
 
 ## 현재 상태
 
@@ -13,64 +13,71 @@
 | 네비바/상태배지 버그픽스        | ✅ 완료 + 머지 (PR #41)                               |
 | VOC 리스트 UI/UX benchmark 정렬 | ✅ 완료 + 머지 (PR #43)                               |
 | VOC 목록 세밀 UI 갭 분석        | ✅ 완료 (`docs/specs/reviews/voc-list-ui-ux-gaps.md`) |
-| VOC 목록 세밀 UI 갭 수정        | ✅ 완료 (feat/align-seed-to-prototype)                |
+| VOC 목록 세밀 UI 갭 수정        | ✅ 완료 (feat/align-seed-to-prototype, main에 머지)   |
+| 대시보드 구현 계획              | ✅ 완료 (`docs/specs/plans/dashboard-impl.md` v2)     |
+| 대시보드 구현                   | ✅ 완료 (feat/dashboard, PR 미오픈)                   |
 | Phase 9                         | ⏳ 대기                                               |
 
 ---
 
-## 다음 세션 시작 전
+## 다음 세션: 대시보드 구현
 
-1. ~~네비바/상태배지 버그픽스 PR 머지~~ ✅ 완료 (PR #41)
-2. ~~VOC 리스트 UI/UX benchmark 정렬 PR 머지~~ ✅ 완료 (PR #43)
-3. **VOC 목록 세밀 UI 갭 수정** (아래 항목 참조)
-4. Phase 9 작업 시작
+> 구현 계획 전문: `docs/specs/plans/dashboard-impl.md`  
+> 벤치마크: `benchmark/12-dashboard.png`, `benchmark/14-dashboard-layout-edit.png`  
+> 스펙: `docs/specs/requires/dashboard.md`, `docs/specs/requires/design.md §11`  
+> 브랜치: `feat/dashboard` 새로 생성 후 작업
 
----
+### Step 1 — 공통 토대
 
-## VOC 목록 세밀 UI 갭 수정
+- [ ] `frontend/src/api/dashboard.ts` — 15개 API 함수
+- [ ] `frontend/src/hooks/useDashboardFilter.ts` — 글로벌 필터 상태 + `buildQueryParams()`
+- [ ] `frontend/src/components/dashboard/DimSelector.tsx` — 공통 dim 셀렉터
+- [ ] `frontend/src/router.tsx` — `/dashboard` 라우트 + Manager/Admin Guard 추가
+- [ ] `frontend/src/pages/DashboardPage.tsx` — 레이아웃 뼈대 + `editMode` / `widgetVisibility` state
 
-> 갭 분석 전문: `docs/specs/reviews/voc-list-ui-ux-gaps.md`
-> 브랜치: `feat/align-seed-to-prototype` (현재 브랜치에서 계속)
+### Step 2 — 헤더·탭·배너
 
-### 글자 크기
+- [ ] `DashboardHeader.tsx` — sticky 헤더, 담당자·날짜·편집 버튼
+- [ ] `GlobalTabs.tsx` — 탭 전환 → filter.globalTab 업데이트
+- [ ] `FilterContextBanner.tsx` — 조건부 표시
 
-- [ ] `VocRow.tsx:137` — 이슈 ID `text-sm`(14px) → `text-xs`(12px)
-- [ ] `VocFilterBar.tsx:112` — 상태 탭 버튼 `text-sm`(14px) → `fontSize: '13px'`
-- [ ] `VocRow.tsx:232` — 유형 배지 텍스트 `11px` → `12px`
+### Step 3 — KPI
 
-### 태그 칩 (`VocRow.tsx`)
+- [ ] `KpiSection.tsx` — VOLUME / QUALITY 2행, 8카드, 클릭→VOC 목록 이동
 
-- [ ] `VocRow.tsx:275` — `borderRadius: '4px'` → `'9999px'` (pill)
-- [ ] `VocRow.tsx:271` — `padding: '1px 6px'` → `'2px 8px'`
+### Step 4 — 분포 + 매트릭스 (2-col)
 
-### 유형 배지 (`VocRow.tsx`)
+- [ ] `DistributionWidget.tsx` — conic-gradient 도넛 + 4탭 + dim셀렉터 + 레전드 클릭
+- [ ] `PriorityStatusMatrix.tsx` — 4×5 테이블, 셀 색상 lerp, 셀 클릭→이동
 
-- [ ] `VocRow.tsx:230` — padding 세로 `1px` → `2px`
-- [ ] `VocRow.tsx:240` — dot `fontSize: '8px'` → `'9px'`, `marginRight: '3px'` → `'4px'`
-- [ ] `VocRow.tsx:224` — 서브 VOC 행에서 유형 배지 숨김 제거 (`!isChild` 조건 삭제)
+### Step 5 — 히트맵
 
-### 테이블 셀 패딩 (`VocRow.tsx`)
+- [ ] `DrilldownHeatmap.tsx` — breadcrumb + X축 3종 + table-layout:fixed + 셀 클릭
 
-- [ ] 이슈 ID / 제목 / 등록일 셀: `px-4`(16px) → `px-3`(12px)
-- [ ] 상태 / 담당자 / 우선순위 셀: `px-3`(12px) → `px-2`(8px)
+### Step 6 — 차트 위젯 (2-col)
 
-### 테이블 열 넓이 (`VocList.tsx`)
+- [ ] `WeeklyTrendChart.tsx` — recharts LineChart, 3선, 포인트 클릭→이동
+- [ ] `TagDistributionChart.tsx` — recharts BarChart layout="vertical", 바 클릭→이동
 
-- [ ] 이슈 ID 컬럼: `150px` → `180px`
-- [ ] 상태 컬럼: `88px` → `76px`
-- [ ] 담당자 컬럼: `108px` → `96px`
-- [ ] 우선순위 컬럼: `82px` → `76px`
-- [ ] 등록일 컬럼: `90px` → `86px`
+### Step 7 — 하단 위젯
 
-### 필터 더보기 (`VocFilterBar.tsx`)
+- [ ] `ProcessingSpeedWidget.tsx` — SLA 테이블
+- [ ] `AgingWidget.tsx` — recharts BarChart stacked, 세그먼트 클릭→이동
+- [ ] `AssigneeTable.tsx` — X축 3종, 셀 클릭→이동, 담당자 필터 하이라이트
+- [ ] `AgingVocList.tsx` — 장기 미처리 Top10, 행 클릭→Drawer
 
-- [ ] 유형(VOC type) 필터 행 추가: 버그/기능 요청/개선 제안/문의 칩
-- [ ] 필터 행 순서 변경: 담당자 → 우선순위 → 유형 → 태그
+### Step 8 — 레이아웃 편집 + 백엔드
 
-### 기타
+- [ ] `LayoutEditPanel.tsx` — 슬라이드인 패널, 위젯 눈버튼, 저장 대상 토글, 설정 저장
+- [ ] `backend/src/routes/dashboard.ts` — 15개 엔드포인트 전체
+- [ ] `backend/src/index.ts` — dashboard 라우터 마운트
 
-- [ ] 미배정 담당자 아이콘: `UserX` → `UserMinus` 또는 벤치마크와 일치하는 아이콘으로 교체 (`VocRow.tsx:68`)
-- [ ] 완료 후 Playwright 스크린샷으로 벤치마크와 재비교
+### Step 9 — 검증
+
+- [ ] `npx tsc --noEmit -p frontend/tsconfig.json` 통과
+- [ ] `frontend vitest` 기존 25/25 통과
+- [ ] `backend jest --testPathPattern=vocs` 기존 33/33 통과
+- [ ] Playwright 스크린샷 vs `benchmark/12-dashboard.png` 육안 비교
 
 ---
 

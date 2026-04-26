@@ -1,125 +1,126 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAssigneeStats, type DashboardFilters } from '../../api/dashboard';
+import { useNavigate } from 'react-router-dom';
+import { getAssigneeStats } from '../../api/dashboard';
+import type { DashboardQueryParams } from '../../api/dashboard';
+import type { DashboardFilterState } from '../../hooks/useDashboardFilter';
+import { buildNav } from '../../utils/dashboardNav';
+import './AssigneeTable.css';
+
+export interface AssigneeTableProps {
+  filter: DashboardFilterState;
+  buildQueryParams: () => DashboardQueryParams;
+}
+
+function cellAlpha(value: number, maxValue: number): string {
+  if (value === 0 || maxValue === 0) return '';
+  const alpha = 0.06 + (value / maxValue) * (0.62 - 0.06);
+  return `oklch(63% 0.19 258 / ${alpha.toFixed(2)})`;
+}
 
 type XAxis = 'status' | 'priority' | 'tag';
 
-const AXIS_OPTIONS: { key: XAxis; label: string }[] = [
-  { key: 'status', label: '진행현황' },
-  { key: 'priority', label: '우선순위별' },
-  { key: 'tag', label: '태그별' },
-];
-
-interface Props {
-  apiFilters: DashboardFilters;
-}
-
-export function AssigneeTable({ apiFilters }: Props) {
+export function AssigneeTable({ filter, buildQueryParams }: AssigneeTableProps) {
+  const navigate = useNavigate();
   const [xAxis, setXAxis] = useState<XAxis>('status');
+  const params = useMemo(() => buildQueryParams(), [buildQueryParams]);
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['dashboard', 'assignee-stats', xAxis, apiFilters],
-    queryFn: () => fetchAssigneeStats(apiFilters, xAxis),
+  const { data } = useQuery({
+    queryKey: ['dashboard-assignee-stats', xAxis, params],
+    queryFn: () => getAssigneeStats({ ...params, xAxis }),
+    staleTime: 5 * 60 * 1000,
   });
 
-  const xValues = data?.x_values ?? [];
-  const assigneeNames = [...new Set(data?.rows.map((r) => r.assignee_name) ?? [])];
-  const cellMap = new Map<string, number>();
-  data?.rows.forEach((r) => cellMap.set(`${r.assignee_name}|${r.x_label}`, r.count));
-
-  const cellStyle: React.CSSProperties = {
-    padding: '8px 12px',
-    textAlign: 'center',
-    fontSize: '13px',
-    border: '1px solid var(--border)',
-    color: 'var(--text-primary)',
-  };
-
-  const headerStyle: React.CSSProperties = {
-    ...cellStyle,
-    color: 'var(--text-muted)',
-    fontWeight: 600,
-    background: 'var(--bg-surface)',
-  };
+  const allValues = data?.rows.flatMap((row) => row.values) ?? [];
+  const maxValue = Math.max(...allValues, 1);
 
   return (
-    <div
-      style={{
-        background: 'var(--bg-panel)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        padding: '16px',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-        <h3 style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0 }}>
-          담당자별 통계
-        </h3>
-        <div style={{ display: 'flex', gap: '6px' }}>
-          {AXIS_OPTIONS.map((opt) => (
-            <button
-              key={opt.key}
-              onClick={() => setXAxis(opt.key)}
-              style={{
-                padding: '3px 10px',
-                borderRadius: '4px',
-                border: '1px solid var(--border)',
-                background: xAxis === opt.key ? 'var(--brand)' : 'transparent',
-                color: xAxis === opt.key ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                fontSize: '12px',
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
+    <div className="widget">
+      <div className="widget-header">
+        <span className="widget-title">담당자별 처리 현황</span>
+        <div className="assign-btn-group">
+          <button
+            className={`assign-btn${xAxis === 'status' ? ' active' : ''}`}
+            onClick={() => setXAxis('status')}
+          >
+            진행 현황
+          </button>
+          <button
+            className={`assign-btn${xAxis === 'priority' ? ' active' : ''}`}
+            onClick={() => setXAxis('priority')}
+          >
+            우선순위별
+          </button>
+          <button
+            className={`assign-btn${xAxis === 'tag' ? ' active' : ''}`}
+            onClick={() => setXAxis('tag')}
+          >
+            태그별
+          </button>
         </div>
       </div>
 
-      {isLoading && <p style={{ color: 'var(--text-muted)' }}>로딩 중...</p>}
-      {isError && <p style={{ color: 'var(--danger)' }}>데이터를 불러오지 못했습니다.</p>}
-
-      {data && (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead>
-              <tr>
-                <th style={{ ...headerStyle, textAlign: 'left', position: 'sticky', left: 0 }}>
-                  담당자
-                </th>
-                {xValues.map((x) => (
-                  <th key={x} style={headerStyle}>
-                    {x}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {assigneeNames.map((name) => (
-                <tr key={name}>
-                  <td
-                    style={{
-                      ...cellStyle,
-                      textAlign: 'left',
-                      background: 'var(--bg-surface)',
-                      position: 'sticky',
-                      left: 0,
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    {name}
-                  </td>
-                  {xValues.map((x) => (
-                    <td key={x} style={cellStyle}>
-                      {cellMap.get(`${name}|${x}`) ?? '—'}
+      <table className="assign-table">
+        <thead>
+          <tr>
+            <th className="rl">담당자</th>
+            {(data?.headers ?? []).map((h) => (
+              <th key={h}>{h}</th>
+            ))}
+            <th>합계</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(data?.rows ?? []).map((row) => {
+            const isActive = filter.activeAssignee === row.assigneeId;
+            return (
+              <tr key={row.assigneeId} className={isActive ? 'assign-row-highlight' : ''}>
+                <td className={`rl${!row.assigneeName ? ' unassigned' : ''}`}>
+                  {row.assigneeName || '미지정'}
+                </td>
+                {row.values.map((val, idx) => {
+                  const header = data?.headers[idx] ?? '';
+                  if (val === 0) {
+                    return (
+                      <td
+                        key={idx}
+                        style={{
+                          background: 'var(--bg-elevated)',
+                          color: 'var(--text-quaternary)',
+                          cursor: 'default',
+                        }}
+                      >
+                        —
+                      </td>
+                    );
+                  }
+                  return (
+                    <td
+                      key={idx}
+                      style={{ background: cellAlpha(val, maxValue), cursor: 'pointer' }}
+                      onClick={() =>
+                        navigate(
+                          buildNav(params, {
+                            assigneeId: row.assigneeId || 'unassigned',
+                            [xAxis === 'status'
+                              ? 'status'
+                              : xAxis === 'priority'
+                                ? 'priority'
+                                : 'tag']: header,
+                          }),
+                        )
+                      }
+                    >
+                      {val}
                     </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                  );
+                })}
+                <td className="tc">{row.total}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

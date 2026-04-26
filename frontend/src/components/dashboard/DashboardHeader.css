@@ -1,0 +1,81 @@
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg-app);
+}
+
+.dashboard-header-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.dashboard-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.menu-selector-sep {
+  color: var(--text-quaternary);
+  font-size: 12px;
+}
+
+.filter-select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.date-btn-group {
+  display: flex;
+  gap: 2px;
+}
+
+.date-btn-group button {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.date-btn-group button.active {
+  background: var(--brand-bg);
+  color: var(--brand);
+  border-color: var(--brand-border);
+  font-weight: 600;
+}
+
+.date-range-btn,
+.edit-layout-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+}

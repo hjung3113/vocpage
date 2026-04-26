@@ -1,81 +1,115 @@
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchPriorityStatusMatrix, type DashboardFilters } from '../../api/dashboard';
+import { useNavigate } from 'react-router-dom';
+import { getPriorityStatusMatrix } from '../../api/dashboard';
+import type { DashboardQueryParams } from '../../api/dashboard';
+import type { DashboardFilterState } from '../../hooks/useDashboardFilter';
+import { DimSelector } from './DimSelector';
+import { buildNav } from '../../utils/dashboardNav';
+import './PriorityStatusMatrix.css';
 
-const PRIORITIES = ['urgent', 'high', 'medium', 'low'];
-const STATUSES = ['접수', '검토중', '처리중', '완료', '드랍'];
-
-interface Props {
-  apiFilters: DashboardFilters;
+export interface PriorityStatusMatrixProps {
+  filter: DashboardFilterState;
+  buildQueryParams: () => DashboardQueryParams;
 }
 
-export function PriorityStatusMatrix({ apiFilters }: Props) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['dashboard', 'priority-status-matrix', apiFilters],
-    queryFn: () => fetchPriorityStatusMatrix(apiFilters),
+const PRIORITY_COLORS: Record<string, string> = {
+  urgent: 'oklch(58% .22 25)',
+  high: 'oklch(60% .18 45)',
+  medium: 'var(--text-tertiary)',
+  low: 'var(--text-quaternary)',
+};
+
+function cellAlpha(value: number, maxValue: number): string {
+  if (value === 0 || maxValue === 0) return '';
+  const alpha = 0.06 + (value / maxValue) * (0.62 - 0.06);
+  return `oklch(63% 0.19 258 / ${alpha.toFixed(2)})`;
+}
+
+export function PriorityStatusMatrix({ filter, buildQueryParams }: PriorityStatusMatrixProps) {
+  const navigate = useNavigate();
+  const [dim, setDim] = useState<'all' | 'system' | 'menu'>('all');
+
+  const params = useMemo(() => buildQueryParams(), [buildQueryParams]);
+
+  const { data } = useQuery({
+    queryKey: ['dashboard-matrix', dim, params],
+    queryFn: () => getPriorityStatusMatrix(params),
+    staleTime: 5 * 60 * 1000,
   });
 
-  const cellMap = new Map<string, number>();
-  data?.rows.forEach((r) => cellMap.set(`${r.priority}|${r.status}`, r.count));
-
-  const cellStyle: React.CSSProperties = {
-    padding: '8px 12px',
-    textAlign: 'center',
-    fontSize: '13px',
-    border: '1px solid var(--border)',
-    color: 'var(--text-primary)',
-  };
-
-  const headerStyle: React.CSSProperties = {
-    ...cellStyle,
-    color: 'var(--text-muted)',
-    fontWeight: 600,
-    background: 'var(--bg-surface)',
-  };
+  const allValues = data?.rows.flatMap((row) => Object.values(row.status)) ?? [];
+  const maxValue = Math.max(...allValues, 1);
 
   return (
-    <div
-      style={{
-        background: 'var(--bg-panel)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        padding: '16px',
-        overflowX: 'auto',
-      }}
-    >
-      <h3 style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '12px' }}>
-        우선순위 × 상태
-      </h3>
-      {isLoading && <p style={{ color: 'var(--text-muted)' }}>로딩 중...</p>}
-      {isError && <p style={{ color: 'var(--danger)' }}>데이터를 불러오지 못했습니다.</p>}
-      {data && (
-        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              <th style={headerStyle}>우선순위</th>
-              {STATUSES.map((s) => (
-                <th key={s} style={headerStyle}>
-                  {s}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {PRIORITIES.map((priority) => (
-              <tr key={priority}>
-                <td style={{ ...headerStyle, textAlign: 'left' }}>{priority}</td>
-                {STATUSES.map((status) => {
-                  const count = cellMap.get(`${priority}|${status}`) ?? 0;
+    <div className="widget">
+      <div className="widget-header">
+        <span className="widget-title">우선순위 × 상태 매트릭스</span>
+        <DimSelector
+          options={[
+            { label: '전체', value: 'all' },
+            { label: '시스템별', value: 'system' },
+            { label: '메뉴별', value: 'menu' },
+          ]}
+          value={dim}
+          onChange={(v) => setDim(v as 'all' | 'system' | 'menu')}
+          hiddenValues={filter.globalTab !== 'all' ? ['system'] : []}
+        />
+      </div>
+
+      <table className="matrix-table">
+        <thead>
+          <tr>
+            <th className="rh"></th>
+            {(data?.statuses ?? []).map((s) => (
+              <th key={s}>{s}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {(data?.rows ?? []).map((row) => (
+            <tr key={row.priority}>
+              <td
+                className="rh"
+                style={{ color: PRIORITY_COLORS[row.priority] ?? 'var(--text-secondary)' }}
+              >
+                {row.priority}
+              </td>
+              {(data?.statuses ?? []).map((statusCol) => {
+                const value = row.status[statusCol] ?? 0;
+                const bg = cellAlpha(value, maxValue);
+                if (value === 0) {
                   return (
-                    <td key={status} style={cellStyle}>
-                      {count > 0 ? count : '—'}
+                    <td
+                      key={statusCol}
+                      style={{
+                        background: 'var(--bg-elevated)',
+                        color: 'var(--text-quaternary)',
+                        cursor: 'default',
+                      }}
+                    >
+                      —
                     </td>
                   );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                }
+                return (
+                  <td
+                    key={statusCol}
+                    style={{ background: bg }}
+                    onClick={() =>
+                      navigate(buildNav(params, { priority: row.priority, status: statusCol }))
+                    }
+                  >
+                    {value}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <p className="matrix-footnote">셀 클릭 → 해당 필터로 VOC 목록 이동</p>
     </div>
   );
 }

@@ -1,4 +1,6 @@
-export interface DashboardFilters {
+const BASE = '/api/dashboard';
+
+export interface DashboardQueryParams {
   systemId?: string;
   menuId?: string;
   assigneeId?: string;
@@ -9,115 +11,245 @@ export interface DashboardFilters {
 export interface DashboardSummary {
   total: number;
   unresolved: number;
-  completed: number;
-  in_progress: number;
-  urgent: number;
-  overdue: number;
-  avg_resolution_days: number | null;
-  new_this_week: number;
+  newThisWeek: number;
+  doneThisWeek: number;
+  avgProcessingDays: number;
+  resolvedRate: number;
+  urgentHighUnresolved: number;
+  over14Days: number;
+  prevWeek: {
+    total: number;
+    unresolved: number;
+    newThisWeek: number;
+    doneThisWeek: number;
+    avgProcessingDays: number;
+    resolvedRate: number;
+    urgentHighUnresolved: number;
+    over14Days: number;
+  };
 }
 
-function buildParams(
-  filters: DashboardFilters,
-  extra?: Record<string, string | undefined>,
-): string {
+export interface DistributionItem {
+  name: string;
+  count: number;
+  pct: number;
+  color?: string;
+}
+
+export interface MatrixData {
+  rows: { priority: string; status: Record<string, number> }[];
+  statuses: string[];
+}
+
+export interface HeatmapData {
+  headers: string[];
+  totalRow: number[];
+  rows: { name: string; id: string; values: number[]; total: number }[];
+}
+
+export interface WeeklyTrendData {
+  weeks: string[];
+  series: { new: number[]; inProgress: number[]; done: number[] };
+}
+
+export interface TagDistItem {
+  name: string;
+  count: number;
+}
+
+export interface SystemOverviewData {
+  systems: { id: string; name: string; status: Record<string, number>; total: number }[];
+}
+
+export interface AssigneeStatsData {
+  headers: string[];
+  rows: { assigneeId: string; assigneeName: string; values: number[]; total: number }[];
+}
+
+export interface ProcessingSpeedData {
+  rows: { id: string; name: string; avgDays: number; slaRate: number }[];
+}
+
+export interface AgingData {
+  rows: { id: string; name: string; safe: number; warn: number; crit: number; total: number }[];
+}
+
+export interface AgingVoc {
+  id: string;
+  issue_code: string | null;
+  title: string;
+  systemName: string;
+  menuName: string;
+  priority: string;
+  daysSinceCreated: number;
+}
+
+export interface DashboardSettings {
+  widget_visibility: Record<string, boolean>;
+  default_date_range: '7d' | '30d' | '90d';
+  heatmap_default_x_axis: 'status' | 'priority' | 'tag';
+}
+
+export interface DashboardSettingsPayload extends DashboardSettings {
+  target: 'user' | 'admin';
+}
+
+export interface MenuItem {
+  id: string;
+  name: string;
+}
+
+export interface AssigneeItem {
+  id: string;
+  name: string;
+}
+
+function buildParams(p: Record<string, string | undefined>): string {
   const params = new URLSearchParams();
-  if (filters.systemId) params.set('systemId', filters.systemId);
-  if (filters.menuId) params.set('menuId', filters.menuId);
-  if (filters.assigneeId) params.set('assigneeId', filters.assigneeId);
-  if (filters.startDate) params.set('startDate', filters.startDate);
-  if (filters.endDate) params.set('endDate', filters.endDate);
-  if (extra) {
-    for (const [key, val] of Object.entries(extra)) {
-      if (val !== undefined) params.set(key, val);
-    }
-  }
-  const str = params.toString();
-  return str ? `?${str}` : '';
+  Object.entries(p).forEach(([k, v]) => {
+    if (v !== undefined && v !== '') params.set(k, v);
+  });
+  return params.toString() ? `?${params}` : '';
 }
 
-async function get<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`dashboard fetch error: ${res.status} ${url}`);
-  return res.json() as Promise<T>;
+function queryToRecord(p: DashboardQueryParams): Record<string, string | undefined> {
+  return {
+    systemId: p.systemId,
+    menuId: p.menuId,
+    assigneeId: p.assigneeId,
+    startDate: p.startDate,
+    endDate: p.endDate,
+  };
 }
 
-export function fetchSummary(filters: DashboardFilters): Promise<DashboardSummary> {
-  return get(`/api/dashboard/summary${buildParams(filters)}`);
+export async function getDashboardSummary(p: DashboardQueryParams): Promise<DashboardSummary> {
+  const res = await fetch(`${BASE}/summary${buildParams(queryToRecord(p))}`);
+  if (!res.ok) throw new Error(`getDashboardSummary: ${res.status}`);
+  return res.json() as Promise<DashboardSummary>;
 }
 
-export function fetchDistribution(
-  filters: DashboardFilters,
-  type: 'status' | 'priority' | 'voc_type' | 'tag',
-): Promise<{ label: string; count: number }[]> {
-  return get(`/api/dashboard/distribution${buildParams(filters, { type })}`);
+export async function getDistribution(
+  p: DashboardQueryParams & { type: 'status' | 'priority' | 'voc_type' | 'tag' },
+): Promise<DistributionItem[]> {
+  const { type, ...rest } = p;
+  const res = await fetch(`${BASE}/distribution${buildParams({ ...queryToRecord(rest), type })}`);
+  if (!res.ok) throw new Error(`getDistribution: ${res.status}`);
+  return res.json() as Promise<DistributionItem[]>;
 }
 
-export function fetchPriorityStatusMatrix(
-  filters: DashboardFilters,
-): Promise<{ rows: { priority: string; status: string; count: number }[] }> {
-  return get(`/api/dashboard/priority-status-matrix${buildParams(filters)}`);
+export async function getPriorityStatusMatrix(p: DashboardQueryParams): Promise<MatrixData> {
+  const res = await fetch(`${BASE}/priority-status-matrix${buildParams(queryToRecord(p))}`);
+  if (!res.ok) throw new Error(`getPriorityStatusMatrix: ${res.status}`);
+  return res.json() as Promise<MatrixData>;
 }
 
-export function fetchHeatmap(
-  filters: DashboardFilters,
-  xAxis: 'status' | 'priority' | 'tag',
-): Promise<{ rows: { y_label: string; x_label: string; count: number }[]; x_values: string[] }> {
-  return get(`/api/dashboard/heatmap${buildParams(filters, { xAxis })}`);
+export async function getHeatmap(
+  p: DashboardQueryParams & { xAxis: 'status' | 'priority' | 'tag' },
+): Promise<HeatmapData> {
+  const { xAxis, ...rest } = p;
+  const res = await fetch(`${BASE}/heatmap${buildParams({ ...queryToRecord(rest), xAxis })}`);
+  if (!res.ok) throw new Error(`getHeatmap: ${res.status}`);
+  return res.json() as Promise<HeatmapData>;
 }
 
-export function fetchWeeklyTrend(
-  filters: DashboardFilters,
-): Promise<{ weeks: { week: string; new: number; in_progress: number; completed: number }[] }> {
-  return get(`/api/dashboard/weekly-trend${buildParams(filters)}`);
-}
-
-export function fetchTagDistribution(
-  filters: DashboardFilters,
-  limit?: number,
-): Promise<{ tag: string; count: number }[]> {
-  return get(
-    `/api/dashboard/tag-distribution${buildParams(filters, { limit: limit?.toString() })}`,
+export async function getWeeklyTrend(
+  p: Pick<DashboardQueryParams, 'systemId' | 'menuId'> & { weeks?: number },
+): Promise<WeeklyTrendData> {
+  const res = await fetch(
+    `${BASE}/weekly-trend${buildParams({
+      systemId: p.systemId,
+      menuId: p.menuId,
+      weeks: p.weeks !== undefined ? String(p.weeks) : undefined,
+    })}`,
   );
+  if (!res.ok) throw new Error(`getWeeklyTrend: ${res.status}`);
+  return res.json() as Promise<WeeklyTrendData>;
 }
 
-export function fetchSystemOverview(
-  filters: DashboardFilters,
-): Promise<
-  { system_id: string; system_name: string; total: number; unresolved: number; completed: number }[]
-> {
-  return get(`/api/dashboard/system-overview${buildParams(filters)}`);
+export async function getTagDistribution(
+  p: DashboardQueryParams & { limit?: number },
+): Promise<TagDistItem[]> {
+  const { limit, ...rest } = p;
+  const res = await fetch(
+    `${BASE}/tag-distribution${buildParams({
+      ...queryToRecord(rest),
+      limit: limit !== undefined ? String(limit) : undefined,
+    })}`,
+  );
+  if (!res.ok) throw new Error(`getTagDistribution: ${res.status}`);
+  return res.json() as Promise<TagDistItem[]>;
 }
 
-export function fetchAssigneeStats(
-  filters: DashboardFilters,
-  xAxis: 'status' | 'priority' | 'tag',
-): Promise<{
-  rows: {
-    assignee_id: string | null;
-    assignee_name: string;
-    x_label: string;
-    count: number;
-  }[];
-  x_values: string[];
-}> {
-  return get(`/api/dashboard/assignee-stats${buildParams(filters, { xAxis })}`);
+export async function getSystemOverview(p: DashboardQueryParams): Promise<SystemOverviewData> {
+  const res = await fetch(`${BASE}/system-overview${buildParams(queryToRecord(p))}`);
+  if (!res.ok) throw new Error(`getSystemOverview: ${res.status}`);
+  return res.json() as Promise<SystemOverviewData>;
 }
 
-export function fetchAging(
-  filters: DashboardFilters,
-): Promise<{ le7: number; d8to30: number; gt30: number }> {
-  return get(`/api/dashboard/aging${buildParams(filters)}`);
+export async function getAssigneeStats(
+  p: DashboardQueryParams & { xAxis: 'status' | 'priority' | 'tag' },
+): Promise<AssigneeStatsData> {
+  const { xAxis, ...rest } = p;
+  const res = await fetch(
+    `${BASE}/assignee-stats${buildParams({ ...queryToRecord(rest), xAxis })}`,
+  );
+  if (!res.ok) throw new Error(`getAssigneeStats: ${res.status}`);
+  return res.json() as Promise<AssigneeStatsData>;
 }
 
-export function fetchAgingVocs(filters: DashboardFilters, limit?: number): Promise<unknown[]> {
-  return get(`/api/dashboard/aging-vocs${buildParams(filters, { limit: limit?.toString() })}`);
+export async function getProcessingSpeed(p: DashboardQueryParams): Promise<ProcessingSpeedData> {
+  const res = await fetch(`${BASE}/processing-speed${buildParams(queryToRecord(p))}`);
+  if (!res.ok) throw new Error(`getProcessingSpeed: ${res.status}`);
+  return res.json() as Promise<ProcessingSpeedData>;
 }
 
-export function fetchDashboardMenus(systemId: string): Promise<{ id: string; name: string }[]> {
-  return get(`/api/dashboard/menus?systemId=${encodeURIComponent(systemId)}`);
+export async function getAging(p: DashboardQueryParams): Promise<AgingData> {
+  const res = await fetch(`${BASE}/aging${buildParams(queryToRecord(p))}`);
+  if (!res.ok) throw new Error(`getAging: ${res.status}`);
+  return res.json() as Promise<AgingData>;
 }
 
-export function fetchAssignees(): Promise<{ id: string; name: string; email: string }[]> {
-  return get('/api/dashboard/assignees');
+export async function getAgingVocs(
+  p: DashboardQueryParams & { limit?: number },
+): Promise<AgingVoc[]> {
+  const { limit, ...rest } = p;
+  const res = await fetch(
+    `${BASE}/aging-vocs${buildParams({
+      ...queryToRecord(rest),
+      limit: limit !== undefined ? String(limit) : undefined,
+    })}`,
+  );
+  if (!res.ok) throw new Error(`getAgingVocs: ${res.status}`);
+  return res.json() as Promise<AgingVoc[]>;
+}
+
+export async function getDashboardSettings(): Promise<DashboardSettings> {
+  const res = await fetch(`${BASE}/settings`);
+  if (!res.ok) throw new Error(`getDashboardSettings: ${res.status}`);
+  return res.json() as Promise<DashboardSettings>;
+}
+
+export async function putDashboardSettings(body: DashboardSettingsPayload): Promise<void> {
+  const res = await fetch(`${BASE}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`putDashboardSettings: ${res.status}`);
+}
+
+export async function getDashboardMenus(systemId: string): Promise<MenuItem[]> {
+  const res = await fetch(`${BASE}/menus${buildParams({ systemId })}`);
+  if (!res.ok) throw new Error(`getDashboardMenus: ${res.status}`);
+  return res.json() as Promise<MenuItem[]>;
+}
+
+export async function getDashboardAssignees(
+  p?: Pick<DashboardQueryParams, 'systemId' | 'menuId'>,
+): Promise<AssigneeItem[]> {
+  const res = await fetch(
+    `${BASE}/assignees${buildParams({ systemId: p?.systemId, menuId: p?.menuId })}`,
+  );
+  if (!res.ok) throw new Error(`getDashboardAssignees: ${res.status}`);
+  return res.json() as Promise<AssigneeItem[]>;
 }

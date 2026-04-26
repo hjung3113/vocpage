@@ -1,0 +1,141 @@
+.heatmap-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.heatmap-top-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.heatmap-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hm-btn-group {
+  display: flex;
+  gap: 1px;
+  background: var(--bg-elevated);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.hm-btn {
+  padding: 3px 9px;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.hm-btn.active {
+  background: var(--bg-surface);
+  color: var(--brand);
+  font-weight: 600;
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.1);
+}
+
+.hm-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.hm-crumb {
+  color: var(--text-tertiary);
+}
+
+.hm-crumb.clickable {
+  cursor: pointer;
+}
+
+.hm-crumb.clickable:hover {
+  color: var(--brand);
+}
+
+.hm-sep {
+  color: var(--text-quaternary);
+  margin: 0 4px;
+}
+
+.heatmap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+}
+
+.heatmap-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  padding: 4px 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.heatmap-table th.rl {
+  text-align: left;
+}
+
+.heatmap-table td {
+  padding: 5px 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.heatmap-table td.rl {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heatmap-table td.rl.clickable {
+  cursor: pointer;
+}
+
+.heatmap-table td.rl.clickable:hover {
+  color: var(--brand);
+}
+
+.heatmap-table td.tc {
+  color: var(--text-tertiary);
+  font-weight: 700;
+}
+
+.heatmap-table td.empty {
+  color: var(--text-quaternary);
+  background: var(--bg-elevated) !important;
+}
+
+.hm-total-row td {
+  background: var(--bg-elevated) !important;
+  border-bottom: 1px solid var(--border-standard);
+}
+
+.hm-total-row td.rl {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hm-total-row td.tc {
+  color: var(--text-secondary);
+  font-weight: 700;
+}

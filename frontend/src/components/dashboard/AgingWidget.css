@@ -1,0 +1,87 @@
+.aging-legend {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.aging-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+}
+
+.aging-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.aging-safe {
+  background: light-dark(oklch(55% 0.17 152), oklch(60% 0.19 155));
+}
+.aging-warn {
+  background: light-dark(oklch(55% 0.15 68), oklch(68% 0.16 72));
+}
+.aging-crit {
+  background: light-dark(oklch(52% 0.18 22), oklch(62% 0.2 22));
+}
+
+.aging-item {
+  margin-bottom: 8px;
+}
+
+.aging-item-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.aging-item-name {
+  color: var(--text-secondary);
+}
+
+.aging-item-counts {
+  display: flex;
+  gap: 6px;
+}
+
+.aging-count-safe {
+  color: light-dark(oklch(55% 0.17 152), oklch(60% 0.19 155));
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.aging-count-warn {
+  color: light-dark(oklch(55% 0.15 68), oklch(68% 0.16 72));
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.aging-count-crit {
+  color: light-dark(oklch(52% 0.18 22), oklch(62% 0.2 22));
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.aging-bar {
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+
+.aging-seg {
+  height: 100%;
+  cursor: pointer;
+}
+
+.aging-empty {
+  font-size: 11px;
+  color: var(--text-quaternary);
+  padding: 12px 0;
+  text-align: center;
+}
