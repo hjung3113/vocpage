@@ -1,0 +1,133 @@
+.layout-edit-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 256px;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border-subtle);
+  z-index: 50;
+  transform: translateX(100%);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px;
+  overflow-y: auto;
+}
+.layout-edit-panel.open {
+  transform: translateX(0);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.panel-close {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.panel-close:hover {
+  color: var(--text-primary);
+}
+
+.panel-desc {
+  font-size: 11px;
+  color: var(--text-quaternary);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.panel-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.ds-save-target-group {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.ds-save-btn {
+  flex: 1;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+.ds-save-btn.active {
+  background: var(--brand-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.ds-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.panel-settings-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.panel-settings-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.panel-select {
+  width: 100%;
+  padding: 7px 9px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.panel-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.panel-save-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--text-on-brand);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.panel-cancel-btn {
+  width: 100%;
+  padding: 7px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
