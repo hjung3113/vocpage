@@ -15,7 +15,7 @@
 | VOC 목록 세밀 UI 갭 분석        | ✅ 완료 (`docs/specs/reviews/voc-list-ui-ux-gaps.md`) |
 | VOC 목록 세밀 UI 갭 수정        | ✅ 완료 (feat/align-seed-to-prototype, main에 머지)   |
 | 대시보드 구현 계획              | ✅ 완료 (`docs/specs/plans/dashboard-impl.md` v2)     |
-| 대시보드 구현                   | 🔄 다음 세션 시작                                     |
+| 대시보드 구현                   | ✅ 완료 (feat/dashboard, PR 미오픈)                   |
 | Phase 9                         | ⏳ 대기                                               |
 
 ---

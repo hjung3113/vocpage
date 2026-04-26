@@ -4,11 +4,30 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~8 ✅ 완료 → 대시보드 전면 재작성 계획 완료 → **다음 세션: 대시보드 구현 시작**
+현재 위치: Phase 0~8 ✅ 완료 → 대시보드 Step 1~9 구현 완료 → **다음 세션: PR 머지 + 시각적 갭 정밀 수정**
 
-브랜치: main (feat/align-seed-to-prototype merge 완료)
+브랜치: feat/dashboard (push 완료, PR 미오픈)
 
-최근 작업 (2026-04-26, feat/align-seed-to-prototype 브랜치):
+최근 작업 (2026-04-26, feat/dashboard 브랜치):
+- 대시보드 전체 구현 완료 (Step 1~9, dashboard-impl.md 기준):
+  - frontend: 16개 컴포넌트 + 3개 CSS + hook + api + utils 신규 작성
+  - backend: dashboard.ts 15개 엔드포인트 + requireManager 미들웨어
+  - AppProviders에 QueryClientProvider 추가 (useQuery 동작 전제)
+  - router.tsx: /dashboard + DashboardGuard (manager|admin)
+- 런타임 에러 3종 수정 (fix 커밋):
+  - listAdminSystems(403) → listSystems(/api/systems) 교체
+  - KpiSection: data.prevWeek null guard
+  - DrilldownHeatmap: totalRow/rows null guard
+  - dashboard.ts: /matrix → /priority-status-matrix URL 수정
+- 검증: typecheck clean, Vitest 25/25 pass, Playwright 0 errors
+- 시각 비교: 레이아웃 구조 benchmark와 일치. 데이터 0은 seed DB 날짜 범위 문제(정상)
+
+다음 세션 할 일:
+1. PR 오픈 (feat/dashboard → main) + 머지
+2. 실데이터 환경에서 시각적 갭 정밀 수정 (benchmark/12-dashboard.png 기준)
+3. Phase 9 운영 실구현 착수
+
+이전 작업 (2026-04-26, feat/align-seed-to-prototype 브랜치):
 - VOC 테이블 세밀 UI 수정 (benchmark/01, benchmark/11 기준):
   - 타입 배지: pill(9999px) → 사각형(4px radius), ● dot 제거, 11px font
   - 테이블 오른쪽 여백: 등록일 컬럼 paddingRight 20px 추가
