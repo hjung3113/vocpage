@@ -8,7 +8,7 @@
 | `feature-voc.md`            | VOC 핵심 기능 명세 — 상태 전환·권한·Priority·첨부·알림·Sub-task·분류 체계·목록 필터·페이지네이션 등 |
 | `feature-notice-faq.md`     | 공지사항 & FAQ 기능 명세 — 사이드바 구조·팝업 동작·Admin 관리                                       |
 | `dashboard.md`              | 대시보드 요구사항 명세 — 위젯 상세·글로벌 필터·API·상태 관리·수용 기준                              |
-| `design.md`                 | 디자인 시스템 — 색상 토큰·타이포그래피·컴포넌트·레이아웃 규칙                                       |
+| `uidesign.md`               | 디자인 시스템 — 색상 토큰·타이포그래피·컴포넌트·레이아웃 규칙                                       |
 
 ### 용어
 
@@ -169,6 +169,36 @@
 2. **사이드바:** 시스템 목록이 아코디언 트리로 표시. 시스템 클릭 시 하위 메뉴 펼침. 메뉴 클릭 시 해당 메뉴 VOC 목록 필터링.
 3. **사이드 드로어(Side Drawer):** 리스트 항목 클릭 시 우측에서 상세 화면 슬라이드. (분석 시스템의 맥락 유지)
 4. **등록 모달:** 시스템 → 메뉴 → 유형 순 연계 드롭다운. 시스템 선택 시 해당 시스템의 메뉴만 표시.
+
+> 시각 토큰·컴포넌트 패턴은 `uidesign.md` 정본. 본 절은 화면 구성 요약.
+
+### 5.1 비데이터 상태 동작 규약
+
+> 시각 패턴은 `uidesign.md §5 Empty / Error / Loading States` 정본. 본 절은 **언제 어떤 상태가 렌더되어야 하는지·실패 흐름**을 정의한다.
+
+**상태 트리거**
+
+| 상태    | 트리거                                     |
+| ------- | ------------------------------------------ |
+| Loading | 데이터 fetch 시작 후 200ms 이상 응답 지연  |
+| Empty   | fetch 성공 + 결과 0건                      |
+| Error   | 네트워크 단절·5xx·검증 실패 등 비정상 응답 |
+
+**권한·존재 실패 흐름**
+
+- **403 (권한 없음)**: 데이터 영역에 error 변형(타이틀 "권한이 없습니다", retry 없음, 홈 링크 1건)을 렌더. admin 페이지 진입 시 admin-topbar 액션 버튼은 숨김.
+- **404 (존재하지 않는 엔티티)**: drawer/modal에서 발생 시 자동 닫고 toast로 안내. 내부에 error state 렌더 금지 (사용자가 사라진 항목을 응시하게 두지 않는다).
+- **세션 만료(401)**: 글로벌 인터셉터가 로그인 화면으로 강제 이동. 페이지 단위 error state 미사용.
+
+**위젯 독립성 (대시보드)**
+
+- 위젯은 각자 독립 fetch + 독립 상태. 한 위젯의 에러가 형제 위젯을 비우거나 페이지 전체를 error 상태로 전환하면 안 된다.
+- 위젯 error 시 해당 위젯 영역에만 inline banner + retry. 다른 위젯은 정상 렌더 유지.
+
+**기타**
+
+- Empty/loading/error는 데이터 영역만 교체 — page header, sidebar, 필터 바는 항상 유지.
+- Empty 상태에는 권한이 허용되는 경우 1차 CTA(예: "공지 추가") 1개만 노출. 보조 액션은 금지.
 
 ---
 
@@ -481,6 +511,22 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 - **비활성화**: Admin이 `is_active=false`로 토글하여 로그인·세션을 차단 (사용자 row는 보존, VOC 이력 무결성 유지).
 - **사용자 관리 화면**: 우상단 "사용자 초대" 버튼은 **MVP에서 비활성화 또는 숨김** — 자동 생성 정책상 진입점 불필요. 벤치마크 스크린샷(`20-admin-users.png`)의 버튼은 NextGen에서 사전 초대 도입 시 활성화 예정.
 
+### 15.3 태그 마스터 관리 (D22)
+
+> 본문은 `feature-voc.md §9.4.6` 단일 출처. 진입점·권한·운영 차단 해소 항목만 본 절에서 포인터.
+
+- **진입점**: 관리자 페이지 → "태그 마스터" 서브탭 (사이드바 `관리자` 그룹 하단).
+- **권한**: Admin (병합/외부 잠금/규칙 일시중지). Manager 읽기 전용.
+- **운영 갭 해소**: `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` 컬럼 (Phase 8 마이그 013 예정).
+
+### 15.4 휴지통 (D23)
+
+> 본문은 `feature-voc.md §9.4.7` 단일 출처. 진입점·권한·운영 차단 해소 항목만 본 절에서 포인터.
+
+- **진입점**: 관리자 페이지 → "휴지통" 서브탭 (사이드바 `관리자` 그룹 최하단). 30일 보존 후 자동 영구 삭제.
+- **권한**: Admin (복원/즉시 영구삭제). Manager 읽기 전용.
+- **운영 갭 해소**: `vocs.deleted_by`, `voc_restore_log` 테이블 (Phase 8 마이그 014 예정).
+
 ---
 
 ## 16. AI 워크플로우 적합성 (NextGen 대비)
@@ -597,6 +643,8 @@ Phase 7 착수 전 종합 리뷰(project-full-review.md) 기반 의사결정 목
 | D16 VOC 목록 서브태스크 인라인 펼침     | **기본 접힘** — 부모 행 좌측 ▶ 토글 클릭 시만 자식 행 인라인 표시, 펼침 상태 영속화 안 함                                                                                                                                                                          | feature-voc.md §9.2                                                                                        |
 | D17 입력 길이 제약 DB CHECK             | **DB CHECK 강제** — title 200자, body 64KB, comment/internal_note 16KB. 앱 레벨 검증과 이중 방어                                                                                                                                                                   | §4 vocs/comments, `migrations/011`                                                                         |
 | D18 Dev role 추가                       | **`users.role` enum 4종 (`user/dev/manager/admin`)** — Dev = User + (assignee=self일 때만) Manager 운영 권한 + Dashboard 보기. Driver: Dashboard 접근은 ownership만으로 표현 불가 + 초대/승급 의미 단위 + role-pill 시각 정체성                                    | §2.3, §4 users, §14.5, §15.2, feature-voc.md §8.3, dashboard.md, `docs/specs/plans/migration-012-draft.md` |
-| D19 공지/FAQ 관리 진입점                | **각 페이지 우측 상단 '관리' 버튼 + `?mode=admin` URL 쿼리** — Admin 탭의 공지/FAQ 서브탭 폐기. Admin/Manager에게만 버튼 노출. URL 쿼리로 deep-link/뒤로가기 보존                                                                                                  | feature-notice-faq.md §10.5(신), §10.3.4, §10.4.3, §10.6, design.md §13.8                                  |
-| D20 design.md ↔ prototype 갭            | **§13 'Admin · Notice · FAQ Components' 신규 + §8 Don't에 raw color literal 금지 + §10에 `--role-dev-*` / `--text-on-brand` 신규 토큰 4종**                                                                                                                        | design.md §8/§10/§13, `docs/specs/reviews/design-prototype-audit.md`                                       |
+| D19 공지/FAQ 관리 진입점                | **각 페이지 우측 상단 '관리' 버튼 + `?mode=admin` URL 쿼리** — Admin 탭의 공지/FAQ 서브탭 폐기. Admin/Manager에게만 버튼 노출. URL 쿼리로 deep-link/뒤로가기 보존                                                                                                  | feature-notice-faq.md §10.5(신), §10.3.4, §10.4.3, §10.6, uidesign.md §13.8                                |
+| D20 uidesign.md ↔ prototype 갭          | **§13 'Admin · Notice · FAQ Components' 신규 + §8 Don't에 raw color literal 금지 + §10에 `--role-dev-*` / `--text-on-brand` 신규 토큰 4종**                                                                                                                        | uidesign.md §8/§10/§13, `docs/specs/reviews/design-prototype-audit.md`                                     |
 | D21 Dev 권한 helper 단일화              | **BE 단일 helper `assertCanManageVoc(user, voc, action)`** — 모든 VOC 운영 라우트가 경유. ownership = `voc.assignee_id === user.id` strict 비교 (primary assignee만, sub-task assignee/co-assignee 미포함). 재배정 시 즉시 권한 박탈, unassigned VOC는 Dev 항상 ❌ | feature-voc.md §8.4-bis (신규)                                                                             |
+| D22 태그 마스터 관리 페이지             | **§9.4.6 태그 마스터 관리 신설** — Admin/Manager가 `tags` CRUD/병합. 사용 VOC 0건 + 규칙 참조 0건일 때만 삭제. `kind` 변경 차단. §8.8.1 "신규 태그는 관리 페이지에서만 생성" 진입점 충족                                                                           | feature-voc.md §9.4.6 (신규)                                                                               |
+| D23 휴지통 (Soft-deleted VOC 복원)      | **§9.4.7 휴지통 신설** — Admin 전용. `?includeDeleted=true` 쿼리만으로는 진입 동선 부재 → 정식 화면. 복원 시 `tag_rules` 재실행. 영구삭제는 D7(무기한 보존)에 따라 MVP 비활성화 자리만 확보                                                                        | feature-voc.md §9.4.7 (신규)                                                                               |

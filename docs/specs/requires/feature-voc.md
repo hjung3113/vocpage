@@ -513,6 +513,49 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
   - 삭제 approve → `vocs.structured_payload=NULL`, `vocs.review_status=NULL`, 해당 history row `final_state='deleted'`/`is_current=false`. 담당자는 이후 "결과 작성"을 다시 수행 가능.
   - 삭제 reject → `vocs.review_status='approved'` 원복, `action='deletion', decision='rejected'` 리뷰 row만 추가.
 
+#### 9.4.6 태그 마스터 관리 (D22 확정, 2026-04-27)
+
+- **목적**: `tags` 테이블의 마스터 레코드(`name`, `kind`, `slug`)를 UI로 관리. §8.8.1이 "신규 태그 생성은 Admin/Manager 전용 관리 페이지에서만 가능"으로 규정한 진입점을 충족.
+- **권한**: Admin/Manager (시스템/메뉴/유형 관리와 동일 정책).
+- **테이블 컬럼**: 태그명 | 슬러그 | 종류(`general`/`menu`) | 사용 VOC 수(`voc_tags` 카운트) | 작업(편집/삭제 또는 병합).
+- **추가**: "태그 추가" 버튼 → 모달(이름·kind·자동 생성 슬러그). 동일 `name+kind` 중복 방지(전역 UNIQUE).
+- **편집**: 행 우측 편집 버튼 → 모달. `kind` 변경은 차단(태그 의미 보존). `name` 변경 시 슬러그 자동 갱신 옵션은 미제공(레거시 슬러그 보호).
+- **삭제 정책**:
+  - 사용 VOC 수 = 0인 태그만 hard delete 허용.
+  - 사용 중 태그 삭제 요청 시 에러 토스트(`"VOC에 부착된 태그는 삭제할 수 없습니다. 병합 또는 부착 해제 후 다시 시도하세요."`).
+  - 별도의 soft delete 컬럼은 추가하지 않음(태그는 부착 해제로 정리).
+- **병합(Minor, MVP 범위 내)**: "병합" 액션 — 두 태그를 선택하여 source 태그의 `voc_tags` 행을 target으로 재배선 후 source 삭제. `tag_rules.tag_id`도 함께 재배선. 트랜잭션 내 처리.
+- **연관 갱신**:
+  - `kind='menu'` 태그는 §8.8 메뉴 태그 규약과 일관: `vocs.menu_id`와 별도. 마스터 페이지에서 menu 태그를 임의로 만드는 것은 허용하나, 실 운영은 메뉴 추가 자동 생성 흐름과 충돌하지 않도록 운영 가이드에 기재.
+  - `tag_rules`가 참조 중인 태그 삭제 시 차단(사용 VOC 수 = 0이라도 규칙 참조 시 차단). 에러 메시지: `"태그 규칙에서 사용 중입니다."`.
+- **API 계약**:
+  - `GET /api/admin/tags?kind=&q=&page=` — 페이지네이션, kind/검색 필터.
+  - `POST /api/admin/tags` — body `{ name, kind }`. 슬러그 BE 자동 생성.
+  - `PATCH /api/admin/tags/:id` — `name`만 수정 허용.
+  - `DELETE /api/admin/tags/:id` — 사용 VOC 수 = 0 + 규칙 참조 0 일 때만 200, 아니면 409.
+  - `POST /api/admin/tags/:id/merge` — body `{ targetId }`. 트랜잭션 처리.
+- **회귀 테스트 필수 4건**: (1) 사용 중 태그 삭제 시 409, (2) 규칙 참조 태그 삭제 시 409, (3) 병합 후 source `voc_tags` 0건 + target에 누적, (4) `kind` 변경 요청 거부.
+
+#### 9.4.7 휴지통 (Soft-deleted VOC 복원, D23 확정, 2026-04-27)
+
+- **목적**: §8.9 Soft Delete된 VOC를 UI로 조회·복원·영구삭제 진입점 제공. 기존 `?includeDeleted=true` 쿼리 파라미터만으로는 정식 진입 동선이 없음.
+- **권한**: Admin 전용 (Soft Delete 권한과 동일 — Manager 비대상).
+- **진입**: 관리자 페이지 좌측 메뉴 "휴지통" 항목. 또는 VOC 목록 우상단 "삭제됨 보기" 토글(`?includeDeleted=true`로 동일 라우트 재사용 가능, MVP는 별도 페이지 채택).
+- **테이블 컬럼**: 이슈 ID | 제목 | 상태(삭제 직전 status) | 시스템/메뉴 | 삭제자(`voc_history` 최근 row) | 삭제일(`deleted_at`) | 작업(복원 / 영구삭제).
+- **필터**: 시스템 / 메뉴 / 삭제일 범위 / 검색(제목·이슈 ID).
+- **복원 액션**:
+  - 행 단위 "복원" 버튼 → 확인 다이얼로그 → `PATCH /api/vocs/:id/restore`.
+  - 동작: `vocs.deleted_at=NULL`로 갱신, `voc_history`에 `restore` 이벤트 기록, §4 `tag_rules` 멱등 재실행(§4 `tag_rules` 불릿 "복원 시 재실행" 정책 준수).
+  - 복원 후 status는 삭제 직전 값 그대로(상태 머신 재진입 없음).
+  - Sub-task: 부모가 hard delete된 경우 `parent_id=NULL`(D13 ON DELETE SET NULL)로 보존된 상태 — 복원 시 그대로 root VOC로 복원.
+- **영구삭제 액션** (MVP 범위 외 표시만):
+  - D7(데이터 보존 무기한)에 따라 MVP는 영구삭제 버튼 **비활성화**(disabled + tooltip "MVP는 영구삭제 미지원"). 컬럼/UI는 NextGen 활성화 대비로 자리만 확보.
+- **첨부파일**: §8.9 정책 그대로 — Admin은 `?includeDeleted=true`로 다운로드 가능. 휴지통 화면 상세에서도 동일 접근 보장.
+- **API 계약**:
+  - `GET /api/admin/vocs/trash?...` — Soft-deleted VOC 목록(필터 + 페이지네이션).
+  - `PATCH /api/vocs/:id/restore` — 복원. 복원 후 응답에 갱신된 VOC + 재부착 태그 포함.
+- **회귀 테스트 필수 3건**: (1) Manager가 `/trash` 호출 시 403, (2) 복원 후 일반 목록 API에서 노출, (3) 복원 시 `tag_rules` 재실행으로 `voc_tags.source='rule'` 행 재부착.
+
 ### 9.5 정렬 옵션 (컬럼 헤더 클릭 정렬)
 
 - 별도 정렬 버튼/드롭다운 없이 **테이블 헤더 컬럼 클릭**으로 오름차순/내림차순 토글.

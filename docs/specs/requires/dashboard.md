@@ -224,7 +224,7 @@
   - 태그 탭: `?tag=X`
   - - 현재 글로벌 필터 공통 추가
 
-#### 상태 탭 (design.md §3 Status Colors 준수)
+#### 상태 탭 (uidesign.md §3 Status Colors 준수)
 
 | 상태   | 색상                         |
 | ------ | ---------------------------- |
@@ -604,7 +604,7 @@ GET /api/dashboard/heatmap
 interface DashboardFilterState {
   // 날짜
   dateRange: { startDate: string; endDate: string };
-  datePreset: '7d' | '30d' | '90d' | 'custom';
+  datePreset: '1m' | '3m' | '1y' | 'all' | 'custom';
 
   // 글로벌 탭 (계층형) — systemId 단일 값으로 관리 (activeSystem 별도 불필요)
   globalTab: 'all' | string; // 'all' | systemId('A', 'B', ...)
@@ -685,8 +685,8 @@ dashboard_settings (
   -- 예: {"kpi": true, "heatmap": true, "aging": false}
   widget_sizes           JSONB       NOT NULL DEFAULT '{}',
   locked_fields          JSONB       NOT NULL DEFAULT '[]',
-  default_date_range     VARCHAR(8)  NOT NULL DEFAULT '30d',
-  -- enum: '7d' | '30d' | '90d' | 'custom'
+  default_date_range     VARCHAR(8)  NOT NULL DEFAULT '3m',
+  -- enum: '1m' | '3m' | '1y' | 'all' | 'custom' (정본: migration 011 + requirements.md §4)
   heatmap_default_x_axis VARCHAR(16) NOT NULL DEFAULT 'status',
   -- enum: 'status' | 'priority' | 'tag'
   globaltabs_order       JSONB,

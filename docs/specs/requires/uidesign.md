@@ -1,6 +1,9 @@
-# VOCpage Design System
+# VOCpage UI Design System
 
-> **Revision history**: Initial Linear-inspired indigo palette → Samsung Blue palette + automatic system theme sync, fully overhauled (2025.06)
+> **Scope**: Visual layer only — color tokens, typography, component visuals, spacing, elevation, layout rules.
+> Behavior, business logic, API contracts, role policy → `requirements.md` / `feature-*.md`.
+>
+> **Revision history**: Initial Linear-inspired indigo palette → Samsung Blue palette + automatic system theme sync, fully overhauled (2025.06). Renamed `design.md` → `uidesign.md` (2026-04-27) to make the visual-only scope unambiguous.
 
 ---
 
@@ -232,14 +235,15 @@ box-shadow: 0 0 0 1px var(--brand-border); /* double-ring: intentional active si
 ### Status Badge
 
 Full pill style — background + border + text color, all semantic. Not dot-only.
+**Use tokens, never raw OKLCH** — defined once in §10 (`--status-{state}-bg/fg/border`).
 
-| Status | BG (dark)             | Text (dark)           | Border (dark)         |
-| ------ | --------------------- | --------------------- | --------------------- |
-| 접수됨 | `bg-elevated`         | `text-quaternary`     | `border-subtle`       |
-| 검토중 | `oklch(20% 0.06 240)` | `oklch(67% 0.17 240)` | `oklch(30% 0.09 240)` |
-| 처리중 | `oklch(18% 0.06 150)` | `oklch(55% 0.17 150)` | `oklch(28% 0.09 150)` |
-| 완료   | `oklch(18% 0.06 158)` | `oklch(62% 0.19 158)` | `oklch(28% 0.10 158)` |
-| 보류   | `oklch(20% 0.06 72)`  | `oklch(70% 0.16 72)`  | `oklch(30% 0.09 72)`  |
+| Status | Background token              | Text token                    | Border token                      |
+| ------ | ----------------------------- | ----------------------------- | --------------------------------- |
+| 접수   | `var(--status-received-bg)`   | `var(--status-received-fg)`   | `var(--status-received-border)`   |
+| 검토중 | `var(--status-reviewing-bg)`  | `var(--status-reviewing-fg)`  | `var(--status-reviewing-border)`  |
+| 처리중 | `var(--status-processing-bg)` | `var(--status-processing-fg)` | `var(--status-processing-border)` |
+| 완료   | `var(--status-done-bg)`       | `var(--status-done-fg)`       | `var(--status-done-border)`       |
+| 드랍   | `var(--status-drop-bg)`       | `var(--status-drop-fg)`       | `var(--status-drop-border)`       |
 
 ```css
 /* shared pill shell */
@@ -370,6 +374,20 @@ Management page components. **Always use classes — never inline `style=`.**
 | Action button      | `.a-btn`                           | Edit, view — secondary actions     |
 | Destructive action | `.a-btn.danger`                    | Delete, disable                    |
 | Count badge        | `.section-count-badge`             | Item count in page header          |
+
+### Empty / Error / Loading States
+
+Every list, table, drawer, and dashboard widget MUST render one of three non-data states. Treat them as first-class — not afterthoughts.
+
+| State   | Trigger                          | Pattern                                                                                                                                                     |
+| ------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Empty   | Successful fetch, zero rows      | Centered icon (32×32, `var(--text-quaternary)`) + headline (13.5px, `var(--text-secondary)`) + optional CTA (`.a-btn`). No card wrapper. Min-height: 220px. |
+| Loading | Initial fetch in flight (>200ms) | Skeleton rows matching real row height (`var(--bg-elevated)` block, 1px `var(--border-subtle)` divider, no shimmer below 200ms). Never spinner-only.        |
+| Error   | Network/5xx/permission failure   | Inline banner: `var(--status-red-bg)` background + `var(--status-red)` text + retry button. Never silently fallback to empty.                               |
+
+**Layout rule:** non-data states replace the data area only — page header, sidebar, and filter bar must stay rendered.
+
+> Behavioral rules (when each state fires, 403 / 404 flow, dashboard widget independence) belong to functional spec — see `requirements.md §5.1 비데이터 상태 동작 규약`.
 
 ---
 
@@ -595,6 +613,23 @@ Full token set — copy into `:root` as the single source of truth.
   --status-dot-processing: light-dark(oklch(48% 0.17 152), oklch(64% 0.19 155)); /* 처리중 */
   --status-dot-done: light-dark(oklch(46% 0.19 155), oklch(63% 0.21 158)); /* 완료 */
   --status-dot-drop: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); /* 드랍 */
+
+  /* Status badge — bg / fg / border per VOC status (used by .s-접수, .s-검토중, ...) */
+  --status-received-bg: light-dark(oklch(91% 0.006 260), oklch(22% 0.008 262));
+  --status-received-fg: light-dark(oklch(50% 0.01 260), oklch(56% 0.008 260));
+  --status-received-border: light-dark(oklch(84% 0.01 260), oklch(28% 0.012 262));
+  --status-reviewing-bg: light-dark(oklch(91% 0.035 242), oklch(21% 0.05 245));
+  --status-reviewing-fg: light-dark(oklch(45% 0.18 245), oklch(68% 0.17 242));
+  --status-reviewing-border: light-dark(oklch(78% 0.06 242), oklch(32% 0.07 244));
+  --status-processing-bg: light-dark(oklch(91% 0.04 152), oklch(20% 0.055 154));
+  --status-processing-fg: light-dark(oklch(42% 0.17 152), oklch(66% 0.19 155));
+  --status-processing-border: light-dark(oklch(76% 0.065 152), oklch(30% 0.075 154));
+  --status-done-bg: light-dark(oklch(91% 0.038 155), oklch(20% 0.05 158));
+  --status-done-fg: light-dark(oklch(40% 0.18 155), oklch(65% 0.2 158));
+  --status-done-border: light-dark(oklch(75% 0.065 155), oklch(30% 0.072 158));
+  --status-drop-bg: light-dark(oklch(93% 0.04 72), oklch(21% 0.048 68));
+  --status-drop-fg: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
+  --status-drop-border: light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
 
   /* Role pill — Admin · Manager · Dev · User (D18 / D20, 2026-04-26) */
   /* admin / manager / user reuse existing brand & status tokens; only `dev` requires net-new tokens. */
@@ -1045,3 +1080,15 @@ Small numeric badge on Notice / FAQ sidebar items.
 ```
 
 Hidden when count === 0. Shows `99+` when count > 99.
+
+### 13.11 Admin Page Non-data States
+
+Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지통) reuse the **Empty / Error / Loading** patterns defined in §5.
+
+- Empty: replace `<table>` body with the §5 empty pattern + primary CTA labeled per page (예: "공지 추가", "FAQ 추가", "복원").
+- Loading: 5 skeleton `<tr>` matching `.admin-table` row height; header stays visible.
+- Error: inline banner above the table; the "추가/refresh" admin-topbar button stays operable.
+
+> 403 / 404 / dashboard 위젯 격리 등 동작 규약은 `requirements.md §5.1` 참조.
+
+휴지통(D23): empty 상태 보조 카피 톤은 `var(--text-tertiary)` — 정책 본문(30일 보존 등)은 `feature-voc.md §9.4.7` 참조.

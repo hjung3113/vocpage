@@ -26,7 +26,7 @@ npm run test -- path/to/file.test.ts     # Single test file
 
 Token pipeline: `src/tokens.ts` → `tailwind.config.ts` (utility classes) + CSS custom properties (`var(--*)`)
 
-Full token reference: `docs/specs/requires/design.md §10 CSS Reference` and `§12 Token Architecture`.
+Full token reference: `docs/specs/requires/uidesign.md §10 CSS Reference` and `§12 Token Architecture`.
 
 **When to use which:**
 
@@ -39,7 +39,7 @@ Full token reference: `docs/specs/requires/design.md §10 CSS Reference` and `§
 **Hard rules:**
 
 - Never write hex or raw OKLCH values outside of `src/tokens.ts`
-- If a token doesn't exist for what you need, add it to `src/tokens.ts` + `design.md §12` first, then use it
+- If a token doesn't exist for what you need, add it to `src/tokens.ts` + `uidesign.md §12` first, then use it
 - Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)
 
 Key tokens: `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--brand)` / `var(--accent)` / `var(--text-primary)` / `var(--text-secondary)`

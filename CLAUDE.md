@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-This is a **VOC (Voice of Customer) management system** currently in **Phase 6 implementation** — frontend and backend are scaffolded with working source code. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
+This is a **VOC (Voice of Customer) management system** currently in **Phase 6 implementation** — frontend and backend are scaffolded with working source code. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/uidesign.md` for the complete design system.
 
 ## Planned Tech Stack
 
@@ -39,7 +39,7 @@ Three-tier app: React SPA → Express REST API → PostgreSQL. Detailed architec
 
 ## Design System (Pointer)
 
-Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Reference.
+Full spec: `docs/specs/requires/uidesign.md`. Full token reference: §10 CSS Reference.
 
 **Hard rule (echoed in `frontend/CLAUDE.md` and `prototype/CLAUDE.md`):**
 
@@ -90,7 +90,7 @@ All design, review, and implementation documents live under `docs/specs/`. No do
 
 ```
 docs/specs/
-├── requires/   # requirements and design specs (requirements.md, design.md, etc.)
+├── requires/   # requirements and design specs (requirements.md, uidesign.md, etc.)
 ├── plans/      # per-feature implementation plans
 └── reviews/    # review and brainstorming outputs
 ```
@@ -99,14 +99,14 @@ docs/specs/
 
 | File                                  | Language         | Scope                                                                                                              |
 | ------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `docs/specs/requires/design.md`       | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
+| `docs/specs/requires/uidesign.md`     | **English only** | Visual design system — color tokens, typography, component specs, layout rules, spacing, elevation, UI do's/don'ts |
 | `docs/specs/requires/requirements.md` | Korean           | Functional requirements — feature specs, behavioral rules, data model, API design, business logic                  |
 
 - New feature plan → `docs/specs/plans/<feature-name>.md`
 - Review / brainstorming → `docs/specs/reviews/<topic>.md`
-- **Never put functional/behavioral spec in `design.md`**
+- **Never put functional/behavioral spec in `uidesign.md`**
 - **Never put visual design rules in `requirements.md`**
-- `design.md` must always be written in English
+- `uidesign.md` must always be written in English
 - **Tool scratch dirs (`.omc/plans/`, `.superpowers/`, etc.) are temporary — canonical docs always live in `docs/specs/`**
 
 ## Document Coherence
@@ -115,7 +115,7 @@ docs/specs/
 
 | Decision made                                                          | Write to                                                         |
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Visual design change (color, layout, spacing, component pattern)       | `docs/specs/requires/design.md` (English)                        |
+| Visual design change (color, layout, spacing, component pattern)       | `docs/specs/requires/uidesign.md` (English)                      |
 | Functional/behavioral change (feature rule, API shape, business logic) | `docs/specs/requires/requirements.md` or relevant `feature-*.md` |
 
 **Then check propagation:**

@@ -22,7 +22,7 @@
 
 - D18 Dev role 추가 (`users.role` enum 4종, ownership 기반 권한)
 - D19 공지/FAQ 관리 진입점 = 페이지 우측 상단 버튼 + `?mode=admin` URL 쿼리
-- D20 design.md §13 신규(Admin·Notice·FAQ 컴포넌트 12건) + raw color 가드 + 신규 토큰 4종
+- D20 uidesign.md §13 신규(Admin·Notice·FAQ 컴포넌트 12건) + raw color 가드 + 신규 토큰 4종
 - D21 `assertCanManageVoc` 헬퍼 단일화 (feature-voc.md §8.4-bis 신규)
 - 산출물: `docs/specs/reviews/design-prototype-audit.md`, `docs/specs/plans/migration-012-draft.md`, `.omc/plans/design-admin-role-overhaul.md`
 
@@ -38,9 +38,9 @@
 | F6  | FE role guard hook 분기 갱신 (`useRequireRole`, dashboard 가드, internal note 가드, role-pill)      | -    |
 | F7  | Notice/FAQ 페이지에 `?mode=admin` 쿼리 토글 + admin-only 컴포넌트 dynamic import                    | -    |
 | F8  | Admin 페이지에서 공지/FAQ 서브탭 제거 (코드/네비/라우트 정리)                                       | -    |
-| F9  | design.md §13 컴포넌트들을 React로 구현 (역할별: AdminTopbar, RolePill 4종, NoticeBadge 3종 등)     | -    |
+| F9  | uidesign.md §13 컴포넌트들을 React로 구현 (역할별: AdminTopbar, RolePill 4종, NoticeBadge 3종 등)   | -    |
 | F10 | prototype.html `#fff` 2건 + 본문 `light-dark(oklch())` 사용처 토큰화 (또는 React 이관 시 자동 해소) | -    |
-| F11 | design.md §5 Status Badge 토큰 그룹 정식화 (prototype L399~433 raw oklch 정리)                      | -    |
+| F11 | uidesign.md §5 Status Badge 토큰 그룹 정식화 (prototype L399~433 raw oklch 정리)                    | -    |
 | F12 | BE 회귀 테스트 5건 추가 (feature-voc.md §8.4-bis 명시)                                              | -    |
 
 ---
@@ -57,6 +57,58 @@
 | Minor 6건     | raw hex 제거, 자동 태그 추천, 태그 규칙 모달, FAQ 카테고리 관리, 사이드바 overflow, 분포 위젯 세그먼트    |
 
 산출물: 5개 spec/HTML 수정 (+759/-207). 잔여는 모두 코드 구현(Critical 6건, FE/BE Major 11건, F1~F12, R-4, C1~C3)으로 Phase 7/8 이관.
+
+---
+
+## 다음 세션 — 결정 + 적용 (2026-04-27 cross-review 후속)
+
+> 출처: `docs/specs/reviews/cross-review-2026-04-27.md`. 4개 도메인 리뷰 결과 식별된 **결정 5건 + 즉시 적용 5건**. **2026-04-27 일괄 처리 완료**.
+
+### 결정 (Open Questions) — ✅ 2026-04-27 확정
+
+| #   | 결정 항목                                                                            | 결정                                                                      |
+| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| Q1  | dashboard.md `7d/30d/90d` ↔ req §4 `1m/3m/1y/all/custom` ↔ migration 011 충돌        | **마이그·req 정본 → dashboard.md 수정** (R-5 적용 완료)                   |
+| Q2  | requirements.md §15 본문에 D22/D23 진입점 서브섹션 vs 포인터만 유지                  | **포인터 한 줄** — feature-voc.md §9.4.6/9.4.7 단일 출처 (R-7 적용)       |
+| Q3  | dashboard 위젯 수용 기준 23개 → §13.1.1 Given/When/Then 일괄 변환 vs 체크리스트 허용 | **일괄 변환** — Phase 8 이후 R-8에서 처리                                 |
+| Q4  | §13.4 "VOC 1,000건" vs dashboard.md:661 "10만 건"                                    | **10만 건 통일** — production-scale 기준, R-9 적용 시점 dashboard.md 정본 |
+| Q5  | external-masters atomic swap: 전체 트랜잭션 vs source별 독립                         | **source별 독립** — 운영 인시던트 격리 우선, 8-M3 spec 반영               |
+
+### 즉시 적용 (docs-only) — ✅ 2026-04-27 일괄 커밋 완료
+
+| ID   | 항목                                                                                                                     | 상태 |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | ---- |
+| R-5  | dashboard.md `7d/30d/90d` → `1m/3m/1y/all/custom` (L13, L607, L688-689)                                                  | ✅   |
+| R-7  | requirements.md §15.3 태그 마스터 + §15.4 휴지통 진입점 포인터 한 줄                                                     | ✅   |
+| R-10 | prototype.html 사이드바 "공지사항/FAQ 관리" 메뉴 + `renderAdminNotices/Faq()` 제거 (D19 정합)                            | ✅   |
+| R-11 | prototype.html L95/157 `#fff` 2건 → `var(--text-on-brand)` + L399~435 status badge raw oklch → token (5 status × 3 prop) | ✅   |
+| R-12 | uidesign.md §5 "Empty / Error / Loading States" 패턴 + §13.11 admin page non-data states 정식화                          | ✅   |
+
+> R-11 부수 산출: uidesign.md §10 + prototype :root 에 `--status-{received,reviewing,processing,done,drop}-{bg,fg,border}` 토큰 15종 신설 → F11 (Phase F follow-up) 자동 해소.
+
+### 이연 — Phase 7 (prototype 고도화) 항목 추가
+
+| ID  | 항목                                                                  |
+| --- | --------------------------------------------------------------------- |
+| P-9 | `?mode=admin` 토글 prototype 시연 추가 (D19/ADR #4 검증 — 현재 0 hit) |
+
+### 이연 — Phase 8 (개발 스켈레톤) 신규/우선순위 항목
+
+| ID    | 항목                                                                                                                | 묶음             |
+| ----- | ------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 8-PR1 | **권한 인프라 PR** = migration 012 실파일(F1) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 헬퍼 단일화(F3) | 첫 PR — critical |
+| 8-PR2 | migration 013 = `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` (D22 운영 차단 해소)      | -                |
+| 8-PR3 | migration 014 = `vocs.deleted_by`, `voc_restore_log` (D23 운영 차단 해소)                                           | -                |
+| 8-M1  | `005_content.sql` `faq_categories.slug UNIQUE`/`is_archived` 명세 §10.4 보완 (스키마 선행 잔재)                     | -                |
+| 8-M2  | `notices.visible_from/to` → `timestamptz` + KST 자정 경계 명문화                                                    | -                |
+| 8-M3  | external-masters refresh 스케줄러/실패 처리 spec (Q5 결정 반영)                                                     | Q5               |
+| 8-M4  | FE 미정의 토큰 사용 정리 — `MockLoginPage.tsx:48,57` `--border` → `--border-standard`, `--danger` → `--status-red`  | -                |
+
+### 이연 — Phase 9 또는 NextGen
+
+- §13.4 성능 측정 환경/툴 정의 → Phase 9 (배포 직전 벤치마크 환경 구성 시점)
+- §17 D3·D4·D5·D6 메모 → 명세 본문 흡수 → Phase 8 각 기능 단계 진입 시점에 분산 처리
+- N-1/N-2 (admin-ui-coverage GAP-3·4) → NextGen 유지
 
 ---
 
@@ -101,10 +153,12 @@
 | --- | ------------------------------------------------------------------------------------------ | ---- |
 | P-1 | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel) | -    |
 | P-2 | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글               | -    |
-| P-3 | design.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                | -    |
+| P-3 | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                              | -    |
 | P-4 | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                           | -    |
 | P-5 | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                      | -    |
 | P-6 | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                       | -    |
+| P-7 | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                       | -    |
+| P-8 | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                 | -    |
 
 ---
 
@@ -130,7 +184,7 @@
 | 8-3  | 태그 + 태그 규칙 자동화 (갭 #6)                                                        | -    |
 | 8-4  | 대시보드 (위젯 데이터 API + 프론트) — `dashboard.md` + `prototype/prototype.html` 참조 | -    |
 | 8-5  | 공지사항 / FAQ                                                                         | -    |
-| 8-6  | 관리자 페이지 (사용자·카테고리·태그규칙·설정)                                          | -    |
+| 8-6  | 관리자 페이지 (사용자·카테고리·태그규칙·설정 + D22 태그 마스터 + D23 휴지통)           | -    |
 | 8-7  | 알림                                                                                   | -    |
 | 8-8  | Result Review 플로우 (review_status, voc_payload_reviews)                              | -    |
 | 8-9  | Sub-task                                                                               | -    |
@@ -158,6 +212,8 @@
 
 ## 미결 사항
 
-| #   | 항목                     | 비고                                            |
-| --- | ------------------------ | ----------------------------------------------- |
-| G-1 | 설비 마스터 MSSQL 스키마 | 담당자 자료 수집 후 external-masters.md §3 보완 |
+| #   | 항목                                                        | 비고                                                                                                     |
+| --- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| G-1 | 설비 마스터 MSSQL 스키마                                    | 담당자 자료 수집 후 external-masters.md §3 보완                                                          |
+| N-1 | 외부 마스터 캐시 인스펙트 화면 (loaded_at·항목수·실패 사유) | NextGen. MVP는 스냅샷/콜드스타트 배지만 노출 (§16.3). 운영 중 디버그 필요성 발생 시 활성화               |
+| N-2 | 자동 태그 "수동 제거 후 재부여 차단" 이력 reset UI          | NextGen. §8.8.1에 따라 수동 제거 시 voc_history에 기록되어 재부여 차단됨 — 정정 수단은 운영 실측 후 결정 |
