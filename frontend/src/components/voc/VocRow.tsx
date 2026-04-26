@@ -249,7 +249,7 @@ export function VocRow({
               className="truncate"
               style={{
                 color: titleColor,
-                fontSize: '14px',
+                fontSize: '13px',
                 fontWeight: isChild ? 500 : 600,
                 lineHeight: 1.45,
                 minWidth: 0,

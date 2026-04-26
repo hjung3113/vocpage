@@ -18,10 +18,10 @@ const STATUS_CONFIG: Record<string, { bg: string; border: string; color: string;
     dot: 'var(--status-green)',
   },
   완료: {
-    bg: 'var(--status-green-bg)',
-    border: 'var(--status-green-border)',
-    color: 'var(--status-green)',
-    dot: 'var(--status-green)',
+    bg: 'var(--status-emerald-bg)',
+    border: 'var(--status-emerald-border)',
+    color: 'var(--status-emerald)',
+    dot: 'var(--status-emerald)',
   },
   드랍: {
     bg: 'var(--status-amber-bg)',
@@ -43,10 +43,9 @@ export function StatusBadge({ status }: { status: string }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '4px',
-        minHeight: '19px',
-        padding: '1px 7px',
-        borderRadius: '9999px',
+        gap: '5px',
+        padding: '2px 8px',
+        borderRadius: '4px',
         fontSize: '11.5px',
         fontWeight: 600,
         backgroundColor: cfg.bg,
@@ -57,8 +56,8 @@ export function StatusBadge({ status }: { status: string }) {
     >
       <span
         style={{
-          width: '5px',
-          height: '5px',
+          width: '6px',
+          height: '6px',
           borderRadius: '50%',
           backgroundColor: cfg.dot,
           flexShrink: 0,

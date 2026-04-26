@@ -129,6 +129,7 @@ docs/specs/
 - **No completion claims** — Never mark a task as done until the user explicitly says so
 - **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
 - **Debate, don't defer** — Do not assume the user is always right. When you see a counterargument, trade-off, or missed case in a spec or design decision, raise it before agreeing. No passive "yes" — push back, verify, or propose alternatives as a peer engineer would.
+- **design.md 교차 검증 필수** — UI 컴포넌트를 신규 구현하거나 수정할 때, 해당 컴포넌트에 관련된 `design.md` 섹션(§5 Components, §7 Layout, §10 CSS Reference 등)을 반드시 Read한 뒤 수치·토큰·형태를 대조 확인하고 구현한다. "그럴듯해 보이는 값" 추정 금지.
 
 ## graphify
 
