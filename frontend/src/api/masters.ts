@@ -46,3 +46,15 @@ export async function triggerVocRefresh(vocId: string): Promise<MasterRefreshRes
   if (!res.ok) throw new Error('voc master refresh failed');
   return res.json() as Promise<MasterRefreshResult>;
 }
+
+export interface SystemItem {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export async function listSystems(): Promise<SystemItem[]> {
+  const res = await fetch(`${BASE}/systems`, { credentials: 'include' });
+  if (!res.ok) throw new Error(`listSystems: ${res.status}`);
+  return res.json() as Promise<SystemItem[]>;
+}

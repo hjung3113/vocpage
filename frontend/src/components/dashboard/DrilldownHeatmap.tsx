@@ -152,7 +152,7 @@ export function DrilldownHeatmap({
           </tr>
         </thead>
         <tbody>
-          {data ? (
+          {data && data.totalRow && data.rows ? (
             <>
               <tr className="hm-total-row">
                 <td className="rl">합계</td>

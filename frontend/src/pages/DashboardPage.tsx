@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { listAdminSystems } from '../api/admin';
+import { listSystems } from '../api/masters';
 import { getDashboardAssignees, getDashboardMenus, putDashboardSettings } from '../api/dashboard';
 import type { DashboardSettingsPayload } from '../api/dashboard';
 import { AuthContext } from '../contexts/AuthContext';
@@ -65,7 +65,7 @@ export function DashboardPage() {
 
   useEffect(() => {
     let cancelled = false;
-    listAdminSystems()
+    listSystems()
       .then((items) => {
         if (!cancelled) setSystems(items.map((s) => ({ id: s.id, name: s.name })));
       })

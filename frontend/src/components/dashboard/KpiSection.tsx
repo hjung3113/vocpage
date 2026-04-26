@@ -112,25 +112,21 @@ export function KpiSection({ filter, buildQueryParams }: KpiSectionProps) {
   const thisMonday = getThisWeekMonday();
   const todayStr = today();
 
+  const pw = data?.prevWeek;
+
   // Volume deltas
-  const totalDelta = data ? calcDelta(data.total, data.prevWeek.total) : null;
-  const unresolvedDelta = data ? calcDelta(data.unresolved, data.prevWeek.unresolved) : null;
-  const newThisWeekDelta = data ? calcDelta(data.newThisWeek, data.prevWeek.newThisWeek) : null;
-  const doneThisWeekDelta = data
-    ? calcDelta(data.doneThisWeek, data.prevWeek.doneThisWeek, true)
-    : null;
+  const totalDelta = pw ? calcDelta(data!.total, pw.total) : null;
+  const unresolvedDelta = pw ? calcDelta(data!.unresolved, pw.unresolved) : null;
+  const newThisWeekDelta = pw ? calcDelta(data!.newThisWeek, pw.newThisWeek) : null;
+  const doneThisWeekDelta = pw ? calcDelta(data!.doneThisWeek, pw.doneThisWeek, true) : null;
 
   // Quality deltas
-  const avgProcessingDelta = data
-    ? calcDelta(data.avgProcessingDays, data.prevWeek.avgProcessingDays)
+  const avgProcessingDelta = pw ? calcDelta(data!.avgProcessingDays, pw.avgProcessingDays) : null;
+  const resolvedRateDelta = pw ? calcDelta(data!.resolvedRate, pw.resolvedRate, true) : null;
+  const urgentHighDelta = pw
+    ? calcDelta(data!.urgentHighUnresolved, pw.urgentHighUnresolved)
     : null;
-  const resolvedRateDelta = data
-    ? calcDelta(data.resolvedRate, data.prevWeek.resolvedRate, true)
-    : null;
-  const urgentHighDelta = data
-    ? calcDelta(data.urgentHighUnresolved, data.prevWeek.urgentHighUnresolved)
-    : null;
-  const over14Delta = data ? calcDelta(data.over14Days, data.prevWeek.over14Days) : null;
+  const over14Delta = pw ? calcDelta(data!.over14Days, pw.over14Days) : null;
 
   return (
     <div className="kpi-section">

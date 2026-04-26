@@ -138,7 +138,7 @@ export async function getDistribution(
 }
 
 export async function getPriorityStatusMatrix(p: DashboardQueryParams): Promise<MatrixData> {
-  const res = await fetch(`${BASE}/matrix${buildParams(queryToRecord(p))}`);
+  const res = await fetch(`${BASE}/priority-status-matrix${buildParams(queryToRecord(p))}`);
   if (!res.ok) throw new Error(`getPriorityStatusMatrix: ${res.status}`);
   return res.json() as Promise<MatrixData>;
 }
