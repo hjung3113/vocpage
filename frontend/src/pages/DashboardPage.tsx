@@ -8,6 +8,8 @@ import { KpiSection } from '../components/dashboard/KpiSection';
 import { DistributionWidget } from '../components/dashboard/DistributionWidget';
 import { PriorityStatusMatrix } from '../components/dashboard/PriorityStatusMatrix';
 import { DrilldownHeatmap } from '../components/dashboard/DrilldownHeatmap';
+import { WeeklyTrendChart } from '../components/dashboard/WeeklyTrendChart';
+import { TagDistributionChart } from '../components/dashboard/TagDistributionChart';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
 import './DashboardPage.css';
 
@@ -119,6 +121,17 @@ export function DashboardPage() {
             systemName={systems.find((s) => s.id === filter.globalTab)?.name}
             menuName={menus.find((m) => m.id === filter.activeMenu)?.name}
           />
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            padding: '12px 24px 0',
+          }}
+        >
+          <WeeklyTrendChart filter={filter} buildQueryParams={buildQueryParams} />
+          <TagDistributionChart filter={filter} buildQueryParams={buildQueryParams} />
         </div>
       </div>
     </div>
