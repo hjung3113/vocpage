@@ -3,15 +3,16 @@ import { NavLink } from 'react-router-dom';
 import {
   Inbox,
   User,
+  UserCheck,
   Users,
-  LayoutDashboard,
+  BarChart2,
   Bell,
   HelpCircle,
   FolderOpen,
   Tag,
   Settings,
   Layers,
-  ShieldCheck,
+  MessageSquareDot,
   Sun,
   Moon,
   Monitor,
@@ -141,28 +142,34 @@ interface NavItemProps {
   label: string;
   end?: boolean;
   badge?: number;
+  badgeVariant?: 'accent' | 'muted';
 }
 
-function SidebarNavItem({ to, icon, label, end, badge }: NavItemProps) {
+function SidebarNavItem({ to, icon, label, end, badge, badgeVariant = 'accent' }: NavItemProps) {
+  const badgeStyle: React.CSSProperties =
+    badgeVariant === 'muted'
+      ? {
+          fontSize: '10px',
+          fontWeight: 600,
+          padding: '1px 6px',
+          borderRadius: '9999px',
+          background: 'var(--bg-elevated)',
+          color: 'var(--text-quaternary)',
+        }
+      : {
+          fontSize: '10px',
+          fontWeight: 600,
+          padding: '1px 6px',
+          borderRadius: '9999px',
+          background: 'var(--brand)',
+          color: 'white',
+        };
+
   return (
     <NavLink to={to} end={end} style={({ isActive }) => navItemStyle(isActive)}>
       {icon}
       <span style={{ flex: 1 }}>{label}</span>
-      {badge !== undefined && badge > 0 && (
-        <span
-          style={{
-            fontSize: '10px',
-            fontWeight: 600,
-            padding: '1px 6px',
-            borderRadius: '9999px',
-            background: 'var(--brand-bg)',
-            color: 'var(--brand)',
-            border: '1px solid var(--brand-border)',
-          }}
-        >
-          {badge}
-        </span>
-      )}
+      {badge !== undefined && badge > 0 && <span style={badgeStyle}>{badge}</span>}
     </NavLink>
   );
 }
@@ -186,6 +193,10 @@ export function Sidebar() {
   const { theme, toggle } = useTheme();
 
   const [systems, setSystems] = useState<Array<{ id: string; name: string }>>([]);
+  const [vocCounts, setVocCounts] = useState<{ total: number; assigned: number }>({
+    total: 0,
+    assigned: 0,
+  });
 
   useEffect(() => {
     fetch('/api/admin/systems', { credentials: 'include' })
@@ -196,12 +207,28 @@ export function Sidebar() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+    Promise.all([
+      fetch('/api/vocs?limit=1', { credentials: 'include' })
+        .then((r) => (r.ok ? r.json() : { total: 0 }))
+        .then((d: { total?: number }) => d.total ?? 0),
+      user.id
+        ? fetch(`/api/vocs?assignee_id=${user.id}&limit=1`, { credentials: 'include' })
+            .then((r) => (r.ok ? r.json() : { total: 0 }))
+            .then((d: { total?: number }) => d.total ?? 0)
+        : Promise.resolve(0),
+    ])
+      .then(([total, assigned]) => setVocCounts({ total, assigned }))
+      .catch(() => {});
+  }, [user]);
+
   return (
     <aside style={sidebarStyle}>
       {/* Logo */}
       <div style={logoAreaStyle}>
         <div style={logoMarkStyle}>
-          <ShieldCheck size={14} color="white" />
+          <MessageSquareDot size={14} color="white" />
         </div>
         <span style={logoTextStyle}>VOCpage</span>
         <span style={logoBadgeStyle}>BETA</span>
@@ -209,10 +236,23 @@ export function Sidebar() {
 
       <nav style={navScrollStyle}>
         <div style={sectionLabelStyle}>보기</div>
-        <SidebarNavItem to="/" end icon={<Inbox size={15} />} label="전체 VOC" />
+        <SidebarNavItem
+          to="/"
+          end
+          icon={<Inbox size={15} />}
+          label="전체 VOC"
+          badge={vocCounts.total}
+          badgeVariant="accent"
+        />
         <SidebarNavItem to="/?view=mine" icon={<User size={15} />} label="내 VOC" />
-        <SidebarNavItem to="/?view=assigned" icon={<Users size={15} />} label="담당 VOC" />
-        <SidebarNavItem to="/dashboard" icon={<LayoutDashboard size={15} />} label="대시보드" />
+        <SidebarNavItem
+          to="/?view=assigned"
+          icon={<UserCheck size={15} />}
+          label="담당 VOC"
+          badge={vocCounts.assigned}
+          badgeVariant="muted"
+        />
+        <SidebarNavItem to="/dashboard" icon={<BarChart2 size={15} />} label="대시보드" />
 
         {systems.length > 0 && (
           <>
@@ -257,15 +297,17 @@ export function Sidebar() {
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: 'var(--brand-bg)',
-              border: '1px solid var(--brand-border)',
+              background: 'var(--brand)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
+              fontSize: '12px',
+              fontWeight: 700,
+              color: 'white',
             }}
           >
-            <User size={13} color="var(--brand)" />
+            {user?.name ? user.name.charAt(0) : <User size={13} color="white" />}
           </div>
           <div style={{ overflow: 'hidden', flex: 1 }}>
             <div style={userNameStyle}>{user?.name ?? '—'}</div>

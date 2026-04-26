@@ -22,12 +22,12 @@ interface HeaderDef {
 }
 
 const HEADERS: HeaderDef[] = [
-  { label: '상태' },
-  { label: '이슈 코드' },
+  { label: '이슈 ID' },
   { label: '제목' },
+  { label: '상태' },
+  { label: '담당자' },
   { label: '우선순위', sortKey: 'priority' },
   { label: '등록일', sortKey: 'created_at' },
-  { label: '기한', sortKey: 'due_date' },
 ];
 
 export function VocList({
@@ -54,7 +54,7 @@ export function VocList({
                 return (
                   <th
                     key={label}
-                    className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide"
+                    className="px-4 py-2 text-left text-xs font-medium"
                     style={{
                       color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                       background: 'var(--bg-panel)',

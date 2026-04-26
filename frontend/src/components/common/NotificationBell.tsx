@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Bell } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { NotificationPanel } from './NotificationPanel';
 
@@ -26,7 +27,7 @@ export function NotificationBell() {
           fontSize: '16px',
         }}
       >
-        🔔
+        <Bell size={16} />
         {unreadCount > 0 && (
           <span
             style={{

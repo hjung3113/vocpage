@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import {
+  SlidersHorizontal,
+  Layers,
+  Circle,
+  Search,
+  Zap,
+  PauseCircle,
+  CheckCircle2,
+} from 'lucide-react';
 import type { VocStatus } from '../../contexts/VOCFilterContext';
 import { listTags, type Tag } from '../../api/tags';
 
@@ -8,13 +16,13 @@ interface User {
   name: string;
 }
 
-const STATUS_OPTIONS: Array<{ label: string; value: VocStatus | null; icon?: string }> = [
-  { label: '전체', value: null },
-  { label: '접수', value: '접수' },
-  { label: '검토중', value: '검토중' },
-  { label: '처리중', value: '처리중' },
-  { label: '드랍', value: '드랍' },
-  { label: '완료', value: '완료' },
+const STATUS_OPTIONS: Array<{ label: string; value: VocStatus | null; icon: React.ReactNode }> = [
+  { label: '전체', value: null, icon: <Layers size={11} /> },
+  { label: '접수', value: '접수', icon: <Circle size={11} /> },
+  { label: '검토중', value: '검토중', icon: <Search size={11} /> },
+  { label: '처리중', value: '처리중', icon: <Zap size={11} /> },
+  { label: '드랍', value: '드랍', icon: <PauseCircle size={11} /> },
+  { label: '완료', value: '완료', icon: <CheckCircle2 size={11} /> },
 ];
 
 interface VocFilterBarProps {
@@ -82,7 +90,7 @@ export function VocFilterBar({
           필터
         </span>
 
-        {STATUS_OPTIONS.map(({ label, value }) => {
+        {STATUS_OPTIONS.map(({ label, value, icon }) => {
           const isActive = activeStatus === value;
           return (
             <button
@@ -98,17 +106,7 @@ export function VocFilterBar({
                 whiteSpace: 'nowrap',
               }}
             >
-              <span
-                style={{
-                  width: '7px',
-                  height: '7px',
-                  borderRadius: '50%',
-                  border: `1.5px solid ${isActive ? 'var(--accent)' : 'var(--text-quaternary)'}`,
-                  background: isActive ? 'var(--accent)' : 'transparent',
-                  flexShrink: 0,
-                  display: 'inline-block',
-                }}
-              />
+              {icon}
               {label}
             </button>
           );

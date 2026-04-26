@@ -52,6 +52,9 @@
   --status-purple: light-dark(oklch(52% 0.22 290), oklch(72% 0.16 290));
   --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
   --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
+  --status-emerald: oklch(62% 0.19 158);
+  --status-emerald-bg: light-dark(oklch(93% 0.03 158), oklch(17% 0.06 158));
+  --status-emerald-border: light-dark(oklch(76% 0.1 158), oklch(29% 0.1 158));
   --status-red: oklch(58% 0.22 25);
   --status-red-bg: light-dark(oklch(94% 0.03 25), oklch(18% 0.07 25));
   --status-red-border: light-dark(oklch(78% 0.1 25), oklch(30% 0.1 25));

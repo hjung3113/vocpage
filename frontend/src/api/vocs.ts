@@ -21,9 +21,12 @@ export interface VocSummary {
   priority: string;
   author_id: string;
   assignee_id: string | null;
+  assignee_name: string | null;
   system_id: string;
   menu_id: string;
   voc_type_id: string;
+  voc_type_name: string | null;
+  tags: Array<{ id: string; name: string }>;
   due_date: string | null;
   created_at: string;
   updated_at: string;
@@ -31,6 +34,9 @@ export interface VocSummary {
 
 export interface VocDetail extends VocSummary {
   body: string;
+  author_name: string | null;
+  system_name: string | null;
+  menu_name: string | null;
   structured_payload: Record<string, unknown> | null;
   structured_payload_draft: Record<string, unknown> | null;
   review_status: string | null;

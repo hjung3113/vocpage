@@ -53,7 +53,7 @@ export function VocTopbar({ total, onSearch, onCreateClick, title = '전체 VOC'
             border: '1px solid var(--border-standard)',
           }}
         >
-          {total}
+          {total}개
         </span>
         {isManagerOrAdmin && isColdStartMode && (
           <span
