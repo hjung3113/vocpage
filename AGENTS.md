@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository. It mirrors the project-level `CLAUDE.md` so Codex can follow the same repository conventions.
 
 ## Project Status
 
-This is a **greenfield VOC (Voice of Customer) management system** currently in the design/requirements phase. No source code exists yet. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
+This is a **VOC (Voice of Customer) management system** currently in **Phase 9 preparation** — frontend and backend are scaffolded with working source code. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
 
 ## Planned Tech Stack
 
@@ -50,7 +50,7 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 
 ## Start Every Session
 
-1. Read `Codex-progress.txt` (first 30 lines only)
+1. Read `claude-progress.txt` (first 30 lines only)
 2. Read `docs/specs/plans/next-session-tasks.md` to find current Phase and pending tasks
 3. Read relevant spec in `docs/` (selectively — only what's needed)
 4. Continue from progress file — don't re-read what you already know
@@ -69,7 +69,7 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
     - `--merge`: preserves both the merge commit (PR boundary) and individual commits ✓
   - After merging, delete the local branch: `git branch -D <branch>`
   - main changes only via PR — direct push and force push are forbidden
-  - These rules are enforced by hookify rules in `.Codex/hookify.block-*.local.md`
+  - These rules are enforced by hookify rules in `.claude/hookify.block-*.local.md`
 - Run tests before committing; follow existing code style (read 2-3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - AGENTS.md stays under 200 lines
@@ -77,7 +77,7 @@ Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Refer
 ## Session Continuity
 
 Every design decision → written to spec or ADR before session ends.
-Every phase completion → update `Codex-progress.txt` + git commit.
+Every phase completion → update `claude-progress.txt` + git commit.
 No implementation without a written spec section covering it.
 
 ## Document Structure
