@@ -21,7 +21,7 @@
 | **X1** | **Dev role 미동기** — migration 012 draft 잔존 + BE `auth/types.ts:5`, `requireRole.ts:3` + FE `api/auth.ts:5`, `MockLoginPage.tsx:8/51-53` 모두 3-role enum                                                                                | B(C3), D(HIGH-1)              | High                                   | Low (4파일 + 1마이그) |
 | **X2** | **D22 태그 마스터 / D23 휴지통의 DB·UI 진입점 부재** — feature-voc.md §9.4.6/9.4.7 본문은 있으나 ① 마이그 013/014(`tags.is_external`/머지 FK/`tag_rules.suspended_until`/`vocs.deleted_by`) 부재 ② requirements.md §15 본문에 진입점 미언급 | A(C2), B(C4·C5)               | Medium                                 | Medium                |
 | **X3** | **명세-구현 100% 갭** — VOC/dashboard/notice/faq/admin/masters API 14+개 라우트, FE 페이지 23개 모두 미구현                                                                                                                                 | A(3-②, 4-②), B(C2), C, D      | Critical (Phase 7→8 전환 전 정의된 갭) | High                  |
-| **X4** | **명세 본문 모순/미반영** — D10 date preset (dashboard.md:607,688,689) + Notice/FAQ 폐기 메뉴 prototype 잔존(`prototype.html:1169-1170,2329-2330,3102,3178`) + design.md §13 컴포넌트 React 미구현                                          | A(C1), C(CRITICAL), D(HIGH-3) | High                                   | Low~Medium            |
+| **X4** | **명세 본문 모순/미반영** — D10 date preset (dashboard.md:607,688,689) + Notice/FAQ 폐기 메뉴 prototype 잔존(`prototype.html:1169-1170,2329-2330,3102,3178`) + uidesign.md §13 컴포넌트 React 미구현                                        | A(C1), C(CRITICAL), D(HIGH-3) | High                                   | Low~Medium            |
 | **X5** | **누락 토큰·스키마 디테일** — `MockLoginPage.tsx:48,57` 미정의 토큰 사용 + `005_content.sql:67-73` `slug UNIQUE`/`is_archived` 명세 부재 + `notices.visible_from/to` timezone 누락                                                          | C(MAJOR-1·2), D(HIGH-2)       | Medium                                 | Low                   |
 
 ## 3. 도메인별 Top Critical 한 줄 요약
@@ -57,7 +57,7 @@
 - **R-7**: requirements.md §15 본문에 §15.3 태그 마스터 + §15.4 휴지통 진입점 추가
 - **R-10** (新): prototype.html 사이드바 "공지/FAQ 관리" 메뉴 + `renderAdminNotices/Faq()` 함수 제거 (D19 정합)
 - **R-11** (新): prototype.html L95/157 `#fff`, L399~435 raw oklch 토큰화 (audit T5 마무리)
-- **R-12** (新): design.md §5/§13 에 empty/error/loading 상태 패턴 정식화
+- **R-12** (新): uidesign.md §5/§13 에 empty/error/loading 상태 패턴 정식화
 
 ### Phase 7 prototype 작업 본 항목
 

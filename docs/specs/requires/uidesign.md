@@ -1,6 +1,9 @@
-# VOCpage Design System
+# VOCpage UI Design System
 
-> **Revision history**: Initial Linear-inspired indigo palette → Samsung Blue palette + automatic system theme sync, fully overhauled (2025.06)
+> **Scope**: Visual layer only — color tokens, typography, component visuals, spacing, elevation, layout rules.
+> Behavior, business logic, API contracts, role policy → `requirements.md` / `feature-*.md`.
+>
+> **Revision history**: Initial Linear-inspired indigo palette → Samsung Blue palette + automatic system theme sync, fully overhauled (2025.06). Renamed `design.md` → `uidesign.md` (2026-04-27) to make the visual-only scope unambiguous.
 
 ---
 
@@ -382,12 +385,9 @@ Every list, table, drawer, and dashboard widget MUST render one of three non-dat
 | Loading | Initial fetch in flight (>200ms) | Skeleton rows matching real row height (`var(--bg-elevated)` block, 1px `var(--border-subtle)` divider, no shimmer below 200ms). Never spinner-only.        |
 | Error   | Network/5xx/permission failure   | Inline banner: `var(--status-red-bg)` background + `var(--status-red)` text + retry button. Never silently fallback to empty.                               |
 
-**Rules:**
+**Layout rule:** non-data states replace the data area only — page header, sidebar, and filter bar must stay rendered.
 
-- Empty/error/loading replace the data area only — page header, sidebar, filters stay rendered.
-- Permission-denied (403) is a distinct error variant: title "권한이 없습니다", no retry button, link to home.
-- Drawer/modal opened on a missing entity (404) closes itself + toast — does NOT render an internal error state.
-- Dashboard widgets degrade independently: one widget's error MUST NOT blank sibling widgets.
+> Behavioral rules (when each state fires, 403 / 404 flow, dashboard widget independence) belong to functional spec — see `requirements.md §5.1 비데이터 상태 동작 규약`.
 
 ---
 
@@ -1088,6 +1088,7 @@ Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지
 - Empty: replace `<table>` body with the §5 empty pattern + primary CTA labeled per page (예: "공지 추가", "FAQ 추가", "복원").
 - Loading: 5 skeleton `<tr>` matching `.admin-table` row height; header stays visible.
 - Error: inline banner above the table; the "추가/refresh" admin-topbar button stays operable.
-- Permission-denied: render the §5 403 variant — admin-topbar button hidden.
 
-휴지통(D23): empty 상태는 "휴지통이 비어 있습니다" + 30일 자동 삭제 정책 보조문구 (`var(--text-tertiary)`).
+> 403 / 404 / dashboard 위젯 격리 등 동작 규약은 `requirements.md §5.1` 참조.
+
+휴지통(D23): empty 상태 보조 카피 톤은 `var(--text-tertiary)` — 정책 본문(30일 보존 등)은 `feature-voc.md §9.4.7` 참조.

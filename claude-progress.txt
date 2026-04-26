@@ -4,7 +4,7 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + design.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) / 4-도메인 cross-review ✅ (2026-04-27) / Q1~Q5 결정 + R-5/R-7/R-10/R-11/R-12 docs 패치 ✅ (2026-04-27, 단일 커밋) → **Phase 7 (prototype 고도화)**
+현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + uidesign.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) / 4-도메인 cross-review ✅ (2026-04-27) / Q1~Q5 결정 + R-5/R-7/R-10/R-11/R-12 docs 패치 ✅ (2026-04-27, 단일 커밋) / design.md → uidesign.md 리네이밍 + §5 비데이터 동작 규약 requirements.md §5.1로 분리 ✅ (2026-04-27) → **Phase 7 (prototype 고도화)**
 
 ### 관리자 UI 커버리지 리뷰 (2026-04-27, 브랜치 docs/admin-ui-gaps)
 
@@ -42,7 +42,7 @@
 | --- | --- |
 | D18 Dev role 추가 | `users.role` enum 4종(`user/dev/manager/admin`). Dev = User + (assignee=self) 상태/Priority/Due Date/Internal Note R·W/Sub-task + Dashboard. requirements §2.3·§4·§14.5·§15.2, feature-voc.md §8.3·§8.4-bis(신규 헬퍼), dashboard.md 권한 확장 |
 | D19 공지/FAQ 관리 진입점 | 페이지 우측 상단 '관리' 버튼 + `?mode=admin` URL 쿼리 토글. Admin 탭 서브탭 폐기. feature-notice-faq.md §10.5 재정의·§10.3.4·§10.4.3·§10.6 |
-| D20 design.md §13 신규 + raw color 가드 | Admin/Notice/FAQ/관리 진입 버튼/로그인 팝업/사이드바 카운트 12개 컴포넌트 spec. §8 Don't에 raw color literal 금지 추가. §10에 `--role-dev-{bg/fg/border}` + `--text-on-brand` 4종 신규 토큰. design.md 자체 위반(`color: #ffffff`) 2건 정정 |
+| D20 uidesign.md §13 신규 + raw color 가드 | Admin/Notice/FAQ/관리 진입 버튼/로그인 팝업/사이드바 카운트 12개 컴포넌트 spec. §8 Don't에 raw color literal 금지 추가. §10에 `--role-dev-{bg/fg/border}` + `--text-on-brand` 4종 신규 토큰. uidesign.md 자체 위반(`color: #ffffff`) 2건 정정 |
 | D21 `assertCanManageVoc` 헬퍼 | BE 단일 헬퍼 contract. ownership = primary `assignee_id`만. unassigned/재배정 직후 즉시 박탈. feature-voc.md §8.4-bis 신규, 회귀 테스트 5건 명시 |
 
 산출물: `docs/specs/reviews/design-prototype-audit.md` (audit + ADR), `docs/specs/plans/migration-012-draft.md` (DDL 스펙), `.omc/plans/design-admin-role-overhaul.md` (consensus plan v2). requirements.md §17에 D18~D21 추가.
@@ -106,7 +106,7 @@
   - §10 → `requires/feature-notice-faq.md`
   - 652줄 → 273줄 (섹션별 요약 + 링크)
 - **문서 인덱스 추가** ✅ — `requirements.md` 상단에 파일별 역할 인덱스 테이블
-- **최종 docs/specs/requires/ 구조**: requirements.md / design.md / feature-voc.md / feature-notice-faq.md / dashboard.md
+- **최종 docs/specs/requires/ 구조**: requirements.md / uidesign.md / feature-voc.md / feature-notice-faq.md / dashboard.md
 
 ## 완료된 작업 (2026-04-23 — Phase 4 requirements.md 5-Expert 리뷰 반영)
 
@@ -179,13 +179,13 @@
     - [x] 시스템/메뉴 현황 카드
     - [x] 담당자별 처리현황 테이블
     - [x] 장기 미처리 Top 10
-    - [x] design.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
+    - [x] uidesign.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
 
 ## 다음 세션 읽을 문서
 
 - `.omc/plans/dashboard-feature.md` (v3.1 — 707줄, 구현 상세 명세)
 - `requirements.md` §11 (업데이트 완료)
-- `design.md` §11 (대시보드 컴포넌트 신규 추가됨)
+- `uidesign.md` §11 (대시보드 컴포넌트 신규 추가됨)
 
 ## 완료된 작업 (2026-04-23 — 문서 정리·싱크)
 
@@ -194,9 +194,9 @@
   - §11.3 글로벌 필터 시스템 신규 (계층형 탭 + 담당자 직교 필터 + FilterContextBanner)
   - §11.4 날짜 필터에 주간 트렌드 12주 고정 명시
   - §11.3~11.5 → §11.4~11.6 번호 이동
-- **design.md §11 Dashboard Components** 신규 추가
+- **uidesign.md §11 Dashboard Components** 신규 추가
   - FilterContextBanner, KPI 카드 (alert border 포함), 히트맵 셀 그라디언트, 분포 도넛, 주간 트렌드 3선, Aging badge 스펙
-- **design.md §10 CSS Reference** `--chart-*` 토큰 7종 추가
+- **uidesign.md §10 CSS Reference** `--chart-*` 토큰 7종 추가
 
 ## 완료된 작업 (2026-04-23 — 대시보드 v3.1 스펙 고도화)
 

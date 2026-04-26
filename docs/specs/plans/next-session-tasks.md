@@ -22,7 +22,7 @@
 
 - D18 Dev role 추가 (`users.role` enum 4종, ownership 기반 권한)
 - D19 공지/FAQ 관리 진입점 = 페이지 우측 상단 버튼 + `?mode=admin` URL 쿼리
-- D20 design.md §13 신규(Admin·Notice·FAQ 컴포넌트 12건) + raw color 가드 + 신규 토큰 4종
+- D20 uidesign.md §13 신규(Admin·Notice·FAQ 컴포넌트 12건) + raw color 가드 + 신규 토큰 4종
 - D21 `assertCanManageVoc` 헬퍼 단일화 (feature-voc.md §8.4-bis 신규)
 - 산출물: `docs/specs/reviews/design-prototype-audit.md`, `docs/specs/plans/migration-012-draft.md`, `.omc/plans/design-admin-role-overhaul.md`
 
@@ -38,9 +38,9 @@
 | F6  | FE role guard hook 분기 갱신 (`useRequireRole`, dashboard 가드, internal note 가드, role-pill)      | -    |
 | F7  | Notice/FAQ 페이지에 `?mode=admin` 쿼리 토글 + admin-only 컴포넌트 dynamic import                    | -    |
 | F8  | Admin 페이지에서 공지/FAQ 서브탭 제거 (코드/네비/라우트 정리)                                       | -    |
-| F9  | design.md §13 컴포넌트들을 React로 구현 (역할별: AdminTopbar, RolePill 4종, NoticeBadge 3종 등)     | -    |
+| F9  | uidesign.md §13 컴포넌트들을 React로 구현 (역할별: AdminTopbar, RolePill 4종, NoticeBadge 3종 등)   | -    |
 | F10 | prototype.html `#fff` 2건 + 본문 `light-dark(oklch())` 사용처 토큰화 (또는 React 이관 시 자동 해소) | -    |
-| F11 | design.md §5 Status Badge 토큰 그룹 정식화 (prototype L399~433 raw oklch 정리)                      | -    |
+| F11 | uidesign.md §5 Status Badge 토큰 그룹 정식화 (prototype L399~433 raw oklch 정리)                    | -    |
 | F12 | BE 회귀 테스트 5건 추가 (feature-voc.md §8.4-bis 명시)                                              | -    |
 
 ---
@@ -82,9 +82,9 @@
 | R-7  | requirements.md §15.3 태그 마스터 + §15.4 휴지통 진입점 포인터 한 줄                                                     | ✅   |
 | R-10 | prototype.html 사이드바 "공지사항/FAQ 관리" 메뉴 + `renderAdminNotices/Faq()` 제거 (D19 정합)                            | ✅   |
 | R-11 | prototype.html L95/157 `#fff` 2건 → `var(--text-on-brand)` + L399~435 status badge raw oklch → token (5 status × 3 prop) | ✅   |
-| R-12 | design.md §5 "Empty / Error / Loading States" 패턴 + §13.11 admin page non-data states 정식화                            | ✅   |
+| R-12 | uidesign.md §5 "Empty / Error / Loading States" 패턴 + §13.11 admin page non-data states 정식화                          | ✅   |
 
-> R-11 부수 산출: design.md §10 + prototype :root 에 `--status-{received,reviewing,processing,done,drop}-{bg,fg,border}` 토큰 15종 신설 → F11 (Phase F follow-up) 자동 해소.
+> R-11 부수 산출: uidesign.md §10 + prototype :root 에 `--status-{received,reviewing,processing,done,drop}-{bg,fg,border}` 토큰 15종 신설 → F11 (Phase F follow-up) 자동 해소.
 
 ### 이연 — Phase 7 (prototype 고도화) 항목 추가
 
@@ -153,7 +153,7 @@
 | --- | ------------------------------------------------------------------------------------------ | ---- |
 | P-1 | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel) | -    |
 | P-2 | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글               | -    |
-| P-3 | design.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                | -    |
+| P-3 | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                              | -    |
 | P-4 | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                           | -    |
 | P-5 | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                      | -    |
 | P-6 | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                       | -    |
