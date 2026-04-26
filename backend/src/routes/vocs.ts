@@ -23,6 +23,7 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
     menu_id,
     assignee_id,
     keyword,
+    view,
     page = '1',
     limit: limitRaw = '20',
     sort = 'created_at',
@@ -42,7 +43,13 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
   let idx = 1;
 
   if (user.role === 'user') {
-    conditions.push(`v.reporter_id = $${idx++}`);
+    conditions.push(`v.author_id = $${idx++}`);
+    params.push(user.id);
+  } else if (view === 'mine') {
+    conditions.push(`v.author_id = $${idx++}`);
+    params.push(user.id);
+  } else if (view === 'assigned') {
+    conditions.push(`v.assignee_id = $${idx++}`);
     params.push(user.id);
   }
 
@@ -135,7 +142,7 @@ vocRouter.post('/', requireAuth, async (req: Request, res: Response): Promise<vo
 
   try {
     const result = await pool.query(
-      `INSERT INTO vocs (title, body, status, priority, reporter_id, system_id, menu_id, voc_type_id, source)
+      `INSERT INTO vocs (title, body, status, priority, author_id, system_id, menu_id, voc_type_id, source)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
       [title, body, status, priority, user.id, system_id, menu_id, voc_type_id, 'manual'],
@@ -172,7 +179,7 @@ vocRouter.get('/:id', requireAuth, async (req: Request, res: Response): Promise<
               ) AS tags
        FROM vocs v
        LEFT JOIN users u ON v.assignee_id = u.id
-       LEFT JOIN users au ON v.reporter_id = au.id
+       LEFT JOIN users au ON v.author_id = au.id
        LEFT JOIN voc_types vt ON v.voc_type_id = vt.id
        LEFT JOIN systems s ON v.system_id = s.id
        LEFT JOIN menus m ON v.menu_id = m.id
@@ -188,9 +195,9 @@ vocRouter.get('/:id', requireAuth, async (req: Request, res: Response): Promise<
       return;
     }
 
-    const voc = result.rows[0] as { reporter_id: string };
+    const voc = result.rows[0] as { author_id: string };
 
-    if (user.role === 'user' && voc.reporter_id !== user.id) {
+    if (user.role === 'user' && voc.author_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
       return;
     }
@@ -219,14 +226,14 @@ vocRouter.patch('/:id', requireAuth, async (req: Request, res: Response): Promis
     }
 
     const voc = existing.rows[0] as {
-      reporter_id: string;
+      author_id: string;
       priority: string;
       assignee_id: string | null;
       parent_id: string | null;
     };
     const prevAssigneeId = voc.assignee_id;
 
-    if (user.role === 'user' && voc.reporter_id !== user.id) {
+    if (user.role === 'user' && voc.author_id !== user.id) {
       res.status(404).json({ error: 'NOT_FOUND' });
       return;
     }
@@ -351,12 +358,12 @@ vocRouter.patch(
         id,
       ]);
 
-      const updatedVoc = result.rows[0] as { reporter_id: string };
+      const updatedVoc = result.rows[0] as { author_id: string };
       res.json(result.rows[0]);
 
       emitNotification({
         pool,
-        userId: updatedVoc.reporter_id,
+        userId: updatedVoc.author_id,
         type: 'status_change',
         vocId: id,
       }).catch(() => {});
@@ -378,7 +385,7 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
     await client.query('BEGIN');
 
     const { rows: vocRows } = await client.query(
-      `SELECT id, reporter_id FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+      `SELECT id, author_id FROM vocs WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
       [id],
     );
 
@@ -388,9 +395,9 @@ vocRouter.delete('/:id', requireAuth, async (req: Request, res: Response): Promi
       return;
     }
 
-    const voc = vocRows[0] as { id: string; reporter_id: string };
+    const voc = vocRows[0] as { id: string; author_id: string };
 
-    if (user.role === 'user' && voc.reporter_id !== user.id) {
+    if (user.role === 'user' && voc.author_id !== user.id) {
       await client.query('ROLLBACK');
       res.status(403).json({ error: 'FORBIDDEN' });
       return;

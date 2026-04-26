@@ -7,6 +7,7 @@ export interface VocFilters {
   keyword?: string;
   tag_id?: string;
   review_status?: string;
+  view?: string;
   page?: number;
   limit?: number;
   sort?: string;
