@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Inbox,
   User,
@@ -143,35 +143,27 @@ interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   end?: boolean;
-  badge?: number;
-  badgeVariant?: 'accent' | 'muted';
 }
 
-function SidebarNavItem({ to, icon, label, end, badge, badgeVariant = 'accent' }: NavItemProps) {
-  const badgeStyle: React.CSSProperties =
-    badgeVariant === 'muted'
-      ? {
-          fontSize: '10px',
-          fontWeight: 600,
-          padding: '1px 6px',
-          borderRadius: '9999px',
-          background: 'var(--bg-elevated)',
-          color: 'var(--text-quaternary)',
-        }
-      : {
-          fontSize: '10px',
-          fontWeight: 600,
-          padding: '1px 6px',
-          borderRadius: '9999px',
-          background: 'var(--brand)',
-          color: 'white',
-        };
+function SidebarNavItem({ to, icon, label, end }: NavItemProps) {
+  const location = useLocation();
+  const toUrl = new URL(to, window.location.origin);
+  const toPathname = toUrl.pathname;
+  const toSearch = toUrl.search;
+
+  let isActive: boolean;
+  if (toSearch) {
+    isActive = location.pathname === toPathname && location.search === toSearch;
+  } else if (end) {
+    isActive = location.pathname === toPathname && location.search === '';
+  } else {
+    isActive = location.pathname === toPathname;
+  }
 
   return (
-    <NavLink to={to} end={end} style={({ isActive }) => navItemStyle(isActive)}>
+    <NavLink to={to} style={navItemStyle(isActive)}>
       {icon}
       <span style={{ flex: 1 }}>{label}</span>
-      {badge !== undefined && badge > 0 && <span style={badgeStyle}>{badge}</span>}
     </NavLink>
   );
 }
@@ -196,33 +188,47 @@ interface SystemAccordionItemProps {
 }
 
 function SystemAccordionItem({ system, isOpen, onToggle, menus }: SystemAccordionItemProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = new URLSearchParams(location.search);
+  const isSystemActive = params.get('system_id') === system.id && !params.get('menu_id');
+
+  function handleClick() {
+    navigate(`/?system_id=${system.id}`);
+    onToggle();
+  }
+
   return (
     <>
       <div
-        onClick={onToggle}
-        style={navItemStyle(false)}
+        onClick={handleClick}
+        style={navItemStyle(isSystemActive)}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && onToggle()}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
       >
         <FolderOpen size={15} />
         <span style={{ flex: 1 }}>{system.name}</span>
         {isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
       </div>
       {isOpen &&
-        menus.map((menu) => (
-          <NavLink
-            key={menu.id}
-            to={`/?system_id=${system.id}&menu_id=${menu.id}`}
-            style={({ isActive }) => ({
-              ...navItemStyle(isActive),
-              paddingLeft: '28px',
-              fontSize: '12px',
-            })}
-          >
-            {menu.name}
-          </NavLink>
-        ))}
+        menus.map((menu) => {
+          const toSearch = `?system_id=${system.id}&menu_id=${menu.id}`;
+          const isActive = location.pathname === '/' && location.search === toSearch;
+          return (
+            <NavLink
+              key={menu.id}
+              to={`/${toSearch}`}
+              style={{
+                ...navItemStyle(isActive),
+                paddingLeft: '28px',
+                fontSize: '12px',
+              }}
+            >
+              {menu.name}
+            </NavLink>
+          );
+        })}
     </>
   );
 }
@@ -232,13 +238,9 @@ export function Sidebar() {
   const user = ctx?.user ?? null;
   const isAdmin = user?.role === 'admin';
   const { theme, toggle } = useTheme();
+  const location = useLocation();
 
   const [systems, setSystems] = useState<Array<{ id: string; name: string }>>([]);
-  const [vocCounts, setVocCounts] = useState<{ total: number; assigned: number; mine: number }>({
-    total: 0,
-    assigned: 0,
-    mine: 0,
-  });
   const [openSystems, setOpenSystems] = useState<Set<string>>(new Set());
   const [systemMenus, setSystemMenus] = useState<
     Record<string, Array<{ id: string; name: string }>>
@@ -254,23 +256,27 @@ export function Sidebar() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-    Promise.all([
-      fetch('/api/vocs?limit=1', { credentials: 'include' })
-        .then((r) => (r.ok ? r.json() : { total: 0 }))
-        .then((d: { total?: number }) => d.total ?? 0),
-      user.id
-        ? fetch(`/api/vocs?assignee_id=${user.id}&limit=1`, { credentials: 'include' })
-            .then((r) => (r.ok ? r.json() : { total: 0 }))
-            .then((d: { total?: number }) => d.total ?? 0)
-        : Promise.resolve(0),
-      fetch('/api/vocs?view=mine&limit=1', { credentials: 'include' })
-        .then((r) => (r.ok ? r.json() : { total: 0 }))
-        .then((d: { total?: number }) => d.total ?? 0),
-    ])
-      .then(([total, assigned, mine]) => setVocCounts({ total, assigned, mine }))
-      .catch(() => {});
-  }, [user]);
+    const systemId = new URLSearchParams(location.search).get('system_id');
+    if (!systemId) return;
+    setOpenSystems((prev) => {
+      if (prev.has(systemId)) return prev;
+      return new Set([...prev, systemId]);
+    });
+    if (!systemMenus[systemId]) {
+      fetch(`/api/systems/${systemId}/menus`, { credentials: 'include' })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data: unknown) => {
+          if (Array.isArray(data)) {
+            setSystemMenus((m) => ({
+              ...m,
+              [systemId]: data as Array<{ id: string; name: string }>,
+            }));
+          }
+        })
+        .catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   function toggleSystem(id: string) {
     setOpenSystems((prev) => {
@@ -310,28 +316,9 @@ export function Sidebar() {
 
       <nav style={navScrollStyle}>
         <div style={sectionLabelStyle}>보기</div>
-        <SidebarNavItem
-          to="/"
-          end
-          icon={<Inbox size={15} />}
-          label="전체 VOC"
-          badge={vocCounts.total}
-          badgeVariant="accent"
-        />
-        <SidebarNavItem
-          to="/?view=mine"
-          icon={<User size={15} />}
-          label="내 VOC"
-          badge={vocCounts.mine}
-          badgeVariant="muted"
-        />
-        <SidebarNavItem
-          to="/?view=assigned"
-          icon={<UserCheck size={15} />}
-          label="담당 VOC"
-          badge={vocCounts.assigned}
-          badgeVariant="muted"
-        />
+        <SidebarNavItem to="/" end icon={<Inbox size={15} />} label="전체 VOC" />
+        <SidebarNavItem to="/?view=mine" icon={<User size={15} />} label="내 VOC" />
+        <SidebarNavItem to="/?view=assigned" icon={<UserCheck size={15} />} label="담당 VOC" />
         <SidebarNavItem to="/dashboard" icon={<BarChart2 size={15} />} label="대시보드" />
 
         {systems.length > 0 && (
