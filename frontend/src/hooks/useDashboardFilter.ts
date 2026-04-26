@@ -3,7 +3,7 @@ import { DashboardQueryParams } from '../api/dashboard';
 
 export interface DashboardFilterState {
   dateRange: { startDate: string; endDate: string };
-  datePreset: '7d' | '30d' | '90d' | 'custom';
+  datePreset: '1m' | '3m' | '1y' | 'all' | 'custom';
   globalTab: 'all' | string;
   activeMenu: string | null;
   activeAssignee: string | null;
@@ -11,7 +11,7 @@ export interface DashboardFilterState {
 
 export interface UseDashboardFilter {
   filter: DashboardFilterState;
-  setDatePreset: (preset: '7d' | '30d' | '90d' | 'custom') => void;
+  setDatePreset: (preset: '1m' | '3m' | '1y' | 'all' | 'custom') => void;
   setDateRange: (startDate: string, endDate: string) => void;
   setGlobalTab: (tab: string) => void;
   setActiveMenu: (menuId: string | null) => void;
@@ -23,19 +23,22 @@ function toISODate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function calcDateRange(preset: '7d' | '30d' | '90d'): { startDate: string; endDate: string } {
+function calcDateRange(preset: '1m' | '3m' | '1y' | 'all'): { startDate: string; endDate: string } {
   const today = new Date();
-  const days = preset === '7d' ? 7 : preset === '30d' ? 30 : 90;
-  const start = new Date(today);
-  start.setDate(today.getDate() - days);
-  return { startDate: toISODate(start), endDate: toISODate(today) };
+  const end = toISODate(today);
+  if (preset === 'all') return { startDate: '2020-01-01', endDate: end };
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  if (preset === '1m') start.setMonth(start.getMonth() - 1);
+  else if (preset === '3m') start.setMonth(start.getMonth() - 3);
+  else if (preset === '1y') start.setFullYear(start.getFullYear() - 1);
+  return { startDate: toISODate(start), endDate: end };
 }
 
-const initial30d = calcDateRange('30d');
+const initial1m = calcDateRange('1m');
 
 const initialState: DashboardFilterState = {
-  dateRange: initial30d,
-  datePreset: '30d',
+  dateRange: initial1m,
+  datePreset: '1m',
   globalTab: 'all',
   activeMenu: null,
   activeAssignee: null,
@@ -44,7 +47,7 @@ const initialState: DashboardFilterState = {
 export function useDashboardFilter(): UseDashboardFilter {
   const [filter, setFilter] = useState<DashboardFilterState>(initialState);
 
-  function setDatePreset(preset: '7d' | '30d' | '90d' | 'custom') {
+  function setDatePreset(preset: '1m' | '3m' | '1y' | 'all' | 'custom') {
     setFilter((prev) => {
       const dateRange = preset === 'custom' ? prev.dateRange : calcDateRange(preset);
       return { ...prev, datePreset: preset, dateRange };

@@ -66,6 +66,10 @@
   font-weight: 600;
 }
 
+.date-range-wrap {
+  position: relative;
+}
+
 .date-range-btn,
 .edit-layout-btn {
   display: flex;
@@ -78,4 +82,56 @@
   color: var(--text-secondary);
   border-radius: 4px;
   cursor: pointer;
+}
+
+.date-range-btn.custom-active {
+  border-color: var(--brand-border);
+  color: var(--brand);
+}
+
+.date-picker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px color-mix(in oklch, var(--text-primary) 10%, transparent);
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.date-picker-input {
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid var(--border-standard);
+  border-radius: 5px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.date-picker-sep {
+  color: var(--text-quaternary);
+  font-size: 12px;
+}
+
+.date-picker-apply {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  background: var(--brand);
+  color: var(--text-on-brand);
+  cursor: pointer;
+}
+
+.date-picker-apply:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
