@@ -1,7 +1,32 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26 (25차 — Phase 7 잔여 갭 수정 완료, PR #37 머지, Phase 8 착수 가능)
-> 목표: Phase 8 — 백엔드 고도화 + 프로덕션 준비
+> 최종 업데이트: 2026-04-26 (26차 — Playwright E2E 전체 기능 검증, 버그 7건 발견, API 래퍼 버그 2건 수정)
+> 목표: **Phase 7 버그 수정 (B-1~B-7) → feat/voc-seeds-toastui-fix PR 머지 → Phase 8**
+
+## 🔴 다음 세션 1순위 — Phase 7 Playwright 테스트 발견 버그 수정
+
+> 브랜치: `feat/voc-seeds-toastui-fix` (현재 브랜치에 계속 작업 후 PR 머지)
+
+### 이번 세션 수정 완료
+
+| 항목             | 내용                                                                 |
+| ---------------- | -------------------------------------------------------------------- |
+| `api/notices.ts` | `listNotices()` 응답 `{ data }` 언래핑 수정                          |
+| `api/faqs.ts`    | `listFaqCategories()`, `listFaqs()` 응답 `{ data }` 언래핑 수정      |
+| `vite.config.ts` | proxy 타겟 `localhost:3001` → `backend:3000` (Docker 내부 통신 수정) |
+| `.env`           | `VITE_AUTH_MODE=mock` 추가 (누락으로 /mock-login 리다이렉트 버그)    |
+
+### 다음 세션에서 수정할 버그 (우선순위 순)
+
+| #   | 위치                   | 내용                                                                   | 심각도 |
+| --- | ---------------------- | ---------------------------------------------------------------------- | ------ |
+| B-1 | VOC 목록 이슈 코드     | 전체 "—" — DB 트리거(`issue_code` sequence) 미작동 또는 시드 누락 확인 | 🔴     |
+| B-2 | VOC Drawer 내부노트 탭 | Admin/Manager 로그인 시 탭 미표시 — 권한 체크 로직 확인                | 🔴     |
+| B-3 | 대시보드 KPI           | 총 VOC·이번주 완료·해결율·14일+ 미처리 "—" — dashboard API 쿼리 디버그 | 🟡     |
+| B-4 | 대시보드 드릴다운      | 히트맵 행에 UUID 표시 — `admin/systems` JOIN 누락                      | 🟡     |
+| B-5 | 새 VOC 등록 모달       | Toast UI Editor Write/Preview 텍스트 중복 노출                         | 🟡     |
+| B-6 | 사용자 관리            | 이름·AD계정 열 빈칸 — `users` 시드에 `name`/`ad_account` 추가 필요     | 🟢     |
+| B-7 | 알림 버튼 클릭         | Sidebar `<div>` pointer-events 차단 — CSS 수정                         | 🟢     |
 
 ## ✅ Phase 7 잔여 갭 수정 — 완료 (2026-04-26, PR #37)
 

@@ -19,7 +19,8 @@ export interface Faq {
 export async function listFaqCategories(): Promise<FaqCategory[]> {
   const res = await fetch('/api/faq-categories');
   if (!res.ok) throw new Error(`listFaqCategories: ${res.status}`);
-  return res.json();
+  const json = (await res.json()) as { data: FaqCategory[] };
+  return json.data;
 }
 
 export async function listFaqs(params?: { category_id?: string; q?: string }): Promise<Faq[]> {
@@ -29,7 +30,8 @@ export async function listFaqs(params?: { category_id?: string; q?: string }): P
   const query = qs.toString() ? `?${qs.toString()}` : '';
   const res = await fetch(`/api/faqs${query}`);
   if (!res.ok) throw new Error(`listFaqs: ${res.status}`);
-  return res.json();
+  const json = (await res.json()) as { data: Faq[] };
+  return json.data;
 }
 
 export async function createFaq(payload: Partial<Faq>): Promise<Faq> {
