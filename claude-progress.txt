@@ -4,10 +4,30 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ 완료 → **Phase 8 진행 중** (fix/phase8-design-theme-fix 브랜치, PR 미머지)
+현재 위치: Phase 0~7 ✅ 완료 → **Phase 8 디자인 정렬 진행 중** (fix/phase8-design-theme-fix 브랜치, PR 미머지)
 
 브랜치: `main` (PR #38 머지 완료 — 2026-04-26)
 테스트: Playwright E2E B-1~B-7 버그 전체 수정 완료 (2026-04-26)
+
+### Phase 8 디자인 정렬 작업 (2026-04-26, 브랜치: fix/phase8-design-theme-fix)
+prototype HTML ↔ React 구현체 비교 후 UI/UX 정렬 완료 (~92% 유사도)
+
+완료된 항목:
+- Sidebar: 아이콘 교체(MessageSquareDot, UserCheck, BarChart2), 전체/담당 VOC 카운트 배지 추가 (accent/muted 2종)
+- VocFilterBar: 상태 필터 pill에 Lucide 아이콘 추가 (Layers/Circle/Search/Zap/PauseCircle/CheckCircle2)
+- VocRow: 타입 뱃지 `●` dot prefix, 제목 인라인 태그 칩(최대 3개)
+- StatusBadge: `●` dot prefix (8px font-size)
+- PriorityBadge: Lucide 아이콘 기반 (ArrowUp/ArrowDown/Minus/Flame)
+- VocDrawer: 이슈코드 accent 모노스페이스, 4개 액션 아이콘(ExternalLink/Link2/Trash2/X)
+- VocDrawer: 2열 메타 그리드 8필드 (상태/우선순위/담당자/시스템/메뉴/유형/작성자/등록일)
+- VocDrawer: 이니셜 아바타 (chart palette 색상 해시), 태그 행 ⚡ 자동 태깅 버튼
+- backend/vocs GET 목록·상세: tags 집계 JOIN, system_name/menu_name JOIN 추가
+- design.md: VocDrawer, InitialsAvatar, FilterTab 아이콘, Sidebar 배지 2종 스펙 추가
+
+잔여 차이 (허용된 기능적 차이):
+- Drawer가 탭(본문/서브테스크/댓글/첨부파일/내부노트) 구조 — prototype은 인라인 스크롤 (더 많은 기능 때문에 유지)
+- 변경 이력 섹션 — 백엔드 히스토리 데이터 없음
+- 이슈코드가 `—` 표시 — 시드 데이터에 issue_code 없음 (데이터 이슈, UI 이슈 아님)
 
 ## Phase 완료 이력
 
