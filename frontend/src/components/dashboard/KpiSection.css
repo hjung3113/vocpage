@@ -1,0 +1,83 @@
+.kpi-section {
+  padding: 16px 24px 0;
+}
+
+.kpi-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 13px 15px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.kpi-card:hover {
+  border-color: var(--brand-border);
+}
+
+.kpi-card.alert-red {
+  border-color: oklch(58% 0.22 25 / 0.35);
+}
+
+.kpi-card.alert-amber {
+  border-color: oklch(70% 0.16 72 / 0.3);
+}
+
+.kpi-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 5px;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.kpi-value .kpi-unit {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.kpi-sublabel {
+  font-size: 10px;
+  color: var(--text-quaternary);
+  margin-bottom: 3px;
+}
+
+.kpi-delta {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.kpi-delta.delta-pos {
+  color: oklch(62% 0.19 158);
+}
+
+.kpi-delta.delta-neg {
+  color: oklch(58% 0.22 25);
+}
+
+.kpi-delta.delta-amb {
+  color: oklch(70% 0.16 72);
+}

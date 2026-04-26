@@ -4,12 +4,20 @@ import { getDashboardAssignees, getDashboardMenus } from '../api/dashboard';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { FilterContextBanner } from '../components/dashboard/FilterContextBanner';
 import { GlobalTabs } from '../components/dashboard/GlobalTabs';
+import { KpiSection } from '../components/dashboard/KpiSection';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
 import './DashboardPage.css';
 
 export function DashboardPage() {
-  const { filter, setGlobalTab, setActiveMenu, setActiveAssignee, setDatePreset, setDateRange } =
-    useDashboardFilter();
+  const {
+    filter,
+    setGlobalTab,
+    setActiveMenu,
+    setActiveAssignee,
+    setDatePreset,
+    setDateRange,
+    buildQueryParams,
+  } = useDashboardFilter();
 
   const [editMode, setEditMode] = useState(false);
   const [widgetVisibility, setWidgetVisibility] = useState<Record<string, boolean>>({
@@ -85,8 +93,10 @@ export function DashboardPage() {
         menuName={menus.find((m) => m.id === filter.activeMenu)?.name}
         assigneeName={assignees.find((a) => a.id === filter.activeAssignee)?.name}
       />
-      <div className="dash-body" style={{ padding: '16px 24px' }}>
-        <p style={{ color: 'var(--text-tertiary)' }}>Dashboard — widgets coming in next steps</p>
+      <div className="dash-body" style={{ padding: '0 0 24px' }}>
+        <div style={{ padding: '0 0 8px' }}>
+          <KpiSection filter={filter} buildQueryParams={buildQueryParams} />
+        </div>
       </div>
     </div>
   );
