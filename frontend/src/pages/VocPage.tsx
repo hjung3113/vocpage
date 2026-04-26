@@ -169,10 +169,18 @@ export function VocPage() {
     [setFilter],
   );
 
+  const handleVocTypeChange = useCallback(
+    (vocType: string | null) => {
+      setFilter('vocType', vocType);
+    },
+    [setFilter],
+  );
+
   const handleReset = useCallback(() => {
     setFilter('priority', null);
     setFilter('tagId', null);
     setFilter('assigneeId', null);
+    setFilter('vocType', null);
   }, [setFilter]);
 
   const handleCreated = useCallback(() => {
@@ -204,6 +212,8 @@ export function VocPage() {
         onAssigneeChange={handleAssigneeChange}
         activePriority={filters.priority}
         onPriorityChange={handlePriorityChange}
+        activeVocType={filters.vocType}
+        onVocTypeChange={handleVocTypeChange}
         onReset={handleReset}
       />
       <VocList

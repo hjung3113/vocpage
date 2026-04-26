@@ -32,6 +32,13 @@ const PRIORITY_OPTIONS: Array<{ label: string; value: string; color: string }> =
   { label: 'Low', value: 'low', color: 'var(--text-quaternary)' },
 ];
 
+const VOC_TYPE_OPTIONS: Array<{ label: string; value: string }> = [
+  { label: '버그', value: '버그' },
+  { label: '기능 요청', value: '기능 요청' },
+  { label: '개선 제안', value: '개선 제안' },
+  { label: '문의', value: '문의' },
+];
+
 interface VocFilterBarProps {
   activeStatus: VocStatus | null;
   onStatusChange: (status: VocStatus | null) => void;
@@ -41,6 +48,8 @@ interface VocFilterBarProps {
   onAssigneeChange?: (id: string | null) => void;
   activePriority?: string | null;
   onPriorityChange?: (priority: string | null) => void;
+  activeVocType?: string | null;
+  onVocTypeChange?: (type: string | null) => void;
   onReset?: () => void;
 }
 
@@ -53,6 +62,8 @@ export function VocFilterBar({
   onAssigneeChange,
   activePriority,
   onPriorityChange,
+  activeVocType,
+  onVocTypeChange,
   onReset,
 }: VocFilterBarProps) {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -109,8 +120,9 @@ export function VocFilterBar({
             <button
               key={label}
               onClick={() => onStatusChange(value)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full transition-colors"
               style={{
+                fontSize: '13px',
                 fontWeight: isActive ? 600 : 400,
                 color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
                 background: isActive ? 'var(--brand-bg)' : 'transparent',
@@ -193,7 +205,89 @@ export function VocFilterBar({
             </div>
           )}
 
-          {/* Tag chips row */}
+          {/* Priority chips row */}
+          <div className="flex items-center gap-2 pt-2 flex-wrap">
+            <span
+              style={{
+                fontSize: '12px',
+                color: 'var(--text-quaternary)',
+                whiteSpace: 'nowrap',
+                minWidth: '48px',
+              }}
+            >
+              우선순위
+            </span>
+            {PRIORITY_OPTIONS.map(({ label, value, color }) => {
+              const isActive = activePriority === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => onPriorityChange?.(isActive ? null : value)}
+                  className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                  style={{
+                    color: isActive ? color : 'var(--text-tertiary)',
+                    background: isActive ? 'var(--brand-bg)' : 'transparent',
+                    border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* VOC type chips row */}
+          {onVocTypeChange && (
+            <div className="flex items-center gap-2 pt-2 flex-wrap">
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-quaternary)',
+                  whiteSpace: 'nowrap',
+                  minWidth: '48px',
+                }}
+              >
+                유형
+              </span>
+              <button
+                onClick={() => onVocTypeChange(null)}
+                className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                style={{
+                  color: activeVocType == null ? 'var(--accent)' : 'var(--text-tertiary)',
+                  background: activeVocType == null ? 'var(--brand-bg)' : 'transparent',
+                  border: `1px solid ${activeVocType == null ? 'var(--brand-border)' : 'transparent'}`,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                전체
+              </button>
+              {VOC_TYPE_OPTIONS.map(({ label, value }) => {
+                const isActive = activeVocType === value;
+                return (
+                  <button
+                    key={value}
+                    onClick={() => onVocTypeChange(isActive ? null : value)}
+                    className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                    style={{
+                      color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
+                      background: isActive ? 'var(--brand-bg)' : 'transparent',
+                      border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Tag chips row + reset button */}
           {onTagChange && tags.length > 0 && (
             <div className="flex items-center gap-2 pt-2 flex-wrap">
               <span
@@ -238,57 +332,23 @@ export function VocFilterBar({
                   </button>
                 );
               })}
-            </div>
-          )}
-
-          {/* Priority chips row + reset button */}
-          <div className="flex items-center gap-2 pt-2 flex-wrap">
-            <span
-              style={{
-                fontSize: '12px',
-                color: 'var(--text-quaternary)',
-                whiteSpace: 'nowrap',
-                minWidth: '48px',
-              }}
-            >
-              우선순위
-            </span>
-            {PRIORITY_OPTIONS.map(({ label, value, color }) => {
-              const isActive = activePriority === value;
-              return (
+              {onReset && (
                 <button
-                  key={value}
-                  onClick={() => onPriorityChange?.(isActive ? null : value)}
-                  className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                  onClick={onReset}
+                  className="flex items-center px-3 py-1 rounded-lg text-sm ml-auto"
                   style={{
-                    color: isActive ? color : 'var(--text-tertiary)',
-                    background: isActive ? 'var(--brand-bg)' : 'transparent',
-                    border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                    color: 'var(--text-tertiary)',
+                    background: 'transparent',
+                    border: '1px solid var(--border-standard)',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
-                    fontWeight: isActive ? 600 : 400,
                   }}
                 >
-                  {label}
+                  초기화
                 </button>
-              );
-            })}
-            {onReset && (
-              <button
-                onClick={onReset}
-                className="flex items-center px-3 py-1 rounded-lg text-sm ml-auto"
-                style={{
-                  color: 'var(--text-tertiary)',
-                  background: 'transparent',
-                  border: '1px solid var(--border-standard)',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                초기화
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

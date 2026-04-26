@@ -24,12 +24,12 @@ interface HeaderDef {
 }
 
 const HEADERS: HeaderDef[] = [
-  { label: '이슈 ID', width: '150px' },
+  { label: '이슈 ID', width: '180px' },
   { label: '제목' },
-  { label: '상태', width: '88px' },
-  { label: '담당자', width: '108px' },
-  { label: '우선순위', sortKey: 'priority', width: '82px' },
-  { label: '등록일', sortKey: 'created_at', width: '90px' },
+  { label: '상태', width: '76px' },
+  { label: '담당자', width: '96px' },
+  { label: '우선순위', sortKey: 'priority', width: '76px' },
+  { label: '등록일', sortKey: 'created_at', width: '86px' },
 ];
 
 type VocListItem = VocSummary & {
