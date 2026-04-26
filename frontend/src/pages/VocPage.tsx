@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { listVocs, type VocSummary } from '../api/vocs';
 import { useVOCFilter } from '../hooks/useVOCFilter';
-import { useContext } from 'react';
 import { VOCDrawerContext } from '../contexts/VOCDrawerContext';
 import { VocTopbar } from '../components/voc/VocTopbar';
 import { VocFilterBar } from '../components/voc/VocFilterBar';
@@ -18,9 +18,15 @@ function useVOCDrawer() {
 
 const LIMIT = 20;
 
+const VIEW_TITLE: Record<string, string> = {
+  mine: '내 VOC',
+  assigned: '담당 VOC',
+};
+
 export function VocPage() {
-  const { filters, setFilter } = useVOCFilter();
+  const { filters, setFilter, resetFilters } = useVOCFilter();
   const { openDrawer, closeDrawer, selectedVocId, isOpen } = useVOCDrawer();
+  const location = useLocation();
 
   const [vocs, setVocs] = useState<VocSummary[]>([]);
   const [total, setTotal] = useState(0);
@@ -29,6 +35,42 @@ export function VocPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [sortColumn, setSortColumn] = useState<'created_at' | 'due_date' | 'priority' | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [pageTitle, setPageTitle] = useState('전체 VOC');
+
+  // Sync URL params → title + reset filter bar
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const view = params.get('view');
+    const systemId = params.get('system_id');
+    const menuId = params.get('menu_id');
+
+    resetFilters();
+    setPage(1);
+
+    if (view) {
+      setPageTitle(VIEW_TITLE[view] ?? '전체 VOC');
+    } else if (systemId) {
+      fetch('/api/systems', { credentials: 'include' })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data: Array<{ id: string; name: string }>) => {
+          const systemName = data.find((s) => s.id === systemId)?.name ?? systemId;
+          if (menuId) {
+            fetch(`/api/systems/${systemId}/menus`, { credentials: 'include' })
+              .then((r) => (r.ok ? r.json() : []))
+              .then((menus: Array<{ id: string; name: string }>) => {
+                const menuName = menus.find((m) => m.id === menuId)?.name ?? menuId;
+                setPageTitle(`${systemName} / ${menuName}`);
+              })
+              .catch(() => setPageTitle(systemName));
+          } else {
+            setPageTitle(systemName);
+          }
+        })
+        .catch(() => setPageTitle('전체 VOC'));
+    } else {
+      setPageTitle('전체 VOC');
+    }
+  }, [location.search, resetFilters]);
 
   const handleSort = useCallback(
     (column: string) => {
@@ -44,13 +86,22 @@ export function VocPage() {
   );
 
   const fetchVocs = useCallback(async () => {
+    const params = new URLSearchParams(location.search);
+    const view = params.get('view') ?? undefined;
+    const systemId = params.get('system_id') ?? undefined;
+    const menuId = params.get('menu_id') ?? undefined;
+
     setIsLoading(true);
     try {
       const result = await listVocs({
         status: filters.status ?? undefined,
         priority: filters.priority ?? undefined,
         keyword: filters.keyword || undefined,
-        assignee_id: filters.assigneeId ?? undefined,
+        // view 모드(mine/assigned)는 독립 필터 — 필터바 assigneeId와 합산하지 않음
+        assignee_id: view ? undefined : (filters.assigneeId ?? undefined),
+        view,
+        system_id: systemId,
+        menu_id: menuId,
         page,
         limit: LIMIT,
         sort: sortColumn ?? undefined,
@@ -68,6 +119,7 @@ export function VocPage() {
     filters.priority,
     filters.keyword,
     filters.assigneeId,
+    location.search,
     page,
     sortColumn,
     sortOrder,
@@ -77,7 +129,7 @@ export function VocPage() {
     void fetchVocs();
   }, [fetchVocs]);
 
-  // Reset page when filters change
+  // Reset page when filter bar changes
   useEffect(() => {
     setPage(1);
   }, [filters.status, filters.priority, filters.keyword, filters.assigneeId]);
@@ -141,6 +193,7 @@ export function VocPage() {
         total={total}
         onSearch={handleSearch}
         onCreateClick={() => setCreateModalOpen(true)}
+        title={pageTitle}
       />
       <VocFilterBar
         activeStatus={filters.status}
