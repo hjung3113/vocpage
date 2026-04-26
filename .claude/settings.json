@@ -46,7 +46,7 @@
     "command": "node .claude/statusline.cjs"
   },
   "enabledPlugins": {
-    "dev-browser@dev-browser-marketplace": false,
+    "dev-browser@dev-browser-marketplace": true,
     "claude-mem@thedotmack": false,
     "superpowers@superpowers-marketplace": true,
     "ralph-loop@claude-plugins-official": false,
