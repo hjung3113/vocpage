@@ -52,7 +52,7 @@ export function ProcessingSpeedWidget({ filter, buildQueryParams }: ProcessingSp
       {(data?.rows ?? []).map((row) => (
         <div className="sla-row" key={row.id}>
           <span className="sla-name">{row.name}</span>
-          <span className="sla-avg">{row.avgDays.toFixed(1)}일</span>
+          <span className="sla-avg">{(row.avgDays ?? 0).toFixed(1)}일</span>
           <span className={slaRateClass(row.slaRate)}>{row.slaRate}%</span>
         </div>
       ))}

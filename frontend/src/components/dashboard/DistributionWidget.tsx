@@ -51,8 +51,9 @@ function buildConicGradient(items: { color: string; pct: number }[]): string {
     'conic-gradient(' +
     items
       .map((item, i) => {
+        const pct = item.pct ?? 0;
         const start = acc;
-        acc += item.pct;
+        acc += pct;
         const end = i === items.length - 1 ? 100 : acc;
         return `${item.color} ${start.toFixed(1)}% ${end.toFixed(1)}%`;
       })
@@ -148,7 +149,7 @@ export function DistributionWidget({ filter, buildQueryParams }: DistributionWid
               <span className="legend-dot" style={{ background: item.resolvedColor }} />
               <span className="legend-name">{item.name}</span>
               <span className="legend-count">{item.count}</span>
-              <span className="legend-pct">{item.pct.toFixed(0)}%</span>
+              <span className="legend-pct">{(item.pct ?? 0).toFixed(0)}%</span>
               <span className="legend-bar-wrap">
                 <span
                   className="legend-bar-fill"
