@@ -1,0 +1,32 @@
+.global-tabs-container {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  background: var(--bg-app);
+}
+
+.global-tab {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.global-tab.active {
+  color: var(--brand);
+  border-bottom-color: var(--brand);
+  font-weight: 600;
+}
+
+.global-tab:hover:not(.active) {
+  color: var(--text-secondary);
+}
