@@ -31,7 +31,7 @@ export function AssigneeTable({ filter, buildQueryParams }: AssigneeTableProps) 
     staleTime: 5 * 60 * 1000,
   });
 
-  const allValues = data?.rows.flatMap((row) => row.values) ?? [];
+  const allValues = data?.rows.flatMap((row) => row.values ?? []) ?? [];
   const maxValue = Math.max(...allValues, 1);
 
   return (
@@ -78,7 +78,7 @@ export function AssigneeTable({ filter, buildQueryParams }: AssigneeTableProps) 
                 <td className={`rl${!row.assigneeName ? ' unassigned' : ''}`}>
                   {row.assigneeName || '미지정'}
                 </td>
-                {row.values.map((val, idx) => {
+                {(row.values ?? []).map((val, idx) => {
                   const header = data?.headers[idx] ?? '';
                   if (val === 0) {
                     return (

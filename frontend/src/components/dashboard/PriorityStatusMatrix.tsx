@@ -67,8 +67,8 @@ export function PriorityStatusMatrix({ filter, buildQueryParams }: PriorityStatu
           </tr>
         </thead>
         <tbody>
-          {(data?.rows ?? []).map((row) => (
-            <tr key={row.priority}>
+          {(data?.rows ?? []).map((row, idx) => (
+            <tr key={`${row.priority}-${idx}`}>
               <td
                 className="rh"
                 style={{ color: PRIORITY_COLORS[row.priority] ?? 'var(--text-secondary)' }}

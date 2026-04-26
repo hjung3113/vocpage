@@ -45,7 +45,7 @@ export function DrilldownHeatmap({
     if (!data) return 0;
     let max = 0;
     for (const row of data.rows) {
-      for (const v of row.values) {
+      for (const v of row.values ?? []) {
         if (v > max) max = v;
       }
     }
@@ -180,7 +180,7 @@ export function DrilldownHeatmap({
                     {isAllTab ? '▶ ' : ''}
                     {row.name}
                   </td>
-                  {row.values.map((v, i) => (
+                  {(row.values ?? []).map((v, i) => (
                     <td
                       key={i}
                       className={v === 0 ? 'empty' : ''}
