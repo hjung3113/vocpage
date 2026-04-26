@@ -1,7 +1,7 @@
 # VOC 프로젝트 전체 다방면 리뷰 — 잔여 항목
 
 **원본 리뷰일**: 2026-04-26  
-**최종 업데이트**: 2026-04-26 (Phase A/B/D 완료 반영)  
+**최종 업데이트**: 2026-04-26 (Phase A/B/D 완료 반영 + benchmark 스크린샷 리뷰 통합)  
 **대상 브랜치**: main (f0f3235) → 결정/수정 브랜치: fix/pre-impl-schema-infra
 
 ---
@@ -57,18 +57,33 @@
 
 ## 잔여 Major
 
-### 설계 Major (8건) — Phase C
+### 설계 Major (11건) — Phase C
 
-| ID  | 항목                                               | 위치                            |
-| --- | -------------------------------------------------- | ------------------------------- |
-| C4  | 공지 "오늘 하루 보지 않기" 일괄 체크박스로 수정    | `prototype.html:3579-3583`      |
-| C5  | 상태 전환 매트릭스 드롭다운 비허용 옵션 disabled   | `prototype.html:2750-2757`      |
-| C6  | Due Date 필드 드로어 추가                          | `prototype.html:2746-2855`      |
-| C7  | 태그 수동 편집 UI 추가                             | `feature-voc.md §8.8`           |
-| C8  | `prototype.html:1651` Linear indigo `#5e6ad2` 제거 | `prototype.html:1651`           |
-| C9  | "최대 2단계" → "최대 1레벨" 문구 수정              | `prototype.html:2477`           |
-| —   | 우선순위 필드 권한 미분리                          | `prototype.html:1775-1777`      |
-| —   | 담당 VOC 탭 배지 권한 분기 누락                    | `feature-notice-faq.md §10.2.2` |
+| ID  | 항목                                               | 위치                         |
+| --- | -------------------------------------------------- | ---------------------------- |
+| C4  | 공지 "오늘 하루 보지 않기" 일괄 체크박스로 수정    | `prototype.html:3579-3583`   |
+| C5  | 상태 전환 매트릭스 드롭다운 비허용 옵션 disabled   | `prototype.html:2750-2757`   |
+| C6  | Due Date 필드 드로어 추가                          | `prototype.html:2746-2855`   |
+| C7  | 태그 수동 편집 UI 추가                             | `feature-voc.md §8.8`        |
+| C8  | `prototype.html:1651` Linear indigo `#5e6ad2` 제거 | `prototype.html:1651`        |
+| C9  | "최대 2단계" → "최대 1레벨" 문구 수정              | `prototype.html:2477`        |
+| C10 | 드로어 퍼머링크 복사 버튼 명세 추가                | `feature-voc.md` (없음)      |
+| C11 | 사용자 초대 플로우 명세 추가                       | `requirements.md` (없음)     |
+| C12 | VOC 목록 서브태스크 행 인라인 펼침 명세 추가       | `feature-voc.md §9.2` (없음) |
+
+**C12 — VOC 목록 서브태스크 행 인라인 펼침**  
+벤치마크(`11-voc-subvoc-expanded.png`) 부모 VOC 행 좌측 ▶ 토글 클릭 시 자식 서브태스크(예: `분析-2025-0001-1`, `-2`)가 해당 행 바로 아래에 인라인으로 표시됨. `feature-voc.md §9.2`에는 서브태스크 **생성** 진입점과 코드 자동 부여만 있고, 목록 테이블에서 인라인 확장하는 방식(토글 아이콘 표시 조건·들여쓰기·서브태스크 행의 컬럼 구성) 명세가 전혀 없음.  
+→ `feature-voc.md §9.2`에 목록 인라인 행 확장 명세 추가
+| — | 우선순위 필드 권한 미분리 | `prototype.html:1775-1777` |
+| — | 담당 VOC 탭 배지 권한 분기 누락 | `feature-notice-faq.md §10.2.2` |
+
+**C10 — 드로어 퍼머링크 복사 버튼**  
+벤치마크(`05-voc-drawer-open.png`, `08-voc-drawer-main-voc.png`) 드로어 상단 우측에 풀스크린(↗)·링크(🔗)·삭제(🗑)·닫기(✕) 4개 버튼이 있음. `feature-voc.md`에 "링크 복사" 또는 "퍼머링크" 기능 명세 전혀 없음. URL param sync(FE Major 항목)와 별개로 클립보드 복사 버튼의 UI·동작·권한(누구나 복사 가능?) 명세 추가 필요.  
+→ `feature-voc.md §8.x`에 퍼머링크 복사 버튼 명세 추가
+
+**C11 — 사용자 초대 플로우**  
+벤치마크(`20-admin-users.png`) 사용자 관리 페이지 우상단에 "사용자 초대" 버튼이 있음. `requirements.md`에 `users` 테이블·역할 변경 API는 있으나 신규 사용자 초대 플로우(이메일 발송, 초대 링크, 만료, AD SSO 환경에서의 자동 계정 생성 vs 수동 초대 구분) 전혀 미정의.  
+→ `requirements.md §15` (관리자 기능)에 초대 플로우 추가
 
 ### DB Major (2건)
 
@@ -101,6 +116,9 @@
 - `prototype.html:3543` — `background:#e5484d` raw hex, `var(--status-red)` 필요
 - FAQ 카테고리 관리 탭 누락 (`feature-notice-faq.md §10.5`)
 - 사이드바 전체 `overflow-y:auto` — 스펙은 보기 섹션 고정·시스템 트리만 스크롤
+- **VOC 등록 모달 자동 태그 추천 UI 미명세** — 벤치마크(`09-voc-create-modal.png`) 등록 모달 하단에 자동 태그 추천 칩 영역이 있음. `feature-voc.md`에 태그 자동 추천(tag_rules 패턴 매칭 미리보기) 등록 시 실시간 노출 명세 없음.
+- **태그 규칙 관리 편집 방법 미정의** — 벤치마크(`17-admin-tag-rules.png`) 태그 규칙 테이블에 "삭제" 버튼만 있고 편집 버튼 없음. 기존 규칙 수정 방법(삭제 후 재추가 vs 인라인 편집 vs 별도 편집 모달) `requirements.md`에 미정의.
+- **분포 위젯 시스템별/날짜별 세그먼트 미명세** — 벤치마크(`12-dashboard.png`) 분포 위젯 우측 상단에 "전체 | 시스템별 | 날짜별" 세그먼트 버튼이 있음. `dashboard.md`에 분포 탭(상태/우선순위/유형/태그) 4종은 있으나 이 세그먼트 명세 없음. `GET /api/dashboard/distribution` API에도 세그먼트 파라미터 미반영.
 
 ### DB
 
@@ -163,14 +181,17 @@
 
 ## Phase C — 프로토타입 간극 해소 (설계 검증 필요)
 
-| ID  | 항목                                                   |
-| --- | ------------------------------------------------------ |
-| C1  | Result Review 관리자 페이지 + 사이드바 진입점 추가     |
-| C2  | Internal Notes 섹션 드로어 추가                        |
-| C3  | 공지 팝업 2-panel 레이아웃 구현                        |
-| C4  | 공지 "오늘 하루 보지 않기" 일괄 체크박스로 수정        |
-| C5  | 상태 전환 매트릭스 드롭다운 비허용 옵션 disabled       |
-| C6  | Due Date 필드 드로어 추가                              |
-| C7  | 태그 수동 편집 UI 추가                                 |
-| C8  | `prototype.html:1651` Linear indigo 제거               |
-| C9  | `prototype.html:2477` "최대 2단계" → "최대 1레벨" 수정 |
+| ID  | 항목                                                                 |
+| --- | -------------------------------------------------------------------- |
+| C1  | Result Review 관리자 페이지 + 사이드바 진입점 추가                   |
+| C2  | Internal Notes 섹션 드로어 추가                                      |
+| C3  | 공지 팝업 2-panel 레이아웃 구현                                      |
+| C4  | 공지 "오늘 하루 보지 않기" 일괄 체크박스로 수정                      |
+| C5  | 상태 전환 매트릭스 드롭다운 비허용 옵션 disabled                     |
+| C6  | Due Date 필드 드로어 추가                                            |
+| C7  | 태그 수동 편집 UI 추가                                               |
+| C8  | `prototype.html:1651` Linear indigo 제거                             |
+| C9  | `prototype.html:2477` "최대 2단계" → "최대 1레벨" 수정               |
+| C10 | 드로어 퍼머링크 복사 버튼 — `feature-voc.md` 명세 추가               |
+| C11 | 사용자 초대 플로우 — `requirements.md §15` 명세 추가                 |
+| C12 | VOC 목록 서브태스크 행 인라인 펼침 — `feature-voc.md §9.2` 명세 추가 |

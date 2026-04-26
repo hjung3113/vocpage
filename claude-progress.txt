@@ -4,7 +4,7 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ / VOC 목록 UI 벤치마크 정렬 ✅ / 대시보드 기간 필터 ✅ / 다방면 전체 리뷰 ✅ / **Phase D(의사결정) ✅ / Phase A(스키마) ✅ / Phase B(기반구조) ✅** → **Phase C(프로토타입 간극) + Phase 7 착수**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ / VOC 목록 UI 벤치마크 정렬 ✅ / 대시보드 기간 필터 ✅ / 다방면 전체 리뷰 ✅ / **Phase D(의사결정) ✅ / Phase A(스키마) ✅ / Phase B(기반구조) ✅ / benchmark 스크린샷 리뷰 ✅** → **Phase C(프로토타입 간극) + Phase 7 착수**
 
 ### 다음 세션 우선순위
 

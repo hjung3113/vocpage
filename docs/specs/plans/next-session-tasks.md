@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26
+> 최종 업데이트: 2026-04-26 (benchmark 스크린샷 리뷰 완료 → C10~C12 추가)
 > 현재 위치: Phase 7 착수 전 문서 수정 → Phase 7 실구현 대기
 
 ---
@@ -13,6 +13,27 @@
 | R-2 | `dashboard_settings` — `globaltabs_order` migration 추가 여부 결정 + dashboard.md 정합  | -    |
 | R-3 | `requirements.md §14.1` 세션 스토어 — "Phase 8-1 구현 예정, 현재 MemoryStore" 주석 추가 | -    |
 | R-4 | `ts-node-dev → tsx watch` 교체 (backend/package.json `dev` 스크립트)                    | -    |
+
+---
+
+## Phase C — 프로토타입 간극 해소 (설계 명세 보완)
+
+> 구현 전 문서 확정 필수. 각 항목은 spec 수정 → prototype 수정 → 커밋 순서.
+
+| ID  | 항목                                                                 | 상태 |
+| --- | -------------------------------------------------------------------- | ---- |
+| C1  | Result Review 관리자 페이지 + 사이드바 진입점 추가                   | -    |
+| C2  | Internal Notes 섹션 드로어 추가                                      | -    |
+| C3  | 공지 팝업 2-panel 레이아웃 구현                                      | -    |
+| C4  | 공지 "오늘 하루 보지 않기" 일괄 체크박스로 수정                      | -    |
+| C5  | 상태 전환 매트릭스 드롭다운 비허용 옵션 disabled                     | -    |
+| C6  | Due Date 필드 드로어 추가                                            | -    |
+| C7  | 태그 수동 편집 UI 추가                                               | -    |
+| C8  | `prototype.html:1651` Linear indigo 제거                             | -    |
+| C9  | `prototype.html:2477` "최대 2단계" → "최대 1레벨" 수정               | -    |
+| C10 | 드로어 퍼머링크 복사 버튼 — `feature-voc.md` 명세 추가               | -    |
+| C11 | 사용자 초대 플로우 — `requirements.md §15` 명세 추가                 | -    |
+| C12 | VOC 목록 서브태스크 행 인라인 펼침 — `feature-voc.md §9.2` 명세 추가 | -    |
 
 ---
 
