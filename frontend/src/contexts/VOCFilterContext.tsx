@@ -10,6 +10,7 @@ export interface VOCFilters {
   tagIds: string[];
   tagId: string | null;
   assigneeId: string | null;
+  vocType: string | null;
   from: string | null;
   to: string | null;
   keyword: string;
@@ -32,6 +33,7 @@ const DEFAULT_FILTERS: VOCFilters = {
   tagIds: [],
   tagId: null,
   assigneeId: null,
+  vocType: null,
   from: null,
   to: null,
   keyword: '',

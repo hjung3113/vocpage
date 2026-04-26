@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, CornerDownRight, UserX } from 'lucide-react';
+import { ChevronDown, ChevronRight, CornerDownRight, UserMinus } from 'lucide-react';
 import type { VocSummary } from '../../api/vocs';
 import { StatusBadge } from '../common/StatusBadge';
 import { PriorityBadge } from '../common/PriorityBadge';
@@ -75,7 +75,7 @@ function AssigneeCell({ name }: { name: string | null }) {
           color: 'var(--text-quaternary)',
         }}
       >
-        <UserX size={13} />
+        <UserMinus size={13} />
         미배정
       </span>
     );
@@ -134,11 +134,12 @@ export function VocRow({
     >
       {/* 이슈 ID */}
       <td
-        className="px-4 py-2.5 text-sm"
+        className="px-3 py-2.5 text-xs"
         style={{
           fontFamily: 'var(--font-code)',
           color: isChild ? 'var(--text-tertiary)' : 'var(--text-secondary)',
           whiteSpace: 'nowrap',
+          paddingLeft: isChild ? '28px' : undefined,
         }}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
@@ -203,7 +204,10 @@ export function VocRow({
       </td>
 
       {/* 제목 (type badge + title + tags) */}
-      <td className="px-4 py-2.5" style={{ minWidth: 0 }}>
+      <td
+        className="px-3 py-2.5"
+        style={{ minWidth: 0, paddingLeft: isChild ? '28px' : undefined }}
+      >
         <div
           style={{
             display: 'grid',
@@ -221,23 +225,23 @@ export function VocRow({
               minWidth: 0,
             }}
           >
-            {!isChild && typeBadge && voc.voc_type_name && (
+            {typeBadge && voc.voc_type_name && (
               <span
                 style={{
                   flexShrink: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  padding: '1px 7px',
-                  borderRadius: '9999px',
+                  padding: '1px 6px',
+                  borderRadius: '4px',
                   fontSize: '11px',
                   fontWeight: 600,
                   background: typeBadge.bg,
                   border: `1px solid ${typeBadge.border}`,
                   color: typeBadge.color,
                   whiteSpace: 'nowrap',
+                  lineHeight: '18px',
                 }}
               >
-                <span style={{ marginRight: '3px', fontSize: '8px', lineHeight: 1 }}>●</span>
                 {voc.voc_type_name}
               </span>
             )}
@@ -268,8 +272,8 @@ export function VocRow({
                 <span
                   key={tag.id}
                   style={{
-                    padding: '1px 6px',
-                    borderRadius: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
                     fontSize: '11px',
                     fontWeight: 500,
                     background: 'var(--bg-elevated)',
@@ -288,24 +292,24 @@ export function VocRow({
       </td>
 
       {/* 상태 */}
-      <td className="px-3 py-2.5" style={{ whiteSpace: 'nowrap' }}>
+      <td className="px-2 py-2.5" style={{ whiteSpace: 'nowrap' }}>
         <StatusBadge status={voc.status} />
       </td>
 
       {/* 담당자 */}
-      <td className="px-3 py-2.5" style={{ whiteSpace: 'nowrap', minWidth: 0 }}>
+      <td className="px-2 py-2.5" style={{ whiteSpace: 'nowrap', minWidth: 0 }}>
         <AssigneeCell name={voc.assignee_name ?? null} />
       </td>
 
       {/* 우선순위 */}
-      <td className="px-3 py-2.5" style={{ whiteSpace: 'nowrap' }}>
+      <td className="px-2 py-2.5" style={{ whiteSpace: 'nowrap' }}>
         <PriorityBadge priority={voc.priority} />
       </td>
 
       {/* 등록일 */}
       <td
-        className="px-4 py-2.5 text-xs"
-        style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}
+        className="px-3 py-2.5 text-xs"
+        style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', paddingRight: '20px' }}
       >
         {formatDate(voc.created_at)}
       </td>

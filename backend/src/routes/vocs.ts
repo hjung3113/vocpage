@@ -47,10 +47,7 @@ vocRouter.get('/', requireAuth, async (req: Request, res: Response): Promise<voi
   const params: unknown[] = [];
   let idx = 1;
 
-  if (user.role === 'user') {
-    conditions.push(`v.author_id = $${idx++}`);
-    params.push(user.id);
-  } else if (view === 'mine') {
+  if (view === 'mine') {
     conditions.push(`v.author_id = $${idx++}`);
     params.push(user.id);
   } else if (view === 'assigned') {

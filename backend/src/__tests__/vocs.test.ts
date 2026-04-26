@@ -43,8 +43,7 @@ describe('VOC endpoints', () => {
       expect(res.body.total).toBeGreaterThanOrEqual(1);
     });
 
-    it('User sees only their own VOCs', async () => {
-      // Insert a VOC authored by user and one by admin
+    it('User sees all VOCs (no role-based list filter)', async () => {
       await pool.query(
         `INSERT INTO vocs (title, body, status, priority, author_id, system_id, menu_id, voc_type_id, source)
          VALUES ('My VOC', 'body', '접수', 'medium', $1, $2, $3, $4, 'manual')`,
@@ -61,10 +60,7 @@ describe('VOC endpoints', () => {
 
       const res = await agent.get('/api/vocs');
       expect(res.status).toBe(200);
-      // All returned VOCs must be authored by the user
-      for (const voc of res.body.data as Array<{ author_id: string }>) {
-        expect(voc.author_id).toBe(fixtures.userId);
-      }
+      expect(res.body.total).toBeGreaterThanOrEqual(2);
     });
   });
 

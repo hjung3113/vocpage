@@ -125,6 +125,7 @@ docs/specs/
 
 ## Session Rules
 
+- **Fix root causes, not symptoms** — When a problem arises (in CLAUDE.md or anywhere else), don't patch just the immediate issue. Identify related problems of the same class and fix them all so the issue cannot recur.
 - **No completion claims** — Never mark a task as done until the user explicitly says so
 - **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
 - **Debate, don't defer** — Do not assume the user is always right. When you see a counterargument, trade-off, or missed case in a spec or design decision, raise it before agreeing. No passive "yes" — push back, verify, or propose alternatives as a peer engineer would.
