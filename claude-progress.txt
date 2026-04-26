@@ -4,7 +4,22 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + design.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) → **Phase 7 (prototype 고도화)** — 기존 Phase 7/8 코드 구현은 8/9로 이관
+현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + design.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) → **Phase 7 (prototype 고도화)** — 기존 Phase 7/8 코드 구현은 8/9로 이관
+
+### 관리자 UI 커버리지 리뷰 (2026-04-27, 브랜치 docs/admin-ui-gaps)
+
+"DB 직접 접근 없이 관리자 페이지만으로 운영 가능?" 요구사항 23개 항목 매핑. 4개 갭 식별 → 2개 즉시 처리, 2개 NextGen 이연.
+
+| 갭    | 결정                                                          |
+| ----- | ------------------------------------------------------------- |
+| GAP-1 | **D22** `feature-voc.md §9.4.6` 태그 마스터 관리 신설         |
+| GAP-2 | **D23** `feature-voc.md §9.4.7` 휴지통 신설                   |
+| GAP-3 | **N-1** 외부 마스터 캐시 인스펙트 — NextGen                   |
+| GAP-4 | **N-2** 자동 태그 재부여 차단 reset — NextGen                 |
+
+산출물: `docs/specs/reviews/admin-ui-coverage-review.md`, requirements.md §17 D22/D23, next-session-tasks.md Phase 7 P-7/P-8 + 8-6 + 미결 N-1/N-2. 다음 세션은 명세 자체 검토(이름·슬러그 정책, 병합 UX, 휴지통 진입 동선)부터 이어서.
+
+---
 
 ### Phase G 완료 요약 (2026-04-27)
 
