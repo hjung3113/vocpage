@@ -1,28 +1,117 @@
 @import 'tailwindcss';
 
 /*
-  @theme values mirror tokens.ts.
-  In Phase 6-9, generate this block from tokens.ts via a build script.
-  Until then, keep manually in sync.
+  @theme values mirror tokens.ts dark-mode values.
+  Full light/dark switching is handled via light-dark() in :root below.
 */
 @theme {
-  --color-brand: oklch(56.5% 0.196 261.3);
-  --color-accent: oklch(60% 0.15 200);
-  --color-bg-app: oklch(14% 0.01 264);
-  --color-text-primary: oklch(95% 0.003 264.5);
-  --color-text-secondary: oklch(65% 0.012 264);
+  --color-bg-app: oklch(11% 0.016 264);
+  --color-bg-panel: oklch(14.5% 0.019 262);
+  --color-bg-surface: oklch(18.5% 0.021 260);
+  --color-bg-elevated: oklch(23% 0.022 258);
+
+  --color-text-primary: oklch(95.5% 0.007 252);
+  --color-text-secondary: oklch(79% 0.014 255);
+  --color-text-tertiary: oklch(59% 0.012 258);
+  --color-text-quaternary: oklch(43% 0.01 260);
+
+  --color-brand: oklch(63% 0.19 258);
+  --color-accent: oklch(70% 0.21 255);
+  --color-accent-hover: oklch(76% 0.18 252);
+  --color-brand-bg: oklch(22% 0.035 262);
+  --color-brand-border: oklch(35% 0.06 260);
 }
 
 :root {
-  --bg-app: oklch(14% 0.01 264);
-  --bg-panel: oklch(17% 0.01 264);
-  --bg-surface: oklch(20% 0.012 264);
-  --brand: oklch(56.5% 0.196 261.3);
-  --text-primary: oklch(95% 0.003 264.5);
-  --text-secondary: oklch(65% 0.012 264);
+  color-scheme: light dark;
+
+  /* Backgrounds */
+  --bg-app: light-dark(oklch(98% 0.007 252), oklch(11% 0.016 264));
+  --bg-panel: light-dark(oklch(96.5% 0.009 255), oklch(14.5% 0.019 262));
+  --bg-surface: light-dark(oklch(100% 0 0), oklch(18.5% 0.021 260));
+  --bg-elevated: light-dark(oklch(95% 0.011 256), oklch(23% 0.022 258));
+
+  /* Text */
+  --text-primary: light-dark(oklch(18% 0.026 267), oklch(95.5% 0.007 252));
+  --text-secondary: light-dark(oklch(36% 0.022 264), oklch(79% 0.014 255));
+  --text-tertiary: light-dark(oklch(54% 0.016 260), oklch(59% 0.012 258));
+  --text-quaternary: light-dark(oklch(68% 0.01 258), oklch(43% 0.01 260));
+
+  /* Brand (Samsung Blue) */
+  --brand: light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
+  --accent: light-dark(oklch(47% 0.23 262), oklch(70% 0.21 255));
+  --accent-hover: light-dark(oklch(35% 0.22 268), oklch(76% 0.18 252));
+  --brand-bg: light-dark(oklch(93% 0.025 258), oklch(22% 0.035 262));
+  --brand-border: light-dark(oklch(80% 0.045 260), oklch(35% 0.06 260));
+
+  /* Borders */
+  --border-subtle: light-dark(oklch(88% 0.012 254), oklch(20% 0.018 261 / 0.8));
+  --border-standard: light-dark(oklch(83% 0.016 256), oklch(27% 0.02 259 / 0.85));
+  --border-solid: light-dark(oklch(83% 0.016 256), oklch(25% 0.019 260));
+
+  /* Shadows */
+  --shadow-sm: light-dark(0 1px 3px oklch(70% 0.04 260 / 0.1), 0 1px 3px oklch(5% 0.01 265 / 0.4));
+  --shadow-md: light-dark(
+    0 4px 16px oklch(65% 0.05 260 / 0.12),
+    0 4px 16px oklch(5% 0.01 265 / 0.55)
+  );
+  --shadow-dialog: light-dark(
+    0 12px 40px oklch(60% 0.06 260 / 0.14),
+    0 12px 40px oklch(5% 0.01 265 / 0.7)
+  );
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* Typography */
+  --font-ui:
+    'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    sans-serif;
+  --font-mono: 'D2Coding', 'SF Mono', 'Menlo', ui-monospace, monospace;
+
+  /* Chart colors */
+  --chart-blue: oklch(63% 0.19 258);
+  --chart-sky: oklch(72% 0.14 235);
+  --chart-emerald: oklch(62% 0.19 158);
+  --chart-amber: oklch(70% 0.16 72);
+  --chart-red: oklch(58% 0.22 25);
+  --chart-teal: oklch(65% 0.16 195);
+  --chart-indigo: oklch(55% 0.17 270);
+
+  /* Status colors */
+  --status-green: oklch(55% 0.17 150);
+  --status-amber: oklch(70% 0.16 72);
+  --status-red: oklch(58% 0.22 25);
+  --status-blue: light-dark(oklch(50% 0.18 242), oklch(67% 0.17 240));
+  --status-purple: light-dark(oklch(52% 0.22 290), oklch(72% 0.16 290));
+
+  --status-amber-bg: light-dark(oklch(94% 0.025 72), oklch(18% 0.05 72));
+  --status-amber-border: light-dark(oklch(78% 0.09 72), oklch(30% 0.09 72));
+  --status-red-bg: light-dark(oklch(94% 0.03 25), oklch(18% 0.07 25));
+  --status-red-border: light-dark(oklch(78% 0.1 25), oklch(30% 0.1 25));
+  --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
+  --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
+
+  /* Status dot colors — VOC list row indicator (matches status enum) */
+  --status-dot-received: light-dark(oklch(60% 0.01 260), oklch(48% 0.01 260)); /* 접수 */
+  --status-dot-reviewing: light-dark(oklch(48% 0.19 244), oklch(66% 0.18 242)); /* 검토중 */
+  --status-dot-processing: light-dark(oklch(48% 0.17 152), oklch(64% 0.19 155)); /* 처리중 */
+  --status-dot-done: light-dark(oklch(46% 0.19 155), oklch(63% 0.21 158)); /* 완료 */
+  --status-dot-drop: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); /* 드랍 */
+
+  /* Semantic aliases */
+  --danger: var(--status-red);
+  --text-on-brand: oklch(100% 0 0);
+  --border: var(--border-standard);
 }
 
 body {
   background-color: var(--bg-app);
   color: var(--text-primary);
+  font-family: var(--font-ui);
 }

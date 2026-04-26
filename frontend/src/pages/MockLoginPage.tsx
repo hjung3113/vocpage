@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockLogin, AuthRole } from '../api/auth';
+import { AuthContext } from '../contexts/AuthContext';
+import type { AuthRole } from '../api/auth';
 
 export default function MockLoginPage() {
+  const { login } = useContext(AuthContext)!;
   const [role, setRole] = useState<AuthRole>('admin');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -13,7 +15,7 @@ export default function MockLoginPage() {
     setLoading(true);
     setError(null);
     try {
-      await mockLogin(role);
+      await login(role);
       navigate('/');
     } catch {
       setError('로그인 실패');

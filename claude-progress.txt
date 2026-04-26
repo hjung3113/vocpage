@@ -4,23 +4,40 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ / VOC 목록 UI 벤치마크 정렬 ✅ / 대시보드 기간 필터 ✅ → **Phase 7 계속 (7-1 VOC CRUD 착수 대기)**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ / VOC 목록 UI 벤치마크 정렬 ✅ / 대시보드 기간 필터 ✅ / 다방면 전체 리뷰 ✅ / **Phase D(의사결정) ✅ / Phase A(스키마) ✅ / Phase B(기반구조) ✅** → **Phase C(프로토타입 간극) + Phase 7 착수**
 
 ### 다음 세션 우선순위
 
-**Phase 7 실구현 착수** — Preflight 전체 완료:
+**Phase C — 프로토타입 간극 해소** (잔여 리뷰 → `docs/specs/reviews/project-full-review.md`):
 
-| ID  | 항목                                                                      | 상태      |
-| --- | ------------------------------------------------------------------------- | --------- |
-| R-1 | `dashboard.md` — `보류→드랍`, `접수됨→접수` 일괄 치환                    | ✅ 완료   |
-| R-2 | `dashboard_settings` — `globaltabs_order` 추가 + 3파일 스키마 정합       | ✅ 완료   |
-| R-3 | `requirements.md §14.1` 세션 스토어 주석 추가                             | ✅ 완료   |
-| R-4 | `ts-node-dev → tsx watch` 교체                                            | ✅ 완료   |
-| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                               | ✅ 완료   |
-| R-6 | prototype 섹션 인벤토리 + React 매핑 문서화 (7-0, 7-1 착수 전)            | ✅ 완료   |
+| 항목 | 내용 |
+| --- | --- |
+| C1 | Result Review 관리자 페이지 + 사이드바 진입점 추가 |
+| C2 | Internal Notes 섹션 드로어 추가 |
+| C3 | 공지 팝업 2-panel 레이아웃 구현 |
+| C4 | 공지 "오늘 하루 보지 않기" 일괄 체크박스로 수정 |
+| C5 | 상태 전환 매트릭스 드롭다운 비허용 옵션 disabled |
+| C6 | Due Date 필드 드로어 추가 |
+| C7 | 태그 수동 편집 UI 추가 |
+| C8 | `prototype.html:1651` Linear indigo 제거 |
+| C9 | `prototype.html:2477` "최대 2단계" → "최대 1레벨" 수정 |
 
 - F-4 MemoryStore → `connect-pg-simple`: **Phase 8-1로 defer 확정** (2026-04-25)
 - Phase 7 = 개발 스켈레톤 (로컬 dev 기능 동작), Phase 8 = 운영 실구현 + 배포
+
+## 완료된 작업 (2026-04-26 — Phase D/A/B 완료)
+
+- **Phase D 의사결정 8건** ✅ — `requirements.md §17` 기록
+- **Phase A 스키마 확정** ✅ — 마이그레이션 008(due_date), 009(subtask 인프라+트리거), 010(인덱스 19건) 추가
+- **Phase B FE/BE 기반 구조** ✅ — tokens.ts/index.css 완성, 에러포맷 통일, errorHandler/requireRole 미들웨어, VocStatus 정리, AuthUser 단일화, MockLoginPage 수정
+- PR: `fix/pre-impl-schema-infra`
+
+## 완료된 작업 (2026-04-26 — 다방면 전체 리뷰 완료)
+
+- **전체 프로젝트 다방면 리뷰** ✅ — 설계/DB/FE/BE 4개 전문가 병렬 리뷰, `docs/specs/reviews/project-full-review.md` 작성 (PR: `docs/multi-expert-review`)
+  - Critical 15건 / Major 32건 / Minor 25건 식별
+  - 미구현 API 38개, 미구현 FE 화면 19개, 인덱스 누락 20건
+  - 의사결정 필요 포인트 8건 도출
 
 ## 완료된 작업 (2026-04-26 — Phase 7 Preflight 완료 + 벤치마크 정리)
 

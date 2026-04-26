@@ -1,8 +1,9 @@
 export interface AuthUser {
   id: string;
-  email: string;
+  email?: string;
   name: string;
   role: 'admin' | 'manager' | 'user';
+  department?: string;
 }
 
 export type AuthRole = AuthUser['role'];

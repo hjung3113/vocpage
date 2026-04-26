@@ -73,7 +73,7 @@
 - **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe, 전역 UNIQUE)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성. `slug` 제약: `(system_id, slug)` 복합 UNIQUE.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `voc_type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
   - `status`: **5단계 유지 확정** (v3 §1.4, 2026-04-24). 기존 `보류`를 `드랍`으로 대체. 4단계 축소 옵션은 폐기 — 분석 업무 특성상 `검토중`(조사) vs `처리중`(착수)의 의미 구분 유지 가치 있음. 상태 전환 매트릭스는 §8.2.
   - `source`: VOC 생성 출처 구분. `manual` = 웹 UI 폼 입력(User/Manager), `import` = Jira 이관 스크립트(MVP 오픈 전 1회성).
     - **PG enum 대신 text+CHECK** 선택 — 향후 값 추가/제거 유연성(`chatbot` 등 NextGen 가능성).
@@ -547,3 +547,20 @@ Phase 4 5-Expert 잔여 7건은 모두 반영 완료 (2026-04-24):
 | 표준 에러 코드 목록                        | §6.1                       |
 | 파일명 규칙 `{voc_id}/{uuid}-{원본파일명}` | feature-voc.md §8.5        |
 | KPI 목표값(MVP는 SC-1·SC-2·SC-3만)         | §12 (기존 반영 완료)       |
+
+## 17. 다방면 리뷰 결정 이력 (2026-04-26)
+
+Phase 7 착수 전 종합 리뷰(project-full-review.md) 기반 의사결정 목록.
+
+| 항목                                    | 결정                                                   | 반영 위치                                             |
+| --------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
+| D1 용어 통일 `type_id` vs `voc_type_id` | **`voc_type_id` 유지** — DB 변경 최소화                | §4 vocs (이미 반영), 이 문서 §4 수정 완료             |
+| D2 `notifications.voc_id` NULL 정책     | **NOT NULL 유지** — 모든 알림은 VOC 연결 필수          | §4 notifications (현행 유지)                          |
+| D3 `structured_payload` 입력 폼 UX      | **별도 모달** — "결과 입력" 버튼 → 독립 모달 팝업      | feature-voc.md §8.4 (Phase 7 구현 시 명세 추가)       |
+| D4 Sub-task API 응답 필드명             | **`subTasks[]`** — 1레벨 고정 의미 명확화              | §6.1 GET /api/vocs 응답 스키마 (Phase 7 구현 시 반영) |
+| D5 대시보드 시스템 탭                   | **동적** — `systems` 테이블 기반 렌더링                | §11 대시보드 (Phase 7 구현 시 반영)                   |
+| D6 공지 상세 표시 방식                  | **드로어** — 기존 드로어 패턴과 일관성                 | feature-notice-faq.md (Phase 7 구현 시 반영)          |
+| D7 데이터 보존 기간                     | **무기한** — VOC soft delete 및 voc_history 모두       | §14.3 운영 정책 (별도 정책 없음 = 물리 삭제 없음)     |
+| D8 알림 디바운스 구현 위치              | **앱 레이어 (BE 서비스)** — 테스트 용이성, 로직 가시성 | §6.1 notification 서비스 (Phase 7 구현 시 반영)       |
+| A3 Sub-task 채번 인프라 방식            | **`voc_subtask_counters` 별도 테이블** — 동시성 안전   | `migrations/009_subtask_infra.sql`                    |
+| A4 Sub-task 1레벨 DB 강제 방식          | **BEFORE INSERT/UPDATE 트리거**                        | `migrations/009_subtask_infra.sql`                    |

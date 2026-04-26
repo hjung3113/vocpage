@@ -9,13 +9,17 @@ const authMiddleware: RequestHandler = (req, res, next) => createAuthMiddleware(
 
 authRouter.post('/mock-login', (req, res): void => {
   if (process.env.AUTH_MODE !== 'mock') {
-    res.status(404).json({ error: 'Not found' });
+    res.status(404).json({ code: 'NOT_FOUND', message: 'Not found', details: null });
     return;
   }
 
   const { role } = req.body as { role?: string };
   if (role !== 'admin' && role !== 'manager' && role !== 'user') {
-    res.status(400).json({ error: 'Invalid role. Expected admin, manager, or user.' });
+    res.status(400).json({
+      code: 'INVALID_ROLE',
+      message: 'role은 admin, manager, user 중 하나여야 합니다.',
+      details: null,
+    });
     return;
   }
 
