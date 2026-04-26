@@ -4,194 +4,29 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ → **feat/voc-seeds-toastui-fix PR 대기** → Phase 8 직전 버그 수정 필요
+현재 위치: Phase 0~7 ✅ 완료 → **Phase 8 진입 대기**
 
-브랜치: `feat/voc-seeds-toastui-fix` (커밋 2edd0d0) — PR 미머지
-테스트: Playwright E2E 전체 기능 검증 완료 (2026-04-26)
-갭 리뷰: `docs/specs/reviews/phase7-prototype-design-gap-2026-04-26.md`
+브랜치: `main` (PR #38 머지 완료 — 2026-04-26)
+테스트: Playwright E2E B-1~B-7 버그 전체 수정 완료 (2026-04-26)
 
-### 다음 세션 — Phase 7 Playwright 테스트 발견 버그 수정 (우선순위 순)
+## Phase 완료 이력
 
-| # | 위치 | 내용 | 심각도 |
-|---|------|------|--------|
-| B-1 | VOC 목록 | 이슈 코드 전체 "—" — DB 트리거 미작동 또는 시드 issue_code 누락 | 🔴 |
-| B-2 | VOC Drawer | 내부노트 탭 없음 — Admin/Manager 로그인 시 표시되어야 함 | 🔴 |
-| B-3 | 대시보드 KPI | 총 VOC·이번주 완료·해결율·14일+ 미처리 "—" — API 쿼리 문제 | 🟡 |
-| B-4 | 대시보드 드릴다운 | 시스템명 대신 UUID 표시 — 히트맵 row 조인 누락 | 🟡 |
-| B-5 | 새 VOC 등록 | Toast UI Editor Write/Preview 텍스트 중복 노출 | 🟡 |
-| B-6 | 사용자 관리 | 이름·AD계정 열 비어있음 — 시드 users 데이터 미포함 | 🟢 |
-| B-7 | 알림 버튼 | Sidebar div가 포인터 이벤트 차단 — z-index/overlay 이슈 | 🟢 |
+| Phase | 내용 | 완료일 | PR |
+|-------|------|--------|-----|
+| 0 | 요구사항 초안 | 2026-04-23 | — |
+| 1~5 | 스펙·문서 정비 | 2026-04-23 | — |
+| 6 | 스캐폴딩·인증 Mock·DB 마이그레이션·상태관리 | 2026-04-24 | #22, #28 |
+| 7 | VOC CRUD·댓글·태그·대시보드·알림·관리자·갭수정 | 2026-04-25~26 | #37, #38 |
 
-이번 세션 수정 완료 (feat/voc-seeds-toastui-fix 브랜치):
-- `frontend/src/api/notices.ts` — `listNotices()` `{ data }` 언래핑
-- `frontend/src/api/faqs.ts` — `listFaqCategories()`, `listFaqs()` `{ data }` 언래핑
-- `frontend/vite.config.ts` — proxy `localhost:3001` → `backend:3000` (Docker 내부 통신)
-- `.env` — `VITE_AUTH_MODE=mock` 추가 (누락으로 /mock-login 리다이렉트 버그)
+## 다음 — Phase 8
 
-### 2026-04-26 작업 (feat/voc-seeds-toastui-fix)
-
-| 항목 | 내용 | 상태 |
-|------|------|------|
-| 시드 데이터 | VOC 10건 → 30건 (status/priority 다양 분포) + seed의 reporter_id 오탈자 수정 | ✅ |
-| VOC 등록 오류 | tsx watch 구버전 캐시 문제 → 백엔드 재시작 + vocs.ts GET author_id→reporter_id 수정 | ✅ |
-| Toast UI Editor | @toast-ui/react-editor 설치, VocCreateModal 실 API 연동 + WYSIWYG 에디터 적용 | ✅ |
-
-### Phase 7 갭 수정 완료 (2026-04-26)
-
-| Step | 내용 | 상태 |
-|------|------|------|
-| 1 | 토큰 보강 --font-code/--font-ui/--shadow-elevated/--text-quaternary, hex/rgba 위반 수정 | ✅ |
-| 2 | AppShell + Sidebar 골격 (layout/AppShell.tsx, layout/Sidebar.tsx) | ✅ |
-| 3 | VOC 목록 — 담당자 필터, 컬럼 정렬, 필터 탭 순서(드랍↔완료) | ✅ |
-| 4 | VocDrawer 탭 재구성 (서브태스크/내부노트 탭 추가) | ✅ |
-| 5 | Sidebar 동적 시스템 메뉴 + SidebarUser 역할 표시 | ✅ |
-| 6 | 대시보드 재구성 — GlobalTabs, KPI 8종, StatusDonut | ✅ |
-| 7 | Admin 공지/FAQ 탭 CRUD + NoticePopup dismiss 완성 | ✅ |
-| 8 | 알림 패널 헤더+빈상태 + UrgentBadge + markAllAsRead | ✅ |
-
-### 다음 세션 우선순위 → Phase 8
-
-**[1순위] Phase 7 잔여 갭 수정 — Step 1~4** (완료됨 — 아래는 구 내용):
-
-| Step | 내용                                                              | 난이도 |
-| ---- | ----------------------------------------------------------------- | ------ |
-| 1    | 토큰 보강 — `--font-code` / `--font-ui` 신설 + hex/rgba 위반 수정 | 반나절 |
-| 2    | AppShell + Sidebar 골격 구현 (정적 섹션)                          | 1~2일  |
-| 3    | VOC 목록 — 담당자 컬럼 / 정렬 / 필터 탭 순서                     | 0.5일  |
-| 4    | VocDrawer + Sub-task UI 전체 구현                                 | 2일    |
-
-**[2순위] Phase 7 잔여 갭 수정 — Step 5~8**:
-
-| Step | 내용                                                       |
-| ---- | ---------------------------------------------------------- |
-| 5    | Sidebar 동적 시스템 메뉴 + SidebarUser 영역                |
-| 6    | 대시보드 재구성 (KPI 8종 / GlobalTabs / 도넛차트)          |
-| 7    | Admin 공지/FAQ 관리 탭 + 공지 로그인 팝업                 |
-| 8    | 알림 패널 UI + Urgent 배지                                 |
-
-## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
-
-- **docs 폴더 정리** ✅ — stale 복사본 삭제, 잘못 배치된 파일 이동
-- **dashboard-feature.md 분리** ✅ — `requires/dashboard.md` (요구사항) + `plans/dashboard-impl.md` (구현 계획)
-- **requirements.md 섹션 분리** ✅
-  - §8·§9 → `requires/feature-voc.md`
-  - §10 → `requires/feature-notice-faq.md`
-  - 652줄 → 273줄 (섹션별 요약 + 링크)
-- **문서 인덱스 추가** ✅ — `requirements.md` 상단에 파일별 역할 인덱스 테이블
-- **최종 docs/specs/requires/ 구조**: requirements.md / design.md / feature-voc.md / feature-notice-faq.md / dashboard.md
-
-## 완료된 작업 (2026-04-23 — Phase 4 requirements.md 5-Expert 리뷰 반영)
-
-- **prototype.html 수정** ✅ — 처리속도 & 에이징 위젯 2개 카드로 분리, 좌우 나란히 배치
-- **5-Expert 체크리스트 리뷰** ✅ — `requirements-5expert-review-2026-04-23.md` 작성 (43점 → 85점)
-- **인터뷰 5건 완료** ✅
-  - AD 인증: OIDC / OAuth2 확정
-  - SLA 목표: 준수율 70%, 기한 = Priority Due Date 기준
-  - 이메일 MVP: v2 1순위 이유 명시 + Urgent 느낌표(!) 배지
-  - Jira 마이그레이션: 오픈 전 일괄 이전, 이후 신규 수동
-  - 성공 기준: SLA 70% + Jira 완전 전환 + Due Date 내 처리
-- **requirements.md 대규모 보강** ✅
-  - §2.1: AD OIDC 확정 (TBD 해소)
-  - §3: Node.js 20 LTS, PostgreSQL 16 버전 명시
-  - §6.1: validateADSession OIDC 상세, 에러 응답 포맷, 헬스체크, CSRF, getVOCList 필터 규칙
-  - §7: 이메일 v2 이유 명시, Jira 마이그레이션 타이밍 확정
-  - §8.3: 공지/FAQ 권한 행 추가
-  - §8.5: 파일명 UUID rename 추가
-  - §8.6: Urgent 알림 빨간 느낌표 배지
-  - §8.14: 폴링 ETag + 304 캐시 전략
-  - §9.9: "선택적" → URL 파라미터 우선, 복원 구현 필수 확정
-  - §11.1: SLA 70% 목표, amber 경고 표시
-  - §12: 성공 기준 3가지 (신규)
-  - §13: 테스트 전략 — AC 형식, 커버리지 목표, 성능 기준 (신규)
-  - §14: 운영 설정 — 환경변수, Docker 구성, 헬스체크, 로깅, 백업/롤백 (신규)
-
-## 완료된 작업 (2026-04-23 — Phase 3 requirements.md 전체 수정)
-
-- **인터뷰 A/B/C 완료 및 반영** ✅
-  - A: AD 연동 방식 TBD (사내 시스템 접근 후 확정), A-3 독립 SPA 확정, 개발환경 실 AD 직접 연결
-  - B: Admin/Manager 기능 권한 동일, INIT_ADMIN_EMAIL 환경변수, 역할 회수 수동 처리
-  - C: 일 10건 이내, 이메일 v2, Due Date MVP 포함 (Priority별 기본값: 긴급1주/높음2주/보통1달/낮음3달), Jira CSV 마이그레이션 스크립트 추가
-- **FIX-01~29 전체 완료** ✅ (requirements-fix-plan.md 전체 [x] 처리)
-  - P0 (9건): Sub-task 1레벨, 태그 편집 권한, notices/faqs/faq_categories 스키마, FAQ 카테고리 FK, 파일 보안(SVG/Content-Disposition/GIF), 계층형 목록 표시 규칙, 대시보드 API §11.7
-  - P1 (10건): Sub-task 순번, 댓글 이미지 경로, Soft Delete 첨부파일 접근, 알림 보관 정책, 댓글 Hard Delete 의도, 공지 복원 권한, slug UNIQUE 제약, dashboard_settings JSONB 예시, 마지막 Admin 판정, DB sequence 이름 규칙
-  - P2 (7건): 하이라이팅 대상, 전체화면 전환 방식, 단일/복수 팝업 구분, 빈 메뉴 안내, User 전체VOC 배지 숨김, Manager 잠금 아이콘, 폴링 에러 처리
-  - P3 (3건): 로드맵 우선순위, React Context 상태관리 확정, tag_rules AI 전환 주석
-
-## 완료된 작업 (2026-04-23 — Phase 1 디자인 통일성 확보)
-
-- **공지사항/FAQ/관리자 페이지 디자인 통일성 리뷰 완료** ✅ (82% → 100%)
-  - CSS 변수 추가: `--status-amber-bg/border`, `--status-red-bg/border`, `--status-purple/bg/border`
-  - 하드코딩 색상 제거: `#e5484d`, `#f5a623`, `#5e6ad233` → CSS vars 교체
-  - CSS 클래스 정비: `.type-keyword`, `.type-regex`, `.role-admin`, `.role-manager` oklch 리터럴 → vars
-  - `.notice-badge` 시스템 도입: 공지사항 뷰 ↔ 관리자 뷰 레벨 배지 통일
-  - `.notice-row`, `.notice-body`, `.faq-filter-bar`, `.faq-cat-btn` 클래스 추가 (onmouseover 제거)
-  - `.btn-form-save`, `.btn-form-cancel` 공통 폼 버튼 클래스 추가
-  - `.a-btn.danger:hover` → `var(--status-red-bg/border)` 교체
-  - Playwright로 전 페이지 시각 검증 완료
-
-## 완료된 작업 (2026-04-23 — requirements.md 전체 리뷰 및 스펙 확정)
-
-- **requirements.md 전체 리뷰 완료** ✅
-  - 10건 수정: Sub-task 표현, 정렬 API 형식, FAQ Soft Delete, dashboard_settings 스키마, useAutoTag 제거, 댓글 이미지 개수 제한, 통합 방식, 복수 팝업 UX, priority 필터 파라미터, 기술 스택
-  - `dashboard-feature.md` 커스터마이징 섹션 MVP로 단순화 (위젯 숨기기/표시)
-  - `docs/specs/plans/dashboard-v2-layout-editor.md` 신규 생성 (드래그앤드롭 레이아웃 편집 v2)
-
-## 완료된 작업 (2026-04-23 — 대시보드 prototype.html 합치기)
-
-- **대시보드를 prototype.html에 합치기** ✅
-  - 체크리스트:
-    - [x] GlobalTabs 3레벨 계층 (전체/시스템/메뉴) + 담당자 직교 필터
-    - [x] Filter Context Banner
-    - [x] KPI 카드 8종 (VOLUME/QUALITY 2줄)
-    - [x] 분포 도넛 4탭 (상태/우선순위/유형/태그)
-    - [x] 우선순위×상태 매트릭스
-    - [x] 드릴다운 히트맵 (X축 3종 + 브레드크럼)
-    - [x] 주간 트렌드 3선
-    - [x] 태그별 분포 바 차트
-    - [x] 시스템/메뉴 현황 카드
-    - [x] 담당자별 처리현황 테이블
-    - [x] 장기 미처리 Top 10
-    - [x] design.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
-
-## 다음 세션 읽을 문서
-
-- `.omc/plans/dashboard-feature.md` (v3.1 — 707줄, 구현 상세 명세)
-- `requirements.md` §11 (업데이트 완료)
-- `design.md` §11 (대시보드 컴포넌트 신규 추가됨)
-
-## 완료된 작업 (2026-04-23 — 문서 정리·싱크)
-
-- **requirements.md §11** v3.1 기준으로 업데이트
-  - 위젯 테이블: 태그 탭 추가, "Created vs. Resolved" → "주간 트렌드 (3선)", "시스템별 현황 카드" → "시스템/메뉴 현황 카드", 담당자별 처리 현황 추가
-  - §11.3 글로벌 필터 시스템 신규 (계층형 탭 + 담당자 직교 필터 + FilterContextBanner)
-  - §11.4 날짜 필터에 주간 트렌드 12주 고정 명시
-  - §11.3~11.5 → §11.4~11.6 번호 이동
-- **design.md §11 Dashboard Components** 신규 추가
-  - FilterContextBanner, KPI 카드 (alert border 포함), 히트맵 셀 그라디언트, 분포 도넛, 주간 트렌드 3선, Aging badge 스펙
-- **design.md §10 CSS Reference** `--chart-*` 토큰 7종 추가
-
-## 완료된 작업 (2026-04-23 — 대시보드 v3.1 스펙 고도화)
-
-- **dashboard-feature.md** v3.1 업데이트 (660→707줄), TODO 전체 해소
-  - 레벨 3 dim `[전체]` 단일 표시 확정
-  - 주간 트렌드 3선 계산 기준 명확화 (진행중=주말 스냅샷)
-  - 담당자 드롭다운 단일 선택(라디오) 확정
-  - GlobalTabs overflow: 드롭다운 병합 + Admin 순서·표시 관리
-  - 더보기 카드: 인라인 확장 토글
-  - 전체 클릭 파라미터 정의 (KPI·분포·히트맵·트렌드·담당자·태그 바)
-  - FE 상태 `activeSystem` 제거, `globalTab` 단일화
-  - API 2개 추가 (`/menus`, `/assignees`)
-  - DB: `status_changed_at`, `assignee_id` 인덱스 추가
-
-## 완료된 작업 (2026-04-23 — 대시보드 v3 설계 확정)
-
-- **dashboard-feature.md** v3 전면 재작성 (660줄)
-  - 글로벌 필터 시스템: 전체→시스템→메뉴 3단계 계층 + 담당자 직교 필터 전체 명세
-  - 히트맵 X축 셀렉터 3종, Y축 합계 행, 고정 레이아웃, 브레드크럼 동작 상세 명세
-  - 주간 트렌드 3선 정의 (신규/진행중/완료)
-  - 담당자별 처리현황 신규 위젯 명세
-  - 장기 미처리 dim 탭별 전환 규칙
-  - 시스템/메뉴 카드 탭 연동 명세
-  - API 엔드포인트 전체 업데이트 (systemId/menuId/assigneeId 공통 파라미터)
-  - FE 상태 타입 정의
-- **시각화 참조 파일**: `prototype/dashboard/dashboard-v3.html`
+| 단계 | 내용 |
+|------|------|
+| 8-1 | `connect-pg-simple` 세션 스토어 (production) |
+| 8-2 | OIDC 인증 실구현 |
+| 8-3 | Production Dockerfile + 빌드 파이프라인 |
+| 8-4 | 구조화 로깅 (pino) |
+| 8-5 | 실 MSSQL 연동 (외부 의존 — 담당자 자료 필요) |
+| 8-6 | 배포 + smoke test |
+| 8-7 | Playwright E2E 핵심 3플로우 |
+| 8-8 | Jira 마이그레이션 스크립트 |
