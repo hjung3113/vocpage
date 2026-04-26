@@ -1,0 +1,78 @@
+:root {
+  color-scheme: light dark;
+  --bg-app: light-dark(oklch(98% 0.007 252), oklch(11% 0.016 264));
+  --bg-panel: light-dark(oklch(96.5% 0.009 255), oklch(14.5% 0.019 262));
+  --bg-surface: light-dark(oklch(100% 0 0), oklch(18.5% 0.021 260));
+  --bg-elevated: light-dark(oklch(95% 0.011 256), oklch(23% 0.022 258));
+  --text-primary: light-dark(oklch(18% 0.026 267), oklch(95.5% 0.007 252));
+  --text-secondary: light-dark(oklch(36% 0.022 264), oklch(79% 0.014 255));
+  --text-tertiary: light-dark(oklch(54% 0.016 260), oklch(59% 0.012 258));
+  --text-quaternary: light-dark(oklch(68% 0.01 258), oklch(43% 0.01 260));
+  --brand: light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
+  --accent: light-dark(oklch(47% 0.23 262), oklch(70% 0.21 255));
+  --accent-hover: light-dark(oklch(35% 0.22 268), oklch(76% 0.18 252));
+  --brand-bg: light-dark(oklch(93% 0.025 258), oklch(22% 0.035 262));
+  --brand-border: light-dark(oklch(80% 0.045 260), oklch(35% 0.06 260));
+  --status-green: oklch(55% 0.17 150);
+  --status-emerald: oklch(62% 0.19 158);
+  --status-amber: oklch(70% 0.16 72);
+  --status-red: oklch(58% 0.22 25);
+  --status-blue: light-dark(oklch(50% 0.18 242), oklch(67% 0.17 240));
+  --status-amber-bg: light-dark(oklch(94% 0.025 72), oklch(18% 0.05 72));
+  --status-amber-border: light-dark(oklch(78% 0.09 72), oklch(30% 0.09 72));
+  --status-red-bg: light-dark(oklch(94% 0.03 25), oklch(18% 0.07 25));
+  --status-red-border: light-dark(oklch(78% 0.1 25), oklch(30% 0.1 25));
+  --status-purple: light-dark(oklch(52% 0.22 290), oklch(72% 0.16 290));
+  --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
+  --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
+  --chart-blue: light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
+  --chart-emerald: light-dark(oklch(40% 0.2 158), oklch(62% 0.19 158));
+  --chart-amber: light-dark(oklch(50% 0.17 72), oklch(70% 0.16 72));
+  --chart-red: light-dark(oklch(42% 0.22 25), oklch(58% 0.22 25));
+  --chart-sky: light-dark(oklch(48% 0.16 235), oklch(72% 0.14 235));
+  --border-subtle: light-dark(oklch(88% 0.012 254), oklch(20% 0.018 261 / 0.8));
+  --border-standard: light-dark(oklch(83% 0.016 256), oklch(27% 0.02 259 / 0.85));
+  --border-solid: light-dark(oklch(83% 0.016 256), oklch(25% 0.019 260));
+  --overlay: light-dark(oklch(18% 0.025 265 / 0.55), oklch(8% 0.012 265 / 0.88));
+  --shadow-sm: light-dark(oklch(70% 0.04 260 / 0.1) 0 1px 3px, oklch(5% 0.01 265 / 0.4) 0 1px 3px);
+  --shadow-md: light-dark(
+    oklch(65% 0.05 260 / 0.12) 0 4px 16px,
+    oklch(5% 0.01 265 / 0.55) 0 4px 16px
+  );
+  --shadow-dialog: light-dark(
+    oklch(60% 0.06 260 / 0.14) 0 12px 40px,
+    oklch(5% 0.01 265 / 0.7) 0 12px 40px
+  );
+  --font-ui:
+    'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    sans-serif;
+  --font-mono: 'D2Coding', 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --sidebar-w: 222px;
+  --drawer-w: 528px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* Text on brand-tinted backgrounds (badges, count pills, brand CTA) */
+  --text-on-brand: oklch(100% 0 0);
+
+  /* Status Badge — bg / fg / border per VOC status (matches uidesign.md §5/§10) */
+  --status-received-bg: light-dark(oklch(91% 0.006 260), oklch(22% 0.008 262));
+  --status-received-fg: light-dark(oklch(50% 0.01 260), oklch(56% 0.008 260));
+  --status-received-border: light-dark(oklch(84% 0.01 260), oklch(28% 0.012 262));
+  --status-reviewing-bg: light-dark(oklch(91% 0.035 242), oklch(21% 0.05 245));
+  --status-reviewing-fg: light-dark(oklch(45% 0.18 245), oklch(68% 0.17 242));
+  --status-reviewing-border: light-dark(oklch(78% 0.06 242), oklch(32% 0.07 244));
+  --status-processing-bg: light-dark(oklch(91% 0.04 152), oklch(20% 0.055 154));
+  --status-processing-fg: light-dark(oklch(42% 0.17 152), oklch(66% 0.19 155));
+  --status-processing-border: light-dark(oklch(76% 0.065 152), oklch(30% 0.075 154));
+  --status-done-bg: light-dark(oklch(91% 0.038 155), oklch(20% 0.05 158));
+  --status-done-fg: light-dark(oklch(40% 0.18 155), oklch(65% 0.2 158));
+  --status-done-border: light-dark(oklch(75% 0.065 155), oklch(30% 0.072 158));
+  --status-drop-bg: light-dark(oklch(93% 0.04 72), oklch(21% 0.048 68));
+  --status-drop-fg: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
+  --status-drop-border: light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
+}
