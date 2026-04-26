@@ -117,10 +117,7 @@ export function DashboardPage() {
       />
       <div className="dash-body" style={{ padding: '0 0 24px', paddingRight: editMode ? 260 : 0 }}>
         <div style={{ padding: '0 0 8px' }}>
-          <div
-            className={`dash-widget${!widgetVisibility['kpi-volume'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
-          >
+          <div className={`dash-widget${!widgetVisibility['kpi-volume'] ? ' widget-hidden' : ''}`}>
             {editMode && (
               <WidgetEditBar
                 name="KPI"
@@ -142,7 +139,6 @@ export function DashboardPage() {
         >
           <div
             className={`dash-widget${!widgetVisibility['distribution'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
           >
             {editMode && (
               <WidgetEditBar
@@ -154,10 +150,7 @@ export function DashboardPage() {
             <div className="widget-hidden-overlay">숨겨진 위젯</div>
             <DistributionWidget filter={filter} buildQueryParams={buildQueryParams} />
           </div>
-          <div
-            className={`dash-widget${!widgetVisibility['matrix'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
-          >
+          <div className={`dash-widget${!widgetVisibility['matrix'] ? ' widget-hidden' : ''}`}>
             {editMode && (
               <WidgetEditBar
                 name="우선순위 매트릭스"
@@ -170,10 +163,7 @@ export function DashboardPage() {
           </div>
         </div>
         <div style={{ padding: '12px 24px 0' }}>
-          <div
-            className={`dash-widget${!widgetVisibility['heatmap'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
-          >
+          <div className={`dash-widget${!widgetVisibility['heatmap'] ? ' widget-hidden' : ''}`}>
             {editMode && (
               <WidgetEditBar
                 name="히트맵"
@@ -201,7 +191,6 @@ export function DashboardPage() {
         >
           <div
             className={`dash-widget${!widgetVisibility['weekly-trend'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
           >
             {editMode && (
               <WidgetEditBar
@@ -215,7 +204,6 @@ export function DashboardPage() {
           </div>
           <div
             className={`dash-widget${!widgetVisibility['tag-distribution'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
           >
             {editMode && (
               <WidgetEditBar
@@ -238,7 +226,6 @@ export function DashboardPage() {
         >
           <div
             className={`dash-widget${!widgetVisibility['processing-speed'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
           >
             {editMode && (
               <WidgetEditBar
@@ -250,10 +237,7 @@ export function DashboardPage() {
             <div className="widget-hidden-overlay">숨겨진 위젯</div>
             <ProcessingSpeedWidget filter={filter} buildQueryParams={buildQueryParams} />
           </div>
-          <div
-            className={`dash-widget${!widgetVisibility['aging'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
-          >
+          <div className={`dash-widget${!widgetVisibility['aging'] ? ' widget-hidden' : ''}`}>
             {editMode && (
               <WidgetEditBar
                 name="에이징"
@@ -266,10 +250,7 @@ export function DashboardPage() {
           </div>
         </div>
         <div style={{ padding: '12px 24px 0' }}>
-          <div
-            className={`dash-widget${!widgetVisibility['assignee'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
-          >
+          <div className={`dash-widget${!widgetVisibility['assignee'] ? ' widget-hidden' : ''}`}>
             {editMode && (
               <WidgetEditBar
                 name="담당자"
@@ -282,10 +263,7 @@ export function DashboardPage() {
           </div>
         </div>
         <div style={{ padding: '12px 24px 24px' }}>
-          <div
-            className={`dash-widget${!widgetVisibility['aging-vocs'] ? ' widget-hidden' : ''}`}
-            style={{ position: 'relative' }}
-          >
+          <div className={`dash-widget${!widgetVisibility['aging-vocs'] ? ' widget-hidden' : ''}`}>
             {editMode && (
               <WidgetEditBar
                 name="장기 미처리 VOC"

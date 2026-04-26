@@ -61,10 +61,14 @@
 
 /* edit-mode widget outlines */
 #page-dashboard.edit-mode .dash-widget {
-  outline: 1.5px dashed oklch(65% 0.17 242 / 0.35);
+  outline: 1.5px dashed color-mix(in oklch, var(--accent) 35%, transparent);
   outline-offset: 2px;
 }
 #page-dashboard.edit-mode .dash-widget:hover {
-  outline-color: oklch(65% 0.17 242 / 0.7);
-  box-shadow: 0 0 0 3px oklch(65% 0.17 242 / 0.08);
+  outline-color: color-mix(in oklch, var(--accent) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 8%, transparent);
+}
+
+.dash-widget {
+  position: relative;
 }

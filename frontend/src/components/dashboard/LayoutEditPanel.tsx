@@ -81,7 +81,7 @@ export function LayoutEditPanel({
           value={heatmapXAxis}
           onChange={(e) => setHeatmapXAxis(e.target.value as 'status' | 'priority' | 'tag')}
         >
-          <option value="status">시스템</option>
+          <option value="status">상태</option>
           <option value="priority">우선순위</option>
           <option value="tag">태그</option>
         </select>
