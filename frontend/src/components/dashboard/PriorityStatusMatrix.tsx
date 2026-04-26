@@ -47,16 +47,13 @@ export function PriorityStatusMatrix({ filter, buildQueryParams }: PriorityStatu
   const params = useMemo(() => buildQueryParams(), [buildQueryParams]);
 
   const { data } = useQuery({
-    queryKey: ['dashboard-matrix', params],
+    queryKey: ['dashboard-matrix', dim, params],
     queryFn: () => getPriorityStatusMatrix(params),
     staleTime: 5 * 60 * 1000,
   });
 
-  const allValues = data?.rows.flatMap((row) => Object.values(row.status).map((v) => v)) ?? [];
+  const allValues = data?.rows.flatMap((row) => Object.values(row.status)) ?? [];
   const maxValue = Math.max(...allValues, 1);
-
-  // suppress unused warning — dim is tracked for future API integration
-  void dim;
 
   return (
     <div className="widget">
@@ -126,9 +123,7 @@ export function PriorityStatusMatrix({ filter, buildQueryParams }: PriorityStatu
         </tbody>
       </table>
 
-      <p style={{ fontSize: 10, color: 'var(--text-quaternary)', marginTop: 7 }}>
-        셀 클릭 → 해당 필터로 VOC 목록 이동
-      </p>
+      <p className="matrix-footnote">셀 클릭 → 해당 필터로 VOC 목록 이동</p>
     </div>
   );
 }

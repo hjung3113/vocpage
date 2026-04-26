@@ -44,13 +44,20 @@ function getColor(tab: TabType, index: number, itemColor?: string): string {
 }
 
 function buildConicGradient(items: { color: string; pct: number }[]): string {
+  if (items.length === 0) return 'conic-gradient(var(--bg-elevated) 0% 100%)';
   let acc = 0;
-  const stops = items.map((item) => {
-    const start = acc;
-    acc += item.pct;
-    return `${item.color} ${start}% ${acc}%`;
-  });
-  return `conic-gradient(${stops.join(', ')})`;
+  return (
+    'conic-gradient(' +
+    items
+      .map((item, i) => {
+        const start = acc;
+        acc += item.pct;
+        const end = i === items.length - 1 ? 100 : acc;
+        return `${item.color} ${start.toFixed(1)}% ${end.toFixed(1)}%`;
+      })
+      .join(', ') +
+    ')'
+  );
 }
 
 function buildNav(base: DashboardQueryParams, extra: Record<string, string | undefined>): string {
@@ -83,7 +90,7 @@ export function DistributionWidget({ filter, buildQueryParams }: DistributionWid
   const params = useMemo(() => buildQueryParams(), [buildQueryParams]);
 
   const { data = [] } = useQuery({
-    queryKey: ['dashboard-dist', activeTab, params],
+    queryKey: ['dashboard-dist', activeTab, dim, params],
     queryFn: () => getDistribution({ ...params, type: activeTab }),
     staleTime: 5 * 60 * 1000,
   });
@@ -145,7 +152,7 @@ export function DistributionWidget({ filter, buildQueryParams }: DistributionWid
         <div className="donut-wrap" style={{ background: conicBg }}>
           <div className="donut-hole">
             <span className="donut-total">{total}</span>
-            <span className="donut-label">건</span>
+            <span className="donut-label">총건수</span>
           </div>
         </div>
 

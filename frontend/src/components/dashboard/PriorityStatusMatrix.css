@@ -32,3 +32,9 @@
   font-size: 11px;
   cursor: default;
 }
+
+.matrix-footnote {
+  font-size: 10px;
+  color: var(--text-quaternary);
+  margin-top: 7px;
+}
