@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAssigneeStats } from '../../api/dashboard';
 import type { DashboardQueryParams } from '../../api/dashboard';
 import type { DashboardFilterState } from '../../hooks/useDashboardFilter';
+import { buildNav } from '../../utils/dashboardNav';
 import './AssigneeTable.css';
 
 export interface AssigneeTableProps {
@@ -15,21 +16,6 @@ function cellAlpha(value: number, maxValue: number): string {
   if (value === 0 || maxValue === 0) return '';
   const alpha = 0.06 + (value / maxValue) * (0.62 - 0.06);
   return `oklch(63% 0.19 258 / ${alpha.toFixed(2)})`;
-}
-
-function buildNav(base: DashboardQueryParams, extra: Record<string, string | undefined>): string {
-  const merged: Record<string, string | undefined> = {
-    systemId: base.systemId,
-    menuId: base.menuId,
-    assigneeId: base.assigneeId,
-    startDate: base.startDate,
-    endDate: base.endDate,
-    ...extra,
-  };
-  const entries = Object.entries(merged).filter(
-    (e): e is [string, string] => e[1] !== undefined && e[1] !== '',
-  );
-  return '/?' + new URLSearchParams(entries).toString();
 }
 
 type XAxis = 'status' | 'priority' | 'tag';
@@ -115,7 +101,7 @@ export function AssigneeTable({ filter, buildQueryParams }: AssigneeTableProps) 
                       onClick={() =>
                         navigate(
                           buildNav(params, {
-                            assigneeId: row.assigneeId,
+                            assigneeId: row.assigneeId || 'unassigned',
                             [xAxis === 'status'
                               ? 'status'
                               : xAxis === 'priority'

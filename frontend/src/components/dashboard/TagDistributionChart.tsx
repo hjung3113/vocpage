@@ -11,26 +11,12 @@ import { getTagDistribution } from '../../api/dashboard';
 import type { DashboardQueryParams, TagDistItem } from '../../api/dashboard';
 import type { DashboardFilterState } from '../../hooks/useDashboardFilter';
 import { DimSelector } from './DimSelector';
+import { buildNav } from '../../utils/dashboardNav';
 import './TagDistributionChart.css';
 
 export interface TagDistributionChartProps {
   filter: DashboardFilterState;
   buildQueryParams: () => DashboardQueryParams;
-}
-
-function buildNav(base: DashboardQueryParams, extra: Record<string, string | undefined>): string {
-  const merged: Record<string, string | undefined> = {
-    systemId: base.systemId,
-    menuId: base.menuId,
-    assigneeId: base.assigneeId,
-    startDate: base.startDate,
-    endDate: base.endDate,
-    ...extra,
-  };
-  const entries = Object.entries(merged).filter(
-    (e): e is [string, string] => e[1] !== undefined && e[1] !== '',
-  );
-  return '/?' + new URLSearchParams(entries).toString();
 }
 
 export function TagDistributionChart({ filter, buildQueryParams }: TagDistributionChartProps) {

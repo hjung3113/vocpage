@@ -5,6 +5,7 @@ import { getDistribution } from '../../api/dashboard';
 import type { DashboardQueryParams } from '../../api/dashboard';
 import type { DashboardFilterState } from '../../hooks/useDashboardFilter';
 import { DimSelector } from './DimSelector';
+import { buildNav } from '../../utils/dashboardNav';
 import './DistributionWidget.css';
 
 export interface DistributionWidgetProps {
@@ -58,21 +59,6 @@ function buildConicGradient(items: { color: string; pct: number }[]): string {
       .join(', ') +
     ')'
   );
-}
-
-function buildNav(base: DashboardQueryParams, extra: Record<string, string | undefined>): string {
-  const merged: Record<string, string | undefined> = {
-    systemId: base.systemId,
-    menuId: base.menuId,
-    assigneeId: base.assigneeId,
-    startDate: base.startDate,
-    endDate: base.endDate,
-    ...extra,
-  };
-  const entries = Object.entries(merged).filter(
-    (e): e is [string, string] => e[1] !== undefined && e[1] !== '',
-  );
-  return '/?' + new URLSearchParams(entries).toString();
 }
 
 const TABS: { value: TabType; label: string }[] = [

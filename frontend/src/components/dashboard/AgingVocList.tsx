@@ -46,7 +46,8 @@ export function AgingVocList({ filter, buildQueryParams, onOpenDrawer }: AgingVo
     staleTime: 5 * 60 * 1000,
   });
 
-  const dimLabel = isAllTab ? '시스템' : '메뉴';
+  const dimLabel = dim === 'menu' ? '메뉴' : '시스템';
+  const dimValue = (row: AgingVoc) => (dim === 'menu' ? row.menuName : row.systemName);
 
   return (
     <div className="widget">
@@ -68,7 +69,6 @@ export function AgingVocList({ filter, buildQueryParams, onOpenDrawer }: AgingVo
         <tbody>
           {data.map((row) => {
             const badgeClass = agingBadgeClass(row.daysSinceCreated);
-            const dimValue = isAllTab ? row.systemName : row.menuName;
             const priorityLabel = PRIORITY_LABELS[row.priority] ?? row.priority;
             const isUrgentOrHigh = row.priority === 'urgent' || row.priority === 'high';
 
@@ -76,7 +76,7 @@ export function AgingVocList({ filter, buildQueryParams, onOpenDrawer }: AgingVo
               <tr key={row.id} onClick={() => onOpenDrawer(row.id)}>
                 <td className="code">{row.issue_code ?? '—'}</td>
                 <td className="title-col">{row.title}</td>
-                <td>{dimValue}</td>
+                <td>{dimValue(row)}</td>
                 <td>
                   {isUrgentOrHigh ? (
                     <span
