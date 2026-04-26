@@ -25,38 +25,51 @@ export function DashboardPage() {
     assignee: true,
     'aging-vocs': true,
   });
+  // widgetVisibility/setWidgetVisibility reserved for Step 7 LayoutEditPanel
+  void widgetVisibility;
+  void setWidgetVisibility;
 
   const [systems, setSystems] = useState<{ id: string; name: string }[]>([]);
   const [menus, setMenus] = useState<{ id: string; name: string }[]>([]);
   const [assignees, setAssignees] = useState<{ id: string; name: string }[]>([]);
 
-  void widgetVisibility;
-  void setWidgetVisibility;
-
   useEffect(() => {
+    let cancelled = false;
     listAdminSystems()
-      .then((items) => setSystems(items.map((s) => ({ id: s.id, name: s.name }))))
+      .then((items) => {
+        if (!cancelled) setSystems(items.map((s) => ({ id: s.id, name: s.name })));
+      })
       .catch(() => {});
     getDashboardAssignees()
-      .then(setAssignees)
+      .then((data) => {
+        if (!cancelled) setAssignees(data);
+      })
       .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (filter.globalTab !== 'all') {
-      getDashboardMenus(filter.globalTab)
-        .then(setMenus)
-        .catch(() => {});
-    } else {
+    if (filter.globalTab === 'all') {
       setMenus([]);
+      return;
     }
+    let cancelled = false;
+    getDashboardMenus(filter.globalTab)
+      .then((data) => {
+        if (!cancelled) setMenus(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [filter.globalTab]);
 
   return (
     <div id="page-dashboard" className={editMode ? 'edit-mode' : ''}>
       <DashboardHeader
         filter={filter}
-        systems={systems}
         menus={menus}
         assignees={assignees}
         onSetDatePreset={setDatePreset}

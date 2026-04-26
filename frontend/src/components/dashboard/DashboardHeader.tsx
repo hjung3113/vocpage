@@ -4,7 +4,6 @@ import './DashboardHeader.css';
 
 interface DashboardHeaderProps {
   filter: DashboardFilterState;
-  systems: { id: string; name: string }[];
   menus: { id: string; name: string }[];
   assignees: { id: string; name: string }[];
   onSetDatePreset: (preset: '7d' | '30d' | '90d' | 'custom') => void;
@@ -14,10 +13,18 @@ interface DashboardHeaderProps {
   onEditLayout: () => void;
 }
 
-function formatDateRange(dateRange: { startDate: string; endDate: string }): string {
-  const fmt = (iso: string) => iso.replace(/-/g, '.').slice(2); // YY.MM.DD
-  return `${fmt(dateRange.startDate)}–${fmt(dateRange.endDate).slice(3)}`; // YY.MM.DD–MM.DD
+function formatDateRange(start: string, end: string): string {
+  if (!start || !end) return '날짜 선택';
+  const fmt = (iso: string) => iso.replace(/^\d{4}-/, '').replace(/-/g, '.');
+  return `${fmt(start)}–${fmt(end)}`;
 }
+
+const DATE_PRESETS = [
+  { label: '7일', value: '7d' as const },
+  { label: '30일', value: '30d' as const },
+  { label: '90일', value: '90d' as const },
+  { label: '커스텀', value: 'custom' as const },
+];
 
 export function DashboardHeader({
   filter,
@@ -28,13 +35,6 @@ export function DashboardHeader({
   onSetActiveAssignee,
   onEditLayout,
 }: DashboardHeaderProps) {
-  const DATE_PRESETS: { label: string; value: '7d' | '30d' | '90d' | 'custom' }[] = [
-    { label: '7일', value: '7d' },
-    { label: '30일', value: '30d' },
-    { label: '90일', value: '90d' },
-    { label: '커스텀', value: 'custom' },
-  ];
-
   return (
     <header className="dashboard-header">
       <span className="dashboard-header-title">대시보드</span>
@@ -84,7 +84,7 @@ export function DashboardHeader({
 
         <button className="date-range-btn">
           <Calendar size={13} />
-          {formatDateRange(filter.dateRange)}
+          {formatDateRange(filter.dateRange.startDate, filter.dateRange.endDate)}
         </button>
 
         <button className="edit-layout-btn" onClick={onEditLayout}>
