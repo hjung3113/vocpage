@@ -29,6 +29,8 @@ export interface VocSummary {
   voc_type_name: string | null;
   tags: Array<{ id: string; name: string }>;
   due_date: string | null;
+  parent_id: string | null;
+  subtask_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -42,7 +44,6 @@ export interface VocDetail extends VocSummary {
   structured_payload_draft: Record<string, unknown> | null;
   review_status: string | null;
   source: string;
-  parent_id: string | null;
 }
 
 export interface VocListResponse {

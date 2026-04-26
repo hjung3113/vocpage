@@ -6,6 +6,7 @@ import { requireAuth, requireManager } from '../middleware/auth';
 import { applyTagRules } from '../services/autoTag';
 import { masterCache } from '../services/masterCache';
 import { calcDueDate } from '../utils/voc';
+import { attachListMetadata, hasParentIdColumn } from './vocMetadata';
 
 export const subtasksRouter = Router({ mergeParams: true });
 
@@ -31,11 +32,31 @@ subtasksRouter.get(
         res.status(404).json({ error: 'NOT_FOUND' });
         return;
       }
+      if (!(await hasParentIdColumn())) {
+        res.json([]);
+        return;
+      }
       const { rows } = await pool.query(
-        `SELECT * FROM vocs WHERE parent_id = $1 AND deleted_at IS NULL ORDER BY created_at ASC`,
+        `SELECT v.*,
+                u.display_name AS assignee_name,
+                au.display_name AS author_name,
+                vt.name AS voc_type_name,
+                s.name AS system_name,
+                m.name AS menu_name
+         FROM vocs v
+         LEFT JOIN users u ON v.assignee_id = u.id
+         LEFT JOIN users au ON v.author_id = au.id
+         LEFT JOIN voc_types vt ON v.voc_type_id = vt.id
+         LEFT JOIN systems s ON v.system_id = s.id
+         LEFT JOIN menus m ON v.menu_id = m.id
+         WHERE v.parent_id = $1 AND v.deleted_at IS NULL
+         ORDER BY v.created_at ASC`,
         [id],
       );
-      res.json(rows);
+      const subtasks = await attachListMetadata(
+        rows as Array<Record<string, unknown> & { id: string }>,
+      );
+      res.json(subtasks);
     } catch (err) {
       logger.error({ err }, 'GET /api/vocs/:id/subtasks failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });

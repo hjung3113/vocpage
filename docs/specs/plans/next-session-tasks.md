@@ -1,30 +1,43 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26 (PR #41 merge 완료)
+> 최종 업데이트: 2026-04-26 (VOC 리스트 UI/UX benchmark 정렬 완료)
 > 목표: **Phase 9 운영 실구현 + 배포**
 
 ## 현재 상태
 
-| 항목                     | 상태                                         |
-| ------------------------ | -------------------------------------------- |
-| Phase 0~7 구현           | ✅ 완료                                      |
-| Phase 8 디자인           | ✅ 완료 + 머지                               |
-| 프로토타입 벤치마크      | ✅ 완료 (`benchmark/` 폴더, 24장 + INDEX.md) |
-| 네비바/상태배지 버그픽스 | ✅ 완료 + 머지 (PR #41)                      |
-| Phase 9                  | ⏳ 대기                                      |
+| 항목                            | 상태                                         |
+| ------------------------------- | -------------------------------------------- |
+| Phase 0~7 구현                  | ✅ 완료                                      |
+| Phase 8 디자인                  | ✅ 완료 + 머지                               |
+| 프로토타입 벤치마크             | ✅ 완료 (`benchmark/` 폴더, 24장 + INDEX.md) |
+| 네비바/상태배지 버그픽스        | ✅ 완료 + 머지 (PR #41)                      |
+| VOC 리스트 UI/UX benchmark 정렬 | ✅ 완료                                      |
+| Phase 9                         | ⏳ 대기                                      |
 
 ---
 
 ## 다음 세션 시작 전
 
 1. ~~네비바/상태배지 버그픽스 PR 머지~~ ✅ 완료 (PR #41)
-2. Phase 9 작업 시작
+2. ~~VOC 리스트 UI/UX benchmark 정렬~~ ✅ 완료
+3. Phase 9 작업 시작
 
 ---
 
 ## Phase 8: 디자인 수정
 
 > ✅ 완료. 사용자 피드백 기반 UI/UX 재작업 완료.
+
+### VOC 리스트 UI/UX benchmark 정렬
+
+> ✅ 완료. `benchmark/01-voc-all-list.png`, `benchmark/11-voc-subvoc-expanded.png` 기준.
+
+- 리스트 컬럼 폭과 제목/태그 스캔성 조정
+- 상태 배지 밀도 축소
+- VOC 행 좌측 chevron affordance 추가
+- `subtask_count` 기반 lazy load + inline child row 표시
+- `parent_id` 컬럼이 없는 기존 로컬 Docker DB에서도 `/api/vocs`가 깨지지 않도록 backend 방어 처리
+- 검증: frontend typecheck, frontend Vitest 25/25, backend VOC/subtask Jest 33/33
 
 ---
 

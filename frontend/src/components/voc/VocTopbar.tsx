@@ -35,14 +35,12 @@ export function VocTopbar({ total, onSearch, onCreateClick, title = '전체 VOC'
         height: '56px',
         background: 'var(--bg-panel)',
         borderBottom: '1px solid var(--border-subtle)',
+        minWidth: 0,
       }}
     >
       {/* Left: title + count + mode badges */}
-      <div className="flex items-center gap-2 shrink-0">
-        <h1
-          className="text-base font-semibold"
-          style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
-        >
+      <div className="flex items-center gap-2" style={{ minWidth: 0 }}>
+        <h1 className="text-base font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
           {title}
         </h1>
         <span
@@ -104,7 +102,7 @@ export function VocTopbar({ total, onSearch, onCreateClick, title = '전체 VOC'
             placeholder="제목, 본문 검색..."
             onChange={handleInputChange}
             style={{
-              width: '220px',
+              width: 'clamp(180px, 18vw, 220px)',
               paddingLeft: '30px',
               paddingRight: '10px',
               paddingTop: '6px',
@@ -129,7 +127,6 @@ export function VocTopbar({ total, onSearch, onCreateClick, title = '전체 VOC'
             color: 'white',
             border: 'none',
             cursor: 'pointer',
-            letterSpacing: '-0.01em',
           }}
         >
           <Plus size={14} />새 VOC 등록
