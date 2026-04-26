@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26 (VOC 리스트 UI/UX benchmark 정렬 완료)
+> 최종 업데이트: 2026-04-26 (VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료)
 > 목표: **Phase 9 운영 실구현 + 배포**
 
 ## 현재 상태
@@ -11,7 +11,7 @@
 | Phase 8 디자인                  | ✅ 완료 + 머지                               |
 | 프로토타입 벤치마크             | ✅ 완료 (`benchmark/` 폴더, 24장 + INDEX.md) |
 | 네비바/상태배지 버그픽스        | ✅ 완료 + 머지 (PR #41)                      |
-| VOC 리스트 UI/UX benchmark 정렬 | ✅ 완료                                      |
+| VOC 리스트 UI/UX benchmark 정렬 | ✅ 완료 + 머지 (PR #43)                      |
 | Phase 9                         | ⏳ 대기                                      |
 
 ---
@@ -19,7 +19,7 @@
 ## 다음 세션 시작 전
 
 1. ~~네비바/상태배지 버그픽스 PR 머지~~ ✅ 완료 (PR #41)
-2. ~~VOC 리스트 UI/UX benchmark 정렬~~ ✅ 완료
+2. ~~VOC 리스트 UI/UX benchmark 정렬 PR 머지~~ ✅ 완료 (PR #43)
 3. Phase 9 작업 시작
 
 ---
