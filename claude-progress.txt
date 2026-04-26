@@ -4,9 +4,9 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~8 ✅ 완료 → 네비바/상태배지 버그픽스 PR #41 merge 완료 → VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료 → **Phase 9 운영 실구현 + 배포 대기**
+현재 위치: Phase 0~8 ✅ 완료 → 네비바/상태배지 버그픽스 PR #41 merge 완료 → VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료 → role 기반 목록 필터 제거 (feat/align-seed-to-prototype) → **Phase 9 운영 실구현 + 배포 대기**
 
-브랜치: main (origin/main 동기화 완료)
+브랜치: feat/align-seed-to-prototype
 
 최근 작업 (2026-04-26):
 - Phase 8 디자인 재작업 완료
