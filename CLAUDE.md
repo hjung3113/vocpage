@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-This is a **VOC (Voice of Customer) management system** currently in **Phase 6 implementation** — frontend and backend are scaffolded with working source code. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
+This is a **VOC (Voice of Customer) management system** currently in **Phase 8 implementation** — frontend and backend are scaffolded with working source code. See `docs/specs/requires/requirements.md` for the product spec and `docs/specs/requires/design.md` for the complete design system.
 
 ## Planned Tech Stack
 
@@ -41,7 +41,7 @@ Three-tier app: React SPA → Express REST API → PostgreSQL. Detailed architec
 
 Full spec: `docs/specs/requires/design.md`. Full token reference: §10 CSS Reference.
 
-**Hard rule (echoed in `frontend/CLAUDE.md` and `prototype/CLAUDE.md`):**
+**Hard rule:**
 
 - Always use CSS custom properties — `var(--bg-app)`, `var(--brand)`, `var(--text-primary)`, etc.
 - **Never write hex values** (no `#5e6ad2`, no `#ffffff`). No raw OKLCH either — go through the token.

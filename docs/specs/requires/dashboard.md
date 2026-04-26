@@ -1,6 +1,5 @@
 # VOC 대시보드 요구사항 명세 (v3 — 2026-04-23 확정)
 
-> **참조 시각화**: `prototype/dashboard/dashboard-v3.html`
 > **구현 계획**: `docs/specs/plans/dashboard-impl.md`
 
 ---

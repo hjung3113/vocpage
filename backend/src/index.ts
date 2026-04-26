@@ -19,6 +19,7 @@ import { faqCategoriesRouter, faqsRouter } from './routes/faqs';
 import { adminRouter, systemsPublicRouter, vocTypesPublicRouter } from './routes/admin';
 import { notificationRouter } from './routes/notifications';
 import { mastersRouter, adminMastersRouter } from './routes/masters';
+import { usersRouter } from './routes/users';
 import { masterCache } from './services/masterCache';
 import logger from './logger';
 
@@ -80,6 +81,7 @@ app.use('/api/systems', authMiddleware, systemsPublicRouter);
 app.use('/api/voc-types', authMiddleware, vocTypesPublicRouter);
 app.use('/api/notifications', authMiddleware, notificationRouter);
 app.use('/api/masters', authMiddleware, mastersRouter);
+app.use('/api/users', authMiddleware, usersRouter);
 
 if (require.main === module) {
   masterCache.init().catch((err) => logger.warn({ err }, 'masterCache.init failed (non-fatal)'));

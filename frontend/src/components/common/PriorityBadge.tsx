@@ -1,15 +1,33 @@
-const PRIORITY_STYLES: Record<string, { bg: string; color: string; label: string }> = {
-  urgent: { bg: 'var(--status-red)', color: 'var(--text-on-brand)', label: '긴급' },
-  high: { bg: 'var(--status-amber)', color: 'var(--bg-app)', label: '높음' },
-  medium: { bg: 'var(--status-blue)', color: 'var(--text-on-brand)', label: '중간' },
-  low: { bg: 'var(--text-muted)', color: 'var(--text-on-brand)', label: '낮음' },
+import { Flame, ChevronUp, Minus, ChevronDown } from 'lucide-react';
+
+const PRIORITY_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  urgent: {
+    icon: <Flame size={13} />,
+    label: 'Urgent',
+    color: 'var(--status-red)',
+  },
+  high: {
+    icon: <ChevronUp size={13} />,
+    label: 'High',
+    color: 'var(--status-amber)',
+  },
+  medium: {
+    icon: <Minus size={13} />,
+    label: 'Medium',
+    color: 'var(--text-tertiary)',
+  },
+  low: {
+    icon: <ChevronDown size={13} />,
+    label: 'Low',
+    color: 'var(--text-quaternary)',
+  },
 };
 
 export function PriorityBadge({ priority }: { priority: string }) {
-  const style = PRIORITY_STYLES[priority] ?? {
-    bg: 'var(--text-muted)',
-    color: 'var(--text-on-brand)',
+  const cfg = PRIORITY_CONFIG[priority] ?? {
+    icon: <Minus size={13} />,
     label: priority,
+    color: 'var(--text-tertiary)',
   };
 
   return (
@@ -17,16 +35,15 @@ export function PriorityBadge({ priority }: { priority: string }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        padding: '2px 8px',
-        borderRadius: '4px',
-        fontSize: '11px',
+        gap: '4px',
+        fontSize: '12px',
         fontWeight: 500,
-        backgroundColor: style.bg,
-        color: style.color,
+        color: cfg.color,
         whiteSpace: 'nowrap',
       }}
     >
-      {style.label}
+      {cfg.icon}
+      {cfg.label}
     </span>
   );
 }

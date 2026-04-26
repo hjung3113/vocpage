@@ -2,11 +2,13 @@ interface KpiCardProps {
   label: string;
   value: number | string;
   unit?: string;
+  onClick?: () => void;
 }
 
-export function KpiCard({ label, value, unit }: KpiCardProps) {
+export function KpiCard({ label, value, unit, onClick }: KpiCardProps) {
   return (
     <div
+      onClick={onClick}
       style={{
         background: 'var(--bg-panel)',
         border: '1px solid var(--border)',
@@ -17,6 +19,7 @@ export function KpiCard({ label, value, unit }: KpiCardProps) {
         alignItems: 'center',
         gap: '4px',
         minWidth: '120px',
+        cursor: onClick ? 'pointer' : undefined,
       }}
     >
       <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{label}</span>

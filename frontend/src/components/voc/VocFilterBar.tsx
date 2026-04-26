@@ -1,4 +1,13 @@
 import { useEffect, useState } from 'react';
+import {
+  SlidersHorizontal,
+  Layers,
+  Circle,
+  Search,
+  Zap,
+  PauseCircle,
+  CheckCircle2,
+} from 'lucide-react';
 import type { VocStatus } from '../../contexts/VOCFilterContext';
 import { listTags, type Tag } from '../../api/tags';
 
@@ -7,13 +16,20 @@ interface User {
   name: string;
 }
 
-const STATUS_OPTIONS: Array<{ label: string; value: VocStatus | null }> = [
-  { label: '전체', value: null },
-  { label: '접수', value: '접수' },
-  { label: '검토중', value: '검토중' },
-  { label: '처리중', value: '처리중' },
-  { label: '드랍', value: '드랍' },
-  { label: '완료', value: '완료' },
+const STATUS_OPTIONS: Array<{ label: string; value: VocStatus | null; icon: React.ReactNode }> = [
+  { label: '전체', value: null, icon: <Layers size={11} /> },
+  { label: '접수', value: '접수', icon: <Circle size={11} /> },
+  { label: '검토중', value: '검토중', icon: <Search size={11} /> },
+  { label: '처리중', value: '처리중', icon: <Zap size={11} /> },
+  { label: '드랍', value: '드랍', icon: <PauseCircle size={11} /> },
+  { label: '완료', value: '완료', icon: <CheckCircle2 size={11} /> },
+];
+
+const PRIORITY_OPTIONS: Array<{ label: string; value: string; color: string }> = [
+  { label: 'Urgent', value: 'urgent', color: 'var(--priority-urgent)' },
+  { label: 'High', value: 'high', color: 'var(--priority-high)' },
+  { label: 'Medium', value: 'medium', color: 'var(--text-tertiary)' },
+  { label: 'Low', value: 'low', color: 'var(--text-quaternary)' },
 ];
 
 interface VocFilterBarProps {
@@ -23,6 +39,9 @@ interface VocFilterBarProps {
   onTagChange?: (tagId: string | null) => void;
   activeAssigneeId?: string | null;
   onAssigneeChange?: (id: string | null) => void;
+  activePriority?: string | null;
+  onPriorityChange?: (priority: string | null) => void;
+  onReset?: () => void;
 }
 
 export function VocFilterBar({
@@ -32,9 +51,13 @@ export function VocFilterBar({
   onTagChange,
   activeAssigneeId,
   onAssigneeChange,
+  activePriority,
+  onPriorityChange,
+  onReset,
 }: VocFilterBarProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [showExtended, setShowExtended] = useState(false);
 
   useEffect(() => {
     listTags()
@@ -43,7 +66,7 @@ export function VocFilterBar({
   }, []);
 
   useEffect(() => {
-    fetch('/api/users')
+    fetch('/api/users', { credentials: 'include' })
       .then((r) => r.json())
       .then((data: unknown) => {
         if (Array.isArray(data)) setUsers(data as User[]);
@@ -60,67 +83,213 @@ export function VocFilterBar({
 
   return (
     <div
-      className="flex items-center gap-2 px-6 py-2 shrink-0 flex-wrap"
-      style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}
+      style={{
+        background: 'var(--bg-panel)',
+        borderBottom: '1px solid var(--border-subtle)',
+        flexShrink: 0,
+      }}
     >
-      {STATUS_OPTIONS.map(({ label, value }) => {
-        const isActive = activeStatus === value;
-        return (
-          <button
-            key={label}
-            onClick={() => onStatusChange(value)}
-            className="px-3 py-1 rounded-full text-sm font-medium transition-colors"
-            style={{
-              background: isActive ? 'var(--brand)' : 'var(--bg-surface)',
-              color: isActive ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-              border: `1px solid ${isActive ? 'var(--brand)' : 'var(--border)'}`,
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
-
-      {onTagChange && tags.length > 0 && (
-        <select
-          value={activeTagId ?? ''}
-          onChange={(e) => onTagChange(e.target.value || null)}
-          className="text-sm px-2 py-1 rounded"
+      {/* Status filter row */}
+      <div className="flex items-center gap-1 px-6 py-2">
+        <span
           style={{
-            border: '1px solid var(--border)',
-            background: 'var(--bg-surface)',
-            color: activeTagId ? 'var(--text-primary)' : 'var(--text-secondary)',
-            marginLeft: '4px',
+            fontSize: '12px',
+            fontWeight: 500,
+            color: 'var(--text-quaternary)',
+            marginRight: '8px',
+            whiteSpace: 'nowrap',
           }}
         >
-          <option value="">태그 전체</option>
-          {tags.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-      )}
+          필터
+        </span>
 
-      {onAssigneeChange && (
-        <select
-          value={activeAssigneeId ?? ''}
-          onChange={(e) => onAssigneeChange(e.target.value || null)}
-          className="text-sm px-2 py-1 rounded"
+        {STATUS_OPTIONS.map(({ label, value, icon }) => {
+          const isActive = activeStatus === value;
+          return (
+            <button
+              key={label}
+              onClick={() => onStatusChange(value)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm transition-colors"
+              style={{
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
+                background: isActive ? 'var(--brand-bg)' : 'transparent',
+                border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {icon}
+              {label}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={() => setShowExtended((p) => !p)}
+          className="flex items-center gap-1.5 ml-auto px-3 py-1 rounded-lg text-sm"
           style={{
-            border: '1px solid var(--border)',
-            background: 'var(--bg-surface)',
-            color: activeAssigneeId ? 'var(--text-primary)' : 'var(--text-secondary)',
-            marginLeft: '4px',
+            color: showExtended ? 'var(--accent)' : 'var(--text-tertiary)',
+            background: showExtended ? 'var(--brand-bg)' : 'transparent',
+            border: `1px solid ${showExtended ? 'var(--brand-border)' : 'var(--border-standard)'}`,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            fontWeight: 500,
           }}
         >
-          <option value="">담당자 전체</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name}
-            </option>
-          ))}
-        </select>
+          <SlidersHorizontal size={13} />
+          필터 더보기
+        </button>
+      </div>
+
+      {/* Extended filters */}
+      {showExtended && (
+        <div className="px-6 pb-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          {/* Assignee chips row */}
+          {onAssigneeChange && (
+            <div className="flex items-center gap-2 pt-2 flex-wrap">
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-quaternary)',
+                  whiteSpace: 'nowrap',
+                  minWidth: '48px',
+                }}
+              >
+                담당자
+              </span>
+              <button
+                onClick={() => onAssigneeChange(null)}
+                className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                style={{
+                  color: activeAssigneeId == null ? 'var(--accent)' : 'var(--text-tertiary)',
+                  background: activeAssigneeId == null ? 'var(--brand-bg)' : 'transparent',
+                  border: `1px solid ${activeAssigneeId == null ? 'var(--brand-border)' : 'transparent'}`,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                전체
+              </button>
+              {users.map((u) => {
+                const isActive = activeAssigneeId === u.id;
+                return (
+                  <button
+                    key={u.id}
+                    onClick={() => onAssigneeChange(isActive ? null : u.id)}
+                    className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                    style={{
+                      color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
+                      background: isActive ? 'var(--brand-bg)' : 'transparent',
+                      border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {u.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Tag chips row */}
+          {onTagChange && tags.length > 0 && (
+            <div className="flex items-center gap-2 pt-2 flex-wrap">
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-quaternary)',
+                  whiteSpace: 'nowrap',
+                  minWidth: '48px',
+                }}
+              >
+                태그
+              </span>
+              <button
+                onClick={() => onTagChange(null)}
+                className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                style={{
+                  color: activeTagId == null ? 'var(--accent)' : 'var(--text-tertiary)',
+                  background: activeTagId == null ? 'var(--brand-bg)' : 'transparent',
+                  border: `1px solid ${activeTagId == null ? 'var(--brand-border)' : 'transparent'}`,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                전체
+              </button>
+              {tags.map((t) => {
+                const isActive = activeTagId === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => onTagChange(isActive ? null : t.id)}
+                    className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                    style={{
+                      color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
+                      background: isActive ? 'var(--brand-bg)' : 'transparent',
+                      border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {t.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Priority chips row + reset button */}
+          <div className="flex items-center gap-2 pt-2 flex-wrap">
+            <span
+              style={{
+                fontSize: '12px',
+                color: 'var(--text-quaternary)',
+                whiteSpace: 'nowrap',
+                minWidth: '48px',
+              }}
+            >
+              우선순위
+            </span>
+            {PRIORITY_OPTIONS.map(({ label, value, color }) => {
+              const isActive = activePriority === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => onPriorityChange?.(isActive ? null : value)}
+                  className="flex items-center px-3 py-1 rounded-full text-sm transition-colors"
+                  style={{
+                    color: isActive ? color : 'var(--text-tertiary)',
+                    background: isActive ? 'var(--brand-bg)' : 'transparent',
+                    border: `1px solid ${isActive ? 'var(--brand-border)' : 'transparent'}`,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+            {onReset && (
+              <button
+                onClick={onReset}
+                className="flex items-center px-3 py-1 rounded-lg text-sm ml-auto"
+                style={{
+                  color: 'var(--text-tertiary)',
+                  background: 'transparent',
+                  border: '1px solid var(--border-standard)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                초기화
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { tokens } from '../../tokens';
+import { Maximize2, Minimize2, Link2, Trash2, X } from 'lucide-react';
 import { getVoc, updateVocStatus, getIncompleteSubtaskCount, type VocDetail } from '../../api/vocs';
 import {
   listVocTags,
@@ -29,7 +31,7 @@ type Tab = 'body' | 'subtasks' | 'comments' | 'attachments' | 'notes';
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
 }
 
 export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps) {
@@ -41,6 +43,7 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
   const [vocTags, setVocTags] = useState<VocTag[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [showTagSelect, setShowTagSelect] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const role = user?.role?.toLowerCase();
   const canEditTags = role === 'manager' || role === 'admin';
@@ -149,6 +152,71 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
     ...(canSeeNotes ? [{ key: 'notes' as Tab, label: '내부노트' }] : []),
   ];
 
+  const metaSelectStyle: React.CSSProperties = {
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border-subtle)',
+    borderRadius: '6px',
+    padding: '5px 9px',
+    color: 'var(--text-secondary)',
+    fontFamily: 'var(--font-ui)',
+    fontSize: '12.5px',
+    cursor: 'pointer',
+    outline: 'none',
+  };
+
+  const metaLabelStyle: React.CSSProperties = {
+    fontSize: '10.5px',
+    fontWeight: 600,
+    color: 'var(--text-quaternary)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.07em',
+  };
+
+  const metaValueStyle: React.CSSProperties = {
+    fontSize: '13px',
+    color: 'var(--text-secondary)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  };
+
+  const AVATAR_COLORS = [
+    tokens.chartBlue,
+    tokens.chartSky,
+    tokens.chartEmerald,
+    tokens.chartAmber,
+    tokens.chartRed,
+    tokens.chartTeal,
+    tokens.chartIndigo,
+    tokens.brand,
+  ];
+  function avatarColor(name: string): string {
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+    return AVATAR_COLORS[h % AVATAR_COLORS.length];
+  }
+  function InitialsAvatar({ name }: { name: string }) {
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '22px',
+          height: '22px',
+          borderRadius: '50%',
+          background: avatarColor(name),
+          color: 'white',
+          fontSize: '11px',
+          fontWeight: 700,
+          flexShrink: 0,
+        }}
+      >
+        {name.charAt(0)}
+      </span>
+    );
+  }
+
   return (
     <>
       {/* Overlay */}
@@ -171,12 +239,13 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
           right: 0,
           top: 0,
           height: '100vh',
-          width: '480px',
+          width: isFullscreen ? '100vw' : '528px',
+          left: isFullscreen ? 0 : undefined,
           background: 'var(--bg-panel)',
-          borderLeft: '1px solid var(--border)',
+          borderLeft: isFullscreen ? 'none' : '1px solid var(--border)',
           zIndex: 50,
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.3s ease',
+          transition: 'transform 0.3s ease, width 0.2s ease',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -184,68 +253,192 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
       >
         {/* Header */}
         <div
-          className="flex items-start justify-between px-6 py-4 shrink-0"
-          style={{ borderBottom: '1px solid var(--border)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            padding: '16px 24px',
+            borderBottom: '1px solid var(--border)',
+            flexShrink: 0,
+          }}
         >
-          <div className="flex flex-col gap-1 flex-1 min-w-0 pr-4">
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              flex: 1,
+              minWidth: 0,
+              paddingRight: '16px',
+            }}
+          >
             {voc && (
-              <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-code)',
+                  fontSize: '11px',
+                  color: 'var(--accent)',
+                  fontWeight: 600,
+                  letterSpacing: '0.02em',
+                }}
+              >
                 {voc.issue_code ?? '—'}
               </span>
             )}
             <h2
-              className="text-base font-semibold truncate"
-              style={{ color: 'var(--text-primary)' }}
+              style={{
+                fontSize: '15px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                margin: 0,
+              }}
             >
               {isLoading ? '불러오는 중...' : (voc?.title ?? '—')}
             </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="shrink-0 px-2 py-1 rounded text-sm"
-            style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
-            aria-label="닫기"
-          >
-            ✕
-          </button>
+          {/* Header action icons */}
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
+            {/* Expand */}
+            <button
+              aria-label={isFullscreen ? '드로어로 보기' : '전체화면으로 보기'}
+              onClick={() => setIsFullscreen((p) => !p)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--text-quaternary)',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-quaternary)';
+              }}
+            >
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+            </button>
+            {/* Copy link */}
+            <button
+              aria-label="링크 복사"
+              onClick={() => {
+                if (voc) {
+                  void navigator.clipboard.writeText(
+                    `${window.location.href.split('?')[0]}?voc=${voc.id}`,
+                  );
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--text-quaternary)',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-quaternary)';
+              }}
+            >
+              <Link2 size={15} />
+            </button>
+            {/* Delete */}
+            <button
+              aria-label="삭제"
+              onClick={() => {
+                /* TODO: delete handler */
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--text-quaternary)',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-quaternary)';
+              }}
+            >
+              <Trash2 size={15} />
+            </button>
+            {/* Close */}
+            <button
+              onClick={onClose}
+              aria-label="닫기"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: '1px solid var(--border)',
+                background: 'transparent',
+                color: 'var(--text-tertiary)',
+                cursor: 'pointer',
+              }}
+            >
+              <X size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto px-6 py-4">
+        <div style={{ flex: 1, overflowY: 'auto' }}>
           {error && (
-            <p className="text-sm" style={{ color: 'var(--danger)' }}>
+            <p
+              style={{ padding: '16px 24px', fontSize: '14px', color: 'var(--danger)', margin: 0 }}
+            >
               {error}
             </p>
           )}
 
           {!isLoading && voc && (
             <>
-              {/* Meta section */}
+              {/* Meta grid */}
               <div
-                className="flex flex-col gap-3 mb-6 p-4 rounded-lg"
-                style={{ background: 'var(--bg-surface)' }}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '12px',
+                  padding: '16px 24px',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}
               >
-                <div className="flex items-center gap-2 text-sm">
-                  <span style={{ color: 'var(--text-muted)', width: '64px', flexShrink: 0 }}>
-                    상태
-                  </span>
-                  {canChangeStatus ? (
-                    <div className="flex items-center gap-2">
-                      <StatusDot status={voc.status} />
+                {/* 상태 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>상태</div>
+                  <div style={metaValueStyle}>
+                    {canChangeStatus ? (
                       <select
                         value={voc.status}
                         onChange={(e) => {
                           void handleStatusChange(e.target.value);
                         }}
-                        style={{
-                          background: 'var(--bg-surface)',
-                          color: 'var(--text-primary)',
-                          border: '1px solid var(--border)',
-                          borderRadius: '4px',
-                          padding: '2px 6px',
-                          fontSize: 'inherit',
-                          cursor: 'pointer',
-                        }}
+                        style={metaSelectStyle}
                       >
                         <option value={voc.status}>{voc.status}</option>
                         {(STATUS_TRANSITIONS[voc.status] ?? []).map((s) => (
@@ -254,52 +447,257 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
                           </option>
                         ))}
                       </select>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <StatusDot status={voc.status} />
-                      <span style={{ color: 'var(--text-primary)' }}>{voc.status}</span>
-                    </div>
-                  )}
+                    ) : (
+                      <>
+                        <StatusDot status={voc.status} />
+                        <span>{voc.status}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span style={{ color: 'var(--text-muted)', width: '64px', flexShrink: 0 }}>
-                    우선순위
-                  </span>
-                  <PriorityBadge priority={voc.priority} />
+
+                {/* 우선순위 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>우선순위</div>
+                  <div style={metaValueStyle}>
+                    {role === 'manager' || role === 'admin' ? (
+                      <select
+                        value={voc.priority}
+                        style={metaSelectStyle}
+                        onChange={(e) => {
+                          if (!voc) return;
+                          fetch(`/api/vocs/${voc.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ priority: e.target.value }),
+                          })
+                            .then((r) => r.json())
+                            .then((updated: VocDetail) => setVoc(updated))
+                            .catch(() => {});
+                        }}
+                      >
+                        <option value="urgent">Urgent</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                      </select>
+                    ) : (
+                      <PriorityBadge priority={voc.priority} />
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span style={{ color: 'var(--text-muted)', width: '64px', flexShrink: 0 }}>
-                    등록일
-                  </span>
-                  <span style={{ color: 'var(--text-secondary)' }}>
-                    {formatDate(voc.created_at)}
-                  </span>
+
+                {/* 담당자 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>담당자</div>
+                  <div style={metaValueStyle}>
+                    {voc.assignee_name ? (
+                      <>
+                        <InitialsAvatar name={voc.assignee_name} />
+                        {voc.assignee_name}
+                      </>
+                    ) : (
+                      <span style={{ color: 'var(--text-quaternary)' }}>미배정</span>
+                    )}
+                  </div>
                 </div>
+
+                {/* 시스템 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>시스템</div>
+                  <div style={metaValueStyle}>{voc.system_name ?? '—'}</div>
+                </div>
+
+                {/* 메뉴 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>메뉴</div>
+                  <div style={metaValueStyle}>{voc.menu_name ?? '—'}</div>
+                </div>
+
+                {/* 유형 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>유형</div>
+                  <div style={metaValueStyle}>
+                    {voc.voc_type_name ? (
+                      <>
+                        <span
+                          style={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            background: 'var(--accent)',
+                            flexShrink: 0,
+                          }}
+                        />
+                        {voc.voc_type_name}
+                      </>
+                    ) : (
+                      '—'
+                    )}
+                  </div>
+                </div>
+
+                {/* 작성자 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>작성자</div>
+                  <div style={metaValueStyle}>
+                    {voc.author_name ? (
+                      <>
+                        <InitialsAvatar name={voc.author_name} />
+                        {voc.author_name}
+                      </>
+                    ) : (
+                      '—'
+                    )}
+                  </div>
+                </div>
+
+                {/* 등록일 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={metaLabelStyle}>등록일</div>
+                  <div style={metaValueStyle}>{formatDate(voc.created_at)}</div>
+                </div>
+
+                {/* 기한 (conditional) */}
                 {voc.due_date && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <span style={{ color: 'var(--text-muted)', width: '64px', flexShrink: 0 }}>
-                      기한
-                    </span>
-                    <span style={{ color: 'var(--text-secondary)' }}>
-                      {formatDate(voc.due_date)}
-                    </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={metaLabelStyle}>기한</div>
+                    <div style={metaValueStyle}>{formatDate(voc.due_date)}</div>
                   </div>
                 )}
               </div>
 
-              {/* Tabs */}
+              {/* Tags section — always visible, outside tabs */}
               <div
-                className="flex gap-0 mb-4 shrink-0"
-                style={{ borderBottom: '1px solid var(--border)' }}
+                style={{
+                  padding: '12px 24px',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '6px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {/* Left: label + chips + add button */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      flexWrap: 'wrap',
+                      flex: 1,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '10.5px',
+                        fontWeight: 600,
+                        color: 'var(--text-quaternary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.07em',
+                        flexShrink: 0,
+                      }}
+                    >
+                      태그
+                    </span>
+                    {vocTags.map((t) => (
+                      <TagChip
+                        key={t.tag_id}
+                        name={t.name}
+                        source={t.source}
+                        onRemove={canEditTags ? () => handleRemoveTag(t.tag_id) : undefined}
+                      />
+                    ))}
+                    {canEditTags && (
+                      <button
+                        onClick={() => setShowTagSelect((v) => !v)}
+                        style={{
+                          fontSize: '12px',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          border: '1px solid var(--border)',
+                          color: 'var(--text-secondary)',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        + 태그 추가
+                      </button>
+                    )}
+                  </div>
+                  {/* Right: auto-tag button */}
+                  <button
+                    style={{
+                      fontSize: '11px',
+                      color: 'var(--accent)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '2px 4px',
+                      flexShrink: 0,
+                    }}
+                    onClick={() => {
+                      /* TODO: auto-tag action */
+                    }}
+                  >
+                    ⚡ 자동 태깅
+                  </button>
+                </div>
+                {showTagSelect && canEditTags && (
+                  <select
+                    style={{
+                      fontSize: '13px',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border)',
+                      background: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                      width: '100%',
+                      marginTop: '4px',
+                    }}
+                    defaultValue=""
+                    onChange={(e) => {
+                      if (e.target.value) handleAddTag(e.target.value);
+                    }}
+                  >
+                    <option value="" disabled>
+                      태그 선택
+                    </option>
+                    {allTags
+                      .filter((t) => !vocTags.some((vt) => vt.tag_id === t.id))
+                      .map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Tab bar */}
+              <div
+                style={{
+                  borderBottom: '1px solid var(--border-subtle)',
+                  padding: '0 24px',
+                  display: 'flex',
+                  flexShrink: 0,
+                }}
               >
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className="px-4 py-2 text-sm font-medium"
                     style={{
-                      color: activeTab === tab.key ? 'var(--brand)' : 'var(--text-secondary)',
+                      padding: '10px 12px',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: activeTab === tab.key ? 'var(--brand)' : 'var(--text-tertiary)',
                       background: 'transparent',
                       border: 'none',
                       borderBottom:
@@ -315,75 +713,20 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
 
               {/* Tab content */}
               {activeTab === 'body' && (
-                <div>
+                <div style={{ padding: '16px 24px' }}>
                   <pre
-                    className="text-sm whitespace-pre-wrap break-words"
                     style={{
+                      fontSize: '14px',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
                       color: 'var(--text-primary)',
                       fontFamily: 'inherit',
                       lineHeight: '1.6',
+                      margin: 0,
                     }}
                   >
                     {voc.body}
                   </pre>
-
-                  <div className="mt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-                        태그
-                      </span>
-                      {canEditTags && (
-                        <button
-                          onClick={() => setShowTagSelect((v) => !v)}
-                          className="text-xs px-2 py-0.5 rounded"
-                          style={{
-                            border: '1px solid var(--border)',
-                            color: 'var(--text-secondary)',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          + 태그 추가
-                        </button>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {vocTags.map((t) => (
-                        <TagChip
-                          key={t.tag_id}
-                          name={t.name}
-                          source={t.source}
-                          onRemove={canEditTags ? () => handleRemoveTag(t.tag_id) : undefined}
-                        />
-                      ))}
-                    </div>
-                    {showTagSelect && canEditTags && (
-                      <select
-                        className="mt-2 text-sm px-2 py-1 rounded"
-                        style={{
-                          border: '1px solid var(--border)',
-                          background: 'var(--bg-surface)',
-                          color: 'var(--text-primary)',
-                          width: '100%',
-                        }}
-                        defaultValue=""
-                        onChange={(e) => {
-                          if (e.target.value) handleAddTag(e.target.value);
-                        }}
-                      >
-                        <option value="" disabled>
-                          태그 선택
-                        </option>
-                        {allTags
-                          .filter((t) => !vocTags.some((vt) => vt.tag_id === t.id))
-                          .map((t) => (
-                            <option key={t.id} value={t.id}>
-                              {t.name}
-                            </option>
-                          ))}
-                      </select>
-                    )}
-                  </div>
                 </div>
               )}
 

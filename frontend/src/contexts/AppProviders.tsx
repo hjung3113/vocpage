@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeProvider } from './ThemeContext';
 import { AuthProvider } from './AuthContext';
 import { NotificationProvider } from './NotificationContext';
 import { MasterCacheProvider } from './MasterCacheContext';
@@ -7,15 +8,17 @@ import { VOCDrawerProvider } from './VOCDrawerContext';
 
 const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <MasterCacheProvider>
-          <VOCFilterProvider>
-            <VOCDrawerProvider>{children}</VOCDrawerProvider>
-          </VOCFilterProvider>
-        </MasterCacheProvider>
-      </NotificationProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <MasterCacheProvider>
+            <VOCFilterProvider>
+              <VOCDrawerProvider>{children}</VOCDrawerProvider>
+            </VOCFilterProvider>
+          </MasterCacheProvider>
+        </NotificationProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

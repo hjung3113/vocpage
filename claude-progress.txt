@@ -4,29 +4,11 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~7 ✅ 완료 → **Phase 8 진입 대기**
+현재 위치: Phase 0~8 ✅ 완료 → **Phase 9 운영 실구현 + 배포 대기**
 
-브랜치: `main` (PR #38 머지 완료 — 2026-04-26)
-테스트: Playwright E2E B-1~B-7 버그 전체 수정 완료 (2026-04-26)
+브랜치: `fix/phase8-design-theme-fix` (PR 후 머지 필요)
 
-## Phase 완료 이력
-
-| Phase | 내용 | 완료일 | PR |
-|-------|------|--------|-----|
-| 0 | 요구사항 초안 | 2026-04-23 | — |
-| 1~5 | 스펙·문서 정비 | 2026-04-23 | — |
-| 6 | 스캐폴딩·인증 Mock·DB 마이그레이션·상태관리 | 2026-04-24 | #22, #28 |
-| 7 | VOC CRUD·댓글·태그·대시보드·알림·관리자·갭수정 | 2026-04-25~26 | #37, #38 |
-
-## 다음 — Phase 8
-
-| 단계 | 내용 |
-|------|------|
-| 8-1 | `connect-pg-simple` 세션 스토어 (production) |
-| 8-2 | OIDC 인증 실구현 |
-| 8-3 | Production Dockerfile + 빌드 파이프라인 |
-| 8-4 | 구조화 로깅 (pino) |
-| 8-5 | 실 MSSQL 연동 (외부 의존 — 담당자 자료 필요) |
-| 8-6 | 배포 + smoke test |
-| 8-7 | Playwright E2E 핵심 3플로우 |
-| 8-8 | Jira 마이그레이션 스크립트 |
+최근 작업 (2026-04-26):
+- Phase 8 디자인 재작업 완료
+- benchmark/ 폴더 생성: prototype 전 페이지·인터렉션 스크린샷 24장 + INDEX.md
+- dashboard-v3.html 삭제 + docs 참조 제거
