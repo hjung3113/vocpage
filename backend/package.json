@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "node-pg-migrate up -m migrations",
     "db:migrate:down": "node-pg-migrate down -m migrations",
-    "db:seed": "psql $DATABASE_URL -f seeds/dev_seed.sql"
+    "db:seed": "psql $DATABASE_URL -f seeds/dev_seed.sql",
+    "db:seed:mock": "psql $DATABASE_URL -f seeds/mock-users.sql"
   },
   "dependencies": {
     "cors": "^2.8.5",

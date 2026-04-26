@@ -1290,9 +1290,10 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
         <option>김지훈</option><option>이수연</option><option>박민준</option><option>최유진</option><option>정해원</option>
       </select>
       <div class="date-btn-group">
-        <button class="date-btn">7일</button>
-        <button class="date-btn active">30일</button>
-        <button class="date-btn">90일</button>
+        <button class="date-btn active">1달</button>
+        <button class="date-btn">3달</button>
+        <button class="date-btn">1년</button>
+        <button class="date-btn">전체</button>
         <button class="date-btn">커스텀</button>
       </div>
       <button class="dash-btn">📅 2025.05.01–05.30 ▾</button>
@@ -1648,7 +1649,7 @@ mark { background: oklch(75% 0.16 72 / .35); color: inherit; border-radius: 2px;
         </div>
         <div class="aform-field">
           <label>색상</label>
-          <input type="color" id="newTypeColor" value="#5e6ad2" style="min-width:56px;padding:2px;height:34px" />
+          <input type="color" id="newTypeColor" value="var(--brand)" style="min-width:56px;padding:2px;height:34px" />
         </div>
         <div style="display:flex;gap:6px;align-self:flex-end">
           <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addType()">추가</button>
@@ -2474,8 +2475,8 @@ function buildSubsSection(d) {
     </div>`).join('');
   const isSubtask = !!d.parentId;
   const addBlock = isSubtask
-    ? `<div class="sub-add-row" style="color:var(--text-quaternary);cursor:not-allowed;opacity:.7" data-tip="Sub-task 아래에는 추가할 수 없습니다 (최대 2단계)">
-         <i data-lucide="ban" style="width:13px;height:13px"></i> 서브태스크 추가 불가 (최대 2단계)
+    ? `<div class="sub-add-row" style="color:var(--text-quaternary);cursor:not-allowed;opacity:.7" data-tip="Sub-task 아래에는 추가할 수 없습니다 (최대 1레벨)">
+         <i data-lucide="ban" style="width:13px;height:13px"></i> 서브태스크 추가 불가 (최대 1레벨)
        </div>`
     : `<div class="sub-add-row" id="sub-add-row-${d.id}" onclick="showSubForm('${d.id}')">
          <i data-lucide="plus" style="width:13px;height:13px"></i> 서브태스크 추가
@@ -2747,12 +2748,14 @@ function openDrawer(id) {
     <div class="d-meta">
       <div class="meta-item">
         <div class="meta-lbl">상태</div>
+        <!-- 상태 전환 매트릭스: 접수→검토중/드랍, 검토중→처리중/드랍, 처리중→완료/드랍, 완료→처리중 -->
+        <!-- allowed[현재상태] = 전환가능한 상태 목록 (현재 상태 자신 포함) -->
         <select class="meta-sel">
-          <option ${d.status==='접수'?'selected':''}>접수</option>
-          <option ${d.status==='검토중'?'selected':''}>검토중</option>
-          <option ${d.status==='처리중'?'selected':''}>처리중</option>
-          <option ${d.status==='완료'?'selected':''}>완료</option>
-          <option ${d.status==='드랍'?'selected':''}>드랍</option>
+          <option ${d.status==='접수'   ?'selected':''}>접수</option>
+          <option ${d.status==='검토중' ?'selected':''} ${['검토중','처리중','완료'].includes(d.status)?'disabled':''} style="${['검토중','처리중','완료'].includes(d.status)?'color:var(--text-quaternary)':''}">검토중</option>
+          <option ${d.status==='처리중' ?'selected':''} ${['접수','검토중'].includes(d.status)?'disabled':''} style="${['접수','검토중'].includes(d.status)?'color:var(--text-quaternary)':''}">처리중</option>
+          <option ${d.status==='완료'   ?'selected':''} ${['접수','검토중','완료'].includes(d.status)?'disabled':''} style="${['접수','검토중','완료'].includes(d.status)?'color:var(--text-quaternary)':''}">완료</option>
+          <option ${d.status==='드랍'   ?'selected':''}>드랍</option>
         </select>
       </div>
       <div class="meta-item">
@@ -2763,6 +2766,11 @@ function openDrawer(id) {
           <option value="medium" ${d.priority==='medium'?'selected':''}>Medium</option>
           <option value="low"    ${d.priority==='low'   ?'selected':''}>Low</option>
         </select>
+      </div>
+      <div class="meta-item">
+        <!-- 마감일 권한: User=읽기전용, Manager/Admin=쓰기, Dev=본인 담당 시 쓰기 -->
+        <div class="meta-lbl">마감일</div>
+        <input type="date" class="meta-sel" value="${d.dueDate||''}" style="font-size:13px;color:var(--text-primary)" />
       </div>
       <div class="meta-item">
         <div class="meta-lbl">담당자</div>
@@ -3541,7 +3549,7 @@ renderVOCList();
   const noticeBadge = document.getElementById('noticeBadge');
   if (noticeBadge && hasUrgent) {
     noticeBadge.textContent = '!';
-    noticeBadge.style.cssText = 'display:inline-block;background:#e5484d;color:#fff';
+    noticeBadge.style.cssText = 'display:inline-block;background:var(--status-red);color:var(--text-on-brand)';
   }
 })();
 
@@ -3576,12 +3584,15 @@ renderVOCList();
             <span style="font-size:13.5px;font-weight:500;color:var(--text-primary)">${n.title}</span>
           </div>
           <div style="font-size:13px;color:var(--text-secondary);line-height:1.65">${n.content}</div>
-          <label style="display:flex;align-items:center;gap:6px;margin-top:12px;cursor:pointer;font-size:12px;color:var(--text-tertiary)">
-            <input type="checkbox" id="hide-today-${n.id}" onchange="handleHideToday(${n.id}, this.checked)">
-            오늘 하루 보지 않기
-          </label>
         </div>`).join('')}
-      <button onclick="closeNoticePopup()" style="width:100%;margin-top:8px;padding:9px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer">확인</button>
+      <!-- 모달 footer: 일괄 "오늘 하루 보지 않기" 체크박스 1개 + 닫기 버튼 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-subtle)">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text-tertiary)">
+          <input type="checkbox" id="hide-today-all" onchange="handleHideTodayAll(this.checked, [${popupNotices.map(n=>n.id).join(',')}])">
+          오늘 하루 보지 않기
+        </label>
+        <button onclick="closeNoticePopup()" style="padding:7px 20px;background:var(--brand-bg);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer">닫기</button>
+      </div>
     </div>`;
 
   document.body.appendChild(overlay);
@@ -3591,6 +3602,10 @@ function handleHideToday(id, checked) {
   const today = new Date().toISOString().slice(0,10);
   if (checked) localStorage.setItem('notice_hide_' + id, today);
   else localStorage.removeItem('notice_hide_' + id);
+}
+
+function handleHideTodayAll(checked, ids) {
+  ids.forEach(id => handleHideToday(id, checked));
 }
 
 function closeNoticePopup() {

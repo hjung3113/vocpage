@@ -148,7 +148,7 @@ CDN: `https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variabl
 
 ```css
 background: var(--brand);
-color: #ffffff;
+color: var(--text-on-brand);
 border-radius: 8px;
 padding: 7px 14px;
 font-weight: 600;
@@ -300,7 +300,7 @@ color: var(--accent);
 font-weight: 600;
 ```
 
-- Count badge on nav items: `font-size: 11px; font-weight: 700; background: var(--brand); color: #fff; border-radius: 9999px; padding: 1px 6px`
+- Count badge on nav items: `font-size: 11px; font-weight: 700; background: var(--brand); color: var(--text-on-brand); border-radius: 9999px; padding: 1px 6px`
 - Active state must be visually unambiguous — background fill, not just color change
 
 ### Page Header
@@ -492,6 +492,8 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 - Use `bg-elevated` for row hover — use brand-tinted OKLCH value for premium hover feel
 - Make page title the same visual weight as body text — it must anchor the page
 - Place filter tabs and table header with zero gap between them — they are separate UI zones
+- Write raw color literals (`#xxxxxx`, `oklch(...)`, `light-dark(oklch(...))`) **outside the `:root` token block** — every component CSS rule and `style=` attribute MUST reference `var(--token)` names. The only legitimate raw-color sites are: (a) the `:root` token definition block in this file, (b) Color Reference tables that document a token's resolved value. Anything else is a violation (audit: `docs/specs/reviews/design-prototype-audit.md`).
+- Use pure white `#fff` / `#ffffff` even on brand-tinted backgrounds — use `var(--text-on-brand)` instead, which resolves to a pure-white token defined once in `:root`.
 
 ---
 
@@ -593,6 +595,20 @@ Full token set — copy into `:root` as the single source of truth.
   --status-dot-processing: light-dark(oklch(48% 0.17 152), oklch(64% 0.19 155)); /* 처리중 */
   --status-dot-done: light-dark(oklch(46% 0.19 155), oklch(63% 0.21 158)); /* 완료 */
   --status-dot-drop: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); /* 드랍 */
+
+  /* Role pill — Admin · Manager · Dev · User (D18 / D20, 2026-04-26) */
+  /* admin / manager / user reuse existing brand & status tokens; only `dev` requires net-new tokens. */
+  --role-dev-fg: light-dark(
+    oklch(40% 0.13 215),
+    oklch(72% 0.13 210)
+  ); /* cyan-leaning, distinct from brand blue */
+  --role-dev-bg: light-dark(oklch(94% 0.03 215), oklch(20% 0.05 215));
+  --role-dev-border: light-dark(oklch(78% 0.07 215), oklch(32% 0.07 215));
+
+  /* Text on brand-tinted backgrounds (badges, count pills, brand CTA) */
+  --text-on-brand: oklch(
+    100% 0 0
+  ); /* defined once; replaces every `#fff` literal in component CSS */
 }
 ```
 
@@ -740,3 +756,292 @@ export default { colors, spacing, fontSize };
 - CI runs the same lint check and blocks merge on failure.
 
 OS/browser dark mode setting automatically switches the entire theme.
+
+---
+
+## 13. Admin · Notice · FAQ Components
+
+> Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Audit reference: `docs/specs/reviews/design-prototype-audit.md`. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
+
+### 13.1 Admin Topbar / Body / Card
+
+Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users — Notice/FAQ admin lives inline on its page, see §13.8).
+
+- `.admin-topbar` — sticky page-header band: title (`font-size: 15px; font-weight: 700`), action slot on the right, `padding: 12px 24px`, `background: var(--bg-panel)`, `border-bottom: 1px solid var(--border-subtle)`.
+- `.admin-body` — scroll container, `flex: 1; overflow-y: auto; padding: 24px`.
+- `.admin-card` — grouping panel inside the body: `background: var(--bg-surface); border: 1px solid var(--border-standard); border-radius: 8px; padding: 16px`. Cards stack with `var(--sp-5)` gap.
+
+### 13.2 Admin Table
+
+```css
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.admin-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.admin-table td {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  padding: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.admin-table tr:hover td {
+  background: var(--bg-elevated);
+}
+```
+
+### 13.2.1 Admin Button (`.admin-btn`)
+
+Primary action button used inside `.admin-topbar` and as the inline "관리" entry button on Notice/FAQ pages.
+
+```css
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--brand-bg);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.admin-btn:hover {
+  background: color-mix(in oklch, var(--brand-bg) 80%, var(--accent) 10%);
+}
+.admin-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+```
+
+Iconography: optional 13×13 SVG icon at the leading edge.
+
+### 13.3 Role Pill (`.role-pill`)
+
+Compact identity badge shown next to display name in user lists, member pickers, and the topbar avatar tooltip. Four variants for the four-role enum (D18).
+
+```css
+.role-pill {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-family: var(--font-ui);
+}
+.role-admin {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border-color: var(--brand-border);
+}
+.role-manager {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border-color: var(--status-amber-border);
+}
+.role-dev {
+  background: var(--role-dev-bg);
+  color: var(--role-dev-fg);
+  border-color: var(--role-dev-border);
+}
+.role-user {
+  background: var(--bg-elevated);
+  color: var(--text-tertiary);
+  border-color: var(--border-subtle);
+}
+```
+
+Order in any role legend: Admin → Manager → Dev → User (descending capability).
+
+### 13.4 Type Badge (`.type-badge-admin`)
+
+Small label used in the Admin VOC-Types table to render the `voc_types.color` swatch as a colored chip. Background is the type's own color (passed inline as a token reference, never as raw hex), text uses `var(--text-on-brand)`.
+
+```css
+.type-badge-admin {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--text-on-brand);
+}
+```
+
+> Token-color contract: `voc_types.color` stored as the **token name** (e.g. `--type-bug`) referenced from the global token sheet — not as a raw hex. Migration follow-up if current schema stores hex.
+
+### 13.5 Status Dot (`.status-dot`)
+
+7×7 round indicator used in admin tables to show per-row activation state.
+
+```css
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+.status-dot.on {
+  background: var(--status-green);
+  box-shadow: 0 0 5px color-mix(in oklch, var(--status-green) 50%, transparent);
+}
+.status-dot.off {
+  background: var(--text-quaternary);
+}
+```
+
+### 13.6 Notice Components
+
+#### 13.6.1 Notice Severity Badge (`.notice-badge`)
+
+Three severity tiers — every Notice list row leads with one of these.
+
+```css
+.notice-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+.notice-badge-urgent {
+  color: var(--status-red);
+  border-color: var(--status-red-border);
+  background: var(--status-red-bg);
+}
+.notice-badge-important {
+  color: var(--status-amber);
+  border-color: var(--status-amber-border);
+  background: var(--status-amber-bg);
+}
+.notice-badge-normal {
+  color: var(--text-tertiary);
+  border-color: var(--border-subtle);
+  background: transparent;
+}
+```
+
+#### 13.6.2 Notice Row + Body
+
+```css
+.notice-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.notice-row:hover {
+  background: var(--bg-elevated);
+}
+.notice-body {
+  display: none;
+  padding: 12px 24px 16px;
+  background: var(--bg-elevated);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  border-top: 1px solid var(--border-subtle);
+}
+.notice-row.is-open + .notice-body {
+  display: block;
+}
+```
+
+### 13.7 FAQ Components
+
+```css
+.faq-item {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.faq-filter-bar {
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.faq-search {
+  padding: 6px 11px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  width: 200px;
+  font-family: var(--font-ui);
+}
+.faq-search:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+.faq-cat-btn {
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: all 0.12s;
+}
+.faq-cat-btn[aria-pressed='true'] {
+  background: var(--brand-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+```
+
+### 13.8 Admin Mode Entry Button (Page Header Action Slot)
+
+> Added in tandem with `feature-notice-faq.md §10.5` (D19). Replaces the previously-planned Admin-tab subtab.
+
+- Renders **only** for `role ∈ {admin, manager}`. User/Dev never receive this DOM node — guard at the component tree, not via `display: none`.
+- Visual: reuse `.admin-btn` from §13.2.1.
+- Activation contract: clicking the button flips a `?mode=admin` URL query param. Read mode is the absence of the param. The toggle MUST survive page reload, browser back/forward, and shareable links.
+- When `mode=admin`, the host page (Notice / FAQ) renders inline admin actions: register/edit/delete row controls, visibility toggle switch, Soft-Delete button. The page route does not change.
+- Recommended placement: right edge of the page header band, vertically aligned with the page title. On widths < 640px the button collapses to icon only (gear glyph) without changing semantics.
+- Implementation note (FE): admin-only handlers and form components MUST be loaded via dynamic `import()` so they do not ship in the user/Dev bundle.
+
+### 13.9 Login-time Notice Popup
+
+> Spec lives in `feature-notice-faq.md §10.3.2`. Visual contract:
+
+- Reuse the standard Modal pattern (overlay = `var(--overlay)`, dialog surface = `var(--bg-surface)` with `box-shadow: var(--shadow-dialog)`).
+- Severity badge in the header (`§13.6.1`), title in `font-size: 16px; font-weight: 700`, body in `font-size: 13.5px; color: var(--text-secondary)`.
+- Footer holds two controls aligned right: `[ ] 오늘 하루 보지 않기` (checkbox, `var(--text-tertiary)` label) and primary `닫기` button (`.admin-btn` ghost variant).
+
+### 13.10 Sidebar Count Badge (Notice / FAQ)
+
+Small numeric badge on Notice / FAQ sidebar items.
+
+```css
+.sidebar-count-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--brand);
+  color: var(--text-on-brand);
+  border-radius: 9999px;
+  padding: 1px 6px;
+  margin-left: auto;
+}
+```
+
+Hidden when count === 0. Shows `99+` when count > 99.

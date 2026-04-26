@@ -45,10 +45,11 @@
 - **업무 배정:** VOC별 담당자(Assignee) 지정 및 추적.
 - **계층형 관리:** 하나의 이슈 아래 여러 Sub-task를 생성하여 관리 (최대 1레벨: root → Sub-task 단일 계층). 본 문서 전체에서 "Sub-task" 단일 용어로 통일 — 한국어 문장에서도 "하위 작업"/"child" 등 대체 표현 금지 (v3 §8.2).
 - **자동 분류:** 키워드를 활용한 **자동 태깅(Auto-tagging)** 기능 (규칙 기반, MVP).
-- **상태 전환:** VOC 상태 변경 권한은 Manager/Admin으로 제한.
-- **우선순위 설정:** Priority(Urgent/High/Medium/Low)는 Manager/Admin만 설정 가능.
-- **삭제:** Soft Delete는 Admin 전용. User는 삭제 불가.
-- **시스템/메뉴/유형/태그규칙/권한 관리:** Admin 전용.
+- **상태 전환:** VOC 상태 변경 권한은 Manager/Admin, 그리고 본인이 assignee로 지정된 VOC에 한해 Dev에게 허용.
+- **우선순위 설정:** Priority(Urgent/High/Medium/Low)는 Manager/Admin, 그리고 본인 담당 VOC에 한해 Dev가 설정 가능.
+- **삭제:** Soft Delete는 Admin 전용. User/Dev는 삭제 불가.
+- **시스템/메뉴/유형/태그규칙/사용자 role 관리:** Admin 전용.
+- **역할 4종(D18, 2026-04-26 확정):** `user` / `dev` / `manager` / `admin`. Admin과 Manager는 사용자 role 변경·시스템/메뉴/유형/태그규칙 관리·Soft Delete를 제외하면 동일 권한. Dev = User 권한 + (assignee = self일 때만) 상태 전환·Priority/Due Date·Internal Note R·W·Sub-task + Dashboard 보기. Dashboard 접근은 Manager/Admin/**Dev**.
 
 ---
 
@@ -69,11 +70,11 @@
 
 ## 4. 데이터베이스 설계 (Data Schema)
 
-- **`users`**: 사내 유저 정보. 컬럼: `id(uuid)`, `ad_username`, `display_name`, `email`, `role(enum: user/manager/admin)`, `is_active`, `created_at`.
+- **`users`**: 사내 유저 정보. 컬럼: `id(uuid)`, `ad_username`, `display_name`, `email`, `role(enum: user/dev/manager/admin)`, `is_active`, `created_at`. **`dev` 추가 (D18, 2026-04-26)** — DDL/롤백 spec은 `docs/specs/plans/migration-012-draft.md`. 실파일 `migrations/012_*.sql`은 구현 phase 승인 후 생성.
 - **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe, 전역 UNIQUE)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성. `slug` 제약: `(system_id, slug)` 복합 UNIQUE.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(unique, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title`, `body(HTML)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `voc_type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `deleted_at`, `created_at`, `updated_at`.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(text NOT NULL UNIQUE, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title(NOT NULL, CHECK char_length<=200)`, `body(HTML, NOT NULL, CHECK octet_length<=65536)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `voc_type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계, ON DELETE SET NULL)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `status_changed_at(timestamptz NOT NULL DEFAULT now() — status 변경 시 트리거가 자동 갱신, 대시보드 주간 트렌드/완료 KPI 기준)`, `deleted_at`, `created_at`, `updated_at`.
   - `status`: **5단계 유지 확정** (v3 §1.4, 2026-04-24). 기존 `보류`를 `드랍`으로 대체. 4단계 축소 옵션은 폐기 — 분석 업무 특성상 `검토중`(조사) vs `처리중`(착수)의 의미 구분 유지 가치 있음. 상태 전환 매트릭스는 §8.2.
   - `source`: VOC 생성 출처 구분. `manual` = 웹 UI 폼 입력(User/Manager), `import` = Jira 이관 스크립트(MVP 오픈 전 1회성).
     - **PG enum 대신 text+CHECK** 선택 — 향후 값 추가/제거 유연성(`chatbot` 등 NextGen 가능성).
@@ -125,7 +126,7 @@
   - `menu`: 주메뉴(`vocs.menu_id`) 외 **영향받는 다른 메뉴**를 태깅
   - `voc_tags` 컬럼: `voc_id`, `tag_id`, `source text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','rule'))`, `created_at`. `source`는 수동 태깅(`manual`)과 `tag_rules` 엔진 자동 부착(`rule`)을 구분. `vocs.source`(Q8, manual/import)와는 별개 축.
   - 초기 마이그레이션 (과거 초안의 `equipment` enum 값이 남아있는 환경 한정): `ALTER TYPE tag_kind RENAME TO tag_kind_old; CREATE TYPE tag_kind AS ENUM ('general','menu'); ALTER TABLE tags ALTER COLUMN kind TYPE tag_kind USING kind::text::tag_kind; DROP TYPE tag_kind_old;` (기존 `equipment` row는 사전 정리 필요).
-- **`tag_rules`**: 자동 태깅을 위한 키워드/규칙 저장소. **`kind='general'` 태그 자동 부착 전용** — 엔티티성 단어(설비/모델/메이커/공정)는 `structured_payload` 파이프라인으로 위임. `menu` 태그는 규칙 대상 아님(메뉴 FK 기반). <!-- NextGen AI 태깅 전환 시 `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
+- **`tag_rules`**: 자동 태깅을 위한 키워드 저장소. **`kind='general'` 태그 자동 부착 전용** — 엔티티성 단어(설비/모델/메이커/공정)는 `structured_payload` 파이프라인으로 위임. `menu` 태그는 규칙 대상 아님(메뉴 FK 기반). 컬럼: `id(uuid)`, `tag_id(FK→tags)`, `pattern text NOT NULL`, `created_by(FK→users)`, `created_at`. **MVP는 키워드(부분 문자열, 대소문자 무시) 매칭 단일 모드**, 정규식·confidence·model_version은 NextGen 도입 시 컬럼 확장. <!-- NextGen AI 태깅 전환 시 `pattern_type CHECK IN ('keyword','regex')`, `confidence_threshold(float)`, `model_version` 컬럼 추가 예정 -->
   - **실행 시점**: VOC 접수 + 제목/본문 편집 저장 시. status 변경만으로는 재실행 안 함.
   - **규칙 충돌**: 같은 본문에 복수 규칙 매칭 시 전부 부착(태그는 다대다, 우선순위·배타 없음).
   - **멱등성**: 재실행은 해당 VOC의 `voc_tags.source='rule'` 행만 삭제 후 재부착. `source='manual'` 행은 보존(담당자 수동 태깅은 엔진이 건드리지 않음).
@@ -146,7 +147,7 @@
   - **Timeline 통합**: Manager/Admin 한정으로 공개 댓글 + internal note + status change를 시간순 혼합 표시하되 배지/배경으로 구분. User role은 internal note 이벤트를 Timeline API 응답에서 수신 불가.
   - **회귀 테스트 필수**: (1) User가 `/notes` 호출 시 404, (2) 공개 댓글 응답에 internal note 절대 미포함, (3) Timeline API에서 User는 internal note 이벤트 수신 불가.
 - **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
-- **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `locked_fields(jsonb)`, `default_date_range(enum: 7d/30d/90d/custom)`, `heatmap_default_x_axis(enum: status/priority/tag)`, `globaltabs_order(jsonb, Admin 기본값 행에만 유효)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
+- **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `locked_fields(jsonb)`, `default_date_range(enum: 1m/3m/1y/all/custom, default '1m')`, `heatmap_default_x_axis(enum: status/priority/tag)`, `globaltabs_order(jsonb, Admin 기본값 행에만 유효)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
   - JSONB 컬럼 예시 구조:
     ```json
     {
@@ -397,6 +398,8 @@ Then  403 반환, body: { code: 'FORBIDDEN' }
 
 **세션 스토어**: `connect-pg-simple` 채택. 기존 PostgreSQL(`DATABASE_URL`)을 재사용하므로 별도 인프라 불필요. 개발(`MemoryStore`)과 운영(`connect-pg-simple`) 전환은 `NODE_ENV`로 자동 분기. 세션 테이블은 `connect-pg-simple` 내장 DDL로 자동 생성. **⚠ Phase 8-1 구현 예정 — 현재 MemoryStore 사용 중.**
 
+> **NOTE (현재 구현)**: `MemoryStore` (개발용). Phase 8-1에서 `connect-pg-simple` 기반 PostgreSQL 세션 스토어로 교체 예정.
+
 ### 14.2 Docker 구성 개요
 
 ```
@@ -439,17 +442,25 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 ### 14.5 Mock User Fixtures
 
-`AUTH_MODE=mock` 시 사용하는 고정 테스트 유저. 실제 DB row 없음 — 세션에만 존재.
+`AUTH_MODE=mock` 시 사용하는 고정 테스트 유저. **DB seed 필수** — `vocs.author_id` 등 NOT NULL FK 위반 방지를 위해 동일 UUID의 `users` row가 사전에 존재해야 한다.
 
 | role    | id (UUID)                              | email               | name         |
 | ------- | -------------------------------------- | ------------------- | ------------ |
 | admin   | `00000000-0000-0000-0000-000000000001` | admin@company.com   | Mock Admin   |
 | manager | `00000000-0000-0000-0000-000000000002` | manager@company.com | Mock Manager |
 | user    | `00000000-0000-0000-0000-000000000003` | user@company.com    | Mock User    |
+| dev     | `00000000-0000-0000-0000-000000000004` | dev@company.com     | Mock Dev     |
+
+- **Seed 파일**: `backend/seeds/mock-users.sql` — 위 4건 INSERT (재실행 안전, ON CONFLICT DO NOTHING). dev row는 `migrations/012` 적용 후 추가 (구현 phase).
+- **실행 시점**: 마이그레이션 직후. `npm run db:seed:mock` (mock 환경) 또는 `npm run db:seed`(개발용 풀 시드, mock-users 포함).
+- **운영 환경**: `AUTH_MODE=oidc`이면 mock-users.sql 실행 금지. 대신 §15.2 사용자 초대 플로우 사용.
+- **세션 매핑**: `frontend/src/auth/mockUsers.ts` 및 `backend/src/auth/mockUsers.ts` fixture가 위 UUID와 일치해야 한다.
 
 ---
 
-## 15. 관리자 페이지: Result Review
+## 15. 관리자 페이지
+
+### 15.1 Result Review
 
 > 상세 UI는 feature-voc.md §9.4 관리자 페이지 목록에 "Result Review" 항목으로 추가 예정.
 
@@ -457,6 +468,18 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 - **액션**: 각 VOC에 코멘트 + approve/reject. 결정 이력은 `voc_payload_reviews`에 `action='submission'|'deletion'` 구분으로 기록.
 - **권한**: Manager/Admin.
 - **연관 갱신**: approve 시 `vocs.structured_payload` 확정 / `voc_payload_history.is_current=true` 스냅샷 유지 / 임베딩 정책(§16) 트리거.
+
+### 15.2 사용자 초대 플로우
+
+**전제**: 사내 AD/SSO 환경(§2.1). 별도 이메일 초대·토큰 발송 시스템 없음 (MVP 범위).
+
+- **자동 생성 (기본)**: AD/OIDC 로그인 성공 시 `users` 테이블에 row 자동 생성.
+  - 초기값: `role='user'`, `is_active=true`, `display_name`/`email`/`ad_username`은 IdP 클레임에서 매핑.
+  - 동일 `ad_username` 재로그인 시 row 재사용 (UPSERT 멱등).
+- **권한 승급**: Admin이 사용자 관리 화면(`feature-voc.md §9.4 관리자 페이지`)에서 `role` 변경 (`user` → `dev` / `manager` / `admin`). Dev 승급 = "내부 엔지니어" 표시 + 본인 담당 VOC 운영 권한 + Dashboard 접근.
+- **사전 초대 미지원**: 로그인 전 사용자 row 사전 생성·이메일 초대 토큰 발송은 MVP 범위 외. 사내 AD에 신규 직원이 등재되면 첫 로그인 시 자동 합류.
+- **비활성화**: Admin이 `is_active=false`로 토글하여 로그인·세션을 차단 (사용자 row는 보존, VOC 이력 무결성 유지).
+- **사용자 관리 화면**: 우상단 "사용자 초대" 버튼은 **MVP에서 비활성화 또는 숨김** — 자동 생성 정책상 진입점 불필요. 벤치마크 스크린샷(`20-admin-users.png`)의 버튼은 NextGen에서 사전 초대 도입 시 활성화 예정.
 
 ---
 
@@ -552,15 +575,28 @@ Phase 4 5-Expert 잔여 7건은 모두 반영 완료 (2026-04-24):
 
 Phase 7 착수 전 종합 리뷰(project-full-review.md) 기반 의사결정 목록.
 
-| 항목                                    | 결정                                                   | 반영 위치                                             |
-| --------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
-| D1 용어 통일 `type_id` vs `voc_type_id` | **`voc_type_id` 유지** — DB 변경 최소화                | §4 vocs (이미 반영), 이 문서 §4 수정 완료             |
-| D2 `notifications.voc_id` NULL 정책     | **NOT NULL 유지** — 모든 알림은 VOC 연결 필수          | §4 notifications (현행 유지)                          |
-| D3 `structured_payload` 입력 폼 UX      | **별도 모달** — "결과 입력" 버튼 → 독립 모달 팝업      | feature-voc.md §8.4 (Phase 7 구현 시 명세 추가)       |
-| D4 Sub-task API 응답 필드명             | **`subTasks[]`** — 1레벨 고정 의미 명확화              | §6.1 GET /api/vocs 응답 스키마 (Phase 7 구현 시 반영) |
-| D5 대시보드 시스템 탭                   | **동적** — `systems` 테이블 기반 렌더링                | §11 대시보드 (Phase 7 구현 시 반영)                   |
-| D6 공지 상세 표시 방식                  | **드로어** — 기존 드로어 패턴과 일관성                 | feature-notice-faq.md (Phase 7 구현 시 반영)          |
-| D7 데이터 보존 기간                     | **무기한** — VOC soft delete 및 voc_history 모두       | §14.3 운영 정책 (별도 정책 없음 = 물리 삭제 없음)     |
-| D8 알림 디바운스 구현 위치              | **앱 레이어 (BE 서비스)** — 테스트 용이성, 로직 가시성 | §6.1 notification 서비스 (Phase 7 구현 시 반영)       |
-| A3 Sub-task 채번 인프라 방식            | **`voc_subtask_counters` 별도 테이블** — 동시성 안전   | `migrations/009_subtask_infra.sql`                    |
-| A4 Sub-task 1레벨 DB 강제 방식          | **BEFORE INSERT/UPDATE 트리거**                        | `migrations/009_subtask_infra.sql`                    |
+| 항목                                    | 결정                                                                                                                                                                                                                                                               | 반영 위치                                                                                                  |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| D1 용어 통일 `type_id` vs `voc_type_id` | **`voc_type_id` 유지** — DB 변경 최소화                                                                                                                                                                                                                            | §4 vocs (이미 반영), 이 문서 §4 수정 완료                                                                  |
+| D2 `notifications.voc_id` NULL 정책     | **NOT NULL 유지** — 모든 알림은 VOC 연결 필수                                                                                                                                                                                                                      | §4 notifications (현행 유지)                                                                               |
+| D3 `structured_payload` 입력 폼 UX      | **별도 모달** — "결과 입력" 버튼 → 독립 모달 팝업                                                                                                                                                                                                                  | feature-voc.md §8.4 (Phase 7 구현 시 명세 추가)                                                            |
+| D4 Sub-task API 응답 필드명             | **`subTasks[]`** — 1레벨 고정 의미 명확화                                                                                                                                                                                                                          | §6.1 GET /api/vocs 응답 스키마 (Phase 7 구현 시 반영)                                                      |
+| D5 대시보드 시스템 탭                   | **동적** — `systems` 테이블 기반 렌더링                                                                                                                                                                                                                            | §11 대시보드 (Phase 7 구현 시 반영)                                                                        |
+| D6 공지 상세 표시 방식                  | **드로어** — 기존 드로어 패턴과 일관성                                                                                                                                                                                                                             | feature-notice-faq.md (Phase 7 구현 시 반영)                                                               |
+| D7 데이터 보존 기간                     | **무기한** — VOC soft delete 및 voc_history 모두                                                                                                                                                                                                                   | §14.3 운영 정책 (별도 정책 없음 = 물리 삭제 없음)                                                          |
+| D8 알림 디바운스 구현 위치              | **앱 레이어 + DB 조회 기반** — 5분 dedup은 INSERT 직전 `notifications`를 (user_id, type, voc_id, created_at) 인덱스로 조회. 재시작·멀티 인스턴스 안전.                                                                                                             | §6.1 notification 서비스 (Phase 7 구현 시 반영), `migrations/011` notifications 인덱스                     |
+| A3 Sub-task 채번 인프라 방식            | **`voc_subtask_counters` 별도 테이블** — 동시성 안전                                                                                                                                                                                                               | `migrations/009_subtask_infra.sql`                                                                         |
+| A4 Sub-task 1레벨 DB 강제 방식          | **BEFORE INSERT/UPDATE 트리거**                                                                                                                                                                                                                                    | `migrations/009_subtask_infra.sql`                                                                         |
+| D9 대시보드 KPI/주간 트렌드 기준 컬럼   | **`vocs.status_changed_at` 컬럼 추가 + 트리거 자동 갱신** — voc_history 풀스캔 회피                                                                                                                                                                                | §4 vocs, `migrations/011`, dashboard.md §5                                                                 |
+| D10 dashboard 프리셋                    | **`1m / 3m / 1y / all / custom`** — FE 변경분과 스키마/요구문서 3중 동기화. 기존 데이터는 `7d→1m`, `30d→1m`, `90d→3m` 매핑                                                                                                                                         | §4 dashboard_settings, dashboard.md, `migrations/011`                                                      |
+| D11 Mock User FK 운영 정책              | **DB seed 의무화** — `seeds/mock-users.sql`을 마이그레이션 직후 실행 (mock 환경)                                                                                                                                                                                   | §14.5, `backend/seeds/mock-users.sql`                                                                      |
+| D12 `tag_rules` 매칭 모드               | **MVP 키워드 only** — 정규식·confidence는 NextGen에서 컬럼 확장 시 도입                                                                                                                                                                                            | §4 tag_rules, feature-voc.md §9.4.1                                                                        |
+| D13 `vocs.parent_id` FK 삭제 동작       | **ON DELETE SET NULL** — 부모 hard delete 시 서브태스크 보존 (소프트 삭제 정책과 일관)                                                                                                                                                                             | §4 vocs, `migrations/011`                                                                                  |
+| D14 사용자 초대 플로우                  | **AD/SSO 자동 생성** — 첫 로그인 시 `users` row 자동 생성, Admin이 사후 권한 승급. MVP는 사전 초대 미지원                                                                                                                                                          | §15.2                                                                                                      |
+| D15 드로어 퍼머링크 복사 권한           | **전체 로그인 사용자** — 드로어가 열린 상태에서 누구나 클립보드 복사 가능, URL 자체는 접근 시점 권한 체크에 의존                                                                                                                                                   | feature-voc.md §8.x (퍼머링크 버튼)                                                                        |
+| D16 VOC 목록 서브태스크 인라인 펼침     | **기본 접힘** — 부모 행 좌측 ▶ 토글 클릭 시만 자식 행 인라인 표시, 펼침 상태 영속화 안 함                                                                                                                                                                          | feature-voc.md §9.2                                                                                        |
+| D17 입력 길이 제약 DB CHECK             | **DB CHECK 강제** — title 200자, body 64KB, comment/internal_note 16KB. 앱 레벨 검증과 이중 방어                                                                                                                                                                   | §4 vocs/comments, `migrations/011`                                                                         |
+| D18 Dev role 추가                       | **`users.role` enum 4종 (`user/dev/manager/admin`)** — Dev = User + (assignee=self일 때만) Manager 운영 권한 + Dashboard 보기. Driver: Dashboard 접근은 ownership만으로 표현 불가 + 초대/승급 의미 단위 + role-pill 시각 정체성                                    | §2.3, §4 users, §14.5, §15.2, feature-voc.md §8.3, dashboard.md, `docs/specs/plans/migration-012-draft.md` |
+| D19 공지/FAQ 관리 진입점                | **각 페이지 우측 상단 '관리' 버튼 + `?mode=admin` URL 쿼리** — Admin 탭의 공지/FAQ 서브탭 폐기. Admin/Manager에게만 버튼 노출. URL 쿼리로 deep-link/뒤로가기 보존                                                                                                  | feature-notice-faq.md §10.5(신), §10.3.4, §10.4.3, §10.6, design.md §13.8                                  |
+| D20 design.md ↔ prototype 갭            | **§13 'Admin · Notice · FAQ Components' 신규 + §8 Don't에 raw color literal 금지 + §10에 `--role-dev-*` / `--text-on-brand` 신규 토큰 4종**                                                                                                                        | design.md §8/§10/§13, `docs/specs/reviews/design-prototype-audit.md`                                       |
+| D21 Dev 권한 helper 단일화              | **BE 단일 helper `assertCanManageVoc(user, voc, action)`** — 모든 VOC 운영 라우트가 경유. ownership = `voc.assignee_id === user.id` strict 비교 (primary assignee만, sub-task assignee/co-assignee 미포함). 재배정 시 즉시 권한 박탈, unassigned VOC는 Dev 항상 ❌ | feature-voc.md §8.4-bis (신규)                                                                             |
