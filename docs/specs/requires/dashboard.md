@@ -7,10 +7,10 @@
 
 ## 요구사항 요약
 
-- **대상 사용자**: Manager / Admin 전용 (User 접근 불가)
+- **대상 사용자**: Manager / Admin / **Dev** (User 접근 불가). D18(2026-04-26)로 Dev role 추가 — Dashboard 접근 권한이 ownership으로 표현 불가하다는 점이 4번째 enum의 핵심 정당화 driver. Dev는 위젯 보기·필터·드릴다운까지 가능하되, **Admin 기본값 저장(`PUT /api/dashboard/settings` `user_id IS NULL`)은 Admin 전용 유지**.
 - **목적**: 운영 현황 요약 + 트렌드 분석 복합 대시보드
 - **진입점**: Sidebar Nav — 담당 VOC 아래, 시스템 트리 위
-- **날짜 필터**: 상단 우측, 7일/30일/90일/커스텀 (기본: 30일)
+- **날짜 필터**: 상단 우측, **1달 / 3달 / 1년 / 전체 / 커스텀** (기본: 1달). DB 저장값은 `1m / 3m / 1y / all / custom` (`dashboard_settings.default_date_range`).
 
 ---
 
@@ -252,6 +252,10 @@
 - Top 6 태그 + "기타" 집계
 - 색상: `var(--chart-blue)`, `var(--chart-sky)`, `var(--chart-red)`, `var(--chart-amber)`, `var(--chart-emerald)`, `var(--text-tertiary)` 순으로 할당
 - 항목 클릭 → 해당 태그 필터로 VOC 목록 이동
+
+#### 세그먼트 옵션
+
+**세그먼트 옵션**: 분포 위젯은 X축을 (a) 시스템별 또는 (b) 일자별(주/월/분기) 중 선택 가능. 기본값=시스템별. 토글 컨트롤은 위젯 헤더 우측.
 
 ---
 
@@ -634,7 +638,7 @@ interface AssigneeTableState {
 
 ## 수용 기준 (v3 업데이트)
 
-- [ ] Manager/Admin 계정으로 로그인 시 사이드바에 'Dashboard' 메뉴가 보인다
+- [ ] Manager/Admin/Dev 계정으로 로그인 시 사이드바에 'Dashboard' 메뉴가 보인다 (User에게는 미노출)
 - [ ] User 계정으로 로그인 시 Dashboard 메뉴가 없고 URL 직접 접근 시 403 + 홈 리다이렉트
 - [ ] 전체 탭 기본 뷰: KPI 8종, 분포(4탭), 매트릭스, 히트맵, 주간 트렌드(3선), 태그 바, 시스템 카드, 담당자 테이블, 장기 미처리 표시
 - [ ] GlobalTab 전환 시 모든 위젯 데이터가 해당 scope로 갱신됨
@@ -687,6 +691,7 @@ dashboard_settings (
   -- enum: 'status' | 'priority' | 'tag'
   globaltabs_order       JSONB,
   -- Admin 기본값 행에만 유효: [{ systemId, visible }]
+  -- → migration 012 draft에서 INTEGER[] DEFAULT '{1,2,3,4,5,6,7,8}'로 타입 변경 예정. 기본 순서: 위젯 ID 오름차순.
   updated_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )
 ```

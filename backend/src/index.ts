@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
+import { errorHandler } from './middleware/errorHandler';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
@@ -44,11 +45,20 @@ if (!isProduction) {
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(spec));
 }
 
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
+app.get('/api/health', async (_req, res) => {
+  const uptime = process.uptime();
+  try {
+    const { getPool } = await import('./db');
+    await getPool().query('SELECT 1');
+    res.json({ status: 'ok', db: 'ok', uptime });
+  } catch {
+    res.status(503).json({ status: 'ok', db: 'error', uptime });
+  }
 });
 
 app.use('/api/auth', authRouter);
+
+app.use(errorHandler);
 
 if (require.main === module) {
   app.listen(PORT, () => {

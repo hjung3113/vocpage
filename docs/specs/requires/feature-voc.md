@@ -19,13 +19,33 @@
 
 ### 8.2 상태 전환 매트릭스
 
-| 현재 상태 | 가능한 다음 상태        | 권한           |
-| :-------- | :---------------------- | :------------- |
-| 접수      | 검토중, 드랍            | Manager, Admin |
-| 검토중    | 처리중, 드랍            | Manager, Admin |
-| 처리중    | 완료, 드랍              | Manager, Admin |
-| 완료      | 처리중 (재오픈)         | Manager, Admin |
-| 드랍      | 검토중, 처리중 (재오픈) | Manager, Admin |
+#### 허용/비허용 전환표
+
+| 출발 상태 \ 도착 상태 | 접수 |   검토중    |   처리중    | 완료 | 드랍 |
+| :-------------------- | :--: | :---------: | :---------: | :--: | :--: |
+| 접수                  |  —   |     ✅      |     ❌      |  ❌  |  ✅  |
+| 검토중                |  ❌  |      —      |     ✅      |  ❌  |  ✅  |
+| 처리중                |  ❌  |     ❌      |      —      |  ✅  |  ✅  |
+| 완료                  |  ❌  |     ❌      | ✅ (재오픈) |  —   |  ❌  |
+| 드랍                  |  ❌  | ✅ (재오픈) | ✅ (재오픈) |  ❌  |  —   |
+
+- ✅ = 허용, ❌ = 비허용, — = 자기 자신 (전환 없음)
+
+#### UI 행동 규칙
+
+- 드로어/목록의 상태 변경 드롭다운에서 **비허용 전환(❌ 셀)에 해당하는 상태 옵션은 `disabled` 속성으로 렌더링**하고 시각적으로 흐리게 표시. 선택 불가.
+- 비허용 상태에 hover 시 툴팁 "이 상태로는 직접 전환할 수 없습니다" 표시.
+- 드롭다운은 항상 5개 옵션을 모두 표시하되, 비허용 항목만 `disabled`. (옵션을 숨기지 않음 — 전체 흐름 파악을 위해)
+
+#### 전환 권한
+
+| 현재 상태 | 가능한 다음 상태        | 권한                              |
+| :-------- | :---------------------- | :-------------------------------- |
+| 접수      | 검토중, 드랍            | Manager, Admin (Dev: 본인 담당만) |
+| 검토중    | 처리중, 드랍            | Manager, Admin (Dev: 본인 담당만) |
+| 처리중    | 완료, 드랍              | Manager, Admin (Dev: 본인 담당만) |
+| 완료      | 처리중 (재오픈)         | Manager, Admin (Dev: 본인 담당만) |
+| 드랍      | 검토중, 처리중 (재오픈) | Manager, Admin (Dev: 본인 담당만) |
 
 - 상태 5단계: `접수/검토중/처리중/완료/드랍` (v3 §1.4 확정, 2026-04-24 — 5단계 유지, 4단계 축소 폐기).
 - 상태 변경 시 `voc_history`에 이력 기록 (변경 전·후 상태, 변경자, 타임스탬프).
@@ -47,7 +67,7 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
                                                       └─reject───▶ approved (원복)
 ```
 
-- 전환 권한: Manager/Admin.
+- 전환 권한: Manager/Admin, Dev(본인 담당 VOC 한정 — §8.4-bis 헬퍼 경유).
 - 제출 스냅샷은 `voc_payload_history`에 `is_current=true`로 insert — 기존 `is_current` row는 false로 내림.
 - 삭제 승인 시: 해당 스냅샷 `final_state='deleted'`, `is_current=false`, `vocs.structured_payload=NULL`, `vocs.review_status=NULL`.
 - 삭제 reject 시: `vocs.review_status='approved'` 원복 + `action='deletion', decision='rejected'` 리뷰 row만 추가.
@@ -55,36 +75,101 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 
 ### 8.3 권한 모델
 
-| 기능                           | User | Manager | Admin |
-| :----------------------------- | :--: | :-----: | :---: |
-| VOC 작성                       |  ✅  |   ✅    |  ✅   |
-| 본인 VOC 조회                  |  ✅  |   ✅    |  ✅   |
-| 전체 VOC 조회                  |  ❌  |   ✅    |  ✅   |
-| 상태 변경                      |  ❌  |   ✅    |  ✅   |
-| 담당자 배정                    |  ❌  |   ✅    |  ✅   |
-| Priority 설정                  |  ❌  |   ✅    |  ✅   |
-| VOC Soft Delete                |  ❌  |   ❌    |  ✅   |
-| 시스템/메뉴/유형 관리          |  ❌  |   ❌    |  ✅   |
-| 태그 규칙 관리(생성/수정/삭제) |  ❌  |   ✅    |  ✅   |
-| 신규 태그 생성                 |  ❌  |   ✅    |  ✅   |
-| 사용자 권한 관리               |  ❌  |   ❌    |  ✅   |
-| 태그 수동 편집                 |  ❌  |   ✅    |  ✅   |
-| 공지사항 작성/관리             |  ❌  |   ✅    |  ✅   |
-| FAQ 작성/관리                  |  ❌  |   ✅    |  ✅   |
-| 공지사항 복원                  |  ❌  |   ❌    |  ✅   |
+> **Dev role 추가 (D18, 2026-04-26 확정).** `🟡 own` = `voc.assignee_id === req.user.id`인 경우에만 허용. unassigned(`assignee_id IS NULL`)이거나 다른 사용자에게 재배정된 VOC에는 적용되지 않음. 모든 권한 분기는 BE 단일 helper `assertCanManageVoc(user, voc, action)`(§8.4-bis)을 경유한다.
 
-- Admin과 Manager의 기능 권한은 동일. Admin은 Manager 관리(역할 부여/회수) 권한이 추가된 역할.
-- Manager는 Admin과 동일하게 전체 VOC를 조회할 수 있으나, Soft Delete/시스템·메뉴·유형·사용자 권한 관리 기능만 제외. 태그 규칙 관리 및 신규 태그 생성은 Manager도 가능.
+| 기능                                  | User |  Dev   | Manager | Admin |
+| :------------------------------------ | :--: | :----: | :-----: | :---: |
+| VOC 작성                              |  ✅  |   ✅   |   ✅    |  ✅   |
+| 본인 VOC 조회                         |  ✅  |   ✅   |   ✅    |  ✅   |
+| 전체 VOC 조회                         |  ❌  |   ✅   |   ✅    |  ✅   |
+| 상태 변경                             |  ❌  | 🟡 own |   ✅    |  ✅   |
+| 상태 변경 — unassigned VOC            |  ❌  |   ❌   |   ✅    |  ✅   |
+| 상태 변경 — 재배정 직후 (이전 담당자) |  ❌  |   ❌   |   ✅    |  ✅   |
+| 담당자 배정/해제                      |  ❌  |   ❌   |   ✅    |  ✅   |
+| Priority / Due Date 설정              |  ❌  | 🟡 own |   ✅    |  ✅   |
+| Sub-task 생성/닫기                    |  ❌  | 🟡 own |   ✅    |  ✅   |
+| Internal Note R·W                     |  ❌  | 🟡 own |   ✅    |  ✅   |
+| Timeline의 internal note 이벤트 수신  |  ❌  | 🟡 own |   ✅    |  ✅   |
+| Dashboard 접근                        |  ❌  |   ✅   |   ✅    |  ✅   |
+| VOC Soft Delete / 복원                |  ❌  |   ❌   |   ❌    |  ✅   |
+| 시스템/메뉴/유형 관리                 |  ❌  |   ❌   |   ❌    |  ✅   |
+| 태그 규칙 관리(생성/수정/삭제)        |  ❌  |   ❌   |   ✅    |  ✅   |
+| 신규 태그 생성                        |  ❌  |   ❌   |   ✅    |  ✅   |
+| 태그 수동 편집                        |  ❌  | 🟡 own |   ✅    |  ✅   |
+| 사용자 role 관리 (승급/강등)          |  ❌  |   ❌   |   ❌    |  ✅   |
+| 공지사항 작성/관리                    |  ❌  |   ❌   |   ✅    |  ✅   |
+| FAQ 작성/관리                         |  ❌  |   ❌   |   ✅    |  ✅   |
+| 공지사항 복원                         |  ❌  |   ❌   |   ❌    |  ✅   |
+
+- Admin과 Manager의 기능 권한은 사실상 동일. Admin 전용 차별 기능: ① 사용자 role 변경(`user`/`dev`/`manager`/`admin`), ② 시스템/메뉴/유형 관리, ③ Soft Delete/복원.
+- **Dev**는 기본적으로 User 권한이며, 본인이 `assignee_id`로 지정된 VOC에 한해 위 `🟡 own` 행 권한이 부여된다. Dashboard는 Dev에게 항상 허용.
+- **Dev에게 Dashboard 권한을 부여하는 driver**: Dashboard 접근 여부는 ownership 술어로 표현 불가 → 4번째 enum 값 정당화. 또한 role-pill UI에서 "내부 엔지니어" 시각 정체성 부여.
 - 최초 Admin 계정: 서버 초기화 시 환경변수 `INIT_ADMIN_EMAIL` 지정 계정을 admin role로 seed.
 - 퇴직·부서이동 시 역할 회수 및 `is_active` 비활성화는 Admin이 수동 처리.
-- 마지막 Admin 강등 불가 판정 기준: `is_active = true AND role = 'admin'` 인 계정 수 ≥ 2일 때만 강등 가능. 권한 변경 API에서 트랜잭션 내 사후 Admin 수 검증.
+- 마지막 Admin 강등 불가 판정 기준: `is_active = true AND role = 'admin'` 인 계정 수 ≥ 2일 때만 강등 가능. 권한 변경 API에서 트랜잭션 내 사후 Admin 수 검증. **Admin이 본인을 `dev`로 강등하는 경우도 동일 가드 적용**.
 - 본인의 권한을 본인이 변경 불가.
+
+### 8.4-bis `assertCanManageVoc` Helper (D21 확정, 2026-04-26)
+
+> 권한 매트릭스의 `🟡 own` 분기를 모든 VOC 운영 라우트가 단일 helper로 경유하도록 강제. 분산된 분기 코드의 누락에 의한 권한 우회를 구조적으로 차단한다.
+
+#### 시그니처
+
+```ts
+type VocAction =
+  | 'changeStatus'
+  | 'setPriority'
+  | 'setDueDate'
+  | 'editTags'
+  | 'createSubtask'
+  | 'closeSubtask'
+  | 'readInternalNote'
+  | 'writeInternalNote';
+
+function assertCanManageVoc(
+  user: { id: string; role: 'user' | 'dev' | 'manager' | 'admin' },
+  voc: { id: string; assignee_id: string | null; deleted_at: Date | null },
+  action: VocAction,
+): void; // throw FORBIDDEN(403) on deny, return on allow
+```
+
+#### 동작 규칙
+
+1. **Admin / Manager**: 항상 허용 (단, Soft-deleted VOC는 별도 helper로 가드).
+2. **Dev**: `voc.assignee_id === user.id`일 때만 위 action 모두 허용. 그 외는 `FORBIDDEN`.
+3. **Dev — unassigned VOC**: `voc.assignee_id === null` → `FORBIDDEN` (담당자 미정 VOC는 Manager/Admin만 운영).
+4. **Dev — 재배정**: `assignee_id`가 다른 사용자로 변경된 시점부터 즉시 `FORBIDDEN`. 진행 중인 sub-task/internal note write 트랜잭션은 commit 시점에 다시 helper로 재검증한다.
+5. **User**: 모든 action에 대해 `FORBIDDEN`.
+
+#### Ownership 정의
+
+- **`assignee_id` (primary assignee)** 만 검사. Sub-task의 assignee, co-assignee 등 다른 형태의 "관여"는 ownership으로 간주하지 않음.
+- VOC 모델 전반에 단일 컬럼 정책 — 향후 co-assignee/sub-task assignee 도입 시 본 helper의 ownership 정의를 명시적으로 확장 (호환성 깨는 변경으로 분류).
+
+#### 회귀 테스트 필수 5건
+
+1. Dev가 본인 담당 VOC의 상태를 `접수 → 검토중`으로 변경 → 200.
+2. Dev가 타인 담당 VOC의 상태 변경 시도 → 403 `FORBIDDEN`.
+3. Dev가 unassigned VOC의 Priority 변경 시도 → 403 `FORBIDDEN`.
+4. Dev가 본인 담당 VOC에 internal note 작성 → 200.
+5. Dev가 담당이던 VOC가 Manager에 의해 재배정된 직후 동일 VOC에 internal note 작성 시도 → 403 `FORBIDDEN`.
 
 ### 8.4 Priority
 
 - 4단계: `urgent` / `high` / `medium` (기본값) / `low`
 - 생성 시 서버에서 `medium`으로 강제 설정 (클라이언트 값 무시).
-- Manager/Admin만 변경 가능. 변경 이력은 `voc_history`에 기록.
+- Manager/Admin, 그리고 본인 담당 VOC에 한해 Dev가 변경 가능 (§8.4-bis 헬퍼 경유). 변경 이력은 `voc_history`에 기록.
+
+#### 8.4.0 Priority 필드 권한 매트릭스
+
+| 역할    | 읽기 | 쓰기 조건                                        |
+| :------ | :--: | :----------------------------------------------- |
+| User    |  ✅  | ❌ (읽기 전용)                                   |
+| Dev     |  ✅  | ✅ 본인 담당(`assignee_id === user.id`)인 경우만 |
+| Manager |  ✅  | ✅ 항상                                          |
+| Admin   |  ✅  | ✅ 항상                                          |
+
+- 모든 쓰기 분기는 `assertCanManageVoc(user, voc, 'setPriority')` 경유 (§8.4-bis).
 
 #### 8.4.1 Due Date 자동 설정
 
@@ -99,6 +184,31 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - Priority 변경 시 `due_date` 자동 재계산.
 - Manager/Admin은 개별 VOC의 `due_date` 수동 수정 가능 (수동 수정 시에도 Priority 재변경이면 재계산).
 - `due_date` 변경 이력은 `voc_history`에 기록.
+
+#### 8.4.2 Due Date 필드 UI 및 권한 명세
+
+**데이터 모델**: `vocs.due_date DATE` (이미 존재).
+
+**권한 매트릭스**
+
+| 역할    | 읽기 | 쓰기 조건                                        |
+| :------ | :--: | :----------------------------------------------- |
+| User    |  ✅  | ❌ (읽기 전용)                                   |
+| Dev     |  ✅  | ✅ 본인 담당(`assignee_id === user.id`)인 경우만 |
+| Manager |  ✅  | ✅ 항상                                          |
+| Admin   |  ✅  | ✅ 항상                                          |
+
+- 모든 쓰기 분기는 `assertCanManageVoc(user, voc, 'setDueDate')` 경유 (§8.4-bis).
+
+**드로어 UI**
+
+- 위치: VOC 드로어 메타 정보 영역 (Priority 필드 바로 아래).
+- 입력 컨트롤: `<input type="date">`. 브라우저 네이티브 날짜 선택기 사용.
+- 읽기 전용 상태(User 또는 타인 담당 Dev): 날짜를 텍스트로만 표시, 입력 필드 미노출.
+- 쓰기 권한자는 날짜 선택기가 활성화되며, 값 변경 즉시 `PATCH /api/vocs/:id` 호출 (자동저장).
+- **과거 날짜 허용**: 이미 처리된 건의 실제 완료일 등 회고적 입력을 위해 과거 날짜 제한 없음.
+- 날짜 미설정 시 "기한 없음" 표시.
+- `due_date`가 오늘 기준 경과(D-day 초과) 시 날짜 텍스트를 강조색(`var(--status-danger)`)으로 표시.
 
 ### 8.5 파일 첨부
 
@@ -165,10 +275,51 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 
 #### 태그 (Tag)
 
-- 자동 태깅 전용 — 작성자(User)가 수동으로 태그 추가/삭제 불가.
-- 키워드/정규식 규칙 기반으로 VOC 생성 시 자동 부여.
-- Admin/Manager는 오탐 정정을 위해 개별 VOC의 태그를 수동으로 추가/삭제 가능 (이력은 `voc_history`에 기록).
+- 키워드 규칙 기반으로 VOC 생성 시 자동 부여 (MVP 키워드 단일 모드 — D12, 정규식·confidence는 NextGen에서 컬럼 확장 시 도입).
+- Admin/Manager, 그리고 본인 담당 Dev는 오탐 정정을 위해 개별 VOC의 태그를 수동으로 추가/삭제 가능. 이력은 `voc_history`에 기록. User는 읽기 전용.
 - 유형과 역할 구분: 유형은 성격 분류(1개), 태그는 토픽 클러스터링(N개).
+
+#### 8.8.1 드로어 태그 수동 편집 UI (C7)
+
+**태그 chip 표시**
+
+- VOC 드로어 메타 영역에 현재 태그를 chip 형태로 나열.
+- **자동 태그**(tag_rules 매칭으로 부여): 옅은 회색 배경(`var(--bg-subtle)`), 텍스트 `var(--text-secondary)`.
+- **수동 태그**(사람이 직접 추가): 기본 chip 스타일(`var(--bg-tag)`, 텍스트 `var(--text-primary)`).
+- 두 종류는 `voc_tags.source` 컬럼(`'auto' | 'manual'`)으로 구분.
+
+**태그 추가**
+
+- 쓰기 권한자(Admin/Manager/본인 담당 Dev)에게는 chip 목록 끝에 "＋ 태그 추가" 버튼 표시.
+- 클릭 시 인라인 `<input type="text">` 활성화. 마스터 태그 목록(`tags` 테이블)에서 자동완성 드롭다운 표시 (입력한 문자열 prefix 매칭).
+- 이미 부여된 태그는 자동완성 목록에서 제외.
+- Enter 또는 드롭다운 항목 선택 시 태그 추가 (`PATCH /api/vocs/:id/tags`). `source='manual'` 로 기록.
+- 마스터 태그 목록에 없는 문자열 입력 시 "등록된 태그가 없습니다" 안내. 새 태그 즉석 생성 불가 — 신규 태그 생성은 Admin/Manager 전용 관리 페이지에서만 가능.
+
+**태그 제거**
+
+- 쓰기 권한자에게는 각 chip에 ✕ 버튼 표시. 클릭 시 즉시 제거 (`DELETE /api/vocs/:id/tags/:tagId`).
+- 읽기 전용 상태(User, 타인 담당 Dev)에서는 ✕ 미노출.
+- 자동 태그도 수동으로 제거 가능 (오탐 정정 목적). 제거 후 동일 tag_rule이 재실행되어도 재부여하지 않음 — 수동 제거 이력을 `voc_history`에 기록하고 재실행 시 제외 처리.
+
+**권한 분기**
+
+- 모든 태그 편집 요청은 BE에서 `assertCanManageVoc(user, voc, 'editTags')` 경유 (§8.4-bis).
+
+#### 8.8.2 VOC 등록 모달 자동 태그 추천 UI (Minor)
+
+- VOC 등록 모달에서 본문(`body`) 필드 변경 후 **500ms debounce** 후 `tag_rules` 전체를 클라이언트에서 매칭 (또는 `POST /api/tags/suggest` API 호출).
+- 매칭된 규칙이 있으면 입력창 하단에 "추천 태그: **X**, **Y**" chip 목록 표시.
+- chip 클릭 시 해당 태그가 "추가 예정 태그" 영역으로 이동. 모달 제출 시 `source='auto'` 로 일괄 저장.
+- 추천 태그가 없으면 해당 UI 영역 미표시 (공간 낭비 없음).
+- 모달 내 추천은 미리보기 용도이며, VOC 생성 API 서버 사이드에서도 동일 tag_rules 재실행 — 클라이언트 추천과 서버 결과 불일치 시 서버 결과 우선.
+
+#### 8.8.3 태그 규칙 관리 편집 방식 (Minor)
+
+- Admin 태그 규칙 관리 페이지에서 규칙 생성/수정은 **모달 방식** 사용.
+- 근거: 시스템·메뉴·유형 등 다른 Admin CRUD 항목과 일관성 유지. 인라인 편집은 긴 정규식 입력 시 레이아웃 깨짐 위험.
+- 모달 필드: 규칙 이름, 키워드(쉼표 구분), 대상 태그(드롭다운), 활성화 토글.
+- 규칙 목록 테이블에서 "편집" 버튼 클릭 → 모달 열림. "삭제" 버튼 클릭 → 인라인 확인 후 즉시 삭제.
 
 ### 8.9 삭제 정책
 
@@ -232,17 +383,17 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 
 #### 권한
 
-- Manager/Admin 전용 읽기·쓰기. User는 엔드포인트 도달 자체 차단 (404 반환 — 존재 자체 은닉).
-- User 로그인 시 Internal Notes 섹션을 **DOM에 렌더링하지 않음** (조건부 렌더 아님 — DOM 생성 자체 차단).
+- Manager/Admin은 항상 읽기·쓰기. **Dev는 본인이 `assignee_id`로 지정된 VOC에 한해 읽기·쓰기**(D18). User는 엔드포인트 도달 자체 차단 (404 반환 — 존재 자체 은닉). 본인 담당이 아닌 VOC를 조회하는 Dev에게도 동일하게 404 반환.
+- User 로그인 시 Internal Notes 섹션을 **DOM에 렌더링하지 않음** (조건부 렌더 아님 — DOM 생성 자체 차단). Dev는 본인 담당 VOC가 아닐 경우 동일하게 DOM 미렌더링.
 
 #### API
 
-| 메서드   | 경로                          | 권한           | 비고        |
-| -------- | ----------------------------- | -------------- | ----------- |
-| `GET`    | `/api/vocs/:id/notes`         | Manager, Admin | User → 404  |
-| `POST`   | `/api/vocs/:id/notes`         | Manager, Admin |             |
-| `PATCH`  | `/api/vocs/:id/notes/:noteId` | 작성자, Admin  |             |
-| `DELETE` | `/api/vocs/:id/notes/:noteId` | 작성자, Admin  | Soft Delete |
+| 메서드   | 경로                          | 권한                     | 비고                                                        |
+| -------- | ----------------------------- | ------------------------ | ----------------------------------------------------------- |
+| `GET`    | `/api/vocs/:id/notes`         | Manager, Admin, Dev(own) | User → 404. Dev는 `assignee_id≠self`일 때도 404 (존재 은닉) |
+| `POST`   | `/api/vocs/:id/notes`         | Manager, Admin, Dev(own) | Dev는 본인 담당 VOC에서만                                   |
+| `PATCH`  | `/api/vocs/:id/notes/:noteId` | 작성자, Admin            | 작성자가 Dev일 경우 본인 담당 유지 시에만                   |
+| `DELETE` | `/api/vocs/:id/notes/:noteId` | 작성자, Admin            | Soft Delete. 작성자가 Dev일 경우 본인 담당 유지 시에만      |
 
 - `GET /api/vocs/:id/comments` (공개 댓글)는 internal note를 **절대 혼입하지 않음**.
 
@@ -254,15 +405,29 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 
 #### Timeline 통합
 
-- Manager/Admin 전용 Timeline 뷰에서 **공개 댓글 + internal note + status change**를 `created_at` 기준 시간순 혼합 표시.
+- Manager/Admin/**Dev(본인 담당 VOC 한정)** Timeline 뷰에서 **공개 댓글 + internal note + status change**를 `created_at` 기준 시간순 혼합 표시.
 - 각 이벤트 타입은 배지/배경으로 구분하여 한눈에 식별 가능하게.
-- User role에게는 Timeline API 응답에서 internal note 이벤트를 **포함하지 않음** (필터링, 404 아님).
+- User role 및 본인 담당이 아닌 VOC를 보는 Dev에게는 Timeline API 응답에서 internal note 이벤트를 **포함하지 않음** (필터링, 404 아님).
 
 #### 회귀 테스트 필수 3건
 
 1. User가 `GET /api/vocs/:id/notes` 호출 시 **404** 반환.
 2. `GET /api/vocs/:id/comments` 응답에 internal note **절대 미포함**.
 3. Timeline API에서 User role은 internal note 이벤트 **수신 불가**.
+4. Dev가 본인 담당이 **아닌** VOC의 `GET /api/vocs/:id/notes` 호출 시 **404** 반환 (존재 은닉 일관).
+5. Dev가 담당이던 VOC가 재배정된 직후 Timeline API 호출 시 internal note 이벤트 **수신 불가**.
+
+### 8.17 드로어 퍼머링크 복사
+
+(D15 확정, 2026-04-26)
+
+드로어 상단 우측 액션 버튼 영역에 링크(🔗) 아이콘을 배치, 클릭 시 현재 VOC의 퍼머링크를 클립보드에 복사한다.
+
+- **URL 형식**: `${origin}/vocs/${issue_code}` — sequence_no가 아닌 issue_code 사용 (사람이 읽을 수 있는 식별자).
+- **권한**: 드로어가 열린 모든 로그인 사용자. 별도 권한 분기 없음 (URL 자체는 접근 시점에 라우터/API 권한 체크에 의존).
+- **동작**: `navigator.clipboard.writeText(url)` 성공 시 토스트 "링크가 복사되었습니다" 노출 (2초). 실패 시 토스트 "복사 실패 — 직접 선택해 복사해 주세요" + 동일 URL 텍스트 prompt.
+- **위치**: 드로어 헤더 우측 버튼 그룹 — 풀스크린(↗) · **링크(🔗)** · 삭제(🗑, 권한자만) · 닫기(✕) 순.
+- **접근성**: `aria-label="링크 복사"`, 키보드 포커스 가능.
 
 ---
 
@@ -274,11 +439,25 @@ approved ──"승인 결과 삭제 신청"──▶ pending_deletion ─┬─
 - **우선순위 필터:** Urgent/High/Medium/Low 다중 선택 가능
 - **태그 필터:** 등록된 태그 기준 다중 선택 필터
 
-### 9.2 서브태스크 생성 진입점
+### 9.2 서브태스크 생성 진입점 + 목록 인라인 펼침
+
+#### 9.2.1 생성 진입점
 
 - Sub-task 추가 UI는 **드로어 하단 인라인 폼 한 곳만** 유지. 헤더 아이콘 버튼(중복 진입점) 제거.
 - 드로어 하단 폼: 제목 입력 + (선택) 유형 선택 → 저장/취소 버튼. 유형 미선택 시 부모 VOC 유형과 동일하게 기본 적용.
 - 저장 시 `{parent-code}-{N}` 형식 코드 자동 부여, 목록에 즉시 반영.
+
+#### 9.2.2 목록 인라인 펼침 (D16 확정, 2026-04-26)
+
+VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인으로 표시하는 방식.
+
+- **토글 표시 조건**: 부모 VOC가 `subTasks.length > 0`인 경우만 행 좌측 첫 컬럼에 ▶/▼ 토글 아이콘 노출. 서브태스크가 없으면 토글 영역은 빈칸 (정렬 유지용 동일 너비 placeholder).
+- **기본 상태**: **접힘**. URL/LocalStorage에 펼침 상태 영속화하지 않음 — 페이지 이동·새로고침 시 모든 부모 행은 다시 접힘 상태로 시작.
+- **클릭 동작**: ▶ 클릭 시 ▼로 전환되며 부모 행 직하단에 자식 서브태스크 행이 인라인으로 추가 렌더 (페이지네이션 단위는 부모 기준 — §8.11과 일관).
+- **자식 행 컬럼 구성**: 부모 행과 동일한 컬럼(상태/우선순위/제목/담당자/유형 등) 그대로. 단 좌측 첫 컬럼은 토글 자리 비움, 두 번째 컬럼(issue_code)에 좌측 패딩 24px 들여쓰기로 시각적 계층 표현.
+- **자식 행 상호작용**: 행 클릭 시 자식 VOC 드로어 열기 — 부모 드로어와 독립. 자식은 더 이상 펼침 토글 없음 (1레벨 강제, §8.7).
+- **API 응답 의존**: `GET /api/vocs` 목록 응답의 부모 VOC 객체에 `subTasks: VocListItem[]` 필드 포함 (D4 확정 필드명). 자식 VOC는 별도 row로 다시 등장하지 않음.
+- **빈 상태**: 토글 클릭 후 자식 0건이면(예: 동시 삭제) 부모 행 직하단에 "서브태스크 없음" 안내 행 1줄 표시 후 자동 접힘 처리.
 - 부모 VOC가 이미 Sub-task인 경우 하단 폼 비활성화 (1레벨 제한, 안내 문구 표시).
 
 ### 9.3 첨부파일 UI 명세

@@ -1,13 +1,8 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { mockLogin as apiMockLogin, logout as apiLogout, getMe } from '../api/auth';
+import type { AuthUser } from '../api/auth';
 
-export interface AuthUser {
-  id: string;
-  email?: string;
-  name: string;
-  role: 'admin' | 'manager' | 'user';
-  department?: string;
-}
+export type { AuthUser };
 
 export interface AuthContextValue {
   user: AuthUser | null;

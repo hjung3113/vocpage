@@ -25,7 +25,7 @@ function TestConsumer() {
         reset
       </button>
       <button
-        onClick={() => ctx.setFilters({ systemId: 'sys-1', status: '접수' })}
+        onClick={() => ctx.setFilters({ systemId: 'sys-1', status: ['접수'] })}
         data-testid="setMultiple"
       >
         set multiple
@@ -47,7 +47,7 @@ test('초기값: 모든 필드 null/빈 배열/빈 문자열, activeFilterCount=
   expect(screen.getByTestId('systemId').textContent).toBe('null');
   expect(screen.getByTestId('keyword').textContent).toBe('');
   expect(screen.getByTestId('tagIds').textContent).toBe('');
-  expect(screen.getByTestId('status').textContent).toBe('null');
+  expect(screen.getByTestId('status').textContent).toBe('');
   expect(screen.getByTestId('activeCount').textContent).toBe('0');
 });
 
