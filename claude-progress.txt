@@ -4,11 +4,11 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ → **Phase 7 착수(7-1 VOC CRUD) 대기**
+현재 위치: Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ / Phase 3 ✅ / Phase 4 ✅ / Phase 5 ✅ / Phase 6 ✅ / Phase 7 진입 전 코드 결함 수정 ✅ / Phase 7 착수 전 종합 리뷰 ✅ / R-1~R-6 모두 완료 ✅ / VOC 목록 UI 벤치마크 정렬 ✅ / 대시보드 기간 필터 ✅ → **Phase 7 계속 (7-1 VOC CRUD 착수 대기)**
 
 ### 다음 세션 우선순위
 
-**R-5·R-6 완료 후 7-0 착수**:
+**Phase 7 실구현 착수** — Preflight 전체 완료:
 
 | ID  | 항목                                                                      | 상태      |
 | --- | ------------------------------------------------------------------------- | --------- |
@@ -16,11 +16,17 @@
 | R-2 | `dashboard_settings` — `globaltabs_order` 추가 + 3파일 스키마 정합       | ✅ 완료   |
 | R-3 | `requirements.md §14.1` 세션 스토어 주석 추가                             | ✅ 완료   |
 | R-4 | `ts-node-dev → tsx watch` 교체                                            | ✅ 완료   |
-| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                               | 대기      |
-| R-6 | prototype 섹션 인벤토리 + React 매핑 문서화 (7-0, 7-1 착수 전)            | 대기      |
+| R-5 | `pino` baseline 설치 (Phase 7 첫 라우트 전)                               | ✅ 완료   |
+| R-6 | prototype 섹션 인벤토리 + React 매핑 문서화 (7-0, 7-1 착수 전)            | ✅ 완료   |
 
 - F-4 MemoryStore → `connect-pg-simple`: **Phase 8-1로 defer 확정** (2026-04-25)
 - Phase 7 = 개발 스켈레톤 (로컬 dev 기능 동작), Phase 8 = 운영 실구현 + 배포
+
+## 완료된 작업 (2026-04-26 — Phase 7 Preflight 완료 + 벤치마크 정리)
+
+- **R-5·R-6 완료** ✅ — pino baseline 설치, prototype 컴포넌트 인벤토리 문서화
+- **benchmark/ 폴더 추가** ✅ — prototype 전 페이지 스크린샷 24장 + INDEX.md (PR #49)
+- **Phase 7 착수 전 종합 리뷰 완료** ✅ — 모든 Preflight 항목 처리
 
 ## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
 
