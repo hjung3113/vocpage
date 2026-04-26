@@ -4,50 +4,11 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~8 ✅ 완료 → **fix/phase8-design-theme-fix 브랜치 커밋 완료, PR 대기 중**
+현재 위치: Phase 0~8 ✅ 완료 → **Phase 9 운영 실구현 + 배포 대기**
 
-브랜치: `main` (PR #38 머지 완료 — 2026-04-26)
-테스트: Playwright E2E B-1~B-7 버그 전체 수정 완료 (2026-04-26)
+브랜치: `fix/phase8-design-theme-fix` (PR 후 머지 필요)
 
-### Phase 8 디자인 정렬 작업 (2026-04-26, 브랜치: fix/phase8-design-theme-fix)
-prototype HTML ↔ React 구현체 비교 후 UI/UX 정렬 완료 (~92% 유사도)
-
-완료된 항목:
-- Sidebar: 아이콘 교체(MessageSquareDot, UserCheck, BarChart2), 전체/담당 VOC 카운트 배지 추가 (accent/muted 2종)
-- VocFilterBar: 상태 필터 pill에 Lucide 아이콘 추가 (Layers/Circle/Search/Zap/PauseCircle/CheckCircle2)
-- VocRow: 타입 뱃지 `●` dot prefix, 제목 인라인 태그 칩(최대 3개)
-- StatusBadge: `●` dot prefix (8px font-size)
-- PriorityBadge: Lucide 아이콘 기반 (ArrowUp/ArrowDown/Minus/Flame)
-- VocDrawer: 이슈코드 accent 모노스페이스, 4개 액션 아이콘(ExternalLink/Link2/Trash2/X)
-- VocDrawer: 2열 메타 그리드 8필드 (상태/우선순위/담당자/시스템/메뉴/유형/작성자/등록일)
-- VocDrawer: 이니셜 아바타 (chart palette 색상 해시), 태그 행 ⚡ 자동 태깅 버튼
-- backend/vocs GET 목록·상세: tags 집계 JOIN, system_name/menu_name JOIN 추가
-- design.md: VocDrawer, InitialsAvatar, FilterTab 아이콘, Sidebar 배지 2종 스펙 추가
-
-잔여 차이 (허용된 기능적 차이):
-- Drawer가 탭(본문/서브테스크/댓글/첨부파일/내부노트) 구조 — prototype은 인라인 스크롤 (더 많은 기능 때문에 유지)
-- 변경 이력 섹션 — 백엔드 히스토리 데이터 없음
-- 이슈코드가 `—` 표시 — 시드 데이터에 issue_code 없음 (데이터 이슈, UI 이슈 아님)
-
-## Phase 완료 이력
-
-| Phase | 내용 | 완료일 | PR |
-|-------|------|--------|-----|
-| 0 | 요구사항 초안 | 2026-04-23 | — |
-| 1~5 | 스펙·문서 정비 | 2026-04-23 | — |
-| 6 | 스캐폴딩·인증 Mock·DB 마이그레이션·상태관리 | 2026-04-24 | #22, #28 |
-| 7 | VOC CRUD·댓글·태그·대시보드·알림·관리자·갭수정 | 2026-04-25~26 | #37, #38 |
-| 8 | UI/UX prototype 정렬 (autopilot 5-phase) — sidebar accordion, 고급 필터 chip, drawer 전체화면, KPI 카드 navigate, design.md sync | 2026-04-26 | PR 대기 (42cc1c9) |
-
-## 다음 — Phase 9 (운영 실구현)
-
-| 단계 | 내용 |
-|------|------|
-| 9-1 | `connect-pg-simple` 세션 스토어 (production) |
-| 9-2 | OIDC 인증 실구현 |
-| 9-3 | Production Dockerfile + 빌드 파이프라인 |
-| 9-4 | 구조화 로깅 (pino) |
-| 9-5 | 실 MSSQL 연동 (외부 의존 — 담당자 자료 필요) |
-| 9-6 | 배포 + smoke test |
-| 9-7 | Playwright E2E 핵심 3플로우 |
-| 9-8 | Jira 마이그레이션 스크립트 |
+최근 작업 (2026-04-26):
+- Phase 8 디자인 재작업 완료
+- benchmark/ 폴더 생성: prototype 전 페이지·인터렉션 스크린샷 24장 + INDEX.md
+- dashboard-v3.html 삭제 + docs 참조 제거
