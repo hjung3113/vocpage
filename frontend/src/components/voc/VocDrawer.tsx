@@ -25,7 +25,7 @@ interface VocDrawerProps {
   onOpenVoc?: (id: string) => void;
 }
 
-type Tab = 'body' | 'comments' | 'attachments';
+type Tab = 'body' | 'subtasks' | 'comments' | 'attachments' | 'notes';
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -139,10 +139,13 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
       .catch(() => {});
   }
 
+  const canSeeNotes = user?.role === 'manager' || user?.role === 'admin';
   const tabs: { key: Tab; label: string }[] = [
     { key: 'body', label: '본문' },
+    { key: 'subtasks', label: '서브태스크' },
     { key: 'comments', label: '댓글' },
     { key: 'attachments', label: '첨부파일' },
+    ...(canSeeNotes ? [{ key: 'notes' as Tab, label: '내부노트' }] : []),
   ];
 
   return (
@@ -383,6 +386,10 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
                 </div>
               )}
 
+              {activeTab === 'subtasks' && (
+                <SubtaskSection voc={voc} onOpenVoc={onOpenVoc} onUpdate={refreshVoc} />
+              )}
+
               {activeTab === 'comments' && user && (
                 <CommentList vocId={voc.id} currentUserId={user.id} currentUserRole={user.role} />
               )}
@@ -395,8 +402,7 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
                 />
               )}
 
-              {/* Internal notes — always shown below tabs for manager/admin */}
-              {user && (
+              {activeTab === 'notes' && user && canSeeNotes && (
                 <InternalNotesSection
                   vocId={voc.id}
                   currentUserId={user.id}
@@ -404,11 +410,10 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
                 />
               )}
 
-              {/* Payload section — only shown when VOC is in 완료 or 드랍 status */}
-              {user && <PayloadSection voc={voc} userRole={user.role} onUpdate={refreshVoc} />}
-
-              {/* Sub-task section — list & inline create form */}
-              <SubtaskSection voc={voc} onOpenVoc={onOpenVoc} onUpdate={refreshVoc} />
+              {/* Payload section — only shown on body tab when VOC is in 완료 or 드랍 status */}
+              {activeTab === 'body' && user && (
+                <PayloadSection voc={voc} userRole={user.role} onUpdate={refreshVoc} />
+              )}
             </>
           )}
         </div>

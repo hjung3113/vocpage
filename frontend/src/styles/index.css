@@ -26,6 +26,10 @@
   --border: oklch(28% 0.012 264);
   --danger: oklch(62% 0.22 25);
   --overlay-bg: oklch(0% 0 0 / 0.5);
+  --text-quaternary: oklch(38% 0.01 264);
+  --font-ui: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-code: 'D2Coding', monospace;
+  --shadow-elevated: 0 4px 16px oklch(0% 0 0 / 0.12);
   /* Status colors */
   --status-blue: oklch(65% 0.18 240);
   --status-blue-bg: oklch(65% 0.18 240 / 0.12);

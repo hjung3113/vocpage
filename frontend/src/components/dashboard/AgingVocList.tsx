@@ -139,7 +139,7 @@ export function AgingVocList({ apiFilters }: Props) {
                   {voc.title ?? '—'}
                 </span>
                 {voc.issue_code && (
-                  <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                  <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-code)' }}>
                     {voc.issue_code}
                   </span>
                 )}

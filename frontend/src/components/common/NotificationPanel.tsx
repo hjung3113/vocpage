@@ -84,7 +84,7 @@ interface NotificationPanelProps {
 }
 
 export function NotificationPanel({ onClose }: NotificationPanelProps) {
-  const { notifications, refetchPanel, markAsRead } = useNotifications();
+  const { notifications, refetchPanel, markAsRead, markAllAsRead } = useNotifications();
 
   useEffect(() => {
     refetchPanel().catch(() => {});
@@ -105,7 +105,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
           background: 'var(--bg-panel)',
           border: '1px solid var(--border)',
           borderRadius: '8px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          boxShadow: 'var(--shadow-elevated)',
           zIndex: 100,
         }}
       >
@@ -118,38 +118,53 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
             justifyContent: 'space-between',
           }}
         >
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
             알림
           </span>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-secondary)',
-              fontSize: '16px',
-              padding: '0',
-              lineHeight: 1,
-            }}
-            aria-label="닫기"
-          >
-            ✕
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => {
+                markAllAsRead().catch(() => {});
+              }}
+              style={{
+                fontSize: '12px',
+                color: 'var(--brand)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              모두 읽음
+            </button>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)',
+                fontSize: '16px',
+                padding: '0',
+                lineHeight: 1,
+              }}
+              aria-label="닫기"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {notifications.length === 0 ? (
-          <p
+          <div
             style={{
-              padding: '24px 16px',
+              padding: '32px 16px',
               textAlign: 'center',
-              color: 'var(--text-secondary)',
+              color: 'var(--text-muted)',
               fontSize: '13px',
-              margin: 0,
             }}
           >
-            알림이 없습니다.
-          </p>
+            알림이 없습니다
+          </div>
         ) : (
           notifications.map((n) => (
             <NotificationItem key={n.id} notification={n} onRead={markAsRead} />

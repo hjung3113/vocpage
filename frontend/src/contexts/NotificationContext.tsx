@@ -19,6 +19,7 @@ export interface NotificationContextValue {
   isPolling: boolean;
   panelError: string | null;
   markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
   refetchPanel: () => Promise<void>;
 }
 
@@ -46,6 +47,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     await markRead(id);
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
     setUnreadCount((c) => Math.max(0, c - 1));
+  }, []);
+
+  const markAllAsRead = useCallback(async () => {
+    await markAllRead();
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+    setHasUrgentUnread(false);
   }, []);
 
   const refetchPanel = useCallback(async () => {
@@ -142,9 +150,19 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       isPolling,
       panelError,
       markAsRead,
+      markAllAsRead,
       refetchPanel,
     }),
-    [notifications, unreadCount, hasUrgentUnread, isPolling, panelError, markAsRead, refetchPanel],
+    [
+      notifications,
+      unreadCount,
+      hasUrgentUnread,
+      isPolling,
+      panelError,
+      markAsRead,
+      markAllAsRead,
+      refetchPanel,
+    ],
   );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;

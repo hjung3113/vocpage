@@ -144,7 +144,7 @@ export function SubtaskSection({ voc, onOpenVoc, onUpdate }: SubtaskSectionProps
               style={{
                 color: 'var(--text-muted)',
                 fontSize: '11px',
-                fontFamily: 'D2Coding, monospace',
+                fontFamily: 'var(--font-code)',
               }}
             >
               {st.issue_code}
