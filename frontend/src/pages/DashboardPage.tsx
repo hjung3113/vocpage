@@ -5,6 +5,8 @@ import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { FilterContextBanner } from '../components/dashboard/FilterContextBanner';
 import { GlobalTabs } from '../components/dashboard/GlobalTabs';
 import { KpiSection } from '../components/dashboard/KpiSection';
+import { DistributionWidget } from '../components/dashboard/DistributionWidget';
+import { PriorityStatusMatrix } from '../components/dashboard/PriorityStatusMatrix';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
 import './DashboardPage.css';
 
@@ -96,6 +98,17 @@ export function DashboardPage() {
       <div className="dash-body" style={{ padding: '0 0 24px' }}>
         <div style={{ padding: '0 0 8px' }}>
           <KpiSection filter={filter} buildQueryParams={buildQueryParams} />
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            padding: '12px 24px 0',
+          }}
+        >
+          <DistributionWidget filter={filter} buildQueryParams={buildQueryParams} />
+          <PriorityStatusMatrix filter={filter} buildQueryParams={buildQueryParams} />
         </div>
       </div>
     </div>

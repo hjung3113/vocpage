@@ -1,0 +1,34 @@
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.matrix-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  padding: 4px 5px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.matrix-table th.rh {
+  text-align: left;
+}
+
+.matrix-table td {
+  padding: 5px 4px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.matrix-table td.rh {
+  text-align: left;
+  font-size: 11px;
+  cursor: default;
+}
