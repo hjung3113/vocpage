@@ -139,6 +139,7 @@ export function VocRow({
           fontFamily: 'var(--font-code)',
           color: isChild ? 'var(--text-tertiary)' : 'var(--text-secondary)',
           whiteSpace: 'nowrap',
+          paddingLeft: isChild ? '28px' : undefined,
         }}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
