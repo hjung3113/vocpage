@@ -33,11 +33,11 @@
 }
 
 .kpi-card.alert-red {
-  border-color: oklch(58% 0.22 25 / 0.35);
+  border-color: color-mix(in oklch, var(--status-red) 35%, transparent);
 }
 
 .kpi-card.alert-amber {
-  border-color: oklch(70% 0.16 72 / 0.3);
+  border-color: color-mix(in oklch, var(--status-amber) 30%, transparent);
 }
 
 .kpi-label {
@@ -71,13 +71,9 @@
 }
 
 .kpi-delta.delta-pos {
-  color: oklch(62% 0.19 158);
+  color: var(--status-emerald);
 }
 
 .kpi-delta.delta-neg {
-  color: oklch(58% 0.22 25);
-}
-
-.kpi-delta.delta-amb {
-  color: oklch(70% 0.16 72);
+  color: var(--status-red);
 }

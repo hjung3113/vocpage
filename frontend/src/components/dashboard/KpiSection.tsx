@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardSummary } from '../../api/dashboard';
@@ -30,6 +31,21 @@ function getThisWeekMonday(): string {
   const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
   return toISODate(d);
+}
+
+function buildNav(base: DashboardQueryParams, extra: Record<string, string | undefined>): string {
+  const merged: Record<string, string | undefined> = {
+    systemId: base.systemId,
+    menuId: base.menuId,
+    assigneeId: base.assigneeId,
+    startDate: base.startDate,
+    endDate: base.endDate,
+    ...extra,
+  };
+  const entries = Object.entries(merged).filter(
+    (e): e is [string, string] => e[1] !== undefined && e[1] !== '',
+  );
+  return '/?' + new URLSearchParams(entries).toString();
 }
 
 interface DeltaResult {
@@ -99,19 +115,13 @@ function KpiCard({
 export function KpiSection({ filter, buildQueryParams }: KpiSectionProps) {
   const navigate = useNavigate();
 
+  const params = useMemo(() => buildQueryParams(), [buildQueryParams]);
+
   const { data } = useQuery({
-    queryKey: ['dashboard-summary', buildQueryParams()],
-    queryFn: () => getDashboardSummary(buildQueryParams()),
+    queryKey: ['dashboard-summary', params],
+    queryFn: () => getDashboardSummary(params),
     staleTime: 5 * 60 * 1000,
   });
-
-  const gp = buildQueryParams();
-
-  function nav(extra: Record<string, string>) {
-    navigate(
-      '/?' + new URLSearchParams({ ...(gp as Record<string, string>), ...extra }).toString(),
-    );
-  }
 
   const thisMonday = getThisWeekMonday();
   const todayStr = today();
@@ -145,26 +155,33 @@ export function KpiSection({ filter, buildQueryParams }: KpiSectionProps) {
           value={data?.total}
           delta={totalDelta}
           onClick={() =>
-            nav({ startDate: filter.dateRange.startDate, endDate: filter.dateRange.endDate })
+            navigate(
+              buildNav(params, {
+                startDate: filter.dateRange.startDate,
+                endDate: filter.dateRange.endDate,
+              }),
+            )
           }
         />
         <KpiCard
           label="미해결"
           value={data?.unresolved}
           delta={unresolvedDelta}
-          onClick={() => nav({ status: '접수,검토중,처리중' })}
+          onClick={() => navigate(buildNav(params, { status: '접수,검토중,처리중' }))}
         />
         <KpiCard
           label="이번주 신규"
           value={data?.newThisWeek}
           delta={newThisWeekDelta}
-          onClick={() => nav({ startDate: thisMonday, endDate: todayStr })}
+          onClick={() => navigate(buildNav(params, { startDate: thisMonday, endDate: todayStr }))}
         />
         <KpiCard
           label="이번주 완료"
           value={data?.doneThisWeek}
           delta={doneThisWeekDelta}
-          onClick={() => nav({ startDate: thisMonday, endDate: todayStr, status: '완료' })}
+          onClick={() =>
+            navigate(buildNav(params, { startDate: thisMonday, endDate: todayStr, status: '완료' }))
+          }
         />
       </div>
 
@@ -177,11 +194,13 @@ export function KpiSection({ filter, buildQueryParams }: KpiSectionProps) {
           delta={avgProcessingDelta}
           deltaUnit="일"
           onClick={() =>
-            nav({
-              startDate: filter.dateRange.startDate,
-              endDate: filter.dateRange.endDate,
-              status: '완료',
-            })
+            navigate(
+              buildNav(params, {
+                startDate: filter.dateRange.startDate,
+                endDate: filter.dateRange.endDate,
+                status: '완료',
+              }),
+            )
           }
         />
         <KpiCard
@@ -191,24 +210,33 @@ export function KpiSection({ filter, buildQueryParams }: KpiSectionProps) {
           delta={resolvedRateDelta}
           deltaUnit="%"
           onClick={() =>
-            nav({ startDate: filter.dateRange.startDate, endDate: filter.dateRange.endDate })
+            navigate(
+              buildNav(params, {
+                startDate: filter.dateRange.startDate,
+                endDate: filter.dateRange.endDate,
+              }),
+            )
           }
         />
         <KpiCard
           label="Urgent·High 미해결"
           value={data?.urgentHighUnresolved}
-          valueColor="oklch(58% .22 25)"
+          valueColor="var(--status-red)"
           cardClass="alert-red"
           delta={urgentHighDelta}
-          onClick={() => nav({ priority: 'urgent,high', status: '접수,검토중,처리중' })}
+          onClick={() =>
+            navigate(buildNav(params, { priority: 'urgent,high', status: '접수,검토중,처리중' }))
+          }
         />
         <KpiCard
           label="14일+ 미처리"
           value={data?.over14Days}
-          valueColor="oklch(70% .16 72)"
+          valueColor="var(--status-amber)"
           cardClass="alert-amber"
           delta={over14Delta}
-          onClick={() => nav({ status: '접수,검토중,처리중', createdBefore: daysAgo(14) })}
+          onClick={() =>
+            navigate(buildNav(params, { status: '접수,검토중,처리중', createdBefore: daysAgo(14) }))
+          }
         />
       </div>
     </div>
