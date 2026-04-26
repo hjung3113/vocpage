@@ -10,6 +10,10 @@ import { PriorityStatusMatrix } from '../components/dashboard/PriorityStatusMatr
 import { DrilldownHeatmap } from '../components/dashboard/DrilldownHeatmap';
 import { WeeklyTrendChart } from '../components/dashboard/WeeklyTrendChart';
 import { TagDistributionChart } from '../components/dashboard/TagDistributionChart';
+import { ProcessingSpeedWidget } from '../components/dashboard/ProcessingSpeedWidget';
+import { AgingWidget } from '../components/dashboard/AgingWidget';
+import { AssigneeTable } from '../components/dashboard/AssigneeTable';
+import { AgingVocList } from '../components/dashboard/AgingVocList';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
 import './DashboardPage.css';
 
@@ -132,6 +136,27 @@ export function DashboardPage() {
         >
           <WeeklyTrendChart filter={filter} buildQueryParams={buildQueryParams} />
           <TagDistributionChart filter={filter} buildQueryParams={buildQueryParams} />
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            padding: '12px 24px 0',
+          }}
+        >
+          <ProcessingSpeedWidget filter={filter} buildQueryParams={buildQueryParams} />
+          <AgingWidget filter={filter} buildQueryParams={buildQueryParams} />
+        </div>
+        <div style={{ padding: '12px 24px 0' }}>
+          <AssigneeTable filter={filter} buildQueryParams={buildQueryParams} />
+        </div>
+        <div style={{ padding: '12px 24px 24px' }}>
+          <AgingVocList
+            filter={filter}
+            buildQueryParams={buildQueryParams}
+            onOpenDrawer={() => {}}
+          />
         </div>
       </div>
     </div>

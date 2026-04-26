@@ -1,0 +1,67 @@
+.aging-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.aging-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.aging-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.aging-table tr:hover td {
+  background: var(--bg-elevated);
+  cursor: pointer;
+}
+
+.aging-table td.code {
+  font-family: D2Coding, monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.aging-table td.title-col {
+  color: var(--text-primary);
+  max-width: 180px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.d-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.d-badge-urgent {
+  background: oklch(58% 0.22 25 / 0.15);
+  color: oklch(58% 0.22 25);
+}
+
+.d-badge-high {
+  background: oklch(60% 0.18 45 / 0.15);
+  color: oklch(60% 0.18 45);
+}
+
+.d-badge-red {
+  background: oklch(58% 0.22 25 / 0.15);
+  color: oklch(58% 0.22 25);
+}
+
+.d-badge-amber {
+  background: oklch(70% 0.16 72 / 0.15);
+  color: oklch(70% 0.16 72);
+}
