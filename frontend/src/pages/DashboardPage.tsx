@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { useDashboardFilter } from '../hooks/useDashboardFilter';
+import { useVOCFilter } from '../hooks/useVOCFilter';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSummary, fetchAssignees } from '../api/dashboard';
 import { listAdminSystems } from '../api/admin';
@@ -18,6 +20,8 @@ const queryClient = new QueryClient({
 });
 
 function DashboardInner() {
+  const navigate = useNavigate();
+  const { setFilters, resetFilters } = useVOCFilter();
   const { filterState, setAssigneeId, setDateRange, setGlobalTab, apiFilters } =
     useDashboardFilter();
 
@@ -166,9 +170,30 @@ function DashboardInner() {
           </span>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
             <KpiCard label="총 VOC" value={summary?.total ?? '—'} />
-            <KpiCard label="미해결" value={summary?.unresolved ?? '—'} />
-            <KpiCard label="이번주 신규" value={summary?.new_this_week ?? '—'} />
-            <KpiCard label="이번주 완료" value={'—'} />
+            <KpiCard
+              label="미해결"
+              value={summary?.unresolved ?? '—'}
+              onClick={() => {
+                setFilters({ status: '접수', priority: null });
+                navigate('/');
+              }}
+            />
+            <KpiCard
+              label="이번주 신규"
+              value={summary?.new_this_week ?? '—'}
+              onClick={() => {
+                resetFilters();
+                navigate('/');
+              }}
+            />
+            <KpiCard
+              label="이번주 완료"
+              value={'—'}
+              onClick={() => {
+                setFilters({ status: '완료', priority: null });
+                navigate('/');
+              }}
+            />
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

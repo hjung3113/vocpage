@@ -239,6 +239,32 @@ box-shadow: 0 0 0 1px var(--brand-border); /* double-ring: intentional active si
 | 드랍   | `PauseCircle`  |
 | 완료   | `CheckCircle2` |
 
+### Advanced Filter Panel (필터 더보기)
+
+Revealed by toggling "필터 더보기" button. Renders three chip-button rows: priority, assignee, tag.
+
+**Chip button style**:
+
+```css
+/* inactive */
+padding: 4px 10px;
+border-radius: 9999px;
+font-size: 12px;
+border: 1px solid var(--border-subtle);
+background: transparent;
+color: var(--text-secondary);
+
+/* active */
+background: var(--brand-bg);
+border-color: var(--brand-border);
+color: var(--accent);
+font-weight: 600;
+```
+
+- Priority chips render a colored indicator dot matching the priority color token (`--status-red` Urgent, `--status-amber`/High, muted Medium, `--status-green` Low)
+- "초기화" button resets all advanced filters to null
+- Chips are mutually exclusive within the same filter dimension (e.g., only one priority active at a time)
+
 ### Status Badge
 
 Full pill style — background + border + text color, all semantic. Not dot-only.
@@ -315,6 +341,8 @@ font-weight: 600;
   - **Muted** (assigned-to-me count): `background: var(--bg-elevated); color: var(--text-quaternary)`
   - Shared: `font-size: 10px; font-weight: 600; border-radius: 9999px; padding: 1px 6px`
 - Active state must be visually unambiguous — background fill, not just color change
+- **System accordion items**: System entries (`생산관리 시스템`, `분석 시스템`) are collapsible. Trigger: `button` (not `a`). Chevron rotates 90° when expanded (`ChevronRight` → `ChevronDown`). Sub-menus load lazily on first expand via `GET /api/systems/:id/menus`.
+- **Mine count badge** on "내 VOC": shows count of open VOCs assigned to the current user. Variant: Accent.
 
 ### Page Header
 
@@ -379,7 +407,7 @@ Slides in from the right. Width: **528px**. Background: `var(--bg-panel)`.
 **Header** (two-row layout):
 
 ```
-Row 1: [issue_code] ········· [ExternalLink] [Link2] [Trash2] [X]
+Row 1: [issue_code] ········· [Maximize2|Minimize2] [Link2] [Trash2] [X]
 Row 2: [title — large bold]
 ```
 
@@ -387,6 +415,7 @@ Row 2: [title — large bold]
 - Title: `font-size: 16px; font-weight: 700; color: var(--text-primary)`
 - Action icons: size 15, `color: var(--text-quaternary)` → hover `var(--text-secondary)`. Close button gets a `border: 1px solid var(--border-standard)` rounded box.
 - `padding: 16px 24px; border-bottom: 1px solid var(--border)`
+- **Fullscreen toggle**: `Maximize2` icon expands drawer to `width: 100vw; left: 0; border-left: none`. `Minimize2` restores to 528px. Transition: `width 0.2s ease`.
 
 **Meta Grid** — 2 columns, 8 fields:
 
@@ -478,7 +507,7 @@ Dark backgrounds suppress shadows — light/dark are separately optimized:
 ### Key Dimensions
 
 - **Sidebar width**: 222px
-- **Drawer width**: 528px
+- **Drawer width**: 528px (default); expands to 100vw when fullscreen toggle active
 - **Max content width**: ~1200px (whole app layout)
 - **Table row height**: 52px (body), 32px (header) — 20px gap creates unambiguous chrome vs content hierarchy
 - **Filterbar height**: 44px — secondary zone, intentionally shorter than the 56px topbar

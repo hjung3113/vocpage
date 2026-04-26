@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { tokens } from '../../tokens';
-import { ExternalLink, Link2, Trash2, X } from 'lucide-react';
+import { Maximize2, Minimize2, Link2, Trash2, X } from 'lucide-react';
 import { getVoc, updateVocStatus, getIncompleteSubtaskCount, type VocDetail } from '../../api/vocs';
 import {
   listVocTags,
@@ -43,6 +43,7 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
   const [vocTags, setVocTags] = useState<VocTag[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [showTagSelect, setShowTagSelect] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const role = user?.role?.toLowerCase();
   const canEditTags = role === 'manager' || role === 'admin';
@@ -238,12 +239,13 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
           right: 0,
           top: 0,
           height: '100vh',
-          width: '528px',
+          width: isFullscreen ? '100vw' : '528px',
+          left: isFullscreen ? 0 : undefined,
           background: 'var(--bg-panel)',
-          borderLeft: '1px solid var(--border)',
+          borderLeft: isFullscreen ? 'none' : '1px solid var(--border)',
           zIndex: 50,
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.3s ease',
+          transition: 'transform 0.3s ease, width 0.2s ease',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -301,10 +303,8 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
           <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
             {/* Expand */}
             <button
-              aria-label="새 탭에서 열기"
-              onClick={() => {
-                /* TODO: open voc in new tab */
-              }}
+              aria-label={isFullscreen ? '드로어로 보기' : '전체화면으로 보기'}
+              onClick={() => setIsFullscreen((p) => !p)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -324,7 +324,7 @@ export function VocDrawer({ vocId, isOpen, onClose, onOpenVoc }: VocDrawerProps)
                 (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-quaternary)';
               }}
             >
-              <ExternalLink size={15} />
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
             {/* Copy link */}
             <button

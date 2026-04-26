@@ -16,6 +16,8 @@ import {
   Sun,
   Moon,
   Monitor,
+  ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -186,6 +188,45 @@ const THEME_LABELS = {
   dark: '다크',
 } as const;
 
+interface SystemAccordionItemProps {
+  system: { id: string; name: string };
+  isOpen: boolean;
+  onToggle: () => void;
+  menus: Array<{ id: string; name: string }>;
+}
+
+function SystemAccordionItem({ system, isOpen, onToggle, menus }: SystemAccordionItemProps) {
+  return (
+    <>
+      <div
+        onClick={onToggle}
+        style={navItemStyle(false)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && onToggle()}
+      >
+        <FolderOpen size={15} />
+        <span style={{ flex: 1 }}>{system.name}</span>
+        {isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+      </div>
+      {isOpen &&
+        menus.map((menu) => (
+          <NavLink
+            key={menu.id}
+            to={`/?system_id=${system.id}&menu_id=${menu.id}`}
+            style={({ isActive }) => ({
+              ...navItemStyle(isActive),
+              paddingLeft: '28px',
+              fontSize: '12px',
+            })}
+          >
+            {menu.name}
+          </NavLink>
+        ))}
+    </>
+  );
+}
+
 export function Sidebar() {
   const ctx = useContext(AuthContext);
   const user = ctx?.user ?? null;
@@ -193,13 +234,18 @@ export function Sidebar() {
   const { theme, toggle } = useTheme();
 
   const [systems, setSystems] = useState<Array<{ id: string; name: string }>>([]);
-  const [vocCounts, setVocCounts] = useState<{ total: number; assigned: number }>({
+  const [vocCounts, setVocCounts] = useState<{ total: number; assigned: number; mine: number }>({
     total: 0,
     assigned: 0,
+    mine: 0,
   });
+  const [openSystems, setOpenSystems] = useState<Set<string>>(new Set());
+  const [systemMenus, setSystemMenus] = useState<
+    Record<string, Array<{ id: string; name: string }>>
+  >({});
 
   useEffect(() => {
-    fetch('/api/admin/systems', { credentials: 'include' })
+    fetch('/api/systems', { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : []))
       .then((data: unknown) => {
         if (Array.isArray(data)) setSystems(data as Array<{ id: string; name: string }>);
@@ -218,10 +264,38 @@ export function Sidebar() {
             .then((r) => (r.ok ? r.json() : { total: 0 }))
             .then((d: { total?: number }) => d.total ?? 0)
         : Promise.resolve(0),
+      fetch('/api/vocs?view=mine&limit=1', { credentials: 'include' })
+        .then((r) => (r.ok ? r.json() : { total: 0 }))
+        .then((d: { total?: number }) => d.total ?? 0),
     ])
-      .then(([total, assigned]) => setVocCounts({ total, assigned }))
+      .then(([total, assigned, mine]) => setVocCounts({ total, assigned, mine }))
       .catch(() => {});
   }, [user]);
+
+  function toggleSystem(id: string) {
+    setOpenSystems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        if (!systemMenus[id]) {
+          fetch(`/api/systems/${id}/menus`, { credentials: 'include' })
+            .then((r) => (r.ok ? r.json() : []))
+            .then((data: unknown) => {
+              if (Array.isArray(data)) {
+                setSystemMenus((m) => ({
+                  ...m,
+                  [id]: data as Array<{ id: string; name: string }>,
+                }));
+              }
+            })
+            .catch(() => {});
+        }
+      }
+      return next;
+    });
+  }
 
   return (
     <aside style={sidebarStyle}>
@@ -244,7 +318,13 @@ export function Sidebar() {
           badge={vocCounts.total}
           badgeVariant="accent"
         />
-        <SidebarNavItem to="/?view=mine" icon={<User size={15} />} label="내 VOC" />
+        <SidebarNavItem
+          to="/?view=mine"
+          icon={<User size={15} />}
+          label="내 VOC"
+          badge={vocCounts.mine}
+          badgeVariant="muted"
+        />
         <SidebarNavItem
           to="/?view=assigned"
           icon={<UserCheck size={15} />}
@@ -259,11 +339,12 @@ export function Sidebar() {
             <div style={dividerStyle} />
             <div style={sectionLabelStyle}>시스템</div>
             {systems.map((system) => (
-              <SidebarNavItem
+              <SystemAccordionItem
                 key={system.id}
-                to={`/?system_id=${system.id}`}
-                icon={<FolderOpen size={15} />}
-                label={system.name}
+                system={system}
+                isOpen={openSystems.has(system.id)}
+                onToggle={() => toggleSystem(system.id)}
+                menus={systemMenus[system.id] ?? []}
               />
             ))}
           </>
