@@ -9,55 +9,21 @@ export const dashboardRouter = Router();
 // ── Filter helpers ───────────────────────────────────────────────────────────
 
 interface DashboardFilters {
-  systemId?: string;
-  menuId?: string;
-  assigneeId?: string;
-  startDate?: string;
-  endDate?: string;
+  systemId: string | null;
+  menuId: string | null;
+  assigneeId: string | null;
+  startDate: string | null;
+  endDate: string | null;
 }
 
 function extractFilters(query: Record<string, string | undefined>): DashboardFilters {
   return {
-    systemId: query.systemId || undefined,
-    menuId: query.menuId || undefined,
-    assigneeId: query.assigneeId || undefined,
-    startDate: query.startDate || undefined,
-    endDate: query.endDate || undefined,
+    systemId: query.systemId ?? null,
+    menuId: query.menuId ?? null,
+    assigneeId: query.assigneeId ?? null,
+    startDate: query.startDate ?? null,
+    endDate: query.endDate ?? null,
   };
-}
-
-function buildWhereClause(
-  filters: DashboardFilters,
-  params: unknown[],
-  startIdx: number,
-): { clause: string; nextIdx: number } {
-  const conditions = ['v.deleted_at IS NULL'];
-  let idx = startIdx;
-
-  if (filters.systemId) {
-    conditions.push(`v.system_id = $${idx++}`);
-    params.push(filters.systemId);
-  }
-  if (filters.menuId) {
-    conditions.push(`v.menu_id = $${idx++}`);
-    params.push(filters.menuId);
-  }
-  if (filters.assigneeId === 'unassigned') {
-    conditions.push('v.assignee_id IS NULL');
-  } else if (filters.assigneeId) {
-    conditions.push(`v.assignee_id = $${idx++}`);
-    params.push(filters.assigneeId);
-  }
-  if (filters.startDate) {
-    conditions.push(`v.created_at >= $${idx++}`);
-    params.push(filters.startDate);
-  }
-  if (filters.endDate) {
-    conditions.push(`v.created_at <= $${idx++}`);
-    params.push(filters.endDate);
-  }
-
-  return { clause: `WHERE ${conditions.join(' AND ')}`, nextIdx: idx };
 }
 
 // ── GET /summary ─────────────────────────────────────────────────────────────
@@ -67,40 +33,157 @@ dashboardRouter.get(
   requireAuth,
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
+    const { systemId, menuId, assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      const result = await pool.query(
-        `SELECT
-          COUNT(*) AS total_voc,
-          COUNT(CASE WHEN v.status IN ('접수','검토중','처리중') THEN 1 END) AS unresolved,
-          COUNT(CASE WHEN v.created_at >= now() - interval '7 days' THEN 1 END) AS new_this_week,
-          COUNT(CASE WHEN v.status IN ('완료','드랍') AND v.updated_at >= now() - interval '7 days' THEN 1 END) AS completed_this_week,
-          COUNT(CASE WHEN v.priority IN ('urgent','high') AND v.status IN ('접수','검토중','처리중') THEN 1 END) AS urgent_high_unresolved,
-          COUNT(CASE WHEN v.status IN ('접수','검토중','처리중') AND v.created_at <= now() - interval '14 days' THEN 1 END) AS overdue_14d,
-          COUNT(CASE WHEN v.status IN ('완료','드랍') THEN 1 END) AS completed_total
-        FROM vocs v
-        ${clause}`,
-        params,
-      );
+      const computeSummary = async (
+        sd: string | null,
+        ed: string | null,
+      ): Promise<{
+        total: number;
+        unresolved: number;
+        newThisWeek: number;
+        doneThisWeek: number;
+        avgProcessingDays: number;
+        resolvedRate: number;
+        urgentHighUnresolved: number;
+        over14Days: number;
+      }> => {
+        const monday = new Date();
+        monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+        const mondayStr = monday.toISOString().slice(0, 10);
 
-      const row = result.rows[0];
-      const total = parseInt(row.total_voc, 10);
-      const completed = parseInt(row.completed_this_week, 10);
-      const resolutionRate = total > 0 ? (completed / total) * 100 : 0;
+        const [
+          totalR,
+          unresolvedR,
+          urgentHighR,
+          over14R,
+          avgR,
+          doneCountR,
+          newThisWeekR,
+          doneThisWeekR,
+        ] = await Promise.all([
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND ($1::date IS NULL OR created_at::date >= $1::date)
+                 AND ($2::date IS NULL OR created_at::date <= $2::date)
+                 AND ($3::text IS NULL OR system_id = $3)
+                 AND ($4::text IS NULL OR menu_id = $4)
+                 AND ($5::text IS NULL OR assignee_id = $5)`,
+            [sd, ed, systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND status IN ('접수','검토중','처리중')
+                 AND ($1::date IS NULL OR created_at::date >= $1::date)
+                 AND ($2::date IS NULL OR created_at::date <= $2::date)
+                 AND ($3::text IS NULL OR system_id = $3)
+                 AND ($4::text IS NULL OR menu_id = $4)
+                 AND ($5::text IS NULL OR assignee_id = $5)`,
+            [sd, ed, systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND priority IN ('urgent','high')
+                 AND status IN ('접수','검토중','처리중')
+                 AND ($1::text IS NULL OR system_id = $1)
+                 AND ($2::text IS NULL OR menu_id = $2)
+                 AND ($3::text IS NULL OR assignee_id = $3)`,
+            [systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND status IN ('접수','검토중','처리중')
+                 AND created_at::date <= (NOW() - interval '14 days')::date
+                 AND ($1::text IS NULL OR system_id = $1)
+                 AND ($2::text IS NULL OR menu_id = $2)
+                 AND ($3::text IS NULL OR assignee_id = $3)`,
+            [systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 86400)::numeric, 1), 0)::float AS avg
+               FROM vocs
+               WHERE deleted_at IS NULL
+                 AND status = '완료'
+                 AND ($1::date IS NULL OR updated_at::date >= $1::date)
+                 AND ($2::date IS NULL OR updated_at::date <= $2::date)
+                 AND ($3::text IS NULL OR system_id = $3)
+                 AND ($4::text IS NULL OR menu_id = $4)
+                 AND ($5::text IS NULL OR assignee_id = $5)`,
+            [sd, ed, systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND status IN ('완료','드랍')
+                 AND ($1::date IS NULL OR created_at::date >= $1::date)
+                 AND ($2::date IS NULL OR created_at::date <= $2::date)
+                 AND ($3::text IS NULL OR system_id = $3)
+                 AND ($4::text IS NULL OR menu_id = $4)
+                 AND ($5::text IS NULL OR assignee_id = $5)`,
+            [sd, ed, systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND created_at::date >= $1::date
+                 AND ($2::text IS NULL OR system_id = $2)
+                 AND ($3::text IS NULL OR menu_id = $3)
+                 AND ($4::text IS NULL OR assignee_id = $4)`,
+            [mondayStr, systemId, menuId, assigneeId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+               WHERE deleted_at IS NULL
+                 AND status IN ('완료','드랍')
+                 AND updated_at::date >= $1::date
+                 AND ($2::text IS NULL OR system_id = $2)
+                 AND ($3::text IS NULL OR menu_id = $3)
+                 AND ($4::text IS NULL OR assignee_id = $4)`,
+            [mondayStr, systemId, menuId, assigneeId],
+          ),
+        ]);
 
-      res.json({
-        total,
-        unresolved: parseInt(row.unresolved, 10),
-        new_this_week: parseInt(row.new_this_week, 10),
-        completed: completed,
-        avg_resolution_days: null,
-        resolution_rate: resolutionRate,
-        urgent: parseInt(row.urgent_high_unresolved, 10),
-        overdue: parseInt(row.overdue_14d, 10),
-      });
+        const total: number = totalR.rows[0].n;
+        const doneCount: number = doneCountR.rows[0].n;
+        const resolvedRate = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+        return {
+          total,
+          unresolved: unresolvedR.rows[0].n as number,
+          newThisWeek: newThisWeekR.rows[0].n as number,
+          doneThisWeek: doneThisWeekR.rows[0].n as number,
+          avgProcessingDays: avgR.rows[0].avg as number,
+          resolvedRate,
+          urgentHighUnresolved: urgentHighR.rows[0].n as number,
+          over14Days: over14R.rows[0].n as number,
+        };
+      };
+
+      const current = await computeSummary(startDate, endDate);
+
+      // prevWeek: shift dates back 7 days if provided, else use same relative windows
+      let prevSd: string | null = null;
+      let prevEd: string | null = null;
+      if (startDate) {
+        const d = new Date(startDate);
+        d.setDate(d.getDate() - 7);
+        prevSd = d.toISOString().slice(0, 10);
+      }
+      if (endDate) {
+        const d = new Date(endDate);
+        d.setDate(d.getDate() - 7);
+        prevEd = d.toISOString().slice(0, 10);
+      }
+      const prevWeek = await computeSummary(prevSd, prevEd);
+
+      res.json({ ...current, prevWeek });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/summary failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -115,36 +198,73 @@ dashboardRouter.get(
   requireAuth,
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
-    const { type } = req.query as { type?: string };
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
+    const { type = 'status' } = req.query as { type?: string };
+    const { systemId, menuId, assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      let sql: string;
+      let rows: { name: string; count: number }[];
 
       if (type === 'tag') {
-        sql = `
-          SELECT t.name AS label, COUNT(*) AS count
-          FROM vocs v
-          JOIN voc_tags vt ON v.id = vt.voc_id
-          JOIN tags t ON vt.tag_id = t.id
-          ${clause}
-          GROUP BY t.name
-          ORDER BY count DESC`;
+        const r = await pool.query(
+          `SELECT t.name, COUNT(vt.voc_id)::int AS count
+           FROM tags t
+           JOIN voc_tags vt ON t.id = vt.tag_id
+           JOIN vocs v ON v.id = vt.voc_id
+           WHERE v.deleted_at IS NULL
+             AND ($1::text IS NULL OR v.system_id = $1)
+             AND ($2::text IS NULL OR v.menu_id = $2)
+             AND ($3::text IS NULL OR v.assignee_id = $3)
+             AND ($4::date IS NULL OR v.created_at::date >= $4::date)
+             AND ($5::date IS NULL OR v.created_at::date <= $5::date)
+           GROUP BY t.name
+           ORDER BY count DESC`,
+          [systemId, menuId, assigneeId, startDate, endDate],
+        );
+        rows = r.rows as { name: string; count: number }[];
+      } else if (type === 'voc_type') {
+        const r = await pool.query(
+          `SELECT vt.name, COUNT(v.id)::int AS count
+           FROM voc_types vt
+           LEFT JOIN vocs v ON v.voc_type_id = vt.id
+             AND v.deleted_at IS NULL
+             AND ($1::text IS NULL OR v.system_id = $1)
+             AND ($2::text IS NULL OR v.menu_id = $2)
+             AND ($3::text IS NULL OR v.assignee_id = $3)
+             AND ($4::date IS NULL OR v.created_at::date >= $4::date)
+             AND ($5::date IS NULL OR v.created_at::date <= $5::date)
+           GROUP BY vt.name
+           ORDER BY count DESC`,
+          [systemId, menuId, assigneeId, startDate, endDate],
+        );
+        rows = r.rows as { name: string; count: number }[];
       } else {
-        const col =
-          type === 'priority' ? 'v.priority' : type === 'voc_type' ? 'v.voc_type_id' : 'v.status';
-        sql = `
-          SELECT ${col} AS label, COUNT(*) AS count
-          FROM vocs v
-          ${clause}
-          GROUP BY ${col}
-          ORDER BY count DESC`;
+        const col = type === 'priority' ? 'priority' : 'status';
+        const r = await pool.query(
+          `SELECT ${col} AS name, COUNT(*)::int AS count
+           FROM vocs
+           WHERE deleted_at IS NULL
+             AND ($1::text IS NULL OR system_id = $1)
+             AND ($2::text IS NULL OR menu_id = $2)
+             AND ($3::text IS NULL OR assignee_id = $3)
+             AND ($4::date IS NULL OR created_at::date >= $4::date)
+             AND ($5::date IS NULL OR created_at::date <= $5::date)
+           GROUP BY ${col}
+           ORDER BY count DESC`,
+          [systemId, menuId, assigneeId, startDate, endDate],
+        );
+        rows = r.rows as { name: string; count: number }[];
       }
 
-      const result = await pool.query(sql, params);
-      res.json(result.rows.map((r) => ({ label: r.label, count: parseInt(r.count, 10) })));
+      const total = rows.reduce((s, r) => s + r.count, 0);
+      res.json(
+        rows.map((r) => ({
+          name: r.name,
+          count: r.count,
+          pct: total > 0 ? Math.round((r.count / total) * 100) : 0,
+        })),
+      );
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/distribution failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -159,26 +279,40 @@ dashboardRouter.get(
   requireAuth,
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
+    const { systemId, menuId, assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      const result = await pool.query(
-        `SELECT v.priority, v.status, COUNT(*) AS count
-         FROM vocs v
-         ${clause}
-         GROUP BY v.priority, v.status
-         ORDER BY v.priority, v.status`,
-        params,
+      const r = await pool.query(
+        `SELECT priority, status, COUNT(*)::int AS count
+         FROM vocs
+         WHERE deleted_at IS NULL
+           AND ($1::text IS NULL OR system_id = $1)
+           AND ($2::text IS NULL OR menu_id = $2)
+           AND ($3::text IS NULL OR assignee_id = $3)
+           AND ($4::date IS NULL OR created_at::date >= $4::date)
+           AND ($5::date IS NULL OR created_at::date <= $5::date)
+         GROUP BY priority, status`,
+        [systemId, menuId, assigneeId, startDate, endDate],
       );
 
+      const statuses = ['접수', '검토중', '처리중', '완료', '드랍'];
+      const priorities = ['urgent', 'high', 'medium', 'low'];
+      const matrix: Record<string, Record<string, number>> = {};
+      priorities.forEach((p) => {
+        matrix[p] = {};
+        statuses.forEach((s) => {
+          matrix[p][s] = 0;
+        });
+      });
+      (r.rows as { priority: string; status: string; count: number }[]).forEach((row) => {
+        if (matrix[row.priority]) matrix[row.priority][row.status] = row.count;
+      });
+
       res.json({
-        rows: result.rows.map((r) => ({
-          priority: r.priority,
-          status: r.status,
-          count: parseInt(r.count, 10),
-        })),
+        rows: priorities.map((p) => ({ priority: p, status: matrix[p] })),
+        statuses,
       });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/priority-status-matrix failed');
@@ -195,58 +329,95 @@ dashboardRouter.get(
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
     const { xAxis = 'status' } = req.query as { xAxis?: string };
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
+    const { systemId, assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      let yGroupCol: string;
-      let yLabelCol: string;
-      let yJoinClause: string;
-
-      if (filters.systemId) {
-        yGroupCol = 'v.menu_id';
-        yLabelCol = 'm.name';
-        yJoinClause = 'JOIN menus m ON v.menu_id = m.id';
-      } else {
-        yGroupCol = 'v.system_id';
-        yLabelCol = 's.name';
-        yJoinClause = 'JOIN systems s ON v.system_id = s.id';
-      }
-
-      let xLabelCol: string;
-      let xJoinClause = '';
-
-      if (xAxis === 'tag') {
-        xLabelCol = 't.name';
-        xJoinClause = 'JOIN voc_tags vt ON v.id = vt.voc_id JOIN tags t ON vt.tag_id = t.id';
+      // X-axis values
+      let xValues: string[];
+      if (xAxis === 'status') {
+        xValues = ['접수', '검토중', '처리중', '완료', '드랍'];
       } else if (xAxis === 'priority') {
-        xLabelCol = 'v.priority';
+        xValues = ['urgent', 'high', 'medium', 'low'];
       } else {
-        xLabelCol = 'v.status';
+        const tagR = await pool.query('SELECT name FROM tags ORDER BY name');
+        xValues = (tagR.rows as { name: string }[]).map((r) => r.name);
       }
 
-      const result = await pool.query(
-        `SELECT ${yLabelCol} AS y_label, ${xLabelCol} AS x_label, COUNT(*) AS count
-         FROM vocs v
-         ${yJoinClause}
-         ${xJoinClause}
-         ${clause}
-         GROUP BY ${yGroupCol}, ${yLabelCol}, ${xLabelCol}
-         ORDER BY ${yLabelCol}, ${xLabelCol}`,
-        params,
-      );
+      // Y-axis: menus if systemId set, else systems
+      interface YRow {
+        id: string;
+        name: string;
+      }
+      let yRows: YRow[];
+      if (systemId) {
+        const r = await pool.query(
+          `SELECT id, name FROM menus WHERE system_id = $1 ORDER BY name`,
+          [systemId],
+        );
+        yRows = r.rows as YRow[];
+      } else {
+        const r = await pool.query(`SELECT id, name FROM systems ORDER BY name`);
+        yRows = r.rows as YRow[];
+      }
 
-      const xValues = [...new Set(result.rows.map((r) => r.x_label as string))];
+      const filterCol = systemId ? 'menu_id' : 'system_id';
 
-      res.json({
-        rows: result.rows.map((r) => ({
-          y_label: r.y_label,
-          x_label: r.x_label,
-          count: parseInt(r.count, 10),
-        })),
-        x_values: xValues,
-      });
+      const results: { id: string; name: string; values: number[]; total: number }[] = [];
+
+      for (const yRow of yRows) {
+        let counts: number[];
+
+        if (xAxis === 'tag') {
+          const r = await pool.query(
+            `SELECT t.name AS xval, COUNT(DISTINCT v.id)::int AS count
+             FROM vocs v
+             JOIN voc_tags vt ON v.id = vt.voc_id
+             JOIN tags t ON t.id = vt.tag_id
+             WHERE v.deleted_at IS NULL
+               AND v.${filterCol} = $1
+               AND ($2::text IS NULL OR v.assignee_id = $2)
+               AND ($3::date IS NULL OR v.created_at::date >= $3::date)
+               AND ($4::date IS NULL OR v.created_at::date <= $4::date)
+             GROUP BY t.name`,
+            [yRow.id, assigneeId, startDate, endDate],
+          );
+          const cmap: Record<string, number> = {};
+          (r.rows as { xval: string; count: number }[]).forEach((rr) => {
+            cmap[rr.xval] = rr.count;
+          });
+          counts = xValues.map((x) => cmap[x] ?? 0);
+        } else {
+          const col = xAxis === 'priority' ? 'priority' : 'status';
+          const r = await pool.query(
+            `SELECT ${col} AS xval, COUNT(*)::int AS count
+             FROM vocs
+             WHERE deleted_at IS NULL
+               AND ${filterCol} = $1
+               AND ($2::text IS NULL OR assignee_id = $2)
+               AND ($3::date IS NULL OR created_at::date >= $3::date)
+               AND ($4::date IS NULL OR created_at::date <= $4::date)
+             GROUP BY ${col}`,
+            [yRow.id, assigneeId, startDate, endDate],
+          );
+          const cmap: Record<string, number> = {};
+          (r.rows as { xval: string; count: number }[]).forEach((rr) => {
+            cmap[rr.xval] = rr.count;
+          });
+          counts = xValues.map((x) => cmap[x] ?? 0);
+        }
+
+        results.push({
+          id: yRow.id,
+          name: yRow.name,
+          values: counts,
+          total: counts.reduce((a, b) => a + b, 0),
+        });
+      }
+
+      const totalRow = xValues.map((_, i) => results.reduce((s, r) => s + r.values[i], 0));
+      res.json({ headers: xValues, totalRow, rows: results });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/heatmap failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -263,28 +434,64 @@ dashboardRouter.get(
   async (req: Request, res: Response): Promise<void> => {
     const weeksRaw = req.query.weeks as string | undefined;
     const weeks = Math.min(52, Math.max(1, parseInt(weeksRaw ?? '12', 10) || 12));
-    const days = weeks * 7;
+    const { systemId, menuId } = extractFilters(req.query as Record<string, string | undefined>);
 
     try {
-      const result = await pool.query(
-        `SELECT
-          created_at AS week,
-          COUNT(*) AS new_count,
-          COUNT(CASE WHEN status IN ('완료','드랍') THEN 1 END) AS completed_count,
-          COUNT(CASE WHEN status IN ('검토중','처리중') THEN 1 END) AS in_progress_count
-         FROM vocs
-         WHERE deleted_at IS NULL AND created_at >= now() - interval '${days} days'
-         GROUP BY created_at
-         ORDER BY created_at`,
-      );
+      const weekLabels: string[] = [];
+      const newCounts: number[] = [];
+      const inProgressCounts: number[] = [];
+      const doneCounts: number[] = [];
+
+      for (let i = weeks - 1; i >= 0; i--) {
+        const weekStart = new Date();
+        const dayOfWeek = weekStart.getDay();
+        const daysToMonday = (dayOfWeek + 6) % 7;
+        weekStart.setDate(weekStart.getDate() - daysToMonday - i * 7);
+        weekStart.setHours(0, 0, 0, 0);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        const s = weekStart.toISOString().slice(0, 10);
+        const e = weekEnd.toISOString().slice(0, 10);
+        const label = `W${weeks - i}`;
+
+        const [newR, inProgressR, doneR] = await Promise.all([
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+             WHERE deleted_at IS NULL
+               AND created_at::date BETWEEN $1 AND $2
+               AND ($3::text IS NULL OR system_id = $3)
+               AND ($4::text IS NULL OR menu_id = $4)`,
+            [s, e, systemId, menuId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+             WHERE deleted_at IS NULL
+               AND status IN ('검토중','처리중')
+               AND created_at::date <= $2
+               AND ($3::text IS NULL OR system_id = $3)
+               AND ($4::text IS NULL OR menu_id = $4)`,
+            [s, e, systemId, menuId],
+          ),
+          pool.query(
+            `SELECT COUNT(*)::int AS n FROM vocs
+             WHERE deleted_at IS NULL
+               AND status IN ('완료','드랍')
+               AND updated_at::date BETWEEN $1 AND $2
+               AND ($3::text IS NULL OR system_id = $3)
+               AND ($4::text IS NULL OR menu_id = $4)`,
+            [s, e, systemId, menuId],
+          ),
+        ]);
+
+        weekLabels.push(label);
+        newCounts.push(newR.rows[0].n as number);
+        inProgressCounts.push(inProgressR.rows[0].n as number);
+        doneCounts.push(doneR.rows[0].n as number);
+      }
 
       res.json({
-        weeks: result.rows.map((r) => ({
-          week: r.week,
-          new: parseInt(r.new_count, 10),
-          in_progress: parseInt(r.in_progress_count, 10),
-          completed: parseInt(r.completed_count, 10),
-        })),
+        weeks: weekLabels,
+        series: { new: newCounts, inProgress: inProgressCounts, done: doneCounts },
       });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/weekly-trend failed');
@@ -302,24 +509,34 @@ dashboardRouter.get(
   async (req: Request, res: Response): Promise<void> => {
     const limitRaw = req.query.limit as string | undefined;
     const limit = Math.min(100, Math.max(1, parseInt(limitRaw ?? '10', 10) || 10));
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause, nextIdx } = buildWhereClause(filters, params, 1);
+    const { systemId, menuId, assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      const result = await pool.query(
-        `SELECT t.name AS tag, COUNT(*) AS count
-         FROM vocs v
-         JOIN voc_tags vt ON v.id = vt.voc_id
-         JOIN tags t ON vt.tag_id = t.id
-         ${clause}
+      const r = await pool.query(
+        `SELECT t.name, COUNT(vt.voc_id)::int AS count
+         FROM tags t
+         JOIN voc_tags vt ON t.id = vt.tag_id
+         JOIN vocs v ON v.id = vt.voc_id
+         WHERE v.deleted_at IS NULL
+           AND ($1::text IS NULL OR v.system_id = $1)
+           AND ($2::text IS NULL OR v.menu_id = $2)
+           AND ($3::text IS NULL OR v.assignee_id = $3)
+           AND ($4::date IS NULL OR v.created_at::date >= $4::date)
+           AND ($5::date IS NULL OR v.created_at::date <= $5::date)
          GROUP BY t.name
          ORDER BY count DESC
-         LIMIT $${nextIdx}`,
-        [...params, limit],
+         LIMIT $6`,
+        [systemId, menuId, assigneeId, startDate, endDate, limit],
       );
 
-      res.json(result.rows.map((r) => ({ tag: r.tag, count: parseInt(r.count, 10) })));
+      res.json(
+        (r.rows as { name: string; count: number }[]).map((row) => ({
+          name: row.name,
+          count: row.count,
+        })),
+      );
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/tag-distribution failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -334,35 +551,41 @@ dashboardRouter.get(
   requireAuth,
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
+    const { assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      const result = await pool.query(
-        `SELECT
-          s.id AS system_id,
-          s.name AS system_name,
-          COUNT(*) AS total,
-          COUNT(CASE WHEN v.status IN ('접수','검토중','처리중') THEN 1 END) AS unresolved,
-          COUNT(CASE WHEN v.status IN ('완료','드랍') THEN 1 END) AS completed
-         FROM vocs v
-         JOIN systems s ON v.system_id = s.id
-         ${clause}
-         GROUP BY s.id, s.name
-         ORDER BY total DESC`,
-        params,
+      const r = await pool.query(
+        `SELECT s.id, s.name, v.status, COUNT(v.id)::int AS count
+         FROM systems s
+         LEFT JOIN vocs v ON v.system_id = s.id
+           AND v.deleted_at IS NULL
+           AND ($1::text IS NULL OR v.assignee_id = $1)
+           AND ($2::date IS NULL OR v.created_at::date >= $2)
+           AND ($3::date IS NULL OR v.created_at::date <= $3)
+         GROUP BY s.id, s.name, v.status
+         ORDER BY s.name`,
+        [assigneeId, startDate, endDate],
       );
 
-      res.json(
-        result.rows.map((r) => ({
-          system_id: r.system_id,
-          system_name: r.system_name,
-          total: parseInt(r.total, 10),
-          unresolved: parseInt(r.unresolved, 10),
-          completed: parseInt(r.completed, 10),
-        })),
+      const systemMap: Record<
+        string,
+        { id: string; name: string; status: Record<string, number>; total: number }
+      > = {};
+      (r.rows as { id: string; name: string; status: string | null; count: number }[]).forEach(
+        (row) => {
+          if (!systemMap[row.id]) {
+            systemMap[row.id] = { id: row.id, name: row.name, status: {}, total: 0 };
+          }
+          if (row.status) {
+            systemMap[row.id].status[row.status] = row.count;
+            systemMap[row.id].total += row.count;
+          }
+        },
       );
+
+      res.json({ systems: Object.values(systemMap) });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/system-overview failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -378,48 +601,109 @@ dashboardRouter.get(
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
     const { xAxis = 'status' } = req.query as { xAxis?: string };
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
+    const { systemId, menuId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      let xLabelCol: string;
-      let joinClause = 'LEFT JOIN users u ON v.assignee_id = u.id';
-
-      if (xAxis === 'tag') {
-        xLabelCol = 't.name';
-        joinClause += ' JOIN voc_tags vt ON v.id = vt.voc_id JOIN tags t ON vt.tag_id = t.id';
+      // Determine xAxis values and column
+      let xValues: string[];
+      if (xAxis === 'status') {
+        xValues = ['접수', '검토중', '처리중', '완료', '드랍'];
       } else if (xAxis === 'priority') {
-        xLabelCol = 'v.priority';
+        xValues = ['urgent', 'high', 'medium', 'low'];
       } else {
-        xLabelCol = 'v.status';
+        const tagR = await pool.query('SELECT name FROM tags ORDER BY name');
+        xValues = (tagR.rows as { name: string }[]).map((r) => r.name);
       }
 
-      const result = await pool.query(
-        `SELECT
-          v.assignee_id,
-          u.display_name AS assignee_name,
-          ${xLabelCol} AS x_label,
-          COUNT(*) AS count
-         FROM vocs v
-         ${joinClause}
-         ${clause}
-         GROUP BY v.assignee_id, u.display_name, ${xLabelCol}
-         ORDER BY v.assignee_id, ${xLabelCol}`,
-        params,
+      // Fetch assignees (managers/admins)
+      const assigneeR = await pool.query(
+        `SELECT id, display_name AS name FROM users WHERE role IN ('manager','admin') AND is_active = true ORDER BY display_name`,
       );
+      const assignees = assigneeR.rows as { id: string; name: string }[];
 
-      const xValues = [...new Set(result.rows.map((r) => r.x_label as string))];
+      interface CountRow {
+        assignee_id: string | null;
+        xval: string;
+        count: number;
+      }
 
-      res.json({
-        rows: result.rows.map((r) => ({
-          assignee_id: r.assignee_id,
-          assignee_name: r.assignee_name,
-          x_label: r.x_label,
-          count: parseInt(r.count, 10),
-        })),
-        x_values: xValues,
+      let countRows: CountRow[];
+
+      if (xAxis === 'tag') {
+        const r = await pool.query(
+          `SELECT v.assignee_id, t.name AS xval, COUNT(DISTINCT v.id)::int AS count
+           FROM vocs v
+           JOIN voc_tags vt ON v.id = vt.voc_id
+           JOIN tags t ON t.id = vt.tag_id
+           WHERE v.deleted_at IS NULL
+             AND ($1::text IS NULL OR v.system_id = $1)
+             AND ($2::text IS NULL OR v.menu_id = $2)
+             AND ($3::date IS NULL OR v.created_at::date >= $3::date)
+             AND ($4::date IS NULL OR v.created_at::date <= $4::date)
+           GROUP BY v.assignee_id, t.name`,
+          [systemId, menuId, startDate, endDate],
+        );
+        countRows = r.rows as CountRow[];
+      } else {
+        const col = xAxis === 'priority' ? 'priority' : 'status';
+        const r = await pool.query(
+          `SELECT assignee_id, ${col} AS xval, COUNT(*)::int AS count
+           FROM vocs
+           WHERE deleted_at IS NULL
+             AND ($1::text IS NULL OR system_id = $1)
+             AND ($2::text IS NULL OR menu_id = $2)
+             AND ($3::date IS NULL OR created_at::date >= $3::date)
+             AND ($4::date IS NULL OR created_at::date <= $4::date)
+           GROUP BY assignee_id, ${col}`,
+          [systemId, menuId, startDate, endDate],
+        );
+        countRows = r.rows as CountRow[];
+      }
+
+      // Build per-assignee map
+      const assigneeMap: Record<string, Record<string, number>> = {};
+      const unassignedMap: Record<string, number> = {};
+      xValues.forEach((x) => {
+        unassignedMap[x] = 0;
       });
+
+      assignees.forEach((a) => {
+        assigneeMap[a.id] = {};
+        xValues.forEach((x) => {
+          assigneeMap[a.id][x] = 0;
+        });
+      });
+
+      countRows.forEach((row) => {
+        if (row.assignee_id === null) {
+          if (unassignedMap[row.xval] !== undefined) unassignedMap[row.xval] = row.count;
+        } else if (assigneeMap[row.assignee_id]) {
+          if (assigneeMap[row.assignee_id][row.xval] !== undefined)
+            assigneeMap[row.assignee_id][row.xval] = row.count;
+        }
+      });
+
+      const rows = [
+        ...assignees.map((a) => {
+          const values = xValues.map((x) => assigneeMap[a.id][x] ?? 0);
+          return {
+            assigneeId: a.id,
+            assigneeName: a.name,
+            values,
+            total: values.reduce((s, v) => s + v, 0),
+          };
+        }),
+        {
+          assigneeId: 'unassigned',
+          assigneeName: '미배정',
+          values: xValues.map((x) => unassignedMap[x] ?? 0),
+          total: Object.values(unassignedMap).reduce((s, v) => s + v, 0),
+        },
+      ];
+
+      res.json({ headers: xValues, rows });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/assignee-stats failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -434,44 +718,43 @@ dashboardRouter.get(
   requireAuth,
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
-
-    const SLA_HOURS: Record<string, number> = {
-      urgent: 168,
-      high: 336,
-      medium: 720,
-      low: 2160,
-    };
+    const { assigneeId, startDate, endDate } = extractFilters(
+      req.query as Record<string, string | undefined>,
+    );
 
     try {
-      const completedClause = clause.replace(
-        'WHERE v.deleted_at IS NULL',
-        "WHERE v.deleted_at IS NULL AND v.status IN ('완료','드랍')",
-      );
-
-      const result = await pool.query(
+      const r = await pool.query(
         `SELECT
-          v.priority,
-          COUNT(*) AS total
-         FROM vocs v
-         ${completedClause}
-         GROUP BY v.priority`,
-        params,
+           s.id,
+           s.name,
+           COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (v.updated_at - v.created_at)) / 86400)::numeric, 1), 0)::float AS avg_days,
+           ROUND(
+             COUNT(CASE WHEN EXTRACT(EPOCH FROM (v.updated_at - v.created_at)) / 86400 <= 14 THEN 1 END)::numeric
+             / NULLIF(COUNT(v.id), 0) * 100,
+             1
+           )::float AS sla_rate
+         FROM systems s
+         LEFT JOIN vocs v ON v.system_id = s.id
+           AND v.deleted_at IS NULL
+           AND v.status = '완료'
+           AND ($1::text IS NULL OR v.assignee_id = $1)
+           AND ($2::date IS NULL OR v.updated_at::date >= $2::date)
+           AND ($3::date IS NULL OR v.updated_at::date <= $3::date)
+         GROUP BY s.id, s.name
+         ORDER BY s.name`,
+        [assigneeId, startDate, endDate],
       );
 
-      res.json(
-        result.rows.map((r) => {
-          const slaHours = SLA_HOURS[r.priority] ?? 720;
-          return {
-            priority: r.priority,
-            avg_hours: null,
-            sla_hours: slaHours,
-            compliance_rate: 0,
-          };
-        }),
-      );
+      res.json({
+        rows: (
+          r.rows as { id: string; name: string; avg_days: number; sla_rate: number | null }[]
+        ).map((row) => ({
+          id: row.id,
+          name: row.name,
+          avgDays: row.avg_days,
+          slaRate: row.sla_rate ?? 0,
+        })),
+      });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/processing-speed failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
@@ -486,31 +769,41 @@ dashboardRouter.get(
   requireAuth,
   requireManager,
   async (req: Request, res: Response): Promise<void> => {
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause } = buildWhereClause(filters, params, 1);
-
-    const unresolvedClause = clause.replace(
-      'WHERE v.deleted_at IS NULL',
-      "WHERE v.deleted_at IS NULL AND v.status IN ('접수','검토중','처리중')",
+    const { systemId, menuId, assigneeId } = extractFilters(
+      req.query as Record<string, string | undefined>,
     );
 
     try {
-      const result = await pool.query(
+      const r = await pool.query(
         `SELECT
-          COUNT(CASE WHEN v.created_at >= now() - interval '7 days' THEN 1 END) AS le7,
-          COUNT(CASE WHEN v.created_at < now() - interval '7 days' AND v.created_at >= now() - interval '30 days' THEN 1 END) AS d8to30,
-          COUNT(CASE WHEN v.created_at < now() - interval '30 days' THEN 1 END) AS gt30
-         FROM vocs v
-         ${unresolvedClause}`,
-        params,
+           s.id,
+           s.name,
+           COUNT(CASE WHEN EXTRACT(EPOCH FROM (NOW() - v.created_at)) / 86400 <= 7 THEN 1 END)::int AS safe,
+           COUNT(CASE WHEN EXTRACT(EPOCH FROM (NOW() - v.created_at)) / 86400 BETWEEN 8 AND 30 THEN 1 END)::int AS warn,
+           COUNT(CASE WHEN EXTRACT(EPOCH FROM (NOW() - v.created_at)) / 86400 > 30 THEN 1 END)::int AS crit
+         FROM systems s
+         LEFT JOIN vocs v ON v.system_id = s.id
+           AND v.deleted_at IS NULL
+           AND v.status IN ('접수','검토중','처리중')
+           AND ($1::text IS NULL OR v.system_id = $1)
+           AND ($2::text IS NULL OR v.menu_id = $2)
+           AND ($3::text IS NULL OR v.assignee_id = $3)
+         GROUP BY s.id, s.name
+         ORDER BY s.name`,
+        [systemId, menuId, assigneeId],
       );
 
-      const row = result.rows[0];
       res.json({
-        le7: parseInt(row.le7, 10),
-        d8to30: parseInt(row.d8to30, 10),
-        gt30: parseInt(row.gt30, 10),
+        rows: (
+          r.rows as { id: string; name: string; safe: number; warn: number; crit: number }[]
+        ).map((row) => ({
+          id: row.id,
+          name: row.name,
+          safe: row.safe,
+          warn: row.warn,
+          crit: row.crit,
+          total: row.safe + row.warn + row.crit,
+        })),
       });
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/aging failed');
@@ -528,32 +821,79 @@ dashboardRouter.get(
   async (req: Request, res: Response): Promise<void> => {
     const limitRaw = req.query.limit as string | undefined;
     const limit = Math.min(100, Math.max(1, parseInt(limitRaw ?? '10', 10) || 10));
-    const filters = extractFilters(req.query as Record<string, string | undefined>);
-    const params: unknown[] = [];
-    const { clause, nextIdx } = buildWhereClause(filters, params, 1);
-
-    const unresolvedClause = clause.replace(
-      'WHERE v.deleted_at IS NULL',
-      "WHERE v.deleted_at IS NULL AND v.status IN ('접수','검토중','처리중')",
+    const { systemId, menuId, assigneeId } = extractFilters(
+      req.query as Record<string, string | undefined>,
     );
 
     try {
-      const result = await pool.query(
-        `SELECT v.id, v.title, v.created_at, v.priority, v.status, v.system_id
+      const r = await pool.query(
+        `SELECT
+           v.id,
+           v.issue_code,
+           v.title,
+           s.name AS system_name,
+           m.name AS menu_name,
+           v.priority,
+           EXTRACT(EPOCH FROM (NOW() - v.created_at)) / 86400 AS days_since_created
          FROM vocs v
-         ${unresolvedClause}
+         JOIN systems s ON s.id = v.system_id
+         JOIN menus m ON m.id = v.menu_id
+         WHERE v.deleted_at IS NULL
+           AND v.status IN ('접수','검토중','처리중')
+           AND ($1::text IS NULL OR v.system_id = $1)
+           AND ($2::text IS NULL OR v.menu_id = $2)
+           AND ($3::text IS NULL OR v.assignee_id = $3)
          ORDER BY v.created_at ASC
-         LIMIT $${nextIdx}`,
-        [...params, limit],
+         LIMIT $4`,
+        [systemId, menuId, assigneeId, limit],
       );
 
-      res.json(result.rows);
+      res.json(
+        (
+          r.rows as {
+            id: string;
+            issue_code: string | null;
+            title: string;
+            system_name: string;
+            menu_name: string;
+            priority: string;
+            days_since_created: number;
+          }[]
+        ).map((row) => ({
+          id: row.id,
+          issue_code: row.issue_code,
+          title: row.title,
+          systemName: row.system_name,
+          menuName: row.menu_name,
+          priority: row.priority,
+          daysSinceCreated: Math.floor(row.days_since_created),
+        })),
+      );
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/aging-vocs failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
     }
   },
 );
+
+// ── Lazy migration for dashboard_settings ─────────────────────────────────────
+
+let settingsTableReady = false;
+async function ensureSettingsTable(): Promise<void> {
+  if (settingsTableReady) return;
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS dashboard_settings (
+      id SERIAL PRIMARY KEY,
+      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+      widget_visibility JSONB DEFAULT '{}',
+      default_date_range VARCHAR(10) DEFAULT '30d',
+      heatmap_default_x_axis VARCHAR(20) DEFAULT 'status',
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(user_id)
+    )
+  `);
+  settingsTableReady = true;
+}
 
 // ── GET /settings ─────────────────────────────────────────────────────────────
 
@@ -565,22 +905,26 @@ dashboardRouter.get(
     const user = req.user as AuthUser;
 
     try {
+      await ensureSettingsTable();
+
+      // User-specific first, then admin default
       const result = await pool.query(
-        `SELECT * FROM dashboard_settings WHERE user_id = $1
+        `SELECT widget_visibility, default_date_range, heatmap_default_x_axis
+         FROM dashboard_settings
+         WHERE user_id = $1
          UNION ALL
-         SELECT * FROM dashboard_settings WHERE user_id IS NULL
+         SELECT widget_visibility, default_date_range, heatmap_default_x_axis
+         FROM dashboard_settings
+         WHERE user_id IS NULL
          LIMIT 1`,
         [user.id],
       );
 
       if (result.rowCount === 0) {
         res.json({
-          widget_order: [],
           widget_visibility: {},
-          widget_sizes: {},
           default_date_range: '30d',
           heatmap_default_x_axis: 'status',
-          locked_fields: [],
         });
         return;
       }
@@ -588,6 +932,71 @@ dashboardRouter.get(
       res.json(result.rows[0]);
     } catch (err) {
       logger.error({ err }, 'GET /api/dashboard/settings failed');
+      res.status(500).json({ error: 'INTERNAL_ERROR' });
+    }
+  },
+);
+
+// ── PUT /settings ─────────────────────────────────────────────────────────────
+
+dashboardRouter.put(
+  '/settings',
+  requireAuth,
+  requireManager,
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as AuthUser;
+    const { widget_visibility, default_date_range, heatmap_default_x_axis, target } = req.body as {
+      widget_visibility?: Record<string, boolean>;
+      default_date_range?: string;
+      heatmap_default_x_axis?: string;
+      target?: 'user' | 'admin';
+    };
+
+    try {
+      await ensureSettingsTable();
+
+      if (target === 'admin') {
+        // Only admins can update the admin default
+        const authUser = user as AuthUser;
+        if (authUser.role !== 'admin') {
+          res.status(403).json({ error: 'FORBIDDEN' });
+          return;
+        }
+        await pool.query(
+          `INSERT INTO dashboard_settings (user_id, widget_visibility, default_date_range, heatmap_default_x_axis, updated_at)
+           VALUES (NULL, $1, $2, $3, NOW())
+           ON CONFLICT (user_id) DO UPDATE
+             SET widget_visibility = EXCLUDED.widget_visibility,
+                 default_date_range = EXCLUDED.default_date_range,
+                 heatmap_default_x_axis = EXCLUDED.heatmap_default_x_axis,
+                 updated_at = NOW()`,
+          [
+            JSON.stringify(widget_visibility ?? {}),
+            default_date_range ?? '30d',
+            heatmap_default_x_axis ?? 'status',
+          ],
+        );
+      } else {
+        await pool.query(
+          `INSERT INTO dashboard_settings (user_id, widget_visibility, default_date_range, heatmap_default_x_axis, updated_at)
+           VALUES ($1, $2, $3, $4, NOW())
+           ON CONFLICT (user_id) DO UPDATE
+             SET widget_visibility = EXCLUDED.widget_visibility,
+                 default_date_range = EXCLUDED.default_date_range,
+                 heatmap_default_x_axis = EXCLUDED.heatmap_default_x_axis,
+                 updated_at = NOW()`,
+          [
+            user.id,
+            JSON.stringify(widget_visibility ?? {}),
+            default_date_range ?? '30d',
+            heatmap_default_x_axis ?? 'status',
+          ],
+        );
+      }
+
+      res.json({ ok: true });
+    } catch (err) {
+      logger.error({ err }, 'PUT /api/dashboard/settings failed');
       res.status(500).json({ error: 'INTERNAL_ERROR' });
     }
   },
@@ -609,7 +1018,7 @@ dashboardRouter.get(
 
     try {
       const result = await pool.query(
-        `SELECT id, name FROM menus WHERE system_id = $1 AND is_archived = false ORDER BY name`,
+        `SELECT id, name FROM menus WHERE system_id = $1 ORDER BY name`,
         [systemId],
       );
 
@@ -630,8 +1039,7 @@ dashboardRouter.get(
   async (_req: Request, res: Response): Promise<void> => {
     try {
       const result = await pool.query(
-        `SELECT id, display_name AS name, email
-         FROM users
+        `SELECT id, display_name AS name FROM users
          WHERE role IN ('manager','admin') AND is_active = true
          ORDER BY display_name`,
       );
