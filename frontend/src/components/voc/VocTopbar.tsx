@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { Search, Plus } from 'lucide-react';
 import { NotificationBell } from '../common/NotificationBell';
 import { useMasterCache } from '../../hooks/useMasterCache';
 import { useAuth } from '../../hooks/useAuth';
@@ -7,9 +8,10 @@ interface VocTopbarProps {
   total: number;
   onSearch: (keyword: string) => void;
   onCreateClick: () => void;
+  title?: string;
 }
 
-export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
+export function VocTopbar({ total, onSearch, onCreateClick, title = '전체 VOC' }: VocTopbarProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { user } = useAuth();
   const { isColdStartMode, isSnapshotMode } = useMasterCache();
@@ -28,17 +30,28 @@ export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
 
   return (
     <header
-      className="flex items-center gap-4 px-6 py-3 shrink-0"
-      style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}
+      className="flex items-center gap-3 px-6 shrink-0"
+      style={{
+        height: '56px',
+        background: 'var(--bg-panel)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
     >
-      {/* Left: title + count + master mode badge */}
+      {/* Left: title + count + mode badges */}
       <div className="flex items-center gap-2 shrink-0">
-        <h1 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-          VOC 목록
+        <h1
+          className="text-base font-semibold"
+          style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
+        >
+          {title}
         </h1>
         <span
-          className="px-2 py-0.5 rounded-full text-xs font-medium"
-          style={{ background: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
+          className="px-2 py-0.5 rounded-full text-xs font-semibold"
+          style={{
+            background: 'var(--bg-elevated)',
+            color: 'var(--text-tertiary)',
+            border: '1px solid var(--border-standard)',
+          }}
         >
           {total}
         </span>
@@ -53,7 +66,7 @@ export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
               color: 'var(--text-primary)',
             }}
           >
-            콜드 스타트 모드
+            콜드 스타트
           </span>
         )}
         {isManagerOrAdmin && !isColdStartMode && isSnapshotMode && (
@@ -72,30 +85,54 @@ export function VocTopbar({ total, onSearch, onCreateClick }: VocTopbarProps) {
         )}
       </div>
 
-      {/* Center: search */}
-      <div className="flex-1 flex justify-center">
-        <input
-          type="search"
-          placeholder="검색..."
-          onChange={handleInputChange}
-          className="w-full max-w-sm px-3 py-1.5 rounded text-sm"
-          style={{
-            background: 'var(--bg-surface)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border)',
-          }}
-        />
-      </div>
+      {/* Right: search + notification + create */}
+      <div className="flex items-center gap-2 ml-auto shrink-0">
+        <div style={{ position: 'relative' }}>
+          <Search
+            size={13}
+            style={{
+              position: 'absolute',
+              left: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--text-quaternary)',
+              pointerEvents: 'none',
+            }}
+          />
+          <input
+            type="search"
+            placeholder="제목, 본문 검색..."
+            onChange={handleInputChange}
+            style={{
+              width: '220px',
+              paddingLeft: '30px',
+              paddingRight: '10px',
+              paddingTop: '6px',
+              paddingBottom: '6px',
+              borderRadius: '7px',
+              fontSize: '13px',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-standard)',
+              outline: 'none',
+            }}
+          />
+        </div>
 
-      {/* Right: notification + create */}
-      <div className="flex items-center gap-2 shrink-0">
         <NotificationBell />
+
         <button
           onClick={onCreateClick}
-          className="px-4 py-1.5 rounded text-sm font-medium"
-          style={{ background: 'var(--brand)', color: 'var(--text-on-brand)' }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold"
+          style={{
+            background: 'var(--brand)',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            letterSpacing: '-0.01em',
+          }}
         >
-          새 VOC 등록
+          <Plus size={14} />새 VOC 등록
         </button>
       </div>
     </header>

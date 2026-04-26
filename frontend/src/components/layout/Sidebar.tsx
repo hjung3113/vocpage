@@ -7,11 +7,17 @@ import {
   LayoutDashboard,
   Bell,
   HelpCircle,
-  ShieldCheck,
   FolderOpen,
+  Tag,
+  Settings,
+  Layers,
+  ShieldCheck,
+  Sun,
+  Moon,
+  Monitor,
 } from 'lucide-react';
 import { AuthContext } from '../../contexts/AuthContext';
-import { NotificationBell } from '../common/NotificationBell';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const sidebarStyle: React.CSSProperties = {
   width: '222px',
@@ -20,25 +26,50 @@ const sidebarStyle: React.CSSProperties = {
   flexDirection: 'column',
   height: '100vh',
   background: 'var(--bg-panel)',
-  borderRight: '1px solid var(--border)',
+  borderRight: '1px solid var(--border-subtle)',
   overflow: 'hidden',
 };
 
-const logoStyle: React.CSSProperties = {
+const logoAreaStyle: React.CSSProperties = {
   height: '56px',
   display: 'flex',
   alignItems: 'center',
+  gap: '8px',
   padding: '0 16px',
-  borderBottom: '1px solid var(--border)',
+  borderBottom: '1px solid var(--border-subtle)',
   flexShrink: 0,
 };
 
+const logoMarkStyle: React.CSSProperties = {
+  width: '26px',
+  height: '26px',
+  borderRadius: '7px',
+  background: 'var(--brand)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  boxShadow: 'var(--shadow-sm)',
+};
+
 const logoTextStyle: React.CSSProperties = {
-  fontSize: '15px',
+  fontSize: '14px',
   fontWeight: 700,
   color: 'var(--text-primary)',
-  fontFamily: 'var(--font-ui)',
-  letterSpacing: '-0.01em',
+  letterSpacing: '-0.3px',
+};
+
+const logoBadgeStyle: React.CSSProperties = {
+  fontSize: '9px',
+  fontWeight: 600,
+  padding: '1px 5px',
+  borderRadius: '3px',
+  background: 'var(--brand-bg)',
+  color: 'var(--brand)',
+  border: '1px solid var(--brand-border)',
+  letterSpacing: '0.03em',
+  alignSelf: 'flex-start',
+  marginTop: '1px',
 };
 
 const navScrollStyle: React.CSSProperties = {
@@ -48,23 +79,22 @@ const navScrollStyle: React.CSSProperties = {
 };
 
 const sectionLabelStyle: React.CSSProperties = {
-  fontSize: '11px',
+  fontSize: '10.5px',
   fontWeight: 600,
   letterSpacing: '0.07em',
   textTransform: 'uppercase',
-  padding: '16px 12px 6px',
+  padding: '12px 12px 4px',
   color: 'var(--text-quaternary)',
-  fontFamily: 'var(--font-ui)',
 };
 
 const dividerStyle: React.CSSProperties = {
   height: '1px',
-  background: 'var(--border)',
-  margin: '4px 0',
+  background: 'var(--border-subtle)',
+  margin: '4px 8px',
 };
 
 const userAreaStyle: React.CSSProperties = {
-  borderTop: '1px solid var(--border)',
+  borderTop: '1px solid var(--border-subtle)',
   padding: '12px 14px',
   flexShrink: 0,
 };
@@ -73,8 +103,6 @@ const userNameStyle: React.CSSProperties = {
   fontSize: '13px',
   fontWeight: 600,
   color: 'var(--text-primary)',
-  fontFamily: 'var(--font-ui)',
-  marginBottom: '2px',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -83,8 +111,7 @@ const userNameStyle: React.CSSProperties = {
 const userRoleStyle: React.CSSProperties = {
   fontSize: '11px',
   color: 'var(--text-quaternary)',
-  fontFamily: 'var(--font-ui)',
-  marginTop: '2px',
+  marginTop: '1px',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -95,17 +122,16 @@ function navItemStyle(isActive: boolean): React.CSSProperties {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '10px 12px',
+    padding: '8px 10px',
     fontSize: '13px',
     fontWeight: isActive ? 600 : 400,
-    color: isActive ? 'var(--brand)' : 'var(--text-secondary)',
-    background: isActive ? 'oklch(56.5% 0.196 261.3 / 0.1)' : 'transparent',
-    borderRadius: '6px',
+    color: isActive ? 'var(--accent)' : 'var(--text-tertiary)',
+    background: isActive ? 'var(--brand-bg)' : 'transparent',
+    borderRadius: '7px',
     margin: '1px 8px',
     cursor: 'pointer',
     textDecoration: 'none',
-    fontFamily: 'var(--font-ui)',
-    transition: 'background 0.1s, color 0.1s',
+    transition: 'background 0.12s, color 0.12s',
   };
 }
 
@@ -114,21 +140,50 @@ interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   end?: boolean;
+  badge?: number;
 }
 
-function SidebarNavItem({ to, icon, label, end }: NavItemProps) {
+function SidebarNavItem({ to, icon, label, end, badge }: NavItemProps) {
   return (
     <NavLink to={to} end={end} style={({ isActive }) => navItemStyle(isActive)}>
       {icon}
-      {label}
+      <span style={{ flex: 1 }}>{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span
+          style={{
+            fontSize: '10px',
+            fontWeight: 600,
+            padding: '1px 6px',
+            borderRadius: '9999px',
+            background: 'var(--brand-bg)',
+            color: 'var(--brand)',
+            border: '1px solid var(--brand-border)',
+          }}
+        >
+          {badge}
+        </span>
+      )}
     </NavLink>
   );
 }
+
+const THEME_ICONS = {
+  system: <Monitor size={14} />,
+  light: <Sun size={14} />,
+  dark: <Moon size={14} />,
+} as const;
+
+const THEME_LABELS = {
+  system: '시스템',
+  light: '라이트',
+  dark: '다크',
+} as const;
 
 export function Sidebar() {
   const ctx = useContext(AuthContext);
   const user = ctx?.user ?? null;
   const isAdmin = user?.role === 'admin';
+  const { theme, toggle } = useTheme();
 
   const [systems, setSystems] = useState<Array<{ id: string; name: string }>>([]);
 
@@ -143,8 +198,13 @@ export function Sidebar() {
 
   return (
     <aside style={sidebarStyle}>
-      <div style={logoStyle}>
-        <span style={logoTextStyle}>VOCPage</span>
+      {/* Logo */}
+      <div style={logoAreaStyle}>
+        <div style={logoMarkStyle}>
+          <ShieldCheck size={14} color="white" />
+        </div>
+        <span style={logoTextStyle}>VOCpage</span>
+        <span style={logoBadgeStyle}>BETA</span>
       </div>
 
       <nav style={navScrollStyle}>
@@ -161,7 +221,7 @@ export function Sidebar() {
             {systems.map((system) => (
               <SidebarNavItem
                 key={system.id}
-                to={`/vocs?system_id=${system.id}`}
+                to={`/?system_id=${system.id}`}
                 icon={<FolderOpen size={15} />}
                 label={system.name}
               />
@@ -179,19 +239,57 @@ export function Sidebar() {
           <>
             <div style={dividerStyle} />
             <div style={sectionLabelStyle}>관리자</div>
-            <SidebarNavItem to="/admin" icon={<ShieldCheck size={15} />} label="관리자" />
+            <SidebarNavItem to="/admin" end icon={<Tag size={15} />} label="태그 규칙 관리" />
+            <SidebarNavItem to="/admin" icon={<Settings size={15} />} label="시스템/메뉴 관리" />
+            <SidebarNavItem to="/admin" icon={<Layers size={15} />} label="유형 관리" />
+            <SidebarNavItem to="/admin" icon={<Users size={15} />} label="사용자 관리" />
+            <SidebarNavItem to="/admin" icon={<Bell size={15} />} label="공지사항 관리" />
+            <SidebarNavItem to="/admin" icon={<HelpCircle size={15} />} label="FAQ 관리" />
           </>
         )}
       </nav>
 
+      {/* Bottom: user info + theme toggle */}
       <div style={userAreaStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <User size={15} color="var(--text-secondary)" />
+          <div
+            style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: 'var(--brand-bg)',
+              border: '1px solid var(--brand-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <User size={13} color="var(--brand)" />
+          </div>
           <div style={{ overflow: 'hidden', flex: 1 }}>
             <div style={userNameStyle}>{user?.name ?? '—'}</div>
             <div style={userRoleStyle}>{user?.role ?? ''}</div>
           </div>
-          <NotificationBell />
+          <button
+            onClick={toggle}
+            title={`테마: ${THEME_LABELS[theme]}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              borderRadius: '6px',
+              border: '1px solid var(--border-standard)',
+              background: 'var(--bg-elevated)',
+              color: 'var(--text-tertiary)',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            {THEME_ICONS[theme]}
+          </button>
         </div>
       </div>
     </aside>
