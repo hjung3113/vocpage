@@ -14,6 +14,10 @@ const FaqPage = lazy(() => import('./pages/FaqPage').then((m) => ({ default: m.F
 
 const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
 
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+);
+
 const MockLoginPage =
   import.meta.env.VITE_AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
 
@@ -33,6 +37,18 @@ function AdminGuard() {
   return (
     <Suspense fallback={null}>
       <AdminPage />
+    </Suspense>
+  );
+}
+
+function DashboardGuard() {
+  const ctx = useContext(AuthContext);
+  if (!ctx || ctx.isLoading) return null;
+  const role = ctx.user?.role;
+  if (role !== 'admin' && role !== 'manager') return <Navigate to="/" replace />;
+  return (
+    <Suspense fallback={null}>
+      <DashboardPage />
     </Suspense>
   );
 }
@@ -78,6 +94,10 @@ export const router = createBrowserRouter([
       {
         path: '/admin',
         element: <AdminGuard />,
+      },
+      {
+        path: '/dashboard',
+        element: <DashboardGuard />,
       },
     ],
   },
