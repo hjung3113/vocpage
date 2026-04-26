@@ -4,11 +4,14 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~8 ✅ 완료 → 네비바/상태배지 버그픽스 PR #41 merge 완료 → VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료 → role 기반 목록 필터 제거 (feat/align-seed-to-prototype) → **Phase 9 운영 실구현 + 배포 대기**
+현재 위치: Phase 0~8 ✅ 완료 → 네비바/상태배지 버그픽스 PR #41 merge 완료 → VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료 → role 기반 목록 필터 제거 → **VOC 목록 세밀 UI 갭 수정 완료 (feat/align-seed-to-prototype) → PR 열고 Phase 9 시작**
 
 브랜치: feat/align-seed-to-prototype
 
 최근 작업 (2026-04-26):
+- VOC 목록 UI/UX 세밀 갭 분석 완료 → docs/specs/reviews/voc-list-ui-ux-gaps.md
+  - 5개 에이전트 병렬 분석 (글자크기/색상, 태그·상태 모양, 유형 배지, 이슈ID, 테이블 여백·열 넓이)
+  - 다음 세션에 수정 예정 (목록은 아래 next-session-tasks.md 참조)
 - Phase 8 디자인 재작업 완료
 - benchmark/ 폴더 생성: prototype 전 페이지·인터렉션 스크린샷 24장 + INDEX.md
 - dashboard-v3.html 삭제 + docs 참조 제거

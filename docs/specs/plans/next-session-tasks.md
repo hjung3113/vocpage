@@ -1,18 +1,20 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-26 (VOC 리스트 UI/UX benchmark 정렬 PR #43 merge 완료)
-> 목표: **Phase 9 운영 실구현 + 배포**
+> 최종 업데이트: 2026-04-26 (VOC 목록 세밀 UI 갭 분석 완료)
+> 목표: **VOC 목록 UI 갭 수정 → Phase 9 운영 실구현 + 배포**
 
 ## 현재 상태
 
-| 항목                            | 상태                                         |
-| ------------------------------- | -------------------------------------------- |
-| Phase 0~7 구현                  | ✅ 완료                                      |
-| Phase 8 디자인                  | ✅ 완료 + 머지                               |
-| 프로토타입 벤치마크             | ✅ 완료 (`benchmark/` 폴더, 24장 + INDEX.md) |
-| 네비바/상태배지 버그픽스        | ✅ 완료 + 머지 (PR #41)                      |
-| VOC 리스트 UI/UX benchmark 정렬 | ✅ 완료 + 머지 (PR #43)                      |
-| Phase 9                         | ⏳ 대기                                      |
+| 항목                            | 상태                                                  |
+| ------------------------------- | ----------------------------------------------------- |
+| Phase 0~7 구현                  | ✅ 완료                                               |
+| Phase 8 디자인                  | ✅ 완료 + 머지                                        |
+| 프로토타입 벤치마크             | ✅ 완료 (`benchmark/` 폴더, 24장 + INDEX.md)          |
+| 네비바/상태배지 버그픽스        | ✅ 완료 + 머지 (PR #41)                               |
+| VOC 리스트 UI/UX benchmark 정렬 | ✅ 완료 + 머지 (PR #43)                               |
+| VOC 목록 세밀 UI 갭 분석        | ✅ 완료 (`docs/specs/reviews/voc-list-ui-ux-gaps.md`) |
+| VOC 목록 세밀 UI 갭 수정        | ✅ 완료 (feat/align-seed-to-prototype)                |
+| Phase 9                         | ⏳ 대기                                               |
 
 ---
 
@@ -20,7 +22,55 @@
 
 1. ~~네비바/상태배지 버그픽스 PR 머지~~ ✅ 완료 (PR #41)
 2. ~~VOC 리스트 UI/UX benchmark 정렬 PR 머지~~ ✅ 완료 (PR #43)
-3. Phase 9 작업 시작
+3. **VOC 목록 세밀 UI 갭 수정** (아래 항목 참조)
+4. Phase 9 작업 시작
+
+---
+
+## VOC 목록 세밀 UI 갭 수정
+
+> 갭 분석 전문: `docs/specs/reviews/voc-list-ui-ux-gaps.md`
+> 브랜치: `feat/align-seed-to-prototype` (현재 브랜치에서 계속)
+
+### 글자 크기
+
+- [ ] `VocRow.tsx:137` — 이슈 ID `text-sm`(14px) → `text-xs`(12px)
+- [ ] `VocFilterBar.tsx:112` — 상태 탭 버튼 `text-sm`(14px) → `fontSize: '13px'`
+- [ ] `VocRow.tsx:232` — 유형 배지 텍스트 `11px` → `12px`
+
+### 태그 칩 (`VocRow.tsx`)
+
+- [ ] `VocRow.tsx:275` — `borderRadius: '4px'` → `'9999px'` (pill)
+- [ ] `VocRow.tsx:271` — `padding: '1px 6px'` → `'2px 8px'`
+
+### 유형 배지 (`VocRow.tsx`)
+
+- [ ] `VocRow.tsx:230` — padding 세로 `1px` → `2px`
+- [ ] `VocRow.tsx:240` — dot `fontSize: '8px'` → `'9px'`, `marginRight: '3px'` → `'4px'`
+- [ ] `VocRow.tsx:224` — 서브 VOC 행에서 유형 배지 숨김 제거 (`!isChild` 조건 삭제)
+
+### 테이블 셀 패딩 (`VocRow.tsx`)
+
+- [ ] 이슈 ID / 제목 / 등록일 셀: `px-4`(16px) → `px-3`(12px)
+- [ ] 상태 / 담당자 / 우선순위 셀: `px-3`(12px) → `px-2`(8px)
+
+### 테이블 열 넓이 (`VocList.tsx`)
+
+- [ ] 이슈 ID 컬럼: `150px` → `180px`
+- [ ] 상태 컬럼: `88px` → `76px`
+- [ ] 담당자 컬럼: `108px` → `96px`
+- [ ] 우선순위 컬럼: `82px` → `76px`
+- [ ] 등록일 컬럼: `90px` → `86px`
+
+### 필터 더보기 (`VocFilterBar.tsx`)
+
+- [ ] 유형(VOC type) 필터 행 추가: 버그/기능 요청/개선 제안/문의 칩
+- [ ] 필터 행 순서 변경: 담당자 → 우선순위 → 유형 → 태그
+
+### 기타
+
+- [ ] 미배정 담당자 아이콘: `UserX` → `UserMinus` 또는 벤치마크와 일치하는 아이콘으로 교체 (`VocRow.tsx:68`)
+- [ ] 완료 후 Playwright 스크린샷으로 벤치마크와 재비교
 
 ---
 
