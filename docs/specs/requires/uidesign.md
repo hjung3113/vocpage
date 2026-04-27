@@ -1092,3 +1092,22 @@ Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지
 > 403 / 404 / dashboard 위젯 격리 등 동작 규약은 `requirements.md §5.1` 참조.
 
 휴지통(D23): empty 상태 보조 카피 톤은 `var(--text-tertiary)` — 정책 본문(30일 보존 등)은 `feature-voc.md §9.4.7` 참조.
+
+---
+
+### 13.12 Diff / Comparison Tokens
+
+Tokens used in payload diff views (Result Review detail drawer, `§13.x` diff panel).
+All tokens are defined in `tokens.css` under `:root` and support `light-dark()`.
+
+| Token           | Role                                                                                   |
+| --------------- | -------------------------------------------------------------------------------------- |
+| `--diff-add-bg` | Background for rows where a key is newly added (not present in current payload)        |
+| `--diff-add-fg` | Text color for added rows                                                              |
+| `--diff-del-bg` | Background for rows where a key is removed (present in current payload, absent in new) |
+| `--diff-del-fg` | Text color for removed rows                                                            |
+| `--diff-mod-bg` | Background for rows where a key exists in both payloads but the value has changed      |
+| `--diff-mod-fg` | Text color for modified rows                                                           |
+
+Usage: apply via `.rv-diff-row.added`, `.rv-diff-row.removed`, `.rv-diff-row.changed` classes.
+Unchanged rows (`.rv-diff-row.same`) use `transparent` background and `var(--text-secondary)` text — no dedicated token needed.

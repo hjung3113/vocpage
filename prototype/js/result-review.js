@@ -15,7 +15,8 @@ const reviewQueue = [
     id: 'VOC-1234',
     title: 'PM 설비 알람 누락 (압연 라인)',
     action: 'submission',
-    statusLabel: '제출 검토',
+    statusLabel: '처리 중',
+    reviewStatusLabel: '검토 대기',
     assignee: '김철수',
     author: '이영희',
     submittedAt: '2026-04-25',
@@ -66,7 +67,8 @@ const reviewQueue = [
     id: 'VOC-1235',
     title: 'MES 로그인 지연 (30초+)',
     action: 'submission',
-    statusLabel: '제출 검토',
+    statusLabel: '처리 중',
+    reviewStatusLabel: '검토 대기',
     assignee: '박민수',
     author: '최수진',
     submittedAt: '2026-04-26',
@@ -114,7 +116,8 @@ const reviewQueue = [
     id: 'VOC-1236',
     title: 'QC 리포트 출력 오류 — 중복 등록',
     action: 'deletion',
-    statusLabel: '삭제 신청',
+    statusLabel: '완료',
+    reviewStatusLabel: '삭제 신청',
     assignee: '이지원',
     author: '김미래',
     submittedAt: '2026-04-27',
@@ -125,9 +128,8 @@ const reviewQueue = [
     currentPayload: {
       사유: 'VOC-0998과 동일 건',
     },
-    newPayload: {
-      사유: 'VOC-0998과 동일 건 — 담당자 합의 후 삭제 요청',
-    },
+    newPayload: null, // E: deletion has no newPayload
+    deletionReason: 'VOC-0998과 동일 건 — 담당자 합의 후 삭제 요청',
     attachments: [],
     history: [
       {
@@ -171,11 +173,26 @@ function renderResultReview() {
   `;
   if (window.lucide) lucide.createIcons();
 
-  // Delegated click handler on the list container
-  const body = document.getElementById('reviewQueueBody');
-  if (body) {
-    body.addEventListener('click', function (e) {
-      // Don't open drawer if clicking a button inside the card
+  // I: bind delegated click once on stable parent #page-result-review
+  if (!el.dataset.bound) {
+    el.dataset.bound = '1';
+    el.addEventListener('click', function (e) {
+      // C: inline approve/reject buttons now open the detail drawer
+      const btn = e.target.closest('button[data-action]');
+      if (btn) {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        if (action === 'approve' && id) {
+          // inline approve: open drawer (consolidate flow per fix B)
+          if (typeof openReviewDetail === 'function') openReviewDetail(id);
+        } else if (action === 'reject' && id) {
+          // inline reject: open drawer so comment can be filled
+          if (typeof openReviewDetail === 'function') openReviewDetail(id);
+        }
+        return;
+      }
+      // Don't open drawer if clicking any other button inside the card
       if (e.target.closest('button')) return;
       const card = e.target.closest('.review-card');
       if (!card) return;
@@ -193,12 +210,17 @@ function renderReviewCard(r) {
     )
     .join('');
   const id = escHtml(r.id);
+  // D: show review_status pill next to status pill
+  const reviewPill = r.reviewStatusLabel
+    ? `<span class="status-pill status-pending">${escHtml(r.reviewStatusLabel)}</span>`
+    : '';
   return `
     <div class="review-card rv-card-clickable" data-id="${id}">
       <div class="review-card-head">
         <div class="review-card-meta">
           <span class="review-id">${id}</span>
           <span class="status-pill status-reviewing">${escHtml(r.statusLabel)}</span>
+          ${reviewPill}
         </div>
         <div class="review-card-title">${escHtml(r.title)}</div>
         <div class="review-card-sub">
@@ -209,10 +231,10 @@ function renderReviewCard(r) {
       </div>
       <div class="review-card-body">${rows}</div>
       <div class="review-card-actions">
-        <button class="rv-btn rv-btn-ghost" onclick="event.stopPropagation(); rejectReview('${id}')">
+        <button class="rv-btn rv-btn-ghost" data-action="reject" data-id="${id}">
           <i data-lucide="x"></i> 반려
         </button>
-        <button class="rv-btn rv-btn-primary" onclick="event.stopPropagation(); approveReview('${id}')">
+        <button class="rv-btn rv-btn-primary" data-action="approve" data-id="${id}">
           <i data-lucide="check"></i> 승인
         </button>
       </div>
@@ -241,12 +263,19 @@ function switchReviewTab(tab) {
   renderResultReview();
 }
 
-function approveReview(id) {
-  showReviewToast(`${id} 승인 처리되었습니다 (mock)`, 'ok');
+// B: comment param added; stored on item; included in toast
+function approveReview(id, comment) {
+  const item = (window.reviewQueue || []).find((r) => r.id === id);
+  if (item) item.lastDecisionComment = comment || '';
+  const suffix = comment ? ` (사유: ${comment})` : '';
+  showReviewToast(`${id} 승인 완료${suffix} (mock)`, 'ok');
 }
 
-function rejectReview(id) {
-  showReviewToast(`${id} 반려 처리되었습니다 — 코멘트 입력은 후속 단계 (mock)`, 'warn');
+function rejectReview(id, comment) {
+  const item = (window.reviewQueue || []).find((r) => r.id === id);
+  if (item) item.lastDecisionComment = comment || '';
+  const suffix = comment ? ` (사유: ${comment})` : '';
+  showReviewToast(`${id} 반려 처리${suffix} (mock)`, 'warn');
 }
 
 function showReviewToast(msg, kind) {

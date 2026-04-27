@@ -534,6 +534,11 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 7. **액션 영역**: 승인 / 반려 버튼. Manager/Admin 외 비활성화 + 잠금 안내문. 승인은 코멘트 선택, 반려는 코멘트 필수.
 
 **권한**: Manager / Admin 만 액션 가능 (§9.4.5 재확인). Viewer 는 모든 섹션 읽기 전용.
+FE 가드: window.currentUser.role ∈ {manager, admin}일 때만 승인/반려 버튼 활성화. 그 외 disabled + 안내 문구 노출.
+
+**데이터 흐름**: 승인/반려 시 `voc_payload_reviews` row 생성 (action, decision, comment, reviewer_id, ts). comment는 반려 시 필수, 승인 시 optional.
+
+**삭제 신청 처리**: 삭제 신청은 newPayload 없음. currentPayload 단일 컬럼 + 삭제 사유 표시.
 
 **데이터 모델 매핑**
 
@@ -550,6 +555,8 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 | 첨부         | `attachments[]`                                    | `voc_payload_reviews`         |
 | 히스토리     | `is_current`, `final_state`, `created_at`, `actor` | `voc_payload_history`         |
 | 댓글/사유    | `comment` (입력값)                                 | `voc_payload_reviews` (write) |
+
+> 히스토리 `actor` → `users.name` via `submitted_by` FK. `history.action` → event_type enum (TBD column; FE는 `history.event_type` 가정).
 
 **SP / Table 가시성**
 
