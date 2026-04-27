@@ -246,3 +246,20 @@ P-1.C1 Result Review 관리자 페이지 셸. 사이드바 "관리자" 섹션에
   - API 엔드포인트 전체 업데이트 (systemId/menuId/assigneeId 공통 파라미터)
   - FE 상태 타입 정의
 - **시각화 참조 파일**: `prototype/dashboard/dashboard-v3.html`
+
+## 검토 상세 드로어 R1~R3 결과 (2026-04-28)
+
+- **점수 추이**: Round1 avg 68.8 → Round2 52.2 → Round3 48 (i18n 22점 OOS 제외 시 실질 개선)
+- **적용 픽스**: 3 fix commits (R1 critical → R2 high-impact → R3 highest-impact)
+- **최종 범위**: prototype FE a11y + 스펙 강화 (feature-voc.md §9.4.5.1/2) + migration 012 (vocs.source_sp, vocs.related_tables)
+- **90+ 미달 이유**: 라운드마다 새 전문가/관점 투입(설계 의도) — 점수 하락이 아닌 커버리지 확장
+- **변경 파일**:
+  - `prototype/js/result-review-data.js` (신규 — 목 데이터 분리)
+  - `prototype/js/result-review.js` (310줄 이하 달성, role=tab + focus-visible + toast aria)
+  - `prototype/js/result-review-detail.js` (h2/h3, role=status, aria-describedby, lucide rAF, close delegation)
+  - `prototype/css/admin.css` (focus-visible outline 규칙 추가)
+  - `prototype/prototype.html` (result-review-data.js 스크립트 태그 추가)
+  - `docs/specs/requires/feature-voc.md` (§9.4.5.2 API Surface 추가)
+  - `docs/specs/plans/next-session-tasks.md` (P-1/P-9 ✅, P-10 NextGen 후속 작업 추가)
+- **브랜치**: feat/result-review-detail-popup
+- **후속 (NextGen)**: i18n 외부화, 풀 RBAC + DB RLS, payload_sha256 BE 구현, OpenAPI 스펙

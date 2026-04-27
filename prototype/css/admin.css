@@ -1715,6 +1715,13 @@
   background: var(--accent-hover);
   border-color: var(--accent-hover);
 }
+.rv-btn:focus-visible,
+.review-card:focus-within,
+.review-tab:focus-visible,
+.rv-card-open:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
 
 .review-empty {
   padding: 48px 24px;

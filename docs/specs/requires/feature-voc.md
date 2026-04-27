@@ -576,6 +576,18 @@ FE 가드: window.currentUser.role ∈ {manager, admin}일 때만 승인/반려 
 
 **토큰 규약**: `var(--*)` 전용. hex / oklch 리터럴 금지 (uidesign.md §10 준거).
 
+##### 9.4.5.2 API Surface (BE 미구현, 명세 우선)
+
+| Method | Path                                                                            | Body                                                                        | 200 응답                                                                                     | 주요 에러                                                                 |
+| ------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| GET    | /api/admin/voc/reviews?tab=submission\|deletion&assignee=&system=&menu=&cursor= | —                                                                           | { items: [...], nextCursor }                                                                 | 403 ROLE_FORBIDDEN                                                        |
+| GET    | /api/admin/voc/reviews/:id                                                      | —                                                                           | drawer payload (currentPayload, newPayload, history, attachments, source_sp, related_tables) | 404 REVIEW_NOT_FOUND                                                      |
+| POST   | /api/admin/voc/reviews/:id/decide                                               | { action, decision, comment?, expectedReviewStatus, expectedPayloadSha256 } | { reviewId, vocReviewStatus }                                                                | 403, 404, 409 REVIEW_STALE / REVIEW_ALREADY_DECIDED, 422 COMMENT_REQUIRED |
+
+에러 envelope (auth.ts 패턴 재사용): `{ code, message, details: { field?, expected?, actual? } }`. 코드: ROLE_FORBIDDEN, REVIEW_NOT_FOUND, REVIEW_ALREADY_DECIDED, REVIEW_STALE, COMMENT_REQUIRED, INVALID_DECISION.
+
+동시성: 두 매니저 동시 승인 → /decide 트랜잭션 안에서 `SELECT … FROM vocs WHERE id=$1 FOR UPDATE` + expectedReviewStatus/expectedPayloadSha256 검증. 불일치 시 409 REVIEW_STALE 반환. 클라이언트는 Idempotency-Key 헤더 (24h dedupe) 권장.
+
 ---
 
 #### 9.4.6 태그 마스터 관리 (D22 확정, 2026-04-27)

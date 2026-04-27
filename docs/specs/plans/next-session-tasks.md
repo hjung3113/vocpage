@@ -149,17 +149,18 @@
 > **선행 조건**: PR #54 머지 완료 (2026-04-27)
 > **산출물**: 갱신된 `prototype/prototype.html` + 컴포넌트 인벤토리 + 갭 리스트.
 
-| ID  | 항목                                                                                       | 상태                                                    |
-| --- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| P-1 | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel) | ✅ B-1 Result Review detail drawer 완료 (R2 fixes 적용) |
-| P-2 | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글               | -                                                       |
-| P-3 | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                              | -                                                       |
-| P-4 | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                           | -                                                       |
-| P-5 | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                      | -                                                       |
-| P-6 | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                       | -                                                       |
-| P-7 | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                       | -                                                       |
-| P-8 | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                 | -                                                       |
-| P-9 | 검토 상세 드로어 Round 3 verification pending                                              | -                                                       |
+| ID   | 항목                                                                                         | 상태                                                    |
+| ---- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| P-1  | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel)   | ✅ B-1 Result Review detail drawer 완료 (R3 fixes 적용) |
+| P-2  | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글                 | -                                                       |
+| P-3  | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                | -                                                       |
+| P-4  | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                             | -                                                       |
+| P-5  | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                        | -                                                       |
+| P-6  | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                         | -                                                       |
+| P-7  | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                         | -                                                       |
+| P-8  | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                   | -                                                       |
+| P-9  | 검토 상세 드로어 Round 3 verification pending                                                | ✅ R3 fixes 완료 (2026-04-28)                           |
+| P-10 | **후속 작업 (NextGen)**: i18n 외부화, 풀 RBAC + DB RLS, payload_sha256 BE 구현, OpenAPI 스펙 | -                                                       |
 
 ---
 

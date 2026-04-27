@@ -36,7 +36,12 @@
       el.setAttribute('aria-labelledby', 'rvDetailTitle');
       document.body.appendChild(el);
       el.addEventListener('click', function (e) {
-        if (e.target === el) closeReviewDetail();
+        if (e.target === el) {
+          closeReviewDetail();
+          return;
+        }
+        const btn = e.target.closest('button[data-action="close"]');
+        if (btn) closeReviewDetail();
       });
     }
 
@@ -56,7 +61,7 @@
     document.body.dataset.rvOpen = '1';
     const appRoot = document.getElementById('app-root') || document.querySelector('main');
     if (appRoot) appRoot.setAttribute('aria-hidden', 'true');
-    if (window.lucide) lucide.createIcons({ nodes: [el] });
+    if (window.lucide) requestAnimationFrame(() => lucide.createIcons({ nodes: [el] }));
 
     const first = _focusableElements(el)[0];
     if (first) first.focus();
@@ -234,19 +239,20 @@
     const dis = canDecide ? '' : ' disabled';
     const roleNoticeHtml = canDecide
       ? ''
-      : '<div class="rv-detail-error" data-testid="rv-role-notice" style="display:block">권한 없음: Manager 또는 Admin만 승인/반려할 수 있습니다.</div>';
+      : '<div class="rv-detail-error" data-testid="rv-role-notice" role="status" style="display:block">권한 없음: Manager 또는 Admin만 승인/반려할 수 있습니다.</div>';
+    const roleDescBy = canDecide ? '' : ' aria-describedby="rv-role-notice"';
 
     return `
       <div class="rv-detail-panel" role="document">
         <div class="rv-detail-toolbar">
-          <span id="rvDetailTitle" class="rv-detail-title">검토 상세</span>
-          <button class="rv-detail-close rv-btn rv-btn-ghost" data-testid="rv-close-btn" onclick="closeReviewDetail()" aria-label="닫기"><i data-lucide="x"></i></button>
+          <h2 id="rvDetailTitle" class="rv-detail-title">검토 상세</h2>
+          <button class="rv-detail-close rv-btn rv-btn-ghost" data-testid="rv-close-btn" data-action="close" aria-label="닫기"><i data-lucide="x"></i></button>
         </div>
-        <section class="rv-detail-section"><div class="rv-section-title">메타 정보</div>${renderMetaHeader(item)}</section>
-        <section class="rv-detail-section"><div class="rv-section-title">시스템 · 메뉴 컨텍스트</div>${renderContext(item)}</section>
-        <section class="rv-detail-section"><div class="rv-section-title">Payload Diff</div>${renderDiffOrDeletion(item)}</section>
-        <section class="rv-detail-section"><div class="rv-section-title">첨부 파일</div>${renderAttachments(item)}</section>
-        <section class="rv-detail-section"><div class="rv-section-title">히스토리 타임라인</div><div class="rv-history">${renderHistory(item)}</div></section>
+        <section class="rv-detail-section"><h3 class="rv-section-title">메타 정보</h3>${renderMetaHeader(item)}</section>
+        <section class="rv-detail-section"><h3 class="rv-section-title">시스템 · 메뉴 컨텍스트</h3>${renderContext(item)}</section>
+        <section class="rv-detail-section"><h3 class="rv-section-title">Payload Diff</h3>${renderDiffOrDeletion(item)}</section>
+        <section class="rv-detail-section"><h3 class="rv-section-title">첨부 파일</h3>${renderAttachments(item)}</section>
+        <section class="rv-detail-section"><h3 class="rv-section-title">히스토리 타임라인</h3><div class="rv-history">${renderHistory(item)}</div></section>
         <section class="rv-detail-section">
           <label for="rvDetailComment" class="rv-section-title">댓글 / 사유 <span class="rv-comment-note">(반려 시 필수)</span></label>
           <div class="rv-comment">
@@ -256,8 +262,8 @@
         </section>
         <div class="rv-actions">
           ${roleNoticeHtml}
-          <button class="rv-btn rv-btn-ghost" data-testid="rv-reject-btn" data-action="reject" data-id="${esc(item.id)}"${dis}><i data-lucide="x-circle"></i> 반려</button>
-          <button class="rv-btn rv-btn-primary" data-testid="rv-approve-btn" data-action="approve" data-id="${esc(item.id)}"${dis}><i data-lucide="check-circle"></i> 승인</button>
+          <button class="rv-btn rv-btn-ghost" data-testid="rv-reject-btn" data-action="reject" data-id="${esc(item.id)}"${dis}${roleDescBy}><i data-lucide="x-circle"></i> 반려</button>
+          <button class="rv-btn rv-btn-primary" data-testid="rv-approve-btn" data-action="approve" data-id="${esc(item.id)}"${dis}${roleDescBy}><i data-lucide="check-circle"></i> 승인</button>
         </div>
       </div>`;
   }
