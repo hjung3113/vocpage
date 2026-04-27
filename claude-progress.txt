@@ -4,7 +4,7 @@
 
 → **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
 
-현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + uidesign.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) / 4-도메인 cross-review ✅ (2026-04-27) / Q1~Q5 결정 + R-5/R-7/R-10/R-11/R-12 docs 패치 ✅ (2026-04-27, 단일 커밋) / design.md → uidesign.md 리네이밍 + §5 비데이터 동작 규약 requirements.md §5.1로 분리 ✅ (2026-04-27) / Phase 7 plan 작성 ✅ (2026-04-27, `.omc/plans/prototype-phase7.md`) / Stage A-2 CSS 분할 5파일 ✅ (PR #57 머지) / Stage A-4 JS 분할 15파일 ✅ (2026-04-27, 브랜치 `feat/prototype-phase7-js`, screenshot byte-identical, 126 globals 정상) → **Stage B (P-1~P-9 데모)**
+현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + uidesign.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) / 4-도메인 cross-review ✅ (2026-04-27) / Q1~Q5 결정 + R-5/R-7/R-10/R-11/R-12 docs 패치 ✅ (2026-04-27, 단일 커밋) / design.md → uidesign.md 리네이밍 + §5 비데이터 동작 규약 requirements.md §5.1로 분리 ✅ (2026-04-27) / Phase 7 plan 작성 ✅ (2026-04-27, `.omc/plans/prototype-phase7.md`) / Stage A-2 CSS 분할 5파일 ✅ (PR #57 머지) / Stage A-4 JS 분할 15파일 ✅ (2026-04-27, 브랜치 `feat/prototype-phase7-js`, PR #58 머지) / Stage B-1 (P-1.C1 Result Review 셸) ✅ (2026-04-28, 브랜치 `feat/prototype-phase7-stage-b1`) → **Stage B-2 (P-1.C2 Internal Notes 드로어)**
 
 ### Phase 7 plan 요약 (2026-04-27)
 
@@ -17,7 +17,11 @@
 
 합의 사항: HTML markup 단일 유지(빌드 툴 금지 제약), CSS/JS는 ≤300 엄수, 새 토큰 추가 금지(§13 기존만). 브랜치 `feat/prototype-phase7`, 커밋 9건 분리.
 
-다음 세션 시작점: Stage A-4 PR 머지 후 → Stage B-1 (P-1.C1 Result Review 관리자 페이지 셸).
+다음 세션 시작점: Stage B-2 (P-1.C2 Internal Notes 드로어 섹션 — drawer 하단 접이식 + mock 노트 2건 + 입력란).
+
+### Stage B-1 결과 (2026-04-28, 브랜치 `feat/prototype-phase7-stage-b1`)
+
+P-1.C1 Result Review 관리자 페이지 셸. 사이드바 "관리자" 섹션에 "결과 검토" 진입점 + 페이지 컨테이너 + 검토 큐 mock 3건 (제출 검토 2 / 삭제 신청 1). 신규 `prototype/js/result-review.js` (161 lines, escHtml 헬퍼 + reviewQueue mock + renderResultReview/renderReviewCard/switchReviewTab/approveReview/rejectReview/showReviewToast/syncReviewBadge) + admin.css 165 lines append (.review-tabs/.review-card/.rv-btn/.review-toast). 인터랙션: 탭 전환 + 승인/반려 → 토스트 (mock). 토큰 100% 준수, hex/oklch literal 0건. 3 전문가 리뷰 — code-reviewer 86/96/94 → escHtml + 뱃지 동기화 fix → 94/96/95 PASS, critic 88/92/78 (게이팅 동일), verifier evidence 충분 (스크린샷 2건, 콘솔 에러 0).
 
 ### Stage A-4 JS 분할 결과 (2026-04-27, 브랜치 `feat/prototype-phase7-js`)
 
