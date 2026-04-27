@@ -513,6 +513,54 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
   - 삭제 approve → `vocs.structured_payload=NULL`, `vocs.review_status=NULL`, 해당 history row `final_state='deleted'`/`is_current=false`. 담당자는 이후 "결과 작성"을 다시 수행 가능.
   - 삭제 reject → `vocs.review_status='approved'` 원복, `action='deletion', decision='rejected'` 리뷰 row만 추가.
 
+##### 9.4.5.1 제출 검토 상세 드로어 (Detail Drawer)
+
+**진입 및 닫기**
+
+- 검토 큐 카드 클릭 시 오른쪽에서 오버레이 드로어가 열린다.
+- 닫기: 오버레이 배경 클릭 / Esc 키 / 드로어 내 X 버튼.
+- 포커스 트랩: 드로어가 열린 동안 Tab / Shift+Tab 은 드로어 내 포커스 가능 요소 사이만 순환한다.
+- 드로어 열릴 때 첫 번째 포커스 가능 요소(X 버튼)로 포커스 이동; 닫힐 때 트리거 카드로 포커스 복귀.
+- 인라인 승인/반려 버튼 클릭은 드로어를 열지 않는다(이벤트 전파 차단).
+
+**드로어 7개 섹션 (위→아래 순)**
+
+1. **메타 헤더**: 이슈 ID (D2Coding 폰트) / 제목 / Status pill (`vocs.status`) / Review Status pill (`vocs.review_status`) / 액션 종류 (제출/삭제, `voc_payload_reviews.action`) / 담당자 (`vocs.assignee`) / 작성자 (`vocs.author`) / 제출일 (`voc_payload_reviews.created_at`).
+2. **시스템·메뉴 컨텍스트**: 시스템명 (`systems.name`) + 메뉴 경로 breadcrumb (`menus` 계층 조인) / 출처 SP (`vocs.source_sp` — 식별자 가상 컬럼) / 관련 테이블 chip 목록 (`vocs.related_tables[]` JSONB array of strings).
+3. **Payload Diff**: 2컬럼 레이아웃 — 왼쪽: `is_current=true` 스냅샷 (`voc_payload_history`), 오른쪽: 신규 제출 (`vocs.structured_payload`). 키 단위 diff: `added`(초록), `removed`(빨강), `changed`(주황), `same`(투명).
+4. **첨부/링크**: `voc_payload_reviews.attachments` 목록 (파일명 + 크기).
+5. **히스토리 타임라인**: `voc_payload_history` 전체 행. `is_current=true` 행에 브랜드 색 좌측 보더 강조; `final_state` pill(`approved`/`rejected`/`deleted`) 표시.
+6. **댓글/사유 입력**: textarea. 반려(`reject`) 선택 시 필수; 빈 값이면 제출 불가 + 인라인 에러 표시.
+7. **액션 영역**: 승인 / 반려 버튼. Manager/Admin 외 비활성화 + 잠금 안내문. 승인은 코멘트 선택, 반려는 코멘트 필수.
+
+**권한**: Manager / Admin 만 액션 가능 (§9.4.5 재확인). Viewer 는 모든 섹션 읽기 전용.
+
+**데이터 모델 매핑**
+
+| 섹션         | 노출 컬럼                                          | 출처 테이블                   |
+| ------------ | -------------------------------------------------- | ----------------------------- |
+| 메타 헤더    | `id`, `title`, `status`, `review_status`           | `vocs`                        |
+| 메타 헤더    | `action`, `created_at`, `comment`                  | `voc_payload_reviews`         |
+| 시스템·메뉴  | `system_id` → `systems.name`                       | `vocs` + `systems(masters)`   |
+| 시스템·메뉴  | `menu_id` → `menus.name` (계층 breadcrumb)         | `vocs` + `menus(masters)`     |
+| 시스템·메뉴  | `source_sp` (가상 식별자)                          | `vocs`                        |
+| 시스템·메뉴  | `related_tables[]` (JSONB)                         | `vocs`                        |
+| Payload Diff | `payload` (is_current 스냅샷)                      | `voc_payload_history`         |
+| Payload Diff | `structured_payload` (신규)                        | `vocs`                        |
+| 첨부         | `attachments[]`                                    | `voc_payload_reviews`         |
+| 히스토리     | `is_current`, `final_state`, `created_at`, `actor` | `voc_payload_history`         |
+| 댓글/사유    | `comment` (입력값)                                 | `voc_payload_reviews` (write) |
+
+**SP / Table 가시성**
+
+- 메뉴 매핑: `vocs.system_id` → `systems`(masters), `vocs.menu_id` → `menus`(masters).
+- 출처 SP: `vocs.source_sp` — 명세상 식별자(가상 컬럼명). 실제 구현 시 BE에서 JOIN 또는 denormalized 컬럼으로 제공.
+- 관련 테이블: `vocs.related_tables[]` — JSONB array of strings, chip 단위 표시.
+
+**토큰 규약**: `var(--*)` 전용. hex / oklch 리터럴 금지 (uidesign.md §10 준거).
+
+---
+
 #### 9.4.6 태그 마스터 관리 (D22 확정, 2026-04-27)
 
 - **목적**: `tags` 테이블의 마스터 레코드(`name`, `kind`, `slug`)를 UI로 관리. §8.8.1이 "신규 태그 생성은 Admin/Manager 전용 관리 페이지에서만 가능"으로 규정한 진입점을 충족.
