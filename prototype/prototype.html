@@ -49,6 +49,7 @@
     <div class="nav-item" onclick="setNav(this)" data-page="system-menu"><i data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
+    <div class="nav-item" onclick="setNav(this)" data-page="result-review"><i data-lucide="check-square"></i> 결과 검토 <span class="nav-badge accent" id="reviewBadge"></span></div>
   </div>
   </div>
   <div class="sidebar-user">
@@ -594,6 +595,9 @@
   </div>
 </div>
 
+<!-- ── Result Review (Stage B-1 P-1.C1) ─── -->
+<div id="page-result-review" class="admin-page"></div>
+
 </main>
 
 <!-- ── Drawer ─── -->
@@ -735,6 +739,7 @@
 <script src="js/notice-faq.js"></script>
 <script src="js/admin-master.js"></script>
 <script src="js/admin-users.js"></script>
+<script src="js/result-review.js"></script>
 <script src="js/dashboard-data.js"></script>
 <script src="js/dashboard-render.js"></script>
 <script src="js/dashboard-actions.js"></script>

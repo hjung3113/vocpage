@@ -129,6 +129,7 @@ function setNav(el) {
     if (page === 'system-menu') renderSystemMenu();
     if (page === 'voc-type') renderVocTypes();
     if (page === 'users') renderUsers();
+    if (page === 'result-review') renderResultReview();
     if (page === 'dashboard') dashboardInit();
     lucide.createIcons();
   }
