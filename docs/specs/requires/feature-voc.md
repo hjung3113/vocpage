@@ -513,7 +513,7 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
   - 삭제 approve → `vocs.structured_payload=NULL`, `vocs.review_status=NULL`, 해당 history row `final_state='deleted'`/`is_current=false`. 담당자는 이후 "결과 작성"을 다시 수행 가능.
   - 삭제 reject → `vocs.review_status='approved'` 원복, `action='deletion', decision='rejected'` 리뷰 row만 추가.
 
-##### 9.4.5.1 제출 검토 상세 드로어 (Detail Drawer)
+##### 9.4.5.1 검토 상세 드로어 (Detail Drawer)
 
 **진입 및 닫기**
 
@@ -525,7 +525,7 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 
 **드로어 7개 섹션 (위→아래 순)**
 
-1. **메타 헤더**: 이슈 ID (D2Coding 폰트) / 제목 / Status pill (`vocs.status`) / Review Status pill (`vocs.review_status`) / 액션 종류 (제출/삭제, `voc_payload_reviews.action`) / 담당자 (`vocs.assignee`) / 작성자 (`vocs.author`) / 제출일 (`voc_payload_reviews.created_at`).
+1. **메타 헤더**: 이슈 ID (D2Coding 폰트) / 제목 / Status pill (`vocs.status`) / 리뷰 상태 pill (`vocs.review_status`) / 액션 종류 (제출/삭제, `voc_payload_reviews.action`) / 담당자 (`vocs.assignee`) / 작성자 (`vocs.author`) / 제출일 (`voc_payload_reviews.created_at`).
 2. **시스템·메뉴 컨텍스트**: 시스템명 (`systems.name`) + 메뉴 경로 breadcrumb (`menus` 계층 조인) / 출처 SP (`vocs.source_sp` — 식별자 가상 컬럼) / 관련 테이블 chip 목록 (`vocs.related_tables[]` JSONB array of strings).
 3. **Payload Diff**: 2컬럼 레이아웃 — 왼쪽: `is_current=true` 스냅샷 (`voc_payload_history`), 오른쪽: 신규 제출 (`vocs.structured_payload`). 키 단위 diff: `added`(초록), `removed`(빨강), `changed`(주황), `same`(투명).
 4. **첨부/링크**: `voc_payload_reviews.attachments` 목록 (파일명 + 크기).
@@ -535,6 +535,16 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 
 **권한**: Manager / Admin 만 액션 가능 (§9.4.5 재확인). Viewer 는 모든 섹션 읽기 전용.
 FE 가드: window.currentUser.role ∈ {manager, admin}일 때만 승인/반려 버튼 활성화. 그 외 disabled + 안내 문구 노출.
+
+**BE 가드**: FE gate 외 추가로 backend는 `requireRole(['manager','admin'])` middleware (req §8.4-bis assertCanManageVoc 헬퍼와 동일 정책)를 모든 review 엔드포인트에 적용. DB 레벨에서는 RLS 또는 CHECK 제약으로 reviewer_role ∈ {manager, admin} 보장 (선택).
+
+**기밀 분류**: `source_sp`, `related_tables`는 DB 내부 식별자라 viewer/contributor에게 노출 금지. Admin only로 detail drawer에서 표시. Manager는 마스킹 노출(예: '관련 테이블 N개').
+
+**큐 정렬**: 검토 큐 기본 정렬 = `status_changed_at DESC`. 동률 시 `created_at DESC`. partial index `(review_status, status_changed_at)` WHERE review_status IN ('unverified','pending_deletion') 권장.
+
+**JSONB 쓰기 순서**: approve 트랜잭션 내 (a) voc_payload_history INSERT first (final_state='approved', payload=새 submission), (b) vocs.structured_payload 갱신, (c) voc_payload_reviews INSERT (payload_sha256 = SHA256(payload)). 단일 트랜잭션 보장.
+
+**텔레메트리**: FE는 승인/반려 시 window.dispatchEvent(new CustomEvent('voc:review:decided', {detail:{id, decision, comment, ts}})) 발행. 모니터링 모듈은 이 이벤트를 구독.
 
 **데이터 흐름**: 승인/반려 시 `voc_payload_reviews` row 생성 (action, decision, comment, reviewer_id, ts). comment는 반려 시 필수, 승인 시 optional.
 

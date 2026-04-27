@@ -1097,7 +1097,7 @@ Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지
 
 ### 13.12 Diff / Comparison Tokens
 
-Tokens used in payload diff views (Result Review detail drawer, `§13.x` diff panel).
+Tokens used in payload diff views (Result Review detail drawer, `§13.12` diff panel).
 All tokens are defined in `tokens.css` under `:root` and support `light-dark()`.
 
 | Token           | Role                                                                                   |
@@ -1111,3 +1111,5 @@ All tokens are defined in `tokens.css` under `:root` and support `light-dark()`.
 
 Usage: apply via `.rv-diff-row.added`, `.rv-diff-row.removed`, `.rv-diff-row.changed` classes.
 Unchanged rows (`.rv-diff-row.same`) use `transparent` background and `var(--text-secondary)` text — no dedicated token needed.
+
+Class ↔ token mapping: `.rv-diff-row.added` → `--diff-add-*`, `.rv-diff-row.removed` → `--diff-del-*`, `.rv-diff-row.changed` → `--diff-mod-*`. Class names use full English words; token prefix uses 3-letter shorthand.

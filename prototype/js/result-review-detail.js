@@ -20,7 +20,10 @@
     if (overlay && overlay.classList.contains('open')) return; // J: idempotent
 
     const item = (window.reviewQueue || []).find((r) => r.id === id);
-    if (!item) return;
+    if (!item) {
+      if (window.showReviewToast) window.showReviewToast('항목을 찾을 수 없습니다.', 'warn');
+      return;
+    }
     _priorFocus = document.activeElement;
 
     let el = overlay;
@@ -50,6 +53,9 @@
     }
 
     el.classList.add('open');
+    document.body.dataset.rvOpen = '1';
+    const appRoot = document.getElementById('app-root') || document.querySelector('main');
+    if (appRoot) appRoot.setAttribute('aria-hidden', 'true');
     if (window.lucide) lucide.createIcons({ nodes: [el] });
 
     const first = _focusableElements(el)[0];
@@ -69,6 +75,9 @@
     const overlay = document.getElementById('rvDetailOverlay');
     if (!overlay) return;
     overlay.classList.remove('open');
+    delete document.body.dataset.rvOpen;
+    const appRoot = document.getElementById('app-root') || document.querySelector('main');
+    if (appRoot) appRoot.removeAttribute('aria-hidden');
     overlay.removeEventListener('keydown', _trapFocus);
     if (_escHandler) {
       document.removeEventListener('keydown', _escHandler);
@@ -128,21 +137,30 @@
   }
 
   function renderContext(item) {
+    const role = (window.currentUser && window.currentUser.role) || 'viewer';
     const breadcrumb = (item.menuPath || []).map(esc).join(' › ');
-    const chips = (item.relatedTables || [])
-      .map((t) => `<span class="rv-chip">${esc(t)}</span>`)
-      .join('');
-    const spLine = item.sp
-      ? `<div class="rv-context-row"><span class="rv-meta-label">출처 SP</span><span class="rv-chip rv-chip-sp">${esc(item.sp)}</span></div>`
-      : '';
+    let spLine = '';
+    let tablesLine = '';
+    if (role === 'admin') {
+      const chips = (item.relatedTables || [])
+        .map((t) => `<span class="rv-chip">${esc(t)}</span>`)
+        .join('');
+      spLine = item.sp
+        ? `<div class="rv-context-row"><span class="rv-meta-label">출처 SP</span><span class="rv-chip rv-chip-sp">${esc(item.sp)}</span></div>`
+        : '';
+      tablesLine = `<div class="rv-context-row"><span class="rv-meta-label">관련 테이블</span>
+          <div class="rv-context__chips">${chips || '<span class="rv-meta-value">—</span>'}</div>
+        </div>`;
+    } else if (role === 'manager') {
+      const n = (item.relatedTables || []).length;
+      tablesLine = `<div class="rv-context-row"><span class="rv-meta-label">관련 테이블</span><span class="rv-meta-value">관련 테이블 ${n}개 (열람은 Admin 전용)</span></div>`;
+    }
     return `
       <div class="rv-context">
         <div class="rv-context-row"><span class="rv-meta-label">시스템</span><span class="rv-meta-value">${esc(item.system || '—')}</span></div>
         <div class="rv-context-row"><span class="rv-meta-label">메뉴 경로</span><span class="rv-meta-value">${breadcrumb || '—'}</span></div>
         ${spLine}
-        <div class="rv-context-row"><span class="rv-meta-label">관련 테이블</span>
-          <div class="rv-context__chips">${chips || '<span class="rv-meta-value">—</span>'}</div>
-        </div>
+        ${tablesLine}
       </div>`;
   }
 
@@ -161,20 +179,27 @@
         : '';
       return `<div class="rv-deletion-panel"><div class="rv-diff">${rows}</div>${reasonHtml}</div>`;
     }
-    // F: use computePayloadDiff + valueToText from diff-helpers.js
-    const diffs = computePayloadDiff(item.currentPayload, item.newPayload);
-    const rows = diffs
-      .map(
-        (d) =>
-          `<div class="rv-diff-row ${esc(d.type)}">` +
-          `<span class="rv-diff-key">${esc(d.key)}</span>` +
-          `<span class="rv-diff-old">${d.oldVal !== undefined ? esc(valueToText(d.oldVal)) : '<em>없음</em>'}</span>` +
-          `<span class="rv-diff-new">${d.newVal !== undefined ? esc(valueToText(d.newVal)) : '<em>삭제됨</em>'}</span></div>`,
-      )
-      .join('');
-    return `
-      <div class="rv-diff-header"><span></span><span>현재 (is_current)</span><span>신규 제출</span></div>
-      <div class="rv-diff">${rows || '<div class="rv-meta-value">변경 없음</div>'}</div>`;
+    // F: use computePayloadDiff + valueToText from diff-helpers.js — wrap in try/catch
+    try {
+      if (typeof window.computePayloadDiff !== 'function') {
+        throw new Error('computePayloadDiff not loaded');
+      }
+      const diffs = window.computePayloadDiff(item.currentPayload, item.newPayload);
+      const rows = diffs
+        .map(
+          (d) =>
+            `<div class="rv-diff-row ${esc(d.type)}">` +
+            `<span class="rv-diff-key">${esc(d.key)}</span>` +
+            `<span class="rv-diff-old">${d.oldVal !== undefined ? esc(valueToText(d.oldVal)) : '<em>없음</em>'}</span>` +
+            `<span class="rv-diff-new">${d.newVal !== undefined ? esc(valueToText(d.newVal)) : '<em>삭제됨</em>'}</span></div>`,
+        )
+        .join('');
+      return `
+        <div class="rv-diff-header"><span></span><span>현재 (is_current)</span><span>신규 제출</span></div>
+        <div class="rv-diff">${rows || '<div class="rv-meta-value">변경 없음</div>'}</div>`;
+    } catch (_e) {
+      return `<div class="rv-diff-error rv-detail-error" style="display:block">diff 헬퍼 로드 실패 — 콘솔 확인</div>`;
+    }
   }
 
   function renderAttachments(item) {
@@ -207,15 +232,15 @@
     const role = (window.currentUser && window.currentUser.role) || 'viewer';
     const canDecide = role === 'manager' || role === 'admin';
     const dis = canDecide ? '' : ' disabled';
-    const roleNotice = canDecide
+    const roleNoticeHtml = canDecide
       ? ''
-      : '<div class="rv-detail-error" style="display:block">권한 없음: Manager 또는 Admin만 승인/반려할 수 있습니다.</div>';
+      : '<div class="rv-detail-error" data-testid="rv-role-notice" style="display:block">권한 없음: Manager 또는 Admin만 승인/반려할 수 있습니다.</div>';
 
     return `
       <div class="rv-detail-panel" role="document">
         <div class="rv-detail-toolbar">
           <span id="rvDetailTitle" class="rv-detail-title">검토 상세</span>
-          <button class="rv-detail-close rv-btn rv-btn-ghost" onclick="closeReviewDetail()" aria-label="닫기"><i data-lucide="x"></i></button>
+          <button class="rv-detail-close rv-btn rv-btn-ghost" data-testid="rv-close-btn" onclick="closeReviewDetail()" aria-label="닫기"><i data-lucide="x"></i></button>
         </div>
         <section class="rv-detail-section"><div class="rv-section-title">메타 정보</div>${renderMetaHeader(item)}</section>
         <section class="rv-detail-section"><div class="rv-section-title">시스템 · 메뉴 컨텍스트</div>${renderContext(item)}</section>
@@ -225,14 +250,14 @@
         <section class="rv-detail-section">
           <label for="rvDetailComment" class="rv-section-title">댓글 / 사유 <span class="rv-comment-note">(반려 시 필수)</span></label>
           <div class="rv-comment">
-            <textarea id="rvDetailComment" rows="4" placeholder="승인 코멘트 또는 반려 사유를 입력하세요..." aria-describedby="rvDetailCommentError"></textarea>
+            <textarea id="rvDetailComment" data-testid="rv-comment" rows="4" placeholder="승인 코멘트 또는 반려 사유를 입력하세요..." aria-describedby="rvDetailCommentError"></textarea>
             <div id="rvDetailCommentError" class="rv-detail-error" style="display:none" role="alert">반려 시 사유를 입력해야 합니다.</div>
           </div>
         </section>
         <div class="rv-actions">
-          ${roleNotice}
-          <button class="rv-btn rv-btn-ghost" data-action="reject" data-id="${esc(item.id)}"${dis}><i data-lucide="x-circle"></i> 반려</button>
-          <button class="rv-btn rv-btn-primary" data-action="approve" data-id="${esc(item.id)}"${dis}><i data-lucide="check-circle"></i> 승인</button>
+          ${roleNoticeHtml}
+          <button class="rv-btn rv-btn-ghost" data-testid="rv-reject-btn" data-action="reject" data-id="${esc(item.id)}"${dis}><i data-lucide="x-circle"></i> 반려</button>
+          <button class="rv-btn rv-btn-primary" data-testid="rv-approve-btn" data-action="approve" data-id="${esc(item.id)}"${dis}><i data-lucide="check-circle"></i> 승인</button>
         </div>
       </div>`;
   }

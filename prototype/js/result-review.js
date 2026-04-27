@@ -144,6 +144,90 @@ const reviewQueue = [
       사유: 'VOC-0998과 동일 건 — 담당자 합의 후 삭제 요청',
     },
   },
+  // VOC-1237: no-diff branch (currentPayload === newPayload)
+  {
+    id: 'VOC-1237',
+    title: '설비 점검 이력 조회 — 변경 없음 제출',
+    action: 'submission',
+    statusLabel: '처리 중',
+    reviewStatusLabel: '검토 대기',
+    assignee: '정현우',
+    author: '강민지',
+    submittedAt: '2026-04-28',
+    system: 'MES',
+    menuPath: ['설비관리', '점검', '이력 조회'],
+    sp: 'sp_inspect_history',
+    relatedTables: ['inspect_log', 'equipment'],
+    currentPayload: { 설비: '압연-B', 증상: '진동 이상', 조치: '베어링 교체' },
+    newPayload: { 설비: '압연-B', 증상: '진동 이상', 조치: '베어링 교체' },
+    attachments: [],
+    history: [
+      {
+        ts: '2026-04-28 08:00',
+        actor: '강민지',
+        action: '재제출',
+        finalState: 'approved',
+        isCurrent: true,
+      },
+    ],
+    payload: { 설비: '압연-B', 증상: '진동 이상', 조치: '베어링 교체' },
+  },
+  // VOC-1238: added key branch (newPayload has extra `priority`)
+  {
+    id: 'VOC-1238',
+    title: '생산 계획 우선순위 필드 추가',
+    action: 'submission',
+    statusLabel: '처리 중',
+    reviewStatusLabel: '검토 대기',
+    assignee: '한승호',
+    author: '오지연',
+    submittedAt: '2026-04-28',
+    system: 'MES',
+    menuPath: ['생산관리', '계획', '일정'],
+    sp: 'sp_production_plan',
+    relatedTables: ['production_plan', 'work_order'],
+    currentPayload: { 라인: '압연-A', 목표수량: '500' },
+    newPayload: { 라인: '압연-A', 목표수량: '500', priority: 'High' },
+    attachments: [{ name: '우선순위_정책.pdf', size: '320 KB' }],
+    history: [
+      {
+        ts: '2026-04-28 09:30',
+        actor: '오지연',
+        action: '최초 제출',
+        finalState: 'approved',
+        isCurrent: true,
+      },
+    ],
+    payload: { 라인: '압연-A', 목표수량: '500', priority: 'High' },
+  },
+  // VOC-1239: removed key branch (currentPayload has `attachmentNote`, new omits it)
+  {
+    id: 'VOC-1239',
+    title: '품질 검사 첨부 메모 필드 제거',
+    action: 'submission',
+    statusLabel: '처리 중',
+    reviewStatusLabel: '검토 대기',
+    assignee: '임도윤',
+    author: '박서준',
+    submittedAt: '2026-04-28',
+    system: 'QMS',
+    menuPath: ['품질관리', '검사', '결과 입력'],
+    sp: null,
+    relatedTables: ['qc_result'],
+    currentPayload: { 항목: '치수 검사', 결과: '합격', attachmentNote: '첨부 참조' },
+    newPayload: { 항목: '치수 검사', 결과: '합격' },
+    attachments: [],
+    history: [
+      {
+        ts: '2026-04-28 10:15',
+        actor: '박서준',
+        action: '최초 제출',
+        finalState: 'approved',
+        isCurrent: true,
+      },
+    ],
+    payload: { 항목: '치수 검사', 결과: '합격' },
+  },
 ];
 
 let reviewTab = 'submission';
@@ -160,12 +244,8 @@ function renderResultReview() {
       <span class="section-count-badge">${reviewQueue.length}건 대기</span>
     </div>
     <div class="review-tabs">
-      <div class="review-tab ${reviewTab === 'submission' ? 'active' : ''}" onclick="switchReviewTab('submission')">
-        제출 검토 <span class="review-tab-count">${submissionCount}</span>
-      </div>
-      <div class="review-tab ${reviewTab === 'deletion' ? 'active' : ''}" onclick="switchReviewTab('deletion')">
-        삭제 신청 <span class="review-tab-count">${deletionCount}</span>
-      </div>
+      <div class="review-tab ${reviewTab === 'submission' ? 'active' : ''}" data-testid="review-tab-submission" onclick="switchReviewTab('submission')">제출 검토 <span class="review-tab-count">${submissionCount}</span></div>
+      <div class="review-tab ${reviewTab === 'deletion' ? 'active' : ''}" data-testid="review-tab-deletion" onclick="switchReviewTab('deletion')">삭제 신청 <span class="review-tab-count">${deletionCount}</span></div>
     </div>
     <div class="review-body" id="reviewQueueBody">
       ${items.length === 0 ? '<div class="review-empty">대기 중인 항목이 없습니다.</div>' : items.map(renderReviewCard).join('')}
@@ -173,32 +253,30 @@ function renderResultReview() {
   `;
   if (window.lucide) lucide.createIcons();
 
-  // I: bind delegated click once on stable parent #page-result-review
+  // bind delegated click + keydown once on stable parent
   if (!el.dataset.bound) {
     el.dataset.bound = '1';
-    el.addEventListener('click', function (e) {
-      // C: inline approve/reject buttons now open the detail drawer
+    function handleCardAction(e) {
       const btn = e.target.closest('button[data-action]');
       if (btn) {
-        e.stopPropagation();
-        const action = btn.dataset.action;
+        if (e.type === 'click') e.stopPropagation();
         const id = btn.dataset.id;
-        if (action === 'approve' && id) {
-          // inline approve: open drawer (consolidate flow per fix B)
-          if (typeof openReviewDetail === 'function') openReviewDetail(id);
-        } else if (action === 'reject' && id) {
-          // inline reject: open drawer so comment can be filled
-          if (typeof openReviewDetail === 'function') openReviewDetail(id);
-        }
+        if (id && typeof openReviewDetail === 'function') openReviewDetail(id);
         return;
       }
-      // Don't open drawer if clicking any other button inside the card
       if (e.target.closest('button')) return;
       const card = e.target.closest('.review-card');
       if (!card) return;
+      if (e.type === 'keydown') {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target !== card) return;
+        e.preventDefault();
+      }
       const id = card.dataset.id;
       if (id && typeof openReviewDetail === 'function') openReviewDetail(id);
-    });
+    }
+    el.addEventListener('click', handleCardAction);
+    el.addEventListener('keydown', handleCardAction);
   }
 }
 
@@ -215,7 +293,7 @@ function renderReviewCard(r) {
     ? `<span class="status-pill status-pending">${escHtml(r.reviewStatusLabel)}</span>`
     : '';
   return `
-    <div class="review-card rv-card-clickable" data-id="${id}">
+    <div class="review-card rv-card-clickable" data-id="${id}" data-testid="review-card" tabindex="0" role="button">
       <div class="review-card-head">
         <div class="review-card-meta">
           <span class="review-id">${id}</span>
@@ -231,12 +309,8 @@ function renderReviewCard(r) {
       </div>
       <div class="review-card-body">${rows}</div>
       <div class="review-card-actions">
-        <button class="rv-btn rv-btn-ghost" data-action="reject" data-id="${id}">
-          <i data-lucide="x"></i> 반려
-        </button>
-        <button class="rv-btn rv-btn-primary" data-action="approve" data-id="${id}">
-          <i data-lucide="check"></i> 승인
-        </button>
+        <button class="rv-btn rv-btn-ghost" data-testid="rv-reject-inline" data-action="reject" data-id="${id}"><i data-lucide="x"></i> 반려</button>
+        <button class="rv-btn rv-btn-primary" data-testid="rv-approve-inline" data-action="approve" data-id="${id}"><i data-lucide="check"></i> 승인</button>
       </div>
     </div>
   `;
@@ -269,6 +343,11 @@ function approveReview(id, comment) {
   if (item) item.lastDecisionComment = comment || '';
   const suffix = comment ? ` (사유: ${comment})` : '';
   showReviewToast(`${id} 승인 완료${suffix} (mock)`, 'ok');
+  window.dispatchEvent(
+    new CustomEvent('voc:review:decided', {
+      detail: { id, decision: 'approve', comment, ts: Date.now() },
+    }),
+  );
 }
 
 function rejectReview(id, comment) {
@@ -276,6 +355,11 @@ function rejectReview(id, comment) {
   if (item) item.lastDecisionComment = comment || '';
   const suffix = comment ? ` (사유: ${comment})` : '';
   showReviewToast(`${id} 반려 처리${suffix} (mock)`, 'warn');
+  window.dispatchEvent(
+    new CustomEvent('voc:review:decided', {
+      detail: { id, decision: 'reject', comment, ts: Date.now() },
+    }),
+  );
 }
 
 function showReviewToast(msg, kind) {
