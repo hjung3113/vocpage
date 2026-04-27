@@ -10,50 +10,8 @@ function escHtml(s) {
   );
 }
 
-const reviewQueue = [
-  {
-    id: 'VOC-1234',
-    title: 'PM 설비 알람 누락 (압연 라인)',
-    action: 'submission',
-    statusLabel: '제출 검토',
-    assignee: '김철수',
-    author: '이영희',
-    submittedAt: '2026-04-25',
-    payload: {
-      설비: '압연-A',
-      증상: '알람이 1시간 주기로 누락됨',
-      원인: '센서 단선 (DI-12 채널)',
-      조치: '센서 교체 및 PM 절차에 점검 항목 추가',
-    },
-  },
-  {
-    id: 'VOC-1235',
-    title: 'MES 로그인 지연 (30초+)',
-    action: 'submission',
-    statusLabel: '제출 검토',
-    assignee: '박민수',
-    author: '최수진',
-    submittedAt: '2026-04-26',
-    payload: {
-      시스템: 'MES',
-      증상: '로그인 시 30초 이상 대기',
-      원인: 'LDAP 풀 고갈',
-      조치: 'LDAP 커넥션 풀 사이즈 20→60 증설',
-    },
-  },
-  {
-    id: 'VOC-1236',
-    title: 'QC 리포트 출력 오류 — 중복 등록',
-    action: 'deletion',
-    statusLabel: '삭제 신청',
-    assignee: '이지원',
-    author: '김미래',
-    submittedAt: '2026-04-27',
-    payload: {
-      사유: 'VOC-0998과 동일 건 — 담당자 합의 후 삭제 요청',
-    },
-  },
-];
+// Mock data lives in result-review-data.js (loaded before this file).
+const reviewQueue = window.reviewQueue || [];
 
 let reviewTab = 'submission';
 
@@ -68,19 +26,60 @@ function renderResultReview() {
       <span class="admin-title">결과 검토</span>
       <span class="section-count-badge">${reviewQueue.length}건 대기</span>
     </div>
-    <div class="review-tabs">
-      <div class="review-tab ${reviewTab === 'submission' ? 'active' : ''}" onclick="switchReviewTab('submission')">
-        제출 검토 <span class="review-tab-count">${submissionCount}</span>
-      </div>
-      <div class="review-tab ${reviewTab === 'deletion' ? 'active' : ''}" onclick="switchReviewTab('deletion')">
-        삭제 신청 <span class="review-tab-count">${deletionCount}</span>
-      </div>
+    <div class="review-tabs" role="tablist">
+      <button class="review-tab ${reviewTab === 'submission' ? 'active' : ''}" role="tab" aria-selected="${reviewTab === 'submission'}" tabindex="${reviewTab === 'submission' ? 0 : -1}" data-testid="review-tab-submission" data-tab="submission">제출 검토 <span class="review-tab-count">${submissionCount}</span></button>
+      <button class="review-tab ${reviewTab === 'deletion' ? 'active' : ''}" role="tab" aria-selected="${reviewTab === 'deletion'}" tabindex="${reviewTab === 'deletion' ? 0 : -1}" data-testid="review-tab-deletion" data-tab="deletion">삭제 신청 <span class="review-tab-count">${deletionCount}</span></button>
     </div>
-    <div class="review-body">
+    <div class="review-body" id="reviewQueueBody">
       ${items.length === 0 ? '<div class="review-empty">대기 중인 항목이 없습니다.</div>' : items.map(renderReviewCard).join('')}
     </div>
   `;
   if (window.lucide) lucide.createIcons();
+
+  // bind delegated click + keydown once on stable parent
+  if (!el.dataset.bound) {
+    el.dataset.bound = '1';
+
+    // tab switching via delegation
+    el.addEventListener('click', function (e) {
+      const tab = e.target.closest('[role="tab"][data-tab]');
+      if (tab) {
+        switchReviewTab(tab.dataset.tab);
+        return;
+      }
+    });
+    el.addEventListener('keydown', function (e) {
+      const tab = e.target.closest('[role="tab"][data-tab]');
+      if (tab) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const tabs = Array.from(el.querySelectorAll('[role="tab"][data-tab]'));
+          const idx = tabs.indexOf(tab);
+          const next = tabs[(idx + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+          if (next) {
+            switchReviewTab(next.dataset.tab);
+            next.focus();
+          }
+        }
+        return;
+      }
+    });
+
+    // card open button delegation
+    function handleCardAction(e) {
+      const btn = e.target.closest('button[data-action]');
+      if (btn) {
+        if (e.type === 'click') e.stopPropagation();
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        if (action === 'open' && id && typeof openReviewDetail === 'function') {
+          openReviewDetail(id);
+        }
+        return;
+      }
+    }
+    el.addEventListener('click', handleCardAction);
+  }
 }
 
 function renderReviewCard(r) {
@@ -91,12 +90,17 @@ function renderReviewCard(r) {
     )
     .join('');
   const id = escHtml(r.id);
+  // D: show review_status pill next to status pill
+  const reviewPill = r.reviewStatusLabel
+    ? `<span class="status-pill status-pending">${escHtml(r.reviewStatusLabel)}</span>`
+    : '';
   return `
-    <div class="review-card" data-id="${id}">
+    <div class="review-card" data-id="${id}" data-testid="review-card">
       <div class="review-card-head">
         <div class="review-card-meta">
           <span class="review-id">${id}</span>
           <span class="status-pill status-reviewing">${escHtml(r.statusLabel)}</span>
+          ${reviewPill}
         </div>
         <div class="review-card-title">${escHtml(r.title)}</div>
         <div class="review-card-sub">
@@ -107,12 +111,9 @@ function renderReviewCard(r) {
       </div>
       <div class="review-card-body">${rows}</div>
       <div class="review-card-actions">
-        <button class="rv-btn rv-btn-ghost" onclick="rejectReview('${id}')">
-          <i data-lucide="x"></i> 반려
-        </button>
-        <button class="rv-btn rv-btn-primary" onclick="approveReview('${id}')">
-          <i data-lucide="check"></i> 승인
-        </button>
+        <button class="rv-btn rv-btn-ghost" data-testid="rv-reject-inline" data-action="reject" data-id="${id}"><i data-lucide="x"></i> 반려</button>
+        <button class="rv-btn rv-btn-primary" data-testid="rv-approve-inline" data-action="approve" data-id="${id}"><i data-lucide="check"></i> 승인</button>
+        <button class="rv-btn rv-btn-ghost rv-card-open" data-testid="rv-card-open" data-action="open" data-id="${id}">상세 보기</button>
       </div>
     </div>
   `;
@@ -139,12 +140,29 @@ function switchReviewTab(tab) {
   renderResultReview();
 }
 
-function approveReview(id) {
-  showReviewToast(`${id} 승인 처리되었습니다 (mock)`, 'ok');
+// B: comment param added; stored on item; included in toast
+function approveReview(id, comment) {
+  const item = (window.reviewQueue || []).find((r) => r.id === id);
+  if (item) item.lastDecisionComment = comment || '';
+  const suffix = comment ? ` (사유: ${comment})` : '';
+  showReviewToast(`${id} 승인 완료${suffix} (mock)`, 'ok');
+  window.dispatchEvent(
+    new CustomEvent('voc:review:decided', {
+      detail: { id, decision: 'approve', comment, ts: Date.now() },
+    }),
+  );
 }
 
-function rejectReview(id) {
-  showReviewToast(`${id} 반려 처리되었습니다 — 코멘트 입력은 후속 단계 (mock)`, 'warn');
+function rejectReview(id, comment) {
+  const item = (window.reviewQueue || []).find((r) => r.id === id);
+  if (item) item.lastDecisionComment = comment || '';
+  const suffix = comment ? ` (사유: ${comment})` : '';
+  showReviewToast(`${id} 반려 처리${suffix} (mock)`, 'warn');
+  window.dispatchEvent(
+    new CustomEvent('voc:review:decided', {
+      detail: { id, decision: 'reject', comment, ts: Date.now() },
+    }),
+  );
 }
 
 function showReviewToast(msg, kind) {
@@ -153,6 +171,8 @@ function showReviewToast(msg, kind) {
     host = document.createElement('div');
     host.id = 'reviewToastHost';
     host.className = 'review-toast-host';
+    host.setAttribute('role', 'status');
+    host.setAttribute('aria-live', 'polite');
     document.body.appendChild(host);
   }
   const t = document.createElement('div');

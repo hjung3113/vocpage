@@ -74,7 +74,7 @@
 - **`systems`**: 시스템 목록. 컬럼: `id`, `name`, `slug(ASCII URL-safe, 전역 UNIQUE)`, `is_archived`. Admin이 관리 (추가/수정/아카이브).
 - **`menus`**: 메뉴 목록. 컬럼: `id`, `system_id(FK→systems)`, `name`, `slug`, `is_archived`. Admin이 관리. 시스템 생성 시 "기타" 메뉴 자동 생성. `slug` 제약: `(system_id, slug)` 복합 UNIQUE.
 - **`voc_types`**: VOC 유형 목록. 컬럼: `id`, `name`, `slug(전역 UNIQUE)`, `color(hex, e.g. #e5534b)`, `sort_order`, `is_archived`. Admin이 관리. 초기값: 버그/기능 요청/개선 제안/문의.
-- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(text NOT NULL UNIQUE, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title(NOT NULL, CHECK char_length<=200)`, `body(HTML, NOT NULL, CHECK octet_length<=65536)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `voc_type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계, ON DELETE SET NULL)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `status_changed_at(timestamptz NOT NULL DEFAULT now() — status 변경 시 트리거가 자동 갱신, 대시보드 주간 트렌드/완료 KPI 기준)`, `deleted_at`, `created_at`, `updated_at`.
+- **`vocs`**: VOC 메인 데이터. 컬럼: `id(uuid)`, `issue_code(text NOT NULL UNIQUE, e.g. ANALYSIS-2025-0001)`, `sequence_no(시스템·연도 단위 유니크)`, `title(NOT NULL, CHECK char_length<=200)`, `body(HTML, NOT NULL, CHECK octet_length<=65536)`, `status(enum: 접수/검토중/처리중/완료/드랍)`, `priority(enum: urgent/high/medium/low, default medium)`, `voc_type_id(FK→voc_types, NOT NULL)`, `system_id(FK→systems, NOT NULL)`, `menu_id(FK→menus, NOT NULL)`, `assignee_id`, `author_id`, `parent_id(self-join, 최대 1단계, ON DELETE SET NULL)`, `due_date(date, nullable — Priority 변경 시 자동 계산)`, `source(text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','import')))`, `source_sp text NULL`, `related_tables jsonb NULL DEFAULT '[]'`, `embedding(vector(1536), nullable)`, `structured_payload(jsonb, nullable — 완료/드랍 시 필수, 최근 승인/제출본)`, `structured_payload_draft(jsonb, nullable — 임시저장 슬롯, 최신 1건만 유지)`, `review_status(text, nullable, CHECK IN ('unverified','approved','rejected','pending_deletion'))`, `embed_stale(boolean, default false — 재작성 후 approve 대기 플래그)`, `resolution_quality(enum: 근본해결/임시조치, nullable — status=완료 시 필수)`, `drop_reason(enum: 중복/정책거부/재현불가/범위외/기타, nullable — status=드랍 시 필수)`, `status_changed_at(timestamptz NOT NULL DEFAULT now() — status 변경 시 트리거가 자동 갱신, 대시보드 주간 트렌드/완료 KPI 기준)`, `deleted_at`, `created_at`, `updated_at`.
   - `status`: **5단계 유지 확정** (v3 §1.4, 2026-04-24). 기존 `보류`를 `드랍`으로 대체. 4단계 축소 옵션은 폐기 — 분석 업무 특성상 `검토중`(조사) vs `처리중`(착수)의 의미 구분 유지 가치 있음. 상태 전환 매트릭스는 §8.2.
   - `source`: VOC 생성 출처 구분. `manual` = 웹 UI 폼 입력(User/Manager), `import` = Jira 이관 스크립트(MVP 오픈 전 1회성).
     - **PG enum 대신 text+CHECK** 선택 — 향후 값 추가/제거 유연성(`chatbot` 등 NextGen 가능성).
@@ -116,7 +116,11 @@
 
 - **`voc_history`**: 감사 로그. 상태·담당자·Priority 변경 이력 보존.
 - **`voc_payload_reviews`** (제출/삭제 리뷰 통합 로그):
-  - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `created_at timestamptz default now()`.
+  - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE RESTRICT)`, `action text CHECK IN ('submission','deletion')`, `reviewer_id(FK→users)`, `decision text CHECK IN ('approved','rejected')`, `comment text`, `payload_sha256 char(64) NOT NULL`, `reviewer_role text NOT NULL`, `reviewer_display_name text NOT NULL`, `created_at timestamptz default now()`.
+  - 첨부(attachments)는 제출 시점 기준 `voc_payload_history`에 보존. review row 단계에서는 `reviewer_id`/`comment`/`decision`/`action`만 기록.
+  - `payload_sha256`: 결정 시점 payload의 SHA256 스냅샷 (감사 추적용). `reviewer_role`, `reviewer_display_name`: 결정자 역할 및 표시명 비정규화 보존 (users 변경 이력 대비).
+  - comment는 insert 후 append-only. 정정은 child 테이블 `voc_payload_review_amendments` (TBD next phase)로 위임.
+  - **`voc_id` ON DELETE RESTRICT**: audit row 보존 원칙. vocs 행 삭제 시 리뷰 로그가 존재하면 삭제 차단.
 - **`voc_payload_history`** (제출 스냅샷 이력, "이전 이력" 버튼 소스):
   - 컬럼: `id(uuid)`, `voc_id(FK→vocs, ON DELETE CASCADE)`, `payload jsonb NOT NULL`, `submitted_by(FK→users)`, `submitted_at timestamptz default now()`, `final_state text CHECK IN ('approved','rejected','deleted','active')`, `is_current boolean default false`.
   - 인덱스: `(voc_id, submitted_at DESC)`.
@@ -498,6 +502,10 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 - **액션**: 각 VOC에 코멘트 + approve/reject. 결정 이력은 `voc_payload_reviews`에 `action='submission'|'deletion'` 구분으로 기록.
 - **권한**: Manager/Admin.
 - **연관 갱신**: approve 시 `vocs.structured_payload` 확정 / `voc_payload_history.is_current=true` 스냅샷 유지 / 임베딩 정책(§16) 트리거.
+
+#### 15.1.1 보존/회수 정책
+
+`voc_payload_reviews` / `voc_payload_history` rows는 PIPA 정렬 7년 보존. 본문 (`vocs`)에 cascade 삭제가 발생해도 audit row는 RESTRICT로 보호됨. 사용자 PII가 포함된 comment는 retention 만료 시 마스킹 + 7년 후 삭제 잡 (cron job ‑ 추후 명세).
 
 ### 15.2 사용자 초대 플로우
 

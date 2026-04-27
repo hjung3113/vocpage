@@ -75,4 +75,12 @@
   --status-drop-bg: light-dark(oklch(93% 0.04 72), oklch(21% 0.048 68));
   --status-drop-fg: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
   --status-drop-border: light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
+
+  /* Payload diff highlight tokens (Result Review detail drawer) */
+  --diff-add-bg: light-dark(oklch(92% 0.04 152), oklch(18% 0.06 152));
+  --diff-add-fg: light-dark(oklch(38% 0.17 152), oklch(66% 0.19 155));
+  --diff-del-bg: light-dark(oklch(93% 0.04 25), oklch(18% 0.07 25));
+  --diff-del-fg: light-dark(oklch(44% 0.2 25), oklch(62% 0.22 25));
+  --diff-mod-bg: light-dark(oklch(93% 0.035 72), oklch(18% 0.05 72));
+  --diff-mod-fg: light-dark(oklch(46% 0.16 68), oklch(70% 0.16 72));
 }

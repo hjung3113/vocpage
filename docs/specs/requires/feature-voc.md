@@ -513,6 +513,83 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
   - 삭제 approve → `vocs.structured_payload=NULL`, `vocs.review_status=NULL`, 해당 history row `final_state='deleted'`/`is_current=false`. 담당자는 이후 "결과 작성"을 다시 수행 가능.
   - 삭제 reject → `vocs.review_status='approved'` 원복, `action='deletion', decision='rejected'` 리뷰 row만 추가.
 
+##### 9.4.5.1 검토 상세 드로어 (Detail Drawer)
+
+**진입 및 닫기**
+
+- 검토 큐 카드 클릭 시 오른쪽에서 오버레이 드로어가 열린다.
+- 닫기: 오버레이 배경 클릭 / Esc 키 / 드로어 내 X 버튼.
+- 포커스 트랩: 드로어가 열린 동안 Tab / Shift+Tab 은 드로어 내 포커스 가능 요소 사이만 순환한다.
+- 드로어 열릴 때 첫 번째 포커스 가능 요소(X 버튼)로 포커스 이동; 닫힐 때 트리거 카드로 포커스 복귀.
+- 인라인 승인/반려 버튼 클릭은 드로어를 열지 않는다(이벤트 전파 차단).
+
+**드로어 7개 섹션 (위→아래 순)**
+
+1. **메타 헤더**: 이슈 ID (D2Coding 폰트) / 제목 / Status pill (`vocs.status`) / 리뷰 상태 pill (`vocs.review_status`) / 액션 종류 (제출/삭제, `voc_payload_reviews.action`) / 담당자 (`vocs.assignee`) / 작성자 (`vocs.author`) / 제출일 (`voc_payload_reviews.created_at`).
+2. **시스템·메뉴 컨텍스트**: 시스템명 (`systems.name`) + 메뉴 경로 breadcrumb (`menus` 계층 조인) / 출처 SP (`vocs.source_sp` — 식별자 가상 컬럼) / 관련 테이블 chip 목록 (`vocs.related_tables[]` JSONB array of strings).
+3. **Payload Diff**: 2컬럼 레이아웃 — 왼쪽: `is_current=true` 스냅샷 (`voc_payload_history`), 오른쪽: 신규 제출 (`vocs.structured_payload`). 키 단위 diff: `added`(초록), `removed`(빨강), `changed`(주황), `same`(투명).
+4. **첨부/링크**: `voc_payload_reviews.attachments` 목록 (파일명 + 크기).
+5. **히스토리 타임라인**: `voc_payload_history` 전체 행. `is_current=true` 행에 브랜드 색 좌측 보더 강조; `final_state` pill(`approved`/`rejected`/`deleted`) 표시.
+6. **댓글/사유 입력**: textarea. 반려(`reject`) 선택 시 필수; 빈 값이면 제출 불가 + 인라인 에러 표시.
+7. **액션 영역**: 승인 / 반려 버튼. Manager/Admin 외 비활성화 + 잠금 안내문. 승인은 코멘트 선택, 반려는 코멘트 필수.
+
+**권한**: Manager / Admin 만 액션 가능 (§9.4.5 재확인). Viewer 는 모든 섹션 읽기 전용.
+FE 가드: window.currentUser.role ∈ {manager, admin}일 때만 승인/반려 버튼 활성화. 그 외 disabled + 안내 문구 노출.
+
+**BE 가드**: FE gate 외 추가로 backend는 `requireRole(['manager','admin'])` middleware (req §8.4-bis assertCanManageVoc 헬퍼와 동일 정책)를 모든 review 엔드포인트에 적용. DB 레벨에서는 RLS 또는 CHECK 제약으로 reviewer_role ∈ {manager, admin} 보장 (선택).
+
+**기밀 분류**: `source_sp`, `related_tables`는 DB 내부 식별자라 viewer/contributor에게 노출 금지. Admin only로 detail drawer에서 표시. Manager는 마스킹 노출(예: '관련 테이블 N개').
+
+**큐 정렬**: 검토 큐 기본 정렬 = `status_changed_at DESC`. 동률 시 `created_at DESC`. partial index `(review_status, status_changed_at)` WHERE review_status IN ('unverified','pending_deletion') 권장.
+
+**JSONB 쓰기 순서**: approve 트랜잭션 내 (a) voc_payload_history INSERT first (final_state='approved', payload=새 submission), (b) vocs.structured_payload 갱신, (c) voc_payload_reviews INSERT (payload_sha256 = SHA256(payload)). 단일 트랜잭션 보장.
+
+**텔레메트리**: FE는 승인/반려 시 window.dispatchEvent(new CustomEvent('voc:review:decided', {detail:{id, decision, comment, ts}})) 발행. 모니터링 모듈은 이 이벤트를 구독.
+
+**데이터 흐름**: 승인/반려 시 `voc_payload_reviews` row 생성 (action, decision, comment, reviewer_id, ts). comment는 반려 시 필수, 승인 시 optional.
+
+**삭제 신청 처리**: 삭제 신청은 newPayload 없음. currentPayload 단일 컬럼 + 삭제 사유 표시.
+
+**데이터 모델 매핑**
+
+| 섹션         | 노출 컬럼                                          | 출처 테이블                   |
+| ------------ | -------------------------------------------------- | ----------------------------- |
+| 메타 헤더    | `id`, `title`, `status`, `review_status`           | `vocs`                        |
+| 메타 헤더    | `action`, `created_at`, `comment`                  | `voc_payload_reviews`         |
+| 시스템·메뉴  | `system_id` → `systems.name`                       | `vocs` + `systems(masters)`   |
+| 시스템·메뉴  | `menu_id` → `menus.name` (계층 breadcrumb)         | `vocs` + `menus(masters)`     |
+| 시스템·메뉴  | `source_sp` (가상 식별자)                          | `vocs`                        |
+| 시스템·메뉴  | `related_tables[]` (JSONB)                         | `vocs`                        |
+| Payload Diff | `payload` (is_current 스냅샷)                      | `voc_payload_history`         |
+| Payload Diff | `structured_payload` (신규)                        | `vocs`                        |
+| 첨부         | `attachments[]`                                    | `voc_payload_reviews`         |
+| 히스토리     | `is_current`, `final_state`, `created_at`, `actor` | `voc_payload_history`         |
+| 댓글/사유    | `comment` (입력값)                                 | `voc_payload_reviews` (write) |
+
+> 히스토리 `actor` → `users.name` via `submitted_by` FK. `history.action` → event_type enum (TBD column; FE는 `history.event_type` 가정).
+
+**SP / Table 가시성**
+
+- 메뉴 매핑: `vocs.system_id` → `systems`(masters), `vocs.menu_id` → `menus`(masters).
+- 출처 SP: `vocs.source_sp` — 명세상 식별자(가상 컬럼명). 실제 구현 시 BE에서 JOIN 또는 denormalized 컬럼으로 제공.
+- 관련 테이블: `vocs.related_tables[]` — JSONB array of strings, chip 단위 표시.
+
+**토큰 규약**: `var(--*)` 전용. hex / oklch 리터럴 금지 (uidesign.md §10 준거).
+
+##### 9.4.5.2 API Surface (BE 미구현, 명세 우선)
+
+| Method | Path                                                                            | Body                                                                        | 200 응답                                                                                     | 주요 에러                                                                 |
+| ------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| GET    | /api/admin/voc/reviews?tab=submission\|deletion&assignee=&system=&menu=&cursor= | —                                                                           | { items: [...], nextCursor }                                                                 | 403 ROLE_FORBIDDEN                                                        |
+| GET    | /api/admin/voc/reviews/:id                                                      | —                                                                           | drawer payload (currentPayload, newPayload, history, attachments, source_sp, related_tables) | 404 REVIEW_NOT_FOUND                                                      |
+| POST   | /api/admin/voc/reviews/:id/decide                                               | { action, decision, comment?, expectedReviewStatus, expectedPayloadSha256 } | { reviewId, vocReviewStatus }                                                                | 403, 404, 409 REVIEW_STALE / REVIEW_ALREADY_DECIDED, 422 COMMENT_REQUIRED |
+
+에러 envelope (auth.ts 패턴 재사용): `{ code, message, details: { field?, expected?, actual? } }`. 코드: ROLE_FORBIDDEN, REVIEW_NOT_FOUND, REVIEW_ALREADY_DECIDED, REVIEW_STALE, COMMENT_REQUIRED, INVALID_DECISION.
+
+동시성: 두 매니저 동시 승인 → /decide 트랜잭션 안에서 `SELECT … FROM vocs WHERE id=$1 FOR UPDATE` + expectedReviewStatus/expectedPayloadSha256 검증. 불일치 시 409 REVIEW_STALE 반환. 클라이언트는 Idempotency-Key 헤더 (24h dedupe) 권장.
+
+---
+
 #### 9.4.6 태그 마스터 관리 (D22 확정, 2026-04-27)
 
 - **목적**: `tags` 테이블의 마스터 레코드(`name`, `kind`, `slug`)를 UI로 관리. §8.8.1이 "신규 태그 생성은 Admin/Manager 전용 관리 페이지에서만 가능"으로 규정한 진입점을 충족.
