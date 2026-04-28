@@ -1557,11 +1557,15 @@
   margin-top: 4px;
 }
 .review-tab {
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--text-secondary);
+  padding: 5px 11px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-tertiary);
   cursor: pointer;
+  background: transparent;
+  border: 0;
   border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1571,9 +1575,9 @@
   color: var(--text-primary);
 }
 .review-tab.active {
-  color: var(--text-primary);
+  color: var(--brand);
   border-bottom-color: var(--brand);
-  font-weight: 500;
+  font-weight: 600;
 }
 .review-tab-count {
   font-size: 11px;
