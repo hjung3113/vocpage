@@ -239,7 +239,7 @@
     const dis = canDecide ? '' : ' disabled';
     const roleNoticeHtml = canDecide
       ? ''
-      : '<div class="rv-detail-error" data-testid="rv-role-notice" role="status" style="display:block">권한 없음: Manager 또는 Admin만 승인/반려할 수 있습니다.</div>';
+      : '<div class="rv-detail-error" id="rv-role-notice" data-testid="rv-role-notice" role="status" style="display:block">권한 없음: Manager 또는 Admin만 승인/반려할 수 있습니다.</div>';
     const roleDescBy = canDecide ? '' : ' aria-describedby="rv-role-notice"';
 
     return `
