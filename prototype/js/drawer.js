@@ -116,11 +116,16 @@ function openDrawer(id) {
 
     ${(function () {
       // TODO: replace hardcoded role with real auth when wired.
-      // window.currentUser is set by auth layer (result-review-detail.js pattern).
-      const role = (window.currentUser && window.currentUser.role) || 'admin';
-      const isOwner = window.currentUser ? window.currentUser.id === d.assignee_id : true; // mock: treat as owner when no auth
-      return typeof window.buildInternalNotesSection === 'function'
-        ? window.buildInternalNotesSection(d.id, role, isOwner)
+      // window.currentUser is set by boot mock (init.js) or real auth layer.
+      // Fix S1: fail-closed — 'user' when window.currentUser is not set.
+      const role = (window.currentUser && window.currentUser.role) || 'user';
+      const isOwner = !!(
+        window.currentUser &&
+        d.assignee_id &&
+        window.currentUser.id === d.assignee_id
+      );
+      return typeof window.InternalNotes === 'object'
+        ? window.InternalNotes.build(d.id, role, isOwner)
         : '';
     })()}
 

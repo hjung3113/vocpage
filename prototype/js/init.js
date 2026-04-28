@@ -1,4 +1,13 @@
 // Trailing initializers — must load AFTER all other js/*.js files and after DOM body parsed.
+
+// ── mock auth — prototype demo only ──────────────────────────────────────────
+// Fix S1: fail-closed guards in drawer.js / internal-notes.js default to 'user'.
+// Inject admin mock here so demo verifier sees notes section rendered.
+// Real auth layer replaces this block when wired.
+if (!window.currentUser) {
+  window.currentUser = { role: 'admin', id: 'u-admin', name: '이분석' };
+}
+
 lucide.createIcons();
 renderSidebar();
 renderVOCList();
