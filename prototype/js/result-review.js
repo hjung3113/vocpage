@@ -1,14 +1,9 @@
 // Stage B-1 P-1.C1 — Result Review (관리자 검토 큐) prototype shell
 // Mock data only. Approve/reject buttons surface a toast; real workflow lands later.
-// All payload values pass through escHtml() before innerHTML interpolation so the
+// All payload values pass through window.escHtml() before innerHTML interpolation so the
 // pattern is safe to copy when the real impl wires up untrusted input.
 
-function escHtml(s) {
-  return String(s).replace(
-    /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
-  );
-}
+// escHtml and showToast live in dom-utils.js (loaded before this file).
 
 // Mock data lives in result-review-data.js (loaded before this file).
 const reviewQueue = window.reviewQueue || [];
@@ -89,27 +84,27 @@ function renderReviewCard(r) {
   const rows = Object.entries(r.payload)
     .map(
       ([k, v]) =>
-        `<div class="review-payload-row"><span class="review-payload-key">${escHtml(k)}</span><span class="review-payload-val">${escHtml(v)}</span></div>`,
+        `<div class="review-payload-row"><span class="review-payload-key">${window.escHtml(k)}</span><span class="review-payload-val">${window.escHtml(v)}</span></div>`,
     )
     .join('');
-  const id = escHtml(r.id);
+  const id = window.escHtml(r.id);
   // D: show review_status pill next to status pill
   const reviewPill = r.reviewStatusLabel
-    ? `<span class="status-pill status-pending">${escHtml(r.reviewStatusLabel)}</span>`
+    ? `<span class="status-pill status-pending">${window.escHtml(r.reviewStatusLabel)}</span>`
     : '';
   return `
     <div class="review-card" data-id="${id}" data-testid="review-card">
       <div class="review-card-head">
         <div class="review-card-meta">
           <span class="review-id">${id}</span>
-          <span class="status-pill status-reviewing">${escHtml(r.statusLabel)}</span>
+          <span class="status-pill status-reviewing">${window.escHtml(r.statusLabel)}</span>
           ${reviewPill}
         </div>
-        <div class="review-card-title">${escHtml(r.title)}</div>
+        <div class="review-card-title">${window.escHtml(r.title)}</div>
         <div class="review-card-sub">
-          <span><i data-lucide="user-check"></i> 담당 ${escHtml(r.assignee)}</span>
-          <span><i data-lucide="send"></i> 제출 ${escHtml(r.author)}</span>
-          <span><i data-lucide="calendar"></i> ${escHtml(r.submittedAt)}</span>
+          <span><i data-lucide="user-check"></i> 담당 ${window.escHtml(r.assignee)}</span>
+          <span><i data-lucide="send"></i> 제출 ${window.escHtml(r.author)}</span>
+          <span><i data-lucide="calendar"></i> ${window.escHtml(r.submittedAt)}</span>
         </div>
       </div>
       <div class="review-card-body">${rows}</div>
@@ -148,7 +143,7 @@ function approveReview(id, comment) {
   const item = (window.reviewQueue || []).find((r) => r.id === id);
   if (item) item.lastDecisionComment = comment || '';
   const suffix = comment ? ` (사유: ${comment})` : '';
-  showReviewToast(`${id} 승인 완료${suffix} (mock)`, 'ok');
+  window.showToast(`${id} 승인 완료${suffix} (mock)`, 'ok');
   window.dispatchEvent(
     new CustomEvent('voc:review:decided', {
       detail: { id, decision: 'approve', comment, ts: Date.now() },
@@ -160,28 +155,10 @@ function rejectReview(id, comment) {
   const item = (window.reviewQueue || []).find((r) => r.id === id);
   if (item) item.lastDecisionComment = comment || '';
   const suffix = comment ? ` (사유: ${comment})` : '';
-  showReviewToast(`${id} 반려 처리${suffix} (mock)`, 'warn');
+  window.showToast(`${id} 반려 처리${suffix} (mock)`, 'warn');
   window.dispatchEvent(
     new CustomEvent('voc:review:decided', {
       detail: { id, decision: 'reject', comment, ts: Date.now() },
     }),
   );
-}
-
-function showReviewToast(msg, kind) {
-  let host = document.getElementById('reviewToastHost');
-  if (!host) {
-    host = document.createElement('div');
-    host.id = 'reviewToastHost';
-    host.className = 'review-toast-host';
-    host.setAttribute('role', 'status');
-    host.setAttribute('aria-live', 'polite');
-    document.body.appendChild(host);
-  }
-  const t = document.createElement('div');
-  t.className = `review-toast review-toast-${kind || 'ok'}`;
-  t.textContent = msg;
-  host.appendChild(t);
-  setTimeout(() => t.classList.add('out'), 1800);
-  setTimeout(() => t.remove(), 2200);
 }

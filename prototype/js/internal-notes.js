@@ -1,17 +1,8 @@
 // Stage B-2 P-1.C2 — Internal Notes drawer section
-//권한: Manager/Admin 항상, Dev는 본인 담당 VOC만, User/외부 Dev → DOM 미렌더
-// 의존성 없음 — escHtml, toast 모두 자체 정의 (result-review.js 패턴 차용)
+// 권한: Manager/Admin 항상, Dev는 본인 담당 VOC만, User/외부 Dev → DOM 미렌더
+// 의존성: dom-utils.js (window.escHtml, window.showToast) — 반드시 먼저 로드.
 
 (function () {
-  // ── helpers ──────────────────────────────────────────────────────────────
-
-  function escHtml(s) {
-    return String(s).replace(
-      /[&<>"']/g,
-      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
-    );
-  }
-
   // ── mock data ─────────────────────────────────────────────────────────────
   // VOC id별 2건. author / role 필드는 실제 API 응답 모양을 모사.
 
@@ -121,12 +112,12 @@
     return notes
       .map(
         (n) => `
-      <div class="note-item" data-note-id="${escHtml(n.id)}">
+      <div class="note-item" data-note-id="${window.escHtml(n.id)}">
         <div class="note-meta">
-          <span class="note-author">${escHtml(n.author)}</span>
-          <span class="note-date">${escHtml(n.createdAt)}</span>
+          <span class="note-author">${window.escHtml(n.author)}</span>
+          <span class="note-date">${window.escHtml(n.createdAt)}</span>
         </div>
-        <div class="note-body">${escHtml(n.content)}</div>
+        <div class="note-body">${window.escHtml(n.content)}</div>
       </div>`,
       )
       .join('');
@@ -150,13 +141,13 @@
     const countLabel = count > 0 ? `내부 메모 ${count}개` : '내부 메모';
 
     return `
-    <section class="notes-section" id="notes-section-${escHtml(vocId)}" aria-label="Internal Notes">
+    <section class="notes-section" id="notes-section-${window.escHtml(vocId)}" aria-label="Internal Notes">
       <div class="notes-section-header">
         <button
           class="notes-toggle-btn"
           aria-expanded="true"
-          aria-controls="notes-body-${escHtml(vocId)}"
-          onclick="window._notesToggle('${escHtml(vocId)}')"
+          aria-controls="notes-body-${window.escHtml(vocId)}"
+          onclick="window.InternalNotes.toggle('${window.escHtml(vocId)}')"
         >
           <span class="notes-header-title">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -166,20 +157,21 @@
           <svg class="notes-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
         </button>
       </div>
-      <div class="notes-body" id="notes-body-${escHtml(vocId)}">
-        <div class="note-list" id="note-list-${escHtml(vocId)}">
+      <div class="notes-body" id="notes-body-${window.escHtml(vocId)}">
+        <div class="note-list" id="note-list-${window.escHtml(vocId)}">
           ${buildNoteItems(vocId)}
         </div>
         <div class="note-input-area">
+          <label class="sr-only" for="note-textarea-${window.escHtml(vocId)}">내부 메모 입력</label>
           <textarea
-            id="note-textarea-${escHtml(vocId)}"
+            id="note-textarea-${window.escHtml(vocId)}"
             class="note-input"
             placeholder="내부 메모를 입력하세요 (담당자·관리자만 볼 수 있음)"
             rows="3"
           ></textarea>
           <div class="note-toolbar">
-            <button class="btn-ghost note-cancel-btn" style="padding:5px 10px;font-size:12px" onclick="window._notesClear('${escHtml(vocId)}')">취소</button>
-            <button class="note-save-btn" onclick="window.addInternalNote('${escHtml(vocId)}')">
+            <button type="button" class="btn-ghost note-cancel-btn" aria-label="입력 취소" style="padding:5px 10px;font-size:12px" onclick="window.InternalNotes.clear('${window.escHtml(vocId)}')">취소</button>
+            <button type="button" class="note-save-btn" onclick="window.InternalNotes.add('${window.escHtml(vocId)}')">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               저장
             </button>
@@ -200,11 +192,20 @@
    * @param {string} vocId
    */
   function addInternalNote(vocId) {
+    // TODO: replace with real currentUser when auth is wired.
+    // Fix S1: fail-closed role guard — 'user' if window.currentUser not set.
+    const role = (window.currentUser && window.currentUser.role) || 'user';
+    const isOwner = false; // mock — 실제 환경에서 voc.assignee_id 조회로 결정
+    if (!canViewNotes(role, isOwner)) {
+      window.showToast('권한이 없습니다.', 'warn');
+      return;
+    }
+
     const ta = document.getElementById(`note-textarea-${vocId}`);
     if (!ta) return;
     const content = ta.value.trim();
     if (!content) {
-      showNotesToast('메모 내용을 입력해 주세요.', 'warn');
+      window.showToast('메모 내용을 입력해 주세요.', 'warn');
       return;
     }
 
@@ -212,9 +213,7 @@
     const pad = (n) => String(n).padStart(2, '0');
     const createdAt = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-    // TODO: replace with real currentUser when auth is wired
     const author = (window.currentUser && window.currentUser.name) || '현재 사용자';
-    const role = (window.currentUser && window.currentUser.role) || 'manager';
 
     internalNotes.push({
       id: `n-${Date.now()}`,
@@ -227,7 +226,7 @@
 
     ta.value = '';
     renderInternalNotes(vocId);
-    showNotesToast('내부 메모가 저장되었습니다.', 'ok');
+    window.showToast('내부 메모가 저장되었습니다.', 'ok');
   }
 
   // ── public: re-render note list ───────────────────────────────────────────
@@ -251,44 +250,26 @@
     }
   }
 
-  // ── toast ─────────────────────────────────────────────────────────────────
-  // review-toast 스타일 재사용 (별도 CSS 클래스 미정의)
+  // ── public API — single namespace ─────────────────────────────────────────
+  // Fix C3: 4개 window.* → window.InternalNotes 단일 객체로 통합
 
-  function showNotesToast(msg, kind) {
-    let host = document.getElementById('reviewToastHost');
-    if (!host) {
-      host = document.createElement('div');
-      host.id = 'reviewToastHost';
-      host.className = 'review-toast-host';
-      host.setAttribute('role', 'status');
-      host.setAttribute('aria-live', 'polite');
-      document.body.appendChild(host);
-    }
-    const t = document.createElement('div');
-    t.className = `review-toast review-toast-${kind || 'ok'}`;
-    t.textContent = msg;
-    host.appendChild(t);
-    setTimeout(() => t.classList.add('out'), 1800);
-    setTimeout(() => t.remove(), 2200);
-  }
+  window.InternalNotes = {
+    build: buildInternalNotesSection,
 
-  // ── internal helpers exposed on window (prefixed to avoid collisions) ─────
+    add: addInternalNote,
 
-  window._notesToggle = function (vocId) {
-    const body = document.getElementById(`notes-body-${vocId}`);
-    const btn = document.querySelector(`#notes-section-${vocId} .notes-toggle-btn`);
-    if (!body || !btn) return;
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!expanded));
-    body.classList.toggle('notes-body--collapsed', expanded);
+    toggle: function (vocId) {
+      const body = document.getElementById(`notes-body-${vocId}`);
+      const btn = document.querySelector(`#notes-section-${vocId} .notes-toggle-btn`);
+      if (!body || !btn) return;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      body.classList.toggle('notes-body--collapsed', expanded);
+    },
+
+    clear: function (vocId) {
+      const ta = document.getElementById(`note-textarea-${vocId}`);
+      if (ta) ta.value = '';
+    },
   };
-
-  window._notesClear = function (vocId) {
-    const ta = document.getElementById(`note-textarea-${vocId}`);
-    if (ta) ta.value = '';
-  };
-
-  // ── public API (two globals only) ─────────────────────────────────────────
-  window.buildInternalNotesSection = buildInternalNotesSection;
-  window.addInternalNote = addInternalNote;
 })();
