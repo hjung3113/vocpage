@@ -114,6 +114,21 @@ function openDrawer(id) {
 
     ${buildAttachSection(d)}
 
+    ${(function () {
+      // TODO: replace hardcoded role with real auth when wired.
+      // window.currentUser is set by boot mock (init.js) or real auth layer.
+      // Fix S1: fail-closed — 'user' when window.currentUser is not set.
+      const role = (window.currentUser && window.currentUser.role) || 'user';
+      const isOwner = !!(
+        window.currentUser &&
+        d.assignee_id &&
+        window.currentUser.id === d.assignee_id
+      );
+      return typeof window.InternalNotes === 'object'
+        ? window.InternalNotes.build(d.id, role, isOwner)
+        : '';
+    })()}
+
     <div class="d-comments">
       <div class="d-section-title" id="comment-count-${d.id}">댓글 1개</div>
       <div id="comment-list-${d.id}">
