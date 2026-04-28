@@ -57,8 +57,11 @@ function renderResultReview() {
           const idx = tabs.indexOf(tab);
           const next = tabs[(idx + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
           if (next) {
-            switchReviewTab(next.dataset.tab);
-            next.focus();
+            const nextTabName = next.dataset.tab;
+            switchReviewTab(nextTabName);
+            // re-query: switchReviewTab re-renders the tablist, so `next` is detached
+            const refreshed = el.querySelector('[role="tab"][data-tab="' + nextTabName + '"]');
+            if (refreshed) refreshed.focus();
           }
         }
         return;
