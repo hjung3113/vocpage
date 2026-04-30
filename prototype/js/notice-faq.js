@@ -1,3 +1,29 @@
+// Notice/FAQ user view + admin-mode integration.
+// spec: docs/specs/requires/feature-notice-faq.md §10.3 / §10.4
+// R2 (B-4a fix branch): all user-content fields escaped via escHtml; FAQ category
+// click delegated to data-cat (no inline onclick string interpolation); slot host
+// element rendered conditionally on canEnterAdminMode (tree-exclusion per
+// uidesign.md §13.8); inline mount only — `attachFaqAdminHooks` monkey-patch
+// removed.
+
+function _nfEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function _nfAdminSlot(id) {
+  // Tree-exclusion guard — emit slot host ONLY when role can enter admin mode.
+  if (!window.AdminMode || !window.AdminMode.canEnterAdminMode()) return '';
+  return '<div class="admin-topbar-actions" id="' + id + '"></div>';
+}
+
+function _nfMountAdmin(slotId, bodyId) {
+  if (!window.AdminMode) return;
+  window.AdminMode.renderEntryButton(document.getElementById(slotId));
+  window.AdminMode.renderModeBanner(document.getElementById(bodyId));
+}
+
 // ── 공지사항 렌더
 function renderNotices() {
   const today = new Date().toISOString().slice(0, 10);
@@ -7,30 +33,27 @@ function renderNotices() {
   el.innerHTML = `
     <div class="admin-topbar">
       <h2 class="admin-title">공지사항</h2>
-      <div class="admin-topbar-actions" id="noticeAdminEntrySlot"></div>
+      ${_nfAdminSlot('noticeAdminEntrySlot')}
     </div>
     <div class="admin-body" id="noticeAdminBody">
-      ${visible.length === 0 ? '<p style="color:var(--text-tertiary);padding:32px 24px">등록된 공지사항이 없습니다.</p>' : ''}
+      ${visible.length === 0 ? '<p class="nf-empty">등록된 공지사항이 없습니다.</p>' : ''}
       ${visible
         .map(
-          (n, i) => `
-        <div class="notice-item" style="border-bottom:1px solid var(--border-subtle)">
+          (n) => `
+        <div class="notice-item nf-row-divider">
           <div onclick="toggleNotice(${n.id})" class="notice-row">
-            <span class="notice-badge notice-badge-${n.level}">${levelLabel[n.level]}</span>
-            <span style="flex:1;font-size:14px;color:var(--text-primary)">${n.title}</span>
-            <span style="font-size:12px;color:var(--text-tertiary);flex-shrink:0">${n.from} ~ ${n.to}</span>
-            <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="notice-icon-${n.id}"></i>
+            <span class="notice-badge notice-badge-${_nfEsc(n.level)}">${_nfEsc(levelLabel[n.level] || '')}</span>
+            <span class="nf-title">${_nfEsc(n.title)}</span>
+            <span class="nf-period">${_nfEsc(n.from)} ~ ${_nfEsc(n.to)}</span>
+            <i data-lucide="chevron-down" class="nf-chevron" id="notice-icon-${n.id}"></i>
           </div>
-          <div id="notice-body-${n.id}" class="notice-body">${n.content}</div>
+          <div id="notice-body-${n.id}" class="notice-body">${_nfEsc(n.content)}</div>
         </div>`,
         )
         .join('')}
     </div>`;
   lucide.createIcons();
-  if (window.AdminMode) {
-    window.AdminMode.renderEntryButton(document.getElementById('noticeAdminEntrySlot'));
-    window.AdminMode.renderModeBanner(document.getElementById('noticeAdminBody'));
-  }
+  _nfMountAdmin('noticeAdminEntrySlot', 'noticeAdminBody');
 }
 
 function toggleNotice(id) {
@@ -57,37 +80,42 @@ function renderFaq() {
     }
     return true;
   });
+  // R2: escape source text first, then apply highlight wrapping. The regex
+  // operates over already-escaped HTML, so &lt; etc. cannot be matched and broken.
   function hl(text) {
-    if (!faqQuery) return text;
+    const safe = _nfEsc(text);
+    if (!faqQuery) return safe;
     const re = new RegExp(`(${faqQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return text.replace(
-      re,
-      '<mark style="background:var(--brand-bg);color:var(--accent);border-radius:2px">$1</mark>',
-    );
+    return safe.replace(re, '<mark class="nf-mark">$1</mark>');
   }
   el.innerHTML = `
     <div class="admin-topbar">
       <h2 class="admin-title">FAQ</h2>
-      <div class="admin-topbar-actions" id="faqAdminEntrySlot"></div>
+      ${_nfAdminSlot('faqAdminEntrySlot')}
     </div>
     <div class="admin-body" id="faqAdminBody">
       <div class="faq-filter-bar">
-        <input id="faqSearch" type="text" placeholder="검색..." value="${faqQuery}"
+        <input id="faqSearch" type="text" placeholder="검색..." value="${_nfEsc(faqQuery)}"
           oninput="faqQuery=this.value;renderFaq()"
           class="faq-search">
-        <div class="faq-cat-group">
-          ${categories.map((c) => `<button onclick="faqCategory='${c}';renderFaq()" class="faq-cat-btn${faqCategory === c ? ' active' : ''}">${c}</button>`).join('')}
+        <div class="faq-cat-group" id="faqCatGroup">
+          ${categories
+            .map(
+              (c) =>
+                `<button type="button" data-cat="${_nfEsc(c)}" class="faq-cat-btn${faqCategory === c ? ' active' : ''}">${_nfEsc(c)}</button>`,
+            )
+            .join('')}
         </div>
       </div>
-      ${filtered.length === 0 ? '<p style="color:var(--text-tertiary);padding:16px 24px">검색 결과가 없습니다.</p>' : ''}
+      ${filtered.length === 0 ? '<p class="nf-empty nf-empty-tight">검색 결과가 없습니다.</p>' : ''}
       ${filtered
         .map(
           (f) => `
         <div class="faq-item">
           <div onclick="toggleFaq(${f.id})" class="notice-row">
-            <span class="notice-badge notice-badge-normal">${f.category}</span>
-            <span style="flex:1;font-size:14px;color:var(--text-primary)">${hl(f.q)}</span>
-            <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);transition:transform .2s;flex-shrink:0" id="faq-icon-${f.id}"></i>
+            <span class="notice-badge notice-badge-normal">${_nfEsc(f.category)}</span>
+            <span class="nf-title">${hl(f.q)}</span>
+            <i data-lucide="chevron-down" class="nf-chevron" id="faq-icon-${f.id}"></i>
           </div>
           <div id="faq-body-${f.id}" class="notice-body">${hl(f.a)}</div>
         </div>`,
@@ -95,6 +123,17 @@ function renderFaq() {
         .join('')}
     </div>`;
   lucide.createIcons();
+  // Delegated click for category buttons (replaces vulnerable inline onclick).
+  const grp = document.getElementById('faqCatGroup');
+  if (grp) {
+    grp.addEventListener('click', function (e) {
+      const btn = e.target.closest('.faq-cat-btn');
+      if (!btn) return;
+      faqCategory = btn.getAttribute('data-cat') || '전체';
+      renderFaq();
+    });
+  }
+  _nfMountAdmin('faqAdminEntrySlot', 'faqAdminBody');
 }
 
 function toggleFaq(id) {
@@ -104,19 +143,6 @@ function toggleFaq(id) {
   body.style.display = open ? 'none' : 'block';
   icon.style.transform = open ? '' : 'rotate(180deg)';
 }
-
-// Mount admin-mode entry button + banner after FAQ DOM is built.
-(function attachFaqAdminHooks() {
-  const orig = window.renderFaq;
-  if (typeof orig !== 'function') return;
-  window.renderFaq = function () {
-    orig.apply(this, arguments);
-    if (window.AdminMode) {
-      window.AdminMode.renderEntryButton(document.getElementById('faqAdminEntrySlot'));
-      window.AdminMode.renderModeBanner(document.getElementById('faqAdminBody'));
-    }
-  };
-})();
 
 // Re-render whichever info page is active when admin mode toggles
 // (handles popstate + button click + programmatic AdminMode.setMode).
@@ -129,5 +155,5 @@ document.addEventListener('admin-mode:change', function (e) {
 });
 
 // 공지/FAQ 관리는 D19에 따라 별도 admin 페이지가 아니라
-// 공지/FAQ 페이지의 `?mode=admin` 토글로 통합됩니다 (P-9에서 시연 추가 예정).
+// 공지/FAQ 페이지의 `?mode=admin` 토글로 통합됩니다 (B-4b에서 인라인 액션 추가).
 // 기존 renderAdminNotices/renderAdminFaq + 헬퍼는 D19와 모순되어 제거 (cross-review R-10).

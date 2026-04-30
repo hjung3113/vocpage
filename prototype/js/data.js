@@ -422,6 +422,14 @@ const FAQS = [
   },
 ];
 
+// ── FAQ Categories (B-4b mock data)
+const FAQ_CATEGORIES = [
+  { id: 1, name: '사용법', order: 1, visible: true },
+  { id: 2, name: '오류', order: 2, visible: true },
+  { id: 3, name: '정책', order: 3, visible: true },
+  { id: 4, name: '기타', order: 4, visible: true },
+];
+
 // ── State
 const CURRENT_USER = '홍길동';
 let currentView = 'all'; // 'all' | 'mine' | 'assigned'
