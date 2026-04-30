@@ -21,20 +21,28 @@ function guardToast(msg) {
   el.setAttribute('role', 'alert');
   el.innerHTML =
     '<span class="guard-toast-icon" aria-hidden="true">&#9888;</span>' +
-    '<span>' + escHtml(msg) + '</span>';
+    '<span>' +
+    escHtml(msg) +
+    '</span>';
   host.appendChild(el);
   // trigger reflow so transition fires
   void el.offsetWidth;
   el.classList.add('guard-toast-in');
-  setTimeout(function () { el.classList.add('guard-toast-out'); }, 3600);
-  setTimeout(function () { el.remove(); }, 4000);
+  setTimeout(function () {
+    el.classList.add('guard-toast-out');
+  }, 3600);
+  setTimeout(function () {
+    el.remove();
+  }, 4000);
 }
 
 // ── D15: self-role guard
 // Triggered by role <select> change on the current user's row
 function onRoleSelectChange(selectEl, userId) {
   if (userId !== GUARD_CURRENT_USER_ID) return; // not self — allow
-  const u = ADMIN_USERS.find(function (x) { return x.id === userId; });
+  const u = ADMIN_USERS.find(function (x) {
+    return x.id === userId;
+  });
   if (!u) return;
   // revert
   selectEl.value = u.role;
@@ -46,7 +54,9 @@ function onRoleSelectChange(selectEl, userId) {
 // Returns true if the guard fired (caller should revert and stop)
 function checkLastAdmin(userId, newRole) {
   if (newRole === 'admin') return false; // still admin — no guard
-  const u = ADMIN_USERS.find(function (x) { return x.id === userId; });
+  const u = ADMIN_USERS.find(function (x) {
+    return x.id === userId;
+  });
   if (!u || u.role !== 'admin') return false; // not currently admin
   const activeAdminCount = ADMIN_USERS.filter(function (x) {
     return x.role === 'admin' && x.active;
@@ -92,8 +102,14 @@ window.checkSelfDeactivate = checkSelfDeactivate;
     var checked = u.active ? ' checked' : '';
     var onChange = 'handleGuardActiveChange(this,' + u.id + ')';
     return (
-      '<label class="guard-toggle" title="' + (u.active ? '활성' : '비활성') + '">' +
-      '<input type="checkbox"' + checked + ' onchange="' + onChange + '">' +
+      '<label class="guard-toggle" title="' +
+      (u.active ? '활성' : '비활성') +
+      '">' +
+      '<input type="checkbox"' +
+      checked +
+      ' onchange="' +
+      onChange +
+      '">' +
       '<span class="guard-toggle-track"></span>' +
       '</label>'
     );
@@ -106,18 +122,34 @@ window.checkSelfDeactivate = checkSelfDeactivate;
       var isSelf = u.id === GUARD_CURRENT_USER_ID;
       var selfMark = isSelf ? ' <span class="guard-self-badge">나</span>' : '';
       return (
-        '<tr id="user-row-' + u.id + '" style="transition:opacity .2s">' +
+        '<tr id="user-row-' +
+        u.id +
+        '" style="transition:opacity .2s">' +
         '<td><div style="display:flex;align-items:center;gap:9px">' +
-        '<div class="user-avatar-sm">' + escHtml(u.init) + '</div>' +
-        '<span class="td-primary">' + escHtml(u.name) + '</span>' + selfMark +
+        '<div class="user-avatar-sm">' +
+        escHtml(u.init) +
+        '</div>' +
+        '<span class="td-primary">' +
+        escHtml(u.name) +
+        '</span>' +
+        selfMark +
         '</div></td>' +
         '<td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">' +
-        escHtml(u.email) + '</td>' +
-        '<td>' + buildRoleSelect(u) + '</td>' +
-        '<td>' + buildActiveToggle(u) + '</td>' +
-        '<td style="font-size:12px;color:var(--text-tertiary)">' + escHtml(u.lastSeen) + '</td>' +
+        escHtml(u.email) +
+        '</td>' +
+        '<td>' +
+        buildRoleSelect(u) +
+        '</td>' +
+        '<td>' +
+        buildActiveToggle(u) +
+        '</td>' +
+        '<td style="font-size:12px;color:var(--text-tertiary)">' +
+        escHtml(u.lastSeen) +
+        '</td>' +
         '<td style="text-align:right">' +
-        '<button class="a-btn danger" onclick="deleteUser(' + u.id + ')">삭제</button>' +
+        '<button class="a-btn danger" onclick="deleteUser(' +
+        u.id +
+        ')">삭제</button>' +
         '</td>' +
         '</tr>'
       );
@@ -130,19 +162,25 @@ window.checkSelfDeactivate = checkSelfDeactivate;
     var newRole = selectEl.value;
     // D15: self-role guard
     if (userId === GUARD_CURRENT_USER_ID) {
-      var u = ADMIN_USERS.find(function (x) { return x.id === userId; });
+      var u = ADMIN_USERS.find(function (x) {
+        return x.id === userId;
+      });
       if (u) selectEl.value = u.role;
       guardToast('본인의 권한은 변경할 수 없습니다.');
       return;
     }
     // D14: last-admin guard
     if (checkLastAdmin(userId, newRole)) {
-      var u2 = ADMIN_USERS.find(function (x) { return x.id === userId; });
+      var u2 = ADMIN_USERS.find(function (x) {
+        return x.id === userId;
+      });
       if (u2) selectEl.value = u2.role;
       return;
     }
     // Allow: commit the change
-    var target = ADMIN_USERS.find(function (x) { return x.id === userId; });
+    var target = ADMIN_USERS.find(function (x) {
+      return x.id === userId;
+    });
     if (target) target.role = newRole;
   };
 
@@ -153,7 +191,9 @@ window.checkSelfDeactivate = checkSelfDeactivate;
       checkboxEl.checked = true; // revert
       return;
     }
-    var target = ADMIN_USERS.find(function (x) { return x.id === userId; });
+    var target = ADMIN_USERS.find(function (x) {
+      return x.id === userId;
+    });
     if (target) target.active = newVal;
   };
 

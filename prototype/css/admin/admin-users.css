@@ -29,7 +29,9 @@
   box-shadow: 0 4px 16px var(--shadow-md);
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
   pointer-events: none;
   white-space: nowrap;
 }
@@ -92,7 +94,7 @@
   position: relative;
 }
 
-.guard-toggle input[type="checkbox"] {
+.guard-toggle input[type='checkbox'] {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -118,7 +120,9 @@
   height: 12px;
   border-radius: 50%;
   background: var(--text-tertiary);
-  transition: transform 0.18s, background 0.18s;
+  transition:
+    transform 0.18s,
+    background 0.18s;
 }
 
 .guard-toggle input:checked + .guard-toggle-track {

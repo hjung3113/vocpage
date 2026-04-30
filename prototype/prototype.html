@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="css/admin/external-masters.css">
 <link rel="stylesheet" href="css/admin/notifications.css">
 <link rel="stylesheet" href="css/admin/mode-toggle.css">
+<link rel="stylesheet" href="css/admin/dashboard-settings-panel.css">
 <link rel="stylesheet" href="css/admin/admin-users.css">
 <link rel="stylesheet" href="css/admin/drawer-advanced.css">
 <link rel="stylesheet" href="css/admin/notice-faq-admin.css">
@@ -211,6 +212,8 @@
       </div>
       <button class="dash-btn">📅 2025.05.01–05.30 ▾</button>
       <button class="dash-btn" id="dashEditBtn" onclick="dashToggleEdit()" style="gap:5px;"><i data-lucide="layout-panel-left" style="width:13px;height:13px"></i> 레이아웃 편집</button>
+      <!-- B-17 Dashboard 설정 슬라이드 패널 -->
+      <button class="dash-btn dash-settings-btn" id="dashSettingsBtn" onclick="DashboardSettingsPanel.open()" aria-label="대시보드 설정"><i data-lucide="settings" style="width:13px;height:13px"></i></button>
     </div>
   </div>
 
@@ -925,6 +928,8 @@
 <script src="js/notif.js"></script>
 <script src="js/notice-faq.js"></script>
 <script src="js/admin-master.js"></script>
+<!-- B-17 Dashboard 설정 슬라이드 패널 -->
+<script src="js/dashboard-settings-panel.js"></script>
 <script src="js/admin-users.js"></script>
 <!-- B-15 User 관리 가드 토스트 (D14/D15/D16) — must load after admin-users.js -->
 <script src="js/admin-users-guards.js"></script>
