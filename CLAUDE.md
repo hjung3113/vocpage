@@ -132,6 +132,15 @@ docs/specs/
 - **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
 - **Debate, don't defer** — Do not assume the user is always right. When you see a counterargument, trade-off, or missed case in a spec or design decision, raise it before agreeing. No passive "yes" — push back, verify, or propose alternatives as a peer engineer would.
 
+## Behavioral Guidelines
+
+Bias toward caution over speed. For trivial tasks, use judgment.
+
+- **Think before coding** — State assumptions explicitly. If multiple interpretations exist, present them; don't pick silently. If unclear, stop and ask. (Reinforces "Debate, don't defer".)
+- **Simplicity first** — Minimum code that solves the problem. No speculative abstractions, no unrequested flexibility, no error handling for impossible scenarios. If 200 lines could be 50, rewrite. (Reinforces YAGNI.)
+- **Surgical changes** — Touch only what the request requires. Don't "improve" adjacent code, comments, or formatting. Match existing style even if you'd do it differently. Only remove orphans (imports/vars/functions) that _your_ changes made unused — leave pre-existing dead code alone (mention it instead). Every changed line must trace directly to the user's request.
+- **Goal-driven execution** — Convert tasks into verifiable goals before implementing ("Add validation" → "Write tests for invalid inputs, then make them pass"). For multi-step work, state a brief plan with per-step verification, then loop until verified.
+
 ## graphify
 
 This project has a graphify knowledge graph at `graphify-out/`.
