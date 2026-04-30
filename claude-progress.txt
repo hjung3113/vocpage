@@ -1,277 +1,39 @@
 # vocpage — Session Progress
 
-## 다음 세션 할 일
+## 다음 세션 시작점
 
-→ **`docs/specs/plans/next-session-tasks.md`** 참조 (전체 Phase 계획)
+→ **Wave 3 W3-A** (VOC 본체 — drawer + modal + voc-list 갭 4건 동시 처리: C-02 Due Date / N-01 자동 태그 / N-02 charcount / N-04 highlight)
 
-현재 위치: Phase 0~6 ✅ / Phase 7 진입 전 결함 수정 ✅ / 종합 리뷰 ✅ / R-1~R-6 ✅ / VOC 목록 UI ✅ / 대시보드 기간 필터 ✅ / 다방면 리뷰 ✅ / Phase D ✅ / Phase A ✅ / Phase B ✅ / benchmark 스크린샷 ✅ / 스키마-요구문서 간극 리뷰 ✅ / Phase E (P1+P2+Major 명세 보완) ✅ / Phase F (Dev role + 공지/FAQ 진입점 + uidesign.md §13) ✅ (2026-04-26) / Phase G (17건 설계 마무리) ✅ (2026-04-27) / PR #54 머지 ✅ (2026-04-27) / 관리자 UI 커버리지 리뷰 (D22 태그 마스터 + D23 휴지통) ✅ (2026-04-27, 브랜치 docs/admin-ui-gaps) / 4-도메인 cross-review ✅ (2026-04-27) / Q1~Q5 결정 + R-5/R-7/R-10/R-11/R-12 docs 패치 ✅ (2026-04-27, 단일 커밋) / design.md → uidesign.md 리네이밍 + §5 비데이터 동작 규약 requirements.md §5.1로 분리 ✅ (2026-04-27) / Phase 7 plan 작성 ✅ (2026-04-27, `.omc/plans/prototype-phase7.md`) / Stage A-2 CSS 분할 5파일 ✅ (PR #57 머지) / Stage A-4 JS 분할 15파일 ✅ (2026-04-27, 브랜치 `feat/prototype-phase7-js`, PR #58 머지) / Stage B-1 (P-1.C1 Result Review 셸) ✅ (2026-04-28, 브랜치 `feat/prototype-phase7-stage-b1`) / Result Review 상세 드로어 + R1~R3 전문가 리뷰 ✅ (2026-04-28, PR #60) / R4 runtime smoke 결함 3건 수정 ✅ (2026-04-28, 브랜치 `docs/result-review-r1-r3-cleanup`: ① `reviewQueue` dup-const SyntaxError → IIFE 래핑, ② `rv-role-notice` id 누락 → aria-describedby dangling 해결, ③ ArrowKey 탭 전환 시 포커스 drop → re-query 후 focus) / 결과 검토 탭 버튼 기본 스타일 회귀 fix ✅ (2026-04-28, 브랜치 `fix/review-tabs-button-defaults`: `.review-tab`이 `<button>`인데 background/border 초기화 누락으로 브라우저 기본 outset 검은 테두리 + 회색 배경 노출 → 대시보드 `.d-tab`과 동일 스펙으로 정렬, padding 5/11 · font 12px · tertiary→active brand+600) / Stage B-2 (P-1.C2 Internal Notes 드로어) ✅ (2026-04-28, 브랜치 `feat/prototype-phase7-stage-b2`, autopilot 5-expert × 3-perspective 리뷰: 1차 평균 87.5 → fix 4건 적용 → 2차 평균 95.5 PASS. internal-notes.js 275줄 + dom-utils.js 27줄 추출, drawer.js Attachments↔Comments 사이 통합, admin.css +188줄, role 가드 fail-closed, sr-only 접근성, `window.InternalNotes` 단일 네임스페이스, hex/oklch literal 0건) / Stage B 추가 항목 6건 docs 갱신 ✅ (2026-04-28, 브랜치 `docs/prototype-phase7-additions`: 4-domain spec 인벤토리 ~125 features 추출 → 갭 6 영역 식별 → B-4 분할(B-4a URL 토글 / B-4b 공지·FAQ 관리 UI) + B-12 External Masters / B-13 드로어 고급 5종 / B-14 알림 유형+Urgent / B-15 User 가드 토스트 / B-16 첨부 에러 / B-17 Dashboard 설정 패널 신설. plan 정본은 `.omc/plans/prototype-phase7.md`(gitignored), 의사결정 근거는 `docs/specs/reviews/prototype-phase7-additions-review.md`, next-session-tasks.md Phase 7 표 P-10~P-15 추가) / Wave 1 시작 (2026-04-30, autopilot 모드, 섹션 분리 + append-only 컨벤션 강제, 5인 전문가 × 3관점 자가 리뷰 금지) / P-7 D22 태그 마스터 ✅ (2026-04-30, PR #66 머지: admin-tag-master.js 170 + admin-tag-master-modals.js 184 + admin-tag-master-data.js 161, R1 75.7 → R2 90.4 PASS, security 96 / verifier 94.7 / code 91.3 / designer 90 / critic 80, R2 잔여 MAJOR 2건 — .type-badge-admin → .tm-kind-badge 분리 + empty state §13.11 토큰 — 추가 fix) / docs/prototype-phase7-wave1-plan PR #65 머지 ✅ / P-8 D23 휴지통 ✅ (2026-04-30, PR #67 머지: admin-trash.js 298 + admin-trash-modals.js 56 + admin-trash-data.js 165, R1 평균 88.8, critic 73.3 — 글로벌 모달 영구 파손 CRITICAL 2건 발견 → #trConfirmBg 전용 모달 + addEventListener 격리, §9.4.7 vs §15.4 spec 충돌 callout 명시, trBuildSystemOptions selected 복원, denied 분기 callout/audit hidden, 파일 340→298 분할. P-7 .a-btn.primary와 머지 시 충돌 발생 → main 정의 보존, P-8 중복 제거) / P-10 External Masters ✅ (2026-04-30, PR #69 머지: admin-external-masters.js 201 + data.js 55, R1 평균 82.3 → critic 5건 spec 정합 fix: --status-green-bg 미정의 토큰 제거, 콜드스타트 글로벌 배너화, snapshot timestamps 분리, 5분 쿨다운 카운트다운, Q5 source-independence 시연) / P-12 알림 유형 + Urgent 뱃지 ✅ (2026-04-30, PR #70 머지: notif.js 59→240 확장, 5 type + Urgent flag (orthogonal), R1 82.5 → security XSS HIGH + critic spec divergence 일괄 fix: n.text 구조화 + escHtml, 위임 리스너, urgent flag-not-type, !important 12건 제거, bell 뱃지 mutually exclusive) / P-5 컴포넌트 인벤토리 매핑표 ✅ (2026-04-30, baseline 74% coverage, 70/94 sections demoed) / P-6 갭 재스캔 ✅ (29건 잔여 갭, Wave 0 12건 중 5개 영역 해소 = 42%) / Wave 2 진행 (2026-04-30, autopilot 모드, 5-expert 자가-금지 리뷰):
-**B-5 역할 토글** ✅ R3 PASS (브랜치 `feat/b-5-role-toggle` 4 commits — R1 21ec5e4 / R2 543b871 / R3 99028af / docs f510795. 5인 평균 R1 83.4 → R2 90.5 → R3 5/5 PASS. 사이드바 .sidebar-user 클릭 → 4역할 popover, data-role-allow nav 분기, --role-dev-* 토큰, RolePill 4 variants, ARIA menu 키보드 컨트랙트, CustomEvent('role:change'). admin=10/manager=6/dev=3/user=0 visible) /
-**B-3 공지 로그인 팝업** ✅ R2 PASS (브랜치 `feat/b-3-notice-popup` 2 commits — R1 df414fe / R2 5b0bea2. 5인 평균 R1 79 → R2 88. uidesign §13.9 + feature-notice-faq §10.3.2 정합 2-panel 모달, notice-popup.js 277줄, notice_dismiss_until_<userId> 키, ARIA dialog/listbox + ↑↓/Home/End/Esc 트랩, .admin-btn-ghost variant 신설. 닫기 버튼만 dismiss 저장, X/Esc/외부클릭 = non-commit. n.level allow-list 보안 fix) /
-**B-4a ?mode=admin URL 토글** ✅ R2 + R2.1 (PR #76 머지된 R1을 사후 5인 리뷰 → fix 브랜치 `fix/b-4a-r2-xss-and-monkeypatch` 2 commits f3f42bd + 990f4d7. 평균 R1 architect 78 / code 68 / security 60 / critic 65 → R2 P0 7건 fix: notice-faq.js XSS escape 7건, monkey-patch 제거 → renderFaq inline mount, 슬롯 tree-exclusion 컨트랙트, isAdminMode AND canEnterAdminMode (deep-link UI flash 차단), renderModeBanner role guard, aria-pressed 의미 명확화, DRY 클래스 5종 추출, R2.1 deep-link cold-start 추가 dispatch. PR 대기) /
-**B-4b 공지/FAQ 관리 UI** ✅ R1 + R2 (브랜치 `feat/b-4b-notice-faq-admin-ui` 2 commits. R1 98cdd4a — additive (notice-faq.js / admin-mode.js 미수정) MutationObserver 통합, NoticeAdmin 326 / FaqAdmin 241 / FaqAdminModals 207 / notice-faq-admin.css 324, FAQ_CATEGORIES mock. R1 평균 architect 77 / code REQUEST_CHANGES / security P0 2건 / verifier APPROVE / critic REVISE → R2 9fec0a6 P0 10건 fix: rgba 리터럴 제거, inline style → 클래스, regex tag-stripper → detached div+textContent, 카테고리 visible 인터랙티브 토글, manager 카테고리 read-only 탭, 액션-시점 role gate, FAQ_CATEGORIES splice in-place, Esc 닫기, setTimeout 제거. R2 verifier 98/100 APPROVE) /
-**B-13 VOC 드로어 고급 6종** ✅ R1 + R2 (브랜치 `feat/b-13-drawer-advanced` 2 commits 2cb249f + 7de9eb5. drawer-advanced.js 217 / drawer-comments.js 166 / drawer-advanced.css 257, drawer.js +1 line CustomEvent. status disabled / sub-task warn / 퍼머링크 / 전체화면 esc / 댓글 편집·삭제 (5s undo) / review_status pill 4 variants. R1 평균 architect 65 / code 81 / security 다중 / verifier wrong-branch / critic REVISE → R2 P0 fix: §8.17 perma URL `/vocs/${code}` (path-based, code 사용), 복사 실패 spec 카피 + window.prompt fallback, 버튼 placement after expand, fail-closed currentUserId, 액션-시점 ownership 재검증, 클래스 추출, undo by id) /
-**B-15 User 가드 토스트** ✅ R1 + R2 (브랜치 `feat/b-15-user-guard-toasts` 2 commits d6c2a5c + fd67ffa. admin-users-guards.js 165 / admin-users.css 132. D14 last-admin / D15 self-role / D16 self-deactivate. 5인 리뷰 평균 architect 62 / code 70 / security 88 / verifier 78 / critic 65 → R2 P0 fix: ADMIN_USERS에 윤대표(id=6, admin) 추가하여 D14 시나리오 도달 가능) /
-**B-16 첨부 에러 토스트** ✅ R1 + R2 (브랜치 `feat/b-16-attachment-error-toasts` 2 commits d6f835c + 2f9b31a. attachment-errors.js 191 / attachment-errors.css 114. 4 시나리오 (413/415/400-count/400-other), MutationObserver hook. 5-perspective 평균 73/100 → R2 P0: spec §8.5 정합 — 5개/PNG·JPG·GIF·WebP only (이전: 30개/pdf/xlsx 디자인 메모 오류), escHtml identity fallback 제거하여 fail-loud) /
-**B-17 Dashboard 설정 패널** ✅ R1 + R2 (PR #85 머지 2026-05-01. 브랜치 `feat/b-17-dashboard-settings-panel` commits e709547 + bdbe181. dashboard-settings-panel.js 273 / dashboard-settings-panel.css 228. 슬라이드인 우측 패널, 8 widget 토글 + ↑↓, 모드 탭 (내 설정 / 기본값[Admin]), Esc/외부클릭 닫기. R2 P0 fix: admin guard / focus return / settings:changed event / a11y tabs) /
-**B-9 mode+role-pill 통합 검증** ✅ (2026-05-01, PR #86 머지: `docs/specs/reviews/b-9-mode-role-integration-verification-result.md`. Playwright MCP 기반 prototype 자동 검증. S1 role admin→user / S2 deep-link+role=user / S3 admin→manager / S4 popstate 4단계 / S5 hash 보존 / S6 race 20회 — 6/6 PASS, 콘솔 에러 0건) /
-**Wave 2 모든 PR 머지 완료** ✅ (2026-05-01: PR #79 docs Wave 2 / #80 B-4a R2 / #81 B-4b / #82 B-13 / #83 B-15 / #84 B-16 / #85 B-17 / #86 B-9 verification — 8건 머지. b-13/b-15/b-17은 prototype.html `<head>` CSS 링크 + `<script>` 섹션에서 main 재머지 후 충돌 해결 후 머지) /
-**Wave 3 plan 작성** ✅ (2026-05-01, 브랜치 `docs/prototype-phase7-wave3-plan` commit 490921d. `docs/specs/plans/prototype-phase7-wave3-plan.md`. B- 기준 = Critical 4 + Major 1 + FE-mock Minor 4 + 보강 2. 3 sub-wave 구성: W3-A VOC 본체 (C-02 Due Date / N-01 자동 태그 / N-02 charcount / N-04 highlight) / W3-B Admin 공통 (C-10 TypeBadge / C-11 StatusDot / C-14 Non-data states / M-05 외부마스터 매핑) / W3-C Dashboard 잔여 + drawer 권한 차단 + 갭 재스캔 0 잔여. R-4 (tsx watch)는 Wave 3 종료 후 단독 PR로 분리. 의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰. next-session-tasks.md Phase 7 표 P-2/P-3/P-4/P-11/P-13/P-14/P-15 ✅ 갱신 + P-16 Wave 3 row 추가)
-→ **다음 세션 시작점: Wave 3 W3-A (VOC 본체 — drawer + modal + voc-list 갭 4건 동시 처리)**
-
-### Phase 7 plan 요약 (2026-04-27)
-
-`/plan` direct mode. prototype.html 3,980줄 → CSS 5 + JS 11 + HTML 1 파일 분할 후 P-1~P-9 데모.
-
-| Stage | 내용 |
-| --- | --- |
-| A | 리팩토링 — CSS 5 / JS 11 파일 (≤300줄), HTML 1 파일 (~700줄, 빌드 금지 예외 합의) |
-| B | P-1~P-9 데모 — mock + 1~2 인터랙션 + 미구현은 토스트. 우선순위 P-1→P-9→P-2→P-7→P-8→P-3→P-4→P-5→P-6 |
-
-합의 사항: HTML markup 단일 유지(빌드 툴 금지 제약), CSS/JS는 ≤300 엄수, 새 토큰 추가 금지(§13 기존만). 브랜치 `feat/prototype-phase7`, 커밋 9건 분리.
-
-다음 세션 시작점: Stage B-2 (P-1.C2 Internal Notes 드로어 섹션 — drawer 하단 접이식 + mock 노트 2건 + 입력란).
-
-### Stage B-1 결과 (2026-04-28, 브랜치 `feat/prototype-phase7-stage-b1`)
-
-P-1.C1 Result Review 관리자 페이지 셸. 사이드바 "관리자" 섹션에 "결과 검토" 진입점 + 페이지 컨테이너 + 검토 큐 mock 3건 (제출 검토 2 / 삭제 신청 1). 신규 `prototype/js/result-review.js` (161 lines, escHtml 헬퍼 + reviewQueue mock + renderResultReview/renderReviewCard/switchReviewTab/approveReview/rejectReview/showReviewToast/syncReviewBadge) + admin.css 165 lines append (.review-tabs/.review-card/.rv-btn/.review-toast). 인터랙션: 탭 전환 + 승인/반려 → 토스트 (mock). 토큰 100% 준수, hex/oklch literal 0건. 3 전문가 리뷰 — code-reviewer 86/96/94 → escHtml + 뱃지 동기화 fix → 94/96/95 PASS, critic 88/92/78 (게이팅 동일), verifier evidence 충분 (스크린샷 2건, 콘솔 에러 0).
-
-### Stage A-4 JS 분할 결과 (2026-04-27, 브랜치 `feat/prototype-phase7-js`)
-
-부모 plan은 11파일을 추정했지만 ≤300 룰을 엄수하기 위해 **15파일로 분할** (helpers/data/voc-list/sidebar/filters/drawer-core/drawer/modal/notif/notice-faq/admin-master/admin-users/dashboard-data/dashboard-render/dashboard-actions/init). 모든 파일 ≤300 lines (max 249). 부모 plan 추정의 admin/dashboard 라인 수가 실제와 달라 +4 deviation. 빌드 툴 추가 없이 classic `<script src>`만 사용. screenshot diff byte-identical (SHA 일치), 126개 전역 0 missing, openDrawer/onSearch/dashboardInit/switchGlobalTab/renderTagRules/renderSystemMenu/renderVocTypes/renderUsers/renderNotices/renderFaq 런타임 호출 0 errors. critic + code-reviewer 2중 검증 통과 (LOW 1건 — HTML 로드 순서 주석 추가로 처리).
-
-알려진 pre-existing 결함: `addCategory()`/`editCat()`/`deleteCat()` 가 정의되지 않은 `renderCategories()` 호출 — Stage A-4 byte-identical 범위 밖이라 그대로 유지. Stage B-1 또는 별도 fix 커밋에서 처리 권장.
-
-### 관리자 UI 커버리지 리뷰 (2026-04-27, 브랜치 docs/admin-ui-gaps)
-
-"DB 직접 접근 없이 관리자 페이지만으로 운영 가능?" 요구사항 23개 항목 매핑. 4개 갭 식별 → 2개 즉시 처리, 2개 NextGen 이연.
-
-| 갭    | 결정                                                          |
-| ----- | ------------------------------------------------------------- |
-| GAP-1 | **D22** `feature-voc.md §9.4.6` 태그 마스터 관리 신설         |
-| GAP-2 | **D23** `feature-voc.md §9.4.7` 휴지통 신설                   |
-| GAP-3 | **N-1** 외부 마스터 캐시 인스펙트 — NextGen                   |
-| GAP-4 | **N-2** 자동 태그 재부여 차단 reset — NextGen                 |
-
-산출물: `docs/specs/reviews/admin-ui-coverage-review.md`, requirements.md §17 D22/D23, next-session-tasks.md Phase 7 P-7/P-8 + 8-6 + 미결 N-1/N-2. 다음 세션은 명세 자체 검토(이름·슬러그 정책, 병합 UX, 휴지통 진입 동선)부터 이어서.
+전체 Phase 계획: **`docs/specs/plans/next-session-tasks.md`**
+Wave 3 상세: **`docs/specs/plans/prototype-phase7-wave3-plan.md`**
+NextGen 백로그: **`docs/specs/plans/nextgen-backlog.md`**
+Wave 2까지 누적 이력: **`docs/specs/plans/progress-archive.md`**
 
 ---
 
-### Phase G 완료 요약 (2026-04-27)
+## 현재 위치 (2026-05-01 기준)
 
-설계 단계 잔여 17건 일괄 마무리. 4개 에이전트 병렬(파일 도메인별 분리). 코드 변경 없는 명세/HTML 텍스트 작업만.
+- Phase 0~6 ✅ → Phase 7 Wave 1·2 ✅ → **Wave 3 진입 직전**
+- Wave 2 PR #79~#86 (8건) 머지 완료 (2026-05-01)
+- Wave 3 plan 작성 완료 — 브랜치 `docs/prototype-phase7-wave3-plan` (commit 490921d)
+- R-4 (tsx watch)는 Wave 3 종료 후 단독 PR
 
-| 영역 | 처리 |
+## Wave 3 구성
+
+| Sub-wave | 범위 |
 | --- | --- |
-| R-1~R-3 | dashboard 용어/세션 스토어 NOTE/globaltabs_order 결정 |
-| C4~C9 | prototype + spec 동기화 (일괄 체크박스, 상태 disabled, Due Date, 태그 수동 편집, indigo 제거, 1레벨 문구) |
-| 권한 분기 2건 | feature-voc Priority/태그 권한 + feature-notice-faq 담당 VOC 배지 |
-| Minor 6건 | raw hex 제거, 자동 태그 추천, 태그 규칙 모달, FAQ 카테고리 관리, 사이드바 overflow, 분포 위젯 세그먼트 |
+| W3-A | VOC 본체 — C-02 / N-01 / N-02 / N-04 |
+| W3-B | Admin 공통 — C-10 TypeBadge / C-11 StatusDot / C-14 Non-data states / M-05 외부마스터 매핑 |
+| W3-C | Dashboard 잔여 + drawer 권한 차단 + 갭 재스캔 0 잔여 |
 
-산출물: 5개 spec/HTML 수정 (+759/-207). 잔여는 모두 코드 구현(Critical 6건, FE/BE Major 11건, F1~F12, R-4, C1~C3)으로 Phase 7/8 이관.
+의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰.
 
-### Phase F 완료 요약 (2026-04-26)
+---
 
-`/plan` consensus(Architect+Critic 검토 후 자체 적용). D18~D21 4건. 실파일 migration 미생성 — `docs/specs/plans/migration-012-draft.md`로 격리.
+## 가장 최근 산출물
 
-| 결정 | 처리 |
-| --- | --- |
-| D18 Dev role 추가 | `users.role` enum 4종(`user/dev/manager/admin`). Dev = User + (assignee=self) 상태/Priority/Due Date/Internal Note R·W/Sub-task + Dashboard. requirements §2.3·§4·§14.5·§15.2, feature-voc.md §8.3·§8.4-bis(신규 헬퍼), dashboard.md 권한 확장 |
-| D19 공지/FAQ 관리 진입점 | 페이지 우측 상단 '관리' 버튼 + `?mode=admin` URL 쿼리 토글. Admin 탭 서브탭 폐기. feature-notice-faq.md §10.5 재정의·§10.3.4·§10.4.3·§10.6 |
-| D20 uidesign.md §13 신규 + raw color 가드 | Admin/Notice/FAQ/관리 진입 버튼/로그인 팝업/사이드바 카운트 12개 컴포넌트 spec. §8 Don't에 raw color literal 금지 추가. §10에 `--role-dev-{bg/fg/border}` + `--text-on-brand` 4종 신규 토큰. uidesign.md 자체 위반(`color: #ffffff`) 2건 정정 |
-| D21 `assertCanManageVoc` 헬퍼 | BE 단일 헬퍼 contract. ownership = primary `assignee_id`만. unassigned/재배정 직후 즉시 박탈. feature-voc.md §8.4-bis 신규, 회귀 테스트 5건 명시 |
+- 2026-05-01 — Wave 2 전건 머지 + Wave 3 plan PR
+- 2026-05-01 — B-9 Playwright MCP 통합 검증 (S1~S6, 6/6 PASS, 콘솔 에러 0)
+- 2026-04-30 — Wave 1 P-7 / P-8 / P-10 / P-12 / P-5 / P-6 (PR #66~#70)
 
-산출물: `docs/specs/reviews/design-prototype-audit.md` (audit + ADR), `docs/specs/plans/migration-012-draft.md` (DDL 스펙), `.omc/plans/design-admin-role-overhaul.md` (consensus plan v2). requirements.md §17에 D18~D21 추가.
-
-
-### Phase E 완료 요약 (2026-04-26)
-
-`migrations/011_pre_impl_alignment.sql` 한 파일에 P1 4건 + P2 5건 + DB Major 1건 + GAP-1 통합. Mock User seed 신규(`seeds/mock-users.sql`). 요구문서 §17에 D9~D17 추가, dashboard.md/feature-voc.md/requirements.md §4·§14.5·§15 동기화.
-
-| 결정 | 처리 |
-| --- | --- |
-| D9 status_changed_at | 컬럼 + 트리거 + partial index 추가 |
-| D10 dashboard preset | 1m/3m/1y/all/custom로 3중 동기화 + 기존 데이터 매핑 |
-| D11 Mock User FK | seeds/mock-users.sql + db:seed:mock 스크립트 |
-| D12 tag_rules | MVP 키워드 only 명시 (스키마 변경 없음) |
-| D13 parent_id FK | ON DELETE SET NULL |
-| D14 사용자 초대 | AD/SSO 자동 생성 (§15.2 신규) |
-| D15 퍼머링크 | 전체 로그인 사용자 (feature-voc.md §8.17 신규) |
-| D16 서브태스크 인라인 펼침 | 기본 접힘 (feature-voc.md §9.2.2 신규) |
-| D17 길이 CHECK | title 200자/body 64KB/comment 16KB DB CHECK |
-
-잔여 → `docs/specs/reviews/schema-requirements-gap.md` (P3 4건, 운영 시점 재검토).
-
-**Phase C — 프로토타입 간극 해소 잔여** (C4~C9 Phase G 완료, 리뷰 → `docs/specs/reviews/project-full-review.md`):
-
-| 항목 | 내용 |
-| --- | --- |
-| C1 | Result Review 관리자 페이지 + 사이드바 진입점 추가 |
-| C2 | Internal Notes 섹션 드로어 추가 |
-| C3 | 공지 팝업 2-panel 레이아웃 구현 |
-
-- F-4 MemoryStore → `connect-pg-simple`: **Phase 8-1로 defer 확정** (2026-04-25)
-- Phase 7 = 개발 스켈레톤 (로컬 dev 기능 동작), Phase 8 = 운영 실구현 + 배포
-
-## 완료된 작업 (2026-04-26 — Phase D/A/B 완료)
-
-- **Phase D 의사결정 8건** ✅ — `requirements.md §17` 기록
-- **Phase A 스키마 확정** ✅ — 마이그레이션 008(due_date), 009(subtask 인프라+트리거), 010(인덱스 19건) 추가
-- **Phase B FE/BE 기반 구조** ✅ — tokens.ts/index.css 완성, 에러포맷 통일, errorHandler/requireRole 미들웨어, VocStatus 정리, AuthUser 단일화, MockLoginPage 수정
-- PR: `fix/pre-impl-schema-infra`
-
-## 완료된 작업 (2026-04-26 — 다방면 전체 리뷰 완료)
-
-- **전체 프로젝트 다방면 리뷰** ✅ — 설계/DB/FE/BE 4개 전문가 병렬 리뷰, `docs/specs/reviews/project-full-review.md` 작성 (PR: `docs/multi-expert-review`)
-  - Critical 15건 / Major 32건 / Minor 25건 식별
-  - 미구현 API 38개, 미구현 FE 화면 19개, 인덱스 누락 20건
-  - 의사결정 필요 포인트 8건 도출
-
-## 완료된 작업 (2026-04-26 — Phase 7 Preflight 완료 + 벤치마크 정리)
-
-- **R-5·R-6 완료** ✅ — pino baseline 설치, prototype 컴포넌트 인벤토리 문서화
-- **benchmark/ 폴더 추가** ✅ — prototype 전 페이지 스크린샷 24장 + INDEX.md (PR #49)
-- **Phase 7 착수 전 종합 리뷰 완료** ✅ — 모든 Preflight 항목 처리
-
-## 완료된 작업 (2026-04-23 — Phase 3·4 문서 구조 정리)
-
-- **docs 폴더 정리** ✅ — stale 복사본 삭제, 잘못 배치된 파일 이동
-- **dashboard-feature.md 분리** ✅ — `requires/dashboard.md` (요구사항) + `plans/dashboard-impl.md` (구현 계획)
-- **requirements.md 섹션 분리** ✅
-  - §8·§9 → `requires/feature-voc.md`
-  - §10 → `requires/feature-notice-faq.md`
-  - 652줄 → 273줄 (섹션별 요약 + 링크)
-- **문서 인덱스 추가** ✅ — `requirements.md` 상단에 파일별 역할 인덱스 테이블
-- **최종 docs/specs/requires/ 구조**: requirements.md / uidesign.md / feature-voc.md / feature-notice-faq.md / dashboard.md
-
-## 완료된 작업 (2026-04-23 — Phase 4 requirements.md 5-Expert 리뷰 반영)
-
-- **prototype.html 수정** ✅ — 처리속도 & 에이징 위젯 2개 카드로 분리, 좌우 나란히 배치
-- **5-Expert 체크리스트 리뷰** ✅ — `requirements-5expert-review-2026-04-23.md` 작성 (43점 → 85점)
-- **인터뷰 5건 완료** ✅
-  - AD 인증: OIDC / OAuth2 확정
-  - SLA 목표: 준수율 70%, 기한 = Priority Due Date 기준
-  - 이메일 MVP: v2 1순위 이유 명시 + Urgent 느낌표(!) 배지
-  - Jira 마이그레이션: 오픈 전 일괄 이전, 이후 신규 수동
-  - 성공 기준: SLA 70% + Jira 완전 전환 + Due Date 내 처리
-- **requirements.md 대규모 보강** ✅
-  - §2.1: AD OIDC 확정 (TBD 해소)
-  - §3: Node.js 20 LTS, PostgreSQL 16 버전 명시
-  - §6.1: validateADSession OIDC 상세, 에러 응답 포맷, 헬스체크, CSRF, getVOCList 필터 규칙
-  - §7: 이메일 v2 이유 명시, Jira 마이그레이션 타이밍 확정
-  - §8.3: 공지/FAQ 권한 행 추가
-  - §8.5: 파일명 UUID rename 추가
-  - §8.6: Urgent 알림 빨간 느낌표 배지
-  - §8.14: 폴링 ETag + 304 캐시 전략
-  - §9.9: "선택적" → URL 파라미터 우선, 복원 구현 필수 확정
-  - §11.1: SLA 70% 목표, amber 경고 표시
-  - §12: 성공 기준 3가지 (신규)
-  - §13: 테스트 전략 — AC 형식, 커버리지 목표, 성능 기준 (신규)
-  - §14: 운영 설정 — 환경변수, Docker 구성, 헬스체크, 로깅, 백업/롤백 (신규)
-
-## 완료된 작업 (2026-04-23 — Phase 3 requirements.md 전체 수정)
-
-- **인터뷰 A/B/C 완료 및 반영** ✅
-  - A: AD 연동 방식 TBD (사내 시스템 접근 후 확정), A-3 독립 SPA 확정, 개발환경 실 AD 직접 연결
-  - B: Admin/Manager 기능 권한 동일, INIT_ADMIN_EMAIL 환경변수, 역할 회수 수동 처리
-  - C: 일 10건 이내, 이메일 v2, Due Date MVP 포함 (Priority별 기본값: 긴급1주/높음2주/보통1달/낮음3달), Jira CSV 마이그레이션 스크립트 추가
-- **FIX-01~29 전체 완료** ✅ (requirements-fix-plan.md 전체 [x] 처리)
-  - P0 (9건): Sub-task 1레벨, 태그 편집 권한, notices/faqs/faq_categories 스키마, FAQ 카테고리 FK, 파일 보안(SVG/Content-Disposition/GIF), 계층형 목록 표시 규칙, 대시보드 API §11.7
-  - P1 (10건): Sub-task 순번, 댓글 이미지 경로, Soft Delete 첨부파일 접근, 알림 보관 정책, 댓글 Hard Delete 의도, 공지 복원 권한, slug UNIQUE 제약, dashboard_settings JSONB 예시, 마지막 Admin 판정, DB sequence 이름 규칙
-  - P2 (7건): 하이라이팅 대상, 전체화면 전환 방식, 단일/복수 팝업 구분, 빈 메뉴 안내, User 전체VOC 배지 숨김, Manager 잠금 아이콘, 폴링 에러 처리
-  - P3 (3건): 로드맵 우선순위, React Context 상태관리 확정, tag_rules AI 전환 주석
-
-## 완료된 작업 (2026-04-23 — Phase 1 디자인 통일성 확보)
-
-- **공지사항/FAQ/관리자 페이지 디자인 통일성 리뷰 완료** ✅ (82% → 100%)
-  - CSS 변수 추가: `--status-amber-bg/border`, `--status-red-bg/border`, `--status-purple/bg/border`
-  - 하드코딩 색상 제거: `#e5484d`, `#f5a623`, `#5e6ad233` → CSS vars 교체
-  - CSS 클래스 정비: `.type-keyword`, `.type-regex`, `.role-admin`, `.role-manager` oklch 리터럴 → vars
-  - `.notice-badge` 시스템 도입: 공지사항 뷰 ↔ 관리자 뷰 레벨 배지 통일
-  - `.notice-row`, `.notice-body`, `.faq-filter-bar`, `.faq-cat-btn` 클래스 추가 (onmouseover 제거)
-  - `.btn-form-save`, `.btn-form-cancel` 공통 폼 버튼 클래스 추가
-  - `.a-btn.danger:hover` → `var(--status-red-bg/border)` 교체
-  - Playwright로 전 페이지 시각 검증 완료
-
-## 완료된 작업 (2026-04-23 — requirements.md 전체 리뷰 및 스펙 확정)
-
-- **requirements.md 전체 리뷰 완료** ✅
-  - 10건 수정: Sub-task 표현, 정렬 API 형식, FAQ Soft Delete, dashboard_settings 스키마, useAutoTag 제거, 댓글 이미지 개수 제한, 통합 방식, 복수 팝업 UX, priority 필터 파라미터, 기술 스택
-  - `dashboard-feature.md` 커스터마이징 섹션 MVP로 단순화 (위젯 숨기기/표시)
-  - `docs/specs/plans/dashboard-v2-layout-editor.md` 신규 생성 (드래그앤드롭 레이아웃 편집 v2)
-
-## 완료된 작업 (2026-04-23 — 대시보드 prototype.html 합치기)
-
-- **대시보드를 prototype.html에 합치기** ✅
-  - 체크리스트:
-    - [x] GlobalTabs 3레벨 계층 (전체/시스템/메뉴) + 담당자 직교 필터
-    - [x] Filter Context Banner
-    - [x] KPI 카드 8종 (VOLUME/QUALITY 2줄)
-    - [x] 분포 도넛 4탭 (상태/우선순위/유형/태그)
-    - [x] 우선순위×상태 매트릭스
-    - [x] 드릴다운 히트맵 (X축 3종 + 브레드크럼)
-    - [x] 주간 트렌드 3선
-    - [x] 태그별 분포 바 차트
-    - [x] 시스템/메뉴 현황 카드
-    - [x] 담당자별 처리현황 테이블
-    - [x] 장기 미처리 Top 10
-    - [x] uidesign.md 토큰 (--bg-*, --brand, --chart-*, --text-*) 전면 적용
-
-## 다음 세션 읽을 문서
-
-- `.omc/plans/dashboard-feature.md` (v3.1 — 707줄, 구현 상세 명세)
-- `requirements.md` §11 (업데이트 완료)
-- `uidesign.md` §11 (대시보드 컴포넌트 신규 추가됨)
-
-## 완료된 작업 (2026-04-23 — 문서 정리·싱크)
-
-- **requirements.md §11** v3.1 기준으로 업데이트
-  - 위젯 테이블: 태그 탭 추가, "Created vs. Resolved" → "주간 트렌드 (3선)", "시스템별 현황 카드" → "시스템/메뉴 현황 카드", 담당자별 처리 현황 추가
-  - §11.3 글로벌 필터 시스템 신규 (계층형 탭 + 담당자 직교 필터 + FilterContextBanner)
-  - §11.4 날짜 필터에 주간 트렌드 12주 고정 명시
-  - §11.3~11.5 → §11.4~11.6 번호 이동
-- **uidesign.md §11 Dashboard Components** 신규 추가
-  - FilterContextBanner, KPI 카드 (alert border 포함), 히트맵 셀 그라디언트, 분포 도넛, 주간 트렌드 3선, Aging badge 스펙
-- **uidesign.md §10 CSS Reference** `--chart-*` 토큰 7종 추가
-
-## 완료된 작업 (2026-04-23 — 대시보드 v3.1 스펙 고도화)
-
-- **dashboard-feature.md** v3.1 업데이트 (660→707줄), TODO 전체 해소
-  - 레벨 3 dim `[전체]` 단일 표시 확정
-  - 주간 트렌드 3선 계산 기준 명확화 (진행중=주말 스냅샷)
-  - 담당자 드롭다운 단일 선택(라디오) 확정
-  - GlobalTabs overflow: 드롭다운 병합 + Admin 순서·표시 관리
-  - 더보기 카드: 인라인 확장 토글
-  - 전체 클릭 파라미터 정의 (KPI·분포·히트맵·트렌드·담당자·태그 바)
-  - FE 상태 `activeSystem` 제거, `globalTab` 단일화
-  - API 2개 추가 (`/menus`, `/assignees`)
-  - DB: `status_changed_at`, `assignee_id` 인덱스 추가
-
-## 완료된 작업 (2026-04-23 — 대시보드 v3 설계 확정)
-
-- **dashboard-feature.md** v3 전면 재작성 (660줄)
-  - 글로벌 필터 시스템: 전체→시스템→메뉴 3단계 계층 + 담당자 직교 필터 전체 명세
-  - 히트맵 X축 셀렉터 3종, Y축 합계 행, 고정 레이아웃, 브레드크럼 동작 상세 명세
-  - 주간 트렌드 3선 정의 (신규/진행중/완료)
-  - 담당자별 처리현황 신규 위젯 명세
-  - 장기 미처리 dim 탭별 전환 규칙
-  - 시스템/메뉴 카드 탭 연동 명세
-  - API 엔드포인트 전체 업데이트 (systemId/menuId/assigneeId 공통 파라미터)
-  - FE 상태 타입 정의
-- **시각화 참조 파일**: `prototype/dashboard/dashboard-v3.html`
-
-## 검토 상세 드로어 R1~R3 결과 (2026-04-28)
-
-- **점수 추이**: Round1 avg 68.8 → Round2 52.2 → Round3 48 (i18n 22점 OOS 제외 시 실질 개선)
-- **적용 픽스**: 3 fix commits (R1 critical → R2 high-impact → R3 highest-impact)
-- **최종 범위**: prototype FE a11y + 스펙 강화 (feature-voc.md §9.4.5.1/2) + migration 012 (vocs.source_sp, vocs.related_tables)
-- **90+ 미달 이유**: 라운드마다 새 전문가/관점 투입(설계 의도) — 점수 하락이 아닌 커버리지 확장
-- **변경 파일**:
-  - `prototype/js/result-review-data.js` (신규 — 목 데이터 분리)
-  - `prototype/js/result-review.js` (310줄 이하 달성, role=tab + focus-visible + toast aria)
-  - `prototype/js/result-review-detail.js` (h2/h3, role=status, aria-describedby, lucide rAF, close delegation)
-  - `prototype/css/admin.css` (focus-visible outline 규칙 추가)
-  - `prototype/prototype.html` (result-review-data.js 스크립트 태그 추가)
-  - `docs/specs/requires/feature-voc.md` (§9.4.5.2 API Surface 추가)
-  - `docs/specs/plans/next-session-tasks.md` (P-1/P-9 ✅, P-10 NextGen 후속 작업 추가)
-- **브랜치**: feat/result-review-detail-popup
-- **후속 (NextGen)**: i18n 외부화, 풀 RBAC + DB RLS, payload_sha256 BE 구현, OpenAPI 스펙
+상세 이력은 `docs/specs/plans/progress-archive.md` 참조 (grep 용도).
