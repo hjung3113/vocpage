@@ -26,20 +26,20 @@
 
 ## 영향 파일
 
-| 파일                                       | 변경                                  |
-| ------------------------------------------ | ------------------------------------- |
-| `prototype/js/admin-users-guards.js`       | NEW — ~150줄                          |
-| `prototype/css/admin/admin-users.css`      | append .guard-toast (~30줄)           |
-| `prototype/prototype.html`                 | `<script>` 추가                        |
+| 파일                                  | 변경                        |
+| ------------------------------------- | --------------------------- |
+| `prototype/js/admin-users-guards.js`  | NEW — ~150줄                |
+| `prototype/css/admin/admin-users.css` | append .guard-toast (~30줄) |
+| `prototype/prototype.html`            | `<script>` 추가             |
 
 ## R1 검증
 
-| #   | 시나리오                                          |
-| --- | ------------------------------------------------- |
-| 1   | 본인 role dropdown 변경 → guard 토스트 + 원복     |
-| 2   | 마지막 admin (다른 admin 0명) role 변경 → 토스트  |
-| 3   | 본인 is_active toggle off → 토스트 + 원복         |
-| 4   | 다른 사용자 role/is_active 변경은 정상 반영       |
+| #   | 시나리오                                         |
+| --- | ------------------------------------------------ |
+| 1   | 본인 role dropdown 변경 → guard 토스트 + 원복    |
+| 2   | 마지막 admin (다른 admin 0명) role 변경 → 토스트 |
+| 3   | 본인 is_active toggle off → 토스트 + 원복        |
+| 4   | 다른 사용자 role/is_active 변경은 정상 반영      |
 
 ## 컨벤션
 

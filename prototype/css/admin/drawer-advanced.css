@@ -1,0 +1,257 @@
+/* drawer-advanced.css — B-13 advanced drawer features */
+
+/* ── review_status pill ───────────────────────────────────────── */
+.rs-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.rs-unverified {
+  color: var(--status-yellow);
+  background: var(--status-yellow-bg);
+  border-color: var(--status-yellow-border);
+}
+
+.rs-approved {
+  color: var(--status-green);
+  background: var(--status-green-bg);
+  border-color: var(--status-green-border);
+}
+
+.rs-rejected {
+  color: var(--status-red);
+  background: var(--status-red-bg);
+  border-color: var(--status-red-border);
+}
+
+.rs-pending_deletion {
+  color: var(--status-orange);
+  background: var(--status-orange-bg);
+  border-color: var(--status-orange-border);
+}
+
+/* ── permalink button ─────────────────────────────────────────── */
+.perma-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
+  flex-shrink: 0;
+}
+
+.perma-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.perma-btn:active {
+  background: var(--brand-bg);
+  color: var(--accent);
+}
+
+/* ── fullscreen button (aria-pressed state) ──────────────────── */
+.fullscreen-btn[aria-pressed='true'] {
+  background: var(--brand-bg);
+  color: var(--accent);
+}
+
+/* ── comment action menu ──────────────────────────────────────── */
+.comment-action-wrap {
+  position: relative;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.comment-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+.comment-menu-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.comment-action-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 200;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px color-mix(in oklch, var(--text-primary) 12%, transparent);
+  min-width: 96px;
+  overflow: hidden;
+  display: none;
+}
+
+.comment-action-menu.open {
+  display: block;
+}
+
+.comment-action-menu button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.comment-action-menu button:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.comment-action-menu button.danger {
+  color: var(--status-red);
+}
+
+.comment-action-menu button.danger:hover {
+  background: var(--status-red-bg);
+}
+
+/* ── comment edit mode ────────────────────────────────────────── */
+.comment-edit-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.comment-edit-textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  resize: vertical;
+  line-height: 1.55;
+  box-sizing: border-box;
+}
+
+.comment-edit-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+
+.comment-edit-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.comment-edit-save {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  border-radius: 6px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg-surface);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.12s;
+}
+
+.comment-edit-save:hover {
+  background: var(--accent-hover);
+}
+
+.comment-edit-cancel {
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.comment-edit-cancel:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* ── status select locked state ───────────────────────────────── */
+.meta-sel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── rs-pill in meta row ──────────────────────────────────────── */
+.meta-item .rs-pill {
+  margin-left: 6px;
+}
+
+/* ── R2: classes extracted from inline styles ─────────────────── */
+.perma-icon { width: 16px; height: 16px; }
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.comment-header .mini-av {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.review-toast.cmt-undo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.review-toast .cmt-undo-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: var(--font-ui);
+}

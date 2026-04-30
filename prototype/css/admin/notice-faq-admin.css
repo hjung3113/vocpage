@@ -28,7 +28,9 @@
   font-weight: 600;
   font-family: var(--font-ui);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
 }
 .nfa-btn-add:hover {
   background: var(--accent);
@@ -217,10 +219,18 @@
 .nfa-cat-label {
   font-size: 12px;
 }
-.nfa-cat-label.on { color: var(--accent); }
-.nfa-cat-label.off { color: var(--text-quaternary); }
-.nfa-cat-actions { white-space: nowrap; }
-.nfa-field textarea.tall { min-height: 100px; }
+.nfa-cat-label.on {
+  color: var(--accent);
+}
+.nfa-cat-label.off {
+  color: var(--text-quaternary);
+}
+.nfa-cat-actions {
+  white-space: nowrap;
+}
+.nfa-field textarea.tall {
+  min-height: 100px;
+}
 
 /* ── Modal overlay */
 .nfa-modal-bg {

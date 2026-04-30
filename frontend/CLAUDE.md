@@ -43,9 +43,3 @@ Full token reference: `docs/specs/requires/uidesign.md §10 CSS Reference` and `
 - Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)
 
 Key tokens: `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--brand)` / `var(--accent)` / `var(--text-primary)` / `var(--text-secondary)`
-
-## Safety Echoes (also in root)
-
-- **No implementation without approval** — never write component code until the user explicitly says to start
-- **Never push directly to main** — feature branch → PR → merge
-- **Canonical docs live in `docs/specs/`** — not `.omc/plans/` or tool scratch dirs

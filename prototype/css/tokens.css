@@ -25,6 +25,14 @@
   --status-purple: light-dark(oklch(52% 0.22 290), oklch(72% 0.16 290));
   --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
   --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
+  --status-yellow: light-dark(oklch(58% 0.17 88), oklch(76% 0.16 88));
+  --status-yellow-bg: light-dark(oklch(95% 0.025 88), oklch(18% 0.05 88));
+  --status-yellow-border: light-dark(oklch(80% 0.07 88), oklch(32% 0.08 88));
+  --status-green-bg: light-dark(oklch(93% 0.03 150), oklch(18% 0.055 150));
+  --status-green-border: light-dark(oklch(76% 0.07 150), oklch(30% 0.075 150));
+  --status-orange: light-dark(oklch(58% 0.2 45), oklch(74% 0.17 45));
+  --status-orange-bg: light-dark(oklch(94% 0.03 45), oklch(18% 0.06 45));
+  --status-orange-border: light-dark(oklch(78% 0.09 45), oklch(30% 0.09 45));
   --chart-blue: light-dark(oklch(40% 0.22 265), oklch(63% 0.19 258));
   --chart-emerald: light-dark(oklch(40% 0.2 158), oklch(62% 0.19 158));
   --chart-amber: light-dark(oklch(50% 0.17 72), oklch(70% 0.16 72));

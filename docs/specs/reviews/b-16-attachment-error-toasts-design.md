@@ -25,21 +25,21 @@ VOC 드로어 첨부 영역에서 4종 에러 토스트 시연: 413 (size), 415 
 
 ## 영향 파일
 
-| 파일                                               | 변경                |
-| -------------------------------------------------- | ------------------- |
-| `prototype/js/attachment-errors.js`                | NEW — ~180줄        |
-| `prototype/css/admin/attachment-errors.css`        | NEW — ~80줄         |
-| `prototype/prototype.html`                         | `<script>` + `<link>` |
+| 파일                                        | 변경                  |
+| ------------------------------------------- | --------------------- |
+| `prototype/js/attachment-errors.js`         | NEW — ~180줄          |
+| `prototype/css/admin/attachment-errors.css` | NEW — ~80줄           |
+| `prototype/prototype.html`                  | `<script>` + `<link>` |
 
 ## R1 검증
 
-| #   | 시나리오                                              |
-| --- | ----------------------------------------------------- |
-| 1   | 413 시뮬: filename + size 토큰화 카피 노출           |
-| 2   | 415 시뮬: extension 토큰화                            |
-| 3   | 400-count 시뮬: 31/30                                 |
-| 4   | 400-other 시뮬: generic                               |
-| 5   | 동시 다중 토스트 stack (3개 상한)                     |
+| #   | 시나리오                                   |
+| --- | ------------------------------------------ |
+| 1   | 413 시뮬: filename + size 토큰화 카피 노출 |
+| 2   | 415 시뮬: extension 토큰화                 |
+| 3   | 400-count 시뮬: 31/30                      |
+| 4   | 400-other 시뮬: generic                    |
+| 5   | 동시 다중 토스트 stack (3개 상한)          |
 
 ## 컨벤션
 

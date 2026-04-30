@@ -7,6 +7,7 @@
 ## 목적
 
 P-11 (next-session-tasks Phase 7) — VOC 드로어에 6가지 고급 기능을 추가:
+
 1. **상태 disabled** — `review_status='approved'` 시 status 변경 차단
 2. **미완 sub-task 경고** — VOC 완료/드랍 전환 시도 시 미완 sub-task 있으면 confirm 다이얼로그
 3. **퍼머링크 복사** — 드로어 우상단 🔗 아이콘 → 클립보드 (`feature-voc.md §8.17`)
@@ -57,28 +58,28 @@ window.DrawerAdvanced = {
 
 ## 영향 파일
 
-| 파일                                       | 변경                                                          |
-| ------------------------------------------ | ------------------------------------------------------------- |
-| `prototype/js/drawer-advanced.js`          | NEW — ~280줄                                                  |
-| `prototype/css/admin/drawer-advanced.css`  | NEW — ~200줄 (.rs-pill, .perma-btn, .comment-action-menu 등) |
-| `prototype/prototype.html`                 | `<script src="js/drawer-advanced.js">` 추가                   |
-| `prototype/js/data.js`                     | review_status 필드 mock 추가 (3건 정도 다른 상태)             |
-| `prototype/js/drawer.js`                   | `drawer:opened` CustomEvent 발화 한 줄만 추가 (necessary hook) |
+| 파일                                      | 변경                                                           |
+| ----------------------------------------- | -------------------------------------------------------------- |
+| `prototype/js/drawer-advanced.js`         | NEW — ~280줄                                                   |
+| `prototype/css/admin/drawer-advanced.css` | NEW — ~200줄 (.rs-pill, .perma-btn, .comment-action-menu 등)   |
+| `prototype/prototype.html`                | `<script src="js/drawer-advanced.js">` 추가                    |
+| `prototype/js/data.js`                    | review_status 필드 mock 추가 (3건 정도 다른 상태)              |
+| `prototype/js/drawer.js`                  | `drawer:opened` CustomEvent 발화 한 줄만 추가 (necessary hook) |
 
 > **drawer.js 한 줄 수정 불가피** — `drawer:opened` 이벤트 발화. monkey-patch 대안도 가능하지만 여기는 1줄 추가가 더 깨끗.
 
 ## R1 검증 시나리오
 
-| #   | 시나리오                                                                |
-| --- | ----------------------------------------------------------------------- |
-| 1   | review_status=approved VOC 열기 → status select disabled + tooltip      |
+| #   | 시나리오                                                                       |
+| --- | ------------------------------------------------------------------------------ |
+| 1   | review_status=approved VOC 열기 → status select disabled + tooltip             |
 | 2   | 미완 sub-task 2건 VOC → 완료 시도 → confirm "2건 있습니다" → cancel: 상태 유지 |
-| 3   | 퍼머링크 클릭 → 클립보드에 `/voc/V-1234` 복사 + 토스트 표시              |
-| 4   | 전체화면 토글 → drawer.fullscreen 클래스 + esc 키로 해제                  |
-| 5   | 댓글 편집: 본인 댓글에서 ... 메뉴 → 편집 → 저장 → 본문 갱신             |
-| 6   | 댓글 삭제: 삭제 → 목록에서 제거 + undo 토스트 → undo: 복원                |
-| 7   | review_status pill 5 variant 시각 확인 (yellow/green/red/orange/없음)   |
-| 8   | 타인 댓글: ... 메뉴 미노출                                              |
+| 3   | 퍼머링크 클릭 → 클립보드에 `/voc/V-1234` 복사 + 토스트 표시                    |
+| 4   | 전체화면 토글 → drawer.fullscreen 클래스 + esc 키로 해제                       |
+| 5   | 댓글 편집: 본인 댓글에서 ... 메뉴 → 편집 → 저장 → 본문 갱신                    |
+| 6   | 댓글 삭제: 삭제 → 목록에서 제거 + undo 토스트 → undo: 복원                     |
+| 7   | review_status pill 5 variant 시각 확인 (yellow/green/red/orange/없음)          |
+| 8   | 타인 댓글: ... 메뉴 미노출                                                     |
 
 ## 컨벤션 준수
 

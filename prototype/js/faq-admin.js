@@ -9,8 +9,12 @@
 (function () {
   'use strict';
 
-  var esc = function (s) { return window.escHtml ? window.escHtml(s) : String(s == null ? '' : s); };
-  var toast = function (m, k) { if (window.showToast) window.showToast(m, k); };
+  var esc = function (s) {
+    return window.escHtml ? window.escHtml(s) : String(s == null ? '' : s);
+  };
+  var toast = function (m, k) {
+    if (window.showToast) window.showToast(m, k);
+  };
 
   // ── module state
   var activeTab = 'faqs'; // 'faqs' | 'categories'
@@ -19,10 +23,14 @@
   function currentRole() {
     return (window.currentUser && window.currentUser.role) || 'user';
   }
-  function isAdmin() { return currentRole() === 'admin'; }
+  function isAdmin() {
+    return currentRole() === 'admin';
+  }
 
   function isAdminMode() {
-    return window.AdminMode && window.AdminMode.isAdminMode() && window.AdminMode.canEnterAdminMode();
+    return (
+      window.AdminMode && window.AdminMode.isAdminMode() && window.AdminMode.canEnterAdminMode()
+    );
   }
 
   // ── inject per-row action buttons
@@ -35,16 +43,28 @@
       var match = (row.getAttribute('onclick') || '').match(/toggleFaq\((\d+)\)/);
       if (!match) return;
       var id = parseInt(match[1], 10);
-      var faq = (window.FAQS || []).find(function (f) { return f.id === id; });
+      var faq = (window.FAQS || []).find(function (f) {
+        return f.id === id;
+      });
       if (!faq) return;
       var existing = row.querySelector('.nfa-row-actions');
       if (existing) existing.remove();
       var div = document.createElement('div');
       div.className = 'nfa-row-actions';
       div.innerHTML =
-        '<button type="button" class="nfa-action-btn" data-action="edit" data-id="' + id + '">편집</button>' +
-        '<button type="button" class="nfa-action-btn danger" data-action="delete" data-id="' + id + '">삭제</button>' +
-        '<button type="button" class="nfa-action-btn ' + (faq.visible ? 'toggle-on' : 'toggle-off') + '" data-action="toggle" data-id="' + id + '">' + (faq.visible ? '노출중' : '비노출') + '</button>';
+        '<button type="button" class="nfa-action-btn" data-action="edit" data-id="' +
+        id +
+        '">편집</button>' +
+        '<button type="button" class="nfa-action-btn danger" data-action="delete" data-id="' +
+        id +
+        '">삭제</button>' +
+        '<button type="button" class="nfa-action-btn ' +
+        (faq.visible ? 'toggle-on' : 'toggle-off') +
+        '" data-action="toggle" data-id="' +
+        id +
+        '">' +
+        (faq.visible ? '노출중' : '비노출') +
+        '</button>';
       div.addEventListener('click', function (e) {
         e.stopPropagation();
         var btn = e.target.closest('[data-action]');
@@ -68,26 +88,34 @@
     bar.className = 'nfa-admin-bar';
     bar.innerHTML =
       '<div class="nfa-tab-group">' +
-      '<button type="button" class="nfa-tab-btn' + (activeTab === 'faqs' ? ' active' : '') + '" data-tab="faqs">FAQ 항목</button>' +
+      '<button type="button" class="nfa-tab-btn' +
+      (activeTab === 'faqs' ? ' active' : '') +
+      '" data-tab="faqs">FAQ 항목</button>' +
       // Manager는 read-only로 카테고리 탭 노출 (spec §10.5.3 "Manager FAQ 카테고리 읽기 전용")
-      '<button type="button" class="nfa-tab-btn' + (activeTab === 'categories' ? ' active' : '') + '" data-tab="categories">카테고리 관리</button>' +
+      '<button type="button" class="nfa-tab-btn' +
+      (activeTab === 'categories' ? ' active' : '') +
+      '" data-tab="categories">카테고리 관리</button>' +
       '</div>' +
       (activeTab === 'faqs'
         ? '<button type="button" class="nfa-btn-add" id="faqAddBtn">+ FAQ 등록</button>'
-        : (isAdmin() ? '<button type="button" class="nfa-btn-add" id="catAddBtn">+ 카테고리 추가</button>' : ''));
+        : isAdmin()
+          ? '<button type="button" class="nfa-btn-add" id="catAddBtn">+ 카테고리 추가</button>'
+          : '');
     bar.addEventListener('click', function (e) {
       var tabBtn = e.target.closest('[data-tab]');
       if (tabBtn) switchAdminTab(tabBtn.getAttribute('data-tab'));
     });
     bodyEl.insertBefore(bar, bodyEl.firstChild);
     var addFaqBtn = bodyEl.querySelector('#faqAddBtn');
-    if (addFaqBtn) addFaqBtn.addEventListener('click', function () {
-      window.FaqAdminModals && window.FaqAdminModals.openCreateFaqModal();
-    });
+    if (addFaqBtn)
+      addFaqBtn.addEventListener('click', function () {
+        window.FaqAdminModals && window.FaqAdminModals.openCreateFaqModal();
+      });
     var addCatBtn = bodyEl.querySelector('#catAddBtn');
-    if (addCatBtn) addCatBtn.addEventListener('click', function () {
-      window.FaqAdminModals && window.FaqAdminModals.openCreateCategoryModal();
-    });
+    if (addCatBtn)
+      addCatBtn.addEventListener('click', function () {
+        window.FaqAdminModals && window.FaqAdminModals.openCreateCategoryModal();
+      });
     if (activeTab === 'faqs') {
       injectFaqRowActions(bodyEl);
       renderDeletedSection(bodyEl);
@@ -101,17 +129,30 @@
     var oldDel = bodyEl.querySelector('.nfa-deleted-section');
     if (oldDel) oldDel.remove();
     if (!isAdmin()) return;
-    var deleted = (window.FAQS || []).filter(function (f) { return f._deleted; });
+    var deleted = (window.FAQS || []).filter(function (f) {
+      return f._deleted;
+    });
     var section = document.createElement('div');
     section.className = 'nfa-deleted-section';
     section.innerHTML =
       '<div class="nfa-deleted-header" id="faqDeletedHdr"><i data-lucide="chevron-down"></i>' +
-      '<span>삭제됨 (Admin only) — ' + deleted.length + '건</span></div>' +
+      '<span>삭제됨 (Admin only) — ' +
+      deleted.length +
+      '건</span></div>' +
       '<div class="nfa-deleted-body" id="faqDeletedBody">' +
-      deleted.map(function (f) {
-        return '<div class="nfa-deleted-item"><span class="title">' + esc(f.q) + '</span>' +
-          '<button type="button" class="nfa-restore-btn" data-restore="' + f.id + '">복원</button></div>';
-      }).join('') + '</div>';
+      deleted
+        .map(function (f) {
+          return (
+            '<div class="nfa-deleted-item"><span class="title">' +
+            esc(f.q) +
+            '</span>' +
+            '<button type="button" class="nfa-restore-btn" data-restore="' +
+            f.id +
+            '">복원</button></div>'
+          );
+        })
+        .join('') +
+      '</div>';
     bodyEl.appendChild(section);
     var hdr = section.querySelector('#faqDeletedHdr');
     var delBody = section.querySelector('#faqDeletedBody');
@@ -123,42 +164,90 @@
       var btn = e.target.closest('[data-restore]');
       if (btn) restore(parseInt(btn.getAttribute('data-restore'), 10));
     });
-    if (window.lucide) { try { lucide.createIcons({ nodes: [section] }); } catch (_) {} }
+    if (window.lucide) {
+      try {
+        lucide.createIcons({ nodes: [section] });
+      } catch (_) {}
+    }
   }
 
   // ── category table (admin only)
   function renderCategoryTab(bodyEl) {
     var oldWrap = bodyEl.querySelector('.nfa-cat-wrap');
     if (oldWrap) oldWrap.remove();
-    var cats = (window.FAQ_CATEGORIES || []).slice().sort(function (a, b) { return a.order - b.order; });
+    var cats = (window.FAQ_CATEGORIES || []).slice().sort(function (a, b) {
+      return a.order - b.order;
+    });
     var canEdit = isAdmin();
     var wrap = document.createElement('div');
     wrap.className = 'nfa-cat-wrap';
     var actionsHeader = canEdit ? '<th class="nfa-cat-actions">액션</th>' : '';
     wrap.innerHTML =
       '<table class="nfa-cat-table"><thead><tr>' +
-      '<th>이름</th><th>순서</th><th>표시</th><th>FAQ 수</th>' + actionsHeader +
+      '<th>이름</th><th>순서</th><th>표시</th><th>FAQ 수</th>' +
+      actionsHeader +
       '</tr></thead><tbody>' +
-      cats.map(function (c) {
-        var cnt = (window.FAQS || []).filter(function (f) { return f.category === c.name && !f._deleted; }).length;
-        // §10.4.4 표시 토글은 인라인 즉시 반영 (admin only). manager는 라벨만.
-        var visibleCell = canEdit
-          ? '<button type="button" class="nfa-cat-toggle ' + (c.visible ? 'on' : 'off') + '" data-cat-toggle="' + c.id + '" aria-pressed="' + (c.visible ? 'true' : 'false') + '">' + (c.visible ? 'ON' : 'OFF') + '</button>'
-          : '<span class="nfa-cat-label ' + (c.visible ? 'on' : 'off') + '">' + (c.visible ? 'ON' : 'OFF') + '</span>';
-        var actionsCell = canEdit
-          ? '<td class="nfa-cat-actions"><button type="button" class="nfa-action-btn" data-cat-edit="' + c.id + '">편집</button> ' +
-            '<button type="button" class="nfa-action-btn danger" data-cat-delete="' + c.id + '">삭제</button></td>'
-          : '';
-        return '<tr><td>' + esc(c.name) + '</td><td>' + esc(c.order) + '</td>' +
-          '<td>' + visibleCell + '</td>' +
-          '<td>' + cnt + '건</td>' +
-          actionsCell + '</tr>';
-      }).join('') + '</tbody></table>';
+      cats
+        .map(function (c) {
+          var cnt = (window.FAQS || []).filter(function (f) {
+            return f.category === c.name && !f._deleted;
+          }).length;
+          // §10.4.4 표시 토글은 인라인 즉시 반영 (admin only). manager는 라벨만.
+          var visibleCell = canEdit
+            ? '<button type="button" class="nfa-cat-toggle ' +
+              (c.visible ? 'on' : 'off') +
+              '" data-cat-toggle="' +
+              c.id +
+              '" aria-pressed="' +
+              (c.visible ? 'true' : 'false') +
+              '">' +
+              (c.visible ? 'ON' : 'OFF') +
+              '</button>'
+            : '<span class="nfa-cat-label ' +
+              (c.visible ? 'on' : 'off') +
+              '">' +
+              (c.visible ? 'ON' : 'OFF') +
+              '</span>';
+          var actionsCell = canEdit
+            ? '<td class="nfa-cat-actions"><button type="button" class="nfa-action-btn" data-cat-edit="' +
+              c.id +
+              '">편집</button> ' +
+              '<button type="button" class="nfa-action-btn danger" data-cat-delete="' +
+              c.id +
+              '">삭제</button></td>'
+            : '';
+          return (
+            '<tr><td>' +
+            esc(c.name) +
+            '</td><td>' +
+            esc(c.order) +
+            '</td>' +
+            '<td>' +
+            visibleCell +
+            '</td>' +
+            '<td>' +
+            cnt +
+            '건</td>' +
+            actionsCell +
+            '</tr>'
+          );
+        })
+        .join('') +
+      '</tbody></table>';
     wrap.addEventListener('click', function (e) {
       var toggleBtn = e.target.closest('[data-cat-toggle]');
-      if (toggleBtn) { toggleCategoryVisible(parseInt(toggleBtn.getAttribute('data-cat-toggle'), 10)); return; }
+      if (toggleBtn) {
+        toggleCategoryVisible(parseInt(toggleBtn.getAttribute('data-cat-toggle'), 10));
+        return;
+      }
       var editBtn = e.target.closest('[data-cat-edit]');
-      if (editBtn) { window.FaqAdminModals && window.FaqAdminModals.openEditCategoryModal(parseInt(editBtn.getAttribute('data-cat-edit'), 10)); return; }
+      if (editBtn) {
+        window.FaqAdminModals &&
+          window.FaqAdminModals.openEditCategoryModal(
+            parseInt(editBtn.getAttribute('data-cat-edit'), 10),
+          );
+        return;
+      }
       var delBtn = e.target.closest('[data-cat-delete]');
       if (delBtn) deleteCategory(parseInt(delBtn.getAttribute('data-cat-delete'), 10));
     });
@@ -166,8 +255,13 @@
   }
 
   function toggleCategoryVisible(id) {
-    if (!isAdmin()) { toast('카테고리 표시 변경 권한이 없습니다.', 'warn'); return; }
-    var cat = (window.FAQ_CATEGORIES || []).find(function (c) { return c.id === id; });
+    if (!isAdmin()) {
+      toast('카테고리 표시 변경 권한이 없습니다.', 'warn');
+      return;
+    }
+    var cat = (window.FAQ_CATEGORIES || []).find(function (c) {
+      return c.id === id;
+    });
     if (!cat) return;
     cat.visible = !cat.visible;
     toast(cat.visible ? '카테고리 표시 ON' : '카테고리 표시 OFF', 'ok');
@@ -176,8 +270,13 @@
 
   // ── CRUD actions
   function toggleVisibility(id) {
-    if (!isAdminMode()) { toast('관리 모드가 아닙니다.', 'warn'); return; }
-    var f = (window.FAQS || []).find(function (x) { return x.id === id; });
+    if (!isAdminMode()) {
+      toast('관리 모드가 아닙니다.', 'warn');
+      return;
+    }
+    var f = (window.FAQS || []).find(function (x) {
+      return x.id === id;
+    });
     if (!f) return;
     f.visible = !f.visible;
     toast(f.visible ? 'FAQ 노출 ON' : 'FAQ 노출 OFF', 'ok');
@@ -185,8 +284,13 @@
   }
 
   function softDelete(id) {
-    if (!isAdminMode()) { toast('관리 모드가 아닙니다.', 'warn'); return; }
-    var f = (window.FAQS || []).find(function (x) { return x.id === id; });
+    if (!isAdminMode()) {
+      toast('관리 모드가 아닙니다.', 'warn');
+      return;
+    }
+    var f = (window.FAQS || []).find(function (x) {
+      return x.id === id;
+    });
     if (!f) return;
     f._deleted = true;
     f.visible = false;
@@ -195,8 +299,13 @@
   }
 
   function restore(id) {
-    if (!isAdmin()) { toast('복원 권한이 없습니다.', 'warn'); return; }
-    var f = (window.FAQS || []).find(function (x) { return x.id === id; });
+    if (!isAdmin()) {
+      toast('복원 권한이 없습니다.', 'warn');
+      return;
+    }
+    var f = (window.FAQS || []).find(function (x) {
+      return x.id === id;
+    });
     if (!f) return;
     f._deleted = false;
     f.visible = true;
@@ -206,11 +315,20 @@
 
   function deleteCategory(id) {
     var cats = window.FAQ_CATEGORIES || [];
-    var cat = cats.find(function (c) { return c.id === id; });
+    var cat = cats.find(function (c) {
+      return c.id === id;
+    });
     if (!cat) return;
-    var count = (window.FAQS || []).filter(function (f) { return f.category === cat.name && !f._deleted; }).length;
-    if (count > 0) { toast('해당 카테고리에 FAQ 항목이 있어 삭제할 수 없습니다.', 'warn'); return; }
-    var idx = cats.findIndex(function (c) { return c.id === id; });
+    var count = (window.FAQS || []).filter(function (f) {
+      return f.category === cat.name && !f._deleted;
+    }).length;
+    if (count > 0) {
+      toast('해당 카테고리에 FAQ 항목이 있어 삭제할 수 없습니다.', 'warn');
+      return;
+    }
+    var idx = cats.findIndex(function (c) {
+      return c.id === id;
+    });
     if (idx >= 0) cats.splice(idx, 1);
     toast('카테고리가 삭제되었습니다.', 'ok');
     if (typeof window.renderFaq === 'function') window.renderFaq();
@@ -226,12 +344,19 @@
   var observer = null;
 
   function attachObserver() {
-    if (observer) { observer.disconnect(); observer = null; }
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
     if (!isAdminMode()) return;
     var body = document.getElementById('faqAdminBody');
     if (body) renderAdminPanel(body);
     observer = new MutationObserver(function () {
-      if (!isAdminMode()) { observer.disconnect(); observer = null; return; }
+      if (!isAdminMode()) {
+        observer.disconnect();
+        observer = null;
+        return;
+      }
       var b = document.getElementById('faqAdminBody');
       if (b) renderAdminPanel(b);
     });
@@ -240,7 +365,14 @@
   }
 
   function onAdminModeChange() {
-    if (!isAdminMode()) { if (observer) { observer.disconnect(); observer = null; } activeTab = 'faqs'; return; }
+    if (!isAdminMode()) {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      activeTab = 'faqs';
+      return;
+    }
     attachObserver();
   }
 
@@ -261,6 +393,8 @@
     restore: restore,
     deleteCategory: deleteCategory,
     switchAdminTab: switchAdminTab,
-    getActiveTab: function () { return activeTab; },
+    getActiveTab: function () {
+      return activeTab;
+    },
   };
 })();

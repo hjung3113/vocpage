@@ -31,13 +31,13 @@
 
 ## 영향 파일
 
-| 파일                                       | 변경                                                                          |
-| ------------------------------------------ | ----------------------------------------------------------------------------- |
-| `prototype/js/notice-admin.js`             | NEW — ~250줄                                                                  |
-| `prototype/js/faq-admin.js`                | NEW — ~270줄                                                                  |
-| `prototype/js/notice-faq.js`               | renderNotices / renderFaq 안에서 admin-mode ON 시 admin 모듈 hook            |
-| `prototype/css/admin/notice-faq-admin.css` | NEW — ~250줄                                                                  |
-| `prototype/prototype.html`                 | `<script src="js/notice-admin.js">` `<script src="js/faq-admin.js">` 추가     |
+| 파일                                       | 변경                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| `prototype/js/notice-admin.js`             | NEW — ~250줄                                                              |
+| `prototype/js/faq-admin.js`                | NEW — ~270줄                                                              |
+| `prototype/js/notice-faq.js`               | renderNotices / renderFaq 안에서 admin-mode ON 시 admin 모듈 hook         |
+| `prototype/css/admin/notice-faq-admin.css` | NEW — ~250줄                                                              |
+| `prototype/prototype.html`                 | `<script src="js/notice-admin.js">` `<script src="js/faq-admin.js">` 추가 |
 
 ## 모듈 API (예시)
 
@@ -73,18 +73,18 @@ window.FaqAdmin = {
 
 ## R1 검증 (Playwright + 수동 시나리오)
 
-| #   | 시나리오                                                                  |
-| --- | ------------------------------------------------------------------------- |
-| 1   | admin role + ?mode=admin: 공지 행에 [편집][삭제][토글] 버튼 노출          |
-| 2   | manager role + ?mode=admin: 동일하지만 "삭제됨 (Admin only)" 섹션 미노출  |
-| 3   | user role + ?mode=admin: 진입 차단 (B-4a canEnterAdminMode false)         |
+| #   | 시나리오                                                                 |
+| --- | ------------------------------------------------------------------------ |
+| 1   | admin role + ?mode=admin: 공지 행에 [편집][삭제][토글] 버튼 노출         |
+| 2   | manager role + ?mode=admin: 동일하지만 "삭제됨 (Admin only)" 섹션 미노출 |
+| 3   | user role + ?mode=admin: 진입 차단 (B-4a canEnterAdminMode false)        |
 | 4   | 공지 등록 모달: 제목/내용/중요도/기간/노출 입력 → 저장 → 목록 prepend    |
-| 5   | 공지 노출 토글: 즉시 반영 (off 시 사용자 뷰에서 제거)                     |
-| 6   | 공지 soft delete: 목록에서 제거 + 삭제됨 섹션에 추가                      |
+| 5   | 공지 노출 토글: 즉시 반영 (off 시 사용자 뷰에서 제거)                    |
+| 6   | 공지 soft delete: 목록에서 제거 + 삭제됨 섹션에 추가                     |
 | 7   | 공지 복원 (admin): 삭제됨 섹션 → 목록 복귀. manager: 버튼 자체 미노출    |
-| 8   | FAQ 카테고리 탭 — admin: 노출 / manager: DOM 자체 없음                    |
-| 9   | FAQ 카테고리 삭제 — 0 items: 성공 / ≥1 items: 토스트 차단                 |
-| 10  | 모드 OFF 시 모든 admin UI 깨끗이 제거 (사용자 뷰 회귀 0)                  |
+| 8   | FAQ 카테고리 탭 — admin: 노출 / manager: DOM 자체 없음                   |
+| 9   | FAQ 카테고리 삭제 — 0 items: 성공 / ≥1 items: 토스트 차단                |
+| 10  | 모드 OFF 시 모든 admin UI 깨끗이 제거 (사용자 뷰 회귀 0)                 |
 
 ## 컨벤션 준수
 
