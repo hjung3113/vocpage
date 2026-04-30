@@ -3136,6 +3136,73 @@ details[open] .em-history-summary::before {
 /* END P-12 Notifications ─────────────────────────────────────── */
 
 /* ============================================================ */
+/* BEGIN B-4a Admin Mode URL Toggle (Wave 2) ─ §13.8 + §10.5.2 ── */
+/* ============================================================ */
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.am-entry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.am-entry-btn[aria-pressed='true'].is-on {
+  background: var(--accent);
+  color: var(--text-on-brand);
+  border-color: var(--accent);
+}
+.am-entry-btn[aria-pressed='true'].is-on i {
+  color: var(--text-on-brand);
+}
+@media (max-width: 640px) {
+  .am-entry-label {
+    display: none;
+  }
+}
+.am-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 24px 0;
+  padding: 10px 14px;
+  background: var(--brand-bg);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+.am-mode-banner i {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.am-mode-banner > span {
+  flex: 1;
+}
+.am-banner-exit {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.am-banner-exit:hover,
+.am-banner-exit:focus-visible {
+  background: var(--accent);
+  color: var(--text-on-brand);
+  outline: none;
+}
+/* END B-4a Admin Mode URL Toggle */
+
+/* ============================================================ */
 /* BEGIN B-5 Role Toggle (Wave 2) ─ append-only, end of file ──── */
 /* ============================================================ */
 .role-dev {

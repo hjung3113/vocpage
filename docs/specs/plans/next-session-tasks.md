@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-30 (Phase 7 Wave 1 종료 — P-5/P-6/P-7/P-8/P-10/P-12 ✅)
-> 현재 위치: Phase 7 Wave 2 — B-5 ✅ (2026-04-30, R3 PASS) → 다음 = B-3 공지 로그인 팝업
+> 최종 업데이트: 2026-04-30 (Phase 7 Wave 2 진행 중 — B-5 ✅ R3 PASS / B-3 ✅ R2 PASS / B-4a R1 commit 5인 리뷰 미진행)
+> 현재 위치: Phase 7 Wave 2 — 다음 = **B-4a 5인 리뷰 dispatch + R2 fix**, 이어서 B-4b/B-9/B-13/B-15/B-16/B-17
 > Wave 2 plan: `plans/prototype-phase7-wave2.md`
 
 ---
@@ -150,24 +150,24 @@
 > **선행 조건**: PR #54 머지 완료 (2026-04-27)
 > **산출물**: 갱신된 `prototype/prototype.html` + 컴포넌트 인벤토리 + 갭 리스트.
 
-| ID   | 항목                                                                                                                  | 상태                                                    |
-| ---- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| P-1  | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel)                            | ✅ B-1 Result Review detail drawer 완료 (R3 fixes 적용) |
-| P-2  | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글                                          | ✅ Wave 2 B-5 (2026-04-30, R3 PASS, 99028af)            |
-| P-3  | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                                         | -                                                       |
-| P-4  | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                                                      | -                                                       |
-| P-5  | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                                                 | ✅ Wave 1 (2026-04-30, 74% coverage 70/94)              |
-| P-6  | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                                                  | ✅ Wave 1 (2026-04-30, 29건 잔여 → Wave 2 입력)         |
-| P-7  | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                                                  | ✅ Wave 1 (2026-04-30, PR #66, R2 90.4)                 |
-| P-8  | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                                            | ✅ Wave 1 (2026-04-30, PR #67, R1 88.8 + critic fix)    |
-| P-9  | 검토 상세 드로어 Round 3 verification pending                                                                         | ✅ R3 fixes 완료 (2026-04-28)                           |
-| P-10 | External Masters 관리 페이지 (Equipment/DB/Program 카드 + 새로고침 + 콜드스타트/스냅샷 뱃지)                          | ✅ Wave 1 (2026-04-30, PR #69, R1 82.3 + 5 spec fix)    |
-| P-11 | VOC 드로어 고급 기능 보강 (상태 disabled, 미완 sub-task 경고, 퍼머링크, 전체화면, 댓글 편집/삭제, review_status 뱃지) | - (B-13)                                                |
-| P-12 | 알림 유형별 데모 + Urgent VOC 빨강 느낌표 뱃지                                                                        | ✅ Wave 1 (2026-04-30, PR #70, R1 82.5 + XSS fix)       |
-| P-13 | User 관리 가드 토스트 (마지막 Admin · self-role · is_active)                                                          | - (B-15)                                                |
-| P-14 | 첨부 업로드 에러 토스트 데모 (413/415/400)                                                                            | - (B-16)                                                |
-| P-15 | Dashboard 설정 패널 슬라이드인 (내 설정 / 기본값[Admin] 토글)                                                         | - (B-17)                                                |
-| P-NG | **후속 작업 (NextGen)**: i18n 외부화, 풀 RBAC + DB RLS, payload_sha256 BE 구현, OpenAPI 스펙                          | -                                                       |
+| ID   | 항목                                                                                                                  | 상태                                                                                                             |
+| ---- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| P-1  | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel)                            | ✅ B-1 Result Review (Wave 1) + B-3 공지 팝업 2-panel ✅ Wave 2 (2026-04-30, R2 PASS, 5b0bea2)                   |
+| P-2  | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글                                          | ✅ Wave 2 B-5 (2026-04-30, R3 PASS, 99028af) + B-4a R1 (`feat/b-4a-mode-admin-url`, 2db5fd6, 5인 리뷰 다음 세션) |
+| P-3  | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                                         | -                                                                                                                |
+| P-4  | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                                                      | -                                                                                                                |
+| P-5  | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                                                 | ✅ Wave 1 (2026-04-30, 74% coverage 70/94)                                                                       |
+| P-6  | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                                                  | ✅ Wave 1 (2026-04-30, 29건 잔여 → Wave 2 입력)                                                                  |
+| P-7  | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                                                  | ✅ Wave 1 (2026-04-30, PR #66, R2 90.4)                                                                          |
+| P-8  | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                                            | ✅ Wave 1 (2026-04-30, PR #67, R1 88.8 + critic fix)                                                             |
+| P-9  | 검토 상세 드로어 Round 3 verification pending                                                                         | ✅ R3 fixes 완료 (2026-04-28)                                                                                    |
+| P-10 | External Masters 관리 페이지 (Equipment/DB/Program 카드 + 새로고침 + 콜드스타트/스냅샷 뱃지)                          | ✅ Wave 1 (2026-04-30, PR #69, R1 82.3 + 5 spec fix)                                                             |
+| P-11 | VOC 드로어 고급 기능 보강 (상태 disabled, 미완 sub-task 경고, 퍼머링크, 전체화면, 댓글 편집/삭제, review_status 뱃지) | - (B-13)                                                                                                         |
+| P-12 | 알림 유형별 데모 + Urgent VOC 빨강 느낌표 뱃지                                                                        | ✅ Wave 1 (2026-04-30, PR #70, R1 82.5 + XSS fix)                                                                |
+| P-13 | User 관리 가드 토스트 (마지막 Admin · self-role · is_active)                                                          | - (B-15)                                                                                                         |
+| P-14 | 첨부 업로드 에러 토스트 데모 (413/415/400)                                                                            | - (B-16)                                                                                                         |
+| P-15 | Dashboard 설정 패널 슬라이드인 (내 설정 / 기본값[Admin] 토글)                                                         | - (B-17)                                                                                                         |
+| P-NG | **후속 작업 (NextGen)**: i18n 외부화, 풀 RBAC + DB RLS, payload_sha256 BE 구현, OpenAPI 스펙                          | -                                                                                                                |
 
 ---
 

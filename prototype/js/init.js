@@ -12,6 +12,10 @@ if (window.RoleState && typeof window.RoleState.init === 'function') {
   window.RoleState.init();
 }
 
+if (window.AdminMode && typeof window.AdminMode.init === 'function') {
+  window.AdminMode.init();
+}
+
 lucide.createIcons();
 renderSidebar();
 renderVOCList();

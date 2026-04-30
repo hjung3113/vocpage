@@ -5,8 +5,11 @@ function renderNotices() {
   const visible = NOTICES.filter((n) => n.visible && n.from <= today && n.to >= today);
   const levelLabel = { urgent: '긴급', important: '중요', normal: '일반' };
   el.innerHTML = `
-    <div class="admin-topbar"><h2 class="admin-title">공지사항</h2></div>
-    <div class="admin-body">
+    <div class="admin-topbar">
+      <h2 class="admin-title">공지사항</h2>
+      <div class="admin-topbar-actions" id="noticeAdminEntrySlot"></div>
+    </div>
+    <div class="admin-body" id="noticeAdminBody">
       ${visible.length === 0 ? '<p style="color:var(--text-tertiary);padding:32px 24px">등록된 공지사항이 없습니다.</p>' : ''}
       ${visible
         .map(
@@ -24,6 +27,10 @@ function renderNotices() {
         .join('')}
     </div>`;
   lucide.createIcons();
+  if (window.AdminMode) {
+    window.AdminMode.renderEntryButton(document.getElementById('noticeAdminEntrySlot'));
+    window.AdminMode.renderModeBanner(document.getElementById('noticeAdminBody'));
+  }
 }
 
 function toggleNotice(id) {
@@ -59,8 +66,11 @@ function renderFaq() {
     );
   }
   el.innerHTML = `
-    <div class="admin-topbar"><h2 class="admin-title">FAQ</h2></div>
-    <div class="admin-body">
+    <div class="admin-topbar">
+      <h2 class="admin-title">FAQ</h2>
+      <div class="admin-topbar-actions" id="faqAdminEntrySlot"></div>
+    </div>
+    <div class="admin-body" id="faqAdminBody">
       <div class="faq-filter-bar">
         <input id="faqSearch" type="text" placeholder="검색..." value="${faqQuery}"
           oninput="faqQuery=this.value;renderFaq()"
@@ -94,6 +104,29 @@ function toggleFaq(id) {
   body.style.display = open ? 'none' : 'block';
   icon.style.transform = open ? '' : 'rotate(180deg)';
 }
+
+// Mount admin-mode entry button + banner after FAQ DOM is built.
+(function attachFaqAdminHooks() {
+  const orig = window.renderFaq;
+  if (typeof orig !== 'function') return;
+  window.renderFaq = function () {
+    orig.apply(this, arguments);
+    if (window.AdminMode) {
+      window.AdminMode.renderEntryButton(document.getElementById('faqAdminEntrySlot'));
+      window.AdminMode.renderModeBanner(document.getElementById('faqAdminBody'));
+    }
+  };
+})();
+
+// Re-render whichever info page is active when admin mode toggles
+// (handles popstate + button click + programmatic AdminMode.setMode).
+document.addEventListener('admin-mode:change', function (e) {
+  if (e.detail && e.detail.page === 'notices' && typeof renderNotices === 'function') {
+    renderNotices();
+  } else if (e.detail && e.detail.page === 'faq' && typeof renderFaq === 'function') {
+    renderFaq();
+  }
+});
 
 // 공지/FAQ 관리는 D19에 따라 별도 admin 페이지가 아니라
 // 공지/FAQ 페이지의 `?mode=admin` 토글로 통합됩니다 (P-9에서 시연 추가 예정).
