@@ -8,6 +8,10 @@ if (!window.currentUser) {
   window.currentUser = { role: 'admin', id: 'u-admin', name: '이분석' };
 }
 
+if (window.AdminMode && typeof window.AdminMode.init === 'function') {
+  window.AdminMode.init();
+}
+
 lucide.createIcons();
 renderSidebar();
 renderVOCList();
