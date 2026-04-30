@@ -75,7 +75,7 @@ function renderTagRow(t) {
   return `<tr class="tm-row${dimClass}" data-id="${esc(t.id)}">
     <td><span style="font-family:var(--font-ui);font-weight:500">${esc(t.name)}</span></td>
     <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">${esc(t.slug)}</code></td>
-    <td><span class="type-badge-admin">${esc(t.kind)}</span></td>
+    <td><span class="tm-kind-badge">${esc(t.kind)}</span></td>
     <td style="text-align:right">${vocDisplay}</td>
     <td>${lastUsed}</td>
     <td>${statusCell}</td>
@@ -92,7 +92,7 @@ function renderTagMaster() {
   // M4: empty state §13.11 pattern (icon + headline, min-height 220px)
   tbody.innerHTML = rows.length
     ? rows.map(renderTagRow).join('')
-    : `<tr><td colspan="7"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;gap:10px;color:var(--text-quaternary)"><i data-lucide="search-x" style="width:32px;height:32px"></i><span style="font-size:14px">검색 결과가 없습니다.</span></div></td></tr>`;
+    : `<tr><td colspan="7"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;gap:10px"><i data-lucide="search-x" style="width:32px;height:32px;color:var(--text-quaternary)"></i><span style="font-size:13.5px;color:var(--text-secondary)">검색 결과가 없습니다.</span></div></td></tr>`;
   if (countBadge) countBadge.textContent = rows.length + '건';
   if (window.lucide) lucide.createIcons();
   // H7: ensure segment .active class matches module state on re-entry
