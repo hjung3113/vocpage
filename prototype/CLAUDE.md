@@ -28,8 +28,3 @@ Full reference: `docs/specs/requires/uidesign.md §10 CSS Reference`. Every colo
 ## graphify
 
 After modifying prototype HTML files, run `graphify update .` from the project root to keep the knowledge graph current.
-
-## Safety Echoes (also in root)
-
-- **Never push directly to main** — feature branch → PR → merge
-- **Canonical docs live in `docs/specs/`** — review outputs go into `docs/specs/reviews/`, not the prototype directory
