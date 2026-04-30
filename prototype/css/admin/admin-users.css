@@ -1,0 +1,136 @@
+/* admin-users.css — B-15 User 관리 가드 토스트 + inline controls */
+
+/* ── Guard toast host (fixed bottom-center) */
+.guard-toast-host {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ── Guard toast item */
+.guard-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--status-red);
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--status-red-border);
+  box-shadow: 0 4px 16px var(--shadow-md);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.guard-toast.guard-toast-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.guard-toast.guard-toast-out {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.guard-toast-icon {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--status-red);
+}
+
+/* ── Self badge ("나") next to user name */
+.guard-self-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--brand);
+  background: var(--accent-bg, var(--bg-surface));
+  border: 1px solid var(--brand);
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+
+/* ── Inline role select */
+.guard-role-select {
+  font-size: 12px;
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 3px 6px;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+
+.guard-role-select:hover,
+.guard-role-select:focus {
+  border-color: var(--brand);
+  outline: none;
+}
+
+/* ── Active toggle */
+.guard-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.guard-toggle input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.guard-toggle-track {
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--border-subtle);
+  transition: background 0.18s;
+  position: relative;
+}
+
+.guard-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  transition:
+    transform 0.18s,
+    background 0.18s;
+}
+
+.guard-toggle input:checked + .guard-toggle-track {
+  background: var(--status-green-bg, var(--bg-elevated));
+  border: 1.5px solid var(--status-green);
+}
+
+.guard-toggle input:checked + .guard-toggle-track::after {
+  transform: translateX(14px);
+  background: var(--status-green);
+}
