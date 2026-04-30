@@ -70,8 +70,25 @@
 .nfa-row-actions {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
+}
+/* 노출 토글 + 라벨은 액션 버튼과 시각적으로 분리 (왼쪽 클러스터) */
+.nfa-row-actions .nfa-visible-toggle {
+  flex-shrink: 0;
+}
+.nfa-visible-label {
+  font-size: 11.5px;
+  font-family: var(--font-ui);
+  min-width: 32px;
+  text-align: left;
+  margin-right: 4px;
+}
+.nfa-visible-label.on {
+  color: var(--status-green, var(--accent));
+}
+.nfa-visible-label.off {
+  color: var(--text-quaternary);
 }
 .nfa-action-btn {
   padding: 3px 9px;
