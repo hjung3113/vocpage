@@ -14,8 +14,9 @@
 **B-16 첨부 에러 토스트** ✅ R1 + R2 (브랜치 `feat/b-16-attachment-error-toasts` 2 commits d6f835c + 2f9b31a. attachment-errors.js 191 / attachment-errors.css 114. 4 시나리오 (413/415/400-count/400-other), MutationObserver hook. 5-perspective 평균 73/100 → R2 P0: spec §8.5 정합 — 5개/PNG·JPG·GIF·WebP only (이전: 30개/pdf/xlsx 디자인 메모 오류), escHtml identity fallback 제거하여 fail-loud) /
 **B-17 Dashboard 설정 패널** ✅ R1 + R2 (PR #85 머지 2026-05-01. 브랜치 `feat/b-17-dashboard-settings-panel` commits e709547 + bdbe181. dashboard-settings-panel.js 273 / dashboard-settings-panel.css 228. 슬라이드인 우측 패널, 8 widget 토글 + ↑↓, 모드 탭 (내 설정 / 기본값[Admin]), Esc/외부클릭 닫기. R2 P0 fix: admin guard / focus return / settings:changed event / a11y tabs) /
 **B-9 mode+role-pill 통합 검증** ✅ (2026-05-01, PR #86 머지: `docs/specs/reviews/b-9-mode-role-integration-verification-result.md`. Playwright MCP 기반 prototype 자동 검증. S1 role admin→user / S2 deep-link+role=user / S3 admin→manager / S4 popstate 4단계 / S5 hash 보존 / S6 race 20회 — 6/6 PASS, 콘솔 에러 0건) /
-**Wave 2 모든 PR 머지 완료** ✅ (2026-05-01: PR #79 docs Wave 2 / #80 B-4a R2 / #81 B-4b / #82 B-13 / #83 B-15 / #84 B-16 / #85 B-17 / #86 B-9 verification — 8건 머지. b-13/b-15/b-17은 prototype.html `<head>` CSS 링크 + `<script>` 섹션에서 main 재머지 후 충돌 해결 후 머지)
-→ **다음 세션 시작점: Wave 2 종료 회고 → Phase 8 진입 R-4 (ts-node-dev → tsx watch)**
+**Wave 2 모든 PR 머지 완료** ✅ (2026-05-01: PR #79 docs Wave 2 / #80 B-4a R2 / #81 B-4b / #82 B-13 / #83 B-15 / #84 B-16 / #85 B-17 / #86 B-9 verification — 8건 머지. b-13/b-15/b-17은 prototype.html `<head>` CSS 링크 + `<script>` 섹션에서 main 재머지 후 충돌 해결 후 머지) /
+**Wave 3 plan 작성** ✅ (2026-05-01, 브랜치 `docs/prototype-phase7-wave3-plan` commit 490921d. `docs/specs/plans/prototype-phase7-wave3-plan.md`. B- 기준 = Critical 4 + Major 1 + FE-mock Minor 4 + 보강 2. 3 sub-wave 구성: W3-A VOC 본체 (C-02 Due Date / N-01 자동 태그 / N-02 charcount / N-04 highlight) / W3-B Admin 공통 (C-10 TypeBadge / C-11 StatusDot / C-14 Non-data states / M-05 외부마스터 매핑) / W3-C Dashboard 잔여 + drawer 권한 차단 + 갭 재스캔 0 잔여. R-4 (tsx watch)는 Wave 3 종료 후 단독 PR로 분리. 의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰. next-session-tasks.md Phase 7 표 P-2/P-3/P-4/P-11/P-13/P-14/P-15 ✅ 갱신 + P-16 Wave 3 row 추가)
+→ **다음 세션 시작점: Wave 3 W3-A (VOC 본체 — drawer + modal + voc-list 갭 4건 동시 처리)**
 
 ### Phase 7 plan 요약 (2026-04-27)
 
