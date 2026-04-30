@@ -13,22 +13,23 @@
   // ── Error scenario definitions ─────────────────────────────────────────────
   const SCENARIOS = [
     { value: '', label: '에러 시뮬레이션 선택…' },
+    // R2: spec §8.5 정합 — 10MB / 5개 / PNG·JPG·GIF·WebP only.
     {
       value: '413',
       label: '413 — 파일 크기 초과',
       message: (esc) =>
-        `파일 크기가 10MB를 초과합니다 (${esc('sample.pdf')}, 12.5MB). 더 작은 파일을 선택하세요.`,
+        `파일 크기가 10MB를 초과합니다 (${esc('screenshot.png')}, 12.5MB). 더 작은 파일을 선택하세요.`,
     },
     {
       value: '415',
       label: '415 — 허용되지 않는 파일 형식',
       message: (esc) =>
-        `허용되지 않는 파일 형식입니다 (${esc('.exe')}). 가능: pdf, png, jpg, xlsx 등.`,
+        `허용되지 않는 파일 형식입니다 (${esc('.exe')}). 가능: PNG, JPG, GIF, WebP.`,
     },
     {
       value: '400-count',
       label: '400 — 첨부 한도 초과',
-      message: () => 'VOC당 첨부 한도(30건)를 초과합니다 (31/30).',
+      message: () => 'VOC당 첨부 한도(5개)를 초과합니다 (6/5).',
     },
     {
       value: '400-other',
@@ -56,7 +57,13 @@
     const scenario = SCENARIOS.find((s) => s.value === kind);
     if (!scenario || !scenario.message) return;
 
-    const esc = window.escHtml || ((s) => String(s));
+    // R2: drop identity fallback to fail-loud if dom-utils.js load order regresses
+    // (XSS footgun — string concat into innerHTML).
+    if (typeof window.escHtml !== 'function') {
+      console.error('[attachment-errors] escHtml unavailable — abort to prevent XSS');
+      return;
+    }
+    const esc = window.escHtml;
     const msgText = scenario.message(esc);
 
     const host = getOrCreateHost();
