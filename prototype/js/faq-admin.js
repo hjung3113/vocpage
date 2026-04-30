@@ -54,17 +54,14 @@
       div.innerHTML =
         '<label class="toggle-switch nfa-visible-toggle" data-action="toggle" data-id="' +
         id +
-        '" title="노출 여부">' +
+        '" title="' +
+        (faq.visible ? '노출 ON — 클릭하여 비노출' : '비노출 — 클릭하여 노출 ON') +
+        '">' +
         '<input type="checkbox" aria-label="노출 여부 토글"' +
         (faq.visible ? ' checked' : '') +
         '>' +
         '<span class="toggle-slider"></span>' +
         '</label>' +
-        '<span class="nfa-visible-label ' +
-        (faq.visible ? 'on' : 'off') +
-        '">' +
-        (faq.visible ? '노출' : '비노출') +
-        '</span>' +
         '<button type="button" class="nfa-action-btn" data-action="edit" data-id="' +
         id +
         '">편집</button>' +
