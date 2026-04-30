@@ -1,0 +1,213 @@
+/* ─── Admin shared ─── */
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px;
+  height: 56px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.admin-title {
+  font-size: 15px;
+  font-weight: 700;
+  flex: 1;
+}
+.admin-body {
+  flex: 1;
+  overflow-y: auto;
+}
+.admin-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--brand-bg);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.admin-btn svg {
+  width: 13px;
+  height: 13px;
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  cursor: pointer;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border-subtle);
+  border-radius: 20px;
+  transition: 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  top: 3px;
+  background: var(--bg-surface);
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent);
+}
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(14px);
+}
+.admin-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+/* ── Dashboard Settings ── */
+.admin-subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-left: 4px;
+}
+.ds-widget-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  cursor: grab;
+}
+.ds-widget-card.ds-widget-hidden {
+  opacity: 0.45;
+}
+.ds-widget-handle {
+  color: var(--text-quaternary);
+  flex-shrink: 0;
+}
+.ds-widget-handle svg {
+  width: 14px;
+  height: 14px;
+}
+.ds-widget-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+.ds-widget-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ds-widget-lock {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.ds-widget-lock svg {
+  width: 11px;
+  height: 11px;
+}
+.ds-widget-locked .ds-widget-lock {
+  color: var(--text-tertiary);
+  background: var(--bg-surface);
+}
+.ds-widget-vis {
+  color: var(--accent);
+  background: var(--brand-bg);
+}
+.ds-widget-vis-off {
+  color: var(--text-quaternary);
+  background: var(--bg-surface);
+}
+.ds-setting-group {
+  margin-bottom: 14px;
+}
+.ds-setting-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ds-setting-select {
+  width: 100%;
+  padding: 7px 9px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+.ds-check-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.ds-check-row input {
+  accent-color: var(--accent);
+}
+.ds-save-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--text-on-brand);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.ds-save-btn:hover {
+  background: var(--accent-hover);
+}
+.ds-reset-btn {
+  width: 100%;
+  padding: 7px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+.ds-reset-btn:hover {
+  border-color: var(--text-tertiary);
+}

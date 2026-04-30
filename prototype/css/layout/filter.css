@@ -1,0 +1,169 @@
+/* ─── Filter Bar ─── */
+.filterbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-5);
+  height: 44px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-app);
+  flex-shrink: 0;
+}
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: var(--sp-1);
+  flex-shrink: 0;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px 4px 9px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  color: var(--text-tertiary);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap;
+}
+.pill:active {
+  transform: scale(0.94);
+}
+.pill:hover {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border-color: var(--border-standard);
+}
+.pill.active {
+  background: var(--brand-bg);
+  border-color: var(--brand-border);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--brand-border);
+}
+.pill svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+/* Filter count badge */
+.fc-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+  margin-left: 2px;
+}
+
+/* ─── Advanced Filter Panel ─── */
+.adv-filter-wrap {
+  max-height: 0;
+  overflow: hidden;
+  background: var(--bg-panel);
+  border-bottom: 0px solid var(--border-subtle);
+  flex-shrink: 0;
+  transition:
+    max-height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    border-bottom-width 0.22s;
+}
+.adv-filter-wrap.open {
+  max-height: 140px;
+  border-bottom-width: 1px;
+}
+.adv-filter-inner {
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  display: flex;
+  gap: var(--sp-6);
+  align-items: flex-start;
+}
+.af-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.af-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+.af-opts,
+.af-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.af-chip {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+  user-select: none;
+  white-space: nowrap;
+}
+.af-chip:hover {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border-color: var(--border-standard);
+}
+.af-chip.active {
+  background: var(--brand-bg);
+  border-color: var(--brand-border);
+  color: var(--accent);
+  font-weight: 600;
+}
+.af-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 1px;
+}
+.af-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.type-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}

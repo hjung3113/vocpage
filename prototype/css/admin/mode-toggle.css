@@ -1,0 +1,174 @@
+/* ============================================================ */
+/* BEGIN B-4a Admin Mode URL Toggle (Wave 2) ─ §13.8 + §10.5.2 ── */
+/* ============================================================ */
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.am-entry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.am-entry-btn[aria-pressed='true'].is-on {
+  background: var(--accent);
+  color: var(--text-on-brand);
+  border-color: var(--accent);
+}
+.am-entry-btn[aria-pressed='true'].is-on i {
+  color: var(--text-on-brand);
+}
+@media (max-width: 640px) {
+  .am-entry-label {
+    display: none;
+  }
+}
+.am-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 24px 0;
+  padding: 10px 14px;
+  background: var(--brand-bg);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+.am-mode-banner i {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.am-mode-banner > span {
+  flex: 1;
+}
+.am-banner-exit {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.am-banner-exit:hover,
+.am-banner-exit:focus-visible {
+  background: var(--accent);
+  color: var(--text-on-brand);
+  outline: none;
+}
+/* END B-4a Admin Mode URL Toggle */
+
+/* ============================================================ */
+/* BEGIN B-5 Role Toggle (Wave 2) ─ append-only, end of file ──── */
+/* ============================================================ */
+.role-dev {
+  background: var(--role-dev-bg);
+  color: var(--role-dev-fg);
+  border: 1px solid var(--role-dev-border);
+}
+.sidebar-user {
+  cursor: pointer;
+  position: relative;
+}
+.sidebar-user:hover {
+  background: var(--bg-elevated);
+}
+.sidebar-user .role-pill {
+  display: inline-block;
+  margin-top: 2px;
+}
+.role-popover {
+  position: fixed;
+  bottom: 60px;
+  left: 12px;
+  width: 198px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-standard);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: var(--sp-2);
+  z-index: 8600;
+  display: none;
+}
+.role-popover[data-open='true'] {
+  display: block;
+}
+.role-popover-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 8px 4px;
+}
+.role-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-ui);
+}
+.role-popover-item:hover,
+.role-popover-item:focus-visible {
+  background: var(--bg-elevated);
+  outline: none;
+}
+.role-popover-item[aria-checked='true'] {
+  background: var(--brand-bg);
+}
+.role-popover-item[aria-checked='true'] .role-pop-check {
+  visibility: visible;
+}
+.role-pop-check {
+  visibility: hidden;
+  margin-left: auto;
+  color: var(--accent);
+  width: 13px;
+  height: 13px;
+}
+.role-pop-name {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+}
+[data-role-hide='true'] {
+  display: none;
+}
+.role-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-standard);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  z-index: 9600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.role-toast.fade-out {
+  opacity: 0;
+}
+/* END B-5 Role Toggle */
