@@ -1,0 +1,234 @@
+/* ─── Sidebar ─── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: background 0.25s;
+}
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4);
+  height: 56px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.logo-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+.logo-mark svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-on-brand);
+}
+.logo-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+.logo-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--brand-bg);
+  color: var(--brand);
+  border: 1px solid var(--brand-border);
+  letter-spacing: 0.03em;
+  margin-left: 2px;
+  align-self: flex-start;
+  margin-top: 1px;
+}
+.sidebar-section {
+  padding: var(--sp-3) var(--sp-2) var(--sp-2);
+}
+.section-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  padding: var(--sp-1) var(--sp-2) var(--sp-2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px var(--sp-2);
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-weight: 400;
+  transition:
+    background 0.12s,
+    color 0.12s;
+  user-select: none;
+}
+.nav-item:hover {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+.nav-item.active {
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+.nav-item svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  min-width: 20px;
+  text-align: center;
+}
+.nav-badge.accent {
+  background: var(--brand);
+  color: #fff;
+}
+.nav-badge.muted {
+  background: var(--bg-elevated);
+  color: var(--text-quaternary);
+}
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: var(--sp-2) var(--sp-2);
+}
+.sys-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 5px var(--sp-2);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  user-select: none;
+}
+.sys-header:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.sys-header.active {
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+.sys-header-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.sys-header-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sys-chevron {
+  width: 12px;
+  height: 12px;
+  color: var(--text-quaternary);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.sys-header.open .sys-chevron {
+  transform: rotate(90deg);
+}
+.sys-menus {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.2s ease;
+}
+.sys-menus.open {
+  max-height: 200px;
+}
+.sys-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px var(--sp-2) 4px 28px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.sys-menu-item:hover {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+.sys-menu-item.active {
+  color: var(--accent);
+  background: var(--brand-bg);
+}
+.sidebar-user {
+  flex-shrink: 0;
+  padding: var(--sp-3) var(--sp-2);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.sidebar-user:hover {
+  background: var(--bg-elevated);
+}
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-on-brand);
+  flex-shrink: 0;
+}
+.user-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-role {
+  font-size: 11px;
+  color: var(--text-quaternary);
+}
+.sidebar-user svg {
+  width: 13px;
+  height: 13px;
+  color: var(--text-quaternary);
+  flex-shrink: 0;
+}

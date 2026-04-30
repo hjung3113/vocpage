@@ -1,0 +1,158 @@
+/* BEGIN P-7 Tag Master (Stage B-6 D22) ──────────────────────────────── */
+
+/* ── Search input ── */
+.tm-search {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-standard);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  outline: none;
+  width: 200px;
+  transition: border-color 0.15s;
+}
+.tm-search:focus {
+  border-color: var(--accent);
+}
+
+/* ── Segment filter ── */
+.tm-seg {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-standard);
+  border-radius: 6px;
+  padding: 2px;
+}
+.tm-seg-btn {
+  padding: 3px 10px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+.tm-seg-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.tm-seg-btn.active {
+  background: var(--brand-bg);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* ── Rule suspend callout ── */
+.tm-callout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: var(--status-amber-bg);
+  border: 1px solid var(--status-amber-border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.tm-callout [data-lucide] {
+  width: 15px;
+  height: 15px;
+  color: var(--status-amber);
+  flex-shrink: 0;
+}
+
+/* ── Merged row dim (H6: visible at reduced opacity in 전체 filter) ── */
+.tm-row-merged td {
+  opacity: 0.6;
+}
+
+/* ── External lock pill ── */
+.tm-ext-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--status-amber-bg);
+  border: 1px solid var(--status-amber-border);
+  color: var(--status-amber);
+}
+
+/* ── Merged-into pill ── */
+.tm-merged-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--status-purple-bg);
+  border: 1px solid var(--status-purple-border);
+  color: var(--status-purple);
+}
+
+/* ── Deletable hint ── */
+.tm-deletable-hint {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--status-red-bg);
+  border: 1px solid var(--status-red-border);
+  color: var(--status-red);
+}
+
+/* ── Modal form helpers ── */
+.tm-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.tm-form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+}
+
+/* ── Primary action button (C3) ── */
+.a-btn.primary {
+  background: var(--brand-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.a-btn.primary:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+}
+
+/* ── Kind badge (P-7 local; §13.4 type-badge-admin은 색 스워치 chip 용도라 분리) ── */
+.tm-kind-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  color: var(--text-secondary);
+}
+
+/* END P-7 Tag Master ────────────────────────────────────────────────────── */

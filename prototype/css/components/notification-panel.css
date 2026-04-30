@@ -1,0 +1,109 @@
+/* ─── Notification Panel ─── */
+.notif-panel {
+  position: fixed;
+  top: 56px;
+  right: var(--sp-4);
+  width: 348px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-standard);
+  border-radius: 12px;
+  box-shadow: var(--shadow-dialog);
+  z-index: 80;
+  overflow: hidden;
+  transform: translateY(-8px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.16s;
+}
+.notif-panel.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.notif-header {
+  display: flex;
+  align-items: center;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.notif-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+}
+.notif-mark {
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 500;
+}
+.notif-mark:hover {
+  color: var(--accent-hover);
+}
+.notif-item {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.notif-item:last-child {
+  border-bottom: none;
+}
+.notif-item:hover {
+  background: var(--bg-elevated);
+}
+.notif-item.unread {
+  background: var(--brand-bg);
+}
+.notif-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.notif-item.unread .notif-icon {
+  background: var(--brand);
+}
+.notif-icon svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-tertiary);
+}
+.notif-item.unread .notif-icon svg {
+  color: #fff;
+}
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
+.notif-content p {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.notif-content p strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.notif-time {
+  font-size: 11px;
+  color: var(--text-quaternary);
+  margin-top: 2px;
+}
+.notif-dot-unread {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 5px;
+  flex-shrink: 0;
+}

@@ -1,0 +1,282 @@
+/* ── Dashboard Edit Mode ── */
+#page-dashboard {
+  position: relative;
+}
+.dash-edit-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 256px;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border-subtle);
+  z-index: 50;
+  transform: translateX(100%);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px;
+  overflow-y: auto;
+}
+#page-dashboard.edit-mode .dash-edit-panel {
+  transform: translateX(0);
+}
+#page-dashboard.edit-mode .dash-body {
+  padding-right: 260px;
+}
+.dash-widget {
+  position: relative;
+  border-radius: 8px;
+  transition: box-shadow 0.15s;
+}
+#page-dashboard.edit-mode .dash-widget {
+  outline: 1.5px dashed oklch(65% 0.17 242 / 0.35);
+  outline-offset: 2px;
+}
+#page-dashboard.edit-mode .dash-widget:hover {
+  outline-color: oklch(65% 0.17 242 / 0.7);
+  box-shadow: 0 0 0 3px oklch(65% 0.17 242 / 0.08);
+}
+.widget-edit-bar {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 6px;
+  margin-bottom: 4px;
+}
+#page-dashboard.edit-mode .widget-edit-bar {
+  display: flex;
+}
+.widget-edit-grip {
+  color: var(--text-quaternary);
+  cursor: grab;
+  font-size: 15px;
+  line-height: 1;
+}
+.widget-edit-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.widget-vis-btn,
+.widget-lock-btn {
+  display: flex;
+  align-items: center;
+  padding: 3px 5px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition:
+    color 0.1s,
+    border-color 0.1s;
+}
+.widget-vis-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.widget-vis-btn svg,
+.widget-lock-btn svg {
+  width: 12px;
+  height: 12px;
+}
+.widget-hidden-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-app);
+  opacity: 0.6;
+  border-radius: 8px;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.dash-widget.widget-hidden .widget-hidden-overlay {
+  display: flex;
+}
+.ds-save-target-group {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.ds-save-target {
+  flex: 1;
+  padding: 6px 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.ds-save-target.active {
+  background: var(--brand-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+#page-dashboard.edit-mode .dash-edit-btn-active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.admin-table th {
+  text-align: left;
+  padding: 9px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+}
+.admin-table td {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+.admin-table tr:hover td {
+  background: var(--bg-elevated);
+}
+.td-primary {
+  color: var(--text-primary) !important;
+  font-weight: 500;
+}
+.kw-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.kw-pill {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--brand-bg);
+  color: var(--accent);
+  border: 1px solid var(--brand-border);
+  font-family: var(--font-mono);
+}
+.tag-pill-sm {
+  font-size: 11.5px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-standard);
+}
+.type-badge-admin {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.type-keyword {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border: 1px solid var(--status-amber-border);
+}
+.type-regex {
+  background: var(--status-purple-bg);
+  color: var(--status-purple);
+  border: 1px solid var(--status-purple-border);
+}
+.admin-page .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+.admin-page .status-dot.on {
+  background: var(--status-green);
+  box-shadow: 0 0 5px oklch(55% 0.17 150 / 0.5);
+}
+.admin-page .status-dot.off {
+  background: var(--text-quaternary);
+}
+.color-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.role-pill {
+  font-size: 11.5px;
+  padding: 2px 9px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.role-admin {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border: 1px solid var(--brand-border);
+}
+.role-manager {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border: 1px solid var(--status-amber-border);
+}
+.role-user {
+  background: var(--bg-elevated);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+.user-avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brand-bg);
+  border: 1px solid var(--brand-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.a-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid var(--border-standard);
+  background: transparent;
+  color: var(--text-tertiary);
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.a-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.a-btn.danger:hover {
+  background: var(--status-red-bg);
+  color: var(--status-red);
+  border-color: var(--status-red-border);
+}
+.admin-add-form {
+  display: none;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 20px;
+  background: var(--bg-panel);
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.admin-add-form.open {
+  display: flex;
+}

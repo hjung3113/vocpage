@@ -1,0 +1,260 @@
+/* ── Notice level badge (공지사항 뷰 + 관리자 뷰 공통) */
+.notice-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+.notice-badge-urgent {
+  color: var(--status-red);
+  border-color: var(--status-red-border);
+  background: var(--status-red-bg);
+}
+.notice-badge-important {
+  color: var(--status-amber);
+  border-color: var(--status-amber-border);
+  background: var(--status-amber-bg);
+}
+.notice-badge-normal {
+  color: var(--text-tertiary);
+  border-color: var(--border-subtle);
+  background: transparent;
+}
+.notice-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.notice-row:hover {
+  background: var(--bg-elevated);
+}
+.notice-body {
+  display: none;
+  padding: 12px 24px 16px;
+  background: var(--bg-elevated);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  border-top: 1px solid var(--border-subtle);
+}
+.faq-item {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.faq-filter-bar {
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.faq-search {
+  padding: 6px 11px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  width: 200px;
+  font-family: var(--font-ui);
+}
+.faq-search:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+.faq-cat-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.faq-cat-btn {
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: all 0.12s;
+}
+.faq-cat-btn.active {
+  border-color: var(--brand-border);
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+.faq-cat-btn:not(.active):hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+/* ── Admin form action buttons */
+.btn-form-save {
+  padding: 6px 14px;
+  background: var(--brand-bg);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.btn-form-cancel {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.btn-form-save:hover {
+  border-color: var(--accent-hover);
+}
+.btn-form-cancel:hover {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+.aform-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.aform-field label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.aform-field input,
+.aform-field select {
+  padding: 6px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  min-width: 140px;
+}
+.aform-field input:focus,
+.aform-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+.kw-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 5px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  border-radius: 6px;
+  min-width: 220px;
+  min-height: 34px;
+  cursor: text;
+}
+.kw-input-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+.kw-input-wrap input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  min-width: 80px;
+  flex: 1;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+.kw-input-wrap input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.kw-tag-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--brand-bg);
+  color: var(--accent);
+  border: 1px solid var(--brand-border);
+  font-family: var(--font-mono);
+}
+.kw-tag-token .rm {
+  cursor: pointer;
+  opacity: 0.6;
+  font-size: 10px;
+}
+.kw-tag-token .rm:hover {
+  opacity: 1;
+}
+.section-count-badge {
+  font-size: 11.5px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  color: var(--text-quaternary);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── Sidebar System Accordion */
+.sys-menus {
+  padding-left: var(--sp-2);
+}
+.menu-nav-item {
+  padding-left: 28px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+.menu-nav-item:hover {
+  color: var(--text-primary);
+}
+.menu-nav-item.active {
+  color: var(--text-primary);
+}
+
+/* ── VOC Type Badge */
+.vt-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+  .btn-primary:active {
+    transform: none;
+  }
+  .pill:active {
+    transform: none;
+  }
+  .voc-group.entering {
+    animation: none;
+  }
+}

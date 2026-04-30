@@ -117,7 +117,6 @@ function buildNotifText(n) {
   const urgentBadge = n.urgent
     ? `<span class="nf-urgent-badge" aria-label="Urgent"><i data-lucide="alert-octagon"></i></span>`
     : '';
-  // M5: notice items get an importance badge prefix (class defined in components.css; TODO if missing)
   const noticeBadge = n.type === 'notice' ? `<span class="notice-badge-important">중요</span>` : '';
   if (n.actor) {
     return `${noticeBadge}<strong>${esc(n.actor)}</strong>(${esc(n.vocId || '')})${esc(n.action)}${urgentBadge}`;
