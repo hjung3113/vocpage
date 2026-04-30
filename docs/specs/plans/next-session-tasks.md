@@ -157,8 +157,8 @@
 | P-4  | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                                                      | -                                                       |
 | P-5  | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                                                 | -                                                       |
 | P-6  | prototype vs spec 갭 재스캔 → 신규 갭은 `docs/specs/reviews/`에 기록                                                  | -                                                       |
-| P-7  | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                                                  | -                                                       |
-| P-8  | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                                            | -                                                       |
+| P-7  | D22 태그 마스터 관리 페이지 prototype 추가 (`feature-voc.md §9.4.6`)                                                  | ✅ Wave 1 (2026-04-30, PR #66, R2 90.4)                 |
+| P-8  | D23 휴지통 페이지 prototype 추가 (`feature-voc.md §9.4.7`)                                                            | ✅ Wave 1 (2026-04-30, PR #67, R1 88.8 + critic fix)    |
 | P-9  | 검토 상세 드로어 Round 3 verification pending                                                                         | ✅ R3 fixes 완료 (2026-04-28)                           |
 | P-10 | External Masters 관리 페이지 (Equipment/DB/Program 카드 + 새로고침 + 콜드스타트/스냅샷 뱃지)                          | - (B-12)                                                |
 | P-11 | VOC 드로어 고급 기능 보강 (상태 disabled, 미완 sub-task 경고, 퍼머링크, 전체화면, 댓글 편집/삭제, review_status 뱃지) | - (B-13)                                                |
