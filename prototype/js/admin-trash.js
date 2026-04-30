@@ -1,9 +1,10 @@
-// ── P-8 Trash (Stage B-7 D23) — depends on: dom-utils.js, admin-trash-data.js, #modalBg
+// ── P-8 Trash (Stage B-7 D23) — depends on: dom-utils.js, admin-trash-data.js, admin-trash-modals.js
 let trQuery = '',
   trRange = 'all',
   trSystem = 'all';
 let trSelectedIds = new Set();
 let trIsAdmin = true;
+let _trDeniedToastShown = false;
 const TR_TODAY = new Date('2026-04-30T00:00:00');
 
 function trDaysLeft(deletedAt) {
@@ -22,7 +23,7 @@ function trFilteredData() {
       (r) => r.title.toLowerCase().includes(q) || r.issueId.toLowerCase().includes(q),
     );
   }
-  if (trSystem !== 'all') rows = rows.filter((r) => r.systemId === trSystem);
+  if (trSystem !== 'all') rows = rows.filter((r) => r.systemName === trSystem);
   if (trRange !== 'all') {
     rows = rows.filter((r) => {
       const d = trDaysLeft(r.deletedAt);
@@ -41,36 +42,46 @@ function trBuildSystemOptions() {
   const seen = new Set();
   const opts = ['<option value="all">전체 시스템</option>'];
   (window.trashedVocData || []).forEach((r) => {
-    if (!seen.has(r.systemId)) {
-      seen.add(r.systemId);
-      opts.push(`<option value="${escHtml(r.systemId)}">${escHtml(r.systemName)}</option>`);
+    if (!seen.has(r.systemName)) {
+      seen.add(r.systemName);
+      opts.push(`<option value="${escHtml(r.systemName)}">${escHtml(r.systemName)}</option>`);
     }
   });
   sel.innerHTML = opts.join('');
+  sel.value = trSystem; // restore selected state
 }
 function renderTrash() {
-  const bg = document.getElementById('modalBg');
-  if (bg && bg.classList.contains('open')) {
-    bg.classList.remove('open');
-    bg.dataset.mode = '';
+  const trBg = document.getElementById('trConfirmBg');
+  if (trBg && trBg.classList.contains('open')) {
+    trBg.classList.remove('open');
+    trBg.hidden = true;
   }
   const denied = document.getElementById('trDenied');
   const table = document.getElementById('trTable');
   const toolbar = document.querySelector('.tr-toolbar');
   const bulkBar = document.getElementById('trBulkBar');
+  const callout = document.getElementById('trInfoCallout');
+  const auditWrap = document.getElementById('trAuditWrap');
   if (!trIsAdmin) {
     if (denied) denied.hidden = false;
     if (table) table.hidden = true;
     if (toolbar) toolbar.hidden = true;
     if (bulkBar) bulkBar.hidden = true;
+    if (callout) callout.hidden = true;
+    if (auditWrap) auditWrap.hidden = true;
     document.getElementById('trCount').textContent = '';
-    showToast('Admin 권한이 필요합니다.', 'warn');
+    if (!_trDeniedToastShown) {
+      _trDeniedToastShown = true;
+      showToast('Admin 권한이 필요합니다.', 'warn');
+    }
     lucide.createIcons();
     return;
   }
   if (denied) denied.hidden = true;
   if (table) table.hidden = false;
   if (toolbar) toolbar.hidden = false;
+  if (callout) callout.hidden = false;
+  if (auditWrap) auditWrap.hidden = false;
   trBuildSystemOptions();
   const rows = trFilteredData();
   document.getElementById('trCount').textContent = rows.length + '건';
@@ -113,21 +124,8 @@ function buildRow(r) {
       : `<span class="tr-role-badge tr-role-manager">Mgr</span>`;
   const attachNote =
     r.attachmentCount > 0 ? ` <span class="tr-attach-note">(첨부 ${r.attachmentCount})</span>` : '';
-  return `<tr class="${rowCls}" id="tr-row-${escHtml(r.id)}">
-    <td><input type="checkbox" ${checked} onchange="toggleTrRow('${escHtml(r.id)}')" aria-label="선택" /></td>
-    <td class="tr-mono">${escHtml(r.issueId)}</td>
-    <td class="tr-title-cell">${escHtml(r.title)}${attachNote}</td>
-    <td>${escHtml(trStatusLabel(r.status))}</td>
-    <td>${escHtml(r.systemName)} / ${escHtml(r.menuName)}</td>
-    <td>${escHtml(r.deletedByName)} ${roleBadge}</td>
-    <td>${escHtml(r.originalAssignee)}</td>
-    <td class="tr-mono">${escHtml(r.deletedAt.slice(0, 10))}</td>
-    <td class="${daysCls}">${daysHtml}</td>
-    <td class="tr-action-cell">
-      <button type="button" class="a-btn primary" onclick="restoreVoc('${escHtml(r.id)}')">복원</button>
-      <button type="button" class="a-btn danger" onclick="purgeVoc('${escHtml(r.id)}')">영구삭제</button>
-    </td>
-  </tr>`;
+  const id = escHtml(r.id);
+  return `<tr class="${rowCls}" id="tr-row-${id}"><td><input type="checkbox" ${checked} onchange="toggleTrRow('${id}')" aria-label="선택" /></td><td class="tr-mono">${escHtml(r.issueId)}</td><td class="tr-title-cell">${escHtml(r.title)}${attachNote}</td><td>${escHtml(trStatusLabel(r.status))}</td><td>${escHtml(r.systemName)} / ${escHtml(r.menuName)}</td><td>${escHtml(r.deletedByName)} ${roleBadge}</td><td>${escHtml(r.originalAssignee)}</td><td class="tr-mono">${escHtml(r.deletedAt.slice(0, 10))}</td><td class="${daysCls}">${daysHtml}</td><td class="tr-action-cell"><button type="button" class="a-btn primary" onclick="restoreVoc('${id}')">복원</button> <button type="button" class="a-btn danger" onclick="purgeVoc('${id}')">영구삭제</button></td></tr>`;
 }
 function syncTrFilter() {
   trQuery = (document.getElementById('trSearch') || {}).value || '';
@@ -171,42 +169,7 @@ function clearTrSelection() {
   syncCheckboxStates();
   updateBulkBar();
 }
-function openTrConfirm({ title, bodyHtml, confirmLabel, danger, onConfirm }) {
-  const bg = document.getElementById('modalBg');
-  if (!bg) return;
-  bg.dataset.mode = 'tr-confirm';
-  const inner = bg.querySelector('.modal');
-  if (!inner) return;
-  inner.innerHTML = `
-    <div class="modal-header">
-      <span class="modal-title">${title}</span>
-      <button type="button" class="icon-btn" onclick="closeTrConfirm()"><i data-lucide="x"></i></button>
-    </div>
-    <div class="modal-body tr-confirm-body">${bodyHtml}</div>
-    <div class="modal-footer">
-      <div></div>
-      <div class="footer-actions">
-        <button type="button" class="btn-ghost" onclick="closeTrConfirm()">취소</button>
-        <button type="button" class="a-btn ${danger ? 'danger' : 'primary'}" id="trConfirmOk">${escHtml(confirmLabel)}</button>
-      </div>
-    </div>`;
-  document.getElementById('trConfirmOk').onclick = () => {
-    closeTrConfirm();
-    onConfirm();
-  };
-  bg.onclick = (e) => {
-    if (e.target === bg) closeTrConfirm();
-  };
-  bg.classList.add('open');
-  lucide.createIcons({ nodes: [inner] });
-}
-function closeTrConfirm() {
-  const bg = document.getElementById('modalBg');
-  if (!bg) return;
-  bg.classList.remove('open');
-  bg.dataset.mode = '';
-  bg.onclick = null;
-}
+// openTrConfirm / closeTrConfirm defined in admin-trash-modals.js
 function _removeVocById(id) {
   const idx = window.trashedVocData.findIndex((r) => r.id === id);
   if (idx !== -1) window.trashedVocData.splice(idx, 1);
@@ -306,6 +269,7 @@ function purgeSelected() {
 }
 function trTogglePersona() {
   trIsAdmin = !trIsAdmin;
+  _trDeniedToastShown = false;
   const btn = document.getElementById('trPersonaBtn');
   if (btn) btn.textContent = trIsAdmin ? '👤 Admin 모드' : '👤 User 모드';
   renderTrash();
@@ -318,13 +282,9 @@ function renderAuditLog() {
     el.innerHTML = '<p class="tr-audit-empty">이력 없음</p>';
     return;
   }
-  const latest = log[0];
-  el.innerHTML = `<div class="tr-audit-row">
-    <span class="tr-mono">${escHtml(latest.at.slice(0, 16).replace('T', ' '))}</span>
-    <span class="tr-audit-actor">${escHtml(latest.actor)}</span>
-    <span class="tr-audit-action">${escHtml(latest.action === 'restore' ? '복원' : '영구삭제')}</span>
-    <span class="tr-mono">${escHtml(latest.vocId)}</span>
-  </div>`;
+  const l = log[0];
+  const act = l.action === 'restore' ? '복원' : '영구삭제';
+  el.innerHTML = `<div class="tr-audit-row"><span class="tr-mono">${escHtml(l.at.slice(0, 16).replace('T', ' '))}</span> <span class="tr-audit-actor">${escHtml(l.actor)}</span> <span class="tr-audit-action">${escHtml(act)}</span> <span class="tr-mono">${escHtml(l.vocId)}</span></div>`;
 }
 window.AdminTrash = { render: renderTrash };
 window.syncTrFilter = syncTrFilter;
@@ -335,6 +295,4 @@ window.restoreVoc = restoreVoc;
 window.purgeVoc = purgeVoc;
 window.restoreSelected = restoreSelected;
 window.purgeSelected = purgeSelected;
-window.openTrConfirm = openTrConfirm;
-window.closeTrConfirm = closeTrConfirm;
 window.trTogglePersona = trTogglePersona;

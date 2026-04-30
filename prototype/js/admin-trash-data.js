@@ -105,7 +105,7 @@ window.trashedVocData = [
     deletedByName: '한매니저',
     deletedByRole: 'manager',
     originalAssignee: '정담당',
-    deletedAt: '2026-03-31T16:45:00',
+    deletedAt: '2026-03-31T00:00:00',
     attachmentCount: 0,
   },
   {

@@ -613,9 +613,9 @@
   </div>
 
   <div class="admin-body" style="padding:16px 20px">
-    <div class="tr-info-callout" role="note">
+    <div class="tr-info-callout" role="note" id="trInfoCallout">
       <i data-lucide="info"></i>
-      <span>삭제 후 30일이 지나면 자동으로 영구 삭제됩니다. 복원 시 태그 규칙이 재실행됩니다.</span>
+      <span>삭제 후 30일이 지나면 자동으로 영구 삭제됩니다. 복원 시 태그 규칙이 재실행됩니다.<br><small>(시연 한정 — 실제 BE는 §9.4.7에 따라 영구삭제 비활성)</small></span>
     </div>
 
     <div class="tr-toolbar">
@@ -662,7 +662,7 @@
       <tbody id="trBody"></tbody>
     </table>
 
-    <details class="tr-audit">
+    <details class="tr-audit" id="trAuditWrap" open>
       <summary>최근 복원/영구삭제 이력 (voc_restore_log)</summary>
       <div id="trAuditList"></div>
     </details>
@@ -689,6 +689,20 @@
   </div>
   <div class="drawer-body" id="drawerBody">
     <!-- Filled dynamically by openDrawer() -->
+  </div>
+</div>
+
+<!-- ── Trash Confirm Modal (P-8 — separate from #modalBg) ─── -->
+<div id="trConfirmBg" class="modal-bg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="trConfirmTitle">
+    <div class="modal-header">
+      <div class="modal-title" id="trConfirmTitle"></div>
+      <button class="icon-btn" type="button" onclick="closeTrConfirm()" aria-label="닫기">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="modal-body" id="trConfirmBody"></div>
+    <div class="modal-footer" id="trConfirmFooter"></div>
   </div>
 </div>
 
@@ -823,6 +837,7 @@
 <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
 <script src="js/admin-trash-data.js"></script>
 <script src="js/admin-trash.js"></script>
+<script src="js/admin-trash-modals.js"></script>
 <!-- END P-8 Trash -->
 <script src="js/init.js"></script>
 </body>
