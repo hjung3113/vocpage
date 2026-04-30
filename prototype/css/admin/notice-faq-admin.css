@@ -70,8 +70,13 @@
 .nfa-row-actions {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
+}
+/* 노출 토글 — 액션 버튼과 시각적으로 분리 (왼쪽 클러스터) */
+.nfa-row-actions .nfa-visible-toggle {
+  flex-shrink: 0;
+  margin-right: 4px;
 }
 .nfa-action-btn {
   padding: 3px 9px;

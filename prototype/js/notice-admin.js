@@ -67,29 +67,44 @@
       var div = document.createElement('div');
       div.className = 'nfa-row-actions';
       div.innerHTML =
+        '<label class="toggle-switch nfa-visible-toggle" data-action="toggle" data-id="' +
+        id +
+        '" title="' +
+        (notice.visible ? '노출 ON — 클릭하여 비노출' : '비노출 — 클릭하여 노출 ON') +
+        '">' +
+        '<input type="checkbox" aria-label="노출 여부 토글"' +
+        (notice.visible ? ' checked' : '') +
+        '>' +
+        '<span class="toggle-slider"></span>' +
+        '</label>' +
         '<button type="button" class="nfa-action-btn" data-action="edit" data-id="' +
         id +
         '">편집</button>' +
         '<button type="button" class="nfa-action-btn danger" data-action="delete" data-id="' +
         id +
-        '">삭제</button>' +
-        '<button type="button" class="nfa-action-btn ' +
-        (notice.visible ? 'toggle-on' : 'toggle-off') +
-        '" data-action="toggle" data-id="' +
-        id +
-        '">' +
-        (notice.visible ? '노출중' : '비노출') +
-        '</button>';
+        '">삭제</button>';
       div.addEventListener('click', function (e) {
         e.stopPropagation();
-        var btn = e.target.closest('[data-action]');
-        if (!btn) return;
-        var action = btn.getAttribute('data-action');
-        var nid = parseInt(btn.getAttribute('data-id'), 10);
+        var trg = e.target.closest('[data-action]');
+        if (!trg) return;
+        var action = trg.getAttribute('data-action');
+        var nid = parseInt(trg.getAttribute('data-id'), 10);
         if (action === 'edit') openEditModal(nid);
         else if (action === 'delete') softDelete(nid);
-        else if (action === 'toggle') toggleVisibility(nid);
+        else if (action === 'toggle') {
+          // label 클릭은 브라우저 기본 동작으로 input 상태가 토글되므로,
+          // 두 번 토글되지 않도록 input 클릭 시에는 핸들러 스킵.
+          if (e.target.tagName === 'INPUT') return;
+          toggleVisibility(nid);
+        }
       });
+      // input 직접 클릭(또는 키보드 Space)은 change 이벤트로 처리
+      var chk = div.querySelector('.nfa-visible-toggle input');
+      if (chk)
+        chk.addEventListener('change', function (e) {
+          e.stopPropagation();
+          toggleVisibility(id);
+        });
       row.appendChild(div);
     });
   }

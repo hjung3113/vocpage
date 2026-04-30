@@ -28,7 +28,13 @@ function _nfMountAdmin(slotId, bodyId) {
 function renderNotices() {
   const today = new Date().toISOString().slice(0, 10);
   const el = document.getElementById('page-notices');
-  const visible = NOTICES.filter((n) => n.visible && n.from <= today && n.to >= today);
+  const adminOn =
+    window.AdminMode && window.AdminMode.isAdminMode() && window.AdminMode.canEnterAdminMode();
+  // 관리 모드: soft-delete 제외 전체 노출 (비노출/기간 외 항목도 표시 — 토글 복원 가능해야 함, spec §10.3.4 "관리 목록에는 계속 표시")
+  // 사용자 모드: 노출 ON + 기간 내 항목만
+  const visible = adminOn
+    ? NOTICES.filter((n) => !n._deleted)
+    : NOTICES.filter((n) => n.visible && n.from <= today && n.to >= today);
   const levelLabel = { urgent: '긴급', important: '중요', normal: '일반' };
   el.innerHTML = `
     <div class="admin-topbar">
@@ -71,8 +77,12 @@ let faqCategory = '전체';
 function renderFaq() {
   const el = document.getElementById('page-faq');
   const categories = ['전체', ...new Set(FAQS.map((f) => f.category))];
+  const adminOn =
+    window.AdminMode && window.AdminMode.isAdminMode() && window.AdminMode.canEnterAdminMode();
   const filtered = FAQS.filter((f) => {
-    if (!f.visible) return false;
+    if (f._deleted) return false;
+    // 관리 모드는 비노출 항목도 표시 (토글 복원 가능). 사용자 모드는 노출 ON만.
+    if (!adminOn && !f.visible) return false;
     if (faqCategory !== '전체' && f.category !== faqCategory) return false;
     if (faqQuery) {
       const q = faqQuery.toLowerCase();

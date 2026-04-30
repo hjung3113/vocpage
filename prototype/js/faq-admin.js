@@ -52,29 +52,41 @@
       var div = document.createElement('div');
       div.className = 'nfa-row-actions';
       div.innerHTML =
+        '<label class="toggle-switch nfa-visible-toggle" data-action="toggle" data-id="' +
+        id +
+        '" title="' +
+        (faq.visible ? '노출 ON — 클릭하여 비노출' : '비노출 — 클릭하여 노출 ON') +
+        '">' +
+        '<input type="checkbox" aria-label="노출 여부 토글"' +
+        (faq.visible ? ' checked' : '') +
+        '>' +
+        '<span class="toggle-slider"></span>' +
+        '</label>' +
         '<button type="button" class="nfa-action-btn" data-action="edit" data-id="' +
         id +
         '">편집</button>' +
         '<button type="button" class="nfa-action-btn danger" data-action="delete" data-id="' +
         id +
-        '">삭제</button>' +
-        '<button type="button" class="nfa-action-btn ' +
-        (faq.visible ? 'toggle-on' : 'toggle-off') +
-        '" data-action="toggle" data-id="' +
-        id +
-        '">' +
-        (faq.visible ? '노출중' : '비노출') +
-        '</button>';
+        '">삭제</button>';
       div.addEventListener('click', function (e) {
         e.stopPropagation();
-        var btn = e.target.closest('[data-action]');
-        if (!btn) return;
-        var action = btn.getAttribute('data-action');
-        var fid = parseInt(btn.getAttribute('data-id'), 10);
+        var trg = e.target.closest('[data-action]');
+        if (!trg) return;
+        var action = trg.getAttribute('data-action');
+        var fid = parseInt(trg.getAttribute('data-id'), 10);
         if (action === 'edit') window.FaqAdminModals && window.FaqAdminModals.openEditFaqModal(fid);
         else if (action === 'delete') softDelete(fid);
-        else if (action === 'toggle') toggleVisibility(fid);
+        else if (action === 'toggle') {
+          if (e.target.tagName === 'INPUT') return;
+          toggleVisibility(fid);
+        }
       });
+      var chk = div.querySelector('.nfa-visible-toggle input');
+      if (chk)
+        chk.addEventListener('change', function (e) {
+          e.stopPropagation();
+          toggleVisibility(id);
+        });
       row.appendChild(div);
     });
   }
@@ -194,15 +206,14 @@
           }).length;
           // §10.4.4 표시 토글은 인라인 즉시 반영 (admin only). manager는 라벨만.
           var visibleCell = canEdit
-            ? '<button type="button" class="nfa-cat-toggle ' +
-              (c.visible ? 'on' : 'off') +
-              '" data-cat-toggle="' +
+            ? '<label class="toggle-switch nfa-cat-toggle" data-cat-toggle="' +
               c.id +
-              '" aria-pressed="' +
-              (c.visible ? 'true' : 'false') +
-              '">' +
-              (c.visible ? 'ON' : 'OFF') +
-              '</button>'
+              '" title="사용자 노출">' +
+              '<input type="checkbox"' +
+              (c.visible ? ' checked' : '') +
+              ' aria-label="카테고리 노출 토글">' +
+              '<span class="toggle-slider"></span>' +
+              '</label>'
             : '<span class="nfa-cat-label ' +
               (c.visible ? 'on' : 'off') +
               '">' +
@@ -237,6 +248,8 @@
     wrap.addEventListener('click', function (e) {
       var toggleBtn = e.target.closest('[data-cat-toggle]');
       if (toggleBtn) {
+        // label 클릭 시 브라우저가 input에 synthetic click을 발화시켜 두 번 토글되는 것을 방지.
+        if (e.target.tagName === 'INPUT') return;
         toggleCategoryVisible(parseInt(toggleBtn.getAttribute('data-cat-toggle'), 10));
         return;
       }

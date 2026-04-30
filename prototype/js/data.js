@@ -468,6 +468,14 @@ const FAQ_CATEGORIES = [
   { id: 4, name: '기타', order: 4, visible: true },
 ];
 
+// `const` at script scope is not exposed on `window`, but notice-admin.js /
+// faq-admin.js / faq-admin-modals.js read these via `window.NOTICES` etc.
+// Without the explicit alias they fall back to `[]` and admin actions silently
+// no-op. Aliasing the same array reference keeps user-view and admin-view in sync.
+window.NOTICES = NOTICES;
+window.FAQS = FAQS;
+window.FAQ_CATEGORIES = FAQ_CATEGORIES;
+
 // ── State
 const CURRENT_USER = '홍길동';
 let currentView = 'all'; // 'all' | 'mine' | 'assigned'

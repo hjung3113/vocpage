@@ -16,6 +16,14 @@ if (window.AdminMode && typeof window.AdminMode.init === 'function') {
   window.AdminMode.init();
 }
 
+if (window.NoticeAdmin && typeof window.NoticeAdmin.init === 'function') {
+  window.NoticeAdmin.init();
+}
+
+if (window.FaqAdmin && typeof window.FaqAdmin.init === 'function') {
+  window.FaqAdmin.init();
+}
+
 lucide.createIcons();
 renderSidebar();
 renderVOCList();
