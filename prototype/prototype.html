@@ -865,29 +865,24 @@
 </div>
 
 <!-- ── Notification Panel ─── -->
+<!-- P-12: extended with type filter chips, dynamic list, urgent badge -->
 <div class="notif-panel" id="notifPanel">
   <div class="notif-header">
-    <span class="notif-title">알림</span>
+    <span class="notif-title">알림<span id="nfUnreadLabel"></span></span>
     <span class="notif-mark" onclick="markAllRead()">모두 읽음 처리</span>
   </div>
-  <div class="notif-item unread" onclick="markRead(this)">
-    <div class="notif-icon"><i data-lucide="message-circle"></i></div>
-    <div class="notif-content"><p><strong>박개발</strong>님이 <strong>분석-2025-0001</strong>에 댓글을 달았습니다.</p><div class="notif-time">방금 전</div></div>
-    <div class="notif-dot-unread"></div>
+  <!-- P-12: type filter chips -->
+  <div class="nf-chips" role="toolbar" aria-label="알림 유형 필터">
+    <button type="button" class="nf-chip nf-chip--active" data-filter="all"      onclick="filterByType('all')">전체</button>
+    <button type="button" class="nf-chip"                 data-filter="comment"  onclick="filterByType('comment')">댓글</button>
+    <button type="button" class="nf-chip"                 data-filter="status"   onclick="filterByType('status')">상태</button>
+    <button type="button" class="nf-chip"                 data-filter="assignee" onclick="filterByType('assignee')">담당자</button>
+    <button type="button" class="nf-chip"                 data-filter="urgent"   onclick="filterByType('urgent')">Urgent</button>
+    <button type="button" class="nf-chip"                 data-filter="notice"   onclick="filterByType('notice')">공지</button>
+    <button type="button" class="nf-chip"                 data-filter="faq"      onclick="filterByType('faq')">FAQ</button>
   </div>
-  <div class="notif-item unread" onclick="markRead(this)">
-    <div class="notif-icon"><i data-lucide="refresh-cw"></i></div>
-    <div class="notif-content"><p><strong>분석-2025-0001</strong> 상태가 <strong>처리중</strong>으로 변경됐습니다.</p><div class="notif-time">어제 14:23</div></div>
-    <div class="notif-dot-unread"></div>
-  </div>
-  <div class="notif-item" onclick="markRead(this)">
-    <div class="notif-icon"><i data-lucide="user-check"></i></div>
-    <div class="notif-content"><p><strong>분석-2025-0047</strong>의 담당자로 배정됐습니다.</p><div class="notif-time">어제 10:05</div></div>
-  </div>
-  <div class="notif-item" onclick="markRead(this)">
-    <div class="notif-icon"><i data-lucide="message-circle"></i></div>
-    <div class="notif-content"><p><strong>이분석</strong>님이 <strong>파이프라인-2025-0002</strong>에 댓글을 달았습니다.</p><div class="notif-time">2025.06.11</div></div>
-  </div>
+  <!-- P-12: dynamic list rendered by notif.js renderNotifPanel() -->
+  <div id="nfList"></div>
 </div>
 
 <!-- Load order matters: helpers → data → consumers → init.js (init MUST stay last) -->
