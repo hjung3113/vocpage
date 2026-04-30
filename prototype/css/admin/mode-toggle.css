@@ -13,12 +13,13 @@
   gap: 6px;
   cursor: pointer;
 }
-.am-entry-btn[aria-pressed='true'].is-on {
+/* R2: aria-pressed alone drives styling (.is-on dropped as redundant). */
+.am-entry-btn[aria-pressed='true'] {
   background: var(--accent);
   color: var(--text-on-brand);
   border-color: var(--accent);
 }
-.am-entry-btn[aria-pressed='true'].is-on i {
+.am-entry-btn[aria-pressed='true'] i {
   color: var(--text-on-brand);
 }
 @media (max-width: 640px) {
@@ -29,6 +30,7 @@
 .am-mode-banner {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 16px 24px 0;
   padding: 10px 14px;
@@ -62,6 +64,39 @@
   background: var(--accent);
   color: var(--text-on-brand);
   outline: none;
+}
+/* R2 — DRY classes for notice-faq.js (replaces 5 inline-style duplications) */
+.nf-row-divider {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.nf-title {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.nf-period {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.nf-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--text-tertiary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.nf-empty {
+  color: var(--text-tertiary);
+  padding: 32px 24px;
+}
+.nf-empty-tight {
+  padding: 16px 24px;
+}
+.nf-mark {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border-radius: 2px;
 }
 /* END B-4a Admin Mode URL Toggle */
 

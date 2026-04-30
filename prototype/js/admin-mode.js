@@ -9,6 +9,10 @@
 // - 모드 진입 버튼은 role ∈ {admin, manager} 일 때만 DOM에 렌더 (cosmetic guard;
 //   BE는 §10.5.3 별도 검증).
 // - 모드 변경 시 `admin-mode:change` CustomEvent 발화, payload = { mode, page }.
+// - isAdminMode()는 URL과 role을 AND 평가 — 무권한 deep-link 시 UI flash 방지.
+//
+// NOTE (R2): prototype은 eager `<script>` 로드. React 이관 시 §13.8/§10.5.2 MUST에
+// 따라 admin-only 핸들러 코드는 dynamic import()로 분할되어야 함.
 
 (function () {
   'use strict';
@@ -31,10 +35,6 @@
     }
   }
 
-  function isAdminMode() {
-    return urlMode() === ADMIN_VAL;
-  }
-
   function currentRole() {
     return (window.currentUser && window.currentUser.role) || 'user';
   }
@@ -43,6 +43,12 @@
   function canEnterAdminMode() {
     var r = currentRole();
     return r === 'admin' || r === 'manager';
+  }
+
+  // R2: AND with role guard — eliminates deep-link UI flash for user/dev pasting
+  // ?mode=admin. Spec §10.5.3 still mandates BE re-verification; this is cosmetic.
+  function isAdminMode() {
+    return urlMode() === ADMIN_VAL && canEnterAdminMode();
   }
 
   function pushUrl(on) {
@@ -88,6 +94,9 @@
 
   // Renders the entry button into a host slot (caller passes the slot element).
   // Idempotent — safe to call repeatedly on re-render.
+  // R2: aria-pressed semantically tracks "관리 모드 활성" (true=admin mode ON).
+  // Visible label is the *target action* per spec §10.5.2 ("읽기 모드 버튼"), so
+  // the button title carries the actual state to disambiguate for SR users.
   function renderEntryButton(slotEl) {
     if (!slotEl) return;
     if (!canEnterAdminMode()) {
@@ -95,13 +104,16 @@
       return;
     }
     var on = isAdminMode();
+    var title = on
+      ? '현재 관리 모드입니다. 클릭하면 읽기 모드로 전환합니다.'
+      : '관리 모드 진입 (?mode=admin)';
     slotEl.innerHTML =
       '<button type="button" class="am-entry-btn admin-btn' +
       (on ? ' is-on' : '') +
       '" data-am-toggle="1" aria-pressed="' +
       (on ? 'true' : 'false') +
       '" title="' +
-      (on ? '읽기 모드로 돌아가기' : '관리 모드 진입 (?mode=admin)') +
+      escHtml(title) +
       '">' +
       '<i data-lucide="' +
       (on ? 'eye' : 'settings') +
@@ -122,10 +134,11 @@
   }
 
   // Renders or removes the "현재 관리 모드입니다" banner in the page admin-body.
+  // R2: explicit role guard — non-admin pasting ?mode=admin no longer sees banner.
   function renderModeBanner(bodyEl) {
     if (!bodyEl) return;
     var existing = bodyEl.querySelector('.am-mode-banner');
-    if (!isAdminMode()) {
+    if (!isAdminMode() || !canEnterAdminMode()) {
       if (existing) existing.remove();
       return;
     }
@@ -158,6 +171,18 @@
     setTimeout(function () {
       dispatchChange(currentInfoPage());
     }, 0);
+    // R2.1: deep-link cold-start. If user lands with ?mode=admin but no info
+    // page is active yet, re-fire after the prototype's default-page activation
+    // has had a chance to run. dispatchChange reads URL fresh — idempotent.
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', function () {
+        dispatchChange(currentInfoPage());
+      });
+    } else {
+      setTimeout(function () {
+        dispatchChange(currentInfoPage());
+      }, 250);
+    }
   }
 
   window.AdminMode = {
