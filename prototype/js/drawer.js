@@ -161,6 +161,7 @@ function openDrawer(id) {
   const row = document.getElementById('row-' + id);
   if (row) row.classList.add('selected');
   lucide.createIcons();
+  document.dispatchEvent(new CustomEvent('drawer:opened', { detail: { vocId: id, voc: d } }));
 }
 
 function closeDrawer() {

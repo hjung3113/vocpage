@@ -51,6 +51,29 @@ const VOCDATA = [
 <p>단일 필터 적용 시에는 정상 동작합니다. 크롬·엣지 모두 동일하게 발생하며 콘솔에 <code>Query timeout after 30s</code> 오류가 기록됩니다.</p>
 <p>재현 방법: 차트 화면 → 기간 필터 + 부서 필터 동시 선택 → 조회 → 무한 로딩.</p>`,
     subs: ['sub1', 'sub2'],
+    review_status: 'approved',
+    subTasks: [
+      { id: 'st1', title: '원인 파악 및 쿼리 최적화 검토', done: true },
+      { id: 'st2', title: '테스트 환경 재현 및 픽스 배포', done: false },
+    ],
+    comments: [
+      {
+        id: 'c1',
+        author: '김관리',
+        author_id: 'user-admin',
+        body: '내용 검토 후 처리 예정입니다. 추가 정보가 필요하면 댓글로 남겨주세요.',
+        date: '어제 14:30',
+        _deleted: false,
+      },
+      {
+        id: 'c2',
+        author: '박개발',
+        author_id: 'user-dev',
+        body: '쿼리 타임아웃 원인 확인했습니다. 다중 필터 JOIN 최적화 진행 중입니다.',
+        date: '오늘 09:15',
+        _deleted: false,
+      },
+    ],
   },
 
   {
@@ -73,6 +96,17 @@ const VOCDATA = [
     body: `<p>월별 매출 차트에서 <strong>2025년 3월, 5월</strong> 데이터가 0으로 표시됩니다. DB에는 정상 저장되어 있고 실제 매출도 발생했습니다.</p>
 <p>다른 월은 정상이며 날짜 범위를 분기별로 변경해도 동일하게 발생합니다. 차트 렌더링 레이어의 데이터 바인딩 문제로 추정됩니다.</p>`,
     subs: [],
+    review_status: 'unverified',
+    comments: [
+      {
+        id: 'c3',
+        author: '이분석',
+        author_id: 'user-dev',
+        body: '3월 데이터 바인딩 버그 확인했습니다. 렌더 레이어 수정 예정입니다.',
+        date: '2일 전 11:20',
+        _deleted: false,
+      },
+    ],
   },
 
   {
@@ -117,6 +151,8 @@ const VOCDATA = [
     body: `<p>KPI 요약 위젯에서 전월 대비 증감률이 <strong>반대 부호</strong>로 표시됩니다. 예: 실제 10% 증가인데 -10%로 표시됩니다.</p>
 <p>모든 KPI 항목에서 동일하게 발생하며, 전일 대비 증감률은 정상입니다. 전월 비교 계산식에서 분자/분모가 뒤바뀐 것으로 추정됩니다.</p>`,
     subs: [],
+    review_status: 'rejected',
+    comments: [],
   },
 
   {
@@ -139,6 +175,8 @@ const VOCDATA = [
     body: `<p>실시간 수집 파이프라인에서 이벤트 1건이 <strong>2~3회 중복 삽입</strong>되는 현상이 확인됐습니다. 중복 건수는 일별 약 200~300건이며 고유 키 제약 위반 에러도 함께 발생합니다.</p>
 <p>네트워크 재시도 로직이 ACK 타임아웃을 중복 실패로 오인하여 재전송하는 것이 원인으로 추정됩니다.</p>`,
     subs: [],
+    review_status: 'pending_deletion',
+    comments: [],
   },
 
   {

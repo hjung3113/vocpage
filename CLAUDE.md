@@ -126,20 +126,51 @@ docs/specs/
 | Implementation plan (task added/removed) | Spec section it implements    |
 | CLAUDE.md (new rule)                     | Spec if rule affects behavior |
 
-## Session Rules
+## Input Interpretation
 
-- **No completion claims** — Never mark a task as done until the user explicitly says so
-- **No implementation without approval** — Never write actual BE/FE code until the user explicitly says to start implementation
-- **Debate, don't defer** — Do not assume the user is always right. When you see a counterargument, trade-off, or missed case in a spec or design decision, raise it before agreeing. No passive "yes" — push back, verify, or propose alternatives as a peer engineer would.
+When you receive a development request, mentally normalize it into this frame before coding. Ask only about items that materially affect the result; otherwise state your assumption and proceed.
 
-## Behavioral Guidelines
+- **Goal** — what + why (one line)
+- **Scope** — files/paths involved; what _not_ to touch
+- **Done when** — verifiable conditions (test passes, build clean, observable behavior)
+- **Constraints** — style, tokens, dependencies, existing patterns
 
-Bias toward caution over speed. For trivial tasks, use judgment.
+Skip the frame for trivial one-liners (rename, obvious typo, single-file change with explicit path).
 
-- **Think before coding** — State assumptions explicitly. If multiple interpretations exist, present them; don't pick silently. If unclear, stop and ask. (Reinforces "Debate, don't defer".)
-- **Simplicity first** — Minimum code that solves the problem. No speculative abstractions, no unrequested flexibility, no error handling for impossible scenarios. If 200 lines could be 50, rewrite. (Reinforces YAGNI.)
-- **Surgical changes** — Touch only what the request requires. Don't "improve" adjacent code, comments, or formatting. Match existing style even if you'd do it differently. Only remove orphans (imports/vars/functions) that _your_ changes made unused — leave pre-existing dead code alone (mention it instead). Every changed line must trace directly to the user's request.
-- **Goal-driven execution** — Convert tasks into verifiable goals before implementing ("Add validation" → "Write tests for invalid inputs, then make them pass"). For multi-step work, state a brief plan with per-step verification, then loop until verified.
+## Working Style
+
+- **No completion claims** — never mark a task done until the user explicitly says so
+- **No implementation without approval** — never write BE/FE code until the user says to start
+- **Debate, don't defer** — when you see a counterargument or missed case, raise it before agreeing; no passive "yes"
+- **Think before coding** — state assumptions; if multiple interpretations exist, present them, don't pick silently
+- **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite
+- **Surgical changes** — touch only what the request requires; match existing style; only remove orphans your changes made unused
+- **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified
+
+## Refactoring
+
+A refactor changes structure without changing observable behavior. Most refactor bugs are mechanical (stale references, partial migration) — catch them with checks, not cleverness.
+
+**Before:**
+
+- State the symbols/files/paths you will change (in chat, before editing)
+- Confirm tests cover the affected behavior; if not, write tests first
+- Refactor and feature change must NOT land together — split into separate commits/PRs
+
+**During:**
+
+- Use `git mv` for file moves so history follows
+- One refactor at a time
+
+**After (mandatory, in order):**
+
+1. **Update all references** — imports, dynamic strings, route paths, config (`*.json`/`*.yml`/`.env`), `docs/specs/**`, plan files, README/CLAUDE.md mentions, comments. **Nothing pointing to the old name/path may remain.**
+2. `grep -rn "<old_name>"` and `grep -rn "<old/path>"` → 0 hits (exception: a deliberate changelog entry)
+3. Typecheck passes (`tsc --noEmit` or `npm run build`)
+4. Tests pass (`npm run test`)
+5. Run the app and exercise the touched surface (UI: browser; API: endpoint)
+
+**Escalate to `code-reviewer` agent only when:** public API surface changed, ≥3 modules touched, or DB schema/migration involved. Routine renames/extracts skip the agent.
 
 ## graphify
 
