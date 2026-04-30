@@ -2402,3 +2402,283 @@
 }
 
 /* END P-7 Tag Master ────────────────────────────────────────────────────── */
+
+/* BEGIN P-8 Trash (Stage B-7 D23)                              */
+/* ============================================================ */
+
+/* ── Info callout ────────────────────────────────────────────── */
+.tr-info-callout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--brand-bg);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.tr-info-callout [data-lucide] {
+  width: 14px;
+  height: 14px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────── */
+.tr-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tr-search {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+}
+.tr-toolbar .form-select {
+  width: auto;
+  min-width: 130px;
+}
+
+/* ── Persona toggle button ───────────────────────────────────── */
+.tr-persona-btn {
+  margin-left: auto;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid var(--border-standard);
+  background: transparent;
+  color: var(--text-tertiary);
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.tr-persona-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* ── Bulk action bar ─────────────────────────────────────────── */
+.tr-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  border-radius: 7px;
+  margin-bottom: 10px;
+}
+.tr-bulk-count {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-right: 4px;
+}
+
+/* ── Denied state ────────────────────────────────────────────── */
+.tr-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 20px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+.tr-denied [data-lucide] {
+  width: 32px;
+  height: 32px;
+  color: var(--text-quaternary);
+}
+
+/* ── Table ───────────────────────────────────────────────────── */
+.tr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+.tr-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-standard);
+  white-space: nowrap;
+}
+.tr-th-check {
+  width: 32px;
+}
+.tr-th-actions {
+  width: 140px;
+}
+.tr-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+.tr-row:hover td {
+  background: var(--bg-elevated);
+}
+
+/* ── Row expiry states ───────────────────────────────────────── */
+.tr-row-soon td {
+  background: var(--status-amber-bg);
+}
+.tr-row-soon:hover td {
+  background: var(--status-amber-bg);
+}
+.tr-row-expired td {
+  opacity: 0.5;
+  background: var(--status-red-bg);
+}
+.tr-row-expired:hover td {
+  background: var(--status-red-bg);
+}
+
+/* ── Days cell ───────────────────────────────────────────────── */
+.tr-days-cell {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.tr-days-soon {
+  color: var(--status-amber);
+  font-weight: 600;
+}
+.tr-days-expired {
+  color: var(--status-red);
+  font-weight: 600;
+}
+.tr-day-icon {
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+/* ── Cell helpers ────────────────────────────────────────────── */
+.tr-mono {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+.tr-title-cell {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tr-attach-note {
+  font-size: 11px;
+  color: var(--text-quaternary);
+  margin-left: 4px;
+}
+.tr-action-cell {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── Role badge ──────────────────────────────────────────────── */
+.tr-role-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 3px;
+}
+.tr-role-admin {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border: 1px solid var(--brand-border);
+}
+.tr-role-manager {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border: 1px solid var(--status-amber-border);
+}
+
+/* ── Empty state (§13.11) ────────────────────────────────────── */
+.tr-empty-cell {
+  text-align: center;
+  padding: 48px 0 !important;
+}
+.tr-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.tr-empty-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--text-quaternary);
+}
+.tr-empty-msg {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+/* ── Confirm modal body ──────────────────────────────────────── */
+.tr-confirm-body p {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  line-height: 1.6;
+}
+.tr-danger-warn {
+  color: var(--status-red) !important;
+  font-weight: 600;
+}
+
+/* ── Audit log ───────────────────────────────────────────────── */
+.tr-audit {
+  margin-top: 24px;
+  border: 1px solid var(--border-standard);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tr-audit summary {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: var(--bg-elevated);
+  user-select: none;
+}
+.tr-audit summary:hover {
+  background: var(--bg-surface);
+}
+.tr-audit-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  border-top: 1px solid var(--border-subtle);
+}
+.tr-audit-actor {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.tr-audit-action {
+  color: var(--accent);
+}
+.tr-audit-empty {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-quaternary);
+  margin: 0;
+}
+
+/* ============================================================ */
+/* END P-8 Trash                                                 */

@@ -53,6 +53,9 @@
     <!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
     <div class="nav-item" onclick="setNav(this)" data-page="tag-master"><i data-lucide="hash"></i> 태그 마스터</div>
     <!-- END P-7 Tag Master -->
+    <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
+    <div class="nav-item" onclick="setNav(this)" data-page="trash"><i data-lucide="trash-2"></i> 휴지통</div>
+    <!-- END P-8 Trash -->
   </div>
   </div>
   <div class="sidebar-user">
@@ -601,7 +604,9 @@
 <!-- ── Result Review (Stage B-1 P-1.C1) ─── -->
 <div id="page-result-review" class="admin-page"></div>
 
-<!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
+<!-- ============================================================ -->
+<!-- BEGIN P-7 Tag Master (Stage B-6 D22)                          -->
+<!-- ============================================================ -->
 <div id="page-tag-master" class="admin-page">
   <div class="admin-topbar">
     <span class="admin-title">태그 마스터</span>
@@ -634,6 +639,75 @@
 </div>
 <!-- END P-7 Tag Master -->
 
+<!-- ============================================================ -->
+<!-- BEGIN P-8 Trash (Stage B-7 D23)                              -->
+<!-- ============================================================ -->
+<section id="page-trash" class="admin-page">
+  <div class="admin-topbar">
+    <span class="admin-title">휴지통</span>
+    <span class="section-count-badge" id="trCount">0건</span>
+    <div class="spacer"></div>
+    <button type="button" class="tr-persona-btn" id="trPersonaBtn" onclick="trTogglePersona()">👤 Admin 모드</button>
+  </div>
+
+  <div class="admin-body" style="padding:16px 20px">
+    <div class="tr-info-callout" role="note" id="trInfoCallout">
+      <i data-lucide="info"></i>
+      <span>삭제 후 30일이 지나면 자동으로 영구 삭제됩니다. 복원 시 태그 규칙이 재실행됩니다.<br><small>(시연 한정 — 실제 BE는 §9.4.7에 따라 영구삭제 비활성)</small></span>
+    </div>
+
+    <div class="tr-toolbar">
+      <input id="trSearch" class="form-input tr-search" placeholder="제목 또는 이슈 ID 검색" oninput="syncTrFilter()" />
+      <select id="trRange" class="form-select" onchange="syncTrFilter()">
+        <option value="all">전체 기간</option>
+        <option value="today">오늘</option>
+        <option value="7d">최근 7일</option>
+        <option value="30d">최근 30일</option>
+        <option value="overdue">30일 초과 (만료 대상)</option>
+      </select>
+      <select id="trSystem" class="form-select" onchange="syncTrFilter()">
+        <option value="all">전체 시스템</option>
+      </select>
+    </div>
+
+    <div id="trBulkBar" class="tr-bulk-bar" hidden>
+      <span class="tr-bulk-count"><span id="trSelectedCount">0</span>건 선택</span>
+      <button type="button" class="a-btn primary" onclick="restoreSelected()">선택 복원</button>
+      <button type="button" class="a-btn danger" onclick="purgeSelected()">선택 영구삭제</button>
+      <button type="button" class="a-btn" onclick="clearTrSelection()">선택 해제</button>
+    </div>
+
+    <div id="trDenied" class="tr-denied" hidden>
+      <i data-lucide="lock"></i>
+      <span>Admin 권한이 필요합니다.</span>
+    </div>
+
+    <table class="tr-table" id="trTable">
+      <thead>
+        <tr>
+          <th class="tr-th-check"><input type="checkbox" id="trSelectAll" onchange="toggleSelectAll(this)" aria-label="전체 선택" /></th>
+          <th>이슈 ID</th>
+          <th>제목</th>
+          <th>상태</th>
+          <th>시스템/메뉴</th>
+          <th>삭제자</th>
+          <th>원담당자</th>
+          <th>삭제일</th>
+          <th>잔여일</th>
+          <th class="tr-th-actions">작업</th>
+        </tr>
+      </thead>
+      <tbody id="trBody"></tbody>
+    </table>
+
+    <details class="tr-audit" id="trAuditWrap" open>
+      <summary>최근 복원/영구삭제 이력 (voc_restore_log)</summary>
+      <div id="trAuditList"></div>
+    </details>
+  </div>
+</section>
+<!-- END P-8 Trash -->
+
 </main>
 
 <!-- ── Drawer ─── -->
@@ -653,6 +727,20 @@
   </div>
   <div class="drawer-body" id="drawerBody">
     <!-- Filled dynamically by openDrawer() -->
+  </div>
+</div>
+
+<!-- ── Trash Confirm Modal (P-8 — separate from #modalBg) ─── -->
+<div id="trConfirmBg" class="modal-bg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="trConfirmTitle">
+    <div class="modal-header">
+      <div class="modal-title" id="trConfirmTitle"></div>
+      <button class="icon-btn" type="button" onclick="closeTrConfirm()" aria-label="닫기">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="modal-body" id="trConfirmBody"></div>
+    <div class="modal-footer" id="trConfirmFooter"></div>
   </div>
 </div>
 
@@ -789,6 +877,11 @@
 <script src="js/dashboard-data.js"></script>
 <script src="js/dashboard-render.js"></script>
 <script src="js/dashboard-actions.js"></script>
+<!-- BEGIN P-8 Trash (Stage B-7 D23) -->
+<script src="js/admin-trash-data.js"></script>
+<script src="js/admin-trash.js"></script>
+<script src="js/admin-trash-modals.js"></script>
+<!-- END P-8 Trash -->
 <script src="js/init.js"></script>
 </body>
 </html>
