@@ -36,9 +36,3 @@ Full schema DDL and column-level spec: `docs/specs/requires/requirements.md` (da
 ## Business Rules (cross-reference)
 
 Behavioral contracts (what auto-tagging does, what the AD session middleware rejects, sub-task propagation rules) live in `docs/specs/requires/requirements.md`. **Do not duplicate behavioral rules into code comments** — link to the spec section.
-
-## Safety Echoes (also in root)
-
-- **No implementation without approval** — never write route/service code until the user explicitly says to start
-- **Never push directly to main** — feature branch → PR → merge
-- **Canonical docs live in `docs/specs/`** — not `.omc/plans/` or tool scratch dirs
