@@ -47,9 +47,15 @@
   // ── Panel DOM IDs
   var PANEL_ID   = 'dspPanel';
   var BACKDROP_ID = 'dspBackdrop';
+  var _prevFocus = null; // R2: return-focus on close (a11y WCAG 2.4.3)
+
+  function isAdminRole() {
+    return (window.currentUser && window.currentUser.role) === 'admin';
+  }
 
   // ── Open
   function openPanel() {
+    _prevFocus = document.activeElement;
     var panel    = document.getElementById(PANEL_ID);
     var backdrop = document.getElementById(BACKDROP_ID);
     if (!panel) { _buildPanel(); panel = document.getElementById(PANEL_ID); backdrop = document.getElementById(BACKDROP_ID); }
@@ -67,6 +73,11 @@
     var backdrop = document.getElementById(BACKDROP_ID);
     if (panel)    panel.setAttribute('data-open', 'false');
     if (backdrop) backdrop.setAttribute('data-open', 'false');
+    // R2: restore focus to the trigger element
+    if (_prevFocus && typeof _prevFocus.focus === 'function') {
+      try { _prevFocus.focus(); } catch (_) {}
+    }
+    _prevFocus = null;
   }
 
   // ── Load draft for active tab
@@ -82,11 +93,24 @@
   // ── Save
   function _save() {
     var userId = (window.currentUser && window.currentUser.id) || 'u-user';
+    if (_activeTab === 'admin' && !isAdminRole()) {
+      // R2: action-time admin guard (defense-in-depth — render-time gate could
+      // be bypassed via console).
+      if (typeof window.showToast === 'function') {
+        window.showToast('기본값 변경 권한이 없습니다.', 'warn');
+      }
+      return;
+    }
     if (_activeTab === 'personal') {
       MY_SETTINGS[userId] = _draft.map(function (w) { return Object.assign({}, w); });
     } else {
       DASHBOARD_DEFAULTS = _draft.map(function (w) { return Object.assign({}, w); });
     }
+    // R2: dispatch event so dashboard grid can re-render (verifier P0 — without
+    // this the feature is non-functional end-to-end).
+    document.dispatchEvent(new CustomEvent('dashboard:settings-changed', {
+      detail: { tab: _activeTab, userId: userId, widgets: _draft.slice() },
+    }));
     if (typeof window.showToast === 'function') {
       window.showToast('저장되었습니다.', 'ok');
     }
@@ -120,10 +144,10 @@
         '<span class="dsp-title">대시보드 설정</span>' +
         '<button class="dsp-close-btn" aria-label="닫기" onclick="DashboardSettingsPanel.close()">&#x2715;</button>' +
       '</div>' +
-      '<div class="dsp-tabs" id="dspTabs">' +
-        '<button class="dsp-tab active" data-tab="personal" onclick="DashboardSettingsPanel._switchTab(\'personal\')">내 설정</button>' +
+      '<div class="dsp-tabs" id="dspTabs" role="tablist">' +
+        '<button class="dsp-tab active" data-tab="personal" role="tab" aria-selected="true" onclick="DashboardSettingsPanel._switchTab(\'personal\')">내 설정</button>' +
         (isAdmin
-          ? '<button class="dsp-tab" data-tab="admin" onclick="DashboardSettingsPanel._switchTab(\'admin\')">기본값 <span class="dsp-tab-badge">Admin</span></button>'
+          ? '<button class="dsp-tab" data-tab="admin" role="tab" aria-selected="false" onclick="DashboardSettingsPanel._switchTab(\'admin\')">기본값 <span class="dsp-tab-badge">Admin</span></button>'
           : '') +
       '</div>' +
       '<div class="dsp-list-wrap" id="dspListWrap"></div>' +
@@ -145,12 +169,21 @@
 
   // ── Switch tab
   function _switchTab(tab) {
+    // R2: admin guard at action time (render-time gate is cosmetic only).
+    if (tab === 'admin' && !isAdminRole()) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('기본값 탭은 Admin 전용입니다.', 'warn');
+      }
+      return;
+    }
     _activeTab = tab;
     _loadDraft();
     _renderContent();
     var tabs = document.querySelectorAll('#dspTabs .dsp-tab');
     tabs.forEach(function (t) {
-      t.classList.toggle('active', t.getAttribute('data-tab') === tab);
+      var on = t.getAttribute('data-tab') === tab;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
     });
   }
 
