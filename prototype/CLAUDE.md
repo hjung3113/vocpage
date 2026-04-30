@@ -10,7 +10,24 @@ This directory is a **visual sandbox** for design reviews — dashboard mockups,
 
 - Prototype HTML is **not** production code. Do not wire it to backend APIs.
 - When a prototype graduates to implementation, the real version goes into `frontend/` — the prototype stays as a reference snapshot.
-- Do not add build tooling here. Plain HTML + `<style>` blocks + inline `<script>` only.
+- No bundler / no transpile. The prototype loads as static HTML with `<link>` to split CSS files under `css/` and classic `<script>` tags loading modules under `js/` (Stage A-2 / A-4 split, see `docs/specs/plans/prototype-phase7-wave3-plan.md`).
+- `package.json` exists only for Playwright-driven smoke verification (`scripts/`); no app-level build step.
+
+## Layout
+
+- `prototype.html` — single entry document (~929 lines, intentionally not split further).
+- `css/` — split modules (`admin/`, `components/`, `layout/`); each file ≤500 lines.
+- `js/` — 16+ modules; data exposed on `window` via explicit aliases in `data.js` (classic-script gotcha — `const NOTICES` etc. don't auto-attach).
+- `screenshots/` — captured reference snapshots.
+- `scripts/` — Playwright + tooling helpers.
+
+## Preview
+
+Open `prototype.html` directly in a browser, or serve the directory:
+
+```bash
+npx http-server prototype -p 8080
+```
 
 ## Design Tokens (authoritative — echoed here because this is a rendered visual surface)
 
