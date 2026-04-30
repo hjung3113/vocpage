@@ -1,7 +1,8 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-04-27 (PR #54 머지 + Phase 재정렬: prototype 고도화를 Phase 7로 신설)
-> 현재 위치: Phase 7 (prototype 고도화)
+> 최종 업데이트: 2026-04-30 (Phase 7 Wave 1 종료 — P-5/P-6/P-7/P-8/P-10/P-12 ✅)
+> 현재 위치: Phase 7 Wave 2 진입 — 다음 작업 = B-5 역할 토글
+> Wave 2 plan: `plans/prototype-phase7-wave2.md`
 
 ---
 
@@ -60,9 +61,9 @@
 
 ---
 
-## 다음 세션 — 결정 + 적용 (2026-04-27 cross-review 후속)
+## 2026-04-27 cross-review 처리 결과 ✅ 완료
 
-> 출처: `docs/specs/reviews/cross-review-2026-04-27.md`. 4개 도메인 리뷰 결과 식별된 **결정 5건 + 즉시 적용 5건**. **2026-04-27 일괄 처리 완료**.
+> 출처: cross-review (삭제됨, git 히스토리 참조). 4개 도메인 리뷰 결과 식별된 **결정 5건 + 즉시 적용 5건**. **2026-04-27 일괄 처리 완료**.
 
 ### 결정 (Open Questions) — ✅ 2026-04-27 확정
 
