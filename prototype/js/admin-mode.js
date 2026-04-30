@@ -171,6 +171,18 @@
     setTimeout(function () {
       dispatchChange(currentInfoPage());
     }, 0);
+    // R2.1: deep-link cold-start. If user lands with ?mode=admin but no info
+    // page is active yet, re-fire after the prototype's default-page activation
+    // has had a chance to run. dispatchChange reads URL fresh — idempotent.
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', function () {
+        dispatchChange(currentInfoPage());
+      });
+    } else {
+      setTimeout(function () {
+        dispatchChange(currentInfoPage());
+      }, 250);
+    }
   }
 
   window.AdminMode = {
