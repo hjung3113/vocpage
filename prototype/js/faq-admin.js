@@ -69,7 +69,8 @@
     bar.innerHTML =
       '<div class="nfa-tab-group">' +
       '<button type="button" class="nfa-tab-btn' + (activeTab === 'faqs' ? ' active' : '') + '" data-tab="faqs">FAQ 항목</button>' +
-      (isAdmin() ? '<button type="button" class="nfa-tab-btn' + (activeTab === 'categories' ? ' active' : '') + '" data-tab="categories">카테고리 관리</button>' : '') +
+      // Manager는 read-only로 카테고리 탭 노출 (spec §10.5.3 "Manager FAQ 카테고리 읽기 전용")
+      '<button type="button" class="nfa-tab-btn' + (activeTab === 'categories' ? ' active' : '') + '" data-tab="categories">카테고리 관리</button>' +
       '</div>' +
       (activeTab === 'faqs'
         ? '<button type="button" class="nfa-btn-add" id="faqAddBtn">+ FAQ 등록</button>'
@@ -90,7 +91,7 @@
     if (activeTab === 'faqs') {
       injectFaqRowActions(bodyEl);
       renderDeletedSection(bodyEl);
-    } else if (activeTab === 'categories' && isAdmin()) {
+    } else if (activeTab === 'categories') {
       renderCategoryTab(bodyEl);
     }
   }
@@ -127,25 +128,35 @@
 
   // ── category table (admin only)
   function renderCategoryTab(bodyEl) {
-    if (!isAdmin()) return;
     var oldWrap = bodyEl.querySelector('.nfa-cat-wrap');
     if (oldWrap) oldWrap.remove();
     var cats = (window.FAQ_CATEGORIES || []).slice().sort(function (a, b) { return a.order - b.order; });
+    var canEdit = isAdmin();
     var wrap = document.createElement('div');
     wrap.className = 'nfa-cat-wrap';
+    var actionsHeader = canEdit ? '<th class="nfa-cat-actions">액션</th>' : '';
     wrap.innerHTML =
       '<table class="nfa-cat-table"><thead><tr>' +
-      '<th>이름</th><th>순서</th><th>표시</th><th>FAQ 수</th><th>액션</th>' +
+      '<th>이름</th><th>순서</th><th>표시</th><th>FAQ 수</th>' + actionsHeader +
       '</tr></thead><tbody>' +
       cats.map(function (c) {
         var cnt = (window.FAQS || []).filter(function (f) { return f.category === c.name && !f._deleted; }).length;
+        // §10.4.4 표시 토글은 인라인 즉시 반영 (admin only). manager는 라벨만.
+        var visibleCell = canEdit
+          ? '<button type="button" class="nfa-cat-toggle ' + (c.visible ? 'on' : 'off') + '" data-cat-toggle="' + c.id + '" aria-pressed="' + (c.visible ? 'true' : 'false') + '">' + (c.visible ? 'ON' : 'OFF') + '</button>'
+          : '<span class="nfa-cat-label ' + (c.visible ? 'on' : 'off') + '">' + (c.visible ? 'ON' : 'OFF') + '</span>';
+        var actionsCell = canEdit
+          ? '<td class="nfa-cat-actions"><button type="button" class="nfa-action-btn" data-cat-edit="' + c.id + '">편집</button> ' +
+            '<button type="button" class="nfa-action-btn danger" data-cat-delete="' + c.id + '">삭제</button></td>'
+          : '';
         return '<tr><td>' + esc(c.name) + '</td><td>' + esc(c.order) + '</td>' +
-          '<td>' + (c.visible ? '<span style="color:var(--accent);font-size:12px">ON</span>' : '<span style="color:var(--text-quaternary);font-size:12px">OFF</span>') + '</td>' +
+          '<td>' + visibleCell + '</td>' +
           '<td>' + cnt + '건</td>' +
-          '<td style="white-space:nowrap"><button type="button" class="nfa-action-btn" data-cat-edit="' + c.id + '">편집</button> ' +
-          '<button type="button" class="nfa-action-btn danger" data-cat-delete="' + c.id + '">삭제</button></td></tr>';
+          actionsCell + '</tr>';
       }).join('') + '</tbody></table>';
     wrap.addEventListener('click', function (e) {
+      var toggleBtn = e.target.closest('[data-cat-toggle]');
+      if (toggleBtn) { toggleCategoryVisible(parseInt(toggleBtn.getAttribute('data-cat-toggle'), 10)); return; }
       var editBtn = e.target.closest('[data-cat-edit]');
       if (editBtn) { window.FaqAdminModals && window.FaqAdminModals.openEditCategoryModal(parseInt(editBtn.getAttribute('data-cat-edit'), 10)); return; }
       var delBtn = e.target.closest('[data-cat-delete]');
@@ -154,8 +165,18 @@
     bodyEl.appendChild(wrap);
   }
 
+  function toggleCategoryVisible(id) {
+    if (!isAdmin()) { toast('카테고리 표시 변경 권한이 없습니다.', 'warn'); return; }
+    var cat = (window.FAQ_CATEGORIES || []).find(function (c) { return c.id === id; });
+    if (!cat) return;
+    cat.visible = !cat.visible;
+    toast(cat.visible ? '카테고리 표시 ON' : '카테고리 표시 OFF', 'ok');
+    if (typeof window.renderFaq === 'function') window.renderFaq();
+  }
+
   // ── CRUD actions
   function toggleVisibility(id) {
+    if (!isAdminMode()) { toast('관리 모드가 아닙니다.', 'warn'); return; }
     var f = (window.FAQS || []).find(function (x) { return x.id === id; });
     if (!f) return;
     f.visible = !f.visible;
@@ -164,6 +185,7 @@
   }
 
   function softDelete(id) {
+    if (!isAdminMode()) { toast('관리 모드가 아닙니다.', 'warn'); return; }
     var f = (window.FAQS || []).find(function (x) { return x.id === id; });
     if (!f) return;
     f._deleted = true;
@@ -188,7 +210,8 @@
     if (!cat) return;
     var count = (window.FAQS || []).filter(function (f) { return f.category === cat.name && !f._deleted; }).length;
     if (count > 0) { toast('해당 카테고리에 FAQ 항목이 있어 삭제할 수 없습니다.', 'warn'); return; }
-    window.FAQ_CATEGORIES = cats.filter(function (c) { return c.id !== id; });
+    var idx = cats.findIndex(function (c) { return c.id === id; });
+    if (idx >= 0) cats.splice(idx, 1);
     toast('카테고리가 삭제되었습니다.', 'ok');
     if (typeof window.renderFaq === 'function') window.renderFaq();
   }
@@ -225,7 +248,8 @@
     if (window.FaqAdminModals) window.FaqAdminModals.init();
     document.addEventListener('admin-mode:change', onAdminModeChange);
     document.addEventListener('role:change', onAdminModeChange);
-    setTimeout(onAdminModeChange, 80);
+    // R2: removed setTimeout kludge — admin-mode.init() dispatches its own
+    // initial event.
   }
 
   window.FaqAdmin = {

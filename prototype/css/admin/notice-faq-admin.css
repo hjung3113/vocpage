@@ -195,13 +195,39 @@
 .nfa-cat-wrap {
   padding: 12px 24px;
 }
+/* R2: replace inline JS styles with classes */
+.nfa-cat-toggle {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-elevated);
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.nfa-cat-toggle.on {
+  color: var(--accent);
+  border-color: var(--brand-border);
+  background: var(--brand-bg);
+}
+.nfa-cat-toggle.off {
+  color: var(--text-quaternary);
+}
+.nfa-cat-label {
+  font-size: 12px;
+}
+.nfa-cat-label.on { color: var(--accent); }
+.nfa-cat-label.off { color: var(--text-quaternary); }
+.nfa-cat-actions { white-space: nowrap; }
+.nfa-field textarea.tall { min-height: 100px; }
 
 /* ── Modal overlay */
 .nfa-modal-bg {
   display: none;
   position: fixed;
   inset: 0;
-  background: var(--overlay-bg, rgba(0, 0, 0, 0.45));
+  background: var(--overlay);
   z-index: 1000;
   align-items: center;
   justify-content: center;
@@ -217,7 +243,7 @@
   max-width: calc(100vw - 40px);
   max-height: calc(100vh - 80px);
   overflow-y: auto;
-  box-shadow: 0 8px 32px var(--shadow-overlay, rgba(0, 0, 0, 0.3));
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
 }

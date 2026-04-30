@@ -104,6 +104,7 @@
   }
 
   function toggleVisibility(id) {
+    if (!isAdminMode()) { toast('관리 모드가 아닙니다.', 'warn'); return; }
     var n = (window.NOTICES || []).find(function (x) { return x.id === id; });
     if (!n) return;
     n.visible = !n.visible;
@@ -112,6 +113,7 @@
   }
 
   function softDelete(id) {
+    if (!isAdminMode()) { toast('관리 모드가 아닙니다.', 'warn'); return; }
     var n = (window.NOTICES || []).find(function (x) { return x.id === id; });
     if (!n) return;
     n._deleted = true; n.visible = false;
@@ -150,7 +152,10 @@
     if (!bg) return;
     bg.querySelector('.nfa-modal-title').textContent = modalMode === 'create' ? '공지 등록' : '공지 수정';
     bg.querySelector('#nfaNoticeTitle').value = data.title || '';
-    bg.querySelector('#nfaNoticeContent').value = (data.content || '').replace(/<[^>]*>/g, '');
+    // R2: safe HTML→text via detached DOM (regex tag-stripper bypass-prone)
+    var tmp = document.createElement('div');
+    tmp.innerHTML = data.content || '';
+    bg.querySelector('#nfaNoticeContent').value = tmp.textContent || '';
     bg.querySelector('#nfaNoticeLevel').innerHTML = levelOptions(data.level || 'normal');
     bg.querySelector('#nfaNoticeFrom').value = data.from || '';
     bg.querySelector('#nfaNoticeTo').value = data.to || '';
@@ -233,11 +238,19 @@
     attachObserver();
   }
 
+  function _onEscClose(e) {
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('.nfa-modal-bg.open');
+    if (open) open.classList.remove('open');
+  }
+
   function init() {
     buildModalDom();
     document.addEventListener('admin-mode:change', onAdminModeChange);
     document.addEventListener('role:change', onAdminModeChange);
-    setTimeout(onAdminModeChange, 50);
+    document.addEventListener('keydown', _onEscClose);
+    // R2: removed setTimeout kludge — admin-mode.init() dispatches its own
+    // initial event (admin-mode.js setTimeout(0) at end of init).
   }
 
   window.NoticeAdmin = {

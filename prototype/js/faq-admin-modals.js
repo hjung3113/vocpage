@@ -53,7 +53,10 @@
     if (!bg) return;
     bg.querySelector('.nfa-modal-title').textContent = faqModalMode === 'create' ? 'FAQ 등록' : 'FAQ 수정';
     bg.querySelector('#nfaFaqQ').value = data.q || '';
-    bg.querySelector('#nfaFaqA').value = (data.a || '').replace(/<[^>]*>/g, '');
+    // R2: safe HTML→text via detached DOM (regex tag-stripper bypass-prone)
+    var tmp = document.createElement('div');
+    tmp.innerHTML = data.a || '';
+    bg.querySelector('#nfaFaqA').value = tmp.textContent || '';
     bg.querySelector('#nfaFaqCategory').innerHTML = categoryOptions(data.category);
     bg.querySelector('#nfaFaqVisible').checked = data.visible !== false;
     bg.classList.add('open');
@@ -149,7 +152,7 @@
           '<div class="nfa-modal-body">' +
             '<div class="nfa-field"><label>질문</label><input type="text" id="nfaFaqQ" placeholder="질문 내용"></div>' +
             '<div class="nfa-field"><label>답변 (Toast UI Editor 자리표시자)</label>' +
-            '<textarea id="nfaFaqA" style="min-height:100px" placeholder="답변 내용"></textarea></div>' +
+            '<textarea id="nfaFaqA" class="tall" placeholder="답변 내용"></textarea></div>' +
             '<div class="nfa-field"><label>카테고리</label><select id="nfaFaqCategory"></select></div>' +
             '<label class="nfa-checkbox-row"><input type="checkbox" id="nfaFaqVisible"> 노출 여부 ON</label>' +
           '</div>' +
@@ -189,7 +192,14 @@
     }
   }
 
+  function _onEscClose(e) {
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('.nfa-modal-bg.open');
+    if (open) open.classList.remove('open');
+  }
+
   function init() {
+    document.addEventListener('keydown', _onEscClose);
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', buildModalDoms);
     } else {
