@@ -1,5 +1,10 @@
-const ROLE_MAP = { admin: 'Admin', manager: 'Manager', user: 'User' };
-const ROLE_CLS = { admin: 'role-admin', manager: 'role-manager', user: 'role-user' };
+const ROLE_MAP = { admin: 'Admin', manager: 'Manager', dev: 'Dev', user: 'User' };
+const ROLE_CLS = {
+  admin: 'role-admin',
+  manager: 'role-manager',
+  dev: 'role-dev',
+  user: 'role-user',
+};
 function renderUsers() {
   const tbody = document.getElementById('usersBody');
   tbody.innerHTML = ADMIN_USERS.map(

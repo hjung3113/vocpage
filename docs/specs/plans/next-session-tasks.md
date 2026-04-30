@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
 > 최종 업데이트: 2026-04-30 (Phase 7 Wave 1 종료 — P-5/P-6/P-7/P-8/P-10/P-12 ✅)
-> 현재 위치: Phase 7 Wave 2 진입 — 다음 작업 = B-5 역할 토글
+> 현재 위치: Phase 7 Wave 2 — B-5 ✅ (2026-04-30, R3 PASS) → 다음 = B-3 공지 로그인 팝업
 > Wave 2 plan: `plans/prototype-phase7-wave2.md`
 
 ---
@@ -153,7 +153,7 @@
 | ID   | 항목                                                                                                                  | 상태                                                    |
 | ---- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | P-1  | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel)                            | ✅ B-1 Result Review detail drawer 완료 (R3 fixes 적용) |
-| P-2  | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글                                          | -                                                       |
+| P-2  | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글                                          | ✅ Wave 2 B-5 (2026-04-30, R3 PASS, 99028af)            |
 | P-3  | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                                         | -                                                       |
 | P-4  | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                                                      | -                                                       |
 | P-5  | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표 작성                                                 | ✅ Wave 1 (2026-04-30, 74% coverage 70/94)              |
