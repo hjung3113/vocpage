@@ -8,6 +8,12 @@
 
   var SEVERITY_ORDER = { urgent: 0, important: 1, normal: 2 };
   var SEVERITY_LABEL = { urgent: '긴급', important: '중요', normal: '일반' };
+  // R2 fix (security P2): allow-list level values to prevent CSS class injection
+  // when content shape drifts (e.g., BE adds new severity).
+  var ALLOWED_LEVELS = { urgent: 1, important: 1, normal: 1 };
+  function safeLevel(lv) {
+    return ALLOWED_LEVELS[lv] ? lv : 'normal';
+  }
 
   function escHtml(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -67,9 +73,9 @@
       escHtml(String(n.id)) +
       '">' +
       '<span class="notice-badge notice-badge-' +
-      escHtml(n.level) +
+      escHtml(safeLevel(n.level)) +
       '">' +
-      escHtml(SEVERITY_LABEL[n.level] || n.level) +
+      escHtml(SEVERITY_LABEL[safeLevel(n.level)]) +
       '</span>' +
       '<span class="np-item-title">' +
       escHtml(n.title) +
@@ -83,9 +89,9 @@
     return (
       '<div class="np-detail-header">' +
       '<span class="notice-badge notice-badge-' +
-      escHtml(n.level) +
+      escHtml(safeLevel(n.level)) +
       '">' +
-      escHtml(SEVERITY_LABEL[n.level] || n.level) +
+      escHtml(SEVERITY_LABEL[safeLevel(n.level)]) +
       '</span>' +
       '<h3 class="np-detail-title">' +
       escHtml(n.title) +
@@ -122,6 +128,13 @@
     refreshDetail();
   }
 
+  /**
+   * Close popup and optionally persist dismissal.
+   * @param {boolean} saveDismiss - true ONLY when user explicitly committed
+   *   via the footer 닫기 button with the "오늘 하루 보지 않기" checkbox checked.
+   *   X button / Esc / outside-click are non-commit (always false) — see R2
+   *   review feedback (verifier Gap 1, architect P1).
+   */
   function close(saveDismiss) {
     if (saveDismiss) {
       localStorage.setItem(dismissKey(), tomorrowStr());
@@ -131,12 +144,53 @@
     document.removeEventListener('keydown', onKey);
   }
 
+  // R2 fix (verifier P1): Esc never persists dismissal — keyboard escape is
+  // a "cancel" action consistent with X button. Only the explicit 닫기 button
+  // commits the checkbox state.
   function onKey(e) {
     if (e.key === 'Escape') {
       e.preventDefault();
-      var cb = document.getElementById('npHideToday');
-      close(cb ? cb.checked : false);
+      close(false);
+      return;
     }
+    if (e.key === 'Tab') {
+      // R2 fix (critic P1): focus trap. Cycle within dialog focusables.
+      var dialog = document.querySelector('.notice-popup-dialog');
+      if (!dialog) return;
+      var focusables = dialog.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  // R2 fix (critic P1): WAI-ARIA listbox keyboard contract — ↑↓/Home/End move
+  // selection across notices, Enter confirms (no-op since selection commits on
+  // ArrowKey itself per APG pattern).
+  function onListKey(e) {
+    if (!notices.length) return;
+    var idx = notices.findIndex(function (n) {
+      return n.id === selectedId;
+    });
+    var next = idx;
+    if (e.key === 'ArrowDown') next = Math.min(notices.length - 1, idx + 1);
+    else if (e.key === 'ArrowUp') next = Math.max(0, idx - 1);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = notices.length - 1;
+    else return;
+    e.preventDefault();
+    selectNotice(notices[next].id);
+    var node = document.querySelector(
+      '#npList .np-item[data-id="' + escHtml(String(notices[next].id)) + '"]',
+    );
+    if (node) node.focus();
   }
 
   function build() {
@@ -170,12 +224,16 @@
     refreshList();
     refreshDetail();
 
-    document.getElementById('npList').addEventListener('click', function (e) {
+    var listEl = document.getElementById('npList');
+    listEl.addEventListener('click', function (e) {
       var item = e.target.closest('.np-item');
       if (!item) return;
+      // NOTE: data.js NOTICES.id is integer; if BE later returns string ids,
+      // adjust both data-id render and this Number() cast together.
       var id = Number(item.getAttribute('data-id'));
       if (!Number.isNaN(id)) selectNotice(id);
     });
+    listEl.addEventListener('keydown', onListKey);
 
     var closeBtn = document.getElementById('npClose');
     var xBtn = document.getElementById('npX');
@@ -199,6 +257,8 @@
   }
 
   function init() {
+    // R2 fix (code-reviewer P2): re-entry guard against double init in dev/HMR.
+    if (document.getElementById('noticePopupOverlay')) return;
     if (isDismissed()) return;
     notices = eligibleNotices();
     if (!notices.length) return;

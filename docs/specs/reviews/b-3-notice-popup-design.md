@@ -62,6 +62,27 @@ prototype의 로그인 시 공지 팝업을 spec 정합 2-panel 모달로 재구
 - append-only (components.css 기존 영역 보존)
 - 자가 리뷰 금지 — 5 전문가 lane 별도 dispatch
 
+## R1 → R2 변경 (5인 리뷰 P0/P1 fix)
+
+| 영역                     | R1 결함                                                          | R2 fix                                                                                                                                                                                                 |
+| ------------------------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| critic P0 시각           | `.np-header-title` 15px (spec §13.9 "16px" 위배)                 | 16px로 수정                                                                                                                                                                                            |
+| critic P1 키보드         | `role=listbox` 선언했으나 ↑↓/Home/End 핸들러 없음 (APG 위반)     | `onListKey` 추가, ArrowUp/Down/Home/End로 selection 이동 + focus 추적                                                                                                                                  |
+| critic P1 focus trap     | Tab이 모달 밖으로 빠져나감                                       | `onKey` Tab handler — Shift+Tab on first / Tab on last → wrap 안에서 순환                                                                                                                              |
+| verifier Gap 1           | Esc → close(체크 시 저장) — design doc "no save"와 불일치        | `close(false)` 강제 — Esc는 항상 cancel, 닫기 버튼만 commit                                                                                                                                            |
+| code-reviewer P1         | `close(saveDismiss)` 의미 공개 API에 미명시                      | JSDoc 추가 (X/Esc/외부클릭=non-commit, 닫기 버튼만 commit)                                                                                                                                             |
+| code-reviewer P2         | `init()` 중복 호출 시 overlay 중복 생성                          | re-entry guard — `if (document.getElementById('noticePopupOverlay')) return;`                                                                                                                          |
+| code-reviewer P2         | `data-id`가 string id로 바뀌면 NaN로 미선택                      | 주석 추가 — data.js NOTICES.id integer 가정 명시                                                                                                                                                       |
+| security P1              | `n.level`이 임의 문자열일 때 CSS 클래스 인젝션 가능              | `ALLOWED_LEVELS` allow-list + `safeLevel()` 헬퍼 — 알 수 없는 level은 'normal' fallback                                                                                                                |
+| **R2 follow-ups (spec)** | architect P1 / security P1 / verifier Gap 2/3 (모두 spec 명문화) | spec/ADR follow-up — feature-notice-faq.md §10.3.2에 (a) X 버튼 = non-commit, (b) Esc = non-commit, (c) 닫기 버튼만 commit, (d) BE sanitize allow-list 태그를 추가하는 별도 PR 권장 (B-3 코드 범위 밖) |
+
+R2 검증 (Playwright smoke 재실행):
+
+- 모든 R1 6 시나리오 + 신규 4 시나리오 (↑↓ keyboard nav, Home/End, focus trap, allow-list level fallback) PASS 예상.
+- 콘솔 에러 0건.
+
+notice-popup.js R2: 277줄 (≤300 룰 유지).
+
 ## 알려진 한계 (Out of Scope)
 
 - prototype mock data NOTICES 중 popup=true & date-active = id=2 1건뿐 (id=1은 2026-04-25 만료). 2건 이상 시나리오 demo는 data.js 갱신 필요 — Wave 3 또는 별도 fixture refresh PR. 단, 1건 시에도 2-panel 구조 유지로 spec 정합은 확인됨.
