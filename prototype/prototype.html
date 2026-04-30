@@ -50,6 +50,9 @@
     <div class="nav-item" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
     <div class="nav-item" onclick="setNav(this)" data-page="result-review"><i data-lucide="check-square"></i> 결과 검토 <span class="nav-badge accent" id="reviewBadge"></span></div>
+    <!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
+    <div class="nav-item" onclick="setNav(this)" data-page="tag-master"><i data-lucide="hash"></i> 태그 마스터</div>
+    <!-- END P-7 Tag Master -->
   </div>
   </div>
   <div class="sidebar-user">
@@ -598,6 +601,39 @@
 <!-- ── Result Review (Stage B-1 P-1.C1) ─── -->
 <div id="page-result-review" class="admin-page"></div>
 
+<!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
+<div id="page-tag-master" class="admin-page">
+  <div class="admin-topbar">
+    <span class="admin-title">태그 마스터</span>
+    <span class="section-count-badge" id="tmCount">0건</span>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <input id="tmSearch" class="tm-search" placeholder="이름/슬러그 검색" oninput="syncTmFilter()" />
+      <div class="tm-seg" role="tablist">
+        <button type="button" class="tm-seg-btn active" data-filter="all"      onclick="syncTmFilter('all')">전체</button>
+        <button type="button" class="tm-seg-btn"        data-filter="general"  onclick="syncTmFilter('general')">general</button>
+        <button type="button" class="tm-seg-btn"        data-filter="menu"     onclick="syncTmFilter('menu')">menu</button>
+        <button type="button" class="tm-seg-btn"        data-filter="external" onclick="syncTmFilter('external')">외부</button>
+        <button type="button" class="tm-seg-btn"        data-filter="merged"   onclick="syncTmFilter('merged')">병합됨</button>
+      </div>
+      <button type="button" class="a-btn primary" onclick="openTmAddModal()"><i data-lucide="plus"></i> 태그 추가</button>
+    </div>
+  </div>
+  <!-- 운영 갭 콜아웃: tag_rules 일시중지 데모 -->
+  <div class="tm-callout" id="tmRuleCallout">
+    <i data-lucide="alert-circle"></i>
+    <span>tag_rules 운영 일시중지 (Admin) — </span>
+    <button type="button" class="a-btn" onclick="suspendRule()">24시간 일시중지</button>
+  </div>
+  <table class="admin-table">
+    <thead><tr>
+      <th>태그명</th><th>슬러그</th><th>kind</th><th style="text-align:right">사용 VOC</th>
+      <th>마지막 사용</th><th>상태</th><th style="text-align:right">작업</th>
+    </tr></thead>
+    <tbody id="tmBody"></tbody>
+  </table>
+</div>
+<!-- END P-7 Tag Master -->
+
 </main>
 
 <!-- ── Drawer ─── -->
@@ -743,6 +779,11 @@
 <script src="js/admin-users.js"></script>
 <script src="js/result-review-data.js"></script>
 <script src="js/result-review.js"></script>
+<!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
+<script src="js/admin-tag-master-data.js"></script>
+<script src="js/admin-tag-master.js"></script>
+<script src="js/admin-tag-master-modals.js"></script>
+<!-- END P-7 Tag Master -->
 <script src="js/diff-helpers.js"></script>
 <script src="js/result-review-detail.js"></script>
 <script src="js/dashboard-data.js"></script>
