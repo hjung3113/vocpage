@@ -1,0 +1,324 @@
+/* ── B-4b Notice/FAQ Admin UI — notice-faq-admin.css
+   Additive styles for notice-admin.js and faq-admin.js.
+   All values via CSS custom properties — zero hex/oklch literals.
+   ────────────────────────────────────────────────────────────── */
+
+/* ── Admin toolbar row (등록 버튼 + 탭) */
+.nfa-admin-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  flex-wrap: wrap;
+}
+
+/* ── Primary add button */
+.nfa-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.nfa-btn-add:hover {
+  background: var(--accent);
+  color: var(--bg-app);
+  border-color: var(--accent-hover);
+}
+
+/* ── Tab group (FAQ 항목 / 카테고리 관리) */
+.nfa-tab-group {
+  display: flex;
+  gap: 4px;
+}
+.nfa-tab-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.nfa-tab-btn.active {
+  border-color: var(--brand-border);
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+.nfa-tab-btn:not(.active):hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* ── Per-row action buttons */
+.nfa-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.nfa-action-btn {
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.1s;
+  white-space: nowrap;
+}
+.nfa-action-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.nfa-action-btn.danger {
+  color: var(--status-red);
+  border-color: var(--status-red-border);
+}
+.nfa-action-btn.danger:hover {
+  background: var(--status-red-bg);
+}
+.nfa-action-btn.toggle-off {
+  color: var(--text-quaternary);
+  border-color: var(--border-subtle);
+}
+.nfa-action-btn.toggle-on {
+  color: var(--status-green, var(--accent));
+  border-color: var(--status-green-border, var(--brand-border));
+  background: var(--status-green-bg, var(--brand-bg));
+}
+
+/* ── Deleted section (Admin only) */
+.nfa-deleted-section {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 8px;
+}
+.nfa-deleted-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 12.5px;
+  font-weight: 600;
+  user-select: none;
+  transition: color 0.12s;
+}
+.nfa-deleted-header:hover {
+  color: var(--text-secondary);
+}
+.nfa-deleted-header i {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s;
+}
+.nfa-deleted-header.open i {
+  transform: rotate(180deg);
+}
+.nfa-deleted-body {
+  display: none;
+}
+.nfa-deleted-body.open {
+  display: block;
+}
+.nfa-deleted-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  opacity: 0.7;
+}
+.nfa-deleted-item span.title {
+  flex: 1;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+.nfa-restore-btn {
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-border);
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.nfa-restore-btn:hover {
+  background: var(--accent);
+  color: var(--bg-app);
+}
+
+/* ── Category table */
+.nfa-cat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.nfa-cat-table th {
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+.nfa-cat-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+.nfa-cat-table tr:hover td {
+  background: var(--bg-elevated);
+}
+.nfa-cat-wrap {
+  padding: 12px 24px;
+}
+
+/* ── Modal overlay */
+.nfa-modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.45));
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.nfa-modal-bg.open {
+  display: flex;
+}
+.nfa-modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-standard);
+  border-radius: 10px;
+  width: 480px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  box-shadow: 0 8px 32px var(--shadow-overlay, rgba(0, 0, 0, 0.3));
+  display: flex;
+  flex-direction: column;
+}
+.nfa-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.nfa-modal-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.nfa-modal-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+}
+.nfa-modal-close:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.nfa-modal-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.nfa-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ── Form fields inside modal (reuse aform-field pattern) */
+.nfa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.nfa-field label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.nfa-field input[type='text'],
+.nfa-field input[type='date'],
+.nfa-field input[type='number'],
+.nfa-field select,
+.nfa-field textarea {
+  padding: 7px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+.nfa-field textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.6;
+}
+.nfa-field input:focus,
+.nfa-field select:focus,
+.nfa-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+.nfa-field-row {
+  display: flex;
+  gap: 12px;
+}
+.nfa-field-row .nfa-field {
+  flex: 1;
+}
+.nfa-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.nfa-checkbox-row input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
