@@ -56,6 +56,9 @@
     <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
     <div class="nav-item" onclick="setNav(this)" data-page="trash"><i data-lucide="trash-2"></i> 휴지통</div>
     <!-- END P-8 Trash -->
+    <!-- BEGIN P-10 External Masters (Stage B-12) -->
+    <div class="nav-item" onclick="setNav(this)" data-page="external-masters"><i data-lucide="plug"></i> 외부 마스터</div>
+    <!-- END P-10 External Masters -->
   </div>
   </div>
   <div class="sidebar-user">
@@ -708,6 +711,24 @@
 </section>
 <!-- END P-8 Trash -->
 
+<!-- ============================================================ -->
+<!-- BEGIN P-10 External Masters (Stage B-12)                     -->
+<!-- ============================================================ -->
+<section id="page-external-masters" class="admin-page">
+  <div class="admin-topbar">
+    <span class="admin-title">외부 마스터</span>
+    <div class="spacer"></div>
+    <button type="button" class="a-btn primary" onclick="emRefreshAll()">
+      <i data-lucide="refresh-cw" style="width:13px;height:13px;vertical-align:-2px"></i>
+      전체 새로고침
+    </button>
+  </div>
+  <div class="admin-body" style="padding:16px 20px">
+    <div id="emGrid" class="em-grid"></div>
+  </div>
+</section>
+<!-- END P-10 External Masters -->
+
 </main>
 
 <!-- ── Drawer ─── -->
@@ -882,6 +903,10 @@
 <script src="js/admin-trash.js"></script>
 <script src="js/admin-trash-modals.js"></script>
 <!-- END P-8 Trash -->
+<!-- BEGIN P-10 External Masters (Stage B-12) -->
+<script src="js/admin-external-masters-data.js"></script>
+<script src="js/admin-external-masters.js"></script>
+<!-- END P-10 External Masters -->
 <script src="js/init.js"></script>
 </body>
 </html>

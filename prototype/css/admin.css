@@ -2682,3 +2682,208 @@
 
 /* ============================================================ */
 /* END P-8 Trash                                                 */
+
+/* ============================================================ */
+/* BEGIN P-10 External Masters (Stage B-12) ─────────────────── */
+/* ============================================================ */
+
+/* ── Page toolbar ────────────────────────────────────────────── */
+.em-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Cards grid ──────────────────────────────────────────────── */
+.em-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ── Single card ─────────────────────────────────────────────── */
+.em-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-standard);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.em-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.em-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+.em-card-source {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-family: var(--font-ui);
+}
+
+.em-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.em-meta-item {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.em-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* ── Status badges ───────────────────────────────────────────── */
+.em-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  white-space: nowrap;
+}
+
+.em-badge-loaded {
+  background: var(--status-green-bg);
+  color: var(--status-green);
+  border: 1px solid var(--status-green-border);
+}
+
+.em-badge-cold {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border: 1px solid var(--status-amber-border);
+}
+
+.em-badge-snapshot {
+  background: var(--status-purple-bg);
+  color: var(--status-purple);
+  border: 1px solid var(--status-purple-border);
+}
+
+.em-badge-error {
+  background: var(--status-red-bg);
+  color: var(--status-red);
+  border: 1px solid var(--status-red-border);
+}
+
+/* ── History expander ────────────────────────────────────────── */
+.em-history {
+  border-top: 1px solid var(--border-standard);
+  padding-top: 8px;
+}
+
+.em-history-summary {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.em-history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.em-history-summary::before {
+  content: '▸';
+  font-size: 10px;
+  transition: transform 0.15s;
+}
+
+details[open] .em-history-summary::before {
+  transform: rotate(90deg);
+}
+
+.em-hist-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.em-hist-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.em-hist-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.em-hist-ok .em-hist-icon {
+  color: var(--status-green);
+}
+
+.em-hist-error .em-hist-icon {
+  color: var(--status-red);
+}
+
+.em-hist-time {
+  color: var(--text-quaternary);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.em-hist-note {
+  color: var(--text-secondary);
+}
+
+/* ── No history note ─────────────────────────────────────────── */
+.em-no-history {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-top: 1px solid var(--border-standard);
+  padding-top: 8px;
+}
+
+/* ── No-refresh note ─────────────────────────────────────────── */
+.em-no-refresh {
+  font-size: 12px;
+  color: var(--text-quaternary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================ */
+/* END P-10 External Masters ─────────────────────────────────── */

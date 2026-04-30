@@ -133,6 +133,7 @@ function setNav(el) {
     if (page === 'tag-master') renderTagMaster();
     if (page === 'dashboard') dashboardInit();
     if (page === 'trash') AdminTrash.render();
+    if (page === 'external-masters') AdminExternalMasters.render();
     lucide.createIcons();
   }
 }
