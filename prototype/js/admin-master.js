@@ -113,10 +113,22 @@ let ADMIN_USERS = [
     active: false,
     lastSeen: '14일 전',
   },
+  // B-15: 2nd admin so D14 last-admin guard is reachable (deactivate 홍길동 first
+  // is blocked by D16 self-deactivate; promoting another to admin then changing
+  // 윤대표 back hits the last-admin-among-others case).
+  {
+    id: 6,
+    name: '윤대표',
+    init: '윤',
+    email: 'yoon@vocpage.io',
+    role: 'admin',
+    active: true,
+    lastSeen: '방금 전',
+  },
 ];
 let ruleNextId = 12,
   catNextId = 6,
-  userNextId = 6;
+  userNextId = 7;
 
 // ── Admin Renders
 function renderTagRules() {
