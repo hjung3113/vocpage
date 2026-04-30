@@ -2940,3 +2940,187 @@ details[open] .em-history-summary::before {
 
 /* ============================================================ */
 /* END P-10 External Masters ─────────────────────────────────── */
+
+/* ============================================================ */
+/* BEGIN P-12 Notifications (Stage B-14) ─────────────────────── */
+
+/* ── Filter chips ─────────────────────────────────────────── */
+.nf-chips {
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nf-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.nf-chip {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border-standard);
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+}
+.nf-chip:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.nf-chip--active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--bg-app);
+}
+
+/* ── Type-coloured icons ──────────────────────────────────── */
+.nf-icon--brand {
+  background: var(--brand-bg) !important;
+}
+.nf-icon--brand svg {
+  color: var(--brand) !important;
+}
+.nf-icon--blue {
+  background: var(--status-blue-bg, var(--bg-elevated)) !important;
+}
+.nf-icon--blue svg {
+  color: var(--status-blue) !important;
+}
+.nf-icon--green {
+  background: var(--status-green-bg, var(--bg-elevated)) !important;
+}
+.nf-icon--green svg {
+  color: var(--status-green) !important;
+}
+.nf-icon--red {
+  background: var(--status-red-bg) !important;
+}
+.nf-icon--red svg {
+  color: var(--status-red) !important;
+}
+.nf-icon--amber {
+  background: var(--status-amber-bg) !important;
+}
+.nf-icon--amber svg {
+  color: var(--status-amber) !important;
+}
+.nf-icon--purple {
+  background: var(--status-purple-bg) !important;
+}
+.nf-icon--purple svg {
+  color: var(--status-purple) !important;
+}
+
+/* Unread overrides type colour with brand (existing pattern) */
+.notif-item.unread .notif-icon[class*='nf-icon--'] {
+  background: var(--brand) !important;
+}
+.notif-item.unread .notif-icon[class*='nf-icon--'] svg {
+  color: var(--bg-app) !important;
+}
+
+/* ── Urgent row highlight ─────────────────────────────────── */
+.notif-item.nf-urgent-row {
+  background: var(--status-red-bg);
+}
+.notif-item.nf-urgent-row:hover {
+  background: var(--status-red-bg);
+  filter: brightness(0.97);
+}
+
+/* ── Urgent inline badge (inside notification text) ─────── */
+.nf-urgent-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+.nf-urgent-badge svg {
+  width: 12px;
+  height: 12px;
+  color: var(--status-red);
+}
+
+/* ── Bell button — count badge ────────────────────────────── */
+.nf-count-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--status-red);
+  color: var(--bg-app);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── Bell button — urgent exclamation badge ───────────────── */
+.nf-bell-urgent {
+  position: absolute;
+  bottom: -4px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--status-red);
+  color: var(--bg-app);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Ensure notifBtn is position relative for badge positioning */
+#notifBtn {
+  position: relative;
+}
+
+/* ── Unread count label in header ─────────────────────────── */
+#nfUnreadLabel {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* ── List container scroll ────────────────────────────────── */
+#nfList {
+  max-height: 380px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-standard) transparent;
+}
+
+/* ── Empty state §13.11 ───────────────────────────────────── */
+.nf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+}
+.nf-empty svg {
+  width: 28px;
+  height: 28px;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+/* ============================================================ */
+/* END P-12 Notifications ─────────────────────────────────────── */
