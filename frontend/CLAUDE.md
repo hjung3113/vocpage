@@ -4,7 +4,7 @@ React SPA for the VOC management system. Read root `CLAUDE.md` first for cross-c
 
 ## Status
 
-Phase 6 implementation in progress. `src/` is scaffolded with `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, and `api/`.
+Scaffolded — actual feature implementation deferred to Phase 8. Currently in Phase 7 (prototype-driven design freeze). `src/` contains: `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, `api/`, `contexts/`, `hooks/`, `styles/`, `test/`.
 
 ## Commands
 
