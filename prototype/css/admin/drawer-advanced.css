@@ -227,3 +227,31 @@
 .meta-item .rs-pill {
   margin-left: 6px;
 }
+
+/* ── R2: classes extracted from inline styles ─────────────────── */
+.perma-icon { width: 16px; height: 16px; }
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.comment-header .mini-av {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.review-toast.cmt-undo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.review-toast .cmt-undo-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: var(--font-ui);
+}

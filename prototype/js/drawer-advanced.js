@@ -68,12 +68,24 @@
   }
 
   // ── Feature 3: permalink ──────────────────────────────────────
+  // R2: feature-voc.md §8.17 contract — path-based `/vocs/{issue_code}` (not hash,
+  // not voc id). Falls back to window.prompt for manual copy on hard failure.
+  function buildPermalinkUrl(voc) {
+    const code = (voc && voc.code) || (voc && voc.id) || '';
+    return window.location.origin + '/vocs/' + encodeURIComponent(code);
+  }
+
   function copyPermalink(vocId) {
-    const url =
-      window.location.origin + window.location.pathname + '#voc/' + encodeURIComponent(vocId);
+    const voc = getVoc(vocId);
+    const url = buildPermalinkUrl(voc);
 
     function onSuccess() {
       window.showToast('링크가 복사되었습니다.', 'ok');
+    }
+    function onHardFail() {
+      // R2: §8.17 spec copy + prompt fallback so user can select manually.
+      window.showToast('복사 실패 — 직접 선택해 복사해 주세요', 'error');
+      try { window.prompt('링크', url); } catch (_) {}
     }
     function onFallback() {
       try {
@@ -83,11 +95,11 @@
         document.body.appendChild(ta);
         ta.focus();
         ta.select();
-        document.execCommand('copy');
+        const ok = document.execCommand('copy');
         document.body.removeChild(ta);
-        onSuccess();
+        if (ok) onSuccess(); else onHardFail();
       } catch (_) {
-        window.showToast('링크 복사에 실패했습니다.', 'error');
+        onHardFail();
       }
     }
 
@@ -107,11 +119,12 @@
     btn.className = 'perma-btn icon-btn';
     btn.setAttribute('data-tip', '링크 복사');
     btn.setAttribute('aria-label', '퍼머링크 복사');
-    btn.innerHTML = '<i data-lucide="link-2" style="width:14px;height:14px"></i>';
+    btn.innerHTML = '<i data-lucide="link-2" class="perma-icon"></i>';
     btn.addEventListener('click', function () {
       copyPermalink(vocId);
     });
-    expandBtn.parentNode.insertBefore(btn, expandBtn);
+    // R2: §8.17 spec ordering "풀스크린 · 링크 · 삭제 · 닫기" — link AFTER expand.
+    expandBtn.parentNode.insertBefore(btn, expandBtn.nextSibling);
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
