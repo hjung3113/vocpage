@@ -2244,13 +2244,13 @@
   border: 0;
 }
 
-/* BEGIN P-7 — Tag Master (Stage B-6 D22) ─────────────────────────────── */
+/* BEGIN P-7 Tag Master (Stage B-6 D22) ──────────────────────────────── */
 
 /* ── Search input ── */
 .tm-search {
   height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-standard);
   border-radius: 6px;
   background: var(--bg-surface);
   color: var(--text-primary);
@@ -2269,7 +2269,7 @@
   display: flex;
   gap: 2px;
   background: var(--bg-surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-standard);
   border-radius: 6px;
   padding: 2px;
 }
@@ -2316,9 +2316,9 @@
   flex-shrink: 0;
 }
 
-/* ── Merged row dim ── */
+/* ── Merged row dim (H6: visible at reduced opacity in 전체 filter) ── */
 .tm-row-merged td {
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 /* ── External lock pill ── */
@@ -2375,4 +2375,30 @@
   font-family: var(--font-ui);
 }
 
-/* END P-7 ──────────────────────────────────────────────────────────────── */
+/* ── Primary action button (C3) ── */
+.a-btn.primary {
+  background: var(--brand-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.a-btn.primary:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+}
+
+/* ── Kind type badge (M2) ── */
+.type-badge-admin {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  color: var(--text-secondary);
+}
+
+/* END P-7 Tag Master ────────────────────────────────────────────────────── */
