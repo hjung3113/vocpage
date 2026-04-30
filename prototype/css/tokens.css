@@ -76,6 +76,11 @@
   --status-drop-fg: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
   --status-drop-border: light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
 
+  /* Role pill — Dev variant tokens (uidesign §10, B-5 Wave 2) */
+  --role-dev-fg: light-dark(oklch(40% 0.13 215), oklch(72% 0.13 210));
+  --role-dev-bg: light-dark(oklch(94% 0.03 215), oklch(20% 0.05 215));
+  --role-dev-border: light-dark(oklch(78% 0.07 215), oklch(32% 0.07 215));
+
   /* Payload diff highlight tokens (Result Review detail drawer) */
   --diff-add-bg: light-dark(oklch(92% 0.04 152), oklch(18% 0.06 152));
   --diff-add-fg: light-dark(oklch(38% 0.17 152), oklch(66% 0.19 155));

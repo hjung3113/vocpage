@@ -27,8 +27,8 @@
     <div class="section-label">보기</div>
     <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent" id="allBadge">0</span></div>
     <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC <span class="nav-badge muted" id="mineBadge"></span></div>
-    <div class="nav-item" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
-    <div class="nav-item" onclick="setNav(this)" data-page="dashboard"><i data-lucide="bar-chart-2"></i> 대시보드</div>
+    <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
+    <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-page="dashboard"><i data-lucide="bar-chart-2"></i> 대시보드</div>
   </div>
   <div class="sidebar-nav">
   <div class="sidebar-divider"></div>
@@ -43,25 +43,25 @@
     <div class="nav-item" onclick="setNav(this)" data-view="faq"><i data-lucide="help-circle"></i> FAQ</div>
   </div>
   <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
+  <div class="sidebar-section" data-role-section="admin">
     <div class="section-label">관리자</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="tag-rules"><i data-lucide="tag"></i> 태그 규칙 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="system-menu"><i data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
-    <div class="nav-item" onclick="setNav(this)" data-page="result-review"><i data-lucide="check-square"></i> 결과 검토 <span class="nav-badge accent" id="reviewBadge"></span></div>
+    <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="tag-rules"><i data-lucide="tag"></i> 태그 규칙 관리</div>
+    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="system-menu"><i data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
+    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
+    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
+    <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-page="result-review"><i data-lucide="check-square"></i> 결과 검토 <span class="nav-badge accent" id="reviewBadge"></span></div>
     <!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
-    <div class="nav-item" onclick="setNav(this)" data-page="tag-master"><i data-lucide="hash"></i> 태그 마스터</div>
+    <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="tag-master"><i data-lucide="hash"></i> 태그 마스터</div>
     <!-- END P-7 Tag Master -->
     <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
-    <div class="nav-item" onclick="setNav(this)" data-page="trash"><i data-lucide="trash-2"></i> 휴지통</div>
+    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="trash"><i data-lucide="trash-2"></i> 휴지통</div>
     <!-- END P-8 Trash -->
     <!-- BEGIN P-10 External Masters (Stage B-12) -->
-    <div class="nav-item" onclick="setNav(this)" data-page="external-masters"><i data-lucide="plug"></i> 외부 마스터</div>
+    <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="external-masters"><i data-lucide="plug"></i> 외부 마스터</div>
     <!-- END P-10 External Masters -->
   </div>
   </div>
-  <div class="sidebar-user">
+  <div class="sidebar-user" data-tip="역할 전환 (데모)" aria-expanded="false">
     <div class="user-avatar">홍</div>
     <div style="flex:1;min-width:0"><div class="user-name">홍길동</div><div class="user-role">Admin</div></div>
     <i data-lucide="chevrons-up-down"></i>
@@ -921,6 +921,8 @@
 <script src="js/admin-external-masters-data.js"></script>
 <script src="js/admin-external-masters.js"></script>
 <!-- END P-10 External Masters -->
+<script src="js/role-state.js"></script>
+<script src="js/notice-popup.js"></script>
 <script src="js/admin-mode.js"></script>
 <script src="js/init.js"></script>
 </body>
