@@ -2983,58 +2983,68 @@ details[open] .em-history-summary::before {
 }
 
 /* ── Type-coloured icons ──────────────────────────────────── */
-.nf-icon--brand {
-  background: var(--brand-bg) !important;
+/* M1: !important removed — .nf-list .notif-icon specificity handles cascade */
+.nf-list .notif-icon.nf-icon--brand {
+  background: var(--brand-bg);
 }
-.nf-icon--brand svg {
-  color: var(--brand) !important;
+.nf-list .notif-icon.nf-icon--brand svg {
+  color: var(--brand);
 }
-.nf-icon--blue {
-  background: var(--status-blue-bg, var(--bg-elevated)) !important;
+.nf-list .notif-icon.nf-icon--blue {
+  background: var(--status-blue-bg, var(--bg-elevated));
 }
-.nf-icon--blue svg {
-  color: var(--status-blue) !important;
+.nf-list .notif-icon.nf-icon--blue svg {
+  color: var(--status-blue);
 }
-.nf-icon--green {
-  background: var(--status-green-bg, var(--bg-elevated)) !important;
+.nf-list .notif-icon.nf-icon--green {
+  background: var(--status-green-bg, var(--bg-elevated));
 }
-.nf-icon--green svg {
-  color: var(--status-green) !important;
+.nf-list .notif-icon.nf-icon--green svg {
+  color: var(--status-green);
 }
-.nf-icon--red {
-  background: var(--status-red-bg) !important;
+.nf-list .notif-icon.nf-icon--red {
+  background: var(--status-red-bg);
 }
-.nf-icon--red svg {
-  color: var(--status-red) !important;
+.nf-list .notif-icon.nf-icon--red svg {
+  color: var(--status-red);
 }
-.nf-icon--amber {
-  background: var(--status-amber-bg) !important;
+.nf-list .notif-icon.nf-icon--amber {
+  background: var(--status-amber-bg);
 }
-.nf-icon--amber svg {
-  color: var(--status-amber) !important;
+.nf-list .notif-icon.nf-icon--amber svg {
+  color: var(--status-amber);
 }
-.nf-icon--purple {
-  background: var(--status-purple-bg) !important;
+.nf-list .notif-icon.nf-icon--purple {
+  background: var(--status-purple-bg);
 }
-.nf-icon--purple svg {
-  color: var(--status-purple) !important;
+.nf-list .notif-icon.nf-icon--purple svg {
+  color: var(--status-purple);
 }
 
 /* Unread overrides type colour with brand (existing pattern) */
-.notif-item.unread .notif-icon[class*='nf-icon--'] {
-  background: var(--brand) !important;
+.nf-list .notif-item.unread .notif-icon[class*='nf-icon--'] {
+  background: var(--brand);
 }
-.notif-item.unread .notif-icon[class*='nf-icon--'] svg {
-  color: var(--bg-app) !important;
+.nf-list .notif-item.unread .notif-icon[class*='nf-icon--'] svg {
+  color: var(--bg-app);
+}
+
+/* M2: Unread urgent stays red (exempt from brand override) */
+.nf-list .notif-item.unread .notif-icon.nf-icon--red {
+  background: var(--status-red-bg);
+  color: var(--status-red);
+}
+.nf-list .notif-item.unread .notif-icon.nf-icon--red svg {
+  color: var(--status-red);
 }
 
 /* ── Urgent row highlight ─────────────────────────────────── */
 .notif-item.nf-urgent-row {
   background: var(--status-red-bg);
 }
+/* M4: replace filter: brightness() with proper token-based overlay */
 .notif-item.nf-urgent-row:hover {
-  background: var(--status-red-bg);
-  filter: brightness(0.97);
+  background: var(--bg-elevated);
 }
 
 /* ── Urgent inline badge (inside notification text) ─────── */

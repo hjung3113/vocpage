@@ -4,19 +4,21 @@ const NOTIF_TYPES = {
   COMMENT: { key: 'comment', icon: 'message-circle', label: '댓글', color: 'brand' },
   STATUS: { key: 'status', icon: 'refresh-cw', label: '상태', color: 'blue' },
   ASSIGNEE: { key: 'assignee', icon: 'user-check', label: '담당자', color: 'green' },
-  URGENT: { key: 'urgent', icon: 'alert-triangle', label: 'Urgent', color: 'red' },
   NOTICE: { key: 'notice', icon: 'megaphone', label: '공지', color: 'amber' },
   FAQ: { key: 'faq', icon: 'help-circle', label: 'FAQ', color: 'purple' },
+  DEFAULT: { key: 'default', icon: 'bell', label: '기타', color: 'brand' },
 };
 
+// urgent is a flag on assignee/status items (not a type); actor/vocId/action avoids raw HTML.
 const MOCK_NOTIFS = [
   {
     id: 1,
-    type: 'urgent',
+    type: 'assignee',
     unread: true,
     urgent: true,
-    voc: '분석-2025-0009',
-    text: '<strong>분석-2025-0009</strong> Urgent VOC 담당자로 배정됐습니다.',
+    actor: '',
+    vocId: '분석-2025-0009',
+    action: 'Urgent VOC 담당자로 배정됐습니다.',
     time: '방금 전',
   },
   {
@@ -24,8 +26,9 @@ const MOCK_NOTIFS = [
     type: 'comment',
     unread: true,
     urgent: false,
-    voc: '분석-2025-0001',
-    text: '<strong>박개발</strong>님이 <strong>분석-2025-0001</strong>에 댓글을 달았습니다.',
+    actor: '박개발',
+    vocId: '분석-2025-0001',
+    action: '님이 댓글을 달았습니다.',
     time: '5분 전',
   },
   {
@@ -33,17 +36,19 @@ const MOCK_NOTIFS = [
     type: 'status',
     unread: true,
     urgent: false,
-    voc: '분석-2025-0001',
-    text: '<strong>분석-2025-0001</strong> 상태가 <strong>처리중</strong>으로 변경됐습니다.',
+    actor: '',
+    vocId: '분석-2025-0001',
+    action: '상태가 처리중으로 변경됐습니다.',
     time: '어제 14:23',
   },
   {
     id: 4,
-    type: 'urgent',
+    type: 'status',
     unread: true,
     urgent: true,
-    voc: '파이프-2025-0007',
-    text: '<strong>파이프-2025-0007</strong> Urgent VOC 상태가 <strong>긴급검토</strong>로 변경됐습니다.',
+    actor: '',
+    vocId: '파이프-2025-0007',
+    action: 'Urgent VOC 상태가 긴급검토로 변경됐습니다.',
     time: '어제 11:40',
   },
   {
@@ -51,8 +56,9 @@ const MOCK_NOTIFS = [
     type: 'assignee',
     unread: false,
     urgent: false,
-    voc: '분석-2025-0047',
-    text: '<strong>분석-2025-0047</strong>의 담당자로 배정됐습니다.',
+    actor: '',
+    vocId: '분석-2025-0047',
+    action: '담당자로 배정됐습니다.',
     time: '어제 10:05',
   },
   {
@@ -60,8 +66,9 @@ const MOCK_NOTIFS = [
     type: 'comment',
     unread: false,
     urgent: false,
-    voc: '파이프-2025-0002',
-    text: '<strong>이분석</strong>님이 <strong>파이프라인-2025-0002</strong>에 댓글을 달았습니다.',
+    actor: '이분석',
+    vocId: '파이프-2025-0002',
+    action: '님이 댓글을 달았습니다.',
     time: '2025.06.11',
   },
   {
@@ -69,8 +76,9 @@ const MOCK_NOTIFS = [
     type: 'notice',
     unread: false,
     urgent: false,
-    voc: null,
-    text: '서비스 점검 공지: 6월 15일(일) 02:00–04:00 시스템 점검 예정입니다.',
+    actor: '',
+    vocId: null,
+    action: '서비스 점검 공지: 6월 15일(일) 02:00–04:00 점검 예정.',
     time: '2025.06.10',
   },
   {
@@ -78,8 +86,9 @@ const MOCK_NOTIFS = [
     type: 'faq',
     unread: false,
     urgent: false,
-    voc: null,
-    text: 'FAQ <strong>결재 프로세스 안내</strong> 항목이 업데이트됐습니다.',
+    actor: '',
+    vocId: null,
+    action: 'FAQ 결재 프로세스 안내 항목이 업데이트됐습니다.',
     time: '2025.06.09',
   },
   {
@@ -87,22 +96,52 @@ const MOCK_NOTIFS = [
     type: 'status',
     unread: false,
     urgent: false,
-    voc: '분석-2025-0033',
-    text: '<strong>분석-2025-0033</strong> 상태가 <strong>완료</strong>로 변경됐습니다.',
+    actor: '',
+    vocId: '분석-2025-0033',
+    action: '상태가 완료로 변경됐습니다.',
     time: '2025.06.08',
   },
 ];
 
-// Active filter key ('all' or a NOTIF_TYPES key)
+// Active filter key ('all', a NOTIF_TYPES key, or 'urgent')
 let _activeFilter = 'all';
+
+// CR2: module flag to ensure delegated listener is set up only once
+let _nfListInited = false;
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const esc = window.escHtml;
+
+// Builds escaped notification text; actor/vocId wrapped with <strong> after escaping.
+function buildNotifText(n) {
+  const urgentBadge = n.urgent
+    ? `<span class="nf-urgent-badge" aria-label="Urgent"><i data-lucide="alert-octagon"></i></span>`
+    : '';
+  // M5: notice items get an importance badge prefix (class defined in components.css; TODO if missing)
+  const noticeBadge = n.type === 'notice' ? `<span class="notice-badge-important">중요</span>` : '';
+  if (n.actor) {
+    return `${noticeBadge}<strong>${esc(n.actor)}</strong>(${esc(n.vocId || '')})${esc(n.action)}${urgentBadge}`;
+  }
+  if (n.vocId) {
+    return `${noticeBadge}(<strong>${esc(n.vocId)}</strong>)${esc(n.action)}${urgentBadge}`;
+  }
+  return `${noticeBadge}${esc(n.action)}${urgentBadge}`;
+}
 
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderNotifPanel() {
   const list = document.getElementById('nfList');
   if (!list) return;
 
-  const filtered =
-    _activeFilter === 'all' ? MOCK_NOTIFS : MOCK_NOTIFS.filter((n) => n.type === _activeFilter);
+  // "Urgent" filter is orthogonal to type — filters by flag
+  let filtered;
+  if (_activeFilter === 'all') {
+    filtered = MOCK_NOTIFS;
+  } else if (_activeFilter === 'urgent') {
+    filtered = MOCK_NOTIFS.filter((n) => n.urgent === true);
+  } else {
+    filtered = MOCK_NOTIFS.filter((n) => n.type === _activeFilter);
+  }
 
   if (filtered.length === 0) {
     list.innerHTML = `<div class="nf-empty"><i data-lucide="bell-off"></i><span>알림이 없습니다.</span></div>`;
@@ -112,21 +151,20 @@ function renderNotifPanel() {
 
   list.innerHTML = filtered
     .map((n) => {
-      const typeInfo =
-        Object.values(NOTIF_TYPES).find((t) => t.key === n.type) || NOTIF_TYPES.COMMENT;
-      const urgentBadge = n.urgent
-        ? `<span class="nf-urgent-badge" aria-label="Urgent"><i data-lucide="alert-octagon"></i></span>`
-        : '';
+      const typeInfo = Object.values(NOTIF_TYPES).find((t) => t.key === n.type);
+      if (!typeInfo) console.warn('[notif] unknown type:', n.type, '— falling back to DEFAULT');
+      const info = typeInfo || NOTIF_TYPES.DEFAULT;
+
       const unreadDot = n.unread ? `<div class="notif-dot-unread"></div>` : '';
       return `
       <div class="notif-item${n.unread ? ' unread' : ''}${n.urgent ? ' nf-urgent-row' : ''}"
-           data-nf-id="${n.id}" onclick="markReadById(${n.id})">
-        <div class="notif-icon nf-icon--${typeInfo.color}">
-          <i data-lucide="${typeInfo.icon}"></i>
+           data-nf-id="${esc(String(n.id))}">
+        <div class="notif-icon nf-icon--${info.color}">
+          <i data-lucide="${info.icon}"></i>
         </div>
         <div class="notif-content">
-          <p>${n.text}${urgentBadge}</p>
-          <div class="notif-time">${n.time}</div>
+          <p>${buildNotifText(n)}</p>
+          <div class="notif-time">${esc(n.time)}</div>
         </div>
         ${unreadDot}
       </div>`;
@@ -134,12 +172,22 @@ function renderNotifPanel() {
     .join('');
 
   lucide.createIcons({ nodes: [list] });
+
+  // CR2: attach delegated listener once after first render
+  if (!_nfListInited) {
+    list.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-nf-id]');
+      if (!item) return;
+      const id = parseInt(item.dataset.nfId, 10);
+      if (id) markReadById(id);
+    });
+    _nfListInited = true;
+  }
 }
 
 // ── Filter ────────────────────────────────────────────────────────────────────
 function filterByType(key) {
   _activeFilter = key;
-  // Update chip active state
   document.querySelectorAll('.nf-chip').forEach((chip) => {
     chip.classList.toggle('nf-chip--active', chip.dataset.filter === key);
   });
@@ -150,8 +198,7 @@ function filterByType(key) {
 function markReadById(id) {
   const notif = MOCK_NOTIFS.find((n) => n.id === id);
   if (!notif || !notif.unread) return;
-  notif.unread = false;
-  if (notif.urgent) notif.urgent = false; // clear urgent badge when read
+  notif.unread = false; // only unread toggled; urgent preserved
   renderNotifPanel();
   syncBadge();
 }
@@ -172,8 +219,7 @@ function markRead(item) {
 function markAllRead() {
   MOCK_NOTIFS.forEach((n) => {
     n.unread = false;
-    n.urgent = false;
-  });
+  }); // urgent preserved
   renderNotifPanel();
   syncBadge();
 }
@@ -183,34 +229,36 @@ function syncBadge() {
   const unreadCount = MOCK_NOTIFS.filter((n) => n.unread).length;
   const hasUrgent = MOCK_NOTIFS.some((n) => n.unread && n.urgent);
 
-  // Dot (legacy)
   const dot = document.querySelector('.notif-dot');
   if (dot) dot.style.display = unreadCount ? '' : 'none';
 
-  // Count badge
+  // M3: badges are mutually exclusive — urgent takes priority over count
+  const notifBtn = document.getElementById('notifBtn');
   let countBadge = document.querySelector('.nf-count-badge');
-  if (unreadCount > 0) {
-    if (!countBadge) {
-      countBadge = document.createElement('span');
-      countBadge.className = 'nf-count-badge';
-      document.getElementById('notifBtn')?.appendChild(countBadge);
-    }
-    countBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-  } else {
-    countBadge?.remove();
-  }
-
-  // Urgent exclamation badge
   let urgentBadge = document.querySelector('.nf-bell-urgent');
+
   if (hasUrgent) {
+    // Show ONLY urgent badge
+    countBadge?.remove();
     if (!urgentBadge) {
       urgentBadge = document.createElement('span');
       urgentBadge.className = 'nf-bell-urgent';
       urgentBadge.setAttribute('aria-label', 'Urgent 알림');
       urgentBadge.textContent = '!';
-      document.getElementById('notifBtn')?.appendChild(urgentBadge);
+      notifBtn?.appendChild(urgentBadge);
     }
+  } else if (unreadCount > 0) {
+    // Show ONLY count badge
+    urgentBadge?.remove();
+    if (!countBadge) {
+      countBadge = document.createElement('span');
+      countBadge.className = 'nf-count-badge';
+      notifBtn?.appendChild(countBadge);
+    }
+    countBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
   } else {
+    // No unread — remove both
+    countBadge?.remove();
     urgentBadge?.remove();
   }
 
