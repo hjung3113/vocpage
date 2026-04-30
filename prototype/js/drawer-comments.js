@@ -9,7 +9,10 @@
 
   function currentUserId() {
     // R2: fail closed — no fallback admin id (security review).
-    return (typeof window.currentUser === 'object' && window.currentUser && window.currentUser.id) || null;
+    return (
+      (typeof window.currentUser === 'object' && window.currentUser && window.currentUser.id) ||
+      null
+    );
   }
 
   function isOwner(comment) {
@@ -18,7 +21,9 @@
   }
 
   function findComment(voc, cid) {
-    return (voc && voc.comments ? voc.comments : []).find(function (c) { return c.id === cid; });
+    return (voc && voc.comments ? voc.comments : []).find(function (c) {
+      return c.id === cid;
+    });
   }
 
   function renderComments(voc) {
@@ -86,14 +91,20 @@
           menu.classList.remove('open');
           // R2: re-resolve + ownership re-check at action time
           var c = findComment(voc, cid);
-          if (!c || !isOwner(c)) { window.showToast('편집 권한이 없습니다.', 'warn'); return; }
+          if (!c || !isOwner(c)) {
+            window.showToast('편집 권한이 없습니다.', 'warn');
+            return;
+          }
           startEditComment(card, c, voc);
         });
 
         card.querySelector('.delete-comment-btn')?.addEventListener('click', function () {
           menu.classList.remove('open');
           var c = findComment(voc, cid);
-          if (!c || !isOwner(c)) { window.showToast('삭제 권한이 없습니다.', 'warn'); return; }
+          if (!c || !isOwner(c)) {
+            window.showToast('삭제 권한이 없습니다.', 'warn');
+            return;
+          }
           softDeleteComment(c, voc);
         });
       }
@@ -156,7 +167,8 @@
     }
     const undoToast = document.createElement('div');
     undoToast.className = 'review-toast review-toast-ok cmt-undo';
-    undoToast.innerHTML = '<span>댓글이 삭제되었습니다.</span><button class="cmt-undo-btn">실행취소</button>';
+    undoToast.innerHTML =
+      '<span>댓글이 삭제되었습니다.</span><button class="cmt-undo-btn">실행취소</button>';
     host.appendChild(undoToast);
 
     undoToast.querySelector('button').addEventListener('click', function () {

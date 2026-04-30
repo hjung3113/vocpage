@@ -85,7 +85,9 @@
     function onHardFail() {
       // R2: §8.17 spec copy + prompt fallback so user can select manually.
       window.showToast('복사 실패 — 직접 선택해 복사해 주세요', 'error');
-      try { window.prompt('링크', url); } catch (_) {}
+      try {
+        window.prompt('링크', url);
+      } catch (_) {}
     }
     function onFallback() {
       try {
@@ -97,7 +99,8 @@
         ta.select();
         const ok = document.execCommand('copy');
         document.body.removeChild(ta);
-        if (ok) onSuccess(); else onHardFail();
+        if (ok) onSuccess();
+        else onHardFail();
       } catch (_) {
         onHardFail();
       }

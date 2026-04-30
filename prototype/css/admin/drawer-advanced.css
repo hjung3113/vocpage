@@ -229,7 +229,10 @@
 }
 
 /* ── R2: classes extracted from inline styles ─────────────────── */
-.perma-icon { width: 16px; height: 16px; }
+.perma-icon {
+  width: 16px;
+  height: 16px;
+}
 .comment-header {
   display: flex;
   align-items: center;
