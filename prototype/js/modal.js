@@ -73,12 +73,36 @@ function onModalSysChange() {
   menuEl.disabled = false;
 }
 
+// ── C-02: Priority → Due Date auto-calc in register modal ────────────────────
+function onModalPriorityChange(priority) {
+  const dueDateEl = document.getElementById('modalDueDate');
+  if (dueDateEl && typeof window.calcDueDate === 'function') {
+    dueDateEl.value = window.calcDueDate(priority);
+  }
+}
+
 function openModal() {
   initModalSelects();
+  // Reset modal state
+  const titleEl = document.getElementById('titleInput');
+  const bodyEl = document.getElementById('bodyInput');
+  if (titleEl) {
+    titleEl.value = '';
+    titleEl.dataset.charCountAttached = '';
+  }
+  if (bodyEl) {
+    bodyEl.value = '';
+    bodyEl.dataset.charCountAttached = '';
+  }
+  modalAttachFiles = [];
+  renderModalAttach();
+  // C-02: set initial due_date based on default priority (medium)
+  const dueDateEl = document.getElementById('modalDueDate');
+  if (dueDateEl && typeof window.calcDueDate === 'function') {
+    dueDateEl.value = window.calcDueDate('medium');
+  }
   document.getElementById('modalBg').classList.add('open');
   setTimeout(() => {
-    const titleEl = document.getElementById('titleInput');
-    const bodyEl = document.getElementById('bodyInput');
     if (typeof window.attachCharCount === 'function') {
       window.attachCharCount(titleEl, 100);
       window.attachCharCount(bodyEl, 5000);

@@ -848,8 +848,16 @@
         </div>
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">우선순위 <span style="color:var(--text-quaternary);font-size:10px">(Admin 설정)</span></label>
-          <select class="form-select" disabled><option>Medium (기본값)</option></select>
+          <select class="form-select" id="modalPrioritySelect" onchange="onModalPriorityChange(this.value)" disabled><option value="medium">Medium (기본값)</option><option value="urgent">Urgent</option><option value="high">High</option><option value="low">Low</option></select>
         </div>
+      </div>
+      <!-- C-02: Due Date row -->
+      <div class="form-row" style="margin-top:var(--sp-3)">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">마감일 <span style="color:var(--text-quaternary);font-size:10px">(자동 계산)</span></label>
+          <input type="date" class="form-input" id="modalDueDate" style="font-size:13px" />
+        </div>
+        <div class="form-group" style="margin-bottom:0"></div>
       </div>
       <div class="form-group" style="margin-top:var(--sp-4)">
         <label class="form-label">본문 <span class="form-req">*</span></label>

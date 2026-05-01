@@ -1,3 +1,14 @@
+// ── C-02 Due Date helpers ────────────────────────────────────────────────────
+// calcDueDate(priority, baseDate?) → 'YYYY-MM-DD'
+// P0(urgent)=+1d, P1(high)=+3d, P2(medium)=+7d, P3(low)=+30d
+window.calcDueDate = function calcDueDate(priority, baseDate) {
+  const base = baseDate ? new Date(baseDate) : new Date();
+  const offsets = { urgent: 1, high: 3, medium: 7, low: 30 };
+  const days = offsets[priority] ?? 7;
+  base.setDate(base.getDate() + days);
+  return base.toISOString().slice(0, 10);
+};
+
 function openDrawer(id) {
   const d = VOC_MAP[id];
   if (!d) return;
@@ -37,7 +48,7 @@ function openDrawer(id) {
       </div>
       <div class="meta-item">
         <div class="meta-lbl">우선순위</div>
-        <select class="meta-sel">
+        <select class="meta-sel" id="drawer-priority-${d.id}" onchange="drawerPriorityChange('${d.id}', this.value)" data-role-allow="manager,admin,dev">
           <option value="urgent" ${d.priority === 'urgent' ? 'selected' : ''}>Urgent</option>
           <option value="high"   ${d.priority === 'high' ? 'selected' : ''}>High</option>
           <option value="medium" ${d.priority === 'medium' ? 'selected' : ''}>Medium</option>
@@ -45,9 +56,13 @@ function openDrawer(id) {
         </select>
       </div>
       <div class="meta-item">
-        <!-- 마감일 권한: User=읽기전용, Manager/Admin=쓰기, Dev=본인 담당 시 쓰기 -->
+        <!-- C-02 마감일 권한: User=읽기전용, Manager/Admin/Dev=쓰기 -->
         <div class="meta-lbl">마감일</div>
-        <input type="date" class="meta-sel" value="${d.dueDate || ''}" style="font-size:13px;color:var(--text-primary)" />
+        <input type="date" class="meta-sel" id="drawer-duedate-${d.id}"
+          value="${d.dueDate || window.calcDueDate(d.priority)}"
+          style="font-size:13px;color:var(--text-primary)"
+          data-role-allow="manager,admin,dev"
+          onchange="drawerDueDateChange('${d.id}', this.value)" />
       </div>
       <div class="meta-item">
         <div class="meta-lbl">담당자</div>
@@ -171,7 +186,39 @@ function openDrawer(id) {
     if (notesInput) window.attachCharCount(notesInput, 1000);
   }
 
+  // C-02: apply role-based readonly for due-date and priority
+  const role = (window.currentUser && window.currentUser.role) || 'user';
+  const dueDateEl = document.getElementById('drawer-duedate-' + id);
+  const priorityEl = document.getElementById('drawer-priority-' + id);
+  if (role === 'user') {
+    if (dueDateEl) {
+      dueDateEl.disabled = true;
+      dueDateEl.title = '권한 없음 (User 조회만 가능)';
+    }
+    if (priorityEl) {
+      priorityEl.disabled = true;
+    }
+  }
+
   document.dispatchEvent(new CustomEvent('drawer:opened', { detail: { vocId: id, voc: d } }));
+}
+
+// ── C-02 Due Date event handlers ─────────────────────────────────────────────
+function drawerPriorityChange(vocId, newPriority) {
+  const dueDateEl = document.getElementById('drawer-duedate-' + vocId);
+  if (!dueDateEl) return;
+  const newDue = window.calcDueDate(newPriority);
+  dueDateEl.value = newDue;
+  dueDateEl.classList.add('due-date-dirty');
+  dueDateEl.title = '우선순위 변경으로 자동 재계산됨';
+  if (VOC_MAP[vocId]) VOC_MAP[vocId].dueDate = newDue;
+}
+
+function drawerDueDateChange(vocId, newDate) {
+  // Manager+ manual override — mark dirty
+  const dueDateEl = document.getElementById('drawer-duedate-' + vocId);
+  if (dueDateEl) dueDateEl.classList.add('due-date-dirty');
+  if (VOC_MAP[vocId]) VOC_MAP[vocId].dueDate = newDate;
 }
 
 function closeDrawer() {
