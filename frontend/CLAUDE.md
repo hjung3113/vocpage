@@ -2,7 +2,7 @@
 
 React SPA for the VOC management system. Read root `CLAUDE.md` first for cross-cutting governance.
 
-**Stack:** React + TypeScript, Vite, Tailwind CSS v4, Toast UI Editor (rich text), Vitest (test).
+**Stack:** React + TypeScript, Vite, Tailwind CSS v4, Toast UI Editor (rich text), shadcn/ui (Radix 카피본) + Lucide, @tanstack/react-query v5, @tanstack/react-table v8, react-hook-form + zod (shared/), sonner, date-fns + react-day-picker, recharts (lazy), MSW v2, Vitest. **TDD 필수** (root CLAUDE.md). 전체 OSS·버전: `docs/specs/requires/requirements.md §3`.
 
 ## Status
 

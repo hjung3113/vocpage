@@ -2,7 +2,7 @@
 
 Express REST API for the VOC management system. Read root `CLAUDE.md` first for cross-cutting governance.
 
-**Stack:** Node.js + Express + TypeScript, PostgreSQL with pgvector extension (`pgvector/pgvector:pg16`), Jest + Supertest (test), tsx (dev runner).
+**Stack:** Node.js + Express + TypeScript, PostgreSQL with pgvector extension (`pgvector/pgvector:pg16`), zod v4 (shared/ 계약 — FE와 단일 schema 공유, 라우트 입력 검증), Jest + Supertest (test), tsx (dev runner). **TDD 필수** (root CLAUDE.md). 전체 OSS·버전: `docs/specs/requires/requirements.md §3`.
 
 ## Status
 

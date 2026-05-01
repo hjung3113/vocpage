@@ -55,16 +55,23 @@
 
 ## 3. 기술 스택 (Tech Stack)
 
-| 구분              | 기술 스택                                | 비고                                                                                                |
-| :---------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| **Frontend**      | Vite, React, TypeScript, Tailwind CSS v4 | `tokens.ts` → Tailwind config + CSS vars 단일 소스                                                  |
-| **Backend**       | Node.js 20 LTS (Express), TypeScript     | OIDC 인증 미들웨어                                                                                  |
-| **Database**      | PostgreSQL 16                            | Self-join 및 M:N 관계 설계                                                                          |
-| **Infra**         | Docker, Docker Compose                   | 환경 일치 및 배포 편의성                                                                            |
-| **Editor**        | Toast UI Editor                          | 오픈소스 리치 텍스트 에디터                                                                         |
-| **Testing**       | Vitest (FE), Jest/Supertest (BE)         | TDD 개발 수행                                                                                       |
-| **Data Fetching** | @tanstack/react-query                    | staleTime 페이지별 확정: 대시보드·관리자 5분, VOC 목록 30초, VOC 상세·댓글 0(항상 fresh), 알림 30초 |
-| **Charts**        | recharts                                 | 대시보드 LineChart / BarChart (lazy import)                                                         |
+| 구분               | 기술 스택                                         | 비고                                                                                                |
+| :----------------- | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------- |
+| **Frontend**       | Vite, React, TypeScript, Tailwind CSS v4          | `tokens.ts` → Tailwind config + CSS vars 단일 소스                                                  |
+| **Backend**        | Node.js 20 LTS (Express), TypeScript              | OIDC 인증 미들웨어                                                                                  |
+| **Database**       | PostgreSQL 16                                     | Self-join 및 M:N 관계 설계                                                                          |
+| **Infra**          | Docker, Docker Compose                            | 환경 일치 및 배포 편의성                                                                            |
+| **Editor**         | Toast UI Editor                                   | 오픈소스 리치 텍스트 에디터                                                                         |
+| **Testing**        | Vitest (FE), Jest/Supertest (BE), MSW             | **TDD 필수** (CLAUDE.md Working Style). MSW v2로 FE 단위·통합 테스트에서 API 모킹                   |
+| **Data Fetching**  | @tanstack/react-query v5                          | staleTime 페이지별 확정: 대시보드·관리자 5분, VOC 목록 30초, VOC 상세·댓글 0(항상 fresh), 알림 30초 |
+| **Charts**         | recharts v2                                       | 대시보드 LineChart / BarChart (lazy import)                                                         |
+| **UI Primitives**  | shadcn/ui (Radix 기반 카피본) + Lucide            | `frontend/src/components/ui/` 에 raw 카피, npm 의존성 아님. 토큰 매핑 codemod로 색상 일괄 치환      |
+| **Tables**         | @tanstack/react-table v8                          | VOC 리스트·관리자 표 (가상 스크롤·정렬·필터·계층 행)                                                |
+| **Forms**          | react-hook-form v7 + @hookform/resolvers          | 드로어/모달 폼 상태. zod resolver 표준                                                              |
+| **Validation**     | zod v4 (FE+BE 공유)                               | `shared/contracts/` 단일 schema 소스 — FE 입력 검증·API 응답 parse + BE 핸들러 입력 검증 동시 사용  |
+| **Toast/Feedback** | sonner v2                                         | 전역 토스트, `<Toaster />` AppShell 마운트                                                          |
+| **Date utils**     | date-fns v3 + react-day-picker v9                 | 드로어 날짜 표기 + Dashboard 기간 필터                                                              |
+| **Tailwind utils** | class-variance-authority, clsx, tailwind-merge v3 | shadcn 카피본 peer. 컴포넌트 variant + 클래스 병합                                                  |
 
 ---
 

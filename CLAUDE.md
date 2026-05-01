@@ -85,6 +85,7 @@ Skip the frame for trivial one-liners (rename, obvious typo, single-file change 
 
 ## Working Style
 
+- **TDD only** — every implementation (FE/BE) goes test-first: write or update the test, confirm it fails for the right reason, write the minimal code to pass, then refactor. No "tests later" PRs. Bug fixes start with a failing regression test. Stack: Vitest (FE) / Jest+Supertest (BE) — see `requirements.md §3`.
 - **No completion claims** — never mark a task done until the user explicitly says so
 - **No implementation without approval** — never write BE/FE code until the user says to start
 - **Debate, don't defer** — raise counterarguments or missed cases before agreeing; no passive "yes"
