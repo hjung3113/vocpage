@@ -13,6 +13,16 @@ import type {
   VocPriority,
 } from '../../../shared/contracts/voc';
 
+/**
+ * Escape ILIKE meta-characters in a free-text query so user input cannot
+ * smuggle wildcards (`%`, `_`) or escape the escape character itself.
+ * Pair with `ILIKE ... ESCAPE '\\'` in the SQL — see `listVocs` below.
+ * Exposed for unit tests (PR #121 review Finding 3).
+ */
+export function escapeLikePattern(input: string): string {
+  return input.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
 export interface ListVocsParams {
   status?: string[];
   system_id?: string;
@@ -66,7 +76,7 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
     values.push(params.tag_ids);
   }
   if (params.q) {
-    const esc = params.q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+    const esc = escapeLikePattern(params.q);
     conditions.push(`(title ILIKE $${i} ESCAPE '\\' OR issue_code ILIKE $${i} ESCAPE '\\')`);
     values.push(`%${esc}%`);
     i += 1;

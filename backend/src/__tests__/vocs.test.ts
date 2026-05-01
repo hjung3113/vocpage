@@ -295,4 +295,60 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
       expect(res.body.pageSize).toBeUndefined();
     });
   });
+
+  // ─── PR #121 review Finding 2 — reassign 권한 + multi-field 우회 차단 ───
+  describe('Wave 1.5 §reassign — assignee_id PATCH 권한 매트릭스', () => {
+    test('Dev (own VOC) PATCH { assignee_id: null } returns 403 reassign', async () => {
+      const agent = await loginAs('dev');
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ assignee_id: null });
+      expect(res.status).toBe(403);
+      expect(res.body.error?.code).toBe('FORBIDDEN');
+      expect(res.body.error?.details?.action).toBe('reassign');
+    });
+
+    test('Dev (own VOC) PATCH { assignee_id: <other> } returns 403 reassign', async () => {
+      const agent = await loginAs('dev');
+      const res = await agent
+        .patch(`/api/vocs/${liveVoc.id}`)
+        .send({ assignee_id: FIXTURE_USERS.devOther });
+      expect(res.status).toBe(403);
+      expect(res.body.error?.code).toBe('FORBIDDEN');
+      expect(res.body.error?.details?.action).toBe('reassign');
+    });
+
+    test('Dev (own VOC) PATCH { assignee_id, status } returns 403 (multi-field bypass blocked)', async () => {
+      const agent = await loginAs('dev');
+      const res = await agent
+        .patch(`/api/vocs/${liveVoc.id}`)
+        .send({ assignee_id: FIXTURE_USERS.devOther, status: '처리중' });
+      expect(res.status).toBe(403);
+      expect(res.body.error?.code).toBe('FORBIDDEN');
+      // reassign 가 먼저 평가되어야 함 (multi-field 우회 차단 핵심)
+      expect(res.body.error?.details?.action).toBe('reassign');
+    });
+
+    test('User (own VOC) PATCH { assignee_id: null } returns 403', async () => {
+      const agent = await loginAs('user');
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ assignee_id: null });
+      expect(res.status).toBe(403);
+      expect(res.body.error?.code).toBe('FORBIDDEN');
+      expect(res.body.error?.details?.action).toBe('reassign');
+    });
+
+    test('Manager PATCH { assignee_id: <other> } returns 200', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent
+        .patch(`/api/vocs/${liveVoc.id}`)
+        .send({ assignee_id: FIXTURE_USERS.devOther });
+      expect(res.status).toBe(200);
+      expect(res.body.assignee_id).toBe(FIXTURE_USERS.devOther);
+    });
+
+    test('Admin PATCH { assignee_id: null } returns 200', async () => {
+      const agent = await loginAs('admin');
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ assignee_id: null });
+      expect(res.status).toBe(200);
+      expect(res.body.assignee_id).toBeNull();
+    });
+  });
 });
