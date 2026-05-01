@@ -16,6 +16,7 @@ import {
 } from '../../../../../shared/contracts/voc/io';
 import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
 import type { VocTypeListItem } from '../../../../../shared/contracts/master/io';
+import { NativeSelect } from './NativeSelect';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));
 
@@ -44,8 +45,6 @@ interface FormState {
 }
 
 const PRIORITIES: VocPriority[] = ['urgent', 'high', 'medium', 'low'];
-const SEL =
-  'h-10 w-full rounded-md border border-[color:var(--border-standard)] bg-[color:var(--bg-app)] px-3 text-sm text-[color:var(--text-primary)]';
 
 function makeInitial(vt: VocTypeListItem[], sy: IdLabel[], mn: IdLabel[]): FormState {
   return {
@@ -56,28 +55,6 @@ function makeInitial(vt: VocTypeListItem[], sy: IdLabel[], mn: IdLabel[]): FormS
     menu_id: mn[0]?.id ?? '',
     priority: 'medium',
   };
-}
-
-function NativeSelect({
-  id,
-  value,
-  onChange,
-  options,
-}: {
-  id: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: ReadonlyArray<{ id: string; label: string }>;
-}) {
-  return (
-    <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className={SEL}>
-      {options.map((o) => (
-        <option key={o.id} value={o.id}>
-          {o.label}
-        </option>
-      ))}
-    </select>
-  );
 }
 
 export function VocCreateModal({
@@ -180,7 +157,7 @@ export function VocCreateModal({
               id="voc-priority"
               value={form.priority}
               onChange={(e) => set('priority', e.target.value as VocPriority)}
-              className={`${SEL} w-40`}
+              className="h-10 w-40 rounded-md border border-[color:var(--border-standard)] bg-[color:var(--bg-app)] px-3 text-sm text-[color:var(--text-primary)]"
             >
               {PRIORITIES.map((p) => (
                 <option key={p} value={p}>
