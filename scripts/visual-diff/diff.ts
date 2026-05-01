@@ -139,17 +139,19 @@ const SEVERITY_ORDER: Record<Severity, number> = { HIGH: 0, MED: 1, LOW: 2 };
  * a sorted list of Diff records for all mismatches.
  */
 export function diff(protoExtracted: Extracted[], reactExtracted: Extracted[]): Diff[] {
-  // Build lookup: componentId+selector → Extracted
+  // Pair root entries by componentId. Children (depth>=1) are skipped because
+  // proto/react DOM trees diverge in child ordering and pairing by index is unreliable.
   const reactMap = new Map<string, Extracted>();
   for (const e of reactExtracted) {
-    reactMap.set(`${e.componentId}::${e.selector}`, e);
+    if (e.role !== 'root') continue;
+    reactMap.set(e.componentId, e);
   }
 
   const results: Diff[] = [];
 
   for (const protoEntry of protoExtracted) {
-    const key = `${protoEntry.componentId}::${protoEntry.selector}`;
-    const reactEntry = reactMap.get(key);
+    if (protoEntry.role !== 'root') continue;
+    const reactEntry = reactMap.get(protoEntry.componentId);
     if (!reactEntry) continue; // no matching pair — skip
 
     for (const [prop, protoVal] of Object.entries(protoEntry.props)) {

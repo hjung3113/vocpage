@@ -241,14 +241,11 @@ export async function bootHarness(opts: HarnessOptions = {}): Promise<HarnessHan
       }
     }
 
-    // Wait for loading indicator to disappear
+    // Wait for at least one data-pcomp marker to appear (guarantees content rendered).
     try {
-      await reactPage.waitForSelector('[data-testid="voc-loading"]', {
-        state: 'detached',
-        timeout: 10_000,
-      });
+      await reactPage.waitForSelector('[data-pcomp]', { timeout: 15_000 });
     } catch {
-      // Loading indicator may not appear if data loads fast
+      console.error('[harness] Warning: no [data-pcomp] markers appeared on /voc within 15s');
     }
 
     return { protoPage, reactPage, teardown };
