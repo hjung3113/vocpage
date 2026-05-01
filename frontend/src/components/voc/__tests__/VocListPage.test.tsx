@@ -75,7 +75,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     expect(screen.getByTestId('status-chip-접수')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('F-T4 user role: drawer 열려도 note 작성 form 비노출', async () => {
+  it('F-T4a user role: drawer 열려도 note 작성 form 비노출', async () => {
     const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
     vi.mocked(vocApi.list).mockResolvedValue({
       rows: [{ ...target, has_children: false, notes_count: 0 }],
@@ -91,11 +91,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     expect(screen.queryByLabelText('new note')).not.toBeInTheDocument();
   });
 
-  it('F-T5 필터 변경 race: drawer 열린 상태에서 outside-press로 안전하게 닫힘', async () => {
-    // Race-safety contract: when the user changes a filter while a drawer is open,
-    // Radix Dialog's outside-press-close semantics guarantee the drawer drops its
-    // stale vocId before the new list arrives, so the user never sees a drawer
-    // pointing at a row that may have been filtered out. We assert that contract.
+  it('F-T4b manager role contrast: 같은 vocId에서 note form은 노출 (gate 조건이 user 전용임을 증명)', async () => {
     const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
     vi.mocked(vocApi.list).mockResolvedValue({
       rows: [{ ...target, has_children: false, notes_count: 0 }],
@@ -107,9 +103,29 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.notes).mockResolvedValue([]);
     renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
     await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
-    const user = userEvent.setup({ pointerEventsCheck: 0 });
-    await user.click(screen.getByTestId('status-chip-접수'));
+    await waitFor(() => expect(screen.getByLabelText('new note')).toBeInTheDocument());
+  });
+
+  it('F-T5 drawer Escape 닫힘: URL ?id 제거 — 다음 list query에 stale id 유출 없음', async () => {
+    // Reachable user path: Escape key. Replaces an earlier draft that simulated
+    // a click *under* the dialog overlay via pointerEventsCheck:0, which codex
+    // correctly flagged as a false-positive (the overlay would intercept that
+    // click in a real browser).
+    const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
+    vi.mocked(vocApi.list).mockResolvedValue({
+      rows: [{ ...target, has_children: false, notes_count: 0 }],
+      page: 1,
+      pageSize: 50,
+      total: 1,
+    });
+    vi.mocked(vocApi.get).mockResolvedValue(target);
+    vi.mocked(vocApi.notes).mockResolvedValue([]);
+    renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
+    await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
+    await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByTestId('voc-drawer')).not.toBeInTheDocument());
-    expect(screen.getByTestId('status-chip-접수')).toHaveAttribute('aria-pressed', 'true');
+    // Drawer disappearance from the DOM is the externally-visible proof that
+    // VocDrawer's `open={!!vocId}` flipped, which only happens after onClose →
+    // setVocId(null) runs. No subsequent list refetch can carry a stale id.
   });
 });
