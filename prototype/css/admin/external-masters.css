@@ -253,5 +253,40 @@ details[open] .em-history-summary::before {
   margin-left: 4px;
 }
 
+/* ── M-05 필드 매핑 섹션 ────────────────────────────────────── */
+.em-field-map-section {
+  margin-bottom: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.em-field-map-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.em-field-map-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.em-field-map-desc {
+  font-size: 12px;
+  color: var(--text-quaternary);
+  margin-left: 4px;
+}
+
+.em-field-map-table {
+  margin: 0;
+  border-radius: 0;
+  border: none;
+}
+
 /* ============================================================ */
 /* END P-10 External Masters ─────────────────────────────────── */
