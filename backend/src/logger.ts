@@ -1,12 +1,15 @@
 import pino from 'pino';
 
-const useDevTransport = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
+export function buildLoggerOptions(env: NodeJS.ProcessEnv = process.env): pino.LoggerOptions {
+  const useDevTransport = env.NODE_ENV !== 'production' && env.NODE_ENV !== 'test';
+  return {
+    level: env.LOG_LEVEL ?? (env.NODE_ENV === 'test' ? 'silent' : 'info'),
+    ...(useDevTransport && {
+      transport: { target: 'pino-pretty', options: { colorize: true, ignore: 'pid,hostname' } },
+    }),
+  };
+}
 
-const logger = pino({
-  level: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === 'test' ? 'silent' : 'info'),
-  ...(useDevTransport && {
-    transport: { target: 'pino-pretty', options: { colorize: true, ignore: 'pid,hostname' } },
-  }),
-});
+const logger = pino(buildLoggerOptions());
 
 export default logger;
