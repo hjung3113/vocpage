@@ -51,6 +51,7 @@ function currentRole(req: Request): { role: 'admin' | 'manager' | 'dev' | 'user'
 export const vocHandlers = [
   http.get('/api/vocs', ({ request }) => {
     const url = new URL(request.url);
+    const { role } = currentRole(request);
     // Mirror BE: shared VocListQuery zod validates sort_by/sort_dir enum +
     // page/per_page positive int. Repeated keys (status, assignees, etc.)
     // must be preserved as arrays for arrayOrSingle preprocess.
@@ -71,7 +72,10 @@ export const vocHandlers = [
     const q = query.q?.toLowerCase() ?? '';
     const { sort_by, sort_dir, page, per_page } = query;
 
-    let rows = store.filter((r) => r.deleted_at === null);
+    // Mirror BE service: includeDeleted only honored for admin (services/voc.ts).
+    const includeDeleted = query.includeDeleted === true && role === 'admin';
+    let rows = includeDeleted ? [...store] : store.filter((r) => r.deleted_at === null);
+    if (query.system_id) rows = rows.filter((r) => r.system_id === query.system_id);
     if (status.length) rows = rows.filter((r) => status.includes(r.status));
     if (voc_type_ids.length) rows = rows.filter((r) => voc_type_ids.includes(r.voc_type_id));
     if (assignees.length)

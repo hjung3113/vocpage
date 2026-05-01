@@ -31,6 +31,7 @@ interface ListResponse {
     issue_code: string;
     priority: string;
     assignee_id: string | null;
+    system_id: string;
   }>;
   total: number;
   page: number;
@@ -141,5 +142,51 @@ describe('MSW GET /api/vocs — tag_ids 실제 필터링 (EXISTS 의미)', () =>
     // 비매칭 row 가 실제로 존재했는지 (필터 무력화 회귀 방지)
     const allActive = VOC_FIXTURES.filter((r) => r.deleted_at === null);
     expect(allActive.length).toBeGreaterThan(expectedIds.size);
+  });
+});
+
+describe('MSW GET /api/vocs — codex round-5 (system_id + includeDeleted)', () => {
+  async function listWithRole(
+    qs: string,
+    role: 'admin' | 'manager' | 'dev' | 'user' = 'manager',
+  ): Promise<{ status: number; body: ListResponse }> {
+    const res = await fetch(`${window.location.origin}/api/vocs?${qs}`, {
+      headers: { 'x-mock-role': role },
+    });
+    const body = (await res.json()) as ListResponse;
+    return { status: res.status, body };
+  }
+
+  it('system_id 필터 — 매칭 system 만 반환', async () => {
+    const targetSystem = VOC_FIXTURES.find((r) => r.deleted_at === null)!.system_id;
+    const { status, body } = await list(`system_id=${targetSystem}&per_page=100`);
+    expect(status).toBe(200);
+    expect(body.rows.length).toBeGreaterThan(0);
+    expect(body.rows.every((r) => r.system_id === targetSystem)).toBe(true);
+  });
+
+  it('system_id + tag_ids 동시 필터 — AND 의미 보존', async () => {
+    const targetSystem = VOC_FIXTURES.find((r) => r.deleted_at === null)!.system_id;
+    const { status, body } = await list(
+      `system_id=${targetSystem}&tag_ids=${FIXTURE_TAGS.bug}&per_page=100`,
+    );
+    expect(status).toBe(200);
+    expect(body.rows.every((r) => r.system_id === targetSystem)).toBe(true);
+  });
+
+  it('manager + includeDeleted=true → deleted row 제외 (admin 전용 정책)', async () => {
+    const { status, body } = await listWithRole('includeDeleted=true&per_page=100', 'manager');
+    expect(status).toBe(200);
+    const deletedIds = new Set(VOC_FIXTURES.filter((r) => r.deleted_at !== null).map((r) => r.id));
+    expect(body.rows.every((r) => !deletedIds.has(r.id))).toBe(true);
+  });
+
+  it('admin + includeDeleted=true → deleted row 포함', async () => {
+    const hasDeleted = VOC_FIXTURES.some((r) => r.deleted_at !== null);
+    if (!hasDeleted) return; // 픽스처에 deleted row 없으면 스킵
+    const { status, body } = await listWithRole('includeDeleted=true&per_page=100', 'admin');
+    expect(status).toBe(200);
+    const deletedIds = new Set(VOC_FIXTURES.filter((r) => r.deleted_at !== null).map((r) => r.id));
+    expect(body.rows.some((r) => deletedIds.has(r.id))).toBe(true);
   });
 });
