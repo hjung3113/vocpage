@@ -1,9 +1,9 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-01 (Wave 3 plan 갱신, Phase 8 이후 본문 정리 — 종료 시점 재계획 예정)
-> 현재 위치: Phase 7 Wave 3 진입 직전 — 다음 = **W3-A VOC 본체** (C-02 / N-01 / N-02 / N-04 / N-06 / N-07)
-> Wave 3 plan: `plans/prototype-phase7-wave3-plan.md`
-> R-4 (tsx watch)는 Wave 3 종료 후 단독 PR
+> 최종 업데이트: 2026-05-01 (**Phase 7 close** — Wave 3 W3-A/B/C 머지 완료, Phase 8 재계획 대기)
+> 현재 위치: **Phase 7 종료** — 다음 = **Phase 8 재계획** (NextGen 백로그 + 운영/배포 phase 후보 입력으로 새 phase 정의)
+> Wave 3 결과: PR #93 W3-A / #94 W3-B / #95 W3-C 모두 머지 + 갭 재스캔 결론 0 잔여
+> R-4 (tsx watch) 이미 완료 — backend `dev` 스크립트 `tsx watch` (commit 809e267)
 
 ---
 
@@ -29,22 +29,39 @@
 | P-13 | User 관리 가드 토스트                                                                                                                   | ✅ Wave 2 B-15 (PR #83)                  |
 | P-14 | 첨부 업로드 에러 토스트                                                                                                                 | ✅ Wave 2 B-16 (PR #84)                  |
 | P-15 | Dashboard 설정 패널                                                                                                                     | ✅ Wave 2 B-17 (PR #85)                  |
-| P-16 | Wave 3 잔여 갭 마감 — C-02 / N-01 / N-02 / N-04 / N-06 / N-07 / C-10 / C-11 / C-14 / M-05 / N-05 + dashboard 빈 상태 + drawer 권한 차단 | → **Wave 3 (W3-A/B/C)**                  |
+| P-16 | Wave 3 잔여 갭 마감 — C-02 / N-01 / N-02 / N-04 / N-06 / N-07 / C-10 / C-11 / C-14 / M-05 / N-05 + dashboard 빈 상태 + drawer 권한 차단 | ✅ Wave 3 W3-A/B/C (PR #93/#94/#95)      |
 
 ---
 
 ## Wave 3 종료 후 단독 PR
 
-| ID  | 항목                                                                                         | 상태 |
-| --- | -------------------------------------------------------------------------------------------- | ---- |
-| R-4 | `ts-node-dev → tsx watch` 교체 (backend/package.json `dev` 스크립트) — `chore/r-4-tsx-watch` | -    |
+| ID  | 항목                                                                 | 상태                                 |
+| --- | -------------------------------------------------------------------- | ------------------------------------ |
+| R-4 | `ts-node-dev → tsx watch` 교체 (backend/package.json `dev` 스크립트) | ✅ (commit 809e267 — 이미 적용 완료) |
 
 ---
 
-## Phase 7 종료 후 (재계획 예정)
+## Phase 7 close 결과 (2026-05-01)
 
-Phase 7 close 시점에 Phase 8 이후 phase를 다시 계획한다. 본 문서는 그 시점에 갱신된다.
-**진행 중 발견된 갭들은 아래 "이연 갭 — 향후 phase 참조용"에 보존**되어 있으며, 재계획 시 입력으로 사용한다.
+| 종료 조건 (plan §7)                                          | 상태                              |
+| ------------------------------------------------------------ | --------------------------------- |
+| W3-A/B/C R2 PASS + PR 머지                                   | ✅ #93 / #94 / #95                |
+| `prototype-phase7-wave3-rescan.md` 갭 0 잔여 (N-03 OOS 명시) | ✅ Critical 0 / Major 0 / Minor 0 |
+| R-4 머지                                                     | ✅ (commit 809e267 — 사전 완료)   |
+| feature-voc.md §9.5 정렬 칩 문구 수정 (N-06 동시 커밋)       | ✅ W3-A commit 6015ffc            |
+| `claude-progress.txt` Phase 7 종료 표기                      | ✅ 2026-05-01                     |
+| `next-session-tasks.md` Phase 7 ✅ + 다음 Phase 재계획 표기  | ✅ 본 문서                        |
+
+---
+
+## Phase 8 재계획 (대기 — 다음 세션 입력)
+
+Phase 8 이후 phase는 다음 세션에서 아래 입력을 토대로 재계획한다:
+
+- 본 문서 "이연 갭" 섹션 (Phase F 후속 / 권한·스키마 인프라 / 명세 보강 / 운영·배포 후보)
+- `docs/specs/plans/nextgen-backlog.md`
+- 사용자 우선순위 조율
+  **진행 중 발견된 갭들은 아래 "이연 갭 — 향후 phase 참조용"에 보존**되어 있으며, 재계획 시 입력으로 사용한다.
 
 ---
 
