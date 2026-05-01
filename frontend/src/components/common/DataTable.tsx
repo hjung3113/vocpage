@@ -45,8 +45,11 @@ export function DataTable<T>({
 
   return (
     <table className="w-full border-collapse text-sm text-[color:var(--text-primary)]">
-      <thead data-pcomp="data-table" style={{ background: 'var(--bg-panel)' }}>
-        <tr className="border-b-2 border-[color:var(--border-subtle)]">
+      <thead
+        data-pcomp="data-table"
+        style={{ background: 'var(--bg-panel)', borderBottom: '2px solid var(--border-subtle)' }}
+      >
+        <tr>
           {columns.map((col) => {
             const active = sortKey === col.key;
             const sortable = col.sortable && onSort;

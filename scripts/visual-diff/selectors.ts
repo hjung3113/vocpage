@@ -69,10 +69,9 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
   },
   {
     componentId: 'voc-create-modal',
-    // openModal() makes #modalBg visible; use it as the structural root
-    proto: '#modalBg',
+    // openModal() makes #modalBg visible; .modal inside is the actual dialog panel
+    proto: '#modalBg .modal',
     react: '[data-pcomp="voc-create-modal"]',
-    // Stage 1: structural selector is the contract; Stage 2 adds data-pcomp
     isOverlay: true,
   },
   {
