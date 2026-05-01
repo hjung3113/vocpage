@@ -1,6 +1,27 @@
 @import 'tailwindcss';
 
 /*
+  Self-hosted fonts — binaries must be committed to frontend/public/fonts/
+  before Wave 0 PR merge. No CDN loading permitted (Phase 8 closed-network policy).
+  TODO: verify woff2 binaries committed to frontend/public/fonts/ before Wave 0 PR merge
+*/
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Pretendard-Variable.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'D2Coding';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/D2Coding.woff2') format('woff2');
+}
+
+/*
   @theme values mirror tokens.ts dark-mode values.
   Full light/dark switching is handled via light-dark() in :root below.
 */
