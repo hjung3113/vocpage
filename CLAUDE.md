@@ -2,9 +2,15 @@
 
 Guidance for Claude Code working in this repo.
 
-## Project Status
+## Project
 
-**VOC (Voice of Customer) management system**, currently **Phase 8 Wave 1 종료 + Wave 1.5 보강 대기** — Wave 1 vertical slice (`/voc` 리스트 + 검토 드로어) 머지 완료, prototype 시각 깊이 보강 PR 진입 전. Product spec: `docs/specs/requires/requirements.md`. Design system: `docs/specs/requires/uidesign.md`.
+**VOC (Voice of Customer) management system**.
+
+- 현재 진행 상태: `claude-progress.txt` (첫 30줄) → `docs/specs/plans/next-session-tasks.md`
+- Product spec: `docs/specs/requires/requirements.md`
+- Design system: `docs/specs/requires/uidesign.md`
+
+이 파일에 phase/wave 진행 상태를 적지 않는다 — 정본은 위 progress·plan 문서.
 
 ## Stack (summary — details in sub-dir CLAUDE.md)
 
