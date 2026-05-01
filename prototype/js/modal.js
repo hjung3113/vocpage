@@ -94,6 +94,8 @@ function openModal() {
     bodyEl.value = '';
     bodyEl.dataset.charCountAttached = '';
   }
+  resetAutoTags();
+  refreshTags();
   modalAttachFiles = [];
   renderModalAttach();
   // C-02: set initial due_date based on default priority (medium)
@@ -125,30 +127,98 @@ function onBodyInput() {
   refreshTags();
 }
 
-const RULES = [
-  { kw: ['집계', '수집', '스트리밍', '파이프라인', '인덱스', '중복'], tag: '데이터수집' },
-  { kw: ['차트', '그래프', '통계', '분석', '시각화'], tag: '데이터분석' },
-  { kw: ['etl', '배치', '파이프라인', '스케줄'], tag: 'ETL' },
-  { kw: ['타임아웃', '만료', '에러', '오류', '실패', '500'], tag: '오류' },
-  { kw: ['대시보드', 'kpi', '위젯', '보고서'], tag: '대시보드' },
-  { kw: ['이메일', '메일', 'smtp', '알림'], tag: '이메일' },
-];
+// ── N-01 Auto-tag suggestion ──────────────────────────────────────────────────
+// KEYWORD_MAP: keyword fragment → suggested tag name
+const KEYWORD_MAP = {
+  키보드: 'Hardware',
+  마우스: 'Hardware',
+  속도: 'Performance',
+  느림: 'Performance',
+  타임아웃: 'Performance',
+  에러: 'Bug',
+  오류: 'Bug',
+  실패: 'Bug',
+  로그인: 'Auth',
+  인증: 'Auth',
+  권한: 'Auth',
+  ui: 'UI/UX',
+  화면: 'UI/UX',
+  레이아웃: 'UI/UX',
+  데이터: 'Data',
+  집계: 'Data',
+  차트: 'Data',
+};
+
+// Tags that have been accepted by the user (moved from suggestions to selected)
+let selectedTags = new Set();
+
+function resetAutoTags() {
+  selectedTags = new Set();
+}
+
+function addSuggestedTag(tag) {
+  selectedTags.add(tag);
+  renderSelectedTags();
+  // Re-render suggestions to remove the accepted chip
+  renderSuggestions(getCurrentSuggestions());
+}
+
+function removeSelectedTag(tag) {
+  selectedTags.delete(tag);
+  renderSelectedTags();
+  renderSuggestions(getCurrentSuggestions());
+}
+
+function getCurrentSuggestions() {
+  const txt = (
+    (document.getElementById('titleInput')?.value || '') +
+    ' ' +
+    (document.getElementById('bodyInput')?.value || '')
+  ).toLowerCase();
+  const matched = new Set();
+  Object.entries(KEYWORD_MAP).forEach(([kw, tagName]) => {
+    if (txt.includes(kw.toLowerCase()) && !selectedTags.has(tagName)) {
+      matched.add(tagName);
+    }
+  });
+  return [...matched];
+}
+
+function renderSuggestions(suggestions) {
+  const row = document.getElementById('autotagRow');
+  if (!row) return;
+  if (suggestions.length === 0 && selectedTags.size === 0) {
+    row.innerHTML =
+      '<span class="at-label">자동 태그 추천:</span>' +
+      '<span style="font-size:11.5px;color:var(--text-quaternary)">제목·본문 입력 시 자동으로 추천됩니다</span>';
+    return;
+  }
+  const suggChips = suggestions
+    .map(
+      (t) =>
+        `<button type="button" class="at-suggest-chip" onclick="addSuggestedTag(${JSON.stringify(t)})" title="클릭하여 추가">+ ${window.escHtml ? window.escHtml(t) : t}</button>`,
+    )
+    .join('');
+  const selChips = [...selectedTags]
+    .map(
+      (t) =>
+        `<span class="at-pill at-selected-chip">${window.escHtml ? window.escHtml(t) : t}<button type="button" class="at-remove-tag" onclick="removeSelectedTag(${JSON.stringify(t)})" aria-label="태그 제거">×</button></span>`,
+    )
+    .join('');
+  row.innerHTML =
+    '<span class="at-label">자동 태그 추천:</span>' +
+    suggChips +
+    (selChips ? '<span class="at-sep">선택됨:</span>' + selChips : '');
+}
+
+function renderSelectedTags() {
+  renderSuggestions(getCurrentSuggestions());
+}
+
 let tagTimer;
 function refreshTags() {
   clearTimeout(tagTimer);
   tagTimer = setTimeout(() => {
-    const txt = (
-      (document.getElementById('titleInput').value || '') +
-      ' ' +
-      (document.getElementById('bodyInput').value || '')
-    ).toLowerCase();
-    const matched = [
-      ...new Set(RULES.filter((r) => r.kw.some((k) => txt.includes(k))).map((r) => r.tag)),
-    ];
-    const row = document.getElementById('autotagRow');
-    row.innerHTML = matched.length
-      ? '<span class="at-label">자동 태그 추천:</span>' +
-        matched.map((t) => `<span class="at-pill"># ${t}</span>`).join('')
-      : '<span class="at-label">자동 태그 추천:</span><span style="font-size:11.5px;color:var(--text-quaternary)">제목·본문 입력 시 자동으로 추천됩니다</span>';
-  }, 280);
+    renderSuggestions(getCurrentSuggestions());
+  }, 300);
 }
