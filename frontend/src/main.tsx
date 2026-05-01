@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { router } from './router';
 import AppProviders from './contexts/AppProviders';
+import { RoleProvider } from './contexts/RoleContext';
 import { queryClient } from './api/queryClient';
 import './styles/index.css';
 
@@ -19,9 +20,11 @@ enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <AppProviders>
-          <RouterProvider router={router} />
-        </AppProviders>
+        <RoleProvider>
+          <AppProviders>
+            <RouterProvider router={router} />
+          </AppProviders>
+        </RoleProvider>
         {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
       </QueryClientProvider>
     </React.StrictMode>,
