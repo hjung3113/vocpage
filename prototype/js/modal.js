@@ -45,7 +45,7 @@ function modalProcessFiles(files) {
       if (typeof window.showAttachmentError === 'function') window.showAttachmentError('415');
       return;
     }
-    if (f.size > 5 * 1024 * 1024) {
+    if (f.size > 10 * 1024 * 1024) {
       if (typeof window.showAttachmentError === 'function') window.showAttachmentError('413');
       return;
     }
@@ -97,7 +97,7 @@ function renderModalAttach() {
       drop.innerHTML =
         `이미지 드래그 또는 ` +
         `<button class="att-select-btn" type="button" onclick="modalAddAttach(event)">선택</button>` +
-        ` · 5MB까지 · <span class="att-count-badge" id="modal-att-count">${count}/${MODAL_ATT_MAX}</span>`;
+        ` · 10MB까지 · <span class="att-count-badge" id="modal-att-count">${count}/${MODAL_ATT_MAX}</span>`;
     }
   }
 }
@@ -175,8 +175,9 @@ function openModal() {
   document.getElementById('modalBg').classList.add('open');
   setTimeout(() => {
     if (typeof window.attachCharCount === 'function') {
-      window.attachCharCount(titleEl, 100);
-      window.attachCharCount(bodyEl, 5000);
+      const registerBtn = document.getElementById('registerVocBtn');
+      window.attachCharCount(titleEl, 100, registerBtn);
+      window.attachCharCount(bodyEl, 5000, registerBtn);
     }
     titleEl && titleEl.focus();
   }, 80);
@@ -188,8 +189,7 @@ function handleBgClick(e) {
   if (e.target === document.getElementById('modalBg')) closeModal();
 }
 
-function onTitleInput(el) {
-  document.getElementById('titleCount').textContent = `${el.value.length} / 200`;
+function onTitleInput() {
   refreshTags();
 }
 function onBodyInput() {
@@ -238,6 +238,10 @@ function removeSelectedTag(tag) {
   renderSuggestions(getCurrentSuggestions());
 }
 
+function escapeRegexKw(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function getCurrentSuggestions() {
   const txt = (
     (document.getElementById('titleInput')?.value || '') +
@@ -246,7 +250,10 @@ function getCurrentSuggestions() {
   ).toLowerCase();
   const matched = new Set();
   Object.entries(KEYWORD_MAP).forEach(([kw, tagName]) => {
-    if (txt.includes(kw.toLowerCase()) && !selectedTags.has(tagName)) {
+    // Word-boundary check: handles spaces/punctuation. Works for Korean (space-delimited).
+    const kwL = kw.toLowerCase();
+    const pattern = new RegExp('(^|[\\s.,!?])' + escapeRegexKw(kwL) + '([\\s.,!?]|$)', 'i');
+    if (pattern.test(txt) && !selectedTags.has(tagName)) {
       matched.add(tagName);
     }
   });

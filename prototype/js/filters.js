@@ -29,9 +29,12 @@ function toggleSort(key) {
   lucide.createIcons();
   // N-06: keep chips in sync when header cells are clicked
   if (typeof updateSortChips === 'function') updateSortChips();
-  // URL sync
+  // URL sync — use API key mapping (same as sortByChip)
   const url = new URL(window.location.href);
-  url.searchParams.set('sort', key);
+  url.searchParams.set(
+    'sort',
+    (typeof SORT_API_KEY_MAP !== 'undefined' ? SORT_API_KEY_MAP[key] : null) || key,
+  );
   url.searchParams.set('order', sortDir);
   history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString());
   currentPage = 1;
@@ -64,10 +67,11 @@ function renderTagChips() {
   const el = document.getElementById('tagChips');
   if (!el) return;
   const allTags = [...new Set(VOCDATA.flatMap((v) => v.tags || []))].sort();
+  const esc = window.escHtml || ((s) => s);
   el.innerHTML = allTags
     .map(
       (tag) =>
-        `<div class="af-chip${filterTags.has(tag) ? ' active' : ''}" onclick="toggleTagChip('${tag}',this)">${tag}</div>`,
+        `<div class="af-chip${filterTags.has(tag) ? ' active' : ''}" onclick="toggleTagChip('${esc(tag)}',this)">${esc(tag)}</div>`,
     )
     .join('');
 }

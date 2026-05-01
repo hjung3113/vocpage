@@ -26,55 +26,55 @@
 
 ### feature-voc.md
 
-| §       | spec line | feature                                | prototype selector / file                                                 | status        |
-| ------- | --------- | -------------------------------------- | ------------------------------------------------------------------------- | ------------- |
-| 8.1     | L9        | VOC 식별자 (Issue Code)                | `#listArea` `.voc-row`, `data.js`                                         | ✅            |
-| 8.2     | L20       | 상태 전환 매트릭스 (7종)               | `#page-voc .pill`, `drawer.js` L31–35                                     | ✅            |
-| 8.2     | L22       | 허용/비허용 전환 disabled UI           | `drawer.js` L32–34 `disabled` option                                      | ✅            |
-| 8.2     | L34       | UI 행동 규칙 (토스트 데모)             | `helpers.js` toast                                                        | ✅            |
-| 8.2.1   | L56       | review_status 서브 상태 머신           | 미구현 — JS/HTML 없음                                                     | ❌            |
-| 8.3     | L76       | 권한 모델 (4역할)                      | sidebar user-role 텍스트 L66                                              | ⚠             |
-| 8.4-bis | L112      | assertCanManageVoc helper              | 미구현 — 권한 가드 토스트 없음                                            | ❌            |
-| 8.4     | L157      | Priority 4종                           | `.af-chip` priority L120–123, `drawer.js` L41–44                          | ✅            |
-| 8.4.0   | L163      | Priority 권한 매트릭스                 | 미구현                                                                    | ❌            |
-| 8.4.1   | L174      | Due Date 자동 설정                     | 미구현                                                                    | ❌            |
-| 8.4.2   | L188      | Due Date 필드 UI                       | 미구현                                                                    | ❌            |
-| 8.5     | L213      | 파일 첨부                              | `drawer-core.js` `buildAttachSection()` L63, `.d-attachments`             | ✅            |
-| 8.5     | L213      | 첨부 에러 토스트 (413/415/400)         | 미구현                                                                    | ❌            |
-| 8.6     | L224      | 인앱 알림 패널                         | `#notifPanel`, `notif.js`, `#notifBtn` L84                                | ✅            |
-| 8.6     | L224      | 알림 유형 필터 (댓글/상태/담당/Urgent) | `#notifPanel .nf-chip` L876–880                                           | ✅            |
-| 8.7     | L234      | Sub-task                               | `drawer-core.js` `buildSubsSection()` L22, `.d-subtasks`                  | ✅            |
-| 8.7     | L244      | Sub-task 생성 진입점                   | `drawer-core.js` `showSubForm()` L80                                      | ✅            |
-| 8.8     | L245      | 분류 체계 (시스템/메뉴/유형/태그)      | `#advFilterWrap .af-chips` L128–132                                       | ✅            |
-| 8.8.1   | L282      | 드로어 태그 수동 편집 UI (C7)          | `drawer.js` 태그 섹션 (partial — edit modal 미구현)                       | ⚠             |
-| 8.8.2   | L309      | VOC 등록 모달 자동 태그 추천           | `modal.js` (partial — 자동 추천 로직 미구현)                              | ⚠             |
-| 8.8.3   | L317      | 태그 규칙 관리 편집 방식               | `#page-tag-rules` L426, `admin-master.js`                                 | ✅            |
-| 8.9     | L324      | 삭제 정책 (소프트 삭제)                | `#page-trash` L648, `admin-trash.js`                                      | ✅            |
-| 8.10    | L331      | 입력값 제한                            | `modal.js` validation (partial — 한도 표시 없음)                          | ⚠             |
-| 8.11    | L339      | VOC 목록 필터/검색/페이지네이션        | `#searchInput` L82, `filters.js`, `#paginationRow` L152                   | ✅            |
-| 8.12    | L348      | 파일 저장소                            | 미구현 (BE spec, FE 미시연)                                               | ⊘             |
-| 8.13    | L356      | 댓글 수정/삭제 정책                    | `drawer-core.js` `editComment()` L198, `deleteComment()` L234             | ✅            |
-| 8.14    | L363      | 인앱 알림 폴링                         | `notif.js` (static mock — 폴링 없음)                                      | ⚠             |
-| 8.15    | L371      | 기존 분석 시스템 통합                  | 미구현 (BE scope)                                                         | ⊘             |
-| 8.16    | L378      | Internal Notes                         | `internal-notes.js`, `.d-internal-notes` via drawer                       | ✅            |
-| 8.17    | L420      | 드로어 퍼머링크 복사 🔗                | `#drawer .icon-btn[data-tip="링크 복사"]` L763 (버튼만 — 실제 copy 없음)  | ⚠             |
-| 9.1     | L436      | 필터 고급 옵션                         | `#advFilterWrap` L106, `toggleAdvFilter()`                                | ✅            |
-| 9.2.1   | L444      | 서브태스크 생성 진입점                 | `drawer-core.js` `showSubForm()` L80                                      | ✅            |
-| 9.2.2   | L450      | 목록 인라인 펼침                       | `drawer-core.js` `buildSubsSection()` L22                                 | ✅            |
-| 9.3     | L463      | 첨부파일 UI 명세                       | `drawer-core.js` `attachItemHTML()` L11, `drawerAddAttach()` L148         | ✅            |
-| 9.4.1   | L472      | 태그 규칙 관리                         | `#page-tag-rules` L426, `admin.css`                                       | ✅            |
-| 9.4.2   | L478      | 시스템/메뉴 관리                       | `#page-system-menu` L472                                                  | ✅            |
-| 9.4.3   | L486      | 유형 관리                              | `#page-voc-type` L523                                                     | ✅            |
-| 9.4.4   | L492      | 사용자 관리                            | `#page-users` L563, `admin-users.js`                                      | ✅            |
-| 9.4.5   | L499      | Result Review                          | `#page-result-review` L608, `result-review.js`, `result-review-detail.js` | ✅            |
-| 9.4.5.1 | L516      | 검토 상세 드로어                       | `result-review-detail.js`                                                 | ✅            |
-| 9.4.6   | L593      | 태그 마스터 관리 (D22)                 | `#page-tag-master` L613, `admin-tag-master.js`                            | ✅ Wave 1 P-7 |
-| 9.4.7   | L616      | 휴지통 (D23)                           | `#page-trash` L648, `admin-trash.js`                                      | ✅ Wave 1 P-8 |
-| 9.5     | L636      | 정렬 옵션 (컬럼 헤더 클릭)             | `.hcell[data-sort-key]` L144–149, `voc-list.js` `toggleSort()`            | ✅            |
-| 9.6     | L644      | 검색 결과 하이라이팅                   | `voc-list.js` (partial — highlight 로직 여부 미확인)                      | ⚠             |
-| 9.7     | L650      | 댓글 인라인 편집                       | `drawer-core.js` `editComment()` L198, `saveComment()` L214               | ✅            |
-| 9.8     | L655      | 페이지네이션 (숫자 버튼)               | `#paginationRow` L152, `voc-list.js`                                      | ✅            |
-| 9.9     | L663      | VOC 상세 전체 화면 전환                | `drawer.js` `toggleFullscreen()` L172, `.drawer.fullscreen`               | ✅            |
+| §       | spec line | feature                                             | prototype selector / file                                                 | status        |
+| ------- | --------- | --------------------------------------------------- | ------------------------------------------------------------------------- | ------------- |
+| 8.1     | L9        | VOC 식별자 (Issue Code)                             | `#listArea` `.voc-row`, `data.js`                                         | ✅            |
+| 8.2     | L20       | 상태 전환 매트릭스 (7종)                            | `#page-voc .pill`, `drawer.js` L31–35                                     | ✅            |
+| 8.2     | L22       | 허용/비허용 전환 disabled UI                        | `drawer.js` L32–34 `disabled` option                                      | ✅            |
+| 8.2     | L34       | UI 행동 규칙 (토스트 데모)                          | `helpers.js` toast                                                        | ✅            |
+| 8.2.1   | L56       | review_status 서브 상태 머신                        | 미구현 — JS/HTML 없음                                                     | ❌            |
+| 8.3     | L76       | 권한 모델 (4역할)                                   | sidebar user-role 텍스트 L66                                              | ⚠             |
+| 8.4-bis | L112      | assertCanManageVoc helper                           | 미구현 — 권한 가드 토스트 없음                                            | ❌            |
+| 8.4     | L157      | Priority 4종                                        | `.af-chip` priority L120–123, `drawer.js` L41–44                          | ✅            |
+| 8.4.0   | L163      | Priority 권한 매트릭스                              | 미구현                                                                    | ❌            |
+| 8.4.1   | L174      | Due Date 자동 설정                                  | 미구현                                                                    | ❌            |
+| 8.4.2   | L188      | Due Date 필드 UI                                    | 미구현                                                                    | ❌            |
+| 8.5     | L213      | 파일 첨부                                           | `drawer-core.js` `buildAttachSection()` L63, `.d-attachments`             | ✅            |
+| 8.5     | L213      | 첨부 에러 토스트 (413/415/400)                      | 미구현                                                                    | ❌            |
+| 8.6     | L224      | 인앱 알림 패널                                      | `#notifPanel`, `notif.js`, `#notifBtn` L84                                | ✅            |
+| 8.6     | L224      | 알림 유형 필터 (댓글/상태/담당/Urgent)              | `#notifPanel .nf-chip` L876–880                                           | ✅            |
+| 8.7     | L234      | Sub-task                                            | `drawer-core.js` `buildSubsSection()` L22, `.d-subtasks`                  | ✅            |
+| 8.7     | L244      | Sub-task 생성 진입점                                | `drawer-core.js` `showSubForm()` L80                                      | ✅            |
+| 8.8     | L245      | 분류 체계 (시스템/메뉴/유형/태그)                   | `#advFilterWrap .af-chips` L128–132                                       | ✅            |
+| 8.8.1   | L282      | 드로어 태그 수동 편집 UI (C7)                       | `drawer.js` 태그 섹션 (partial — edit modal 미구현)                       | ⚠             |
+| 8.8.2   | L309      | VOC 등록 모달 자동 태그 추천                        | `modal.js` (partial — 자동 추천 로직 미구현)                              | ⚠             |
+| 8.8.3   | L317      | 태그 규칙 관리 편집 방식                            | `#page-tag-rules` L426, `admin-master.js`                                 | ✅            |
+| 8.9     | L324      | 삭제 정책 (소프트 삭제)                             | `#page-trash` L648, `admin-trash.js`                                      | ✅            |
+| 8.10    | L331      | 입력값 제한                                         | `modal.js` validation (partial — 한도 표시 없음)                          | ⚠             |
+| 8.11    | L339      | VOC 목록 필터/검색/페이지네이션                     | `#searchInput` L82, `filters.js`, `#paginationRow` L152                   | ✅            |
+| 8.12    | L348      | 파일 저장소                                         | 미구현 (BE spec, FE 미시연)                                               | ⊘             |
+| 8.13    | L356      | 댓글 수정/삭제 정책                                 | `drawer-core.js` `editComment()` L198, `deleteComment()` L234             | ✅            |
+| 8.14    | L363      | 인앱 알림 폴링                                      | `notif.js` (static mock — 폴링 없음)                                      | ⚠             |
+| 8.15    | L371      | 기존 분석 시스템 통합                               | 미구현 (BE scope)                                                         | ⊘             |
+| 8.16    | L378      | Internal Notes                                      | `internal-notes.js`, `.d-internal-notes` via drawer                       | ✅            |
+| 8.17    | L420      | 드로어 퍼머링크 복사 🔗                             | `#drawer .icon-btn[data-tip="링크 복사"]` L763 (버튼만 — 실제 copy 없음)  | ⚠             |
+| 9.1     | L436      | 필터 고급 옵션                                      | `#advFilterWrap` L106, `toggleAdvFilter()`                                | ✅            |
+| 9.2.1   | L444      | 서브태스크 생성 진입점                              | `drawer-core.js` `showSubForm()` L80                                      | ✅            |
+| 9.2.2   | L450      | 목록 인라인 펼침                                    | `drawer-core.js` `buildSubsSection()` L22                                 | ✅            |
+| 9.3     | L463      | 첨부파일 UI 명세                                    | `drawer-core.js` `attachItemHTML()` L11, `drawerAddAttach()` L148         | ✅            |
+| 9.4.1   | L472      | 태그 규칙 관리                                      | `#page-tag-rules` L426, `admin.css`                                       | ✅            |
+| 9.4.2   | L478      | 시스템/메뉴 관리                                    | `#page-system-menu` L472                                                  | ✅            |
+| 9.4.3   | L486      | 유형 관리                                           | `#page-voc-type` L523                                                     | ✅            |
+| 9.4.4   | L492      | 사용자 관리                                         | `#page-users` L563, `admin-users.js`                                      | ✅            |
+| 9.4.5   | L499      | Result Review                                       | `#page-result-review` L608, `result-review.js`, `result-review-detail.js` | ✅            |
+| 9.4.5.1 | L516      | 검토 상세 드로어                                    | `result-review-detail.js`                                                 | ✅            |
+| 9.4.6   | L593      | 태그 마스터 관리 (D22)                              | `#page-tag-master` L613, `admin-tag-master.js`                            | ✅ Wave 1 P-7 |
+| 9.4.7   | L616      | 휴지통 (D23)                                        | `#page-trash` L648, `admin-trash.js`                                      | ✅ Wave 1 P-8 |
+| 9.5     | L636      | 정렬 옵션 (정렬 칩 클릭, §9.5 amendment 2026-05-01) | `.hcell[data-sort-key]` L144–149, `voc-list.js` `toggleSort()`            | ✅            |
+| 9.6     | L644      | 검색 결과 하이라이팅                                | `voc-list.js` (partial — highlight 로직 여부 미확인)                      | ⚠             |
+| 9.7     | L650      | 댓글 인라인 편집                                    | `drawer-core.js` `editComment()` L198, `saveComment()` L214               | ✅            |
+| 9.8     | L655      | 페이지네이션 (숫자 버튼)                            | `#paginationRow` L152, `voc-list.js`                                      | ✅            |
+| 9.9     | L663      | VOC 상세 전체 화면 전환                             | `drawer.js` `toggleFullscreen()` L172, `.drawer.fullscreen`               | ✅            |
 
 **feature-voc.md 소계: 38섹션 중 28 시연 → 74%**
 

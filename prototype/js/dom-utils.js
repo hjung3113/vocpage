@@ -9,10 +9,10 @@ window.escHtml = function escHtml(s) {
 };
 
 // ── N-02 Character count helper ─────────────────────────────────────────────
-// attachCharCount(input, max) — appends a live counter element after the input.
+// attachCharCount(input, max, saveBtn?) — appends a live counter element after the input.
 // Thresholds: < 90% → default (--text-quaternary), ≥ 90% → amber, > max → red + disables saveBtn.
-// saveBtn: nearest ancestor .modal or .drawer-body → first btn-primary inside it.
-window.attachCharCount = function attachCharCount(input, max) {
+// saveBtn: explicit button element; if null, falls back to nearest ancestor .modal/.drawer-body first .btn-primary.
+window.attachCharCount = function attachCharCount(input, max, saveBtn) {
   if (!input || input.dataset.charCountAttached) return;
   input.dataset.charCountAttached = 'true';
   input.dataset.charMax = String(max);
@@ -23,6 +23,7 @@ window.attachCharCount = function attachCharCount(input, max) {
   input.insertAdjacentElement('afterend', counter);
 
   function findSaveBtn() {
+    if (saveBtn) return saveBtn;
     const ctx = input.closest('.modal') || input.closest('.drawer-body');
     return ctx ? ctx.querySelector('.btn-primary') : null;
   }
@@ -30,6 +31,7 @@ window.attachCharCount = function attachCharCount(input, max) {
   function update() {
     const len = input.value.length;
     counter.textContent = `${len} / ${max}`;
+    input.setAttribute('aria-invalid', len > max ? 'true' : 'false');
     if (len > max) {
       counter.className = 'char-count char-count--over';
       const btn = findSaveBtn();

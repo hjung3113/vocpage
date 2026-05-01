@@ -84,11 +84,12 @@ if (!attachStore['voc1'] || attachStore['voc1'].length < 2) {
 
 function attThumbHTML(f, idx, vocId) {
   const bg = f.mockColor || 'var(--bg-elevated)';
+  const safeName = window.escHtml ? window.escHtml(f.name) : f.name;
   return `<div class="att-item" data-idx="${idx}">
-    <div class="att-thumb" style="background:${bg}" title="${f.name}">
+    <div class="att-thumb" style="background:${bg}" title="${safeName}">
       <i data-lucide="image" style="width:20px;height:20px;color:var(--text-quaternary)"></i>
     </div>
-    <span class="att-item-name">${f.name}</span>
+    <span class="att-item-name">${safeName}</span>
     <button class="att-remove" type="button" onclick="removeAttach('${vocId}',${idx})" aria-label="삭제">×</button>
   </div>`;
 }
@@ -101,7 +102,7 @@ function buildAttachSection(d) {
   const dropDisabledClass = full ? ' att-drop--disabled' : '';
   const dropText = full
     ? `<span style="color:var(--text-quaternary)">첨부 한도 도달 (${count}/${ATT_MAX})</span>`
-    : `이미지 드래그 또는 <button class="att-select-btn" type="button" onclick="drawerAddAttach('${d.id}')">선택</button> · 5MB까지 · <span class="att-count-badge">${count}/${ATT_MAX}</span>`;
+    : `이미지 드래그 또는 <button class="att-select-btn" type="button" onclick="drawerAddAttach('${d.id}')">선택</button> · 10MB까지 · <span class="att-count-badge">${count}/${ATT_MAX}</span>`;
 
   return `
     <div class="d-attachments">
@@ -169,7 +170,7 @@ function processAttachFiles(files, vocId) {
       if (typeof window.showAttachmentError === 'function') window.showAttachmentError('415');
       return;
     }
-    if (f.size > 5 * 1024 * 1024) {
+    if (f.size > 10 * 1024 * 1024) {
       if (typeof window.showAttachmentError === 'function') window.showAttachmentError('413');
       return;
     }
@@ -205,7 +206,7 @@ function refreshAttZone(vocId) {
       drop.innerHTML = `<span style="color:var(--text-quaternary)">첨부 한도 도달 (${count}/${ATT_MAX})</span>`;
     } else {
       drop.classList.remove('att-drop--disabled');
-      drop.innerHTML = `이미지 드래그 또는 <button class="att-select-btn" type="button" onclick="drawerAddAttach('${vocId}')">선택</button> · 5MB까지 · <span class="att-count-badge">${count}/${ATT_MAX}</span>`;
+      drop.innerHTML = `이미지 드래그 또는 <button class="att-select-btn" type="button" onclick="drawerAddAttach('${vocId}')">선택</button> · 10MB까지 · <span class="att-count-badge">${count}/${ATT_MAX}</span>`;
     }
   }
   lucide.createIcons({ nodes: [grid, drop].filter(Boolean) });
@@ -261,7 +262,7 @@ function confirmSub(vocId) {
     const div = document.createElement('div');
     div.innerHTML = `<div class="sub-row" onclick="openDrawer('${newId}')">
       ${statusHTML('접수')}
-      <span class="sub-row-title">${title}</span>
+      <span class="sub-row-title">${window.escHtml ? window.escHtml(title) : title}</span>
       <div class="mini-av" style="width:20px;height:20px;font-size:9px;flex-shrink:0">—</div>
     </div>`;
     list.appendChild(div.firstElementChild);
@@ -330,7 +331,7 @@ function saveComment(btn) {
 function cancelEditComment(btn) {
   const bodyEl = btn.closest('.c-body');
   bodyEl.classList.remove('editing');
-  bodyEl.innerHTML = bodyEl.dataset.orig || '';
+  bodyEl.textContent = bodyEl.dataset.orig || '';
 }
 function deleteComment(btn) {
   const card = btn.closest('.comment-card');

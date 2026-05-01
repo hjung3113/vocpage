@@ -156,6 +156,16 @@ function onSearch(val) {
 }
 
 // ── N-06 Sort chips ───────────────────────────────────────────────────────────
+// API key mapping for URL sort param (internal key → API field name)
+const SORT_API_KEY_MAP = {
+  date: 'created_at',
+  id: 'issue_code',
+  title: 'title',
+  status: 'status',
+  priority: 'priority',
+  assignee: 'assignee',
+};
+
 function sortByChip(key) {
   if (sortKey === key) {
     sortDir = sortDir === 'asc' ? 'desc' : 'asc';
@@ -178,9 +188,9 @@ function sortByChip(key) {
     }
   });
   lucide.createIcons();
-  // URL sync: ?sort=key&order=dir
+  // URL sync: ?sort=api_key&order=dir
   const url = new URL(window.location.href);
-  url.searchParams.set('sort', key);
+  url.searchParams.set('sort', SORT_API_KEY_MAP[key] || key);
   url.searchParams.set('order', sortDir);
   history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString());
   renderVOCList();
@@ -191,14 +201,21 @@ function updateSortChips() {
     const key = chip.dataset.sortKey;
     const isActive = key === sortKey;
     chip.classList.toggle('sort-chip--active', isActive);
+    chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     // Remove any existing direction indicator
     const existingIcon = chip.querySelector('.sort-chip-icon');
     if (existingIcon) existingIcon.remove();
     if (isActive) {
       const icon = document.createElement('span');
       icon.className = 'sort-chip-icon';
+      icon.setAttribute('aria-hidden', 'true');
       icon.textContent = sortDir === 'asc' ? ' ▲' : ' ▼';
       chip.appendChild(icon);
+      // Visually-hidden text for screen readers
+      const srText = document.createElement('span');
+      srText.className = 'sr-only';
+      srText.textContent = sortDir === 'asc' ? ' 오름차순' : ' 내림차순';
+      chip.appendChild(srText);
     }
   });
 }

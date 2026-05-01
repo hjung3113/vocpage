@@ -1,10 +1,10 @@
 // ── C-02 Due Date helpers ────────────────────────────────────────────────────
 // calcDueDate(priority, baseDate?) → 'YYYY-MM-DD'
-// P0(urgent)=+1d, P1(high)=+3d, P2(medium)=+7d, P3(low)=+30d
+// urgent=+7d, high=+14d, medium=+30d, low=+90d (feature-voc.md §8.4.1)
 window.calcDueDate = function calcDueDate(priority, baseDate) {
   const base = baseDate ? new Date(baseDate) : new Date();
-  const offsets = { urgent: 1, high: 3, medium: 7, low: 30 };
-  const days = offsets[priority] ?? 7;
+  const offsets = { urgent: 7, high: 14, medium: 30, low: 90 };
+  const days = offsets[priority] ?? 30;
   base.setDate(base.getDate() + days);
   return base.toISOString().slice(0, 10);
 };
@@ -177,13 +177,19 @@ function openDrawer(id) {
   if (row) row.classList.add('selected');
   lucide.createIcons();
 
-  // N-02: attach charcount to drawer comment input
+  // N-02: attach charcount to drawer comment input — pass explicit submit button to avoid wrong btn-primary
   if (typeof window.attachCharCount === 'function') {
     const commentInput = document.getElementById('new-comment-input-' + id);
-    if (commentInput) window.attachCharCount(commentInput, 1000);
-    // internal-notes textarea (rendered by InternalNotes.build)
-    const notesInput = document.querySelector('.in-compose-ta');
-    if (notesInput) window.attachCharCount(notesInput, 1000);
+    const commentSubmitBtn = commentInput
+      ? commentInput.closest('.comment-input')?.querySelector('.btn-primary')
+      : null;
+    if (commentInput) window.attachCharCount(commentInput, 1000, commentSubmitBtn || null);
+    // internal-notes textarea (rendered by InternalNotes.build) — uses its own note-save-btn (not btn-primary)
+    const notesInput = document.querySelector('.note-input');
+    const notesSaveBtn = notesInput
+      ? notesInput.closest('.note-input-area')?.querySelector('.note-save-btn')
+      : null;
+    if (notesInput) window.attachCharCount(notesInput, 1000, notesSaveBtn || null);
   }
 
   // C-02: apply role-based readonly for due-date and priority
@@ -192,8 +198,15 @@ function openDrawer(id) {
   const priorityEl = document.getElementById('drawer-priority-' + id);
   if (role === 'user') {
     if (dueDateEl) {
-      dueDateEl.disabled = true;
-      dueDateEl.title = '권한 없음 (User 조회만 가능)';
+      // Spec §8.4.2: User role — show date as plain text, hide input
+      const dateVal = dueDateEl.value;
+      const displayText = dateVal || '기한 없음';
+      const span = document.createElement('span');
+      span.className = 'due-date-readonly';
+      span.style.fontSize = '13px';
+      span.style.color = 'var(--text-primary)';
+      span.textContent = displayText;
+      dueDateEl.parentNode.replaceChild(span, dueDateEl);
     }
     if (priorityEl) {
       priorityEl.disabled = true;
@@ -201,6 +214,9 @@ function openDrawer(id) {
   }
 
   document.dispatchEvent(new CustomEvent('drawer:opened', { detail: { vocId: id, voc: d } }));
+  // F9: re-enforce data-role-allow on freshly injected drawer content
+  if (typeof window.RoleState?.applyRoleVisibility === 'function')
+    window.RoleState.applyRoleVisibility();
 }
 
 // ── C-02 Due Date event handlers ─────────────────────────────────────────────
