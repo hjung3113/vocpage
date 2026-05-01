@@ -338,3 +338,12 @@
   height: 11px;
   flex-shrink: 0;
 }
+
+/* ─── N-04 Search highlight ─── */
+mark.search-highlight {
+  background: var(--brand-bg);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  font-weight: 600;
+}
