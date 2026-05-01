@@ -58,7 +58,8 @@
 
 > **계획서 정본**: `docs/specs/plans/phase-8.md` (PR #99, 2026-05-01 머지)
 > **방식**: A′ Contract-first per-screen — Wave 1만 vertical slice, Wave 2~5 분리 PR
-> **스택**: shadcn/ui + TanStack Query/Table + RHF/Zod + MSW + Recharts (폐쇄망 self-host)
+> **스택**: shadcn/ui + TanStack Query/Table + RHF/Zod + MSW + Recharts (폐쇄망 self-host 가능 구성)
+> **운영 전제 (2026-05-01 갱신)**: Wave 0~5는 **개방망 표준 npm registry**로 진행. 폐쇄망 빌드는 동일 lockfile + `phase-8.md` §7.2 우회 4경로(미러 / 오프라인 캐시 / Verdaccio / git tarball·`npm pack`)로 **사후 재현**. 사내 미러 점검은 Phase 8 종료 후 별도 phase. 단, 진행 중에도 runtime fetch·CDN URL·telemetry zero / self-host / `package-lock.json` commit 강제(폐쇄망 재현 가능성 보존).
 
 | Wave | 범위                                                                                                                                                   | PR 수 | 상태       |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | ---------- |
@@ -76,7 +77,7 @@
 - 핵심 12 화면 시각 회귀 yes/no 통과 (사용자 결정자)
 - NextGen leger 갱신 (N-03-ETag, 시각 회귀 자동화, shadcn 라이선스 inventory, contract semver)
 
-**Wave 0 첫 commit 강제**: 사내 npm 미러 사전 점검 (`npm config get registry` + `npm install zod --dry-run`). 미러 부재 시 §7 raw 벤더링 절차로 우회 결정 (사용자 승인 필요).
+**Wave 0 첫 commit**: 레지스트리 환경 기록 (`npm config get registry` + `npm ci` 캡처) + 폐쇄망 사후 재현 4경로(§7.2: 미러 / 오프라인 캐시 / Verdaccio / git tarball·`npm pack`) 우선순위 정리 → `docs/specs/plans/phase-8-mirror-check.md`. **개방망 진행 강제 규칙**: runtime fetch·CDN URL·telemetry 산출물 zero / 폰트·아이콘·MSW worker self-host / `package-lock.json` 항상 commit.
 
 ---
 

@@ -58,24 +58,19 @@ No implementation without a written spec section covering it.
 
 ## Documents (structure + coherence)
 
-All design / review / implementation docs live under `docs/specs/`. No document files at the repo root. Tool scratch dirs (`.omc/plans/`, `.superpowers/`, etc.) are temporary — canonical docs always live in `docs/specs/`.
+**문서 관리 정본: `docs/specs/README.md` (Documentation Hygiene).** 본 섹션은 핵심 룰만 명시.
 
-```
-docs/specs/
-├── requires/   # requirements.md (Korean), uidesign.md (English only)
-├── plans/      # per-feature implementation plans, <feature-name>.md
-└── reviews/    # review / brainstorming, <topic>.md
-```
+핵심 원칙:
 
-| Decision made                                                     | Write to                                           | Then propagate to             |
-| ----------------------------------------------------------------- | -------------------------------------------------- | ----------------------------- |
-| Visual design (color, layout, spacing, component pattern)         | `requires/uidesign.md` (English)                   | implementation plan           |
-| Functional / behavioral (feature rule, API shape, business logic) | `requires/requirements.md` or relevant `feature-*` | implementation plan           |
-| Implementation plan (task added/removed)                          | `plans/<feature>.md`                               | spec section it implements    |
-| New rule in `CLAUDE.md`                                           | this file                                          | spec if rule affects behavior |
+- **CLAUDE.md가 governance 최상위 정본**, AGENTS.md는 진입 포인터일 뿐 (룰은 여기로 위임)
+- **신규 doc 금지** — 사용자 명시 요청 시에만 새 파일. 그 외엔 기존 SoT 갱신
+- **One responsibility per doc** — 시각/동작 spec 혼합 금지. `uidesign.md`에 동작 ✗, `requirements.md`에 시각 ✗. `uidesign.md`는 English
+- **Active vs archive** — 활성: `plans/next-session-tasks.md` + 진행 중 `plans/phase-N.md`. 머지된 리뷰 → `reviews/done/`, 완료 plan → `plans/done/`. **archive는 정본 인용 금지**
+- **루트에 doc 파일 금지** — 모든 design/review/plan은 `docs/specs/` 하위. 도구 임시(`.omc/plans/`, `.superpowers/`) 는 canonical 아님
+- **Cleanup 절차** — 세션 시작·phase close·"문서 정리" 요청 시 `docs/specs/README.md §5` 7단계 실행
+- **신규 doc 작성 전** — `docs/specs/README.md §6` 체크리스트 통과 필수
 
-- **Never put functional/behavioral spec in `uidesign.md`** and **never put visual rules in `requirements.md`**.
-- `uidesign.md` must always be English.
+SoT 우선순위·결정 분기표·archive 운영 메모는 `docs/specs/README.md`에 정본.
 
 ## Input Interpretation
 

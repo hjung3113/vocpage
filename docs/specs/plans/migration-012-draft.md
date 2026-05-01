@@ -1,8 +1,7 @@
 # Migration 012 — Add `dev` Role (DRAFT)
 
 > **상태**: DRAFT — DDL/롤백 spec 단계. 실파일 `backend/migrations/012_add_dev_role.sql`은 **구현 phase 승인 후** 본 문서 기반으로 생성.
-> **상위 plan**: `.omc/plans/design-admin-role-overhaul.md`
-> **관련 결정**: `docs/specs/reviews/design-prototype-audit.md` ADR §5 — Decision #5
+> **관련 결정**: Phase F (D18 — `dev` role 도입). 근거는 `docs/specs/plans/progress-archive.md` Phase F 항목 + `docs/specs/requires/uidesign.md §13` (role-dev 토큰).
 
 ---
 
