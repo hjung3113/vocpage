@@ -87,13 +87,7 @@
   background: var(--accent);
 }
 
-/* menu → status-blue */
-.type-badge-admin.type-menu {
-  background: var(--status-blue);
-  color: var(--bg-surface);
-  border-color: transparent;
-  opacity: 0.85;
-}
+/* menu → status-blue (using reviewing tokens which are blue-toned) */
 .type-badge-admin.type-menu {
   background: var(--status-reviewing-bg);
   color: var(--status-reviewing-fg);
