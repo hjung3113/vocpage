@@ -56,4 +56,40 @@ describe('assertCanManageVoc — feature-voc.md §8.4-bis 회귀 5건', () => {
     const user = { id: 'u', role: 'user' as const };
     expect(() => assertCanManageVoc(user, baseVoc, 'changeStatus')).toThrow(HttpError);
   });
+
+  describe('reassign action — manager/admin only (codex review HIGH)', () => {
+    test('Dev self-reassign (own VOC) → 403 FORBIDDEN', () => {
+      expect(() => assertCanManageVoc(devUser, baseVoc, 'reassign')).toThrow(HttpError);
+      try {
+        assertCanManageVoc(devUser, baseVoc, 'reassign');
+      } catch (e) {
+        expect((e as HttpError).status).toBe(403);
+        expect((e as HttpError).code).toBe('FORBIDDEN');
+      }
+    });
+
+    test('Dev self-unassign (own VOC, assignee_id null target) → 403 FORBIDDEN', () => {
+      expect(() => assertCanManageVoc(devUser, baseVoc, 'reassign')).toThrow(HttpError);
+    });
+
+    test('Dev 타인 담당 VOC reassign → 403 FORBIDDEN', () => {
+      const voc = { ...baseVoc, assignee_id: otherUserId };
+      expect(() => assertCanManageVoc(devUser, voc, 'reassign')).toThrow(HttpError);
+    });
+
+    test('User reassign → 403 FORBIDDEN', () => {
+      const user = { id: 'u', role: 'user' as const };
+      expect(() => assertCanManageVoc(user, baseVoc, 'reassign')).toThrow(HttpError);
+    });
+
+    test('Manager reassign → 허용', () => {
+      const manager = { id: 'm', role: 'manager' as const };
+      expect(() => assertCanManageVoc(manager, baseVoc, 'reassign')).not.toThrow();
+    });
+
+    test('Admin reassign → 허용', () => {
+      const admin = { id: 'a', role: 'admin' as const };
+      expect(() => assertCanManageVoc(admin, baseVoc, 'reassign')).not.toThrow();
+    });
+  });
 });
