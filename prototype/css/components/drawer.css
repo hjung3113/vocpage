@@ -431,6 +431,12 @@
   color: var(--accent);
 }
 
+/* ─── C-02 Due Date dirty indicator ─── */
+.due-date-dirty {
+  border-color: var(--status-amber) !important;
+  box-shadow: 0 0 0 2px var(--status-amber-bg) !important;
+}
+
 /* ─── Comment inline edit ─── */
 .c-edit-textarea {
   width: 100%;

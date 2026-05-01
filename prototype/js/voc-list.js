@@ -154,3 +154,73 @@ function onSearch(val) {
   currentPage = 1;
   renderVOCList();
 }
+
+// ── N-06 Sort chips ───────────────────────────────────────────────────────────
+// API key mapping for URL sort param (internal key → API field name)
+const SORT_API_KEY_MAP = {
+  date: 'created_at',
+  id: 'issue_code',
+  title: 'title',
+  status: 'status',
+  priority: 'priority',
+  assignee: 'assignee',
+};
+
+function sortByChip(key) {
+  if (sortKey === key) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey = key;
+    sortDir = 'desc';
+  }
+  currentPage = 1;
+  updateSortChips();
+  // Sync existing list-header hcells too
+  document.querySelectorAll('.hcell').forEach((h) => {
+    const isActive = h.dataset.sortKey === key;
+    h.classList.toggle('sort-active', isActive);
+    const icon = h.querySelector('.sort-icon');
+    if (icon) {
+      icon.setAttribute(
+        'data-lucide',
+        isActive ? (sortDir === 'asc' ? 'chevron-up' : 'chevron-down') : 'chevrons-up-down',
+      );
+    }
+  });
+  lucide.createIcons();
+  // URL sync: ?sort=api_key&order=dir
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', SORT_API_KEY_MAP[key] || key);
+  url.searchParams.set('order', sortDir);
+  history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString());
+  renderVOCList();
+}
+
+function updateSortChips() {
+  document.querySelectorAll('.sort-chip').forEach((chip) => {
+    const key = chip.dataset.sortKey;
+    const isActive = key === sortKey;
+    chip.classList.toggle('sort-chip--active', isActive);
+    chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    // Remove any existing direction indicator
+    const existingIcon = chip.querySelector('.sort-chip-icon');
+    if (existingIcon) existingIcon.remove();
+    if (isActive) {
+      const icon = document.createElement('span');
+      icon.className = 'sort-chip-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = sortDir === 'asc' ? ' ▲' : ' ▼';
+      chip.appendChild(icon);
+      // Visually-hidden text for screen readers
+      const srText = document.createElement('span');
+      srText.className = 'sr-only';
+      srText.textContent = sortDir === 'asc' ? ' 오름차순' : ' 내림차순';
+      chip.appendChild(srText);
+    }
+  });
+}
+
+// Init sort chips state on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateSortChips();
+});

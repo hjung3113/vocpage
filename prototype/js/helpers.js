@@ -21,10 +21,19 @@ function assigneeHTML(v) {
     return `<div class="assignee-cell" style="color:var(--text-quaternary)"><i data-lucide="user-x" style="width:15px;height:15px"></i> 미배정</div>`;
   return `<div class="assignee-cell"><div class="mini-av ${v.assigneeCls}">${v.assigneeInit}</div>${v.assignee}</div>`;
 }
+// N-04: search highlight — uses escapeHtml (dom-utils.js) for XSS safety
+// and escapes regex special chars to prevent regex injection.
 function highlight(text, q) {
-  if (!q) return text;
-  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark>$1</mark>');
+  // escHtml available after dom-utils.js loads; fall back to identity for safety
+  const safe = typeof window.escHtml === 'function' ? window.escHtml(String(text)) : String(text);
+  if (!q) return safe;
+  const escRegex = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const safeQ = typeof window.escHtml === 'function' ? window.escHtml(q) : q;
+  const escRegexSafe = safeQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(
+    new RegExp(`(${escRegexSafe})`, 'gi'),
+    '<mark class="search-highlight">$1</mark>',
+  );
 }
 function formatDateKo(d) {
   if (!d) return '';

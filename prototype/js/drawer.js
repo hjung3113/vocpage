@@ -1,3 +1,14 @@
+// ── C-02 Due Date helpers ────────────────────────────────────────────────────
+// calcDueDate(priority, baseDate?) → 'YYYY-MM-DD'
+// urgent=+7d, high=+14d, medium=+30d, low=+90d (feature-voc.md §8.4.1)
+window.calcDueDate = function calcDueDate(priority, baseDate) {
+  const base = baseDate ? new Date(baseDate) : new Date();
+  const offsets = { urgent: 7, high: 14, medium: 30, low: 90 };
+  const days = offsets[priority] ?? 30;
+  base.setDate(base.getDate() + days);
+  return base.toISOString().slice(0, 10);
+};
+
 function openDrawer(id) {
   const d = VOC_MAP[id];
   if (!d) return;
@@ -37,7 +48,7 @@ function openDrawer(id) {
       </div>
       <div class="meta-item">
         <div class="meta-lbl">우선순위</div>
-        <select class="meta-sel">
+        <select class="meta-sel" id="drawer-priority-${d.id}" onchange="drawerPriorityChange('${d.id}', this.value)" data-role-allow="manager,admin,dev">
           <option value="urgent" ${d.priority === 'urgent' ? 'selected' : ''}>Urgent</option>
           <option value="high"   ${d.priority === 'high' ? 'selected' : ''}>High</option>
           <option value="medium" ${d.priority === 'medium' ? 'selected' : ''}>Medium</option>
@@ -45,9 +56,13 @@ function openDrawer(id) {
         </select>
       </div>
       <div class="meta-item">
-        <!-- 마감일 권한: User=읽기전용, Manager/Admin=쓰기, Dev=본인 담당 시 쓰기 -->
+        <!-- C-02 마감일 권한: User=읽기전용, Manager/Admin/Dev=쓰기 -->
         <div class="meta-lbl">마감일</div>
-        <input type="date" class="meta-sel" value="${d.dueDate || ''}" style="font-size:13px;color:var(--text-primary)" />
+        <input type="date" class="meta-sel" id="drawer-duedate-${d.id}"
+          value="${d.dueDate || window.calcDueDate(d.priority)}"
+          style="font-size:13px;color:var(--text-primary)"
+          data-role-allow="manager,admin,dev"
+          onchange="drawerDueDateChange('${d.id}', this.value)" />
       </div>
       <div class="meta-item">
         <div class="meta-lbl">담당자</div>
@@ -161,7 +176,65 @@ function openDrawer(id) {
   const row = document.getElementById('row-' + id);
   if (row) row.classList.add('selected');
   lucide.createIcons();
+
+  // N-02: attach charcount to drawer comment input — pass explicit submit button to avoid wrong btn-primary
+  if (typeof window.attachCharCount === 'function') {
+    const commentInput = document.getElementById('new-comment-input-' + id);
+    const commentSubmitBtn = commentInput
+      ? commentInput.closest('.comment-input')?.querySelector('.btn-primary')
+      : null;
+    if (commentInput) window.attachCharCount(commentInput, 1000, commentSubmitBtn || null);
+    // internal-notes textarea (rendered by InternalNotes.build) — uses its own note-save-btn (not btn-primary)
+    const notesInput = document.querySelector('.note-input');
+    const notesSaveBtn = notesInput
+      ? notesInput.closest('.note-input-area')?.querySelector('.note-save-btn')
+      : null;
+    if (notesInput) window.attachCharCount(notesInput, 1000, notesSaveBtn || null);
+  }
+
+  // C-02: apply role-based readonly for due-date and priority
+  const role = (window.currentUser && window.currentUser.role) || 'user';
+  const dueDateEl = document.getElementById('drawer-duedate-' + id);
+  const priorityEl = document.getElementById('drawer-priority-' + id);
+  if (role === 'user') {
+    if (dueDateEl) {
+      // Spec §8.4.2: User role — show date as plain text, hide input
+      const dateVal = dueDateEl.value;
+      const displayText = dateVal || '기한 없음';
+      const span = document.createElement('span');
+      span.className = 'due-date-readonly';
+      span.style.fontSize = '13px';
+      span.style.color = 'var(--text-primary)';
+      span.textContent = displayText;
+      dueDateEl.parentNode.replaceChild(span, dueDateEl);
+    }
+    if (priorityEl) {
+      priorityEl.disabled = true;
+    }
+  }
+
   document.dispatchEvent(new CustomEvent('drawer:opened', { detail: { vocId: id, voc: d } }));
+  // F9: re-enforce data-role-allow on freshly injected drawer content
+  if (typeof window.RoleState?.applyRoleVisibility === 'function')
+    window.RoleState.applyRoleVisibility();
+}
+
+// ── C-02 Due Date event handlers ─────────────────────────────────────────────
+function drawerPriorityChange(vocId, newPriority) {
+  const dueDateEl = document.getElementById('drawer-duedate-' + vocId);
+  if (!dueDateEl) return;
+  const newDue = window.calcDueDate(newPriority);
+  dueDateEl.value = newDue;
+  dueDateEl.classList.add('due-date-dirty');
+  dueDateEl.title = '우선순위 변경으로 자동 재계산됨';
+  if (VOC_MAP[vocId]) VOC_MAP[vocId].dueDate = newDue;
+}
+
+function drawerDueDateChange(vocId, newDate) {
+  // Manager+ manual override — mark dirty
+  const dueDateEl = document.getElementById('drawer-duedate-' + vocId);
+  if (dueDateEl) dueDateEl.classList.add('due-date-dirty');
+  if (VOC_MAP[vocId]) VOC_MAP[vocId].dueDate = newDate;
 }
 
 function closeDrawer() {
