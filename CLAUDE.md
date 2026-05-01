@@ -4,7 +4,7 @@ Guidance for Claude Code working in this repo.
 
 ## Project Status
 
-**VOC (Voice of Customer) management system**, currently **Phase 6 implementation** — frontend and backend are scaffolded with working source code. Product spec: `docs/specs/requires/requirements.md`. Design system: `docs/specs/requires/uidesign.md`.
+**VOC (Voice of Customer) management system**, currently **Phase 8 Wave 1 종료 + Wave 1.5 보강 대기** — Wave 1 vertical slice (`/voc` 리스트 + 검토 드로어) 머지 완료, prototype 시각 깊이 보강 PR 진입 전. Product spec: `docs/specs/requires/requirements.md`. Design system: `docs/specs/requires/uidesign.md`.
 
 ## Stack (summary — details in sub-dir CLAUDE.md)
 
