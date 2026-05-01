@@ -250,6 +250,121 @@ backend/src/
 
 ---
 
+### Wave 1.5 — `/voc` Prototype 시각·UX 동등화 (보강 PR 2건)
+
+> **트리거**: PR #114 closure-report `User acceptance` 절에서 prototype 대비 `/voc` 시각 깊이 부족 지적 → Wave 2 진입 전 보강.
+> **방식**: 인터뷰 9개 (Q4→Q5→Q1 의존 우선) → 본 entry promotion → 설계/구현계획 → TDD 구현 → 5명 OMC subagent 리뷰 (code-reviewer · security-reviewer · verifier · test-engineer · architect) × (정량 · 정성 · 리스크) 3관점.
+> **PR 흐름**: 사용자 직접 push + PR + merge.
+
+#### 1.5-D 인터뷰 결정 (2026-05-01 확정)
+
+| #   | 항목                  | 결정                                                                                                            |
+| --- | --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Q4  | PR 분할               | **2 PR (옵션 C)**: PR-α 계약+BE → PR-β FE 시각. 계약 불일치 윈도우 제거 우선                                    |
+| Q5  | 시각 회귀 캡처        | **하이브리드 (옵션 C)**: Wave 1.5에서 사용자 수동 yes/no, Wave 5에서 자동 회귀 12 화면 일괄                     |
+| Q1  | Toast UI Editor       | **lazy-load + dynamic import (옵션 C)**: PR-β 포함, `React.lazy` + Suspense, 폐쇄망 chunk 재현 검증 추가        |
+| Q2  | 고급 필터 fixture     | **mockUsers 재활용 (옵션 B)**: 담당자는 기존, `tags`/`voc-types`만 신규 fixture + MSW handler                   |
+| Q3  | 계약 변경 영역        | **풀 스펙 (옵션 A)**: PR-α에 BE repository SQL + route validator + integration test 모두 포함                   |
+| Q6  | 등록 모달 ROC         | **user role only + 첨부 OFF + 자동 태그 OFF (옵션 A)**: 폼 스키마는 첨부 `optional` 미리 정의 (무파괴 확장)     |
+| Q7  | `?mode=admin` 토글    | **Wave 1.5 범위 외 (옵션 A)**: Wave 2 dashboard와 동시 진행                                                     |
+| Q8  | TDD 단위              | **C′ (하이브리드+조정)**: integration `VocListPage.test` + 9 VOC composition 단위 + **사전 추출 primitive 3종** |
+| Q9  | OSS 라이선스 인벤토리 | **`phase-8-oss-vendoring.md` §3-bis 추가 (옵션 B)**: 신규 doc 생성 회피, 기존 정본 확장                         |
+
+#### 1.5-A PR-α (계약 + BE) — 풀 스펙
+
+| 파일                                    | 변경                                                                                                                                                            |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shared/contracts/voc/io.ts` (확장)     | `VocListQuery`에 `sort_by` / `sort_dir` / `page` / `per_page` / `assignees[]` / `priorities[]` / `tag_ids[]` / `voc_type_ids[]` 추가 (Zod schema + inferred TS) |
+| `shared/contracts/master/io.ts` (신규)  | `AssigneeListResponse` / `TagListResponse` / `VocTypeListResponse`                                                                                              |
+| `backend/src/repositories/voc.ts`       | 정렬·필터·페이지네이션 SQL 반영 (whitelist sort col, parameterized IN)                                                                                          |
+| `backend/src/routes/voc.ts`             | `validate(VocListQuery)` 미들웨어 적용                                                                                                                          |
+| `backend/src/routes/masters.ts` (신규)  | `GET /api/masters/{assignees,tags,voc-types}` 핸들러                                                                                                            |
+| `backend/src/__tests__/voc.test.ts`     | Supertest: 정렬 6종 / 다중 필터 AND / 페이지 경계 / invalid sort_by 400                                                                                         |
+| `backend/src/__tests__/masters.test.ts` | 마스터 3 endpoint shape                                                                                                                                         |
+
+**검증**: Jest pass + Zod schema로 fixture 파싱 + FE 미연결 상태에서 `curl` 응답 shape 일치. PR 디스크립션에 "PR-β 의존 컨텍스트" 명시.
+
+#### 1.5-B PR-β (FE 시각) — Prototype 동등화
+
+**보강 범위 + 사전 테스트 계약 (TDD red 진입 기준)**:
+
+| 영역             | Prototype                                                              | 현재 FE (`VocListPage`)                 | 보강 후 목표                   | 사전 테스트 계약 (RTL/integration)                                                                                         |
+| ---------------- | ---------------------------------------------------------------------- | --------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Topbar           | "전체 VOC" + count 뱃지 + 검색박스 + 알림 bell + "새 VOC 등록"         | `<PageTitle title="VOC" />` 만          | prototype 동등                 | RTL: 카운트 뱃지 텍스트, 검색 input `aria-label`, 알림 bell 버튼, "새 VOC 등록" CTA 클릭 시 모달 open                      |
+| 상태 필터        | 6 pill (전체 / 접수 / 검토중 / 처리중 / 드랍 / 완료) + 아이콘 + 한국어 | shadcn Button(영문 enum 그대로)         | prototype 동등                 | RTL: 6 pill 모두 `aria-pressed` 토글 + 클릭 시 list re-query (Query observer 호출 횟수)                                    |
+| 고급 필터        | "필터 더보기" panel — 담당자 / 우선순위 / 유형 / 태그 + 초기화         | 없음 (q + status만)                     | prototype 동등                 | RTL: 패널 토글 visibility, 담당자 chip 다중 선택 + filter prop, 초기화 버튼 → 모든 chip cleared                            |
+| 정렬             | sort chips 6종 + 헤더 토글 + 활성 표시                                 | 없음                                    | prototype 동등                 | RTL: sort chip 6종 클릭 시 active class + sort prop 전달, 헤더 클릭 시 asc/desc 토글                                       |
+| 리스트 컬럼      | 6열 (이슈 ID / 제목 / 상태 / 담당자 / 우선순위 / 등록일)               | 4열 (Issue / Title / Status / Priority) | 6열 (담당자 + 등록일 추가)     | RTL: 6 `<th>` headers, 각 row 6 `<td>`; 담당자 미배정 시 "—" rendering                                                     |
+| Pagination       | `paginationRow`                                                        | 없음                                    | prototype 동등                 | RTL: 페이지 버튼 클릭 시 `page` prop 변경; "다음" 비활성화 (last page); item count 표기                                    |
+| 새 VOC 등록 모달 | Toast UI Editor 포함                                                   | 없음                                    | prototype 동등 (Toast UI lazy) | RTL: 모달 open/close, 필수 필드 validation, Toast UI editor 인스턴스 mount(jsdom 한계 → editor mock 또는 integration test) |
+| 알림 드롭다운    | bell + dot                                                             | 없음                                    | prototype 동등                 | RTL: dot visibility(unread > 0), 클릭 시 드롭다운 open + 항목 list 렌더링                                                  |
+| 검토 드로어 깊이 | 풀 스펙                                                                | 161줄 골격                              | prototype 동등                 | RTL: 추가 필드별(첨부 / 코멘트 / 변경 이력 등) 가시성 + 권한 분기 (user vs manager/admin)                                  |
+
+**사전 추출 primitive 3종** (`frontend/src/components/common/`):
+
+| 컴포넌트           | 이유                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `NotificationBell` | bell + dot + dropdown 컴포지션. Wave 2 dashboard / Wave 3 admin / Wave 4 공지·FAQ 4회 재등장 (prototype 동일) |
+| `Pagination`       | Wave 2 dashboard / Wave 3 admin 4화면 즉시 재사용                                                             |
+| `DataTable`        | TanStack Table 래핑 + 컬럼 토글 + 정렬, Wave 3 admin 4화면 의존                                               |
+
+> **추출 보류**: `SearchBox` (shadcn Input + icon 직접), `Modal`/`Drawer` (shadcn Dialog/Sheet 직접), `PillGroup`/`ChipGroup` (Wave 2/3에서 API 형태 확정 후).
+> **추출 전 검증**: prototype 3 화면 (`/voc`, dashboard, admin tag) bell·pagination 마크업 diff 1회 확인. 동일 시 추출, 다르면 보류.
+
+**VOC composition 9종** (`frontend/src/features/voc/components/`):
+
+| 컴포넌트                   | prototype 대응                                                                           |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `VocTopbar`                | 전체 VOC 타이틀 + count 뱃지 + 검색박스 + `<NotificationBell>` + "새 VOC 등록" CTA       |
+| `VocStatusFilters`         | 6 status pill (전체/접수/검토중/처리중/드랍/완료) 한국어 + 아이콘                        |
+| `VocAdvancedFilters`       | 패널 토글 + 담당자/우선순위/유형/태그 다중 chip + 초기화                                 |
+| `VocSortChips`             | sort chip 6종 + 헤더 토글 + 활성 표시                                                    |
+| `VocTable` (재구성)        | `<DataTable>` 소비, 6 컬럼 (이슈ID/제목/상태/담당자/우선순위/등록일)                     |
+| `VocPaginationBar`         | `<Pagination>` 소비 + item count 표기                                                    |
+| `VocCreateModal`           | shadcn Dialog + RHF/Zod, **Toast UI Editor lazy-load**, 첨부 필드 schema에 optional 미리 |
+| `VocNotificationsDropdown` | `<NotificationBell>` 소비 + 알림 항목 list                                               |
+| `VocReviewDrawer` (보강)   | 기존 161줄 골격에 첨부/코멘트/변경이력 영역 추가, 권한 분기 (user vs manager/admin)      |
+
+**의존성 추가** (PR-β):
+
+| 라이브러리               | 사이즈 | 라이선스 | 도입 위치                               |
+| ------------------------ | ------ | -------- | --------------------------------------- |
+| `@toast-ui/editor`       | ~5MB   | MIT      | `VocCreateModal` 본문 입력 (lazy chunk) |
+| `@toast-ui/react-editor` | 작음   | MIT      | React 래퍼                              |
+
+> 라이선스/번들/CDN 없음 검증은 `phase-8-oss-vendoring.md` §3-bis (Wave 1.5 OSS 인벤토리)에 기재.
+
+**테스트 (Q8 = C′)**:
+
+- **Integration**: `VocListPage.test.tsx` (필터+정렬+페이지 동시 동작 1~2 시나리오)
+- **Component (12개)**: primitive 3 + composition 9 각각 RTL 단위 (next-session-tasks.md 표 "사전 테스트 계약" 컬럼 기준)
+- **Toast UI lazy boundary**: editor mount 테스트는 mock 또는 integration 한정. jsdom 한계 명시.
+
+**검증**:
+
+- Vitest + RTL: 12 컴포넌트 + 1 integration 모두 pass (TDD red→green→refactor)
+- 개방망 빌드 후 `frontend/dist`에 CDN URL/telemetry 0건 (`grep -r "cdn\|googleapis\|jsdelivr\|unpkg"`)
+- Toast UI lazy chunk: `vite build` 산출물에서 별도 chunk로 분리 확인 (`stats.html` 또는 `dist/assets/*.js` 사이즈 inspection)
+- 폐쇄망 사후 재현 — lazy chunk가 동일 origin에서 fetch되는지 (`phase-8-oss-vendoring.md §2` 4 우회 경로)
+- **사용자 수동 yes/no** (Q5=C): `/voc` 화면 + 모달 열림 + 드로어 열림 3장 캡처 → prototype과 1:1 비교 → 정성 PASS
+
+#### 1.5 구현 진행 순서
+
+1. PR-α 작성·테스트·푸시·5 OMC 리뷰·머지 (계약+BE 단독 동작 확인 — FE 미변경)
+2. PR-β 작성·TDD red→green→refactor (행 단위 9 + primitive 3 + integration)·푸시·5 OMC 리뷰·**사용자 수동 시각 yes/no**·머지
+3. `phase-8.md` Wave 5 close-gate "12 화면 시각 회귀" 표현 변경 없음 (자동 회귀는 Wave 5 일괄, Q5=C 결정)
+4. `nextgen-backlog.md`에 차감 기록 없음 (Wave 5에서 12 → 12 유지)
+5. Wave 1.5 머지 후 follow-up A (Playwright e2e) + follow-up C-2 (seed UUID v4) 진입 → Wave 2 hard-block 해제
+
+#### 1.5 close 조건
+
+- PR-α 머지 + PR-β 머지 (5/5 OMC APPROVE)
+- 사용자 시각 yes/no PASS (`/voc` 3장 캡처)
+- `phase-8-oss-vendoring.md` §3-bis OSS 인벤토리 동시 머지
+- ESLint max-lines / 토큰 lint clean / fixture-seed parity check pass
+
+---
+
 ### Wave 2 — Dashboard
 
 #### 2-A 계약 PR
@@ -547,7 +662,8 @@ Phase 8 = **A′ Contract-first per-screen, 6 Wave** (단, **Wave 1만 vertical 
 
 ## 11. Changelog (consensus revision 적용 이력)
 
-| 일자                    | 변경                                                                                                                                                                                                                                                                                                           |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-05-01 (초안)       | Wave 0~5 + §0~§9 작성, A′ 채택 결정                                                                                                                                                                                                                                                                            |
-| 2026-05-01 (revision 1) | Architect 4 조건 + Critic 1 Critical + 5 Major 반영 — shared/ 독립 tsconfig·ESLint·CI 매트릭스 / Wave 1 vertical slice / N-03 BE 필수 격상 / queryKey·shadcn lint Wave 0 / Wave 5 close 12 화면 명시 / max-lines ESLint / 의존성 메이저 lock / PR template / §10 ADR 신설 / pre-mortem detection·rollback 보강 |
+| 일자                    | 변경                                                                                                                                                                                                                                                                                                                                            |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-01 (초안)       | Wave 0~5 + §0~§9 작성, A′ 채택 결정                                                                                                                                                                                                                                                                                                             |
+| 2026-05-01 (revision 1) | Architect 4 조건 + Critic 1 Critical + 5 Major 반영 — shared/ 독립 tsconfig·ESLint·CI 매트릭스 / Wave 1 vertical slice / N-03 BE 필수 격상 / queryKey·shadcn lint Wave 0 / Wave 5 close 12 화면 명시 / max-lines ESLint / 의존성 메이저 lock / PR template / §10 ADR 신설 / pre-mortem detection·rollback 보강                                  |
+| 2026-05-01 (Wave 1.5)   | Wave 1.5 entry 추가 — 인터뷰 9 결정 promotion (Q1=lazy-load / Q2=mockUsers 재활용 / Q3=풀스펙 / Q4=2 PR / Q5=하이브리드 / Q6=user-only / Q7=Wave 2 이연 / Q8=C′ primitive 3 / Q9=oss-vendoring §3-bis). 2 PR(α 계약+BE / β FE 시각) 분할, Wave 5 시각 회귀 12 화면 표현 무변경. `phase-8-oss-vendoring.md §3-bis`에 Toast UI 인벤토리 동시 추가 |

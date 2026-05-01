@@ -57,6 +57,31 @@ npm ci                           # 재현 빌드 검증
 
 ---
 
+## §3-bis. Wave 1.5 OSS 인벤토리 (보강 PR-β 도입분)
+
+> Wave 1.5 보강 PR-β (`/voc` 시각 동등화)에서 신규 도입되는 OSS. `phase-8.md` Wave 1.5 §1.5-B 의존성 추가 표와 동기화.
+
+| 라이브러리               | 버전 (PR-β commit 시점 lockfile) | 라이선스 | 사이즈 영향                          | runtime fetch / CDN | 도입 위치                  | 폐쇄망 사후 재현 (§2 우선순위)   |
+| ------------------------ | -------------------------------- | -------- | ------------------------------------ | ------------------- | -------------------------- | -------------------------------- |
+| `@toast-ui/editor`       | (PR-β commit 시점 pin)           | MIT      | ~5MB (lazy chunk, 초기 번들 영향 ≈0) | 없음                | `VocCreateModal` 본문 입력 | 1순위 미러 → 2순위 오프라인 캐시 |
+| `@toast-ui/react-editor` | (PR-β commit 시점 pin)           | MIT      | 작음 (래퍼)                          | 없음                | React 래퍼                 | 동상                             |
+
+**lazy-load 폐쇄망 검증** (Q1=C 결정):
+
+- Toast UI는 `React.lazy(() => import('@toast-ui/react-editor'))` + Suspense 경계로 모달 open 시점 chunk fetch
+- `vite build` 산출물에서 별도 chunk 분리 확인 (`dist/assets/*.js` inspection)
+- 폐쇄망 환경에서 동일 origin chunk fetch 여부 검증 (절대 외부 CDN URL 발생 금지)
+- §4 체크리스트 4항 모두 PR-β description에 통과 기록
+
+**Wave 1.5 §4 사전 체크리스트 결과** (PR-β 머지 전 필수):
+
+- [ ] `@toast-ui/*` `package.json scripts.postinstall` 외부 ping 0건
+- [ ] `node_modules/@toast-ui` 내 `fetch`/`XMLHttpRequest` telemetry 호출 0건
+- [ ] `frontend/dist` 빌드 산출물에 CDN URL 0건 (`grep -r "cdn\|googleapis\|jsdelivr\|unpkg"`)
+- [ ] MIT 라이선스 사내 OSS 정책 호환 확인
+
+---
+
 ## §4. 추가 OSS 도입 시 사전 체크리스트
 
 1. `package.json`의 `scripts.postinstall`이 외부로 ping 보내는지
