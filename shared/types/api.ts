@@ -1048,7 +1048,7 @@ export interface components {
       /** Format: uuid */
       voc_type_id: string;
       /** Format: uuid */
-      system_id?: string | null;
+      system_id: string;
       /** Format: uuid */
       menu_id: string;
       /** Format: uuid */
@@ -1083,7 +1083,7 @@ export interface components {
       /** Format: uuid */
       voc_type_id: string;
       /** Format: uuid */
-      system_id?: string;
+      system_id: string;
       /** Format: uuid */
       menu_id: string;
       /** Format: uuid */
