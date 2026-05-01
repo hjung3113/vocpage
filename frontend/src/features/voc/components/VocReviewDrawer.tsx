@@ -1,26 +1,37 @@
-import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { vocApi } from '../../api/voc';
-import { queryKeys } from '../../api/queryKeys';
-import { useRole } from '../../hooks/useRole';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
+import { vocApi } from '../../../api/voc';
+import { queryKeys } from '../../../api/queryKeys';
+import { useRole } from '../../../hooks/useRole';
 import {
   VocStatus,
   VocPriority,
   type InternalNote,
   type VocUpdate,
-} from '../../../../shared/contracts/voc';
-import { VocPermissionGate } from './VocPermissionGate';
-import { LoadingState } from '../common/LoadingState';
+} from '../../../../../shared/contracts/voc';
+import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
+import { LoadingState } from '../../../components/common/LoadingState';
+import {
+  VocCommentsPanel,
+  VocAttachmentsPanel,
+  VocHistoryPanel,
+  type AttachmentItem,
+} from './VocReviewTabs';
 
 interface Props {
   vocId: string | null;
   notes: InternalNote[] | undefined;
   notesLoading: boolean;
   pending: boolean;
+  attachments?: AttachmentItem[];
   onClose: () => void;
   onPatch: (id: string, patch: VocUpdate) => Promise<unknown>;
   onAddNote: (id: string, body: string) => Promise<unknown>;
@@ -35,26 +46,34 @@ function useVocDetail(id: string | null) {
   });
 }
 
-export function VocDrawer({
+function useVocHistory(id: string | null) {
+  const { role } = useRole();
+  return useQuery({
+    queryKey: id ? queryKeys.voc.history(role, id) : ['voc', role, 'history', 'none'],
+    queryFn: () => vocApi.history(id!),
+    enabled: !!id,
+  });
+}
+
+export function VocReviewDrawer({
   vocId,
   notes,
   notesLoading,
   pending,
+  attachments = [],
   onClose,
   onPatch,
   onAddNote,
 }: Props) {
   const detail = useVocDetail(vocId);
-  const role = useRole();
-  const [noteBody, setNoteBody] = useState('');
-
-  useEffect(() => {
-    if (!vocId) setNoteBody('');
-  }, [vocId]);
-
+  const history = useVocHistory(vocId);
+  const { role } = useRole();
   const open = !!vocId;
   const voc = detail.data;
-  const canWriteNote = role.role !== 'user';
+  const canWrite = role !== 'user';
+  const canUpload = role === 'manager' || role === 'admin';
+  const isDeleted = !!voc?.deleted_at;
+  const blockedDeleted = isDeleted && role !== 'admin';
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -68,8 +87,16 @@ export function VocDrawer({
         </DialogHeader>
         {detail.isLoading && <LoadingState />}
         {detail.isError && <VocPermissionGate reason="role" />}
-        {voc && (
+        {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
+        {voc && !blockedDeleted && (
           <div className="flex flex-col gap-4 overflow-y-auto py-2">
+            <div
+              className="font-mono text-xs"
+              style={{ color: 'var(--text-secondary)' }}
+              data-testid="drawer-meta"
+            >
+              {voc.issue_code} · 등록 {voc.created_at.slice(0, 10)}
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1 text-xs">
                 Status
@@ -112,50 +139,29 @@ export function VocDrawer({
                 </Select>
               </label>
             </div>
-            <section data-testid="drawer-notes">
-              <h3 className="mb-2 text-sm font-semibold">Internal Notes</h3>
-              {notesLoading && <LoadingState />}
-              {!notesLoading && notes && notes.length === 0 && (
-                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  아직 작성된 노트가 없습니다.
-                </p>
-              )}
-              <ul className="flex flex-col gap-2">
-                {notes?.map((n) => (
-                  <li
-                    key={n.id}
-                    className="rounded border p-2 text-sm"
-                    style={{ borderColor: 'var(--border-standard)' }}
-                  >
-                    {n.body}
-                  </li>
-                ))}
-              </ul>
-              {canWriteNote && (
-                <form
-                  className="mt-3 flex flex-col gap-2"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (noteBody.trim()) {
-                      onAddNote(voc.id, noteBody.trim()).then(() => setNoteBody(''));
-                    }
-                  }}
-                >
-                  <Textarea
-                    value={noteBody}
-                    onChange={(e) => setNoteBody(e.target.value)}
-                    placeholder="노트를 입력하세요"
-                    aria-label="new note"
-                  />
-                  <Button type="submit" disabled={pending || !noteBody.trim()} size="sm">
-                    저장
-                  </Button>
-                </form>
-              )}
-            </section>
+            <Tabs defaultValue="comments" className="flex flex-col gap-3">
+              <TabsList>
+                <TabsTrigger value="comments">코멘트</TabsTrigger>
+                <TabsTrigger value="attachments">첨부</TabsTrigger>
+                <TabsTrigger value="history">변경이력</TabsTrigger>
+              </TabsList>
+              <VocCommentsPanel
+                notes={notes}
+                notesLoading={notesLoading}
+                canWrite={canWrite}
+                pending={pending}
+                onAdd={(body) => {
+                  void onAddNote(voc.id, body);
+                }}
+              />
+              <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
+              <VocHistoryPanel entries={history.data} loading={history.isLoading} />
+            </Tabs>
           </div>
         )}
       </DialogContent>
     </Dialog>
   );
 }
+
+export default VocReviewDrawer;

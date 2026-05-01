@@ -40,3 +40,8 @@ export const VocHistoryEntry = z.object({
   changed_at: Iso,
 });
 export type VocHistoryEntry = z.infer<typeof VocHistoryEntry>;
+
+export const VocHistoryListResponse = z.object({
+  rows: z.array(VocHistoryEntry),
+});
+export type VocHistoryListResponse = z.infer<typeof VocHistoryListResponse>;

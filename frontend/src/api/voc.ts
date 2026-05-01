@@ -9,9 +9,12 @@ import {
   VocDetail,
   type VocUpdate,
   type VocListQuery,
+  type VocCreate,
   InternalNote,
   InternalNoteListResponse,
   InternalNoteCreate,
+  VocHistoryListResponse,
+  type VocHistoryEntry,
 } from '../../../shared/contracts/voc';
 
 function toQs(query: Partial<VocListQuery>): string {
@@ -36,6 +39,9 @@ export const vocApi = {
   list(query: Partial<VocListQuery> = {}): Promise<VocListResponse> {
     return apiGet(`/api/vocs${toQs(query)}`, VocListResponse);
   },
+  create(payload: VocCreate): Promise<VocDetail> {
+    return apiPost(`/api/vocs`, payload, VocDetail);
+  },
   get(id: string): Promise<VocDetail> {
     return apiGet(`/api/vocs/${id}`, VocDetail);
   },
@@ -47,5 +53,8 @@ export const vocApi = {
   },
   addNote(id: string, body: string): Promise<InternalNote> {
     return apiPost(`/api/vocs/${id}/notes`, InternalNoteCreate.parse({ body }), InternalNote);
+  },
+  history(id: string): Promise<VocHistoryEntry[]> {
+    return apiGet(`/api/vocs/${id}/history`, VocHistoryListResponse).then((r) => r.rows);
   },
 };

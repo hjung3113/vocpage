@@ -11,6 +11,7 @@ import { http, HttpResponse } from 'msw';
 import {
   VOC_FIXTURES,
   VOC_NOTES_FIXTURES,
+  VOC_HISTORY_FIXTURES,
   VOC_TAG_RELATIONS,
   FIXTURE_USERS,
 } from '../../../../shared/fixtures/voc.fixtures';
@@ -146,6 +147,38 @@ export const vocHandlers = [
     return HttpResponse.json({ rows: slice, page, per_page, total });
   }),
 
+  http.post('/api/vocs', async ({ request }) => {
+    const { role, id: userId } = currentRole(request);
+    if (role === 'user') return envelope('FORBIDDEN', '접근 권한이 없습니다.');
+    const payload = (await request.json()) as Partial<Voc>;
+    const now = new Date().toISOString();
+    const idHex = `aaaaaaaa-0000-4000-8000-${String(store.length + 1).padStart(12, '0')}`;
+    const created: Voc = {
+      id: idHex,
+      issue_code: `VOC-${String(store.length + 1).padStart(4, '0')}`,
+      title: payload.title ?? '',
+      body: payload.body ?? '',
+      status: payload.status ?? '접수',
+      priority: payload.priority ?? 'medium',
+      voc_type_id: payload.voc_type_id!,
+      system_id: payload.system_id!,
+      menu_id: payload.menu_id!,
+      assignee_id: payload.assignee_id ?? null,
+      author_id: userId,
+      parent_id: null,
+      source: payload.source ?? 'manual',
+      review_status: null,
+      resolution_quality: null,
+      drop_reason: null,
+      due_date: null,
+      deleted_at: null,
+      created_at: now,
+      updated_at: now,
+    } as Voc;
+    store.push(created);
+    return HttpResponse.json(created, { status: 201 });
+  }),
+
   http.get('/api/vocs/:id', ({ params, request }) => {
     const { role } = currentRole(request);
     const row = store.find((r) => r.id === params.id);
@@ -214,6 +247,11 @@ export const vocHandlers = [
     };
     notes.push(note);
     return HttpResponse.json(note);
+  }),
+
+  http.get('/api/vocs/:id/history', ({ params }) => {
+    const rows = VOC_HISTORY_FIXTURES.filter((h) => h.voc_id === params.id);
+    return HttpResponse.json({ rows });
   }),
 ];
 
