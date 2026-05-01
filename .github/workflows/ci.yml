@@ -25,8 +25,6 @@ jobs:
   font-self-host:
     name: Verify self-hosted fonts present
     runs-on: ubuntu-latest
-    # TODO: remove continue-on-error once font binaries committed (see phase-8-font-audit.md)
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Check Pretendard + D2Coding committed

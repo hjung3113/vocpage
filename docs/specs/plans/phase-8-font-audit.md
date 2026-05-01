@@ -44,23 +44,17 @@ No line-level CDN replacements were needed.
 
 ---
 
-## §3 Action Items Remaining
+## §3 Action Items Remaining — RESOLVED (2026-05-01)
 
-The following font binary files **must be committed** to `frontend/public/fonts/` by the team
-before the Wave 0 PR can be merged:
+Font binaries committed via npm-vendored sources (closed-net 친화):
 
-| File                                              | Source                                                                                                                                               |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `frontend/public/fonts/Pretendard-Variable.woff2` | https://github.com/orioncactus/pretendard/releases — extract from `Pretendard-1.x.x.zip` → `public/variable/woff2complete/Pretendard-Variable.woff2` |
-| `frontend/public/fonts/D2Coding.woff2`            | https://github.com/naver/d2codingfont/releases — convert `D2Coding-Ver1.3.2-20180524.ttf` → woff2 via `npx ttf2woff2` or fonttools                   |
+| File                                              | Source (npm)                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------------ |
+| `frontend/public/fonts/Pretendard-Variable.woff2` | `pretendard@^1.3.9` → `dist/web/variable/woff2/PretendardVariable.woff2` |
+| `frontend/public/fonts/D2Coding.woff2`            | `d2coding@^1.3.2` → `fonts/d2coding-full.woff2`                          |
 
-Licenses: both SIL OFL 1.1 (see `frontend/public/fonts/README.md`).
-
-A reminder comment is embedded in `frontend/src/styles/index.css`:
-
-```
-/* TODO: verify woff2 binaries committed to frontend/public/fonts/ before Wave 0 PR merge */
-```
+Licenses: 둘 다 SIL OFL 1.1 (`frontend/public/fonts/README.md`).
+CI `font-self-host` job 이 머지마다 검증.
 
 ---
 

@@ -1,10 +1,6 @@
 @import 'tailwindcss';
 
-/*
-  Self-hosted fonts — binaries must be committed to frontend/public/fonts/
-  before Wave 0 PR merge. No CDN loading permitted (Phase 8 closed-network policy).
-  TODO: verify woff2 binaries committed to frontend/public/fonts/ before Wave 0 PR merge
-*/
+/* Self-hosted fonts — Phase 8 closed-network policy (no CDN). Binaries committed in frontend/public/fonts/. */
 @font-face {
   font-family: 'Pretendard Variable';
   font-weight: 100 900;
