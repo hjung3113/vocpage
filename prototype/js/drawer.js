@@ -1,3 +1,172 @@
+// ── W3-C A: User role drawer readonly gate ────────────────────────────────────
+// spec: feature-voc.md §8.3 — User은 댓글 작성·첨부·상태·담당자·sub-task 권한 없음 → fail-closed
+function applyDrawerUserReadonly(vocId) {
+  const drawer = document.getElementById('drawer');
+
+  // Disable comment input area (F10: save original placeholder)
+  const commentInput = document.getElementById('new-comment-input-' + vocId);
+  if (commentInput) {
+    commentInput.dataset.originalPlaceholder = commentInput.placeholder || '';
+    commentInput.disabled = true;
+    commentInput.placeholder = '';
+  }
+  const commentInputWrap = commentInput ? commentInput.closest('.comment-input') : null;
+  if (commentInputWrap) {
+    commentInputWrap.classList.add('comment-input--readonly');
+  }
+
+  // Inject inline notice before comment input (not a toast)
+  const commentsSection = document.querySelector('.d-comments');
+  if (commentsSection && !commentsSection.querySelector('.d-readonly-notice')) {
+    const notice = document.createElement('div');
+    notice.className = 'd-readonly-notice';
+    notice.setAttribute('role', 'status');
+    notice.textContent = '조회만 가능합니다 (권한 없음)';
+    const inputWrap = commentsSection.querySelector('.comment-input');
+    if (inputWrap) {
+      commentsSection.insertBefore(notice, inputWrap);
+    } else {
+      commentsSection.appendChild(notice);
+    }
+  }
+
+  // Disable status select (F1)
+  if (drawer) {
+    const statusSel = drawer.querySelector('.d-meta .meta-sel:not([id])');
+    if (statusSel) {
+      statusSel.disabled = true;
+      statusSel.classList.add('select--readonly');
+    }
+  }
+
+  // Disable assignee select (F1) — the one inside .meta-val with mini-av
+  if (drawer) {
+    const assigneeVal = drawer.querySelector('.meta-item .meta-val select.meta-sel');
+    if (assigneeVal) {
+      assigneeVal.disabled = true;
+      assigneeVal.classList.add('select--readonly');
+    }
+  }
+
+  // Hide comment edit/delete icon buttons (F1)
+  if (drawer) {
+    drawer
+      .querySelectorAll('.c-actions, .comment-edit-btn, .comment-delete-btn')
+      .forEach(function (btn) {
+        btn.style.display = 'none';
+      });
+    // Also hide the icon-btn pencil/trash inside comment-header action divs
+    drawer.querySelectorAll('.comment-header .icon-btn').forEach(function (btn) {
+      btn.style.display = 'none';
+    });
+  }
+
+  // Hide sub-task add button and inline form (F1)
+  const subAddRow = document.getElementById('sub-add-row-' + vocId);
+  if (subAddRow) subAddRow.style.display = 'none';
+  const subForm = document.getElementById('sub-form-' + vocId);
+  if (subForm) subForm.style.display = 'none';
+
+  // Hide internal-notes write area (F1)
+  if (drawer) {
+    drawer.querySelectorAll('.in-compose, .note-save-btn, .note-input-area').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+
+  // Disable attachment zone (F8: save original drop HTML before overwriting)
+  const attZone = document.getElementById('att-zone-' + vocId);
+  if (attZone) {
+    attZone.classList.add('att-zone--readonly');
+    const drop = attZone.querySelector('.att-drop');
+    if (drop) {
+      drop.dataset.originalHtml = drop.innerHTML; // F8: capture before overwrite
+      drop.classList.add('att-drop--disabled');
+      drop.innerHTML =
+        '<span style="color:var(--text-quaternary)">첨부 권한 없음 (조회 전용)</span>';
+    }
+    const removeButtons = attZone.querySelectorAll('.att-remove');
+    removeButtons.forEach(function (btn) {
+      btn.style.display = 'none';
+    });
+  }
+}
+
+// Re-apply drawer user gate when role changes while drawer is open
+document.addEventListener('role:change', function (e) {
+  const drawer = document.getElementById('drawer');
+  if (!drawer || !drawer.classList.contains('open')) return;
+  const vocId = drawer.dataset.openVocId;
+  if (!vocId) return;
+  const newRole = e.detail && e.detail.role;
+
+  // Remove existing readonly notice
+  const existingNotice = document.querySelector('.d-readonly-notice');
+  if (existingNotice) existingNotice.remove();
+
+  // Re-enable comment input (F10: restore original placeholder from data-attribute)
+  const commentInput = document.getElementById('new-comment-input-' + vocId);
+  if (commentInput) {
+    commentInput.disabled = false;
+    if (commentInput.dataset.originalPlaceholder !== undefined) {
+      commentInput.placeholder = commentInput.dataset.originalPlaceholder;
+      delete commentInput.dataset.originalPlaceholder;
+    }
+  }
+  const commentInputWrap = commentInput ? commentInput.closest('.comment-input') : null;
+  if (commentInputWrap) commentInputWrap.classList.remove('comment-input--readonly');
+
+  // Re-enable status select (F1)
+  const statusSel = drawer.querySelector('.d-meta .meta-sel:not([id])');
+  if (statusSel) {
+    statusSel.disabled = false;
+    statusSel.classList.remove('select--readonly');
+  }
+
+  // Re-enable assignee select (F1)
+  const assigneeVal = drawer.querySelector('.meta-item .meta-val select.meta-sel');
+  if (assigneeVal) {
+    assigneeVal.disabled = false;
+    assigneeVal.classList.remove('select--readonly');
+  }
+
+  // Restore comment edit/delete icon buttons (F1)
+  drawer.querySelectorAll('.comment-header .icon-btn').forEach(function (btn) {
+    btn.style.display = '';
+  });
+
+  // Restore sub-task add row (F1)
+  const subAddRow = document.getElementById('sub-add-row-' + vocId);
+  if (subAddRow) subAddRow.style.display = '';
+
+  // Restore internal-notes write area (F1)
+  drawer.querySelectorAll('.in-compose, .note-save-btn, .note-input-area').forEach(function (el) {
+    el.style.display = '';
+  });
+
+  // Re-enable attachment zone (F8: restore original drop HTML)
+  const attZone = document.getElementById('att-zone-' + vocId);
+  if (attZone) {
+    attZone.classList.remove('att-zone--readonly');
+    const drop = attZone.querySelector('.att-drop');
+    if (drop) {
+      drop.classList.remove('att-drop--disabled');
+      if (drop.dataset.originalHtml !== undefined) {
+        drop.innerHTML = drop.dataset.originalHtml;
+        delete drop.dataset.originalHtml;
+      }
+    }
+    // Restore remove buttons visibility
+    attZone.querySelectorAll('.att-remove').forEach(function (btn) {
+      btn.style.display = '';
+    });
+  }
+
+  if (newRole === 'user') {
+    applyDrawerUserReadonly(vocId);
+  }
+});
+
 // ── C-02 Due Date helpers ────────────────────────────────────────────────────
 // calcDueDate(priority, baseDate?) → 'YYYY-MM-DD'
 // urgent=+7d, high=+14d, medium=+30d, low=+90d (feature-voc.md §8.4.1)
@@ -171,11 +340,20 @@ function openDrawer(id) {
     </div>`;
 
   document.getElementById('drawerOverlay').classList.add('open');
-  document.getElementById('drawer').classList.add('open');
+  const drawerEl = document.getElementById('drawer');
+  drawerEl.classList.add('open');
+  drawerEl.dataset.openVocId = id;
   document.querySelectorAll('.voc-row').forEach((r) => r.classList.remove('selected'));
   const row = document.getElementById('row-' + id);
   if (row) row.classList.add('selected');
   lucide.createIcons();
+
+  // W3-C A: User role — fail-closed comment input + attachment zone
+  // spec: feature-voc.md §8.3 (User: 댓글 쓰기 권한 없음)
+  const drawerRole = (window.currentUser && window.currentUser.role) || 'user';
+  if (drawerRole === 'user') {
+    applyDrawerUserReadonly(id);
+  }
 
   // N-02: attach charcount to drawer comment input — pass explicit submit button to avoid wrong btn-primary
   if (typeof window.attachCharCount === 'function') {

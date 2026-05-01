@@ -207,3 +207,187 @@
 .delta-amb {
   color: oklch(70% 0.16 72);
 }
+
+/* ─── W7 현황 카드 (N-05 가로 스크롤) ─── */
+.w7-scroll-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.w7-cards {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
+}
+.w7-cards::-webkit-scrollbar {
+  display: none;
+}
+.w7-card {
+  flex: 0 0 148px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  scroll-snap-align: start;
+  min-width: 148px;
+}
+.w7-card-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.w7-card-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.w7-card-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  font-size: 11px;
+}
+.w7-card-lbl {
+  color: var(--text-tertiary);
+}
+.w7-card-val {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.w7-card-val--total {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.w7-card-val--receive {
+  color: var(--text-tertiary);
+}
+.w7-card-val--review {
+  color: var(--status-blue);
+}
+.w7-card-val--process {
+  color: var(--status-green);
+}
+.w7-card-val--done {
+  font-weight: 700;
+  color: var(--status-green);
+}
+.w7-card-val--drop {
+  color: var(--status-amber);
+}
+.w7-scroll-fade-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 4px;
+  width: 32px;
+  background: linear-gradient(to right, transparent, var(--bg-surface));
+  pointer-events: none;
+  border-radius: 0 8px 8px 0;
+}
+.w7-scroll-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    color 0.12s;
+}
+.w7-scroll-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+@media (prefers-reduced-motion: reduce) {
+  .w7-cards {
+    scroll-snap-type: none;
+  }
+}
+
+/* ─── Widget empty / error states (B: W2~W11) ─── */
+.widget-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  gap: 8px;
+  color: var(--text-quaternary);
+}
+.widget-empty-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--text-quaternary);
+  opacity: 0.5;
+}
+.widget-empty-label {
+  font-size: 12px;
+  color: var(--text-quaternary);
+}
+.widget-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 8px;
+}
+.widget-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--status-red);
+  background: var(--status-red-bg);
+  border: 1px solid var(--status-red);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.widget-error-retry {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  border-radius: 5px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.widget-error-retry:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ─── Dashboard state demo toggle ─── */
+.dash-state-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dash-state-toggle-label {
+  font-size: 11px;
+  color: var(--text-quaternary);
+}
+.dash-state-toggle {
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}

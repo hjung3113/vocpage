@@ -1,0 +1,38 @@
+/* ─── W3-C A: User role readonly styles (feature-voc.md §8.3) ─── */
+/* Extracted from drawer.css (F7: keep drawer.css ≤500 lines) */
+
+.d-readonly-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-standard);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-quaternary);
+  margin-bottom: var(--sp-2);
+}
+.d-readonly-notice::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-quaternary);
+  flex-shrink: 0;
+}
+.comment-input--readonly {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+.att-zone--readonly {
+  pointer-events: none;
+}
+/* F1: status/assignee select disabled visual */
+.select--readonly {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
