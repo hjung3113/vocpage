@@ -94,3 +94,21 @@ export function apiPost<T>(
     opts,
   );
 }
+
+export function apiPatch<T>(
+  url: string,
+  body: unknown,
+  schema: ZodSchema<T>,
+  opts?: ApiClientOptions,
+): Promise<T> {
+  return request(
+    url,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    },
+    schema,
+    opts,
+  );
+}
