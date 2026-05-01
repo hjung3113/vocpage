@@ -1,12 +1,12 @@
 # VOC Visual Diff — Prototype vs `/voc` (Wave 1.5 Follow-up A, Stage 1 output)
 
-Generated: 2026-05-01T17:23:02.701Z
+Generated: 2026-05-01T17:57:58.289Z
 Prototype URL: http://127.0.0.1:4174/prototype.html#page-voc
 React URL: http://127.0.0.1:5173/voc
 
 > **[NOT MEASURABLE]** The following components could not be extracted:
 >
-> - `voc-create-modal`: Selector not found on React side
+> - `voc-advanced-filters`: Selector not found on React side
 > - `voc-notif-dropdown`: Selector not found on React side
 > - `voc-review-drawer`: Selector not found on React side
 
@@ -26,16 +26,16 @@ React URL: http://127.0.0.1:5173/voc
 
 | Component            | HIGH | MED | LOW |
 | -------------------- | ---- | --- | --- |
-| data-table           | 5    | 7   | 1   |
-| notification-bell    | 4    | 6   | 0   |
-| pagination           | 1    | 10  | 0   |
-| voc-advanced-filters | 4    | 9   | 0   |
+| data-table           | 3    | 6   | 1   |
+| notification-bell    | 0    | 3   | 0   |
+| pagination           | 0    | 10  | 0   |
+| voc-create-modal     | 2    | 13  | 1   |
 | voc-pagination       | 4    | 9   | 0   |
-| voc-sort-chips       | 3    | 11  | 0   |
-| voc-status-filters   | 3    | 8   | 0   |
-| voc-table            | 0    | 6   | 0   |
-| voc-topbar           | 2    | 11  | 0   |
-| voc-create-modal     | —    | —   | —   |
+| voc-sort-chips       | 0    | 6   | 0   |
+| voc-status-filters   | 0    | 5   | 0   |
+| voc-table            | 0    | 4   | 0   |
+| voc-topbar           | 0    | 5   | 0   |
+| voc-advanced-filters | —    | —   | —   |
 | voc-notif-dropdown   | —    | —   | —   |
 | voc-review-drawer    | —    | —   | —   |
 
@@ -44,14 +44,11 @@ React URL: http://127.0.0.1:5173/voc
 | Property              | Prototype                                                                                        | React                                         | Severity | Suggested Action |
 | --------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
 | align-items           | center                                                                                           | normal                                        | HIGH     | —                |
-| background-color      | oklch(0.965 0.009 255)                                                                           | rgba(0, 0, 0, 0)                              | HIGH     | —                |
-| border-color          | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.88 0.012 254)                                | oklch(0.18 0.026 267)                         | HIGH     | —                |
-| display               | grid                                                                                             | table                                         | HIGH     | —                |
+| display               | grid                                                                                             | table-header-group                            | HIGH     | —                |
 | grid-template-columns | 22px 144px 441px 115px 108px 84px 96px                                                           | none                                          | HIGH     | —                |
 | border-style          | none none solid                                                                                  | solid                                         | MED      | —                |
 | font-family           | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
-| height                | 32px                                                                                             | 797px                                         | MED      | —                |
-| line-height           | 21px                                                                                             | 20px                                          | MED      | —                |
+| height                | 32px                                                                                             | 37px                                          | MED      | —                |
 | padding-left          | 24px                                                                                             | 0px                                           | MED      | —                |
 | padding-right         | 24px                                                                                             | 0px                                           | MED      | —                |
 | width                 | 1058px                                                                                           | 976px                                         | MED      | —                |
@@ -59,59 +56,54 @@ React URL: http://127.0.0.1:5173/voc
 
 ## notification-bell
 
-| Property         | Prototype                                                                                        | React                                         | Severity | Suggested Action |
-| ---------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
-| background-color | oklch(1 0 0)                                                                                     | rgba(0, 0, 0, 0)                              | HIGH     | —                |
-| border-color     | oklch(0.88 0.012 254)                                                                            | oklch(0.36 0.022 264)                         | HIGH     | —                |
-| color            | oklch(0.54 0.016 260)                                                                            | oklch(0.36 0.022 264)                         | HIGH     | —                |
-| outline-color    | oklch(0.54 0.016 260)                                                                            | oklch(0.36 0.022 264)                         | HIGH     | —                |
-| border-radius    | 8px                                                                                              | 6px                                           | MED      | —                |
-| font-family      | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
-| font-size        | 14px                                                                                             | 16px                                          | MED      | —                |
-| height           | 32px                                                                                             | 36px                                          | MED      | —                |
-| line-height      | 21px                                                                                             | 24px                                          | MED      | —                |
-| width            | 32px                                                                                             | 36px                                          | MED      | —                |
+| Property    | Prototype                                                                                        | React                                         | Severity | Suggested Action |
+| ----------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
+| font-family | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
+| font-size   | 14px                                                                                             | 16px                                          | MED      | —                |
+| line-height | 21px                                                                                             | 24px                                          | MED      | —                |
 
 ## pagination
 
-| Property        | Prototype                                                                                        | React                                         | Severity | Suggested Action |
-| --------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
-| justify-content | center                                                                                           | normal                                        | HIGH     | —                |
-| border-style    | none                                                                                             | solid                                         | MED      | —                |
-| font-family     | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
-| font-size       | 14px                                                                                             | 16px                                          | MED      | —                |
-| height          | 62px                                                                                             | 36px                                          | MED      | —                |
-| line-height     | 21px                                                                                             | 24px                                          | MED      | —                |
-| padding-bottom  | 16px                                                                                             | 0px                                           | MED      | —                |
-| padding-left    | 24px                                                                                             | 0px                                           | MED      | —                |
-| padding-right   | 24px                                                                                             | 0px                                           | MED      | —                |
-| padding-top     | 16px                                                                                             | 0px                                           | MED      | —                |
-| width           | 1058px                                                                                           | 224.406px                                     | MED      | —                |
+| Property       | Prototype                                                                                        | React                                         | Severity | Suggested Action |
+| -------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
+| border-style   | none                                                                                             | solid                                         | MED      | —                |
+| font-family    | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
+| font-size      | 14px                                                                                             | 16px                                          | MED      | —                |
+| height         | 62px                                                                                             | 36px                                          | MED      | —                |
+| line-height    | 21px                                                                                             | 24px                                          | MED      | —                |
+| padding-bottom | 16px                                                                                             | 0px                                           | MED      | —                |
+| padding-left   | 24px                                                                                             | 0px                                           | MED      | —                |
+| padding-right  | 24px                                                                                             | 0px                                           | MED      | —                |
+| padding-top    | 16px                                                                                             | 0px                                           | MED      | —                |
+| width          | 1058px                                                                                           | 224.406px                                     | MED      | —                |
 
-## voc-advanced-filters
+## voc-create-modal
 
-| Property         | Prototype                                                                                        | React                                         | Severity | Suggested Action |
-| ---------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
-| background-color | oklch(0.965 0.009 255)                                                                           | rgba(0, 0, 0, 0)                              | HIGH     | —                |
-| border-color     | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.88 0.012 254)                                | oklch(0.18 0.026 267)                         | HIGH     | —                |
-| display          | block                                                                                            | flex                                          | HIGH     | —                |
-| flex-direction   | row                                                                                              | column                                        | HIGH     | —                |
-| border-style     | none none solid                                                                                  | solid                                         | MED      | —                |
-| column-gap       | normal                                                                                           | 12px                                          | MED      | —                |
-| font-family      | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
-| font-size        | 14px                                                                                             | 16px                                          | MED      | —                |
-| gap              | normal                                                                                           | 12px                                          | MED      | —                |
-| height           | 0px                                                                                              | 36px                                          | MED      | —                |
-| line-height      | 21px                                                                                             | 24px                                          | MED      | —                |
-| row-gap          | normal                                                                                           | 12px                                          | MED      | —                |
-| width            | 1058px                                                                                           | 976px                                         | MED      | —                |
+| Property              | Prototype | React                                                                                                                                                                                                              | Severity | Suggested Action |
+| --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------------- |
+| display               | block     | grid                                                                                                                                                                                                               | HIGH     | —                |
+| grid-template-columns | none      | 929px                                                                                                                                                                                                              | HIGH     | —                |
+| border-radius         | 14px      | 8px                                                                                                                                                                                                                | MED      | —                |
+| column-gap            | normal    | 16px                                                                                                                                                                                                               | MED      | —                |
+| font-size             | 14px      | 16px                                                                                                                                                                                                               | MED      | —                |
+| gap                   | normal    | 16px                                                                                                                                                                                                               | MED      | —                |
+| height                | 833px     | 700px                                                                                                                                                                                                              | MED      | —                |
+| line-height           | 21px      | 24px                                                                                                                                                                                                               | MED      | —                |
+| max-width             | 648px     | 672px                                                                                                                                                                                                              | MED      | —                |
+| padding-bottom        | 0px       | 24px                                                                                                                                                                                                               | MED      | —                |
+| padding-left          | 0px       | 24px                                                                                                                                                                                                               | MED      | —                |
+| padding-right         | 0px       | 24px                                                                                                                                                                                                               | MED      | —                |
+| padding-top           | 0px       | 24px                                                                                                                                                                                                               | MED      | —                |
+| row-gap               | normal    | 16px                                                                                                                                                                                                               | MED      | —                |
+| width                 | 648px     | 672px                                                                                                                                                                                                              | MED      | —                |
+| box-shadow            | none      | rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px | LOW      | —                |
 
 ## voc-pagination
 
 | Property        | Prototype                                                                                        | React                                                             | Severity | Suggested Action |
 | --------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | -------- | ---------------- |
 | align-items     | normal                                                                                           | center                                                            | HIGH     | —                |
-| border-color    | oklch(0.18 0.026 267)                                                                            | oklch(0.83 0.016 256) oklch(0.18 0.026 267) oklch(0.18 0.026 267) | HIGH     | —                |
+| border-color    | oklch(0.18 0.026 267)                                                                            | oklch(0.88 0.012 254) oklch(0.18 0.026 267) oklch(0.18 0.026 267) | HIGH     | —                |
 | display         | block                                                                                            | flex                                                              | HIGH     | —                |
 | justify-content | normal                                                                                           | space-between                                                     | HIGH     | —                |
 | border-style    | none                                                                                             | solid                                                             | MED      | —                |
@@ -126,38 +118,24 @@ React URL: http://127.0.0.1:5173/voc
 
 ## voc-sort-chips
 
-| Property         | Prototype                                                                                        | React                                         | Severity | Suggested Action |
-| ---------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
-| background-color | oklch(0.965 0.009 255)                                                                           | rgba(0, 0, 0, 0)                              | HIGH     | —                |
-| border-color     | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.88 0.012 254)                                | oklch(0.18 0.026 267)                         | HIGH     | —                |
-| flex-wrap        | nowrap                                                                                           | wrap                                          | HIGH     | —                |
-| border-style     | none none solid                                                                                  | solid                                         | MED      | —                |
-| column-gap       | 8px                                                                                              | 6px                                           | MED      | —                |
-| font-family      | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
-| font-size        | 14px                                                                                             | 16px                                          | MED      | —                |
-| gap              | 8px                                                                                              | 6px                                           | MED      | —                |
-| height           | 35px                                                                                             | 46px                                          | MED      | —                |
-| line-height      | 21px                                                                                             | 24px                                          | MED      | —                |
-| padding-bottom   | 6px                                                                                              | 8px                                           | MED      | —                |
-| padding-top      | 6px                                                                                              | 8px                                           | MED      | —                |
-| row-gap          | 8px                                                                                              | 6px                                           | MED      | —                |
-| width            | 1058px                                                                                           | 1024px                                        | MED      | —                |
+| Property     | Prototype                                                                                        | React                                         | Severity | Suggested Action |
+| ------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
+| border-style | none none solid                                                                                  | solid                                         | MED      | —                |
+| font-family  | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
+| font-size    | 14px                                                                                             | 16px                                          | MED      | —                |
+| height       | 35px                                                                                             | 43px                                          | MED      | —                |
+| line-height  | 21px                                                                                             | 24px                                          | MED      | —                |
+| width        | 1058px                                                                                           | 1024px                                        | MED      | —                |
 
 ## voc-status-filters
 
-| Property         | Prototype                                                                                        | React                                                             | Severity | Suggested Action |
-| ---------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | -------- | ---------------- |
-| background-color | oklch(0.98 0.007 252)                                                                            | rgba(0, 0, 0, 0)                                                  | HIGH     | —                |
-| border-color     | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.88 0.012 254)                                | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.83 0.016 256) | HIGH     | —                |
-| flex-wrap        | nowrap                                                                                           | wrap                                                              | HIGH     | —                |
-| border-style     | none none solid                                                                                  | solid                                                             | MED      | —                |
-| font-family      | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif                     | MED      | —                |
-| font-size        | 14px                                                                                             | 16px                                                              | MED      | —                |
-| height           | 44px                                                                                             | 55px                                                              | MED      | —                |
-| line-height      | 21px                                                                                             | 24px                                                              | MED      | —                |
-| padding-bottom   | 0px                                                                                              | 12px                                                              | MED      | —                |
-| padding-top      | 0px                                                                                              | 12px                                                              | MED      | —                |
-| width            | 1058px                                                                                           | 1024px                                                            | MED      | —                |
+| Property     | Prototype                                                                                        | React                                         | Severity | Suggested Action |
+| ------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
+| border-style | none none solid                                                                                  | solid                                         | MED      | —                |
+| font-family  | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
+| font-size    | 14px                                                                                             | 16px                                          | MED      | —                |
+| line-height  | 21px                                                                                             | 24px                                          | MED      | —                |
+| width        | 1058px                                                                                           | 1024px                                        | MED      | —                |
 
 ## voc-table
 
@@ -165,33 +143,15 @@ React URL: http://127.0.0.1:5173/voc
 | ------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
 | border-style | none                                                                                             | solid                                         | MED      | —                |
 | font-family  | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
-| font-size    | 14px                                                                                             | 16px                                          | MED      | —                |
-| height       | 620px                                                                                            | 797px                                         | MED      | —                |
-| line-height  | 21px                                                                                             | 24px                                          | MED      | —                |
+| height       | 620px                                                                                            | 798px                                         | MED      | —                |
 | width        | 1058px                                                                                           | 976px                                         | MED      | —                |
 
 ## voc-topbar
 
-| Property         | Prototype                                                                                        | React                                                             | Severity | Suggested Action |
-| ---------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | -------- | ---------------- |
-| background-color | oklch(0.98 0.007 252)                                                                            | oklch(0.965 0.009 255)                                            | HIGH     | —                |
-| border-color     | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.88 0.012 254)                                | oklch(0.18 0.026 267) oklch(0.18 0.026 267) oklch(0.83 0.016 256) | HIGH     | —                |
-| border-style     | none none solid                                                                                  | solid                                                             | MED      | —                |
-| column-gap       | 8px                                                                                              | 16px                                                              | MED      | —                |
-| font-family      | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif                     | MED      | —                |
-| font-size        | 14px                                                                                             | 16px                                                              | MED      | —                |
-| gap              | 8px                                                                                              | 16px                                                              | MED      | —                |
-| height           | 56px                                                                                             | 73px                                                              | MED      | —                |
-| line-height      | 21px                                                                                             | 24px                                                              | MED      | —                |
-| padding-bottom   | 0px                                                                                              | 16px                                                              | MED      | —                |
-| padding-top      | 0px                                                                                              | 16px                                                              | MED      | —                |
-| row-gap          | 8px                                                                                              | 16px                                                              | MED      | —                |
-| width            | 1058px                                                                                           | 1024px                                                            | MED      | —                |
-
-## Token Mapping Hints
-
-For each unique React color encountered, the nearest token from `frontend/src/tokens.ts`:
-
-| Observed (React) | Closest token   | ΔE (LAB) |
-| ---------------- | --------------- | -------- |
-| rgba(0, 0, 0, 0) | `var(--bg-app)` | 2.3      |
+| Property     | Prototype                                                                                        | React                                         | Severity | Suggested Action |
+| ------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------- | ---------------- |
+| border-style | none none solid                                                                                  | solid                                         | MED      | —                |
+| font-family  | "Pretendard Variable", Pretendard, -apple-system, "system-ui", "Apple SD Gothic Neo", sans-serif | "Pretendard Variable", Pretendard, sans-serif | MED      | —                |
+| font-size    | 14px                                                                                             | 16px                                          | MED      | —                |
+| line-height  | 21px                                                                                             | 24px                                          | MED      | —                |
+| width        | 1058px                                                                                           | 1024px                                        | MED      | —                |
