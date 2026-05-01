@@ -258,6 +258,12 @@ function toggleArchiveMenu(id) {
   }
 }
 
+const TYPE_KIND_LABEL = {
+  system: 'system',
+  menu: 'menu',
+  'issue-kind': 'issue-kind',
+  external: 'external',
+};
 function renderVocTypes() {
   const el = document.getElementById('adminVocTypeContent');
   if (!el) return;
@@ -266,12 +272,15 @@ function renderVocTypes() {
     const state = t.archived
       ? `<span style="font-size:12px;color:var(--text-quaternary)"><span class="status-dot off"></span>아카이브</span>`
       : `<span style="font-size:12px;color:var(--status-green)"><span class="status-dot on"></span>활성</span>`;
+    const kindCls = t.typeKind ? `type-${t.typeKind}` : 'type-issue-kind';
+    const kindLabel = TYPE_KIND_LABEL[t.typeKind] || t.typeKind || '—';
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:8px">
         <span class="color-swatch" style="background:${t.color};flex-shrink:0"></span>
         <span class="td-primary" style="${t.archived ? 'opacity:.55' : ''}">${t.name}</span>
       </div></td>
       <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">${t.slug}</td>
+      <td><span class="type-badge-admin ${kindCls}">${kindLabel}</span></td>
       <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${cnt}</td>
       <td>${state}</td>
       <td style="text-align:right">

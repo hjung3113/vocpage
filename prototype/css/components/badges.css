@@ -1,0 +1,145 @@
+/* ============================================================
+   badges.css — Status Dot (C-11) + Type Badge Admin (C-10)
+   Wave 3-B · spec: uidesign §13.4 (TypeBadge) §13.5 (StatusDot)
+   Hard rule: zero hex / zero raw OKLCH — only var(--token)
+   ============================================================ */
+
+/* ── C-11 Status Dot ────────────────────────────────────────── */
+/*
+   Usage: <span class="status-dot on"></span>   → green  (active)
+          <span class="status-dot off"></span>  → gray   (inactive)
+          <span class="status-dot archived"></span> → red (archived)
+          <span class="status-dot pending"></span>  → amber (pending)
+
+   Pair with a sibling text label; the dot itself carries no text.
+*/
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* active — green */
+.status-dot.on {
+  background: var(--status-green);
+}
+
+/* inactive — quaternary gray */
+.status-dot.off {
+  background: var(--text-quaternary);
+}
+
+/* archived — red */
+.status-dot.archived {
+  background: var(--status-red);
+}
+
+/* pending — amber */
+.status-dot.pending {
+  background: var(--status-amber);
+}
+
+/* ── C-10 Type Badge Admin ──────────────────────────────────── */
+/*
+   Usage:
+     <span class="type-badge-admin type-system">system</span>
+     <span class="type-badge-admin type-menu">menu</span>
+     <span class="type-badge-admin type-issue-kind">issue-kind</span>
+     <span class="type-badge-admin type-external">external</span>
+
+   Also supports legacy tag-rule variants (keyword / regex) used
+   in admin-master.js renderTagRules() for the type column.
+*/
+.type-badge-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+/* dot inside badge — injected via ::before pseudo-element */
+.type-badge-admin::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* system → brand (blue) */
+.type-badge-admin.type-system {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border-color: var(--brand-border);
+}
+.type-badge-admin.type-system::before {
+  background: var(--accent);
+}
+
+/* menu → status-blue */
+.type-badge-admin.type-menu {
+  background: var(--status-blue);
+  color: var(--bg-surface);
+  border-color: transparent;
+  opacity: 0.85;
+}
+.type-badge-admin.type-menu {
+  background: var(--status-reviewing-bg);
+  color: var(--status-reviewing-fg);
+  border-color: var(--status-reviewing-border);
+}
+.type-badge-admin.type-menu::before {
+  background: var(--status-reviewing-fg);
+}
+
+/* issue-kind → purple */
+.type-badge-admin.type-issue-kind {
+  background: var(--status-purple-bg);
+  color: var(--status-purple);
+  border-color: var(--status-purple-border);
+}
+.type-badge-admin.type-issue-kind::before {
+  background: var(--status-purple);
+}
+
+/* external → amber */
+.type-badge-admin.type-external {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border-color: var(--status-amber-border);
+}
+.type-badge-admin.type-external::before {
+  background: var(--status-amber);
+}
+
+/* ── Legacy tag-rule type variants (keyword / regex) ─────────
+   Used in admin-master.js renderTagRules() type column.
+   Retained here so they continue to work after any refactor.    */
+.type-badge-admin.type-keyword {
+  background: var(--status-green-bg);
+  color: var(--status-green);
+  border-color: var(--status-green-border);
+}
+.type-badge-admin.type-keyword::before {
+  background: var(--status-green);
+}
+
+.type-badge-admin.type-regex {
+  background: var(--status-purple-bg);
+  color: var(--status-purple);
+  border-color: var(--status-purple-border);
+}
+.type-badge-admin.type-regex::before {
+  background: var(--status-purple);
+}
