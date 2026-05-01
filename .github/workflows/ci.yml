@@ -19,7 +19,7 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run -w frontend typecheck
-      # TODO(Wave 0-11): add lint step once frontend lint script is added
+      - run: npm run -w frontend lint
       - run: npm run -w frontend build
 
   build-be:
