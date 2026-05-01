@@ -8,6 +8,19 @@ import type { Extracted } from './diff.js';
 
 export type { Extracted };
 
+/** Sentinel emitted when a target's selector finds no element in the DOM. */
+export interface MissingExtracted {
+  componentId: string;
+  selector: string;
+  status: 'MISSING';
+}
+
+export type ExtractResult = Extracted | MissingExtracted;
+
+export function isMissing(e: ExtractResult): e is MissingExtracted {
+  return (e as MissingExtracted).status === 'MISSING';
+}
+
 export interface ExtractOptions {
   whitelist: readonly string[];
   depth: 0 | 1;
@@ -83,7 +96,7 @@ export async function extractFromPage(
   page: PageLike,
   targets: ExtractTarget[],
   opts: ExtractOptions,
-): Promise<Extracted[]> {
+): Promise<ExtractResult[]> {
   const whitelist = Array.from(opts.whitelist);
   const depth = opts.depth;
 
@@ -114,7 +127,15 @@ export async function extractFromPage(
     for (var t = 0; t < targets.length; t++) {
       var target = targets[t];
       var el = document.querySelector(target.selector);
-      if (!el) continue;
+      if (!el) {
+        // Emit a sentinel instead of silently skipping
+        extracted.push({
+          componentId: target.componentId,
+          selector: target.selector,
+          status: 'MISSING',
+        });
+        continue;
+      }
 
       extracted.push({
         componentId: target.componentId,
@@ -143,9 +164,9 @@ export async function extractFromPage(
     targets: ExtractTarget[];
     whitelist: string[];
     depth: number;
-  }) => Extracted[];
+  }) => ExtractResult[];
 
   const results = await page.evaluate(browserFn, { targets, whitelist, depth } as unknown);
 
-  return results as Extracted[];
+  return results as ExtractResult[];
 }

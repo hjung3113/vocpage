@@ -57,6 +57,29 @@ describe('classify()', () => {
       expect(result.match).toBe(false);
       expect(result.severity).toBe('MED');
     });
+
+    // Boundary tests at exactly ±1.0 and just outside ±1.001
+    it('spacing diff exactly 1.0px → match=true (at boundary)', () => {
+      const result = classify('padding-top', '12px', '13px');
+      expect(result.match).toBe(true);
+    });
+
+    it('spacing diff exactly -1.0px → match=true (at boundary)', () => {
+      const result = classify('padding-top', '13px', '12px');
+      expect(result.match).toBe(true);
+    });
+
+    it('spacing diff 1.001px → match=false (just outside boundary)', () => {
+      const result = classify('padding-top', '12px', '13.001px');
+      expect(result.match).toBe(false);
+      expect(result.severity).toBe('MED');
+    });
+
+    it('spacing diff -1.001px → match=false (just outside boundary)', () => {
+      const result = classify('padding-top', '13.001px', '12px');
+      expect(result.match).toBe(false);
+      expect(result.severity).toBe('MED');
+    });
   });
 
   // Layout group — exact match, HIGH on mismatch

@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 import { bootHarness } from './harness.js';
-import { extractFromPage, WHITELIST } from './extract.js';
+import { extractFromPage, isMissing, WHITELIST } from './extract.js';
 import { diff } from './diff.js';
 import { renderReport } from './report.js';
 import { loadTokens, findNearestTokens } from './tokens.js';
@@ -69,15 +69,29 @@ function parseArgs(argv: string[]): {
 export async function main(argv: string[]): Promise<void> {
   const args = parseArgs(argv);
 
+  // F7: path traversal guard — resolve and assert within repo root
+  const resolvedOut = path.resolve(args.out);
+  if (!resolvedOut.startsWith(ROOT + path.sep) && resolvedOut !== ROOT) {
+    process.stderr.write(
+      `[visual-diff] ERROR: --out path "${resolvedOut}" is outside repo root "${ROOT}". Aborting.\n`,
+    );
+    process.exit(1);
+  }
+
   // Determine which components to process
   const allComponents = SELECTOR_MAP.map((e) => e.componentId);
   const targetComponents: ComponentId[] =
     args.components.length > 0 ? args.components : allComponents;
 
-  const fallbackComponents = getFallbackComponents();
+  // Compute fallback list from the FULL selector map (not filtered target list)
+  // so the banner always reflects all 9 structural-fallback components when no --component= filter.
+  const allFallbackComponents = getFallbackComponents();
+  const selectorFallbacks = allFallbackComponents.filter((id) =>
+    targetComponents.includes(id as ComponentId),
+  );
 
   console.error(`[visual-diff] Processing ${targetComponents.length} components`);
-  console.error(`[visual-diff] Report → ${args.out}`);
+  console.error(`[visual-diff] Report → ${resolvedOut}`);
 
   const { protoPage, reactPage, teardown } = await bootHarness({
     protoPort: args.protoPort,
@@ -88,16 +102,10 @@ export async function main(argv: string[]): Promise<void> {
 
   try {
     const notMeasurable: NotMeasurableEntry[] = [];
-    const selectorFallbacks: string[] = [];
 
     // Build extraction targets for prototype
     const protoTargets = targetComponents
-      .filter((id) => {
-        const entry = SELECTOR_MAP.find((e) => e.componentId === id);
-        if (!entry) return false;
-        if (fallbackComponents.includes(id)) selectorFallbacks.push(id);
-        return true;
-      })
+      .filter((id) => SELECTOR_MAP.find((e) => e.componentId === id))
       .map((id) => {
         const entry = SELECTOR_MAP.find((e) => e.componentId === id)!;
         return { componentId: id, selector: entry.proto };
@@ -112,32 +120,52 @@ export async function main(argv: string[]): Promise<void> {
       });
 
     // --- Handle modal/dropdown/drawer interactions before extraction ---
-    // Prototype: open modal, notif dropdown (wait for globals to be available)
     await openPrototypeOverlays(protoPage);
-
-    // React: open create modal and notif dropdown if present
     await openReactOverlays(reactPage);
 
     // Extract computed styles
     console.error('[visual-diff] Extracting prototype styles...');
-    const protoExtracted = await extractFromPage(protoPage, protoTargets, {
+    const protoRaw = await extractFromPage(protoPage, protoTargets, {
       whitelist: WHITELIST,
       depth: 1,
     });
 
     console.error('[visual-diff] Extracting React styles...');
-    const reactExtracted = await extractFromPage(reactPage, reactTargets, {
+    const reactRaw = await extractFromPage(reactPage, reactTargets, {
       whitelist: WHITELIST,
       depth: 1,
     });
 
-    // Check for empty voc-table (MSW guard)
-    const protoTableEntry = protoExtracted.find(
-      (e) => e.componentId === 'voc-table' && e.role === 'root',
-    );
-    if (protoTableEntry && Object.keys(protoTableEntry.props).length === 0) {
-      notMeasurable.push({ componentId: 'voc-table', reason: 'list empty' });
+    // F1: Collect missing sentinels from both sides and emit NotMeasurableEntry per component
+    const protoMissingIds = new Set<string>();
+    const reactMissingIds = new Set<string>();
+
+    for (const e of protoRaw) {
+      if (isMissing(e)) protoMissingIds.add(e.componentId);
     }
+    for (const e of reactRaw) {
+      if (isMissing(e)) reactMissingIds.add(e.componentId);
+    }
+
+    // Union of all components that are missing on at least one side
+    const allMissingIds = new Set([...protoMissingIds, ...reactMissingIds]);
+    for (const id of allMissingIds) {
+      const protoMissing = protoMissingIds.has(id);
+      const reactMissing = reactMissingIds.has(id);
+      let reason: string;
+      if (protoMissing && reactMissing) {
+        reason = 'Selector not found on both prototype and React sides';
+      } else if (protoMissing) {
+        reason = 'Selector not found on prototype side';
+      } else {
+        reason = 'Selector not found on React side';
+      }
+      notMeasurable.push({ componentId: id, reason });
+    }
+
+    // Filter to only successfully extracted entries for diff
+    const protoExtracted = protoRaw.filter((e) => !isMissing(e)) as import('./diff.js').Extracted[];
+    const reactExtracted = reactRaw.filter((e) => !isMissing(e)) as import('./diff.js').Extracted[];
 
     // Determine sort key parity warning
     const sortKeyWarning = await detectSortKeyMismatch(protoPage, reactPage);
@@ -155,28 +183,24 @@ export async function main(argv: string[]): Promise<void> {
     console.error('[visual-diff] Computing token hints...');
     const tokenHints = await computeTokenHints(filteredDiffs);
 
-    // Build unique list of fallbacks actually encountered
-    const uniqueFallbacks = [...new Set(selectorFallbacks)].filter((id) =>
-      targetComponents.includes(id as ComponentId),
-    );
-
     const meta: ReportMeta = {
       generatedAt: new Date().toISOString(),
       protoUrl: `http://127.0.0.1:${args.protoPort}/prototype.html#page-voc`,
       reactUrl: `http://127.0.0.1:${args.reactPort}/voc`,
       notMeasurable,
-      selectorFallbacks: uniqueFallbacks,
+      selectorFallbacks,
       sortKeyWarning,
     };
 
     // Render and write report
     const markdown = renderReport(filteredDiffs, meta, tokenHints);
 
-    const outDir = path.dirname(args.out);
-    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-    fs.writeFileSync(args.out, markdown, 'utf-8');
+    // F9: unconditional mkdirSync with recursive to avoid TOCTOU
+    const outDir = path.dirname(resolvedOut);
+    fs.mkdirSync(outDir, { recursive: true });
+    fs.writeFileSync(resolvedOut, markdown, 'utf-8');
 
-    console.error(`[visual-diff] Report written: ${args.out}`);
+    console.error(`[visual-diff] Report written: ${resolvedOut}`);
     console.error(
       `[visual-diff] Total diffs: ${filteredDiffs.length} (HIGH: ${filteredDiffs.filter((d) => d.severity === 'HIGH').length}, MED: ${filteredDiffs.filter((d) => d.severity === 'MED').length}, LOW: ${filteredDiffs.filter((d) => d.severity === 'LOW').length})`,
     );
@@ -204,8 +228,10 @@ async function openPrototypeOverlays(page: import('playwright').Page): Promise<v
     }
   }
 
-  // We don't open overlays by default during bulk extraction to avoid DOM interference.
-  // The modal/drawer will be opened only when extracting those specific components.
+  // TODO(stage-2): Open overlays (modal, notif panel, drawer) individually when
+  // extracting those specific components. In Stage 1, overlay elements (#modalBg,
+  // #notifPanel, #drawer) are present in the DOM but may be hidden; selectors still
+  // locate them via ID. Stage 2 will add targeted interaction before extracting each overlay.
 }
 
 async function openReactOverlays(_page: import('playwright').Page): Promise<void> {

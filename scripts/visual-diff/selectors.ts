@@ -69,21 +69,25 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
   },
   {
     componentId: 'voc-create-modal',
-    proto: '[data-pcomp="voc-create-modal"]',
+    // openModal() makes #modalBg visible; use it as the structural root
+    proto: '#modalBg',
     react: '[data-pcomp="voc-create-modal"]',
-    hasPcompMarker: false,
+    // Stage 1: structural selector is the contract; Stage 2 adds data-pcomp
+    hasPcompMarker: true,
   },
   {
     componentId: 'voc-notif-dropdown',
-    proto: '[data-pcomp="voc-notif-dropdown"]',
+    // toggleNotif() shows #notifPanel; use it as the structural root
+    proto: '#notifPanel',
     react: '[data-pcomp="voc-notif-dropdown"]',
-    hasPcompMarker: false,
+    hasPcompMarker: true,
   },
   {
     componentId: 'voc-review-drawer',
-    proto: '[data-pcomp="voc-review-drawer"]',
+    // openDrawer() shows #drawer; use it as the structural root
+    proto: '#drawer',
     react: '[data-pcomp="voc-review-drawer"]',
-    hasPcompMarker: false,
+    hasPcompMarker: true,
   },
   {
     componentId: 'notification-bell',

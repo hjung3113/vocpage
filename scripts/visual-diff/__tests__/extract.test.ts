@@ -1,20 +1,59 @@
 import { describe, it, expect } from 'vitest';
-import { extractFromPage, WHITELIST } from '../extract.js';
+import { extractFromPage, isMissing, WHITELIST } from '../extract.js';
 import type { ExtractOptions } from '../extract.js';
 
-// Minimal Page mock — only needs `evaluate` returning fixture data
-function makeFakePage(fixtureStyles: Record<string, string>) {
+// ---------------------------------------------------------------------------
+// Minimal jsdom-compatible Page mock.
+// The real browserFnSrc serialises itself and runs in-page, calling
+// document.querySelector + getComputedStyle. We replicate that logic
+// in a fake page.evaluate so that we exercise the REAL browser-side
+// function path (not a stub that returns fixture data).
+// ---------------------------------------------------------------------------
+function makeJsdomPage(
+  elements: Array<{
+    selector: string;
+    styles: Record<string, string>;
+    children?: Array<Record<string, string>>;
+  }>,
+) {
   return {
-    evaluate: async (fn: Function, ...args: unknown[]) => {
-      // The real extractFromPage calls page.evaluate with an inline function.
-      // We intercept by calling fn with mocked DOM-like data.
-      return fn(
-        // Pass a fake "execution context" — our fn is evaluated as if in browser.
-        // Since we can't actually run page.evaluate in jsdom without Playwright,
-        // we instead expose the fixture via a special __fixture__ symbol.
-        { __fixture__: fixtureStyles },
-        ...args,
+    async evaluate(fn: Function, arg: unknown): Promise<unknown> {
+      // Build a fake document that matches the evaluated browser fn's contract:
+      // document.querySelector(sel) returns an element with getComputedStyle support.
+      const fakeDoc = {
+        querySelector(sel: string) {
+          const match = elements.find((e) => e.selector === sel);
+          if (!match) return null;
+          const makeEl = (
+            styles: Record<string, string>,
+            childStyles?: Array<Record<string, string>>,
+          ) => ({
+            children: (childStyles ?? []).map((cs) => makeEl(cs)),
+            // getComputedStyle is called via window.getComputedStyle(el)
+            __styles: styles,
+          });
+          return makeEl(match.styles, match.children);
+        },
+      };
+
+      const fakeWindow = {
+        getComputedStyle(el: { __styles: Record<string, string> }) {
+          return {
+            getPropertyValue(prop: string): string {
+              return el.__styles[prop] ?? '';
+            },
+          };
+        },
+      };
+
+      // Patch the globals the serialised browser fn references
+      const patchedFn = new Function(
+        'document',
+        'window',
+        `return (${fn.toString()})(arguments[2])`,
       );
+      // TypeScript doesn't know about the extra arg — cast
+      return (patchedFn as Function)(fakeDoc, fakeWindow, arg);
     },
   };
 }
@@ -50,45 +89,134 @@ describe('WHITELIST', () => {
     expect(WHITELIST).not.toContain('transform');
     expect(WHITELIST).not.toContain('transition');
   });
-});
 
-describe('extractFromPage() — whitelist filtering', () => {
-  it('filters out non-whitelisted properties from returned styles', async () => {
-    // We test the whitelist filtering logic directly since we can't run real Playwright in vitest
-    const allProps: Record<string, string> = {
-      'background-color': 'rgb(20, 22, 28)',
-      'font-size': '14px',
-      display: 'flex',
-      cursor: 'pointer', // NOT in whitelist
-      'z-index': '100', // NOT in whitelist
-      transform: 'none', // NOT in whitelist
-      transition: 'all 0.2s', // NOT in whitelist
-    };
-
-    // Filter logic mirrors what extractFromPage does internally
-    const whitelistSet = new Set(WHITELIST);
-    const filtered = Object.fromEntries(
-      Object.entries(allProps).filter(([k]) => whitelistSet.has(k)),
-    );
-
-    expect(filtered).toHaveProperty('background-color');
-    expect(filtered).toHaveProperty('font-size');
-    expect(filtered).toHaveProperty('display');
-    expect(filtered).not.toHaveProperty('cursor');
-    expect(filtered).not.toHaveProperty('z-index');
-    expect(filtered).not.toHaveProperty('transform');
-    expect(filtered).not.toHaveProperty('transition');
-  });
-
-  it('WHITELIST set has no duplicate entries', () => {
+  it('has no duplicate entries', () => {
     const unique = new Set(WHITELIST);
     expect(unique.size).toBe(WHITELIST.length);
   });
+});
 
-  it('ExtractOptions type accepts depth 0 or 1', () => {
+describe('ExtractOptions type', () => {
+  it('accepts depth 0 or 1', () => {
     const opts0: ExtractOptions = { whitelist: WHITELIST, depth: 0 };
     const opts1: ExtractOptions = { whitelist: WHITELIST, depth: 1 };
     expect(opts0.depth).toBe(0);
     expect(opts1.depth).toBe(1);
+  });
+});
+
+describe('extractFromPage() — real browser-fn path via jsdom mock', () => {
+  const opts: ExtractOptions = { whitelist: WHITELIST, depth: 0 };
+
+  it('returns a root entry with whitelisted props when selector matches', async () => {
+    const page = makeJsdomPage([
+      {
+        selector: '#topbar',
+        styles: {
+          'background-color': 'rgb(20, 22, 28)',
+          display: 'flex',
+          cursor: 'pointer', // NOT in whitelist — must be stripped
+        },
+      },
+    ]);
+
+    const results = await extractFromPage(
+      page as any,
+      [{ componentId: 'voc-topbar', selector: '#topbar' }],
+      opts,
+    );
+
+    expect(results).toHaveLength(1);
+    const entry = results[0];
+    expect(isMissing(entry)).toBe(false);
+    if (!isMissing(entry)) {
+      expect(entry.componentId).toBe('voc-topbar');
+      expect(entry.role).toBe('root');
+      expect(entry.props['background-color']).toBe('rgb(20, 22, 28)');
+      expect(entry.props['display']).toBe('flex');
+      expect(entry.props['cursor']).toBeUndefined();
+    }
+  });
+
+  it('emits a MISSING sentinel when selector finds no element', async () => {
+    const page = makeJsdomPage([]); // no elements registered
+
+    const results = await extractFromPage(
+      page as any,
+      [{ componentId: 'voc-table', selector: '.list-area' }],
+      opts,
+    );
+
+    expect(results).toHaveLength(1);
+    expect(isMissing(results[0])).toBe(true);
+    if (isMissing(results[0])) {
+      expect(results[0].componentId).toBe('voc-table');
+      expect(results[0].selector).toBe('.list-area');
+    }
+  });
+
+  it('skips SIZING_PROPS when value is auto/none/normal', async () => {
+    const page = makeJsdomPage([
+      {
+        selector: '#el',
+        styles: {
+          width: 'auto', // should be skipped
+          height: 'none', // should be skipped
+          display: 'flex', // whitelisted, non-SIZING → kept
+        },
+      },
+    ]);
+
+    const results = await extractFromPage(
+      page as any,
+      [{ componentId: 'voc-topbar', selector: '#el' }],
+      opts,
+    );
+
+    expect(isMissing(results[0])).toBe(false);
+    if (!isMissing(results[0])) {
+      expect(results[0].props['width']).toBeUndefined();
+      expect(results[0].props['height']).toBeUndefined();
+      expect(results[0].props['display']).toBe('flex');
+    }
+  });
+
+  it('extracts children when depth=1', async () => {
+    const page = makeJsdomPage([
+      {
+        selector: '#nav',
+        styles: { display: 'flex' },
+        children: [{ 'font-size': '14px' }, { 'font-size': '12px' }],
+      },
+    ]);
+
+    const results = await extractFromPage(
+      page as any,
+      [{ componentId: 'voc-topbar', selector: '#nav' }],
+      { whitelist: WHITELIST, depth: 1 },
+    );
+
+    // root + 2 children
+    expect(results.filter((r) => !isMissing(r))).toHaveLength(3);
+  });
+
+  it('handles multiple targets and partial missing', async () => {
+    const page = makeJsdomPage([
+      { selector: '#present', styles: { display: 'flex' } },
+      // '#missing' is not registered
+    ]);
+
+    const results = await extractFromPage(
+      page as any,
+      [
+        { componentId: 'comp-a', selector: '#present' },
+        { componentId: 'comp-b', selector: '#missing' },
+      ],
+      opts,
+    );
+
+    expect(results).toHaveLength(2);
+    expect(isMissing(results[0])).toBe(false);
+    expect(isMissing(results[1])).toBe(true);
   });
 });

@@ -93,7 +93,7 @@ export function renderReport(diffs: Diff[], meta: ReportMeta, tokenHints?: Token
 
   for (const nm of meta.notMeasurable) {
     if (!componentIds.includes(nm.componentId)) {
-      lines.push(`| ${nm.componentId} | — | — | — | [NOT MEASURABLE]`);
+      lines.push(`| ${nm.componentId} | — | — | — |`);
     }
   }
 
