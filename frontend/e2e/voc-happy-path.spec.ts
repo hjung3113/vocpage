@@ -38,9 +38,9 @@ test.describe('VOC happy path', () => {
     //    (Don't assert toHaveCount(initialRowCount + 1) — list is paginated to 20.)
     await expect(rows.first()).toContainText('E2E happy path test VOC', { timeout: 8_000 });
 
-    // 7. Click a VOC by stable fixture issue_code (VOC-0001 has 5 history entries).
+    // 7. Click a VOC by stable fixture issue_code (ANALYSIS-2026-0001 has 5 history entries).
     //    Avoids fragile sort-order assumptions.
-    await rows.filter({ hasText: 'VOC-0001' }).first().click();
+    await rows.filter({ hasText: 'ANALYSIS-2026-0001' }).first().click();
     await expect(page.locator('[data-pcomp="voc-review-drawer"]')).toBeVisible({
       timeout: 8_000,
     });
