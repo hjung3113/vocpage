@@ -38,7 +38,7 @@ export function VocListPage() {
         onCreate={() => ctrl.create.setOpen(true)}
       />
       <VocStatusFilters value={statusValue} onChange={ctrl.onStatusChange} />
-      <div className="px-6 py-3">
+      <div>
         <VocAdvancedFilters
           open={ctrl.advanced.open}
           onToggle={ctrl.advanced.onToggle}
