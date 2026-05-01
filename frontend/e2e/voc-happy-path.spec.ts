@@ -32,11 +32,11 @@ test.describe('VOC happy path', () => {
       timeout: 8_000,
     });
 
-    // 6. New VOC title visible AND row count incremented by 1
-    await expect(page.locator('text=E2E happy path test VOC').first()).toBeVisible({
-      timeout: 8_000,
-    });
-    await expect(rows).toHaveCount(initialRowCount + 1, { timeout: 8_000 });
+    // 6. New VOC title visible at the TOP of the list (sort=created_at desc).
+    //    Asserting first-row position is stronger than just any-visible: it catches
+    //    list-not-refetched bugs even when pagination caps total row count.
+    //    (Don't assert toHaveCount(initialRowCount + 1) — list is paginated to 20.)
+    await expect(rows.first()).toContainText('E2E happy path test VOC', { timeout: 8_000 });
 
     // 7. Click a VOC by stable fixture issue_code (VOC-0001 has 5 history entries).
     //    Avoids fragile sort-order assumptions.
