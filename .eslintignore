@@ -3,3 +3,9 @@ shared/types/
 
 # meta scripts (run via tsx, not part of FE/BE bundle)
 scripts/
+
+# prototype is a static UX sandbox (see prototype/CLAUDE.md) — not production
+prototype/
+
+# build outputs
+**/dist/
