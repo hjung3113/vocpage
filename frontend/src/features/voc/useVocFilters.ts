@@ -20,7 +20,7 @@ export function useVocFilters(): {
     return {
       status: status.length ? status : undefined,
       system_id: params.get('system_id') ?? undefined,
-      assignee_id: params.get('assignee_id') ?? undefined,
+      assignees: params.getAll('assignees').length ? params.getAll('assignees') : undefined,
       q: params.get('q') ?? undefined,
     };
   }, [params]);
@@ -30,7 +30,7 @@ export function useVocFilters(): {
       const p = new URLSearchParams();
       if (next.status) for (const s of next.status) p.append('status', s);
       if (next.system_id) p.set('system_id', next.system_id);
-      if (next.assignee_id) p.set('assignee_id', next.assignee_id);
+      if (next.assignees) for (const a of next.assignees) p.append('assignees', a);
       if (next.q) p.set('q', next.q);
       const id = params.get('id');
       if (id) p.set('id', id);

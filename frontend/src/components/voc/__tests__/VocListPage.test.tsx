@@ -48,7 +48,7 @@ describe('VocListPage — Wave 1 RTL', () => {
   });
 
   it('F-T1 EmptyState 시나리오 (빈 리스트)', async () => {
-    vi.mocked(vocApi.list).mockResolvedValue({ rows: [], page: 1, pageSize: 50, total: 0 });
+    vi.mocked(vocApi.list).mockResolvedValue({ rows: [], page: 1, per_page: 50, total: 0 });
     renderPage();
     await waitFor(() => expect(screen.getByText(/VOC가 없습니다/)).toBeInTheDocument());
   });
@@ -66,7 +66,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.list).mockResolvedValue({
       rows: live.slice(0, 5).map((r) => ({ ...r, has_children: false, notes_count: 0 })),
       page: 1,
-      pageSize: 50,
+      per_page: 50,
       total: 5,
     });
     renderPage();
@@ -80,7 +80,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.list).mockResolvedValue({
       rows: [{ ...target, has_children: false, notes_count: 0 }],
       page: 1,
-      pageSize: 50,
+      per_page: 50,
       total: 1,
     });
     vi.mocked(vocApi.get).mockResolvedValue(target);
@@ -96,7 +96,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.list).mockResolvedValue({
       rows: [{ ...target, has_children: false, notes_count: 0 }],
       page: 1,
-      pageSize: 50,
+      per_page: 50,
       total: 1,
     });
     vi.mocked(vocApi.get).mockResolvedValue(target);
@@ -115,7 +115,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.list).mockResolvedValue({
       rows: [{ ...target, has_children: false, notes_count: 0 }],
       page: 1,
-      pageSize: 50,
+      per_page: 50,
       total: 1,
     });
     vi.mocked(vocApi.get).mockResolvedValue(target);

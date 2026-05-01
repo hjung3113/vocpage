@@ -136,6 +136,25 @@ export const VOC_FIXTURES: ReadonlyArray<VocT> = SPECS.map((s, i) => {
   });
 });
 
+/**
+ * Minimal voc_tags relation mirror.
+ *
+ * BE는 voc_tags 조인(EXISTS)으로 tag_ids 필터를 평가한다. MSW도 동일 의미를
+ * 가지도록 픽스처에 (voc_id, tag_id) mapping 을 둔다. 일부 VOC만 태그를 갖고,
+ * 일부는 태그 없음 — 회귀 테스트가 “필터 적용 시 unfiltered row 가 사라지는지”
+ * 직접 확인할 수 있어야 한다.
+ */
+export const FIXTURE_TAGS = {
+  bug: 'eeeeeeee-0000-4000-8000-000000000001',
+  feature: 'eeeeeeee-0000-4000-8000-000000000002',
+} as const;
+
+export const VOC_TAG_RELATIONS: ReadonlyArray<{ voc_id: string; tag_id: string }> = [
+  { voc_id: VOC_FIXTURES[0]!.id, tag_id: FIXTURE_TAGS.bug },
+  { voc_id: VOC_FIXTURES[1]!.id, tag_id: FIXTURE_TAGS.bug },
+  { voc_id: VOC_FIXTURES[2]!.id, tag_id: FIXTURE_TAGS.feature },
+];
+
 export const VOC_NOTES_FIXTURES: ReadonlyArray<InternalNoteT> = [
   InternalNote.parse({
     id: 'bbbbbbbb-0000-4000-8000-000000000001',

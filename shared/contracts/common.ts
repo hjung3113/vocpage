@@ -5,6 +5,13 @@
  * frontend React SPA and the backend Express API.  This file must remain
  * environment-agnostic: no DOM, no Node.js, no framework imports allowed.
  */
+import { z } from 'zod';
+
+// Loose UUID — DB-level `uuid` columns accept any 8-4-4-4-12 hex pattern;
+// strict v4 enforcement breaks legacy fixtures (e.g. permission.test.ts).
+export const Uuid = z
+  .string()
+  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 export type SortDir = 'asc' | 'desc';
 

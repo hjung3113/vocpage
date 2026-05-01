@@ -15,10 +15,9 @@ import {
   VocResolutionQuality,
   VocDropReason,
 } from './entity';
+import { Uuid } from '../common';
 
-// Loose UUID — DB-level `uuid` columns accept any 8-4-4-4-12 hex pattern;
-// strict v4 enforcement breaks legacy fixtures (e.g. permission.test.ts).
-const Uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+export { Uuid };
 
 export const VocSortColumn = z.enum([
   'created_at',
@@ -40,17 +39,19 @@ const arrayOrSingle = <T extends z.ZodTypeAny>(item: T) =>
 export const VocFilter = z.object({
   status: arrayOrSingle(VocStatus).optional(),
   system_id: Uuid.optional(),
-  voc_type_id: arrayOrSingle(Uuid).optional(),
-  assignee_id: Uuid.optional(),
+  voc_type_ids: arrayOrSingle(Uuid).optional(),
+  assignees: arrayOrSingle(Uuid).optional(),
+  priorities: arrayOrSingle(VocPriority).optional(),
+  tag_ids: arrayOrSingle(Uuid).optional(),
   q: z.string().trim().max(120).optional(),
 });
 export type VocFilter = z.infer<typeof VocFilter>;
 
 export const VocListQuery = VocFilter.extend({
-  sort: VocSortColumn.default('created_at'),
-  order: SortDir.default('desc'),
+  sort_by: VocSortColumn.default('created_at'),
+  sort_dir: SortDir.default('desc'),
   page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  per_page: z.coerce.number().int().min(1).max(100).default(20),
   includeDeleted: z.coerce.boolean().optional(),
 });
 export type VocListQuery = z.infer<typeof VocListQuery>;
@@ -58,7 +59,7 @@ export type VocListQuery = z.infer<typeof VocListQuery>;
 export const VocListResponse = z.object({
   rows: z.array(VocListItem),
   page: z.number().int().positive(),
-  pageSize: z.number().int().positive(),
+  per_page: z.number().int().positive(),
   total: z.number().int().nonnegative(),
 });
 export type VocListResponse = z.infer<typeof VocListResponse>;

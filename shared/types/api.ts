@@ -269,6 +269,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/masters/assignees': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List assignable users (admin/manager/dev) for filter dropdowns */
+    get: operations['listAssignees'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/masters/tags': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List tags for filter dropdowns */
+    get: operations['listMasterTags'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/masters/voc-types': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List VOC types for filter dropdowns */
+    get: operations['listMasterVocTypes'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/vocs/{id}/tags': {
     parameters: {
       query?: never;
@@ -1268,12 +1319,71 @@ export interface components {
       /** Format: date-time */
       created_at: string;
     };
+    VocListItem: {
+      /** Format: uuid */
+      id: string;
+      issue_code: string;
+      title: string;
+      status: components['schemas']['VocStatus'];
+      priority: components['schemas']['VocPriority'];
+      /** Format: uuid */
+      voc_type_id: string;
+      /** Format: uuid */
+      system_id: string;
+      /** Format: uuid */
+      menu_id: string;
+      /** Format: uuid */
+      assignee_id: string | null;
+      /** Format: uuid */
+      author_id: string;
+      /** Format: uuid */
+      parent_id: string | null;
+      source: components['schemas']['VocSource'];
+      /** Format: date-time */
+      due_date: string | null;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
+      has_children: boolean;
+      notes_count: number;
+    };
     PaginatedVocs: {
-      items: components['schemas']['Voc'][];
+      rows: components['schemas']['VocListItem'][];
       total: number;
       page: number;
-      limit: number;
-      totalPages: number;
+      per_page: number;
+    };
+    AssigneeListItem: {
+      /** Format: uuid */
+      id: string;
+      ad_username: string;
+      display_name: string;
+    };
+    AssigneeListResponse: {
+      rows: components['schemas']['AssigneeListItem'][];
+    };
+    TagListItem: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      slug: string;
+      kind: string;
+    };
+    TagListResponse: {
+      rows: components['schemas']['TagListItem'][];
+    };
+    VocTypeListItem: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      slug: string;
+      color: string | null;
+      sort_order: number;
+      is_archived: boolean;
+    };
+    VocTypeListResponse: {
+      rows: components['schemas']['VocTypeListItem'][];
     };
     DashboardSummary: {
       total: number;
@@ -1513,16 +1623,17 @@ export interface operations {
     parameters: {
       query?: {
         page?: components['parameters']['page'];
-        limit?: components['parameters']['limit'];
-        status?: components['schemas']['VocStatus'];
-        priority?: components['schemas']['VocPriority'];
-        systemId?: string;
-        menuId?: string;
-        type?: string;
-        assigneeId?: string;
+        per_page?: number;
+        sort_by?: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
+        sort_dir?: 'asc' | 'desc';
+        /** @description Repeat to filter by multiple statuses. */
+        status?: components['schemas']['VocStatus'][];
+        priorities?: components['schemas']['VocPriority'][];
+        system_id?: string;
+        voc_type_ids?: string[];
+        assignees?: string[];
+        tag_ids?: string[];
         q?: string;
-        sort?: string;
-        order?: 'asc' | 'desc';
         includeDeleted?: boolean;
       };
       header?: never;
@@ -1996,6 +2107,69 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['Tag'][];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+    };
+  };
+  listAssignees: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Assignees */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AssigneeListResponse'];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+    };
+  };
+  listMasterTags: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Tags */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TagListResponse'];
+        };
+      };
+      401: components['responses']['Unauthorized'];
+    };
+  };
+  listMasterVocTypes: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description VOC types */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['VocTypeListResponse'];
         };
       };
       401: components['responses']['Unauthorized'];

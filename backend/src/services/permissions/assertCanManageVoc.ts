@@ -9,6 +9,7 @@ export type VocAction =
   | 'changeStatus'
   | 'setPriority'
   | 'setDueDate'
+  | 'reassign'
   | 'editTags'
   | 'createSubtask'
   | 'closeSubtask'
@@ -27,6 +28,12 @@ export function assertCanManageVoc(
   action: VocAction,
 ): void {
   if (user.role === 'admin' || user.role === 'manager') return;
+
+  // Reassignment (담당자 배정/해제) is manager/admin only — own-VOC branch does NOT
+  // grant Dev the right to reassign self/others. Spec: feature-voc.md.
+  if (action === 'reassign') {
+    throw new HttpError(403, 'FORBIDDEN', '담당자 변경은 관리자만 수행할 수 있습니다.', { action });
+  }
 
   if (user.role === 'dev') {
     if (voc.assignee_id !== null && voc.assignee_id === user.id) return;

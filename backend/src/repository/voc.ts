@@ -6,18 +6,35 @@
  * surface minimal — list / get / update / notes (list+create) / history.
  */
 import { getPool } from '../db';
-import type { Voc, InternalNote, VocHistoryEntry } from '../../../shared/contracts/voc';
+import type {
+  Voc,
+  InternalNote,
+  VocHistoryEntry,
+  VocPriority,
+} from '../../../shared/contracts/voc';
+
+/**
+ * Escape ILIKE meta-characters in a free-text query so user input cannot
+ * smuggle wildcards (`%`, `_`) or escape the escape character itself.
+ * Pair with `ILIKE ... ESCAPE '\\'` in the SQL — see `listVocs` below.
+ * Exposed for unit tests (PR #121 review Finding 3).
+ */
+export function escapeLikePattern(input: string): string {
+  return input.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
 
 export interface ListVocsParams {
   status?: string[];
   system_id?: string;
-  voc_type_id?: string[];
-  assignee_id?: string;
+  voc_type_ids?: string[];
+  assignees?: string[];
+  priorities?: VocPriority[];
+  tag_ids?: string[];
   q?: string;
-  sort: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
-  order: 'asc' | 'desc';
+  sort_by: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
+  sort_dir: 'asc' | 'desc';
   page: number;
-  limit: number;
+  per_page: number;
   includeDeleted?: boolean;
 }
 
@@ -40,25 +57,37 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
     conditions.push(`system_id = $${i++}`);
     values.push(params.system_id);
   }
-  if (params.voc_type_id?.length) {
+  if (params.voc_type_ids?.length) {
     conditions.push(`voc_type_id = ANY($${i++})`);
-    values.push(params.voc_type_id);
+    values.push(params.voc_type_ids);
   }
-  if (params.assignee_id) {
-    conditions.push(`assignee_id = $${i++}`);
-    values.push(params.assignee_id);
+  if (params.assignees?.length) {
+    conditions.push(`assignee_id = ANY($${i++})`);
+    values.push(params.assignees);
+  }
+  if (params.priorities?.length) {
+    conditions.push(`priority = ANY($${i++})`);
+    values.push(params.priorities);
+  }
+  if (params.tag_ids?.length) {
+    conditions.push(
+      `EXISTS (SELECT 1 FROM voc_tags vt WHERE vt.voc_id = vocs.id AND vt.tag_id = ANY($${i++}))`,
+    );
+    values.push(params.tag_ids);
   }
   if (params.q) {
-    conditions.push(`(title ILIKE $${i} OR issue_code ILIKE $${i})`);
-    values.push(`%${params.q}%`);
+    const esc = escapeLikePattern(params.q);
+    conditions.push(`(title ILIKE $${i} ESCAPE '\\' OR issue_code ILIKE $${i} ESCAPE '\\')`);
+    values.push(`%${esc}%`);
     i += 1;
   }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const offset = (params.page - 1) * params.limit;
+  const offset = (params.page - 1) * params.per_page;
+  // sort_by/sort_dir are zod-enum validated upstream; safe to interpolate.
   const rows = (
     await pool.query(
-      `SELECT * FROM vocs ${where} ORDER BY ${params.sort} ${params.order} LIMIT $${i++} OFFSET $${i++}`,
-      [...values, params.limit, offset],
+      `SELECT * FROM vocs ${where} ORDER BY ${params.sort_by} ${params.sort_dir} LIMIT $${i++} OFFSET $${i++}`,
+      [...values, params.per_page, offset],
     )
   ).rows as Voc[];
   const totalRow = await pool.query(`SELECT count(*)::int AS n FROM vocs ${where}`, values);
