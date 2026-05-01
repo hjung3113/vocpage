@@ -29,7 +29,7 @@ describe('POST /api/auth/mock-login', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.user).toMatchObject({
-      id: '00000000-0000-0000-0000-000000000001',
+      id: '00000000-0000-4000-8000-0000000000a1',
       email: 'admin@company.com',
       name: 'Mock Admin',
       role: 'admin',
@@ -42,7 +42,7 @@ describe('POST /api/auth/mock-login', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.user).toMatchObject({
-      id: '00000000-0000-0000-0000-000000000004',
+      id: '00000000-0000-4000-8000-0000000000c1',
       email: 'dev@company.com',
       name: 'Mock Dev',
       role: 'dev',

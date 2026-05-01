@@ -18,7 +18,7 @@ export type VocAction =
 export interface VocPermissionContext {
   id: string;
   assignee_id: string | null;
-  deleted_at: Date | null;
+  deleted_at: Date | string | null | undefined;
 }
 
 export function assertCanManageVoc(
@@ -33,5 +33,11 @@ export function assertCanManageVoc(
     throw new HttpError(403, 'FORBIDDEN', '담당자만 수행할 수 있는 작업입니다.', { action });
   }
 
+  // user role: internal-note read/write must look like a hidden endpoint (404)
+  // per requirements; other actions return 403. Helper centralises the role
+  // branch so route code never makes this decision (backend/CLAUDE.md rule).
+  if (action === 'readInternalNote' || action === 'writeInternalNote') {
+    throw new HttpError(404, 'NOT_FOUND', 'Not found.');
+  }
   throw new HttpError(403, 'FORBIDDEN', '접근 권한이 없습니다.', { action });
 }
