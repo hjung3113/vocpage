@@ -24,7 +24,7 @@ export function VocListPage() {
   const statusValue = ctrl.filter.status ?? 'all';
 
   return (
-    <div className="flex flex-col text-sm">
+    <div className="flex flex-col">
       <VocTopbar
         totalCount={total}
         query={ctrl.filter.q ?? ''}
@@ -56,7 +56,7 @@ export function VocListPage() {
         />
       </div>
       <VocSortChips sortBy={ctrl.sortBy} sortDir={ctrl.sortDir} onChange={ctrl.setSort} />
-      <div className="px-6">
+      <div className="px-6 text-sm">
         {list.isLoading && <LoadingState data-testid="voc-loading" />}
         {list.isError && <ErrorState onRetry={() => list.refetch()} />}
         {!list.isLoading && !list.isError && rows.length === 0 && (
