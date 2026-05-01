@@ -36,7 +36,7 @@ export function VocSortChips({ sortBy, sortDir, onChange }: VocSortChipsProps) {
       data-pcomp="voc-sort-chips"
       role="radiogroup"
       aria-label="정렬"
-      className="flex items-center gap-2 flex-nowrap px-6 py-1.5"
+      className="flex items-center gap-2 flex-nowrap overflow-x-auto px-6 py-1.5 scrollbar-none"
       style={{
         background: 'var(--bg-panel)',
         borderBottom: '1px solid var(--border-subtle)',

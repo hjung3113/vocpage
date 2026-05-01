@@ -58,7 +58,7 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
   return (
     <div
       data-pcomp="voc-status-filters"
-      className="flex items-center gap-2 flex-nowrap px-6 h-11"
+      className="flex items-center gap-2 flex-nowrap overflow-x-auto px-6 h-11 scrollbar-none"
       style={{
         background: 'var(--bg-app)',
         borderBottom: '1px solid var(--border-subtle)',
@@ -84,7 +84,7 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
                   ? 'var(--brand-bg, var(--brand))'
                   : (statusBg ?? 'var(--brand-bg, var(--brand))')
                 : 'var(--bg-elevated)',
-              color: pressed ? 'var(--accent)' : 'var(--text-secondary)',
+              color: pressed ? 'var(--text-on-brand)' : 'var(--text-secondary)',
               border: '1px solid var(--border-subtle)',
             }}
           >
