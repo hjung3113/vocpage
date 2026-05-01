@@ -37,6 +37,8 @@
     "zod": "^4.4.1"
   },
   "devDependencies": {
+    "http-server": "^14.1.1",
+    "playwright": "^1.52.0",
     "@tailwindcss/vite": "^4.0.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
