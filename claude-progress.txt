@@ -2,36 +2,38 @@
 
 ## 다음 세션 시작점
 
-→ **Wave 3 W3-A** (VOC 본체 — drawer + modal + voc-list 갭 4건 동시 처리: C-02 Due Date / N-01 자동 태그 / N-02 charcount / N-04 highlight)
+→ **Phase 8 재계획** — Phase 7 종료, 다음 Phase 정의 필요
 
 전체 Phase 계획: **`docs/specs/plans/next-session-tasks.md`**
-Wave 3 상세: **`docs/specs/plans/prototype-phase7-wave3-plan.md`**
 NextGen 백로그: **`docs/specs/plans/nextgen-backlog.md`**
-Wave 2까지 누적 이력: **`docs/specs/plans/progress-archive.md`**
+누적 이력: **`docs/specs/plans/progress-archive.md`**
 
 ---
 
 ## 현재 위치 (2026-05-01 기준)
 
-- Phase 0~6 ✅ → Phase 7 Wave 1·2 ✅ → **Wave 3 진입 직전**
-- Wave 2 PR #79~#86 (8건) 머지 완료 (2026-05-01)
-- Wave 3 plan 작성 완료 — 브랜치 `docs/prototype-phase7-wave3-plan` (commit 490921d)
-- R-4 (tsx watch)는 Wave 3 종료 후 단독 PR
+- Phase 0~6 ✅ → Phase 7 Wave 1·2·3 ✅ → **Phase 7 close**
+- Wave 3 PR #93 #94 #95 머지 완료 (2026-05-01)
+- R-4 (tsx watch) 이미 완료 — backend `dev` 스크립트 `tsx watch` (commit 809e267)
+- 갭 재스캔 결론: Critical 0 / Major 0 / Minor 0 (N-03 알림 폴링은 OOS — BE/timer 의존)
 
-## Wave 3 구성
+## Phase 7 Wave 3 산출물
 
-| Sub-wave | 범위 |
-| --- | --- |
-| W3-A | VOC 본체 — C-02 / N-01 / N-02 / N-04 |
-| W3-B | Admin 공통 — C-10 TypeBadge / C-11 StatusDot / C-14 Non-data states / M-05 외부마스터 매핑 |
-| W3-C | Dashboard 잔여 + drawer 권한 차단 + 갭 재스캔 0 잔여 |
+| Sub-wave | 범위 | PR |
+| --- | --- | --- |
+| W3-A | VOC 본체 — C-02 / N-01 / N-02 / N-04 / N-06 / N-07 + R2 fix 14건 | #93 |
+| W3-B | Admin 공통 — C-10 / C-11 / C-14 / M-05 + R2 fix 10건 | #94 |
+| W3-C | Dashboard 빈 상태 / W7 스크롤 / drawer 권한 차단 / 갭 재스캔 + R2 fix 11건 | #95 |
 
-의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰.
+각 sub-wave는 5인 자가-금지 리뷰 (architect / code-reviewer / security / verifier / critic) × 3관점 후 R2 fix → verifier APPROVE.
+
+의도적 제외: N-03 알림 폴링 (BE/timer 의존), 풀 역할×상태 매트릭스, 신규 토큰.
 
 ---
 
 ## 가장 최근 산출물
 
+- 2026-05-01 — **Phase 7 close** (Wave 3 W3-A/B/C 머지 #93/#94/#95 + 재스캔 0 잔여)
 - 2026-05-01 — Wave 2 전건 머지 + Wave 3 plan PR
 - 2026-05-01 — B-9 Playwright MCP 통합 검증 (S1~S6, 6/6 PASS, 콘솔 에러 0)
 - 2026-04-30 — Wave 1 P-7 / P-8 / P-10 / P-12 / P-5 / P-6 (PR #66~#70)
