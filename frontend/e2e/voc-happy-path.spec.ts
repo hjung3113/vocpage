@@ -20,9 +20,9 @@ test.describe('VOC happy path', () => {
     // 4. Fill the form
     await page.fill('#voc-title', 'E2E happy path test VOC');
 
-    // Wait for vocTypes to load — the select must have an option value before submitting
+    // Wait for vocTypes to populate the select with a real UUID value
     // (vocTypesQ resolves asynchronously; empty voc_type_id fails zod Uuid validation)
-    await expect(page.locator('#voc-type option').first()).toBeAttached({ timeout: 5_000 });
+    await expect(page.locator('#voc-type')).toHaveValue(/.+/, { timeout: 5_000 });
 
     // Submit
     await page.click('[data-pcomp="voc-create-modal"] button[type="submit"]');
@@ -32,15 +32,15 @@ test.describe('VOC happy path', () => {
       timeout: 8_000,
     });
 
-    // 6. New VOC title visible somewhere in the list (sort: created_at desc, so it's first)
+    // 6. New VOC title visible AND row count incremented by 1
     await expect(page.locator('text=E2E happy path test VOC').first()).toBeVisible({
       timeout: 8_000,
     });
+    await expect(rows).toHaveCount(initialRowCount + 1, { timeout: 8_000 });
 
-    // 7. Click a VOC that has history entries — VOC_FIXTURES[0] is the second row after
-    //    the newly created VOC (sort: created_at desc). The fixtures have 5 history entries
-    //    for the first fixture. Use nth(1) to click it.
-    await rows.nth(1).click();
+    // 7. Click a VOC by stable fixture issue_code (VOC-0001 has 5 history entries).
+    //    Avoids fragile sort-order assumptions.
+    await rows.filter({ hasText: 'VOC-0001' }).first().click();
     await expect(page.locator('[data-pcomp="voc-review-drawer"]')).toBeVisible({
       timeout: 8_000,
     });
