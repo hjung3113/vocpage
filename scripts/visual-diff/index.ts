@@ -210,33 +210,85 @@ export async function main(argv: string[]): Promise<void> {
 }
 
 async function openPrototypeOverlays(page: import('playwright').Page): Promise<void> {
-  // Wait for globals to be attached (per plan decision #3)
-  const globalsReady = await page
-    .evaluate(() => {
-      return typeof (window as unknown as Record<string, unknown>).openModal === 'function';
-    })
-    .catch(() => false);
-
-  if (!globalsReady) {
-    try {
-      await page.waitForFunction(
-        () => typeof (window as unknown as Record<string, unknown>).openModal === 'function',
-        { timeout: 5_000 },
-      );
-    } catch {
-      console.error('[harness] Warning: window.openModal not available within 5s');
-    }
+  // Wait for globals to be attached
+  try {
+    await page.waitForFunction(
+      () => typeof (window as unknown as Record<string, unknown>).openModal === 'function',
+      { timeout: 5_000 },
+    );
+  } catch {
+    console.error('[harness] Warning: window.openModal not available within 5s');
   }
 
-  // TODO(stage-2): Open overlays (modal, notif panel, drawer) individually when
-  // extracting those specific components. In Stage 1, overlay elements (#modalBg,
-  // #notifPanel, #drawer) are present in the DOM but may be hidden; selectors still
-  // locate them via ID. Stage 2 will add targeted interaction before extracting each overlay.
+  // Open voc-create-modal
+  try {
+    await page.evaluate(() => {
+      (window as unknown as Record<string, () => void>).openModal?.();
+    });
+    await page.waitForSelector('#modalBg', { state: 'visible', timeout: 5_000 });
+    console.error('[harness] Proto overlay: #modalBg visible');
+  } catch (e) {
+    console.error('[harness] Warning: failed to open proto modal:', e);
+  }
+
+  // Open voc-notif-dropdown
+  try {
+    const notifBtn = await page.$('#notifBtn');
+    if (notifBtn) {
+      await notifBtn.click();
+      await page.waitForSelector('#notifPanel', { state: 'visible', timeout: 5_000 });
+      console.error('[harness] Proto overlay: #notifPanel visible');
+    }
+  } catch (e) {
+    console.error('[harness] Warning: failed to open proto notif panel:', e);
+  }
 }
 
-async function openReactOverlays(_page: import('playwright').Page): Promise<void> {
-  // React overlays are driven via click simulation during row-level extraction.
-  // No-op in Stage 1 bulk extraction pass.
+async function openReactOverlays(page: import('playwright').Page): Promise<void> {
+  // Open voc-create-modal
+  try {
+    const createBtn = await page.$('button:has-text("새 VOC 등록")');
+    if (createBtn) {
+      await createBtn.click();
+      await page.waitForSelector('[data-pcomp="voc-create-modal"]', {
+        state: 'visible',
+        timeout: 8_000,
+      });
+      console.error('[harness] React overlay: voc-create-modal visible');
+    }
+  } catch (e) {
+    console.error('[harness] Warning: failed to open react create modal:', e);
+  }
+
+  // Open voc-notif-dropdown
+  try {
+    const bellBtn = await page.$('[data-pcomp="notification-bell"]');
+    if (bellBtn) {
+      await bellBtn.click();
+      await page.waitForSelector('[data-pcomp="voc-notif-dropdown"]', {
+        state: 'visible',
+        timeout: 5_000,
+      });
+      console.error('[harness] React overlay: voc-notif-dropdown visible');
+    }
+  } catch (e) {
+    console.error('[harness] Warning: failed to open react notif dropdown:', e);
+  }
+
+  // Open voc-review-drawer by clicking first table row
+  try {
+    const firstRow = await page.$('thead[data-pcomp="data-table"] ~ tbody tr');
+    if (firstRow) {
+      await firstRow.click();
+      await page.waitForSelector('[data-pcomp="voc-review-drawer"]', {
+        state: 'visible',
+        timeout: 8_000,
+      });
+      console.error('[harness] React overlay: voc-review-drawer visible');
+    }
+  } catch (e) {
+    console.error('[harness] Warning: failed to open react review drawer:', e);
+  }
 }
 
 async function detectSortKeyMismatch(
