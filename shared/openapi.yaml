@@ -60,7 +60,7 @@ paths:
               properties:
                 role:
                   type: string
-                  enum: [admin, manager, user]
+                  enum: [admin, manager, dev, user]
       responses:
         '200':
           description: Logged in
@@ -1916,7 +1916,7 @@ components:
 
     UserRole:
       type: string
-      enum: [user, manager, admin]
+      enum: [user, manager, admin, dev]
 
     AuthUser:
       type: object

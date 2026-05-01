@@ -6,5 +6,6 @@
 INSERT INTO users (id, ad_username, display_name, email, role) VALUES
   ('00000000-0000-0000-0000-000000000001', 'mock_admin',   'Mock Admin',   'admin@company.com',   'admin'),
   ('00000000-0000-0000-0000-000000000002', 'mock_manager', 'Mock Manager', 'manager@company.com', 'manager'),
-  ('00000000-0000-0000-0000-000000000003', 'mock_user',    'Mock User',    'user@company.com',    'user')
+  ('00000000-0000-0000-0000-000000000003', 'mock_user',    'Mock User',    'user@company.com',    'user'),
+  ('00000000-0000-0000-0000-000000000004', 'mock_dev',     'Mock Dev',     'dev@company.com',     'dev')
 ON CONFLICT (id) DO NOTHING;

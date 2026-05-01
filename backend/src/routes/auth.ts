@@ -14,10 +14,10 @@ authRouter.post('/mock-login', (req, res): void => {
   }
 
   const { role } = req.body as { role?: string };
-  if (role !== 'admin' && role !== 'manager' && role !== 'user') {
+  if (role !== 'admin' && role !== 'manager' && role !== 'dev' && role !== 'user') {
     res.status(400).json({
       code: 'INVALID_ROLE',
-      message: 'role은 admin, manager, user 중 하나여야 합니다.',
+      message: 'role은 admin, manager, dev, user 중 하나여야 합니다.',
       details: null,
     });
     return;

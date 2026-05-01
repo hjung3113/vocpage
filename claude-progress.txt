@@ -2,7 +2,9 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 0 구현 완료** — Foundation 6 commits on `feat/phase-8-foundation`, codex adversarial-review 2 라운드 통과 (APPROVE), PR 오픈 대기
+→ **Phase 8 8-PR1 권한 인프라 진행 중** — `feat/phase-8-pr1-permission-infra` 브랜치. migration 013_add_dev_role.sql + dev role 동기화 (BE auth/types · mockUsers · requireRole · routes/auth · seeds · FE api/auth · OpenAPI/UserRole) + `assertCanManageVoc` 헬퍼 (`backend/src/services/permissions/`) + 7건 회귀테스트. 검증 PASS: BE typecheck/27 tests · FE typecheck/build/lint · no-raw-color. PR 오픈 + codex adversarial-review 대기.
+
+**이전 단계**: Phase 8 Wave 0 ✅ (PR #102 머지 — 2026-05-01)
 
 **Wave 0 산출 요약 (15 항목)**: 0-0 mirror-check.md / 0-1 shared/ tsconfig+ESLint+contracts / 0-2 shadcn 8 + token codemod / 0-3 TanStack Query + queryKeys / 0-4 MSW /health / 0-5 api/client + ErrorBoundary / 0-6 AppShell+Sidebar+TopBar+router / 0-7 RoleContext + useRole / 0-8 Toast+EmptyState/ErrorState/LoadingState / 0-9 BE zod + validate + errorEnvelope / 0-10 .github/ ci.yml + PR template + oss-vendoring.md / 0-11 ESLint max-lines / 0-12 no-raw-color 스캐너 / 0-13 폰트 self-host 점검 / 0-14 fixture-seed parity script
 
