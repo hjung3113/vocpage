@@ -90,6 +90,7 @@ Skip the frame for trivial one-liners (rename, obvious typo, single-file change 
 - **No implementation without approval** — never write BE/FE code until the user says to start
 - **Debate, don't defer** — raise counterarguments or missed cases before agreeing; no passive "yes"
 - **Think before coding** — state assumptions; if multiple interpretations exist, present them, don't pick silently
+- **90% certainty gate** — 진행 중 어떤 결정이든 90% 이상 확신이 없으면 임의 진행 금지. 해소될 때까지 사용자에게 질문한다 (양쪽 옵션·근거 명시 형식). 추측·기본값 채우기·"일단 이걸로" 모두 금지
 - **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite
 - **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused
 - **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified
