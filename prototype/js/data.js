@@ -14,6 +14,10 @@ const MENUS = [
   { id: 'm10', systemId: 'sys4', name: 'KPI', archived: false },
   { id: 'm11', systemId: 'sys4', name: '알림 설정', archived: false },
 ];
+// typeKind: prototype-only mock for badge variant coverage.
+// spec §13.4 has no canonical typeKind taxonomy yet — values here are illustrative
+// (issue-kind for bug, system/menu/external for variant demo) and will be redefined
+// when the schema decision lands.
 const VOC_TYPES = [
   {
     id: 't1',

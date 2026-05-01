@@ -3,6 +3,7 @@
 // Wires a state-toggle <select> into each admin page's admin-topbar.
 // States: normal (정상) / empty (빈) / loading (로딩) / error (오류)
 // Depends on: lucide (global), dom-utils.js (optional showToast)
+// Demo toggle gated behind ?demo URL param — production builds will not show it
 
 (function () {
   'use strict';
@@ -11,7 +12,8 @@
   var STATE_LABELS = { normal: '정상', empty: '빈', loading: '로딩', error: '오류' };
 
   // Per-page config: which content selectors to hide/show per state
-  // Each entry: { pageId, contentSelectors[], emptyMsg, emptyCtaLabel }
+  // 7 pages with meaningful content selectors (pages with empty contentSelectors
+  // removed — they caused demo to show both content + state simultaneously)
   var PAGE_CONFIGS = [
     {
       pageId: 'page-users',
@@ -35,31 +37,18 @@
       pageId: 'page-trash',
       contentSelectors: ['.tr-toolbar', '.tr-table', '.tr-audit'],
       emptyMsg: '휴지통이 비어 있습니다.',
-      emptyCtaLabel: null,
+      emptyCtaLabel: '복원',
     },
     {
       pageId: 'page-external-masters',
-      contentSelectors: ['.em-atomic-note', '#emGrid', '.em-coldstart-banner'],
+      contentSelectors: [
+        '.em-atomic-note',
+        '#emGrid',
+        '.em-coldstart-banner',
+        '.em-field-map-section',
+      ],
       emptyMsg: '등록된 외부 마스터가 없습니다.',
       emptyCtaLabel: null,
-    },
-    {
-      pageId: 'page-result-review',
-      contentSelectors: [],
-      emptyMsg: '검토 대기 중인 항목이 없습니다.',
-      emptyCtaLabel: null,
-    },
-    {
-      pageId: 'page-notices',
-      contentSelectors: [],
-      emptyMsg: '등록된 공지사항이 없습니다.',
-      emptyCtaLabel: '공지 등록',
-    },
-    {
-      pageId: 'page-faq',
-      contentSelectors: [],
-      emptyMsg: '등록된 FAQ가 없습니다.',
-      emptyCtaLabel: 'FAQ 등록',
     },
     {
       pageId: 'page-tag-rules',
@@ -109,11 +98,11 @@
       : '';
 
     return (
-      '<div class="admin-state-container" id="' +
+      '<div class="admin-state-container" aria-live="polite" id="' +
       cfg.pageId +
       '-state-container">' +
       // Empty state
-      '<div class="admin-empty admin-state-panel" data-state="empty" style="display:none">' +
+      '<div class="admin-empty admin-state-panel" role="status" data-state="empty" style="display:none">' +
       '<svg class="admin-empty-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" ' +
       'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 01-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 011-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 011.52 0C14.51 3.81 17 5 19 5a1 1 0 011 1z"/>' +
@@ -125,11 +114,11 @@
       emptyCtaHtml +
       '</div>' +
       // Loading state
-      '<div class="admin-loading admin-state-panel" data-state="loading" style="display:none">' +
+      '<div class="admin-loading admin-state-panel" aria-busy="true" aria-live="polite" data-state="loading" style="display:none">' +
       buildSkeletonRows() +
       '</div>' +
       // Error state
-      '<div class="admin-error admin-state-panel" data-state="error" style="display:none">' +
+      '<div class="admin-error admin-state-panel" role="alert" data-state="error" style="display:none">' +
       '<div class="admin-error-banner">' +
       '<svg class="admin-error-banner-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" ' +
       'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
@@ -234,8 +223,9 @@
     }
   }
 
-  // Init: wire all configured pages
+  // Init: wire all configured pages — gated behind ?demo URL param
   function init() {
+    if (!new URLSearchParams(window.location.search).has('demo')) return;
     PAGE_CONFIGS.forEach(function (cfg) {
       wireToggle(cfg);
     });

@@ -280,7 +280,7 @@ function renderVocTypes() {
         <span class="td-primary" style="${t.archived ? 'opacity:.55' : ''}">${t.name}</span>
       </div></td>
       <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)">${t.slug}</td>
-      <td><span class="type-badge-admin ${kindCls}">${kindLabel}</span></td>
+      <td><span class="type-kind-badge ${kindCls}">${kindLabel}</span></td>
       <td style="font-size:12px;color:var(--text-tertiary);text-align:right">${cnt}</td>
       <td>${state}</td>
       <td style="text-align:right">
