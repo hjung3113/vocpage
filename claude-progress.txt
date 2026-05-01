@@ -2,14 +2,17 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 1 종료 + 사용자 수락 + Wave 2 보류** — Wave 1 vertical
-   slice가 prototype 시각 깊이 미달. **Wave 1 보강 PR (option-2)**으로
-   `/voc`를 prototype 수준까지 끌어올린 뒤 Wave 2 진입.
-→ **다음 세션 첫 작업**: `next-session-tasks.md` "다음 세션 — Wave 1
-   보강 plan" — 모호점 인터뷰 → 설계 → 구현계획 → 구현 → 5명 OMC
-   subagent 리뷰(정량·정성·리스크).
-→ 진행 전 필독: `docs/specs/plans/phase-8-wave1-closure-report.md`
-   (User acceptance 절 포함), `phase-8-pattern.md`.
+→ **Phase 8 Wave 1.5 promotion 완료** (PR #119 merge) — 인터뷰 9
+   결정 + 1.5-A/1.5-B PR 스펙 + primitive 3종 사전 추출 + 사전 테스트
+   계약 9행 모두 `phase-8.md §Wave 1.5`에 정본화. Toast UI lazy-load
+   인벤토리는 `phase-8-oss-vendoring.md §3-bis`.
+→ **다음 세션 첫 작업**: PR-α (`feat/wave1.5-contract-be`) 시작 —
+   `shared/contracts/voc/io.ts` 확장 + `shared/contracts/master/io.ts`
+   신규 + BE repository/route + Supertest TDD red 진입. PR-α 머지 후
+   PR-β (`feat/wave1.5-fe-visual`) FE 시각 보강.
+→ 진행 전 필독: `docs/specs/plans/phase-8.md §Wave 1.5` (정본),
+   `phase-8-wave1-closure-report.md` (User acceptance 절),
+   `phase-8-pattern.md`.
 
 **2026-05-01 (autonomous, 후속 세션)** — 추가 머지:
 
