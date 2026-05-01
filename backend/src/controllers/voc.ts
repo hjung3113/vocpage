@@ -40,6 +40,27 @@ export async function patchVoc(req: Request, res: Response, next: NextFunction):
   }
 }
 
+export async function postCreate(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const created = await service.create(
+      req.body as Parameters<typeof service.create>[0],
+      user(req),
+    );
+    res.status(201).json(created);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const rows = await service.history(req.params.id as string, user(req));
+    res.json({ rows });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getNotes(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const rows = await service.notes(req.params.id as string, user(req));

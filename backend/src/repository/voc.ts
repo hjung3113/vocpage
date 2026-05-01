@@ -141,6 +141,48 @@ export async function createNote(
   return r.rows[0] as InternalNote;
 }
 
+export interface CreateVocInput {
+  title: string;
+  body?: string;
+  status?: string;
+  priority?: VocPriority;
+  voc_type_id: string;
+  system_id: string;
+  menu_id: string;
+  assignee_id?: string | null;
+  parent_id?: string | null;
+  source?: string;
+}
+
+/**
+ * INSERT a new VOC. `sequence_no` / `issue_code` are filled by the
+ * `trg_voc_sequence_no` BEFORE-INSERT trigger (003_vocs.sql) — we omit them.
+ * `body` is NOT NULL in DDL, so default to '' when caller omits.
+ */
+export async function createVoc(input: CreateVocInput, authorId: string): Promise<Voc> {
+  const pool = getPool();
+  const r = await pool.query(
+    `INSERT INTO vocs (
+       title, body, status, priority, voc_type_id, system_id, menu_id,
+       assignee_id, parent_id, source, author_id
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+    [
+      input.title,
+      input.body ?? '',
+      input.status ?? '접수',
+      input.priority ?? 'medium',
+      input.voc_type_id,
+      input.system_id,
+      input.menu_id,
+      input.assignee_id ?? null,
+      input.parent_id ?? null,
+      input.source ?? 'manual',
+      authorId,
+    ],
+  );
+  return r.rows[0] as Voc;
+}
+
 export async function listHistory(vocId: string): Promise<VocHistoryEntry[]> {
   const pool = getPool();
   const r = await pool.query(

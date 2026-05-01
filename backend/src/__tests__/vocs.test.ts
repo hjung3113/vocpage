@@ -103,7 +103,68 @@ jest.mock('../repository/voc', () => {
       noteStore.push(row);
       return row;
     }),
-    listHistory: jest.fn(async () => []),
+    listHistory: jest.fn(async (vocId: string) => {
+      const all = (
+        jest.requireActual('../../../shared/fixtures/voc.fixtures') as {
+          VOC_HISTORY_FIXTURES: Array<{
+            id: string;
+            voc_id: string;
+            field: string;
+            old_value: string | null;
+            new_value: string | null;
+            changed_by: string;
+            changed_at: string;
+          }>;
+        }
+      ).VOC_HISTORY_FIXTURES;
+      return all.filter((h) => h.voc_id === vocId);
+    }),
+    createVoc: jest.fn(
+      async (
+        input: {
+          title: string;
+          body?: string;
+          status?: string;
+          priority?: string;
+          voc_type_id: string;
+          system_id: string;
+          menu_id: string;
+          assignee_id?: string | null;
+          parent_id?: string | null;
+          source?: string;
+        },
+        authorId: string,
+      ) => {
+        const now = new Date().toISOString();
+        const seq = store.length + 1;
+        const row = {
+          id: `aaaaaaaa-0000-4000-8000-${String(seq).padStart(12, '0')}`,
+          issue_code: `VOC-${String(seq).padStart(4, '0')}`,
+          sequence_no: seq,
+          title: input.title,
+          body: input.body ?? '',
+          status: input.status ?? '접수',
+          priority: input.priority ?? 'medium',
+          voc_type_id: input.voc_type_id,
+          system_id: input.system_id,
+          menu_id: input.menu_id,
+          assignee_id: input.assignee_id ?? null,
+          author_id: authorId,
+          parent_id: input.parent_id ?? null,
+          source: input.source ?? 'manual',
+          review_status: null,
+          structured_payload: null,
+          resolution_quality: null,
+          drop_reason: null,
+          due_date: null,
+          deleted_at: null,
+          created_at: now,
+          updated_at: now,
+        } as Row;
+        store.push(row);
+        return row;
+      },
+    ),
     __reset: () => {
       store.length = 0;
       store.push(...fixtures.VOC_FIXTURES);
@@ -349,6 +410,53 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
       const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ assignee_id: null });
       expect(res.status).toBe(200);
       expect(res.body.assignee_id).toBeNull();
+    });
+  });
+
+  // ─── Wave 1.5 PR-β (codex review HIGH) — POST /api/vocs ───
+  describe('Wave 1.5 §β-create — POST /api/vocs', () => {
+    test('manager POST valid payload returns 201 + created VOC (status=접수, author_id=self)', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.post('/api/vocs').send({
+        title: 'New issue from API',
+        body: '본문',
+        voc_type_id: liveVoc.voc_type_id,
+        system_id: liveVoc.system_id,
+        menu_id: liveVoc.menu_id,
+        priority: 'high',
+      });
+      expect(res.status).toBe(201);
+      expect(res.body.title).toBe('New issue from API');
+      expect(res.body.status).toBe('접수');
+      expect(res.body.author_id).toBe(FIXTURE_USERS.manager);
+    });
+
+    test('POST invalid payload (missing title) returns 400 VALIDATION_ERROR', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.post('/api/vocs').send({
+        voc_type_id: liveVoc.voc_type_id,
+        system_id: liveVoc.system_id,
+        menu_id: liveVoc.menu_id,
+      });
+      expect(res.status).toBe(400);
+      expect(res.body.error?.code).toBe('VALIDATION_ERROR');
+    });
+  });
+
+  // ─── Wave 1.5 PR-β (codex review MED) — GET /api/vocs/:id/history ───
+  describe('Wave 1.5 §β-history — GET /api/vocs/:id/history', () => {
+    test('existing VOC returns 200 + VocHistoryListResponse rows', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.get(`/api/vocs/${VOC_FIXTURES[0]!.id}/history`);
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body.rows)).toBe(true);
+      expect(res.body.rows.length).toBeGreaterThan(0);
+    });
+
+    test('non-existent VOC id returns 404 NOT_FOUND', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.get('/api/vocs/00000000-0000-4000-8000-00000000ffff/history');
+      expect(res.status).toBe(404);
     });
   });
 });

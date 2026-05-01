@@ -18,7 +18,9 @@ import type {
   VocListQuery,
   VocListResponse,
   VocUpdate,
+  VocCreate,
   InternalNote,
+  VocHistoryEntry,
 } from '../../../shared/contracts/voc';
 
 function toListItem(v: Voc) {
@@ -131,6 +133,40 @@ export async function notes(id: string, user: AuthUser): Promise<InternalNote[]>
   if (!existing) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
   assertCanManageVoc(user, existing, 'readInternalNote');
   return repo.listNotes(id);
+}
+
+/**
+ * Create a VOC. PR-β (Wave 1.5) — codex review HIGH 해소: FE `vocApi.create()` 가
+ * 실 BE 라우트로 도달할 수 있도록 신설. 인증된 모든 역할(user 포함)이 본인을
+ * author로 등록 가능 — 권한 매트릭스는 PATCH 단계에서 갈린다.
+ */
+export async function create(payload: VocCreate, user: AuthUser): Promise<Voc> {
+  return repo.createVoc(
+    {
+      title: payload.title,
+      body: payload.body,
+      status: payload.status,
+      priority: payload.priority,
+      voc_type_id: payload.voc_type_id,
+      system_id: payload.system_id,
+      menu_id: payload.menu_id,
+      assignee_id: payload.assignee_id ?? null,
+      parent_id: payload.parent_id ?? null,
+      source: payload.source,
+    },
+    user.id,
+  );
+}
+
+/**
+ * List VOC change history. PR-β (Wave 1.5) — codex review MED 해소.
+ * 실재하지 않는 voc id 는 404 (drawer silent fail 방지).
+ */
+export async function history(id: string, user: AuthUser): Promise<VocHistoryEntry[]> {
+  const includeDeleted = user.role === 'admin';
+  const existing = await repo.getVocById(id, { includeDeleted });
+  if (!existing) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+  return repo.listHistory(id);
 }
 
 export async function addNote(id: string, body: string, user: AuthUser): Promise<InternalNote> {
