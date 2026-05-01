@@ -29,6 +29,7 @@ jest.mock('../repository/voc', () => {
     listVocs: jest.fn(
       async (params: {
         status?: string[];
+        voc_type_id?: string[];
         limit?: number;
         page?: number;
         includeDeleted?: boolean;
@@ -38,6 +39,9 @@ jest.mock('../repository/voc', () => {
         let filtered = store.filter((r) => params.includeDeleted || r.deleted_at === null);
         if (params.status?.length) {
           filtered = filtered.filter((r) => params.status!.includes(r.status));
+        }
+        if (params.voc_type_id?.length) {
+          filtered = filtered.filter((r) => params.voc_type_id!.includes(r.voc_type_id));
         }
         const total = filtered.length;
         const start = (page - 1) * limit;
@@ -153,5 +157,27 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
     const agent = await loginAs('user');
     const res = await agent.get(`/api/vocs/${liveVoc.id}/notes`);
     expect(res.status).toBe(404);
+  });
+
+  test('B-T8 non-admin ?includeDeleted=true does not leak soft-deleted rows', async () => {
+    const agent = await loginAs('manager');
+    const res = await agent.get('/api/vocs?includeDeleted=true&limit=100');
+    expect(res.status).toBe(200);
+    const ids = (res.body.rows as Array<{ id: string }>).map((r) => r.id);
+    expect(ids).not.toContain(deletedVoc.id);
+  });
+
+  test('B-T9 ?voc_type_id filter is applied at repository (no silent drop)', async () => {
+    const targetType = liveVoc.voc_type_id;
+    const expectedIds = VOC_FIXTURES.filter(
+      (r) => r.deleted_at === null && r.voc_type_id === targetType,
+    ).map((r) => r.id);
+    const agent = await loginAs('manager');
+    const res = await agent.get(
+      `/api/vocs?voc_type_id=${encodeURIComponent(targetType)}&limit=100`,
+    );
+    expect(res.status).toBe(200);
+    const ids = (res.body.rows as Array<{ id: string }>).map((r) => r.id).sort();
+    expect(ids).toEqual([...expectedIds].sort());
   });
 });

@@ -43,7 +43,7 @@ function toListItem(v: Voc) {
   };
 }
 
-export async function list(query: VocListQuery): Promise<VocListResponse> {
+export async function list(query: VocListQuery, user: AuthUser): Promise<VocListResponse> {
   const result = await repo.listVocs({
     status: query.status,
     system_id: query.system_id,
@@ -54,7 +54,7 @@ export async function list(query: VocListQuery): Promise<VocListResponse> {
     order: query.order,
     page: query.page,
     limit: query.limit,
-    includeDeleted: query.includeDeleted,
+    includeDeleted: query.includeDeleted && user.role === 'admin',
   });
   return {
     rows: result.rows.map(toListItem),

@@ -8,7 +8,10 @@ function user(req: Request): AuthUser {
 
 export async function getList(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const result = await service.list(req.query as unknown as Parameters<typeof service.list>[0]);
+    const result = await service.list(
+      req.query as unknown as Parameters<typeof service.list>[0],
+      user(req),
+    );
     res.json(result);
   } catch (err) {
     next(err);

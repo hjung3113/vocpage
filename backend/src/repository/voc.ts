@@ -40,6 +40,10 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
     conditions.push(`system_id = $${i++}`);
     values.push(params.system_id);
   }
+  if (params.voc_type_id?.length) {
+    conditions.push(`voc_type_id = ANY($${i++})`);
+    values.push(params.voc_type_id);
+  }
   if (params.assignee_id) {
     conditions.push(`assignee_id = $${i++}`);
     values.push(params.assignee_id);
