@@ -8,6 +8,7 @@
 - [ ] CDN URL (Google Fonts, jsDelivr, unpkg, Tailwind play 등) 0건
 - [ ] telemetry / analytics 산출물 0건
 - [ ] 폰트·아이콘·MSW worker self-host 유지, `package-lock.json` 커밋 포함
+- [ ] frontend/public/fonts/{Pretendard-Variable,D2Coding}.woff2 자기호스팅 바이너리 커밋 완료 (또는 별도 follow-up issue 링크)
 
 ## 검증 명령
 

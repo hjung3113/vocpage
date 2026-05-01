@@ -7,7 +7,7 @@ interface RoleContextValue {
 }
 
 export const RoleContext = createContext<RoleContextValue>({
-  role: 'reporter',
+  role: 'user',
   setRole: () => {},
 });
 
@@ -15,9 +15,9 @@ function getRoleFromURL(): Role {
   const params = new URLSearchParams(window.location.search);
   const mode = params.get('mode');
   if (mode === 'admin') return 'admin';
+  if (mode === 'manager') return 'manager';
   if (mode === 'dev') return 'dev';
-  if (mode === 'reviewer') return 'reviewer';
-  return 'reporter';
+  return 'user';
 }
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
@@ -27,7 +27,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     const params = new URLSearchParams(window.location.search);
     const current = params.get('mode');
     if (current !== role) {
-      if (role === 'reporter') {
+      if (role === 'user') {
         params.delete('mode');
       } else {
         params.set('mode', role);

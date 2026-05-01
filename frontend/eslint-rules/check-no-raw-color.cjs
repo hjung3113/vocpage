@@ -6,6 +6,7 @@
  * Detects in .ts/.tsx files under the given root:
  *   - hex literals (#abc, #abcdef, #abcdef12)
  *   - rgb(), rgba(), oklch() function calls
+ *   - Tailwind named raw colors (bg-black, text-white/80, border-gray-300, …)
  *
  * Allowed exception: a line containing
  *   `// allow-raw-color: <reason>`
@@ -16,8 +17,17 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const RAW_COLOR_RE = /(#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(|\boklch\s*\()/;
+const TW_PREFIX =
+  '(?:bg|text|border|ring|fill|stroke|from|via|to|outline|caret|accent|decoration|placeholder|divide|shadow)';
+const TW_COLOR =
+  '(?:black|white|gray|red|orange|yellow|amber|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|zinc|neutral|stone)';
+const TW_NAMED_RE = new RegExp(`\\b${TW_PREFIX}-${TW_COLOR}(?:-\\d{1,3})?(?:\\/(?:\\d{1,3}))?\\b`);
+
+const HEX_FUNC_RE = /(#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(|\boklch\s*\()/;
 const ALLOW_RE = /allow-raw-color\s*:\s*\S+/;
+function lineHasViolation(line) {
+  return HEX_FUNC_RE.test(line) || TW_NAMED_RE.test(line);
+}
 
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -40,7 +50,7 @@ function scanFile(file) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (ALLOW_RE.test(line)) continue;
-    if (RAW_COLOR_RE.test(line)) {
+    if (lineHasViolation(line)) {
       violations.push({ line: i + 1, text: line.trim() });
     }
   }
@@ -63,7 +73,7 @@ function main() {
       const rel = path.relative(process.cwd(), f);
       for (const { line, text } of v) {
         console.error(
-          `${rel}:${line}: raw color literal — use var(--token-name) instead. (${text})`,
+          `${rel}:${line}: raw color literal (hex/rgb/oklch or Tailwind named color) — use var(--token-name) instead. (${text})`,
         );
       }
     }

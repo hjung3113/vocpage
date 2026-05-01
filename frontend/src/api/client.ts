@@ -33,10 +33,24 @@ async function parseError(res: Response): Promise<ApiError> {
   } catch {
     body = null;
   }
-  const envelope: ErrorEnvelope =
-    body && typeof body === 'object' && 'code' in body && 'message' in body
-      ? (body as ErrorEnvelope)
-      : { code: `HTTP_${res.status}`, message: res.statusText || 'Request failed' };
+  // Canonical shape: { error: { code, message, details? } }.
+  // Legacy fallback: { code, message } at top level.
+  let envelope: ErrorEnvelope;
+  if (
+    body &&
+    typeof body === 'object' &&
+    'error' in body &&
+    body.error &&
+    typeof body.error === 'object' &&
+    'code' in body.error &&
+    'message' in body.error
+  ) {
+    envelope = body.error as ErrorEnvelope;
+  } else if (body && typeof body === 'object' && 'code' in body && 'message' in body) {
+    envelope = body as ErrorEnvelope;
+  } else {
+    envelope = { code: `HTTP_${res.status}`, message: res.statusText || 'Request failed' };
+  }
   return new ApiError(envelope, res.status);
 }
 

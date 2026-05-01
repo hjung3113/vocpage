@@ -32,10 +32,10 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function Sidebar() {
-  const { isAdmin, isDev } = useRole();
+  const { isAdmin, isManager, isDev } = useRole();
 
   const visible = NAV_ITEMS.filter(
-    (item) => (!item.adminOnly || isAdmin || isDev) && (!item.devOnly || isDev),
+    (item) => (!item.adminOnly || isAdmin || isManager) && (!item.devOnly || isDev),
   );
 
   return (

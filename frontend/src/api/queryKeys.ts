@@ -7,7 +7,7 @@
  * switching role automatically yields a fresh cache key — no manual
  * invalidation required for role-scoped data.
  */
-export type Role = 'admin' | 'reviewer' | 'requester' | 'guest';
+import type { Role } from '../../../shared/contracts/common';
 
 type Filter = Record<string, unknown> | undefined;
 

@@ -22,6 +22,18 @@ jobs:
       - run: npm run -w frontend lint
       - run: npm run -w frontend build
 
+  font-self-host:
+    name: Verify self-hosted fonts present
+    runs-on: ubuntu-latest
+    # TODO: remove continue-on-error once font binaries committed (see phase-8-font-audit.md)
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Pretendard + D2Coding committed
+        run: |
+          test -f frontend/public/fonts/Pretendard-Variable.woff2 || { echo "::error::Pretendard-Variable.woff2 missing — see docs/specs/plans/phase-8-font-audit.md"; exit 1; }
+          test -f frontend/public/fonts/D2Coding.woff2 || { echo "::error::D2Coding.woff2 missing — see docs/specs/plans/phase-8-font-audit.md"; exit 1; }
+
   build-be:
     runs-on: ubuntu-latest
     strategy:

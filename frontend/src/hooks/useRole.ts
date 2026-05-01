@@ -12,18 +12,18 @@ import type { Role } from '../../../shared/contracts/common';
 export function useRole(): {
   role: Role;
   setRole: (role: Role) => void;
-  isAdmin: boolean;
-  isReviewer: boolean;
-  isReporter: boolean;
+  isUser: boolean;
   isDev: boolean;
+  isManager: boolean;
+  isAdmin: boolean;
 } {
   const { role, setRole } = useContext(RoleContext);
   return {
     role,
     setRole,
-    isAdmin: role === 'admin',
-    isReviewer: role === 'reviewer',
-    isReporter: role === 'reporter',
+    isUser: role === 'user',
     isDev: role === 'dev',
+    isManager: role === 'manager',
+    isAdmin: role === 'admin',
   };
 }

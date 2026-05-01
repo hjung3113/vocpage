@@ -19,6 +19,8 @@ npm install <pkg>                # lockfile 갱신 → commit
 npm ci                           # 재현 빌드 검증
 ```
 
+> **Wave 0 implementation note (2026-05-01)**: 메이저 버전은 설치 시점 stable로 채택 — `zod@^4`, `sonner@^2`, `tailwind-merge@^3`, `lucide-react@^1.14`, `@tanstack/react-query@^5`, `msw@^2`. `phase-8.md §4` 표의 `^3 / ^1 / ^2 / ^0.4xx`는 계획 시점 표기, 실제 lockfile이 정본.
+
 ---
 
 ## §2. 폐쇄망 사후 재현 — 우회 옵션 우선순위

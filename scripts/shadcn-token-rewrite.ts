@@ -34,6 +34,13 @@ export const MAPPING: Record<string, string> = {
   'border-input': 'border-[color:var(--border-standard)]',
   'border-border': 'border-[color:var(--border-standard)]',
   'placeholder:text-muted-foreground': 'placeholder:text-[color:var(--text-tertiary)]',
+
+  // Named raw-color usages found in shadcn defaults — map to design tokens.
+  'bg-black/60': 'bg-[color:var(--bg-overlay)]',
+  'bg-black/80': 'bg-[color:var(--bg-overlay)]',
+  'bg-white': 'bg-[color:var(--bg-app)]',
+  'text-white': 'text-[color:var(--text-on-brand)]',
+  'text-black': 'text-[color:var(--text-primary)]',
 };
 
 export function rewrite(source: string): string {

@@ -129,6 +129,9 @@
   --danger: var(--status-red);
   --text-on-brand: oklch(100% 0 0);
   --border: var(--border-standard);
+
+  /* Overlay (modal/dialog scrim) — light/dark mirror, ~60% opacity black */
+  --bg-overlay: light-dark(oklch(0% 0 0 / 0.45), oklch(0% 0 0 / 0.6));
 }
 
 body {

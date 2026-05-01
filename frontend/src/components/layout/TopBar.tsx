@@ -6,10 +6,10 @@ interface TopBarProps {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  reporter: 'Reporter',
-  reviewer: 'Reviewer',
-  admin: 'Admin',
+  user: 'User',
   dev: 'Dev',
+  manager: 'Manager',
+  admin: 'Admin',
 };
 
 export function TopBar({ title }: TopBarProps) {
