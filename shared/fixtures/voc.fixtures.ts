@@ -18,6 +18,9 @@ import {
   VocHistoryEntry,
   type VocHistoryEntry as VocHistoryEntryT,
 } from '../contracts/voc/note';
+import { FIXTURE_USERS } from '../contracts/voc/users';
+
+export { FIXTURE_USERS };
 
 const SYS = {
   ANALYSIS: '11111111-1111-4111-8111-111111111111',
@@ -27,15 +30,6 @@ const SYS = {
 
 const MENU = '44444444-4444-4444-8444-444444444444';
 const TYPE = '55555555-5555-4555-8555-555555555555';
-
-export const FIXTURE_USERS = {
-  admin: '00000000-0000-4000-8000-0000000000a1',
-  manager: '00000000-0000-4000-8000-0000000000b1',
-  /** Dev assignee for §6-3 B-T5 */
-  devSelf: '00000000-0000-4000-8000-0000000000c1',
-  devOther: '00000000-0000-4000-8000-0000000000c2',
-  user: '00000000-0000-4000-8000-0000000000d1',
-} as const;
 
 const STATUSES = ['접수', '검토중', '처리중', '완료', '드랍'] as const;
 

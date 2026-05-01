@@ -1,9 +1,10 @@
 import { AuthUser } from './types.js';
-import { FIXTURE_USERS } from '../../../shared/fixtures/voc.fixtures';
+import { FIXTURE_USERS } from '../../../shared/contracts/voc/users';
 
-// Mock users now reference the same UUID space as `shared/fixtures/voc.fixtures`
+// Mock users share the UUID space declared in `shared/contracts/voc/users`
 // (v4-compliant). This unifies BE/FE auth ids with the fixture assignee_id used
-// for permission tests (Wave 1 §U3=A).
+// for permission tests (Wave 1 §U3=A). Imported from contracts/ — not
+// fixtures/ — so prod backend code does not pull in the 50-row fixture array.
 export const MOCK_USERS: AuthUser[] = [
   {
     id: FIXTURE_USERS.admin,
