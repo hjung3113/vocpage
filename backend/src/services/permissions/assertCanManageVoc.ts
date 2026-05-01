@@ -9,6 +9,7 @@ export type VocAction =
   | 'changeStatus'
   | 'setPriority'
   | 'setDueDate'
+  | 'reassign'
   | 'editTags'
   | 'createSubtask'
   | 'closeSubtask'

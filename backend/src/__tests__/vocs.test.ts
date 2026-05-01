@@ -29,23 +29,50 @@ jest.mock('../repository/voc', () => {
     listVocs: jest.fn(
       async (params: {
         status?: string[];
-        voc_type_id?: string[];
-        limit?: number;
+        voc_type_ids?: string[];
+        assignees?: string[];
+        priorities?: string[];
+        tag_ids?: string[];
+        per_page?: number;
         page?: number;
+        sort_by?: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
+        sort_dir?: 'asc' | 'desc';
         includeDeleted?: boolean;
       }) => {
-        const limit = params.limit ?? 20;
+        const per_page = params.per_page ?? 20;
         const page = params.page ?? 1;
         let filtered = store.filter((r) => params.includeDeleted || r.deleted_at === null);
         if (params.status?.length) {
           filtered = filtered.filter((r) => params.status!.includes(r.status));
         }
-        if (params.voc_type_id?.length) {
-          filtered = filtered.filter((r) => params.voc_type_id!.includes(r.voc_type_id));
+        if (params.voc_type_ids?.length) {
+          filtered = filtered.filter((r) => params.voc_type_ids!.includes(r.voc_type_id));
+        }
+        if (params.assignees?.length) {
+          filtered = filtered.filter(
+            (r) => r.assignee_id !== null && params.assignees!.includes(r.assignee_id),
+          );
+        }
+        if (params.priorities?.length) {
+          filtered = filtered.filter((r) => params.priorities!.includes(r.priority));
+        }
+        // tag_ids filtering — fixtures don't carry tag relations; treat as no-op
+        // unless test wires tags via store mutation. EXISTS-subquery-equivalent.
+        if (params.sort_by) {
+          const dir = params.sort_dir === 'asc' ? 1 : -1;
+          const key = params.sort_by;
+          filtered = [...filtered].sort((a, b) => {
+            const av = (a as unknown as Record<string, unknown>)[key];
+            const bv = (b as unknown as Record<string, unknown>)[key];
+            if (av === bv) return 0;
+            if (av == null) return 1;
+            if (bv == null) return -1;
+            return (av as string) < (bv as string) ? -dir : dir;
+          });
         }
         const total = filtered.length;
-        const start = (page - 1) * limit;
-        return { rows: filtered.slice(start, start + limit), total };
+        const start = (page - 1) * per_page;
+        return { rows: filtered.slice(start, start + per_page), total };
       },
     ),
     getVocById: jest.fn(async (id: string, opts: { includeDeleted?: boolean } = {}) => {
@@ -88,6 +115,7 @@ jest.mock('../repository/voc', () => {
 
 const repoMock = jest.requireMock('../repository/voc') as {
   __reset: () => void;
+  listVocs: jest.Mock;
 };
 
 beforeEach(() => {
@@ -113,14 +141,14 @@ async function loginAs(role: 'admin' | 'manager' | 'dev' | 'user') {
 describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
   test('B-T1 GET /api/vocs returns 200 + VocListResponse for manager', async () => {
     const agent = await loginAs('manager');
-    const res = await agent.get('/api/vocs?status=%EC%A0%91%EC%88%98&limit=20');
+    const res = await agent.get('/api/vocs?status=%EC%A0%91%EC%88%98&per_page=20');
     expect(res.status).toBe(200);
     expect(() => VocListResponse.parse(res.body)).not.toThrow();
   });
 
-  test('B-T2 GET /api/vocs?limit=999 returns 400 VALIDATION_ERROR', async () => {
+  test('B-T2 GET /api/vocs?per_page=999 returns 400 VALIDATION_ERROR', async () => {
     const agent = await loginAs('manager');
-    const res = await agent.get('/api/vocs?limit=999');
+    const res = await agent.get('/api/vocs?per_page=999');
     expect(res.status).toBe(400);
     expect(res.body.error?.code).toBe('VALIDATION_ERROR');
   });
@@ -161,23 +189,110 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
 
   test('B-T8 non-admin ?includeDeleted=true does not leak soft-deleted rows', async () => {
     const agent = await loginAs('manager');
-    const res = await agent.get('/api/vocs?includeDeleted=true&limit=100');
+    const res = await agent.get('/api/vocs?includeDeleted=true&per_page=100');
     expect(res.status).toBe(200);
     const ids = (res.body.rows as Array<{ id: string }>).map((r) => r.id);
     expect(ids).not.toContain(deletedVoc.id);
   });
 
-  test('B-T9 ?voc_type_id filter is applied at repository (no silent drop)', async () => {
+  test('B-T9 ?voc_type_ids filter is applied at repository (no silent drop)', async () => {
     const targetType = liveVoc.voc_type_id;
     const expectedIds = VOC_FIXTURES.filter(
       (r) => r.deleted_at === null && r.voc_type_id === targetType,
     ).map((r) => r.id);
     const agent = await loginAs('manager');
     const res = await agent.get(
-      `/api/vocs?voc_type_id=${encodeURIComponent(targetType)}&limit=100`,
+      `/api/vocs?voc_type_ids=${encodeURIComponent(targetType)}&per_page=100`,
     );
     expect(res.status).toBe(200);
     const ids = (res.body.rows as Array<{ id: string }>).map((r) => r.id).sort();
     expect(ids).toEqual([...expectedIds].sort());
+  });
+
+  // ─── PR-α (Wave 1.5) — sort_by / sort_dir / per_page / multi-filter ───
+  describe('Wave 1.5 §1.5-A — extended list contract', () => {
+    test.each([
+      'created_at',
+      'updated_at',
+      'priority',
+      'status',
+      'due_date',
+      'issue_code',
+    ] as const)(
+      'sort_by=%s returns 200 + parsed VocListResponse + repo called with sort_by/sort_dir',
+      async (col) => {
+        const agent = await loginAs('manager');
+        const res = await agent.get(`/api/vocs?sort_by=${col}&sort_dir=asc&per_page=50`);
+        expect(res.status).toBe(200);
+        expect(() => VocListResponse.parse(res.body)).not.toThrow();
+        expect(repoMock.listVocs).toHaveBeenCalledWith(
+          expect.objectContaining({ sort_by: col, sort_dir: 'asc' }),
+        );
+      },
+    );
+
+    test('sort_dir=desc forwards desc to repo', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.get('/api/vocs?sort_by=created_at&sort_dir=desc&per_page=50');
+      expect(res.status).toBe(200);
+      expect(repoMock.listVocs).toHaveBeenCalledWith(
+        expect.objectContaining({ sort_by: 'created_at', sort_dir: 'desc' }),
+      );
+    });
+
+    test('invalid sort_by=foo returns 400 VALIDATION_ERROR', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.get('/api/vocs?sort_by=foo');
+      expect(res.status).toBe(400);
+      expect(res.body.error?.code).toBe('VALIDATION_ERROR');
+    });
+
+    test('invalid sort_dir=invalid returns 400 VALIDATION_ERROR', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.get('/api/vocs?sort_dir=invalid');
+      expect(res.status).toBe(400);
+      expect(res.body.error?.code).toBe('VALIDATION_ERROR');
+    });
+
+    test('multi-filter AND: assignees + priorities applied conjunctively', async () => {
+      const agent = await loginAs('manager');
+      // pick assignee + priority with overlap
+      const targetAssignee = FIXTURE_USERS.devSelf;
+      const targetPriority = 'urgent';
+      const expectedIds = VOC_FIXTURES.filter(
+        (r) =>
+          r.deleted_at === null &&
+          r.assignee_id === targetAssignee &&
+          r.priority === targetPriority,
+      ).map((r) => r.id);
+      const res = await agent.get(
+        `/api/vocs?assignees=${encodeURIComponent(targetAssignee)}&priorities=${targetPriority}&per_page=100`,
+      );
+      expect(res.status).toBe(200);
+      const ids = (res.body.rows as Array<{ id: string }>).map((r) => r.id).sort();
+      expect(ids).toEqual([...expectedIds].sort());
+    });
+
+    test('pagination: page=1 + page=2 + per_page=20 yield disjoint rows, consistent total', async () => {
+      const agent = await loginAs('manager');
+      const r1 = await agent.get('/api/vocs?page=1&per_page=20&sort_by=created_at&sort_dir=desc');
+      const r2 = await agent.get('/api/vocs?page=2&per_page=20&sort_by=created_at&sort_dir=desc');
+      expect(r1.status).toBe(200);
+      expect(r2.status).toBe(200);
+      expect(r1.body.total).toBe(r2.body.total);
+      expect(r1.body.per_page).toBe(20);
+      expect(r2.body.page).toBe(2);
+      const ids1 = new Set((r1.body.rows as Array<{ id: string }>).map((r) => r.id));
+      const ids2 = new Set((r2.body.rows as Array<{ id: string }>).map((r) => r.id));
+      for (const id of ids2) expect(ids1.has(id)).toBe(false);
+    });
+
+    test('response shape uses per_page (not pageSize)', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.get('/api/vocs?per_page=5');
+      expect(res.status).toBe(200);
+      expect(res.body.per_page).toBe(5);
+      expect(res.body.pageSize).toBeUndefined();
+    });
   });
 });

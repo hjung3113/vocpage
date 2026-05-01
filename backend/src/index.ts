@@ -9,6 +9,7 @@ import yaml from 'js-yaml';
 import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
 import { vocRouter } from './routes/voc';
+import { mastersRouter } from './routes/masters';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './logger';
 
@@ -59,6 +60,7 @@ app.get('/api/health', async (_req, res) => {
 
 app.use('/api/auth', authRouter);
 app.use('/api/vocs', vocRouter);
+app.use('/api/masters', mastersRouter);
 
 app.use(errorHandler);
 

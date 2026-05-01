@@ -50,19 +50,19 @@ export const vocHandlers = [
   http.get('/api/vocs', ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.getAll('status');
-    const limit = Number(url.searchParams.get('limit') ?? 20);
+    const per_page = Number(url.searchParams.get('per_page') ?? 20);
     const page = Number(url.searchParams.get('page') ?? 1);
-    if (limit > 100) return envelope('VALIDATION_ERROR', 'limit must be ≤ 100');
+    if (per_page > 100) return envelope('VALIDATION_ERROR', 'per_page must be ≤ 100');
     let rows = store.filter((r) => r.deleted_at === null);
     if (status.length) rows = rows.filter((r) => status.includes(r.status));
     const total = rows.length;
-    const start = (page - 1) * limit;
-    const slice = rows.slice(start, start + limit).map((r) => ({
+    const start = (page - 1) * per_page;
+    const slice = rows.slice(start, start + per_page).map((r) => ({
       ...r,
       has_children: false,
       notes_count: notes.filter((n) => n.voc_id === r.id).length,
     }));
-    return HttpResponse.json({ rows: slice, page, pageSize: limit, total });
+    return HttpResponse.json({ rows: slice, page, per_page, total });
   }),
 
   http.get('/api/vocs/:id', ({ params, request }) => {

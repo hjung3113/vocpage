@@ -47,19 +47,21 @@ export async function list(query: VocListQuery, user: AuthUser): Promise<VocList
   const result = await repo.listVocs({
     status: query.status,
     system_id: query.system_id,
-    voc_type_id: query.voc_type_id,
-    assignee_id: query.assignee_id,
+    voc_type_ids: query.voc_type_ids,
+    assignees: query.assignees,
+    priorities: query.priorities,
+    tag_ids: query.tag_ids,
     q: query.q,
-    sort: query.sort,
-    order: query.order,
+    sort_by: query.sort_by,
+    sort_dir: query.sort_dir,
     page: query.page,
-    limit: query.limit,
+    per_page: query.per_page,
     includeDeleted: query.includeDeleted && user.role === 'admin',
   });
   return {
     rows: result.rows.map(toListItem),
     page: query.page,
-    pageSize: query.limit,
+    per_page: query.per_page,
     total: result.total,
   };
 }
@@ -76,7 +78,7 @@ function inferAction(patch: VocUpdate): VocAction {
   if ('status' in patch) return 'changeStatus';
   if ('priority' in patch) return 'setPriority';
   if ('due_date' in patch) return 'setDueDate';
-  if ('assignee_id' in patch) return 'changeStatus';
+  if ('assignee_id' in patch) return 'reassign';
   return 'changeStatus';
 }
 
