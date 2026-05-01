@@ -1,30 +1,87 @@
 import { useVocPageController } from '../../features/voc/useVocPageController';
-import { VocFilterBar } from './VocFilterBar';
-import { VocTable } from './VocTable';
-import { VocDrawer } from './VocDrawer';
+import { VocTopbar } from '../../features/voc/components/VocTopbar';
+import { VocStatusFilters } from '../../features/voc/components/VocStatusFilters';
+import { VocAdvancedFilters } from '../../features/voc/components/VocAdvancedFilters';
+import { VocSortChips } from '../../features/voc/components/VocSortChips';
+import { VocTable } from '../../features/voc/components/VocTable';
+import { VocPaginationBar } from '../../features/voc/components/VocPaginationBar';
+import { VocReviewDrawer } from '../../features/voc/components/VocReviewDrawer';
+import { VocCreateModal } from '../../features/voc/components/VocCreateModal';
 import { EmptyState } from '../common/EmptyState';
 import { ErrorState } from '../common/ErrorState';
 import { LoadingState } from '../common/LoadingState';
-import { PageTitle } from '../layout/PageTitle';
+
+const SYSTEMS_PLACEHOLDER = [
+  { id: '11111111-1111-4111-8111-111111111111', label: '시스템 미지정' },
+];
+const MENUS_PLACEHOLDER = [{ id: '22222222-2222-4222-8222-222222222222', label: '메뉴 미지정' }];
 
 export function VocListPage() {
   const ctrl = useVocPageController();
   const { list } = ctrl;
   const rows = list.data?.rows ?? [];
+  const total = list.data?.total ?? 0;
+  const statusValue = ctrl.filter.status ?? 'all';
 
   return (
-    <div className="flex flex-col gap-3">
-      <PageTitle title="VOC" />
-      <VocFilterBar value={ctrl.filter} onChange={ctrl.setFilter} />
-      {list.isLoading && <LoadingState data-testid="voc-loading" />}
-      {list.isError && <ErrorState onRetry={() => list.refetch()} />}
-      {!list.isLoading && !list.isError && rows.length === 0 && (
-        <EmptyState title="VOC가 없습니다" description="필터를 조정해보세요." />
-      )}
-      {!list.isLoading && !list.isError && rows.length > 0 && (
-        <VocTable rows={rows} onRowClick={ctrl.drawer.open} />
-      )}
-      <VocDrawer
+    <div className="flex flex-col">
+      <VocTopbar
+        totalCount={total}
+        query={ctrl.filter.q ?? ''}
+        onQueryChange={(q) => ctrl.setFilter({ ...ctrl.filter, q: q || undefined })}
+        notifications={{
+          items: ctrl.notifications.items,
+          unreadCount: ctrl.notifications.unreadCount,
+          onMarkAllRead: ctrl.notifications.onMarkAllRead,
+          onItemClick: ctrl.notifications.onItemClick,
+        }}
+        onCreate={() => ctrl.create.setOpen(true)}
+      />
+      <VocStatusFilters value={statusValue} onChange={ctrl.onStatusChange} />
+      <div className="px-6 py-3">
+        <VocAdvancedFilters
+          open={ctrl.advanced.open}
+          onToggle={ctrl.advanced.onToggle}
+          assignees={ctrl.masters.assignees}
+          tags={ctrl.masters.tags}
+          vocTypes={ctrl.masters.vocTypes}
+          value={{
+            assignees: ctrl.filter.assignees,
+            priorities: ctrl.filter.priorities,
+            voc_type_ids: ctrl.filter.voc_type_ids,
+            tag_ids: ctrl.filter.tag_ids,
+          }}
+          onChange={ctrl.advanced.onChange}
+          onReset={ctrl.advanced.onReset}
+        />
+      </div>
+      <VocSortChips sortBy={ctrl.sortBy} sortDir={ctrl.sortDir} onChange={ctrl.setSort} />
+      <div className="px-6">
+        {list.isLoading && <LoadingState data-testid="voc-loading" />}
+        {list.isError && <ErrorState onRetry={() => list.refetch()} />}
+        {!list.isLoading && !list.isError && rows.length === 0 && (
+          <EmptyState title="VOC가 없습니다" description="필터를 조정해보세요." />
+        )}
+        {!list.isLoading && !list.isError && rows.length > 0 && (
+          <VocTable
+            rows={rows}
+            sortBy={ctrl.sortBy}
+            sortDir={ctrl.sortDir}
+            onSort={(key) =>
+              ctrl.setSort(key, ctrl.sortBy === key && ctrl.sortDir === 'desc' ? 'asc' : 'desc')
+            }
+            onRowClick={ctrl.drawer.open}
+            assigneeMap={ctrl.masters.assigneeMap}
+          />
+        )}
+      </div>
+      <VocPaginationBar
+        page={ctrl.page}
+        perPage={ctrl.perPage}
+        total={total}
+        onPageChange={ctrl.setPage}
+      />
+      <VocReviewDrawer
         vocId={ctrl.drawer.vocId}
         notes={ctrl.notes.data}
         notesLoading={ctrl.notes.isLoading}
@@ -32,6 +89,15 @@ export function VocListPage() {
         onClose={ctrl.drawer.close}
         onPatch={ctrl.actions.patch}
         onAddNote={ctrl.actions.addNote}
+      />
+      <VocCreateModal
+        open={ctrl.create.open}
+        onOpenChange={ctrl.create.setOpen}
+        vocTypes={ctrl.masters.vocTypes}
+        systems={SYSTEMS_PLACEHOLDER}
+        menus={MENUS_PLACEHOLDER}
+        onSubmit={ctrl.create.onSubmit}
+        submitting={ctrl.create.submitting}
       />
     </div>
   );

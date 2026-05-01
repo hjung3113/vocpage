@@ -70,20 +70,22 @@ export function VocTable({
   ];
 
   return (
-    <DataTable<Row>
-      columns={columns}
-      rows={rows}
-      rowKey={(row) => row.id}
-      sortKey={sortBy}
-      sortDir={sortDir}
-      onSort={(key) => onSort(key as VocSortColumn)}
-      onRowClick={(row) => onRowClick(row.id)}
-      emptyState={
-        <div className="py-12 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
-          데이터가 없습니다
-        </div>
-      }
-    />
+    <div data-testid="voc-table">
+      <DataTable<Row>
+        columns={columns}
+        rows={rows}
+        rowKey={(row) => row.id}
+        sortKey={sortBy}
+        sortDir={sortDir}
+        onSort={(key) => onSort(key as VocSortColumn)}
+        onRowClick={(row) => onRowClick(row.id)}
+        emptyState={
+          <div className="py-12 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
+            데이터가 없습니다
+          </div>
+        }
+      />
+    </div>
   );
 }
 

@@ -70,6 +70,7 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
             key={pillValue}
             type="button"
             role="button"
+            data-testid={`status-chip-${pillValue}`}
             aria-pressed={pressed}
             onClick={() => handleClick(pillValue)}
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors"
