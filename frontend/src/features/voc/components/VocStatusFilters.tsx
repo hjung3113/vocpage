@@ -57,6 +57,7 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
 
   return (
     <div
+      data-pcomp="voc-status-filters"
       className="flex items-center gap-2 flex-wrap px-6 py-3"
       style={{ borderBottom: '1px solid var(--border-standard)' }}
     >

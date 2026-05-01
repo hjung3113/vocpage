@@ -79,6 +79,7 @@ export function VocReviewDrawer({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
+        data-pcomp="voc-review-drawer"
         className="ml-auto h-screen max-w-xl rounded-none"
         data-testid="voc-drawer"
         style={{ background: 'var(--bg-panel)' }}

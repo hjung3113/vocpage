@@ -70,7 +70,7 @@ export function VocTable({
   ];
 
   return (
-    <div data-testid="voc-table">
+    <div data-pcomp="voc-table" data-testid="voc-table">
       <DataTable<Row>
         columns={columns}
         rows={rows}

@@ -95,7 +95,7 @@ export function VocAdvancedFilters({
   onReset,
 }: VocAdvancedFiltersProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div data-pcomp="voc-advanced-filters" className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <Button
           type="button"

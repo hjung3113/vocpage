@@ -32,6 +32,7 @@ export function NotificationBell({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
+          data-pcomp="notification-bell"
           type="button"
           aria-label="알림"
           className={cn(

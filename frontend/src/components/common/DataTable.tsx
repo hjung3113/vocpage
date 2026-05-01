@@ -44,7 +44,10 @@ export function DataTable<T>({
   }
 
   return (
-    <table className="w-full border-collapse text-sm text-[color:var(--text-primary)]">
+    <table
+      data-pcomp="data-table"
+      className="w-full border-collapse text-sm text-[color:var(--text-primary)]"
+    >
       <thead>
         <tr className="border-b border-[color:var(--border-standard)]">
           {columns.map((col) => {
