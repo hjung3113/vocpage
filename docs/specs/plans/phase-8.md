@@ -193,12 +193,12 @@ backend/src/
 
 #### 1-A 계약 영역 (vertical slice 내)
 
-| 파일                                       | 내용                                                                                                                                                               |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `shared/contracts/voc.ts`                  | `Voc`, `VocStatus`, `VocSource`, `VocFilter`, `VocListQuery`, `VocListResponse`, `VocCreate`, `VocUpdate`, `InternalNote`, `VocHistory` (Zod schema + inferred TS) |
-| `shared/contracts/common.ts` 보강          | `Pagination`, `SortDir`, `RoleScopedColumns`                                                                                                                       |
-| `shared/fixtures/voc.fixtures.ts`          | 50건 더미 (역할별 케이스 다 포함: 빈, 1건, 100건, 권한 차단, 길이 초과)                                                                                            |
-| `docs/specs/plans/phase-8-contract-voc.md` | 본 계약 PR 메모 (의도·스펙 매핑·후속 영향)                                                                                                                         |
+| 파일                                            | 내용                                                                                                                                                               |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `shared/contracts/voc.ts`                       | `Voc`, `VocStatus`, `VocSource`, `VocFilter`, `VocListQuery`, `VocListResponse`, `VocCreate`, `VocUpdate`, `InternalNote`, `VocHistory` (Zod schema + inferred TS) |
+| `shared/contracts/common.ts` 보강               | `Pagination`, `SortDir`, `RoleScopedColumns`                                                                                                                       |
+| `shared/fixtures/voc.fixtures.ts`               | 50건 더미 (역할별 케이스 다 포함: 빈, 1건, 100건, 권한 차단, 길이 초과)                                                                                            |
+| `docs/specs/plans/done/phase-8-contract-voc.md` | 본 계약 PR 메모 (의도·스펙 매핑·후속 영향) — Wave 1 머지로 archive                                                                                                 |
 
 **검증**: `pnpm -w typecheck` 통과 + Zod schema로 fixture 파싱 100% 통과. FE/BE 코드 변경 없음.
 
