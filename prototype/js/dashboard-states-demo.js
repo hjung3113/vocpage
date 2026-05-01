@@ -69,7 +69,10 @@
 
     // Show/hide right fade gradient
     updateW7Fade();
-    container.addEventListener('scroll', updateW7Fade);
+    if (!container.dataset.scrollListenerAttached) {
+      container.dataset.scrollListenerAttached = '1';
+      container.addEventListener('scroll', updateW7Fade);
+    }
   }
 
   function updateW7Fade() {
@@ -84,56 +87,74 @@
   window.w7Scroll = function w7Scroll(dir) {
     var container = document.getElementById('w7Cards');
     if (!container) return;
-    container.scrollBy({ left: dir * 160, behavior: 'smooth' });
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    container.scrollBy({ left: dir * 160, behavior: reducedMotion ? 'auto' : 'smooth' });
   };
 
   // ── B: Widget empty/error state toggle ───────────────────────────────────
   // Widget sections in .dash-body — ordered to match DASH_WIDGET_NAMES
   // Each entry: { id (optional), selector, contentQuery, label }
+  // 11 widget entries — each targets a single data-dash-widget element
+  // Paired groups (분포/매트릭스, 트렌드/태그, 처리속도/에이징) split into separate entries (F5)
   var WIDGET_SECTIONS = [
     {
       label: 'KPI (Volume)',
-      selector: '.dash-body > div:nth-child(1)',
+      selector: '[data-dash-widget="kpi-volume"]',
       contentQuery: '.kpi-grid',
     },
     {
       label: 'KPI (Quality)',
-      selector: '.dash-body > div:nth-child(2)',
+      selector: '[data-dash-widget="kpi-quality"]',
       contentQuery: '.kpi-grid',
     },
     {
-      label: '분포 + 매트릭스',
-      selector: '.dash-body > div:nth-child(3)',
-      contentQuery: '.two-col, table',
+      label: '분포',
+      selector: '[data-dash-widget="dist"]',
+      contentQuery: '#distContent, .d-tabs',
+    },
+    {
+      label: '매트릭스',
+      selector: '[data-dash-widget="matrix"]',
+      contentQuery: 'table',
     },
     {
       label: '드릴다운 히트맵',
-      selector: '.dash-body > div:nth-child(4)',
+      selector: '[data-dash-widget="heatmap"]',
       contentQuery: '#hmTable, .heatmap-top',
     },
     {
-      label: '주간 트렌드 + 태그',
-      selector: '.dash-body > div:nth-child(5)',
-      contentQuery: '.two-col',
+      label: '주간 트렌드',
+      selector: '[data-dash-widget="trend"]',
+      contentQuery: '.chart-area, .chart-legend',
+    },
+    {
+      label: '태그별 분포',
+      selector: '[data-dash-widget="tags"]',
+      contentQuery: '.bar-list',
     },
     {
       label: '현황 카드',
-      selector: '#w7-status-widget',
+      selector: '[data-dash-widget="status-cards"]',
       contentQuery: '.w7-scroll-wrap',
     },
     {
-      label: '처리속도 & 에이징',
-      selector: '.dash-body > div:nth-child(7)',
-      contentQuery: '#slaCardWrap, #agingCardWrap',
+      label: '처리속도',
+      selector: '[data-dash-widget="throughput"]',
+      contentQuery: '#slaCardWrap',
+    },
+    {
+      label: '에이징',
+      selector: '[data-dash-widget="aging"]',
+      contentQuery: '#agingCardWrap',
     },
     {
       label: '담당자별 현황',
-      selector: '.dash-body > div:nth-child(8)',
+      selector: '[data-dash-widget="assignee"]',
       contentQuery: '#assignTable',
     },
     {
       label: '장기 미처리',
-      selector: '.dash-body > div:nth-child(9)',
+      selector: '[data-dash-widget="long-pending"]',
       contentQuery: '#agingTableWrap',
     },
   ];

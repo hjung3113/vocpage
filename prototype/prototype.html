@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/layout/filter.css">
 <link rel="stylesheet" href="css/layout/list.css">
 <link rel="stylesheet" href="css/components/drawer.css">
+<link rel="stylesheet" href="css/components/drawer-readonly.css">
 <link rel="stylesheet" href="css/components/modal.css">
 <link rel="stylesheet" href="css/components/notification-panel.css">
 <link rel="stylesheet" href="css/components/misc.css">
@@ -248,7 +249,7 @@
   <div class="dash-body">
 
     <!-- KPI VOLUME -->
-    <div>
+    <div data-dash-widget="kpi-volume">
       <div class="section-label">Volume</div>
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-label">총 VOC</div><div class="kpi-value">1,204</div><div class="kpi-delta delta-pos">▲ 12% vs 전주</div></div>
@@ -259,7 +260,7 @@
     </div>
 
     <!-- KPI QUALITY -->
-    <div>
+    <div data-dash-widget="kpi-quality">
       <div class="section-label">Quality</div>
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-label">평균 처리시간</div><div class="kpi-value">4.2<span style="font-size:14px;font-weight:400;">일</span></div><div class="kpi-delta delta-pos">▼ 0.3일 vs 전주</div></div>
@@ -270,8 +271,8 @@
     </div>
 
     <!-- 분포 + 매트릭스 -->
-    <div class="two-col">
-      <div class="widget">
+    <div class="two-col" data-dash-widget="dist-matrix">
+      <div class="widget" data-dash-widget="dist">
         <div class="widget-header">
           <div class="widget-title">분포</div>
           <div class="dim-selector" id="distDimSel">
@@ -289,7 +290,7 @@
         <div id="distContent"></div>
       </div>
 
-      <div class="widget">
+      <div class="widget" data-dash-widget="matrix">
         <div class="widget-header">
           <div class="widget-title">우선순위 × 상태 매트릭스</div>
           <div class="dim-selector" id="matDimSel">
@@ -312,7 +313,7 @@
     </div>
 
     <!-- 히트맵 -->
-    <div class="widget">
+    <div class="widget" data-dash-widget="heatmap">
       <div class="heatmap-top">
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="widget-title">드릴다운 히트맵</div>
@@ -328,8 +329,8 @@
     </div>
 
     <!-- 주간 트렌드 + 태그 바 -->
-    <div class="two-col">
-      <div class="widget">
+    <div class="two-col" data-dash-widget="trend-tags">
+      <div class="widget" data-dash-widget="trend">
         <div class="widget-header">
           <div class="widget-title">주간 트렌드 (최근 12주)</div>
           <div class="dim-selector" id="lineDimSel">
@@ -359,7 +360,7 @@
         </div>
       </div>
 
-      <div class="widget">
+      <div class="widget" data-dash-widget="tags">
         <div class="widget-header">
           <div class="widget-title">태그별 분포 (Top 10)</div>
           <div class="dim-selector" id="tagDimSel">
@@ -384,7 +385,7 @@
     </div>
 
     <!-- 현황 카드 (W7) — 가로 스크롤, N-05 -->
-    <div class="widget" id="w7-status-widget">
+    <div class="widget" id="w7-status-widget" data-dash-widget="status-cards">
       <div class="widget-header">
         <div class="widget-title">현황</div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -403,14 +404,14 @@
     </div>
 
     <!-- 처리속도 & 에이징 — 2개 카드 좌우 배치 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="widget">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" data-dash-widget="throughput-aging">
+      <div class="widget" data-dash-widget="throughput">
         <div class="widget-header">
           <div class="widget-title">처리속도</div>
         </div>
         <div id="slaCardWrap"></div>
       </div>
-      <div class="widget">
+      <div class="widget" data-dash-widget="aging">
         <div class="widget-header">
           <div class="widget-title">에이징</div>
         </div>
@@ -419,7 +420,7 @@
     </div>
 
     <!-- 담당자별 처리 현황 -->
-    <div class="widget">
+    <div class="widget" data-dash-widget="assignee">
       <div class="widget-header">
         <div class="widget-title">담당자별 처리 현황</div>
         <div class="dash-btn-group" id="assignXAxisBtns">
@@ -432,7 +433,7 @@
     </div>
 
     <!-- 장기 미처리 -->
-    <div class="widget" style="margin-bottom:24px;">
+    <div class="widget" data-dash-widget="long-pending" style="margin-bottom:24px;">
       <div class="widget-header">
         <div class="widget-title">장기 미처리 VOC Top 10</div>
         <div class="dim-selector" id="agingDimSel">

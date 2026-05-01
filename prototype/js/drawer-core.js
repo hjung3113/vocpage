@@ -226,6 +226,7 @@ function cancelSub(vocId) {
   if (inp) inp.value = '';
 }
 function confirmSub(vocId) {
+  if (window.currentUser && window.currentUser.role === 'user') return; // F1: User cannot add sub-tasks
   const inp = document.getElementById('sub-input-' + vocId);
   const title = inp?.value.trim();
   if (!title) {
@@ -298,6 +299,7 @@ function removeAttach(vocId, idx) {
 
 // ── Comment inline edit
 function editComment(btn) {
+  if (window.currentUser && window.currentUser.role === 'user') return; // F1: User cannot edit comments
   const card = btn.closest('.comment-card');
   const bodyEl = card.querySelector('.c-body');
   if (!bodyEl || bodyEl.classList.contains('editing')) return;
@@ -334,6 +336,7 @@ function cancelEditComment(btn) {
   bodyEl.textContent = bodyEl.dataset.orig || '';
 }
 function deleteComment(btn) {
+  if (window.currentUser && window.currentUser.role === 'user') return; // F1: User cannot delete comments
   const card = btn.closest('.comment-card');
   card.style.transition = 'opacity 0.15s, transform 0.15s';
   card.style.opacity = '0';
@@ -350,6 +353,7 @@ function deleteComment(btn) {
 
 // ── New comment submit
 function submitComment(vocId) {
+  if (window.currentUser && window.currentUser.role === 'user') return; // F1: User cannot submit comments
   const inp = document.getElementById('new-comment-input-' + vocId);
   const text = inp?.value.trim();
   if (!text) {

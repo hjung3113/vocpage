@@ -1,9 +1,12 @@
 // ── W3-C A: User role drawer readonly gate ────────────────────────────────────
-// spec: feature-voc.md §8.3 — User은 댓글 작성·첨부 권한 없음 → fail-closed
+// spec: feature-voc.md §8.3 — User은 댓글 작성·첨부·상태·담당자·sub-task 권한 없음 → fail-closed
 function applyDrawerUserReadonly(vocId) {
-  // Disable comment input area
+  const drawer = document.getElementById('drawer');
+
+  // Disable comment input area (F10: save original placeholder)
   const commentInput = document.getElementById('new-comment-input-' + vocId);
   if (commentInput) {
+    commentInput.dataset.originalPlaceholder = commentInput.placeholder || '';
     commentInput.disabled = true;
     commentInput.placeholder = '';
   }
@@ -27,12 +30,57 @@ function applyDrawerUserReadonly(vocId) {
     }
   }
 
-  // Disable attachment zone
+  // Disable status select (F1)
+  if (drawer) {
+    const statusSel = drawer.querySelector('.d-meta .meta-sel:not([id])');
+    if (statusSel) {
+      statusSel.disabled = true;
+      statusSel.classList.add('select--readonly');
+    }
+  }
+
+  // Disable assignee select (F1) — the one inside .meta-val with mini-av
+  if (drawer) {
+    const assigneeVal = drawer.querySelector('.meta-item .meta-val select.meta-sel');
+    if (assigneeVal) {
+      assigneeVal.disabled = true;
+      assigneeVal.classList.add('select--readonly');
+    }
+  }
+
+  // Hide comment edit/delete icon buttons (F1)
+  if (drawer) {
+    drawer
+      .querySelectorAll('.c-actions, .comment-edit-btn, .comment-delete-btn')
+      .forEach(function (btn) {
+        btn.style.display = 'none';
+      });
+    // Also hide the icon-btn pencil/trash inside comment-header action divs
+    drawer.querySelectorAll('.comment-header .icon-btn').forEach(function (btn) {
+      btn.style.display = 'none';
+    });
+  }
+
+  // Hide sub-task add button and inline form (F1)
+  const subAddRow = document.getElementById('sub-add-row-' + vocId);
+  if (subAddRow) subAddRow.style.display = 'none';
+  const subForm = document.getElementById('sub-form-' + vocId);
+  if (subForm) subForm.style.display = 'none';
+
+  // Hide internal-notes write area (F1)
+  if (drawer) {
+    drawer.querySelectorAll('.in-compose, .note-save-btn, .note-input-area').forEach(function (el) {
+      el.style.display = 'none';
+    });
+  }
+
+  // Disable attachment zone (F8: save original drop HTML before overwriting)
   const attZone = document.getElementById('att-zone-' + vocId);
   if (attZone) {
     attZone.classList.add('att-zone--readonly');
     const drop = attZone.querySelector('.att-drop');
     if (drop) {
+      drop.dataset.originalHtml = drop.innerHTML; // F8: capture before overwrite
       drop.classList.add('att-drop--disabled');
       drop.innerHTML =
         '<span style="color:var(--text-quaternary)">첨부 권한 없음 (조회 전용)</span>';
@@ -52,25 +100,66 @@ document.addEventListener('role:change', function (e) {
   if (!vocId) return;
   const newRole = e.detail && e.detail.role;
 
-  // Remove existing readonly notice if switching away from user
+  // Remove existing readonly notice
   const existingNotice = document.querySelector('.d-readonly-notice');
   if (existingNotice) existingNotice.remove();
 
-  // Re-enable comment input
+  // Re-enable comment input (F10: restore original placeholder from data-attribute)
   const commentInput = document.getElementById('new-comment-input-' + vocId);
   if (commentInput) {
     commentInput.disabled = false;
-    commentInput.placeholder = '댓글을 입력하세요 (Markdown 지원, Toast UI Editor 마운트 예정)';
+    if (commentInput.dataset.originalPlaceholder !== undefined) {
+      commentInput.placeholder = commentInput.dataset.originalPlaceholder;
+      delete commentInput.dataset.originalPlaceholder;
+    }
   }
   const commentInputWrap = commentInput ? commentInput.closest('.comment-input') : null;
   if (commentInputWrap) commentInputWrap.classList.remove('comment-input--readonly');
 
-  // Re-enable attachment zone
+  // Re-enable status select (F1)
+  const statusSel = drawer.querySelector('.d-meta .meta-sel:not([id])');
+  if (statusSel) {
+    statusSel.disabled = false;
+    statusSel.classList.remove('select--readonly');
+  }
+
+  // Re-enable assignee select (F1)
+  const assigneeVal = drawer.querySelector('.meta-item .meta-val select.meta-sel');
+  if (assigneeVal) {
+    assigneeVal.disabled = false;
+    assigneeVal.classList.remove('select--readonly');
+  }
+
+  // Restore comment edit/delete icon buttons (F1)
+  drawer.querySelectorAll('.comment-header .icon-btn').forEach(function (btn) {
+    btn.style.display = '';
+  });
+
+  // Restore sub-task add row (F1)
+  const subAddRow = document.getElementById('sub-add-row-' + vocId);
+  if (subAddRow) subAddRow.style.display = '';
+
+  // Restore internal-notes write area (F1)
+  drawer.querySelectorAll('.in-compose, .note-save-btn, .note-input-area').forEach(function (el) {
+    el.style.display = '';
+  });
+
+  // Re-enable attachment zone (F8: restore original drop HTML)
   const attZone = document.getElementById('att-zone-' + vocId);
   if (attZone) {
     attZone.classList.remove('att-zone--readonly');
     const drop = attZone.querySelector('.att-drop');
-    if (drop) drop.classList.remove('att-drop--disabled');
+    if (drop) {
+      drop.classList.remove('att-drop--disabled');
+      if (drop.dataset.originalHtml !== undefined) {
+        drop.innerHTML = drop.dataset.originalHtml;
+        delete drop.dataset.originalHtml;
+      }
+    }
+    // Restore remove buttons visibility
+    attZone.querySelectorAll('.att-remove').forEach(function (btn) {
+      btn.style.display = '';
+    });
   }
 
   if (newRole === 'user') {

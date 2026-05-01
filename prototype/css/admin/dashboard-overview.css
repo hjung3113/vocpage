@@ -270,17 +270,17 @@
   color: var(--text-tertiary);
 }
 .w7-card-val--review {
-  color: var(--status-blue-fg, var(--accent));
+  color: var(--status-blue);
 }
 .w7-card-val--process {
-  color: var(--status-green-fg, oklch(52% 0.18 155));
+  color: var(--status-green);
 }
 .w7-card-val--done {
   font-weight: 700;
-  color: var(--status-green-fg, oklch(52% 0.18 155));
+  color: var(--status-green);
 }
 .w7-card-val--drop {
-  color: var(--status-amber-fg, oklch(60% 0.16 72));
+  color: var(--status-amber);
 }
 .w7-scroll-fade-right {
   position: absolute;
@@ -310,6 +310,11 @@
 .w7-scroll-btn:hover {
   border-color: var(--brand);
   color: var(--brand);
+}
+@media (prefers-reduced-motion: reduce) {
+  .w7-cards {
+    scroll-snap-type: none;
+  }
 }
 
 /* ─── Widget empty / error states (B: W2~W11) ─── */
@@ -345,9 +350,9 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: var(--status-red-fg, oklch(58% 0.22 25));
-  background: var(--status-red-bg, oklch(97% 0.02 25));
-  border: 1px solid var(--status-red-fg, oklch(58% 0.22 25));
+  color: var(--status-red);
+  background: var(--status-red-bg);
+  border: 1px solid var(--status-red);
   border-radius: 6px;
   padding: 6px 10px;
 }
