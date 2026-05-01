@@ -37,6 +37,7 @@ services:
     volumes:
       - uploads_data:/app/backend/uploads
       - ./backend:/app/backend
+      - ./shared:/app/shared
     depends_on:
       postgres:
         condition: service_healthy

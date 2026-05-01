@@ -23,9 +23,11 @@
 
 - Follow-up A (Playwright e2e) — Wave 1 보강과 시나리오 겹침 → **다음
   세션 보강 후** 진행.
-- Follow-up C (`VITE_USE_MSW=false` 통합) — Docker Desktop 시작 →
-  `docker compose up -d` → `/voc` 실 BE/Postgres 검증. **본 세션 별도
-  PR로 처리.**
+- Follow-up C-1 (Docker shared mount) — backend Dockerfile/compose
+  fix. **본 세션 PR로 처리** (`docs/wave1-followup-c-verify`).
+- Follow-up C-2 (seed UUID v4 drift) — `dev_seed.sql` user UUIDs가
+  `FIXTURE_USERS` v4 포맷과 불일치 → `VocListResponse.safeParse` FAIL.
+  다음 세션 단독 PR `feat/wave1-followup-c-seed`.
 
 **Wave 2 prerequisites**: ❌ **보류**. Wave 1 보강 PR 머지 +
 follow-up A·C 종결 후 진입. 그 전에 Wave 2 implementation 금지.

@@ -13,7 +13,8 @@ COPY backend/package.json ./backend/
 # 루트에서 설치
 RUN npm ci
 
-# 소스 복사
+# 소스 복사 (shared/는 backend 런타임에서 상대 경로로 import됨 — Wave 1부터 도입)
+COPY shared/ ./shared/
 COPY backend/ ./backend/
 
 WORKDIR /app/backend
