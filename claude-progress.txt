@@ -4,7 +4,9 @@
 
 → **Phase 8 Wave 0 시작** — Foundation PR 작성 (`feat/phase-8-foundation`)
 
-**Wave 0 첫 commit 강제**: 사내 npm 미러 사전 점검 (`npm config get registry` + `npm install zod --dry-run`). 미러 부재 시 §7 raw 벤더링 경로로 사용자 승인 후 진행.
+**운영 전제 (2026-05-01 갱신)**: Wave 0~5는 **개방망 표준 npm registry**로 진행 (사내 폐쇄망 검증 환경 미확보). 폐쇄망 빌드는 동일 lockfile + `phase-8.md` §7.2 우회 4경로(미러 / 오프라인 캐시 / Verdaccio / git tarball·`npm pack`)로 사후 재현. 사내 미러 점검은 Phase 8 종료 후 별도 phase.
+
+**Wave 0 첫 commit**: 레지스트리 환경 기록 (`npm config get registry` + `npm ci` 캡처) + 폐쇄망 사후 재현 4경로 우선순위 → `docs/specs/plans/phase-8-mirror-check.md`. 진행 중 강제 규칙: runtime fetch·CDN URL·telemetry zero / self-host / `package-lock.json` commit.
 
 계획서 정본: **`docs/specs/plans/phase-8.md`** (PR #99, consensus 통과)
 전체 Phase 계획: **`docs/specs/plans/next-session-tasks.md`** (Phase 8 Wave 0~5 표)
@@ -36,6 +38,7 @@ NextGen 백로그: **`docs/specs/plans/nextgen-backlog.md`** (§5 Phase 8 분리
 
 ## 가장 최근 산출물
 
+- 2026-05-01 — **Documentation Hygiene 정책 도입** — `docs/specs/README.md`을 정본으로 채택 + `.claude/skills/doc-hygiene/SKILL.md` 등록 + `reviews/` 13건 → `reviews/done/` archive + dangling ref 4건 fix + Phase 8 운영 전제 (개방망 진행, 폐쇄망 사후 재현 4경로) 반영
 - 2026-05-01 — **Phase 8 계획 확정** (PR #99) — A′ Contract-first per-screen, 6 Wave + ADR §10
 - 2026-05-01 — **Phase 7 close** (Wave 3 W3-A/B/C 머지 #93/#94/#95 + 재스캔 0 잔여)
 - 2026-05-01 — Wave 2 전건 머지 + Wave 3 plan PR

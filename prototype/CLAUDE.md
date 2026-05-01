@@ -4,13 +4,13 @@ Static HTML prototypes for visual exploration. Read root `CLAUDE.md` first for c
 
 ## Purpose
 
-This directory is a **visual sandbox** for design reviews — dashboard mockups, widget experiments, layout studies. Outputs feed into `docs/specs/requires/uidesign.md` and `docs/specs/reviews/`.
+This directory is a **visual sandbox** for design reviews — dashboard mockups, widget experiments, layout studies. Outputs feed into `docs/specs/requires/uidesign.md` (정본) — 활성 리뷰는 `docs/specs/reviews/`, 완료된 것은 `docs/specs/reviews/done/`.
 
 ## Throwaway Scope
 
 - Prototype HTML is **not** production code. Do not wire it to backend APIs.
 - When a prototype graduates to implementation, the real version goes into `frontend/` — the prototype stays as a reference snapshot.
-- No bundler / no transpile. The prototype loads as static HTML with `<link>` to split CSS files under `css/` and classic `<script>` tags loading modules under `js/` (Stage A-2 / A-4 split, see `docs/specs/plans/prototype-phase7-wave3-plan.md`).
+- No bundler / no transpile. The prototype loads as static HTML with `<link>` to split CSS files under `css/` and classic `<script>` tags loading modules under `js/` (Stage A-2 / A-4 split, see `docs/specs/plans/done/prototype-phase7-wave3-plan.md`).
 - `package.json` exists only for Playwright-driven smoke verification (`scripts/`); no app-level build step.
 
 ## Layout

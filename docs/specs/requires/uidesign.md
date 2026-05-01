@@ -510,7 +510,7 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 - Use `bg-elevated` for row hover — use brand-tinted OKLCH value for premium hover feel
 - Make page title the same visual weight as body text — it must anchor the page
 - Place filter tabs and table header with zero gap between them — they are separate UI zones
-- Write raw color literals (`#xxxxxx`, `oklch(...)`, `light-dark(oklch(...))`) **outside the `:root` token block** — every component CSS rule and `style=` attribute MUST reference `var(--token)` names. The only legitimate raw-color sites are: (a) the `:root` token definition block in this file, (b) Color Reference tables that document a token's resolved value. Anything else is a violation (audit: `docs/specs/reviews/design-prototype-audit.md`).
+- Write raw color literals (`#xxxxxx`, `oklch(...)`, `light-dark(oklch(...))`) **outside the `:root` token block** — every component CSS rule and `style=` attribute MUST reference `var(--token)` names. The only legitimate raw-color sites are: (a) the `:root` token definition block in this file, (b) Color Reference tables that document a token's resolved value. Anything else is a violation.
 - Use pure white `#fff` / `#ffffff` even on brand-tinted backgrounds — use `var(--text-on-brand)` instead, which resolves to a pure-white token defined once in `:root`.
 
 ---
@@ -796,7 +796,7 @@ OS/browser dark mode setting automatically switches the entire theme.
 
 ## 13. Admin · Notice · FAQ Components
 
-> Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Audit reference: `docs/specs/reviews/design-prototype-audit.md`. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
+> Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
 
 ### 13.1 Admin Topbar / Body / Card
 
