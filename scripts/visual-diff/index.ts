@@ -16,6 +16,7 @@ import { loadTokens, findNearestTokens } from './tokens.js';
 import { SELECTOR_MAP, getFallbackBannerComponents } from './selectors.js';
 import type { ComponentId } from './selectors.js';
 import type { ReportMeta, NotMeasurableEntry } from './report.js';
+import { runScreenshots } from './screenshot.js';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -34,6 +35,7 @@ function parseArgs(argv: string[]): {
   reactPort: number;
   headed: boolean;
   severity: 'HIGH' | 'MED' | 'LOW';
+  screenshots: boolean;
 } {
   const result = {
     components: [] as ComponentId[],
@@ -43,6 +45,7 @@ function parseArgs(argv: string[]): {
     reactPort: 5173,
     headed: false,
     severity: 'LOW' as 'HIGH' | 'MED' | 'LOW',
+    screenshots: false,
   };
 
   for (const arg of argv) {
@@ -60,6 +63,8 @@ function parseArgs(argv: string[]): {
       result.headed = true;
     } else if (arg.startsWith('--severity=')) {
       result.severity = arg.slice('--severity='.length) as 'HIGH' | 'MED' | 'LOW';
+    } else if (arg === '--screenshots') {
+      result.screenshots = true;
     }
   }
 
@@ -68,6 +73,23 @@ function parseArgs(argv: string[]): {
 
 export async function main(argv: string[]): Promise<void> {
   const args = parseArgs(argv);
+
+  // --screenshots: delegate entirely to screenshot module, then exit
+  if (args.screenshots) {
+    const result = await runScreenshots({
+      protoPort: args.protoPort,
+      reactPort: args.reactPort,
+      headed: args.headed,
+      keepServer: args.keepServer,
+    });
+    console.error(
+      `[visual-diff] Screenshots complete. ${result.captured.length} captured, ${result.skipped.length} skipped.`,
+    );
+    if (result.skipped.length > 0) {
+      console.error(`[visual-diff] Skipped: ${result.skipped.join(', ')}`);
+    }
+    return;
+  }
 
   // F7: path traversal guard — resolve and assert within repo root
   const resolvedOut = path.resolve(args.out);
