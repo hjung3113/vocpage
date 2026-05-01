@@ -2,38 +2,23 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 1 PR #110 리뷰 대기** — 본 세션 vertical slice 4 commit 푸시 완료.
+→ **Phase 8 Wave 1 종료** — closure report 작성 완료. 사용자 검토 대기 후 Wave 2 진입.
+→ 진행 전 필독: `docs/specs/plans/phase-8-wave1-closure-report.md`, `phase-8-pattern.md`.
 
-**이번 세션 산출 (2026-05-01 cont.)**:
+**이번 세션 (2026-05-01 autonomous)** — 4 PR 머지:
 
-- PR #110 (open) `feat/phase-8-wave1` — VOC 리스트 + 검토 드로어 vertical slice (~1500 LOC)
-  - `454c8ca` shared 계약 (entity/io/note 3분할) + 50 fixture + U2 zod↔openapi 가드 9건
-  - `20a6a73` BE vertical slice — repository/service/validators/routes + 회귀 매트릭스 7건
-  - `93ae273` FE api/voc + MSW handler 5건 + queryKey 보강
-  - `b7030dd` FE list + drawer 슬라이스 (RTL 3건) + /voc 라우트
+- PR #111 (`f6d69b9`) CI baseline unblock — linux-x64 native bindings pin.
+- PR #110 (`9cc853a`) Wave 1 vertical slice — codex round-1 2 fix (admin
+  gate `includeDeleted`, repo `voc_type_id` filter), B-T8/B-T9 추가.
+- PR #112 (`f10c57a`) `phase-8-pattern.md` 회고 (7 패턴 + 3 pain + Wave 2 게이트).
+- PR #113 (`fb1c862`) follow-up B — RTL F-T4a/F-T4b/F-T5 (Escape close).
 
-**검증**: BE jest 42 PASS / FE vitest 30 PASS / 양쪽 typecheck clean.
+**검증 (post-Wave-1)**: BE jest 44 / FE vitest 32 / 양쪽 typecheck + prod build clean / Lighthouse a11y `/voc` 100/100.
 
-**결정 로그 (4건 추가)**:
+**Open items (사용자 액션)**:
 
-- U1=B `/api/vocs` 복수형 (기존 코드 일관성)
-- U2=B lightweight zod ↔ openapi 양방향 가드 (dep 0)
-- U3=A jest.mock 모듈 단위 mocking
-- U4=B openapi.yaml 본 PR 미변경
+- Follow-up A (Playwright e2e) — 별도 PR 다음 세션. ~150MB browser dep + CI workflow 변경 필요.
+- Follow-up C (`VITE_USE_MSW=false` 통합) — **BLOCKED**: Docker Desktop 미실행. 시작 후 `docker compose up -d` → `/voc` 실 BE/Postgres 검증.
+- `next-session-tasks.md` Phase 8 Wave 2 진입 안내 갱신됨.
 
-**plan vs 실제 deviation**:
-
-- C2/C3 결합, C5~C9 결합 (10 commit → 4 commit, TDD discipline 은 작성 순서 유지)
-- drawer 4분할 → 단일 파일 (180 LOC)
-- RTL 5건 → 3건 (empty/error/필터칩 핵심 시나리오)
-
-**Wave 1 follow-up (별도 PR 또는 머지 후 commit)**:
-
-- `/codex:adversarial-review` 라운드 (사용자 트리거)
-- Playwright happy path (`frontend/e2e/voc-happy-path.spec.ts`)
-- `VITE_USE_MSW=false` 통합 verification + Lighthouse a11y ≥ 95
-- `phase-8-pattern.md` 회고 (Wave 2 진입 게이트, 머지 후)
-- RTL 5 매트릭스 보강 (F-T4 권한 차단 / F-T5 필터+드로어 + drawer dirty close)
-- `phase-8-wave1-plan.md` §6-3 표기 정정 (`VALIDATION_FAILED` → `VALIDATION_ERROR`)
-
-**이전 단계**: Wave 0 PR #102 / 8-PR1 권한 인프라 PR #103 / shadcn mini-PR #108 / plan PR #107 / certainty gate PR #106 — 모두 머지.
+**Wave 2 prerequisites**: 본 closure-report 사용자 OK + follow-up A·C 완결 후 진입. 그 전에 Wave 2 implementation 금지.

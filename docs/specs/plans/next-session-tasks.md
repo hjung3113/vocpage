@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-01 (**Phase 8 계획 확정** — PR #99 머지, Wave 0 진입 대기)
-> 현재 위치: **Phase 8 Wave 0 진입 직전** — 계획서 `docs/specs/plans/phase-8.md` (consensus 통과, ADR §10)
+> 최종 업데이트: 2026-05-01 (**Phase 8 Wave 1 종료** — PR #110/#111/#112/#113 머지)
+> 현재 위치: **Phase 8 Wave 2 진입 대기** — closure report `phase-8-wave1-closure-report.md` + 회고 `phase-8-pattern.md` 사용자 검토 + follow-up A/C 마감 후 진입
 > Wave 3 결과: PR #93 W3-A / #94 W3-B / #95 W3-C 모두 머지 + 갭 재스캔 결론 0 잔여
 > R-4 (tsx watch) 이미 완료 — backend `dev` 스크립트 `tsx watch` (commit 809e267)
 
@@ -61,14 +61,14 @@
 > **스택**: shadcn/ui + TanStack Query/Table + RHF/Zod + MSW + Recharts (폐쇄망 self-host 가능 구성)
 > **운영 전제 (2026-05-01 갱신)**: Wave 0~5는 **개방망 표준 npm registry**로 진행. 폐쇄망 빌드는 동일 lockfile + `phase-8.md` §7.2 우회 4경로(미러 / 오프라인 캐시 / Verdaccio / git tarball·`npm pack`)로 **사후 재현**. 사내 미러 점검은 Phase 8 종료 후 별도 phase. 단, 진행 중에도 runtime fetch·CDN URL·telemetry zero / self-host / `package-lock.json` commit 강제(폐쇄망 재현 가능성 보존).
 
-| Wave | 범위                                                                                                                                                   | PR 수 | 상태       |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | ---------- |
-| 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint(max-lines), CI 매트릭스, PR template, 폰트 self-host 점검 | 1     | 대기       |
-| 1    | **기준 화면** — VOC 리스트 + 검토 드로어 (vertical slice 1 PR) + `phase-8-pattern.md` 머지 (Wave 2 진입 게이트)                                        | 1     | Wave 0 후  |
-| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                                                                  | 3     | Wave 1 후  |
-| 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users) — 계약 1 + FE/BE 묶음 4                                                                   | 5     | 병렬 가능  |
-| 4    | 공지/FAQ + Notice popup                                                                                                                                | 3     | 병렬 가능  |
-| 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 — N-03 BE polling 필수                                                                                              | 3     | close gate |
+| Wave | 범위                                                                                                                                                   | PR 수 | 상태                                                                                    |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | --------------------------------------------------------------------------------------- |
+| 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint(max-lines), CI 매트릭스, PR template, 폰트 self-host 점검 | 1     | ✅ PR #102                                                                              |
+| 1    | **기준 화면** — VOC 리스트 + 검토 드로어 (vertical slice) + 회고 `phase-8-pattern.md` + RTL F-T4/F-T5 보강                                             | 4     | ✅ #110/#111/#112/#113 — closure report 사용자 검토 + follow-up A/C 마감 후 Wave 2 진입 |
+| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                                                                  | 3     | Wave 1 게이트 통과 후                                                                   |
+| 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users) — 계약 1 + FE/BE 묶음 4                                                                   | 5     | 병렬 가능                                                                               |
+| 4    | 공지/FAQ + Notice popup                                                                                                                                | 3     | 병렬 가능                                                                               |
+| 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 — N-03 BE polling 필수                                                                                              | 3     | close gate                                                                              |
 
 **Phase 8 close 조건** (계획서 §2 Wave 5 close 참조):
 
