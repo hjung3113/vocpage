@@ -1,11 +1,12 @@
 import type { RequestHandler } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodError } from 'zod';
+import type { ZodType } from 'zod';
 import { errorEnvelope } from './errorEnvelope';
 
-export function validate<T>(opts: {
-  body?: ZodSchema<T>;
-  query?: ZodSchema<T>;
-  params?: ZodSchema<T>;
+export function validate<TBody = unknown, TQuery = unknown, TParams = unknown>(opts: {
+  body?: ZodType<TBody>;
+  query?: ZodType<TQuery>;
+  params?: ZodType<TParams>;
 }): RequestHandler {
   return (req, res, next) => {
     try {

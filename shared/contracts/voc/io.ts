@@ -16,7 +16,9 @@ import {
   VocDropReason,
 } from './entity';
 
-const Uuid = z.string().uuid();
+// Loose UUID — DB-level `uuid` columns accept any 8-4-4-4-12 hex pattern;
+// strict v4 enforcement breaks legacy fixtures (e.g. permission.test.ts).
+const Uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 export const VocSortColumn = z.enum([
   'created_at',
@@ -32,10 +34,13 @@ export const SortDir = z.enum(['asc', 'desc']);
 export type SortDir = z.infer<typeof SortDir>;
 
 /** URL filter shape — primitive-only so it round-trips through URLSearchParams. */
+const arrayOrSingle = <T extends z.ZodTypeAny>(item: T) =>
+  z.preprocess((v) => (Array.isArray(v) ? v : v == null ? undefined : [v]), z.array(item));
+
 export const VocFilter = z.object({
-  status: z.array(VocStatus).optional(),
+  status: arrayOrSingle(VocStatus).optional(),
   system_id: Uuid.optional(),
-  voc_type_id: z.array(Uuid).optional(),
+  voc_type_id: arrayOrSingle(Uuid).optional(),
   assignee_id: Uuid.optional(),
   q: z.string().trim().max(120).optional(),
 });

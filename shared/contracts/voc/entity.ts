@@ -50,8 +50,8 @@ export const Voc = z.object({
   structured_payload: z.record(z.string(), z.unknown()).nullable().optional(),
   resolution_quality: VocResolutionQuality.nullable().optional(),
   drop_reason: VocDropReason.nullable().optional(),
-  due_date: Iso.nullable().optional(),
-  deleted_at: Iso.nullable().optional(),
+  due_date: Iso.nullable(),
+  deleted_at: Iso.nullable(),
   created_at: Iso,
   updated_at: Iso,
 });

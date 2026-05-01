@@ -1,6 +1,8 @@
 import express from 'express';
 import session from 'express-session';
 import { authRouter } from '../../routes/auth';
+import { vocRouter } from '../../routes/voc';
+import { errorHandler } from '../../middleware/errorHandler';
 import { setPool } from '../../db';
 import type { Pool } from 'pg';
 
@@ -31,6 +33,9 @@ export function createTestApp(pool?: Pool, authMode = 'mock') {
   });
 
   app.use('/api/auth', authRouter);
+  app.use('/api/vocs', vocRouter);
+
+  app.use(errorHandler);
 
   return app;
 }
