@@ -2,7 +2,7 @@
 
 > 작성: 2026-05-01
 > 선행: Phase 7 close (PR #93/#94/#95) — 프로토타입·spec 완성
-> 전제: 폐쇄망 환경. 모든 OSS는 build-time 번들/벤더링만 허용 (runtime fetch / telemetry 금지)
+> 전제 (2026-05-01 갱신): **개방망 표준 npm registry**로 진행 (사내 폐쇄망 검증 환경 미확보). 단 산출물은 폐쇄망 호환 — runtime fetch / telemetry / CDN URL zero, 폰트·아이콘·MSW worker self-host, `package-lock.json` 항상 commit. 폐쇄망 사후 재현 절차는 §7.2 (4경로 우선순위).
 > 산출 단위: **계약 PR 1개 → FE/BE 병렬 PR (스크린 또는 스크린 그룹 단위)**
 
 ---
