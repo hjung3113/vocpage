@@ -19,4 +19,10 @@ export const MOCK_USERS: AuthUser[] = [
     name: 'Mock User',
     role: 'user',
   },
+  {
+    id: '00000000-0000-0000-0000-000000000004',
+    email: 'dev@company.com',
+    name: 'Mock Dev',
+    role: 'dev',
+  },
 ];

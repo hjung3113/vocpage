@@ -50,6 +50,7 @@ export default function MockLoginPage() {
         >
           <option value="admin">Admin</option>
           <option value="manager">Manager</option>
+          <option value="dev">Dev</option>
           <option value="user">User</option>
         </select>
 

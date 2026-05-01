@@ -60,7 +60,7 @@ paths:
               properties:
                 role:
                   type: string
-                  enum: [admin, manager, user]
+                  enum: [admin, manager, dev, user]
       responses:
         '200':
           description: Logged in
@@ -1916,7 +1916,7 @@ components:
 
     UserRole:
       type: string
-      enum: [user, manager, admin]
+      enum: [user, manager, admin, dev]
 
     AuthUser:
       type: object
@@ -1969,7 +1969,7 @@ components:
 
     Voc:
       type: object
-      required: [id, issue_code, sequence_no, title, status, priority, source, created_at, updated_at]
+      required: [id, issue_code, sequence_no, title, status, priority, voc_type_id, system_id, menu_id, source, created_at, updated_at]
       properties:
         id:
           type: string
@@ -1993,7 +1993,6 @@ components:
         system_id:
           type: string
           format: uuid
-          nullable: true
         menu_id:
           type: string
           format: uuid
@@ -2042,7 +2041,7 @@ components:
 
     VocInput:
       type: object
-      required: [title, status, priority]
+      required: [title, status, priority, voc_type_id, system_id, menu_id]
       properties:
         title:
           type: string

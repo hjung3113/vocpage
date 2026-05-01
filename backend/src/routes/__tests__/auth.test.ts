@@ -36,6 +36,19 @@ describe('POST /api/auth/mock-login', () => {
     });
   });
 
+  test('returns 200 with dev user when role=dev', async () => {
+    const app = makeApp();
+    const res = await request(app).post('/api/auth/mock-login').send({ role: 'dev' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.user).toMatchObject({
+      id: '00000000-0000-0000-0000-000000000004',
+      email: 'dev@company.com',
+      name: 'Mock Dev',
+      role: 'dev',
+    });
+  });
+
   test('returns 400 when role is invalid', async () => {
     const app = makeApp();
     const res = await request(app).post('/api/auth/mock-login').send({ role: 'superuser' });

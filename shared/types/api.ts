@@ -1010,7 +1010,7 @@ export interface components {
       };
     };
     /** @enum {string} */
-    UserRole: 'user' | 'manager' | 'admin';
+    UserRole: 'user' | 'manager' | 'admin' | 'dev';
     AuthUser: {
       /** Format: uuid */
       id: string;
@@ -1048,7 +1048,7 @@ export interface components {
       /** Format: uuid */
       voc_type_id: string;
       /** Format: uuid */
-      system_id?: string | null;
+      system_id: string;
       /** Format: uuid */
       menu_id: string;
       /** Format: uuid */
@@ -1081,11 +1081,11 @@ export interface components {
       status: components['schemas']['VocStatus'];
       priority: components['schemas']['VocPriority'];
       /** Format: uuid */
-      voc_type_id?: string;
+      voc_type_id: string;
       /** Format: uuid */
-      system_id?: string;
+      system_id: string;
       /** Format: uuid */
-      menu_id?: string;
+      menu_id: string;
       /** Format: uuid */
       assignee_id?: string;
       /** Format: uuid */
@@ -1449,7 +1449,7 @@ export interface operations {
       content: {
         'application/json': {
           /** @enum {string} */
-          role: 'admin' | 'manager' | 'user';
+          role: 'admin' | 'manager' | 'dev' | 'user';
         };
       };
     };

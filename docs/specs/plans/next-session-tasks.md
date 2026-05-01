@@ -87,38 +87,38 @@
 
 ### Cross-review 결정 (Q1~Q5, ✅ 2026-04-27 확정)
 
-| #   | 결정 항목                                                                            | 결정                                                                      |
-| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| Q1  | dashboard.md `7d/30d/90d` ↔ req §4 `1m/3m/1y/all/custom` ↔ migration 011 충돌        | **마이그·req 정본 → dashboard.md 수정** (R-5 적용 완료)                   |
-| Q2  | requirements.md §15 본문에 D22/D23 진입점 서브섹션 vs 포인터만 유지                  | **포인터 한 줄** — feature-voc.md §9.4.6/9.4.7 단일 출처 (R-7 적용)       |
-| Q3  | dashboard 위젯 수용 기준 23개 → §13.1.1 Given/When/Then 일괄 변환 vs 체크리스트 허용 | **일괄 변환** — 향후 R-8에서 처리                                         |
-| Q4  | §13.4 "VOC 1,000건" vs dashboard.md:661 "10만 건"                                    | **10만 건 통일** — production-scale 기준, R-9 적용 시점 dashboard.md 정본 |
-| Q5  | external-masters atomic swap: 전체 트랜잭션 vs source별 독립                         | **source별 독립** — 운영 인시던트 격리 우선, 8-M3 spec 반영               |
+| #   | 결정 항목                                                                            | 결정                                                                                                                  |
+| --- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Q1  | dashboard.md `7d/30d/90d` ↔ req §4 `1m/3m/1y/all/custom` ↔ migration 011 충돌        | **마이그·req 정본 → dashboard.md 수정** (R-5 적용 완료)                                                               |
+| Q2  | requirements.md §15 본문에 D22/D23 진입점 서브섹션 vs 포인터만 유지                  | **포인터 한 줄** — feature-voc.md §9.4.6/9.4.7 단일 출처 (R-7 적용)                                                   |
+| Q3  | dashboard 위젯 수용 기준 23개 → §13.1.1 Given/When/Then 일괄 변환 vs 체크리스트 허용 | **일괄 변환** — 향후 R-8에서 처리                                                                                     |
+| Q4  | §13.4 "VOC 1,000건" vs dashboard.md:661 "10만 건"                                    | **3,000건 통일** (2026-05-01 갱신) — 연 1,000건 × 3년 보관 가정. requirements.md §13.4 + dashboard.md §성능 동시 갱신 |
+| Q5  | external-masters atomic swap: 전체 트랜잭션 vs source별 독립                         | **source별 독립** — 운영 인시던트 격리 우선, 8-M3 spec 반영                                                           |
 
 ### Phase F 후속 — 구현 phase 진입 시 이행 (BE/FE 코드)
 
-| ID  | 항목                                                                                                |
-| --- | --------------------------------------------------------------------------------------------------- |
-| F1  | `backend/migrations/012_add_dev_role.sql` 실파일 생성 (draft 기반)                                  |
-| F2  | `backend/seeds/mock-users.sql`에 dev fixture 1건 추가                                               |
-| F3  | BE `assertCanManageVoc(user, voc, action)` 헬퍼 단일화 + 모든 VOC 운영 라우트 적용                  |
-| F4  | FE/BE `Role` union 타입에 `'dev'` 추가, `mockUsers.ts` fixture 추가                                 |
-| F5  | `POST /api/auth/mock-login` body validator enum 확장                                                |
-| F6  | FE role guard hook 분기 갱신 (`useRequireRole`, dashboard 가드, internal note 가드, role-pill)      |
-| F7  | Notice/FAQ 페이지에 `?mode=admin` 쿼리 토글 + admin-only 컴포넌트 dynamic import                    |
-| F8  | Admin 페이지에서 공지/FAQ 서브탭 제거 (코드/네비/라우트 정리)                                       |
-| F9  | uidesign.md §13 컴포넌트들을 React로 구현 (역할별: AdminTopbar, RolePill 4종, NoticeBadge 3종 등)   |
-| F10 | prototype.html `#fff` 2건 + 본문 `light-dark(oklch())` 사용처 토큰화 (또는 React 이관 시 자동 해소) |
-| F11 | uidesign.md §5 Status Badge 토큰 그룹 정식화 (R-11에서 자동 해소됨, ✅)                             |
-| F12 | BE 회귀 테스트 5건 추가 (feature-voc.md §8.4-bis 명시)                                              |
+| ID  | 항목                                                                                                                  |
+| --- | --------------------------------------------------------------------------------------------------------------------- |
+| F1  | `backend/migrations/013_add_dev_role.sql` 실파일 생성 (draft 기반 — 012는 voc_origin_metadata가 선점, 013으로 시프트) |
+| F2  | `backend/seeds/mock-users.sql`에 dev fixture 1건 추가                                                                 |
+| F3  | BE `assertCanManageVoc(user, voc, action)` 헬퍼 단일화 + 모든 VOC 운영 라우트 적용                                    |
+| F4  | FE/BE `Role` union 타입에 `'dev'` 추가, `mockUsers.ts` fixture 추가                                                   |
+| F5  | `POST /api/auth/mock-login` body validator enum 확장                                                                  |
+| F6  | FE role guard hook 분기 갱신 (`useRequireRole`, dashboard 가드, internal note 가드, role-pill)                        |
+| F7  | Notice/FAQ 페이지에 `?mode=admin` 쿼리 토글 + admin-only 컴포넌트 dynamic import                                      |
+| F8  | Admin 페이지에서 공지/FAQ 서브탭 제거 (코드/네비/라우트 정리)                                                         |
+| F9  | uidesign.md §13 컴포넌트들을 React로 구현 (역할별: AdminTopbar, RolePill 4종, NoticeBadge 3종 등)                     |
+| F10 | prototype.html `#fff` 2건 + 본문 `light-dark(oklch())` 사용처 토큰화 (또는 React 이관 시 자동 해소)                   |
+| F11 | uidesign.md §5 Status Badge 토큰 그룹 정식화 (R-11에서 자동 해소됨, ✅)                                               |
+| F12 | BE 회귀 테스트 5건 추가 (feature-voc.md §8.4-bis 명시)                                                                |
 
 ### 권한·스키마 인프라 우선 PR 후보
 
-| ID    | 항목                                                                                                                |
-| ----- | ------------------------------------------------------------------------------------------------------------------- |
-| 8-PR1 | **권한 인프라 PR** = migration 012 실파일(F1) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 헬퍼 단일화(F3) |
-| 8-PR2 | migration 013 = `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` (D22 운영 차단 해소)      |
-| 8-PR3 | migration 014 = `vocs.deleted_by`, `voc_restore_log` (D23 운영 차단 해소)                                           |
+| ID    | 항목                                                                                                                                                |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 8-PR1 | **권한 인프라 PR** = migration 013 실파일(F1, 012는 voc_origin_metadata 선점) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 헬퍼 단일화(F3) |
+| 8-PR2 | migration 014 = `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` (D22 운영 차단 해소)                                      |
+| 8-PR3 | migration 015 = `vocs.deleted_by`, `voc_restore_log` (D23 운영 차단 해소)                                                                           |
 
 ### 명세 보강 (M)
 

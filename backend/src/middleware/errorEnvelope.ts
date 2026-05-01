@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import logger from '../logger';
+import { HttpError } from './httpError';
+
+export { HttpError } from './httpError';
 
 export interface ErrorEnvelope {
   error: {
@@ -13,18 +16,6 @@ export interface ErrorEnvelope {
 
 export function errorEnvelope(code: string, message: string, details?: unknown): ErrorEnvelope {
   return { error: { code, message, ...(details !== undefined ? { details } : {}) } };
-}
-
-export class HttpError extends Error {
-  constructor(
-    public status: number,
-    public code: string,
-    message: string,
-    public details?: unknown,
-  ) {
-    super(message);
-    this.name = 'HttpError';
-  }
 }
 
 export function errorEnvelopeMiddleware(
