@@ -115,13 +115,14 @@ describe('U2 guard — zod ↔ openapi voc 정합 (Wave 1)', () => {
     }
   });
 
-  test('VocListItem.required 매트릭스 (zod 비-옵셔널 키 ⊇ openapi.required)', () => {
+  test('VocListItem.required 매트릭스 (zod 비-옵셔널 키 === openapi.required, 양방향 equality)', () => {
     const yamlListItem = schemas.VocListItem!;
     expect(yamlListItem).toBeDefined();
     const zodKeys = zodRequiredKeys(VocSchemas.VocListItem as unknown as AnyZodObject);
-    for (const k of yamlListItem.required ?? []) {
-      expect(zodKeys.has(k)).toBe(true);
-    }
+    const yamlRequired = new Set(yamlListItem.required ?? []);
+    // Codex round-3 finding: nullable=true 여도 키는 required 여야 한다
+    // (zod pick 결과 기본 비-옵셔널 → openapi 도 동일 집합이어야 drift 없음).
+    expect([...zodKeys].sort()).toEqual([...yamlRequired].sort());
   });
 
   test('VocListItem 키 셋 정합 (yaml properties === zod shape keys)', () => {

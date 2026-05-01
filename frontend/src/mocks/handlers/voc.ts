@@ -49,12 +49,83 @@ function currentRole(req: Request): { role: 'admin' | 'manager' | 'dev' | 'user'
 export const vocHandlers = [
   http.get('/api/vocs', ({ request }) => {
     const url = new URL(request.url);
-    const status = url.searchParams.getAll('status');
-    const per_page = Number(url.searchParams.get('per_page') ?? 20);
-    const page = Number(url.searchParams.get('page') ?? 1);
+    const sp = url.searchParams;
+    const status = sp.getAll('status');
+    const voc_type_ids = sp.getAll('voc_type_ids');
+    const assignees = sp.getAll('assignees');
+    const priorities = sp.getAll('priorities');
+    const tag_ids = sp.getAll('tag_ids');
+    const q = sp.get('q')?.trim().toLowerCase() ?? '';
+    const sort_by = (sp.get('sort_by') ?? 'created_at') as
+      | 'created_at'
+      | 'updated_at'
+      | 'priority'
+      | 'status'
+      | 'due_date'
+      | 'issue_code';
+    const sort_dir = (sp.get('sort_dir') ?? 'desc') as 'asc' | 'desc';
+    const per_page = Number(sp.get('per_page') ?? 20);
+    const page = Number(sp.get('page') ?? 1);
     if (per_page > 100) return envelope('VALIDATION_ERROR', 'per_page must be ≤ 100');
+
     let rows = store.filter((r) => r.deleted_at === null);
     if (status.length) rows = rows.filter((r) => status.includes(r.status));
+    if (voc_type_ids.length) rows = rows.filter((r) => voc_type_ids.includes(r.voc_type_id));
+    if (assignees.length)
+      rows = rows.filter((r) => r.assignee_id !== null && assignees.includes(r.assignee_id));
+    if (priorities.length) rows = rows.filter((r) => priorities.includes(r.priority));
+    // tag_ids: fixture 에 voc_tags relation 미존재 → no-op (BE join 위치 표식만 유지).
+    if (tag_ids.length) {
+      // intentionally empty: parity hook for future fixture extension.
+    }
+    if (q) {
+      rows = rows.filter(
+        (r) => r.title.toLowerCase().includes(q) || r.issue_code.toLowerCase().includes(q),
+      );
+    }
+
+    const PRIORITY_RANK: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
+    const STATUS_RANK: Record<string, number> = {
+      접수: 0,
+      검토중: 1,
+      처리중: 2,
+      완료: 3,
+      드랍: 4,
+    };
+    const dir = sort_dir === 'asc' ? 1 : -1;
+    rows = [...rows].sort((a, b) => {
+      let av: string | number;
+      let bv: string | number;
+      switch (sort_by) {
+        case 'priority':
+          av = PRIORITY_RANK[a.priority] ?? 99;
+          bv = PRIORITY_RANK[b.priority] ?? 99;
+          break;
+        case 'status':
+          av = STATUS_RANK[a.status] ?? 99;
+          bv = STATUS_RANK[b.status] ?? 99;
+          break;
+        case 'due_date':
+          av = a.due_date ?? '';
+          bv = b.due_date ?? '';
+          break;
+        case 'issue_code':
+          av = a.issue_code;
+          bv = b.issue_code;
+          break;
+        case 'updated_at':
+          av = a.updated_at;
+          bv = b.updated_at;
+          break;
+        default:
+          av = a.created_at;
+          bv = b.created_at;
+      }
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+
     const total = rows.length;
     const start = (page - 1) * per_page;
     const slice = rows.slice(start, start + per_page).map((r) => ({

@@ -1333,14 +1333,14 @@ export interface components {
       /** Format: uuid */
       menu_id: string;
       /** Format: uuid */
-      assignee_id?: string | null;
+      assignee_id: string | null;
       /** Format: uuid */
-      author_id?: string;
+      author_id: string;
       /** Format: uuid */
-      parent_id?: string | null;
+      parent_id: string | null;
       source: components['schemas']['VocSource'];
       /** Format: date-time */
-      due_date?: string | null;
+      due_date: string | null;
       /** Format: date-time */
       created_at: string;
       /** Format: date-time */
