@@ -28,7 +28,7 @@
 
 **Wave 2 모든 PR 머지 완료** ✅ 2026-05-01 — PR #79 docs Wave 2 / #80 B-4a R2 / #81 B-4b / #82 B-13 / #83 B-15 / #84 B-16 / #85 B-17 / #86 B-9 verification (8건 머지). b-13/b-15/b-17은 prototype.html `<head>` CSS 링크 + `<script>` 섹션에서 main 재머지 후 충돌 해결.
 
-**Wave 3 plan 작성** ✅ 2026-05-01 — 브랜치 `docs/prototype-phase7-wave3-plan` commit 490921d. `docs/specs/plans/prototype-phase7-wave3-plan.md`. B- 기준 = Critical 4 + Major 1 + FE-mock Minor 4 + 보강 2. 3 sub-wave: W3-A VOC 본체 / W3-B Admin 공통 / W3-C Dashboard 잔여. R-4 (tsx watch) Wave 3 종료 후 단독 PR. 의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰.
+**Wave 3 plan 작성** ✅ 2026-05-01 — 브랜치 `docs/prototype-phase7-wave3-plan` commit 490921d. `docs/specs/plans/done/prototype-phase7-wave3-plan.md`. B- 기준 = Critical 4 + Major 1 + FE-mock Minor 4 + 보강 2. 3 sub-wave: W3-A VOC 본체 / W3-B Admin 공통 / W3-C Dashboard 잔여. R-4 (tsx watch) Wave 3 종료 후 단독 PR. 의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰.
 
 ---
 
