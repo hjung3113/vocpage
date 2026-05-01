@@ -2,7 +2,15 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 0 시작** — Foundation PR 작성 (`feat/phase-8-foundation`)
+→ **Phase 8 Wave 0 구현 완료** — Foundation 6 commits on `feat/phase-8-foundation`, codex adversarial-review 2 라운드 통과 (APPROVE), PR 오픈 대기
+
+**Wave 0 산출 요약 (15 항목)**: 0-0 mirror-check.md / 0-1 shared/ tsconfig+ESLint+contracts / 0-2 shadcn 8 + token codemod / 0-3 TanStack Query + queryKeys / 0-4 MSW /health / 0-5 api/client + ErrorBoundary / 0-6 AppShell+Sidebar+TopBar+router / 0-7 RoleContext + useRole / 0-8 Toast+EmptyState/ErrorState/LoadingState / 0-9 BE zod + validate + errorEnvelope / 0-10 .github/ ci.yml + PR template + oss-vendoring.md / 0-11 ESLint max-lines / 0-12 no-raw-color 스캐너 / 0-13 폰트 self-host 점검 / 0-14 fixture-seed parity script
+
+**검증 (모두 PASS)**: FE typecheck/lint/build + BE typecheck/tests (19/19) + parity script (graceful skip)
+
+**머지 전 외부 액션**: 폰트 바이너리 (`Pretendard-Variable.woff2` + `D2Coding.woff2`) 사용자가 `frontend/public/fonts/` 에 직접 커밋 — 외부 GitHub release 다운로드 (closed-net 방침 검토 후). CI 의 `font-self-host` job 은 `continue-on-error: true` 로 임시 통과.
+
+**Wave 1 진입 전제**: BE dev role 정합 (auth/types.ts, MOCK_USERS, routes/auth.ts, requireRole.ts, FE auth.ts) — `next-session-tasks.md` "Phase F 후속" F1~F6 (8-PR1 권한 인프라 PR) 우선 머지 필수.
 
 **운영 전제 (2026-05-01 갱신)**: Wave 0~5는 **개방망 표준 npm registry**로 진행 (사내 폐쇄망 검증 환경 미확보). 폐쇄망 빌드는 동일 lockfile + `phase-8.md` §7.2 우회 4경로(미러 / 오프라인 캐시 / Verdaccio / git tarball·`npm pack`)로 사후 재현. 사내 미러 점검은 Phase 8 종료 후 별도 phase.
 
