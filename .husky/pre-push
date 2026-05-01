@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+# CI 사전 검증 — push 전 lint + test 강제 (CI 실패 알림 방지).
+# 빠른 우회 필요 시: HUSKY=0 git push (사용 자제)
+echo "[pre-push] frontend lint + lint:tokens"
+npm run -w frontend lint
+echo "[pre-push] backend lint (if defined)"
+npm run -w backend lint --if-present || true
+echo "[pre-push] frontend test (--run)"
+npm test -w frontend -- --run
+echo "[pre-push] backend test"
+npm test -w backend
+echo "[pre-push] all checks passed"

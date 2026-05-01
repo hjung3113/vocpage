@@ -1,5 +1,5 @@
 /**
- * MSW handler regression — PR #121 codex re-review Finding 2.
+ * MSW handler regression — PR-121 codex re-review Finding 2.
  *
  * Backend `inferActions` (services/voc.ts) classifies any patch containing
  * `assignee_id` as `reassign`, which is manager/admin-only. The MSW PATCH

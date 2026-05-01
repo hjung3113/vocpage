@@ -1,5 +1,5 @@
 /**
- * MSW handler regression — PR #121 codex round-3 Finding 2.
+ * MSW handler regression — PR-121 codex round-3 Finding 2.
  *
  * Backend `/api/vocs` supports q/voc_type_ids/assignees/priorities/tag_ids/
  * sort_by/sort_dir. MSW must mirror these so dev/demo (`VITE_USE_MSW=true`)
