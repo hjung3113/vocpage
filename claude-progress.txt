@@ -2,20 +2,23 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 재계획** — Phase 7 종료, 다음 Phase 정의 필요
+→ **Phase 8 Wave 0 시작** — Foundation PR 작성 (`feat/phase-8-foundation`)
 
-전체 Phase 계획: **`docs/specs/plans/next-session-tasks.md`**
-NextGen 백로그: **`docs/specs/plans/nextgen-backlog.md`**
+**Wave 0 첫 commit 강제**: 사내 npm 미러 사전 점검 (`npm config get registry` + `npm install zod --dry-run`). 미러 부재 시 §7 raw 벤더링 경로로 사용자 승인 후 진행.
+
+계획서 정본: **`docs/specs/plans/phase-8.md`** (PR #99, consensus 통과)
+전체 Phase 계획: **`docs/specs/plans/next-session-tasks.md`** (Phase 8 Wave 0~5 표)
+NextGen 백로그: **`docs/specs/plans/nextgen-backlog.md`** (§5 Phase 8 분리 항목 4건)
 누적 이력: **`docs/specs/plans/progress-archive.md`**
 
 ---
 
 ## 현재 위치 (2026-05-01 기준)
 
-- Phase 0~6 ✅ → Phase 7 Wave 1·2·3 ✅ → **Phase 7 close**
-- Wave 3 PR #93 #94 #95 머지 완료 (2026-05-01)
-- R-4 (tsx watch) 이미 완료 — backend `dev` 스크립트 `tsx watch` (commit 809e267)
-- 갭 재스캔 결론: Critical 0 / Major 0 / Minor 0 (N-03 알림 폴링은 OOS — BE/timer 의존)
+- Phase 0~6 ✅ → Phase 7 ✅ → **Phase 8 계획 확정** (PR #99 머지)
+- Phase 8 채택안: A′ Contract-first per-screen, 6 Wave (Wave 1만 vertical slice)
+- 스택 결정: shadcn/ui + TanStack Query/Table + RHF/Zod + MSW + Recharts (폐쇄망 self-host)
+- Architect 4 조건 + Critic 1 Critical + 5 Major 모두 반영 → APPROVED
 
 ## Phase 7 Wave 3 산출물
 
@@ -33,6 +36,7 @@ NextGen 백로그: **`docs/specs/plans/nextgen-backlog.md`**
 
 ## 가장 최근 산출물
 
+- 2026-05-01 — **Phase 8 계획 확정** (PR #99) — A′ Contract-first per-screen, 6 Wave + ADR §10
 - 2026-05-01 — **Phase 7 close** (Wave 3 W3-A/B/C 머지 #93/#94/#95 + 재스캔 0 잔여)
 - 2026-05-01 — Wave 2 전건 머지 + Wave 3 plan PR
 - 2026-05-01 — B-9 Playwright MCP 통합 검증 (S1~S6, 6/6 PASS, 콘솔 에러 0)
