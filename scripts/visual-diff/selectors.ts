@@ -21,51 +21,51 @@ export interface SelectorEntry {
   componentId: ComponentId;
   proto: string;
   react: string;
-  /** True when we're using the data-pcomp marker (Stage 2+); false = structural fallback */
-  hasPcompMarker: boolean;
+  /** True when the component requires programmatic open (modal/dropdown/drawer) before extraction */
+  isOverlay: boolean;
 }
 
 /**
  * Mapping table: componentId → prototype selector + React selector.
  * Stage 1: all entries use structural fallback selectors.
- * Stage 2: hasPcompMarker becomes true and selectors become [data-pcomp="<id>"].
+ * Stage 2: isOverlay becomes true and selectors become [data-pcomp="<id>"].
  */
 export const SELECTOR_MAP: readonly SelectorEntry[] = [
   {
     componentId: 'voc-topbar',
     proto: '#page-voc > .topbar',
     react: '[data-pcomp="voc-topbar"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'voc-status-filters',
     proto: '#page-voc > .filterbar',
     react: '[data-pcomp="voc-status-filters"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'voc-advanced-filters',
     proto: '#advFilterWrap',
     react: '[data-pcomp="voc-advanced-filters"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'voc-sort-chips',
     proto: '.list-toolbar',
     react: '[data-pcomp="voc-sort-chips"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'voc-table',
     proto: '.list-area',
     react: '[data-pcomp="voc-table"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'voc-pagination',
     proto: '#paginationRow',
     react: '[data-pcomp="voc-pagination"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'voc-create-modal',
@@ -73,39 +73,39 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
     proto: '#modalBg',
     react: '[data-pcomp="voc-create-modal"]',
     // Stage 1: structural selector is the contract; Stage 2 adds data-pcomp
-    hasPcompMarker: true,
+    isOverlay: true,
   },
   {
     componentId: 'voc-notif-dropdown',
     // toggleNotif() shows #notifPanel; use it as the structural root
     proto: '#notifPanel',
     react: '[data-pcomp="voc-notif-dropdown"]',
-    hasPcompMarker: true,
+    isOverlay: true,
   },
   {
     componentId: 'voc-review-drawer',
     // openDrawer() shows #drawer; use it as the structural root
     proto: '#drawer',
     react: '[data-pcomp="voc-review-drawer"]',
-    hasPcompMarker: true,
+    isOverlay: true,
   },
   {
     componentId: 'notification-bell',
     proto: '#notifBtn',
     react: '[data-pcomp="notification-bell"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'pagination',
     proto: '#paginationRow .pagination',
     react: '[data-pcomp="pagination"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
   {
     componentId: 'data-table',
     proto: '.list-header',
     react: '[data-pcomp="data-table"]',
-    hasPcompMarker: false,
+    isOverlay: false,
   },
 ] as const;
 
@@ -121,7 +121,7 @@ export function getSelectorChain(componentId: ComponentId, side: 'proto' | 'reac
   return side === 'proto' ? entry.proto : entry.react;
 }
 
-/** Returns all entries that use structural fallback (i.e. not yet Stage 2 marked). */
-export function getFallbackComponents(): ComponentId[] {
-  return SELECTOR_MAP.filter((e) => !e.hasPcompMarker).map((e) => e.componentId);
+/** Returns all non-overlay component ids (i.e. those that do not require programmatic open). */
+export function getFallbackBannerComponents(): ComponentId[] {
+  return SELECTOR_MAP.filter((e) => !e.isOverlay).map((e) => e.componentId);
 }

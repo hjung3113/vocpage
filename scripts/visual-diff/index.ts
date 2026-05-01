@@ -13,7 +13,7 @@ import { extractFromPage, isMissing, WHITELIST } from './extract.js';
 import { diff } from './diff.js';
 import { renderReport } from './report.js';
 import { loadTokens, findNearestTokens } from './tokens.js';
-import { SELECTOR_MAP, getFallbackComponents } from './selectors.js';
+import { SELECTOR_MAP, getFallbackBannerComponents } from './selectors.js';
 import type { ComponentId } from './selectors.js';
 import type { ReportMeta, NotMeasurableEntry } from './report.js';
 
@@ -85,7 +85,7 @@ export async function main(argv: string[]): Promise<void> {
 
   // Compute fallback list from the FULL selector map (not filtered target list)
   // so the banner always reflects all 9 structural-fallback components when no --component= filter.
-  const allFallbackComponents = getFallbackComponents();
+  const allFallbackComponents = getFallbackBannerComponents();
   const selectorFallbacks = allFallbackComponents.filter((id) =>
     targetComponents.includes(id as ComponentId),
   );
