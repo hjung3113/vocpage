@@ -154,3 +154,56 @@ function onSearch(val) {
   currentPage = 1;
   renderVOCList();
 }
+
+// ── N-06 Sort chips ───────────────────────────────────────────────────────────
+function sortByChip(key) {
+  if (sortKey === key) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey = key;
+    sortDir = 'desc';
+  }
+  currentPage = 1;
+  updateSortChips();
+  // Sync existing list-header hcells too
+  document.querySelectorAll('.hcell').forEach((h) => {
+    const isActive = h.dataset.sortKey === key;
+    h.classList.toggle('sort-active', isActive);
+    const icon = h.querySelector('.sort-icon');
+    if (icon) {
+      icon.setAttribute(
+        'data-lucide',
+        isActive ? (sortDir === 'asc' ? 'chevron-up' : 'chevron-down') : 'chevrons-up-down',
+      );
+    }
+  });
+  lucide.createIcons();
+  // URL sync: ?sort=key&order=dir
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', key);
+  url.searchParams.set('order', sortDir);
+  history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString());
+  renderVOCList();
+}
+
+function updateSortChips() {
+  document.querySelectorAll('.sort-chip').forEach((chip) => {
+    const key = chip.dataset.sortKey;
+    const isActive = key === sortKey;
+    chip.classList.toggle('sort-chip--active', isActive);
+    // Remove any existing direction indicator
+    const existingIcon = chip.querySelector('.sort-chip-icon');
+    if (existingIcon) existingIcon.remove();
+    if (isActive) {
+      const icon = document.createElement('span');
+      icon.className = 'sort-chip-icon';
+      icon.textContent = sortDir === 'asc' ? ' ▲' : ' ▼';
+      chip.appendChild(icon);
+    }
+  });
+}
+
+// Init sort chips state on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateSortChips();
+});

@@ -163,6 +163,18 @@
 
   <!-- List -->
   <div class="list-area">
+    <!-- N-06: Sort chips toolbar -->
+    <div class="list-toolbar">
+      <span class="sort-label">정렬</span>
+      <div class="sort-chips" id="sortChips">
+        <button class="sort-chip" data-sort-key="date" onclick="sortByChip('date')">등록일</button>
+        <button class="sort-chip" data-sort-key="id" onclick="sortByChip('id')">이슈 ID</button>
+        <button class="sort-chip" data-sort-key="title" onclick="sortByChip('title')">제목</button>
+        <button class="sort-chip" data-sort-key="status" onclick="sortByChip('status')">상태</button>
+        <button class="sort-chip" data-sort-key="priority" onclick="sortByChip('priority')">우선순위</button>
+        <button class="sort-chip" data-sort-key="assignee" onclick="sortByChip('assignee')">담당자</button>
+      </div>
+    </div>
     <div class="list-header">
       <div></div>
       <div class="hcell" data-sort-key="id" onclick="toggleSort('id')">이슈 ID <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>

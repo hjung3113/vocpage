@@ -27,6 +27,13 @@ function toggleSort(key) {
     }
   });
   lucide.createIcons();
+  // N-06: keep chips in sync when header cells are clicked
+  if (typeof updateSortChips === 'function') updateSortChips();
+  // URL sync
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', key);
+  url.searchParams.set('order', sortDir);
+  history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString());
   currentPage = 1;
   renderVOCList();
 }
