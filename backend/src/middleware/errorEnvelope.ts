@@ -47,7 +47,7 @@ export function errorEnvelopeMiddleware(
     return;
   }
 
-  const message = err instanceof Error ? err.message : 'Internal server error';
-  logger.error({ err }, message);
-  res.status(500).json(errorEnvelope('INTERNAL_ERROR', message));
+  // Unknown 500: log internal details server-side only; never leak err.message to clients.
+  logger.error({ err }, err instanceof Error ? err.message : 'unknown error');
+  res.status(500).json(errorEnvelope('INTERNAL_ERROR', 'Internal server error'));
 }
