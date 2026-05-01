@@ -89,8 +89,22 @@
 
 ---
 
-## 5. 변경 이력
+## 5. Phase 8 분리 항목 (계획서 §10 ADR Follow-ups)
+
+> 출처: `docs/specs/plans/phase-8.md` ADR + Wave 5 close 조건 4번 leger.
+
+| ID        | 항목                                    | 분리 사유                                                                                              | 활성화 시점                      |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| N-03-ETag | 알림 폴링 ETag 304 최적화               | MVP는 단순 GET polling으로 충분 (BE는 Wave 5 필수). ETag 헤더·캐시 매니지먼트는 운영 부하 측정 후 도입 | Phase 8 close 후 운영 1~2주 측정 |
+| VR-1      | 시각 회귀 자동화 (pixel-diff)           | Phase 8 close는 수동 12 화면 yes/no 체크. 자동화는 별도 phase                                          | Phase 9 검토                     |
+| OSS-1     | shadcn 카피본 라이선스 inventory 자동화 | 사내 OSS 정책 license inventory 자동 생성 스크립트. Phase 8 시점은 LICENSE 동봉 honor system           | NextGen                          |
+| CON-1     | contract semver / breaking-change 정책  | `shared/contracts/<domain>.ts` 변경 정책 (메이저 변경 시 dual-write, 마이그레이션 스크립트 등)         | NextGen                          |
+
+---
+
+## 6. 변경 이력
 
 | 일자       | 변경                                                                                         |
 | ---------- | -------------------------------------------------------------------------------------------- |
 | 2026-05-01 | 초기 분리 — `next-session-tasks.md` "미결" 섹션 + 8개 spec/review 파일에서 NextGen 언급 통합 |
+| 2026-05-01 | §5 추가 — Phase 8 ADR 분리 항목 4건 (N-03-ETag / VR-1 / OSS-1 / CON-1)                       |

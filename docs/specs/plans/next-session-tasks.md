@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-01 (**Phase 7 close** — Wave 3 W3-A/B/C 머지 완료, Phase 8 재계획 대기)
-> 현재 위치: **Phase 7 종료** — 다음 = **Phase 8 재계획** (NextGen 백로그 + 운영/배포 phase 후보 입력으로 새 phase 정의)
+> 최종 업데이트: 2026-05-01 (**Phase 8 계획 확정** — PR #99 머지, Wave 0 진입 대기)
+> 현재 위치: **Phase 8 Wave 0 진입 직전** — 계획서 `docs/specs/plans/phase-8.md` (consensus 통과, ADR §10)
 > Wave 3 결과: PR #93 W3-A / #94 W3-B / #95 W3-C 모두 머지 + 갭 재스캔 결론 0 잔여
 > R-4 (tsx watch) 이미 완료 — backend `dev` 스크립트 `tsx watch` (commit 809e267)
 
@@ -54,13 +54,29 @@
 
 ---
 
-## Phase 8 재계획 (대기 — 다음 세션 입력)
+## Phase 8: FE 실구현 (Contract-first per-screen, 6 Wave)
 
-Phase 8 이후 phase는 다음 세션에서 아래 입력을 토대로 재계획한다:
+> **계획서 정본**: `docs/specs/plans/phase-8.md` (PR #99, 2026-05-01 머지)
+> **방식**: A′ Contract-first per-screen — Wave 1만 vertical slice, Wave 2~5 분리 PR
+> **스택**: shadcn/ui + TanStack Query/Table + RHF/Zod + MSW + Recharts (폐쇄망 self-host)
 
-- 본 문서 "이연 갭" 섹션 (Phase F 후속 / 권한·스키마 인프라 / 명세 보강 / 운영·배포 후보)
-- `docs/specs/plans/nextgen-backlog.md`
-- 사용자 우선순위 조율
+| Wave | 범위                                                                                                                                                   | PR 수 | 상태       |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | ---------- |
+| 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint(max-lines), CI 매트릭스, PR template, 폰트 self-host 점검 | 1     | 대기       |
+| 1    | **기준 화면** — VOC 리스트 + 검토 드로어 (vertical slice 1 PR) + `phase-8-pattern.md` 머지 (Wave 2 진입 게이트)                                        | 1     | Wave 0 후  |
+| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                                                                  | 3     | Wave 1 후  |
+| 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users) — 계약 1 + FE/BE 묶음 4                                                                   | 5     | 병렬 가능  |
+| 4    | 공지/FAQ + Notice popup                                                                                                                                | 3     | 병렬 가능  |
+| 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 — N-03 BE polling 필수                                                                                              | 3     | close gate |
+
+**Phase 8 close 조건** (계획서 §2 Wave 5 close 참조):
+
+- 빌드/테스트/lint clean (FE/BE) + fixture-seed parity check
+- Playwright 9 시나리오 PASS
+- 핵심 12 화면 시각 회귀 yes/no 통과 (사용자 결정자)
+- NextGen leger 갱신 (N-03-ETag, 시각 회귀 자동화, shadcn 라이선스 inventory, contract semver)
+
+**Wave 0 첫 commit 강제**: 사내 npm 미러 사전 점검 (`npm config get registry` + `npm install zod --dry-run`). 미러 부재 시 §7 raw 벤더링 절차로 우회 결정 (사용자 승인 필요).
 
 ---
 
