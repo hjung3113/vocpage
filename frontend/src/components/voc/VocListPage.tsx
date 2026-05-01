@@ -24,7 +24,7 @@ export function VocListPage() {
   const statusValue = ctrl.filter.status ?? 'all';
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-sm">
       <VocTopbar
         totalCount={total}
         query={ctrl.filter.q ?? ''}
