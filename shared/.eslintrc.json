@@ -1,0 +1,18 @@
+{
+  "extends": ["../.eslintrc.base.js"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "react*",
+          "express*",
+          "pg",
+          "node:*",
+          "@vocpage/frontend/**",
+          "@vocpage/backend/**"
+        ]
+      }
+    ]
+  }
+}

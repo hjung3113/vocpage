@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+
+jobs:
+  build-fe:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["20.x"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run -w frontend typecheck
+      - run: npm run -w frontend lint
+      - run: npm run -w frontend build
+
+  font-self-host:
+    name: Verify self-hosted fonts present
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Pretendard + D2Coding committed
+        run: |
+          test -f frontend/public/fonts/Pretendard-Variable.woff2 || { echo "::error::Pretendard-Variable.woff2 missing — see docs/specs/plans/phase-8-font-audit.md"; exit 1; }
+          test -f frontend/public/fonts/D2Coding.woff2 || { echo "::error::D2Coding.woff2 missing — see docs/specs/plans/phase-8-font-audit.md"; exit 1; }
+
+  build-be:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["20.x"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run -w backend typecheck
+      - run: npm run -w backend build
+
+  lint-root:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["20.x"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "npm"
+      - run: npm ci
+      - run: npx eslint . --max-warnings=0
+
+  fixture-seed-parity:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["20.x"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "npm"
+      - run: npm ci
+      # TODO(Wave 0-14): script added by fixture-seed-parity agent
+      - if: hashFiles('scripts/check-fixture-seed-parity.ts') != ''
+        run: npx tsx scripts/check-fixture-seed-parity.ts
