@@ -2,27 +2,25 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 1.5 PR-α MERGED** (PR #121, merge `2250f44`,
-   2026-05-01) — VocListQuery rename (sort_by/sort_dir/per_page/
-   assignees/voc_type_ids/priorities/tag_ids) + masters contract +
-   BE repository/route + Codex 5라운드 review-fix 사이클 종결
-   (HIGH 2 + MED 8 모두 해소). 테스트 BE 88 pass + 7 todo / FE 52 pass.
-→ **다음 세션 첫 작업**: PR-β (`feat/wave1.5-fe-visual`) FE 시각 보강
-   — VocTopbar / VocStatusFilters / VocAdvancedFilters / VocSortChips /
-   VocTable(6열) / VocPaginationBar / VocCreateModal (Toast UI lazy) /
-   VocNotificationsDropdown / VocReviewDrawer + primitive 3
-   (NotificationBell / Pagination / DataTable). TDD red→green→refactor.
-→ 진행 전 필독: `docs/specs/plans/phase-8.md §Wave 1.5-B` (정본 9행
-   사전 테스트 계약), `phase-8-oss-vendoring.md §3-bis` (Toast UI
-   lazy-load 인벤토리).
+→ **Phase 8 Wave 1.5 PR-β MERGED** (PR #123, merge `ff3ba0a`,
+   2026-05-02) — `/voc` prototype 시각·UX 동등화 완료.
+   12 신규 컴포넌트 (primitive 3 + VOC composition 9) +
+   integration test + Toast UI Editor lazy chunk (~776kB) +
+   VocReviewDrawer/Tabs 분할 + BE `POST /api/vocs` & history
+   라우트 (codex review HIGH+MED 해소).
+   테스트: BE 92 pass + 7 todo / FE 122 pass.
+→ **다음 세션 첫 작업**: Wave 2 진입 hard-block 해소
+   - Follow-up A (Playwright e2e) — `frontend/e2e/voc-happy-path.spec.ts`
+   - Follow-up C-2 (seed UUID v4) — `feat/wave1-followup-c-seed`
+   - 둘 다 머지 후 Wave 2 (Dashboard) 진입 가능
 
-**Open items (Wave 1.5 종결 후 진입)**:
+**Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
 
-- Follow-up A (Playwright e2e) — Wave 1.5-B FE 머지 후 진입.
-- Follow-up C-2 (seed UUID v4 fix) — `feat/wave1-followup-c-seed`
-  (단독 PR).
-- openapi guard 확장 (architect MED-1) — VocListQuery query params +
-  masters 3 schema 정합 가드. 별도 follow-up commit 가능.
+- VocCreateModal 수동 useState → RHF+Zod resolver 마이그레이션 (spec drift)
+- DOMPurify customHTMLSanitizer (defense-in-depth)
+- VocAdvancedFilters tag/voc_type chip 테스트 보강
+- NativeSelect 단위 테스트
+- systems/menus placeholder UUID → Wave 3 admin masters에서 query 연결
+- openapi guard 확장 — VocListQuery + masters 3 schema 정합 가드
 
-**Wave 2 prerequisites**: Wave 1.5 PR-β 머지 + follow-up A·C-2
-종결 전까지 Wave 2 implementation 금지.
+**Wave 2 prerequisites**: Follow-up A (Playwright) + C-2 (seed UUID) 종결.
