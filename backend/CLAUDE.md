@@ -6,7 +6,7 @@ Express REST API for the VOC management system. Read root `CLAUDE.md` first for 
 
 ## Status
 
-Scaffolded — feature work deferred to Phase 8. Currently `src/` has `index.ts`, `auth/` (mockLogin only — `validateADSession` is a stub for Phase 9), `routes/`. Migrations 001-011 applied; 012 (dev role), 013 (tag master), 014 (trash) drafted in `docs/specs/plans/`.
+Phase 8 Wave 1.5-β merged (POST /api/vocs + history routes). `src/` layout follows route → controller → service → repository: `index.ts`, `db.ts`, `logger.ts`, `auth/` (mockLogin only — `validateADSession` is a stub for Phase 9), `routes/`, `controllers/`, `services/`, `repository/`, `middleware/`, `validators/`. Migrations 001-013 applied (013 = dev role + voc origin metadata). Next: Wave 2 — see `docs/specs/plans/next-session-tasks.md`.
 
 ## Commands
 
