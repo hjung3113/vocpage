@@ -29,6 +29,9 @@
   "overrides": {
     "eslint": "^8.57.0"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.20.0"
+  },
   "lint-staged": {
     "**/*.{ts,tsx}": [
       "eslint --fix",
