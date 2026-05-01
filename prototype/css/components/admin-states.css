@@ -1,0 +1,248 @@
+/* ============================================================
+   admin-states.css — Admin Non-data States (C-14)
+   Wave 3-B · spec: uidesign §13.11
+   3 variants: .admin-empty / .admin-loading / .admin-error
+   Hard rule: zero hex / zero raw OKLCH — only var(--token)
+   ============================================================ */
+
+/* ── Demo toggle bar ────────────────────────────────────────── */
+/*
+   Injected by admin-states-demo.js into each admin page's
+   admin-topbar. Floated right, does not affect layout.
+*/
+.admin-state-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.admin-state-toggle-label {
+  font-size: 11px;
+  color: var(--text-quaternary);
+  white-space: nowrap;
+}
+
+.admin-state-toggle {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-standard);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.admin-state-toggle:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--brand-bg);
+}
+
+/* ── State container ────────────────────────────────────────── */
+/*
+   .admin-state-container wraps all three state variants.
+   JS shows/hides the active child; hides normal table/content.
+*/
+.admin-state-container {
+  display: none; /* hidden by default; JS activates */
+  padding: 0 0 24px;
+}
+
+.admin-state-container.is-active {
+  display: block;
+}
+
+/* ── C-14 Empty State (.admin-empty) ───────────────────────── */
+.admin-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  gap: 12px;
+  padding: 40px 24px;
+}
+
+.admin-empty-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-quaternary);
+  opacity: 0.7;
+}
+
+.admin-empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.admin-empty-desc {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.admin-empty-cta {
+  margin-top: 4px;
+  padding: 7px 18px;
+  border-radius: 7px;
+  border: 1px solid var(--brand-border);
+  background: var(--brand-bg);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+
+.admin-empty-cta:hover {
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+}
+
+/* ── C-14 Loading State (.admin-loading) ───────────────────── */
+.admin-loading {
+  padding: 8px 0;
+}
+
+/* Shimmer animation */
+@keyframes admin-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.admin-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.admin-skeleton-row:last-child {
+  border-bottom: none;
+}
+
+.admin-skeleton-cell {
+  border-radius: 5px;
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 0%,
+    var(--bg-panel) 50%,
+    var(--bg-elevated) 100%
+  );
+  background-size: 800px 100%;
+  animation: admin-shimmer 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* Varying widths for visual realism */
+.admin-skeleton-cell.w-8 {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.admin-skeleton-cell.w-32 {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.admin-skeleton-cell.w-120 {
+  width: 120px;
+}
+.admin-skeleton-cell.w-80 {
+  width: 80px;
+}
+.admin-skeleton-cell.w-60 {
+  width: 60px;
+}
+.admin-skeleton-cell.w-40 {
+  width: 40px;
+}
+.admin-skeleton-cell.flex-1 {
+  flex: 1;
+}
+
+/* ── C-14 Error State (.admin-error) ───────────────────────── */
+.admin-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  gap: 12px;
+  padding: 40px 24px;
+}
+
+.admin-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: var(--status-red-bg);
+  border: 1px solid var(--status-red-border);
+  color: var(--status-red);
+  font-size: 13.5px;
+  font-weight: 600;
+  max-width: 420px;
+  width: 100%;
+}
+
+.admin-error-banner-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.admin-error-desc {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 340px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.admin-error-retry {
+  margin-top: 4px;
+  padding: 7px 18px;
+  border-radius: 7px;
+  border: 1px solid var(--status-red-border);
+  background: var(--status-red-bg);
+  color: var(--status-red);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.12s;
+}
+
+.admin-error-retry:hover {
+  opacity: 0.8;
+}
+
+/* ── Reduced motion override ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .admin-skeleton-cell {
+    animation: none;
+    background: var(--bg-elevated);
+  }
+}

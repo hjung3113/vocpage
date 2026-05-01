@@ -1,0 +1,148 @@
+/* ============================================================
+   badges.css — Status Dot (C-11) + Type Badge Admin (C-10)
+   Wave 3-B · spec: uidesign §13.4 (TypeBadge) §13.5 (StatusDot)
+   Hard rule: zero hex / zero raw OKLCH — only var(--token)
+   ============================================================ */
+
+/* ── C-11 Status Dot ────────────────────────────────────────── */
+/*
+   Usage: <span class="status-dot on"></span>   → green  (active)
+          <span class="status-dot off"></span>  → gray   (inactive)
+          <span class="status-dot archived"></span> → red (archived)
+          <span class="status-dot pending"></span>  → amber (pending)
+
+   Scoped to .admin-page so admin tables get the spec 7×7 size
+   without colliding with list.css (6px row badges) or
+   dashboard-edit.css (7px — coincidentally same but separate scope).
+
+   Pair with a sibling text label; the dot itself carries no text.
+*/
+.admin-page .status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* active — green */
+.admin-page .status-dot.on {
+  background: var(--status-green);
+  box-shadow: 0 0 5px color-mix(in oklch, var(--status-green) 50%, transparent);
+}
+
+/* inactive — quaternary gray */
+.admin-page .status-dot.off {
+  background: var(--text-quaternary);
+}
+
+/* archived — red */
+.admin-page .status-dot.archived {
+  background: var(--status-red);
+}
+
+/* pending — amber */
+.admin-page .status-dot.pending {
+  background: var(--status-amber);
+}
+
+/* ── C-10 Type Badge Admin ──────────────────────────────────── */
+/*
+   .type-badge-admin — used by spec §13.4 for the voc_types.color
+   swatch chip (color passed inline; legacy only — see note below).
+
+   .type-kind-badge — typeKind classifier badge (system / menu /
+   issue-kind / external). Renamed from .type-badge-admin.type-system
+   etc. to avoid collision with the §13.4 swatch-chip class.
+
+   Also supports legacy tag-rule variants (keyword / regex) under
+   .type-badge-admin, used in admin-master.js renderTagRules().
+*/
+.type-kind-badge,
+.type-badge-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+/* dot inside badge — injected via ::before pseudo-element */
+.type-kind-badge::before,
+.type-badge-admin::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── .type-kind-badge variants (typeKind classifier) ─────────
+   system → brand (blue) */
+.type-kind-badge.type-system {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border-color: var(--brand-border);
+}
+.type-kind-badge.type-system::before {
+  background: var(--accent);
+}
+
+/* menu → brand accent (not status-reviewing which has "검토중" semantic) */
+.type-kind-badge.type-menu {
+  background: var(--brand-bg);
+  color: var(--accent);
+  border-color: var(--brand-border);
+}
+.type-kind-badge.type-menu::before {
+  background: var(--accent);
+}
+
+/* issue-kind → purple */
+.type-kind-badge.type-issue-kind {
+  background: var(--status-purple-bg);
+  color: var(--status-purple);
+  border-color: var(--status-purple-border);
+}
+.type-kind-badge.type-issue-kind::before {
+  background: var(--status-purple);
+}
+
+/* external → amber */
+.type-kind-badge.type-external {
+  background: var(--status-amber-bg);
+  color: var(--status-amber);
+  border-color: var(--status-amber-border);
+}
+.type-kind-badge.type-external::before {
+  background: var(--status-amber);
+}
+
+/* ── Legacy tag-rule type variants (keyword / regex) ─────────
+   Used in admin-master.js renderTagRules() type column.
+   Retained here so they continue to work after any refactor.    */
+.type-badge-admin.type-keyword {
+  background: var(--status-green-bg);
+  color: var(--status-green);
+  border-color: var(--status-green-border);
+}
+.type-badge-admin.type-keyword::before {
+  background: var(--status-green);
+}
+
+.type-badge-admin.type-regex {
+  background: var(--status-purple-bg);
+  color: var(--status-purple);
+  border-color: var(--status-purple-border);
+}
+.type-badge-admin.type-regex::before {
+  background: var(--status-purple);
+}

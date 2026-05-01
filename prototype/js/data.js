@@ -14,11 +14,43 @@ const MENUS = [
   { id: 'm10', systemId: 'sys4', name: 'KPI', archived: false },
   { id: 'm11', systemId: 'sys4', name: '알림 설정', archived: false },
 ];
+// typeKind: prototype-only mock for badge variant coverage.
+// spec §13.4 has no canonical typeKind taxonomy yet — values here are illustrative
+// (issue-kind for bug, system/menu/external for variant demo) and will be redefined
+// when the schema decision lands.
 const VOC_TYPES = [
-  { id: 't1', name: '버그', slug: 'bug', color: '#e5534b', archived: false },
-  { id: 't2', name: '기능 요청', slug: 'feature', color: '#5e6ad2', archived: false },
-  { id: 't3', name: '개선 제안', slug: 'improvement', color: '#f5a623', archived: false },
-  { id: 't4', name: '문의', slug: 'inquiry', color: '#57ab5a', archived: false },
+  {
+    id: 't1',
+    name: '버그',
+    slug: 'bug',
+    color: '#e5534b',
+    archived: false,
+    typeKind: 'issue-kind',
+  },
+  {
+    id: 't2',
+    name: '기능 요청',
+    slug: 'feature',
+    color: '#5e6ad2',
+    archived: false,
+    typeKind: 'system',
+  },
+  {
+    id: 't3',
+    name: '개선 제안',
+    slug: 'improvement',
+    color: '#f5a623',
+    archived: false,
+    typeKind: 'menu',
+  },
+  {
+    id: 't4',
+    name: '문의',
+    slug: 'inquiry',
+    color: '#57ab5a',
+    archived: false,
+    typeKind: 'external',
+  },
 ];
 let sysNextSeq = 5,
   menuNextSeq = 12,
