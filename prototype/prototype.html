@@ -383,6 +383,25 @@
       </div>
     </div>
 
+    <!-- 현황 카드 (W7) — 가로 스크롤, N-05 -->
+    <div class="widget" id="w7-status-widget">
+      <div class="widget-header">
+        <div class="widget-title">현황</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="w7-scroll-btn" id="w7ScrollLeft" aria-label="왼쪽으로 스크롤" onclick="w7Scroll(-1)" style="display:none">
+            <i data-lucide="chevron-left" style="width:14px;height:14px"></i>
+          </button>
+          <button class="w7-scroll-btn" id="w7ScrollRight" aria-label="오른쪽으로 스크롤" onclick="w7Scroll(1)" style="display:none">
+            <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+          </button>
+        </div>
+      </div>
+      <div class="w7-scroll-wrap" id="w7ScrollWrap">
+        <div class="w7-cards" id="w7Cards"></div>
+        <div class="w7-scroll-fade-right" id="w7FadeRight"></div>
+      </div>
+    </div>
+
     <!-- 처리속도 & 에이징 — 2개 카드 좌우 배치 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="widget">
@@ -1054,6 +1073,7 @@
 <script src="js/faq-admin.js"></script>
 <script src="js/faq-admin-modals.js"></script>
 <script src="js/admin-states-demo.js"></script>
+<script src="js/dashboard-states-demo.js"></script>
 <script src="js/init.js"></script>
 </body>
 </html>
