@@ -231,3 +231,18 @@
   display: flex;
   gap: var(--sp-2);
 }
+
+/* ─── N-02 Char count states ─── */
+.char-count--warn {
+  font-size: 11px;
+  text-align: right;
+  margin-top: 4px;
+  color: var(--status-amber-fg);
+}
+.char-count--over {
+  font-size: 11px;
+  text-align: right;
+  margin-top: 4px;
+  color: var(--status-red-fg);
+  font-weight: 600;
+}

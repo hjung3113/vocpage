@@ -161,6 +161,16 @@ function openDrawer(id) {
   const row = document.getElementById('row-' + id);
   if (row) row.classList.add('selected');
   lucide.createIcons();
+
+  // N-02: attach charcount to drawer comment input
+  if (typeof window.attachCharCount === 'function') {
+    const commentInput = document.getElementById('new-comment-input-' + id);
+    if (commentInput) window.attachCharCount(commentInput, 1000);
+    // internal-notes textarea (rendered by InternalNotes.build)
+    const notesInput = document.querySelector('.in-compose-ta');
+    if (notesInput) window.attachCharCount(notesInput, 1000);
+  }
+
   document.dispatchEvent(new CustomEvent('drawer:opened', { detail: { vocId: id, voc: d } }));
 }
 

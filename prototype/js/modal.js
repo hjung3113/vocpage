@@ -76,7 +76,15 @@ function onModalSysChange() {
 function openModal() {
   initModalSelects();
   document.getElementById('modalBg').classList.add('open');
-  setTimeout(() => document.getElementById('titleInput').focus(), 80);
+  setTimeout(() => {
+    const titleEl = document.getElementById('titleInput');
+    const bodyEl = document.getElementById('bodyInput');
+    if (typeof window.attachCharCount === 'function') {
+      window.attachCharCount(titleEl, 100);
+      window.attachCharCount(bodyEl, 5000);
+    }
+    titleEl && titleEl.focus();
+  }, 80);
 }
 function closeModal() {
   document.getElementById('modalBg').classList.remove('open');
