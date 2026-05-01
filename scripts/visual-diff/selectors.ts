@@ -104,7 +104,7 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
   {
     componentId: 'data-table',
     proto: '.list-header',
-    react: '[data-pcomp="data-table"]',
+    react: 'thead[data-pcomp="data-table"]',
     isOverlay: false,
   },
 ] as const;
