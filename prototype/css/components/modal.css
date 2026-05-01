@@ -284,12 +284,12 @@
   font-size: 11px;
   text-align: right;
   margin-top: 4px;
-  color: var(--status-amber-fg);
+  color: var(--status-amber);
 }
 .char-count--over {
   font-size: 11px;
   text-align: right;
   margin-top: 4px;
-  color: var(--status-red-fg);
+  color: var(--status-red);
   font-weight: 600;
 }

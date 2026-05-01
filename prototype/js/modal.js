@@ -1,13 +1,54 @@
-// ── Modal file attach
+// ── N-07 Modal file attach (att-zone)
+const MODAL_ATT_MAX = 5;
+const MODAL_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 let modalAttachFiles = [];
+
 function modalAddAttach(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   document.getElementById('modal-file-input')?.click();
 }
-function modalFileSelected(e) {
-  const files = Array.from(e.target.files || []);
-  if (!files.length) return;
-  files.forEach((f) => {
+
+function modalAttDragEnter(e) {
+  e.preventDefault();
+  const drop = document.getElementById('modal-att-drop');
+  if (drop && !drop.classList.contains('att-drop--disabled')) drop.classList.add('att-drop--over');
+}
+function modalAttDragOver(e) {
+  e.preventDefault();
+  const drop = document.getElementById('modal-att-drop');
+  if (drop && !drop.classList.contains('att-drop--disabled')) drop.classList.add('att-drop--over');
+}
+function modalAttDragLeave(e) {
+  document.getElementById('modal-att-drop')?.classList.remove('att-drop--over');
+}
+function modalAttDrop(e) {
+  e.preventDefault();
+  const drop = document.getElementById('modal-att-drop');
+  if (drop) drop.classList.remove('att-drop--over');
+  if (drop?.classList.contains('att-drop--disabled')) return;
+  const files = Array.from(e.dataTransfer?.files || []);
+  if (files.length) modalProcessFiles(files);
+}
+
+function modalProcessFiles(files) {
+  const allowed = MODAL_ATT_MAX - modalAttachFiles.length;
+  if (allowed <= 0) {
+    if (typeof window.showAttachmentError === 'function') window.showAttachmentError('400-count');
+    return;
+  }
+  const toAdd = files.slice(0, allowed);
+  if (files.length > allowed && typeof window.showAttachmentError === 'function') {
+    window.showAttachmentError('400-count');
+  }
+  toAdd.forEach((f) => {
+    if (!MODAL_IMAGE_TYPES.includes(f.type)) {
+      if (typeof window.showAttachmentError === 'function') window.showAttachmentError('415');
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      if (typeof window.showAttachmentError === 'function') window.showAttachmentError('413');
+      return;
+    }
     const size =
       f.size > 1024 * 1024
         ? (f.size / 1024 / 1024).toFixed(1) + ' MB'
@@ -15,24 +56,52 @@ function modalFileSelected(e) {
     modalAttachFiles.push({ name: f.name, size });
   });
   renderModalAttach();
+}
+
+function modalFileSelected(e) {
+  const files = Array.from(e.target.files || []);
+  if (files.length) modalProcessFiles(files);
   e.target.value = '';
 }
+
 function renderModalAttach() {
-  const list = document.getElementById('modal-attach-list');
-  if (!list) return;
-  list.innerHTML = modalAttachFiles
-    .map(
-      (f, i) => `
-    <div class="modal-attach-row">
-      <i data-lucide="file" style="width:13px;height:13px;color:var(--accent);flex-shrink:0"></i>
-      <span class="modal-attach-name">${f.name}</span>
-      <span class="modal-attach-size">${f.size}</span>
-      <div class="icon-btn" style="width:22px;height:22px" onclick="removeModalAttach(${i})"><i data-lucide="x" style="width:10px;height:10px"></i></div>
-    </div>`,
-    )
-    .join('');
-  lucide.createIcons({ nodes: [list] });
+  const grid = document.getElementById('modal-att-grid');
+  const drop = document.getElementById('modal-att-drop');
+  const countEl = document.getElementById('modal-att-count');
+  const count = modalAttachFiles.length;
+  const full = count >= MODAL_ATT_MAX;
+
+  if (grid) {
+    grid.innerHTML = modalAttachFiles
+      .map(
+        (f, i) => `<div class="att-item" data-idx="${i}">
+        <div class="att-thumb" style="background:var(--bg-elevated)">
+          <i data-lucide="image" style="width:20px;height:20px;color:var(--text-quaternary)"></i>
+        </div>
+        <span class="att-item-name">${window.escHtml ? window.escHtml(f.name) : f.name}</span>
+        <button class="att-remove" type="button" onclick="removeModalAttach(${i})" aria-label="삭제">×</button>
+      </div>`,
+      )
+      .join('');
+    lucide.createIcons({ nodes: [grid] });
+  }
+
+  if (countEl) countEl.textContent = `${count}/${MODAL_ATT_MAX}`;
+
+  if (drop) {
+    if (full) {
+      drop.classList.add('att-drop--disabled');
+      drop.innerHTML = `<span style="color:var(--text-quaternary)">첨부 한도 도달 (${count}/${MODAL_ATT_MAX})</span>`;
+    } else {
+      drop.classList.remove('att-drop--disabled');
+      drop.innerHTML =
+        `이미지 드래그 또는 ` +
+        `<button class="att-select-btn" type="button" onclick="modalAddAttach(event)">선택</button>` +
+        ` · 5MB까지 · <span class="att-count-badge" id="modal-att-count">${count}/${MODAL_ATT_MAX}</span>`;
+    }
+  }
 }
+
 function removeModalAttach(i) {
   modalAttachFiles.splice(i, 1);
   renderModalAttach();

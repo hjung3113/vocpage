@@ -60,20 +60,155 @@ function buildSubsSection(d) {
     </div>`;
 }
 
+// N-07: Mock demo thumbnails (data URIs for 5 sample images)
+const MOCK_THUMB_COLORS = [
+  'var(--brand-bg)',
+  'var(--status-green-bg)',
+  'var(--status-amber-bg)',
+  'var(--status-purple-bg)',
+  'var(--status-red-bg)',
+];
+const MOCK_THUMBS = [
+  { name: 'screenshot_01.png', size: '284 KB', mockColor: MOCK_THUMB_COLORS[0] },
+  { name: 'error_log_capture.png', size: '156 KB', mockColor: MOCK_THUMB_COLORS[1] },
+  { name: 'ui_glitch.png', size: '412 KB', mockColor: MOCK_THUMB_COLORS[2] },
+  { name: 'network_trace.png', size: '98 KB', mockColor: MOCK_THUMB_COLORS[3] },
+  { name: 'console_output.png', size: '203 KB', mockColor: MOCK_THUMB_COLORS[4] },
+];
+const ATT_MAX = 5;
+
+// Seed demo attachments for voc1 with mock thumbnails
+if (!attachStore['voc1'] || attachStore['voc1'].length < 2) {
+  attachStore['voc1'] = MOCK_THUMBS.slice(0, 2).map((t) => ({ ...t, icon: 'image' }));
+}
+
+function attThumbHTML(f, idx, vocId) {
+  const bg = f.mockColor || 'var(--bg-elevated)';
+  return `<div class="att-item" data-idx="${idx}">
+    <div class="att-thumb" style="background:${bg}" title="${f.name}">
+      <i data-lucide="image" style="width:20px;height:20px;color:var(--text-quaternary)"></i>
+    </div>
+    <span class="att-item-name">${f.name}</span>
+    <button class="att-remove" type="button" onclick="removeAttach('${vocId}',${idx})" aria-label="삭제">×</button>
+  </div>`;
+}
+
 function buildAttachSection(d) {
   const files = attachStore[d.id] || [];
-  const filesHTML = files.map((f, i) => attachItemHTML(d.id, f, i)).join('');
+  const count = files.length;
+  const full = count >= ATT_MAX;
+  const gridHTML = files.map((f, i) => attThumbHTML(f, i, d.id)).join('');
+  const dropDisabledClass = full ? ' att-drop--disabled' : '';
+  const dropText = full
+    ? `<span style="color:var(--text-quaternary)">첨부 한도 도달 (${count}/${ATT_MAX})</span>`
+    : `이미지 드래그 또는 <button class="att-select-btn" type="button" onclick="drawerAddAttach('${d.id}')">선택</button> · 5MB까지 · <span class="att-count-badge">${count}/${ATT_MAX}</span>`;
+
   return `
     <div class="d-attachments">
       <div class="d-section-title" style="display:flex;align-items:center;gap:6px">
-        첨부파일<span style="font-size:10.5px;color:var(--text-quaternary);font-weight:400;text-transform:none">${files.length}개</span>
+        첨부파일<span style="font-size:10.5px;color:var(--text-quaternary);font-weight:400;text-transform:none">${count}개</span>
       </div>
-      <div class="attach-list" id="attach-list-${d.id}">${filesHTML}</div>
-      <button class="attach-add-btn" onclick="drawerAddAttach('${d.id}')" type="button">
-        <i data-lucide="paperclip" style="width:13px;height:13px"></i> 파일 첨부
-      </button>
-      <input type="file" id="attach-input-${d.id}" style="display:none" multiple onchange="drawerFileSelected(event,'${d.id}')">
+      <div class="att-zone" id="att-zone-${d.id}" data-voc-id="${d.id}">
+        <input type="file" id="attach-input-${d.id}" multiple
+          accept="image/png,image/jpeg,image/gif,image/webp"
+          style="display:none" onchange="drawerFileSelected(event,'${d.id}')">
+        <div class="att-drop${dropDisabledClass}" id="att-drop-${d.id}"
+          ondragenter="attDragEnter(event,'${d.id}')"
+          ondragover="attDragOver(event,'${d.id}')"
+          ondragleave="attDragLeave(event,'${d.id}')"
+          ondrop="attDrop(event,'${d.id}')">
+          ${dropText}
+        </div>
+        <div class="att-grid" id="att-grid-${d.id}">${gridHTML}</div>
+      </div>
     </div>`;
+}
+
+// ── N-07 Drag & Drop handlers ─────────────────────────────────────────────────
+function attDragEnter(e, vocId) {
+  e.preventDefault();
+  const drop = document.getElementById('att-drop-' + vocId);
+  if (drop && !drop.classList.contains('att-drop--disabled')) drop.classList.add('att-drop--over');
+}
+function attDragOver(e, vocId) {
+  e.preventDefault();
+  const drop = document.getElementById('att-drop-' + vocId);
+  if (drop && !drop.classList.contains('att-drop--disabled')) drop.classList.add('att-drop--over');
+}
+function attDragLeave(e, vocId) {
+  const drop = document.getElementById('att-drop-' + vocId);
+  if (drop) drop.classList.remove('att-drop--over');
+}
+function attDrop(e, vocId) {
+  e.preventDefault();
+  const drop = document.getElementById('att-drop-' + vocId);
+  if (drop) drop.classList.remove('att-drop--over');
+  if (drop && drop.classList.contains('att-drop--disabled')) return;
+
+  const files = Array.from(e.dataTransfer?.files || []);
+  if (!files.length) return;
+  processAttachFiles(files, vocId);
+}
+
+function processAttachFiles(files, vocId) {
+  if (!attachStore[vocId]) attachStore[vocId] = [];
+  const current = attachStore[vocId].length;
+  const allowed = ATT_MAX - current;
+
+  if (allowed <= 0) {
+    if (typeof window.showAttachmentError === 'function') window.showAttachmentError('400-count');
+    return;
+  }
+
+  const imageTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+  const toAdd = files.slice(0, allowed);
+  const skipped = files.length - toAdd.length;
+
+  toAdd.forEach((f) => {
+    if (!imageTypes.includes(f.type)) {
+      if (typeof window.showAttachmentError === 'function') window.showAttachmentError('415');
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      if (typeof window.showAttachmentError === 'function') window.showAttachmentError('413');
+      return;
+    }
+    const size =
+      f.size > 1024 * 1024
+        ? (f.size / 1024 / 1024).toFixed(1) + ' MB'
+        : Math.round(f.size / 1024) + ' KB';
+    attachStore[vocId].push({ name: f.name, size, icon: 'image' });
+  });
+
+  if (skipped > 0 || current + toAdd.length > ATT_MAX) {
+    if (typeof window.showAttachmentError === 'function') window.showAttachmentError('400-count');
+  }
+
+  refreshAttZone(vocId);
+}
+
+function refreshAttZone(vocId) {
+  const files = attachStore[vocId] || [];
+  const count = files.length;
+  const full = count >= ATT_MAX;
+  const grid = document.getElementById('att-grid-' + vocId);
+  const drop = document.getElementById('att-drop-' + vocId);
+  const section = grid?.closest('.d-attachments');
+  const titleSpan = section?.querySelector('.d-section-title span');
+
+  if (grid) grid.innerHTML = files.map((f, i) => attThumbHTML(f, i, vocId)).join('');
+  if (titleSpan) titleSpan.textContent = count + '개';
+
+  if (drop) {
+    if (full) {
+      drop.classList.add('att-drop--disabled');
+      drop.innerHTML = `<span style="color:var(--text-quaternary)">첨부 한도 도달 (${count}/${ATT_MAX})</span>`;
+    } else {
+      drop.classList.remove('att-drop--disabled');
+      drop.innerHTML = `이미지 드래그 또는 <button class="att-select-btn" type="button" onclick="drawerAddAttach('${vocId}')">선택</button> · 5MB까지 · <span class="att-count-badge">${count}/${ATT_MAX}</span>`;
+    }
+  }
+  lucide.createIcons({ nodes: [grid, drop].filter(Boolean) });
 }
 
 // ── Subtask interactions
@@ -151,47 +286,13 @@ function drawerAddAttach(vocId) {
 function drawerFileSelected(e, vocId) {
   const files = Array.from(e.target.files || []);
   if (!files.length) return;
-  if (!attachStore[vocId]) attachStore[vocId] = [];
-  const list = document.getElementById('attach-list-' + vocId);
-  files.forEach((f) => {
-    const size =
-      f.size > 1024 * 1024
-        ? (f.size / 1024 / 1024).toFixed(1) + ' MB'
-        : Math.round(f.size / 1024) + ' KB';
-    const ext = f.name.split('.').pop()?.toLowerCase();
-    const icon = ['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext)
-      ? 'image'
-      : ['pdf'].includes(ext)
-        ? 'file-text'
-        : ['zip', 'tar', 'gz'].includes(ext)
-          ? 'archive'
-          : 'file';
-    const idx = attachStore[vocId].length;
-    attachStore[vocId].push({ name: f.name, size, icon });
-    if (list) {
-      const div = document.createElement('div');
-      div.innerHTML = attachItemHTML(vocId, { name: f.name, size, icon }, idx);
-      list.appendChild(div.firstElementChild);
-      lucide.createIcons({ nodes: [list.lastElementChild] });
-    }
-  });
-  const titleSpan = document
-    .querySelector(`#attach-list-${vocId}`)
-    ?.closest('.d-attachments')
-    ?.querySelector('.d-section-title span');
-  if (titleSpan) titleSpan.textContent = attachStore[vocId].length + '개';
+  processAttachFiles(files, vocId);
   e.target.value = '';
 }
 function removeAttach(vocId, idx) {
   if (!attachStore[vocId]) return;
   attachStore[vocId].splice(idx, 1);
-  const list = document.getElementById('attach-list-' + vocId);
-  if (list) {
-    list.innerHTML = attachStore[vocId].map((f, i) => attachItemHTML(vocId, f, i)).join('');
-    lucide.createIcons({ nodes: [list] });
-  }
-  const titleSpan = list?.closest('.d-attachments')?.querySelector('.d-section-title span');
-  if (titleSpan) titleSpan.textContent = attachStore[vocId].length + '개';
+  refreshAttZone(vocId);
 }
 
 // ── Comment inline edit
