@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderReport() > matches golden snapshot 1`] = `
+"# VOC Visual Diff — Prototype vs \`/voc\` (Wave 1.5 Follow-up A, Stage 1 output)
+
+Generated: 2026-01-01T00:00:00.000Z
+Prototype URL: http://127.0.0.1:4174/prototype.html#page-voc
+React URL: http://127.0.0.1:5173/voc
+
+## Summary
+
+| Component | HIGH | MED | LOW |
+|-----------|------|-----|-----|
+| voc-topbar | 1 | 1 | 1 |
+| voc-status-filters | 1 | 0 | 0 |
+
+## voc-topbar
+
+| Property | Prototype | React | Severity | Suggested Action |
+|----------|-----------|-------|----------|------------------|
+| background-color | rgb(20, 22, 28) | rgb(30, 32, 40) | HIGH | Use \`var(--bg-panel)\` |
+| padding-left | 24px | 16px | MED | — |
+| box-shadow | none | 0px 1px 3px rgba(0,0,0,0.1) | LOW | — |
+
+## voc-status-filters
+
+| Property | Prototype | React | Severity | Suggested Action |
+|----------|-----------|-------|----------|------------------|
+| display | flex | block | HIGH | — |
+"
+`;

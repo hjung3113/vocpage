@@ -79,8 +79,20 @@ added 92 packages, and removed 87 packages in 606ms
 
 검증: Wave 0 PR 검토 시 `git diff` 에 위 4 항목 위반 발견 즉시 reject.
 
+## 6. Dev-only Exemptions
+
+The following tooling packages use Playwright's bundled Chromium and are
+**exempt from the phase-8 §7.2 closed-network vendoring discipline** because
+they are never deployed to production and only run on developer machines.
+
+| Package                                                            | Location                   | Reason for exemption                                                                                                                                                        |
+| ------------------------------------------------------------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `playwright` (+ Chromium binary via `playwright install chromium`) | `frontend/devDependencies` | Visual-diff harness (`scripts/visual-diff/`) — dev-only tool. Binaries downloaded once per machine via `npx -w frontend playwright install chromium`. Not committed to git. |
+| `http-server`                                                      | `frontend/devDependencies` | Serves `prototype/` for the visual-diff harness. Dev-only.                                                                                                                  |
+
 ## 5. Changelog
 
 | 일자       | 변경                                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| 2026-05-02 | §6 추가 — Wave 1.5 Follow-up A Stage 1: `playwright` + `http-server` dev-only exemption 등록                      |
 | 2026-05-01 | 초안 — Wave 0 첫 commit 산출물. npm 레지스트리·dry-run 캡처, §3 우회 경로 정리, §3.2 사내 신청 플로우 placeholder |
