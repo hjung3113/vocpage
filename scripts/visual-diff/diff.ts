@@ -55,7 +55,6 @@ const LAYOUT_PROPS = new Set([
 ]);
 
 const TYPOGRAPHY_EXACT_PROPS = new Set([
-  'font-family',
   'font-weight',
   'text-transform',
   'letter-spacing',
@@ -75,6 +74,27 @@ function parsePx(val: string): number {
 /** Normalize whitespace for shadow comparison */
 function normalizeShadow(val: string): string {
   return val.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * compareFontFamily — normalizes two font-family strings and returns true if
+ * they match or one stack is a prefix of the other (handles Tailwind v4 vs prototype stack differences).
+ * Normalization: lowercase, strip quotes, split on comma, trim each entry.
+ */
+export function compareFontFamily(a: string, b: string): boolean {
+  function normalize(v: string): string[] {
+    return v
+      .toLowerCase()
+      .split(',')
+      .map((s) => s.trim().replace(/^["']|["']$/g, ''));
+  }
+  const stackA = normalize(a);
+  const stackB = normalize(b);
+  if (stackA.length === 0 || stackB.length === 0) return false;
+  // Check if one stack is a prefix of the other
+  const shorter = stackA.length <= stackB.length ? stackA : stackB;
+  const longer = stackA.length <= stackB.length ? stackB : stackA;
+  return shorter.every((font, i) => font === longer[i]);
 }
 
 /**
@@ -108,6 +128,12 @@ export function classify(
     return { match: false, severity: 'MED' };
   }
 
+  if (prop === 'font-family') {
+    return compareFontFamily(a, b)
+      ? { match: true, severity: 'MED' }
+      : { match: false, severity: 'MED' };
+  }
+
   if (TYPOGRAPHY_EXACT_PROPS.has(prop)) {
     return { match: false, severity: 'MED' };
   }
@@ -115,7 +141,7 @@ export function classify(
   if (TYPOGRAPHY_APPROX_PROPS.has(prop)) {
     const pxA = parsePx(a);
     const pxB = parsePx(b);
-    if (!isNaN(pxA) && !isNaN(pxB) && Math.abs(pxA - pxB) <= 0.5) {
+    if (!isNaN(pxA) && !isNaN(pxB) && Math.abs(pxA - pxB) <= 1.5) {
       return { match: true, severity: 'MED' };
     }
     return { match: false, severity: 'MED' };

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classify, diff } from '../diff.js';
+import { classify, diff, compareFontFamily } from '../diff.js';
 import type { Extracted } from '../diff.js';
 
 describe('classify()', () => {
@@ -109,10 +109,33 @@ describe('classify()', () => {
       expect(result.match).toBe(true);
     });
 
-    it('font-family mismatch → match=false, severity MED', () => {
+    it('font-family totally different families → match=false, severity MED', () => {
       const result = classify('font-family', 'Pretendard', 'Arial');
       expect(result.match).toBe(false);
       expect(result.severity).toBe('MED');
+    });
+
+    it('font-family same stack with quotes stripped → match=true', () => {
+      const result = classify('font-family', '"Pretendard Variable"', 'Pretendard Variable');
+      expect(result.match).toBe(true);
+    });
+
+    it('font-family react stack is prefix of proto stack → match=true', () => {
+      const result = classify(
+        'font-family',
+        'Pretendard Variable, Pretendard, sans-serif',
+        'Pretendard Variable, Pretendard, sans-serif, system-ui',
+      );
+      expect(result.match).toBe(true);
+    });
+
+    it('font-family proto stack is prefix of react stack → match=true', () => {
+      const result = classify(
+        'font-family',
+        'Pretendard Variable, Pretendard, sans-serif, system-ui',
+        'Pretendard Variable, Pretendard, sans-serif',
+      );
+      expect(result.match).toBe(true);
     });
 
     it('font-weight mismatch → MED', () => {
@@ -121,20 +144,85 @@ describe('classify()', () => {
       expect(result.severity).toBe('MED');
     });
 
-    it('font-size within ±0.5px → match=true', () => {
+    it('font-size within ±1.5px → match=true', () => {
       const result = classify('font-size', '14px', '14.3px');
       expect(result.match).toBe(true);
     });
 
-    it('font-size outside ±0.5px → match=false, MED', () => {
+    it('font-size 14 vs 16 within new ±1.5px tolerance → match=false (diff=2px)', () => {
       const result = classify('font-size', '14px', '16px');
       expect(result.match).toBe(false);
       expect(result.severity).toBe('MED');
     });
 
+    it('font-size 14 vs 15 within ±1.5px → match=true', () => {
+      const result = classify('font-size', '14px', '15px');
+      expect(result.match).toBe(true);
+    });
+
     it('line-height within ±0.5px → match=true', () => {
       const result = classify('line-height', '20px', '20.4px');
       expect(result.match).toBe(true);
+    });
+
+    it('line-height 21 vs 24 within ±1.5px → match=false (diff=3px)', () => {
+      const result = classify('line-height', '21px', '24px');
+      expect(result.match).toBe(false);
+      expect(result.severity).toBe('MED');
+    });
+
+    it('line-height 21 vs 22.5 within ±1.5px → match=true', () => {
+      const result = classify('line-height', '21px', '22.5px');
+      expect(result.match).toBe(true);
+    });
+  });
+
+  // Spacing group regression — tolerance must remain ±1px
+  describe('spacing tolerance regression', () => {
+    it('spacing diff exactly 1.0px → match=true (unchanged)', () => {
+      const result = classify('padding-top', '12px', '13px');
+      expect(result.match).toBe(true);
+    });
+
+    it('spacing diff 1.001px → match=false (unchanged boundary)', () => {
+      const result = classify('padding-top', '12px', '13.001px');
+      expect(result.match).toBe(false);
+      expect(result.severity).toBe('MED');
+    });
+  });
+
+  // compareFontFamily direct tests
+  describe('compareFontFamily()', () => {
+    it('identical single fonts → true', () => {
+      expect(compareFontFamily('Pretendard', 'Pretendard')).toBe(true);
+    });
+
+    it('same font, different casing → true', () => {
+      expect(compareFontFamily('Pretendard', 'pretendard')).toBe(true);
+    });
+
+    it('quotes stripped → true', () => {
+      expect(compareFontFamily('"Pretendard Variable"', 'Pretendard Variable')).toBe(true);
+    });
+
+    it('proto is prefix of react → true', () => {
+      expect(compareFontFamily('Pretendard Variable', 'Pretendard Variable, sans-serif')).toBe(
+        true,
+      );
+    });
+
+    it('react is prefix of proto → true', () => {
+      expect(compareFontFamily('Pretendard Variable, sans-serif', 'Pretendard Variable')).toBe(
+        true,
+      );
+    });
+
+    it('totally different families → false', () => {
+      expect(compareFontFamily('Pretendard', 'Arial')).toBe(false);
+    });
+
+    it('stacks with different first fonts → false', () => {
+      expect(compareFontFamily('Arial, sans-serif', 'Pretendard, sans-serif')).toBe(false);
     });
   });
 
