@@ -1319,8 +1319,37 @@ export interface components {
       /** Format: date-time */
       created_at: string;
     };
+    VocListItem: {
+      /** Format: uuid */
+      id: string;
+      issue_code: string;
+      title: string;
+      status: components['schemas']['VocStatus'];
+      priority: components['schemas']['VocPriority'];
+      /** Format: uuid */
+      voc_type_id: string;
+      /** Format: uuid */
+      system_id: string;
+      /** Format: uuid */
+      menu_id: string;
+      /** Format: uuid */
+      assignee_id?: string | null;
+      /** Format: uuid */
+      author_id?: string;
+      /** Format: uuid */
+      parent_id?: string | null;
+      source: components['schemas']['VocSource'];
+      /** Format: date-time */
+      due_date?: string | null;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
+      has_children: boolean;
+      notes_count: number;
+    };
     PaginatedVocs: {
-      rows: components['schemas']['Voc'][];
+      rows: components['schemas']['VocListItem'][];
       total: number;
       page: number;
       per_page: number;

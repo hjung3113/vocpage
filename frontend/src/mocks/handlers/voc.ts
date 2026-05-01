@@ -79,6 +79,17 @@ export const vocHandlers = [
     const idx = store.findIndex((r) => r.id === params.id);
     if (idx < 0) return envelope('NOT_FOUND', 'VOC를 찾을 수 없습니다.');
     const row = store[idx]!;
+    const patch = (await request.json()) as Partial<Voc>;
+    // Mirror backend `inferActions` (services/voc.ts) — `assignee_id` patch
+    // requires manager/admin; multi-field patch (e.g. {assignee_id, status})
+    // must fail on the reassign branch first to avoid Dev own-VOC bypass.
+    // See PR #121 codex re-review Finding 2.
+    const isReassign = 'assignee_id' in patch;
+    if (isReassign && role !== 'admin' && role !== 'manager') {
+      return envelope('FORBIDDEN', '담당자 변경은 관리자만 수행할 수 있습니다.', {
+        action: 'reassign',
+      });
+    }
     if (role === 'dev' && row.assignee_id !== userId) {
       return envelope('FORBIDDEN', '담당자만 수행할 수 있는 작업입니다.', {
         action: 'changeStatus',
@@ -87,7 +98,6 @@ export const vocHandlers = [
     if (role === 'user') {
       return envelope('FORBIDDEN', '접근 권한이 없습니다.', { action: 'changeStatus' });
     }
-    const patch = (await request.json()) as Partial<Voc>;
     const next = { ...row, ...patch, updated_at: new Date().toISOString() } as Voc;
     store[idx] = next;
     return HttpResponse.json(next);

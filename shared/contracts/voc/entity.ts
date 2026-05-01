@@ -75,7 +75,7 @@ export const VocListItem = Voc.pick({
   created_at: true,
   updated_at: true,
 }).extend({
-  has_children: z.boolean().default(false),
-  notes_count: z.number().int().nonnegative().default(0),
+  has_children: z.boolean(),
+  notes_count: z.number().int().nonnegative(),
 });
 export type VocListItem = z.infer<typeof VocListItem>;

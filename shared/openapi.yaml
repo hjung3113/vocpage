@@ -2468,6 +2468,59 @@ components:
           type: string
           format: date-time
 
+    VocListItem:
+      type: object
+      required: [id, issue_code, title, status, priority, voc_type_id, system_id, menu_id, source, created_at, updated_at, has_children, notes_count]
+      properties:
+        id:
+          type: string
+          format: uuid
+        issue_code:
+          type: string
+        title:
+          type: string
+        status:
+          $ref: '#/components/schemas/VocStatus'
+        priority:
+          $ref: '#/components/schemas/VocPriority'
+        voc_type_id:
+          type: string
+          format: uuid
+        system_id:
+          type: string
+          format: uuid
+        menu_id:
+          type: string
+          format: uuid
+        assignee_id:
+          type: string
+          format: uuid
+          nullable: true
+        author_id:
+          type: string
+          format: uuid
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        source:
+          $ref: '#/components/schemas/VocSource'
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        has_children:
+          type: boolean
+        notes_count:
+          type: integer
+          minimum: 0
+
     PaginatedVocs:
       type: object
       required: [rows, total, page, per_page]
@@ -2475,7 +2528,7 @@ components:
         rows:
           type: array
           items:
-            $ref: '#/components/schemas/Voc'
+            $ref: '#/components/schemas/VocListItem'
         total:
           type: integer
         page:

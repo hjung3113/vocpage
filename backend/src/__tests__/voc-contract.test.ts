@@ -115,6 +115,34 @@ describe('U2 guard — zod ↔ openapi voc 정합 (Wave 1)', () => {
     }
   });
 
+  test('VocListItem.required 매트릭스 (zod 비-옵셔널 키 ⊇ openapi.required)', () => {
+    const yamlListItem = schemas.VocListItem!;
+    expect(yamlListItem).toBeDefined();
+    const zodKeys = zodRequiredKeys(VocSchemas.VocListItem as unknown as AnyZodObject);
+    for (const k of yamlListItem.required ?? []) {
+      expect(zodKeys.has(k)).toBe(true);
+    }
+  });
+
+  test('VocListItem 키 셋 정합 (yaml properties === zod shape keys)', () => {
+    const yamlListItem = schemas.VocListItem!;
+    const yamlKeys = new Set(Object.keys(yamlListItem.properties ?? {}));
+    const zodShape = (VocSchemas.VocListItem as unknown as { shape: Record<string, unknown> })
+      .shape;
+    const zodKeys = new Set(Object.keys(zodShape));
+    expect([...zodKeys].sort()).toEqual([...yamlKeys].sort());
+  });
+
+  test('VocListItem nullable 키 정합 (yaml.nullable=true ⊆ zod nullable)', () => {
+    const yamlListItem = schemas.VocListItem!;
+    const zodNullable = zodNullableKeys(VocSchemas.VocListItem as unknown as AnyZodObject);
+    const missing: string[] = [];
+    for (const [key, prop] of Object.entries(yamlListItem.properties ?? {})) {
+      if (prop.nullable && !zodNullable.has(key)) missing.push(key);
+    }
+    expect(missing).toEqual([]);
+  });
+
   test('fixture 50건 모두 Voc.parse 통과', async () => {
     const { VOC_FIXTURES } = await import('../../../shared/fixtures/voc.fixtures');
     expect(VOC_FIXTURES.length).toBeGreaterThanOrEqual(50);
