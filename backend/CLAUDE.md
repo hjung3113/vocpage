@@ -2,6 +2,8 @@
 
 Express REST API for the VOC management system. Read root `CLAUDE.md` first for cross-cutting governance.
 
+**Stack:** Node.js + Express + TypeScript, PostgreSQL with pgvector extension (`pgvector/pgvector:pg16`), Jest + Supertest (test), tsx (dev runner).
+
 ## Status
 
 Scaffolded — feature work deferred to Phase 8. Currently `src/` has `index.ts`, `auth/` (mockLogin only — `validateADSession` is a stub for Phase 9), `routes/`. Migrations 001-011 applied; 012 (dev role), 013 (tag master), 014 (trash) drafted in `docs/specs/plans/`.
@@ -13,6 +15,28 @@ npm run dev                                      # tsx watch
 npm run test                                     # Jest
 npm run test -- --testPathPattern=filename       # Single test
 ```
+
+## Working from the Prototype
+
+The frontend prototype (`prototype/`) is a **product/UX reference**, not a backend spec. Treat it as evidence of real requirements — never as a DB schema or API blueprint.
+
+Infer backend needs from: pages, user actions, forms, displayed data, filters/sorting, status values, empty/error states, permission hints.
+
+Before coding an endpoint, define:
+
+- Domain entities + relationships, required/optional fields, enums/statuses
+- API contract (route, method, request/response shape, status codes, error shape)
+- Validation rules, auth/permission rules, error cases
+
+Rules:
+
+- Design APIs around **product behavior**, not UI layout — models reflect business concepts, not screen labels
+- Keep business logic out of route handlers (route → service → repository)
+- Validate all external input; use clear status codes and stable error shapes
+- Support FE states: pagination, filtering, sorting, loading-friendly responses, empty/error semantics
+- Avoid vague strings, generic models, and prototype-driven DB design (e.g., a column per UI badge)
+
+Flow: review prototype behavior → define entities/types → design API contract → service logic → persistence → validation/errors → confirm FE integration.
 
 ## Architecture
 
