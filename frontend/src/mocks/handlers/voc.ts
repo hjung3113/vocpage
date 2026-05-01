@@ -11,8 +11,10 @@ import { http, HttpResponse } from 'msw';
 import {
   VOC_FIXTURES,
   VOC_NOTES_FIXTURES,
+  VOC_TAG_RELATIONS,
   FIXTURE_USERS,
 } from '../../../../shared/fixtures/voc.fixtures';
+import { VocListQuery } from '../../../../shared/contracts/voc';
 
 type Voc = (typeof VOC_FIXTURES)[number];
 type Note = (typeof VOC_NOTES_FIXTURES)[number];
@@ -49,24 +51,25 @@ function currentRole(req: Request): { role: 'admin' | 'manager' | 'dev' | 'user'
 export const vocHandlers = [
   http.get('/api/vocs', ({ request }) => {
     const url = new URL(request.url);
-    const sp = url.searchParams;
-    const status = sp.getAll('status');
-    const voc_type_ids = sp.getAll('voc_type_ids');
-    const assignees = sp.getAll('assignees');
-    const priorities = sp.getAll('priorities');
-    const tag_ids = sp.getAll('tag_ids');
-    const q = sp.get('q')?.trim().toLowerCase() ?? '';
-    const sort_by = (sp.get('sort_by') ?? 'created_at') as
-      | 'created_at'
-      | 'updated_at'
-      | 'priority'
-      | 'status'
-      | 'due_date'
-      | 'issue_code';
-    const sort_dir = (sp.get('sort_dir') ?? 'desc') as 'asc' | 'desc';
-    const per_page = Number(sp.get('per_page') ?? 20);
-    const page = Number(sp.get('page') ?? 1);
-    if (per_page > 100) return envelope('VALIDATION_ERROR', 'per_page must be ≤ 100');
+    // Mirror BE: shared VocListQuery zod validates sort_by/sort_dir enum +
+    // page/per_page positive int. Repeated keys (status, assignees, etc.)
+    // must be preserved as arrays for arrayOrSingle preprocess.
+    const obj: Record<string, unknown> = {};
+    for (const k of url.searchParams.keys()) {
+      if (k in obj) continue;
+      const all = url.searchParams.getAll(k);
+      obj[k] = all.length > 1 ? all : all[0];
+    }
+    const parsed = VocListQuery.safeParse(obj);
+    if (!parsed.success) return envelope('VALIDATION_ERROR', 'invalid query');
+    const query = parsed.data;
+    const status = query.status ?? [];
+    const voc_type_ids = query.voc_type_ids ?? [];
+    const assignees = query.assignees ?? [];
+    const priorities = query.priorities ?? [];
+    const tag_ids = query.tag_ids ?? [];
+    const q = query.q?.toLowerCase() ?? '';
+    const { sort_by, sort_dir, page, per_page } = query;
 
     let rows = store.filter((r) => r.deleted_at === null);
     if (status.length) rows = rows.filter((r) => status.includes(r.status));
@@ -74,9 +77,12 @@ export const vocHandlers = [
     if (assignees.length)
       rows = rows.filter((r) => r.assignee_id !== null && assignees.includes(r.assignee_id));
     if (priorities.length) rows = rows.filter((r) => priorities.includes(r.priority));
-    // tag_ids: fixture 에 voc_tags relation 미존재 → no-op (BE join 위치 표식만 유지).
+    // tag_ids: BE는 EXISTS voc_tags 조인. MSW는 shared 픽스처
+    // VOC_TAG_RELATIONS 로 동일 의미 재현.
     if (tag_ids.length) {
-      // intentionally empty: parity hook for future fixture extension.
+      rows = rows.filter((r) =>
+        VOC_TAG_RELATIONS.some((rel) => rel.voc_id === r.id && tag_ids.includes(rel.tag_id)),
+      );
     }
     if (q) {
       rows = rows.filter(

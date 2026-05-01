@@ -8,7 +8,12 @@
 import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest';
 import { setupServer } from 'msw/node';
 import { vocHandlers, __resetVocMocks } from '../voc';
-import { VOC_FIXTURES, FIXTURE_USERS } from '../../../../../shared/fixtures/voc.fixtures';
+import {
+  VOC_FIXTURES,
+  VOC_TAG_RELATIONS,
+  FIXTURE_TAGS,
+  FIXTURE_USERS,
+} from '../../../../../shared/fixtures/voc.fixtures';
 
 const server = setupServer(...vocHandlers);
 
@@ -94,5 +99,47 @@ describe('MSW GET /api/vocs — query 필터/정렬 동기화 (BE 미러)', () =
       headers: { 'x-mock-role': 'manager' },
     });
     expect(res.status).toBe(400);
+  });
+});
+
+describe('MSW GET /api/vocs — VocListQuery zod 검증 (BE 미러)', () => {
+  it('sort_by=foo → 400 VALIDATION_ERROR', async () => {
+    const { status } = await list('sort_by=foo');
+    expect(status).toBe(400);
+  });
+
+  it('sort_dir=invalid → 400', async () => {
+    const { status } = await list('sort_dir=invalid');
+    expect(status).toBe(400);
+  });
+
+  it('page=0 → 400 (positive int 위반)', async () => {
+    const { status } = await list('page=0');
+    expect(status).toBe(400);
+  });
+
+  it('per_page=0 → 400 (min=1 위반)', async () => {
+    const { status } = await list('per_page=0');
+    expect(status).toBe(400);
+  });
+
+  it('per_page=abc → 400 (coerce 실패)', async () => {
+    const { status } = await list('per_page=abc');
+    expect(status).toBe(400);
+  });
+});
+
+describe('MSW GET /api/vocs — tag_ids 실제 필터링 (EXISTS 의미)', () => {
+  it('tag_ids=[bug] → relation 매칭 row 만 반환, 비매칭 row 제외', async () => {
+    const { status, body } = await list(`tag_ids=${FIXTURE_TAGS.bug}&per_page=100`);
+    expect(status).toBe(200);
+    const expectedIds = new Set(
+      VOC_TAG_RELATIONS.filter((r) => r.tag_id === FIXTURE_TAGS.bug).map((r) => r.voc_id),
+    );
+    expect(body.rows.length).toBe(expectedIds.size);
+    expect(body.rows.every((r) => expectedIds.has(r.id))).toBe(true);
+    // 비매칭 row 가 실제로 존재했는지 (필터 무력화 회귀 방지)
+    const allActive = VOC_FIXTURES.filter((r) => r.deleted_at === null);
+    expect(allActive.length).toBeGreaterThan(expectedIds.size);
   });
 });
