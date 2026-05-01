@@ -6,7 +6,7 @@ React SPA for the VOC management system. Read root `CLAUDE.md` first for cross-c
 
 ## Status
 
-Scaffolded — actual feature implementation deferred to Phase 8. Currently in Phase 7 (prototype-driven design freeze). `src/` contains: `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, `api/`, `contexts/`, `hooks/`, `styles/`, `test/`.
+Phase 8 Wave 1.5-β merged (`/voc` prototype-equivalent UI). Current `src/` tree: `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, `api/`, `components/{common,voc,layout,ui}/`, `features/`, `contexts/`, `hooks/`, `lib/`, `mocks/` (MSW v2 handlers), `styles/`, `test/`. Next: Wave 2 (Dashboard) — see `docs/specs/plans/next-session-tasks.md`.
 
 ## Commands
 
