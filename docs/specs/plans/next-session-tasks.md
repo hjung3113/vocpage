@@ -55,9 +55,17 @@
 6. **5명 OMC subagent 리뷰** (code-reviewer · security-reviewer · verifier · test-engineer · architect) × (정량 · 정성 · 리스크) 3관점 — 1라운드 이상 + 모든 REQUEST_CHANGES 해소.
 7. APPROVE 5/5 시 push + PR + 사용자 merge.
 
+### Wave 1 follow-up PRs (Wave 1.5 보강 PR과 병렬 가능)
+
+| ID                            | 항목                                                                                                                                                                                                                                                    | 상태                                              |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| follow-up A (Playwright e2e)  | `frontend/e2e/voc-happy-path.spec.ts` + `@playwright/test` install + CI workflow                                                                                                                                                                        | ⏳ Wave 1.5 보강 후 (시나리오 재작성 회피)        |
+| follow-up C-1 (Docker fix)    | backend Dockerfile `COPY shared/`, `docker-compose.yml` `./shared:/app/shared` 마운트                                                                                                                                                                   | ✅ 본 PR (`docs/wave1-followup-c-verify`)         |
+| follow-up C-2 (seed UUID fix) | `backend/seeds/dev_seed.sql` user UUIDs를 `FIXTURE_USERS` 정식 v4로 교체 + FK cascade(`vocs.author_id`/`assignee_id`, `comments.author_id`) + `backend/src/__tests__/seed-fixture-parity.test.ts` 회귀 (pg-mem 기반 `VocListResponse.parse` smoke) 추가 | ⏳ 다음 세션 단독 PR `feat/wave1-followup-c-seed` |
+
 ### Wave 2 진입 hard-block
 
-위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + follow-up C (real-BE) 종결 전까지 **Wave 2 implementation 금지**.
+위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + follow-up C-2 (seed UUID fix) 종결 전까지 **Wave 2 implementation 금지**. follow-up C-1은 본 PR로 종결.
 
 ---
 

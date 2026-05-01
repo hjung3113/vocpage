@@ -246,3 +246,124 @@ buildLoggerOptions`) merged this session — `npm run dev` no longer
 crashes at the pino transport. (A separate `AUTH_MODE` env crash
 remains; that path is exercised by docker-compose, addressed via
 follow-up C.)
+
+---
+
+## Follow-up C — verification results (2026-05-01)
+
+### Stack startup (after BE Dockerfile fix)
+
+`docker compose up -d postgres backend` initially failed at two layers:
+
+1. **Stale postgres volume** — old `postgres_data` volume from a 5-day
+   prior schema state (`008_alter_due_date` already applied) collided
+   with newer migration ordering. Resolved by `docker compose down -v`
+   - fresh start.
+2. **Backend image missing `shared/`** — `backend/Dockerfile` previously
+   only copied `./backend/`, but Wave 1 introduced runtime imports of
+   `shared/contracts/voc/users` (and `shared/fixtures/voc.fixtures` for
+   tests). Container crashed with `MODULE_NOT_FOUND` at
+   `/app/backend/src/auth/mockUsers.ts`. **Fixed in this PR**:
+   - `backend/Dockerfile` — `COPY shared/ ./shared/` before
+     `COPY backend/ ./backend/`.
+   - `docker-compose.yml` — added `./shared:/app/shared` bind mount
+     under `services.backend.volumes` so `tsx watch` picks up shared
+     contract edits without rebuild.
+
+After both fixes: `docker compose ps` shows postgres + backend `(healthy)`
+in ~30s; `GET /api/health` returns `200`.
+
+### `GET /api/vocs?limit=2` against real BE/Postgres
+
+After `npm run db:seed` inside the backend container, the endpoint
+returned `total: 10` (the seed's `vocs` table count; the other inserts
+populate `users`, `systems`, `menus`, `voc_types`, `tags`, `comments`
+but are not part of the list response). Pagination param is `limit`
+(not `per_page`) per `shared/contracts/voc/io.ts:53` — `limit=2`
+returns 2 rows of the 10-row total, with `page=1` and `pageSize=2`.
+Sample row 0 keys (17 fields):
+
+```
+id, issue_code, title, status, priority, voc_type_id, system_id,
+menu_id, assignee_id, author_id, parent_id, source, due_date,
+created_at, updated_at, has_children, notes_count
+```
+
+Shape matches `shared/contracts/voc/entity.ts` `VocListItem` exactly
+(15 picked + 2 extended). `sequence_no` is intentionally projected
+out by `backend/src/services/voc.ts:24-44 toListItem` — list endpoint
+returns the lightweight summary, full `Voc` is fetched per-row via
+`GET /api/vocs/:id`. Not a drift — by design.
+
+### 🔴 Drift: seed UUIDs are not v4 (entity-level strict UUID)
+
+`VocListResponse.safeParse(real-BE-response)` **FAIL** — first issue
+raised on `rows[0].system_id`, then cascades to `voc_type_id`,
+`menu_id`, `assignee_id`, `author_id`. Note: `shared/contracts/voc/io.ts:21`
+defines a **loose hex regex `Uuid`** for query/IO use cases (legacy
+fixture support) but `VocListItem` (which `VocListResponse.rows` uses)
+is defined in `shared/contracts/voc/entity.ts:61` and inherits the
+**strict `z.string().uuid()`** from `entity.ts:32`. Strict zod uuid
+enforces RFC 4122 v1-v8 (version digit `[1-8]` at position 14 +
+variant `[89abAB]` at position 19). Seed values fail both. Trace:
+
+| Source                                          | Example UUID                           | v4 valid?              |
+| ----------------------------------------------- | -------------------------------------- | ---------------------- |
+| `dev_seed.sql` users                            | `00000000-0000-0000-0000-000000000003` | ❌ (version digit `0`) |
+| `shared/contracts/voc/users.ts` `FIXTURE_USERS` | `00000000-0000-4000-8000-0000000000d1` | ✅ (v4 marker)         |
+
+Zod `z.string().uuid()` enforces RFC 4122 v1-v8 with the version digit
+in position 14. Seed values use all-zeros + counter, so the version
+digit is `0` → schema rejection. FE in `VITE_USE_MSW=false` would
+crash on first table render.
+
+**Impact assessment:**
+
+- ❌ Wave 1 FE never tested against real BE response — MSW handlers
+  return fixture rows (which DO use v4 UUIDs) so the gap was masked.
+- ❌ BE itself does not validate response shape (raw repo row → JSON).
+  This means the FE strict schema is the only catch — and it never
+  ran against real seed data this session.
+
+### Fix routing
+
+Per closure-report Open Item #2 playbook, seed UUID drift goes to a
+**separate PR** `feat/wave1-followup-c-seed` (next session entry).
+Audit shows the drift is broader than users: **every PK in
+`dev_seed.sql` uses the `XX000000-0000-0000-0000-...` v0 pattern**
+(users `00000000-…`, systems `10000000-…`, menus `20000000-…`,
+voc_types `30000000-…`, vocs `50000000-…`, comments, tags).
+
+Scope:
+
+1. Rewrite `backend/seeds/dev_seed.sql` UUIDs into RFC 4122 v4 form
+   (version digit at position 14 ∈ `[1-8]`, variant at position 19 ∈
+   `[89ab]`) while preserving deterministic prefixes for grep-ability.
+   Where users overlap `FIXTURE_USERS` (admin / manager / devSelf /
+   devOther / user — `shared/contracts/voc/users.ts`), reuse the
+   fixture UUIDs verbatim. Add `dev` role user (migration 013).
+2. Cascade FK references in the seed: `vocs.author_id`,
+   `vocs.assignee_id`, `vocs.system_id`, `vocs.menu_id`,
+   `vocs.voc_type_id`, `comments.author_id`, `voc_tags.tag_id`, etc.
+3. Per test-engineer round-1 guidance: add
+   `backend/src/__tests__/seed-fixture-parity.test.ts` as a **pure
+   parsing unit test** — `fs.readFileSync('seeds/dev_seed.sql')` →
+   regex-extract every UUID literal → assert each passes
+   `z.string().uuid()`. Faster than pg-mem and catches the same drift
+   class. (FK cascade verification stays in supertest integration
+   tests, not bundled here.)
+4. Re-run `VocListResponse.safeParse` smoke against the running
+   stack — must return `{ success: true, data: …rows: 10… }` before
+   merge.
+
+### Verification artifacts captured
+
+- `/tmp/voc-resp.json` (44 bytes empty → 10-row response after seed)
+- `/tmp/voc-cookie.txt` (admin session cookie via mock-login)
+- Docker compose logs available via `docker compose logs backend`
+
+### Status of Wave 2 prereq #3
+
+⏳ **Real-BE verification ran**, surfaced one drift (seed UUIDs).
+Stack startup blockers fixed in this PR. Drift fix is a separate PR
+before Wave 2 can ship safely.
