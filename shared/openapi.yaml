@@ -1969,7 +1969,7 @@ components:
 
     Voc:
       type: object
-      required: [id, issue_code, sequence_no, title, status, priority, source, created_at, updated_at]
+      required: [id, issue_code, sequence_no, title, status, priority, voc_type_id, menu_id, source, created_at, updated_at]
       properties:
         id:
           type: string
@@ -2042,7 +2042,7 @@ components:
 
     VocInput:
       type: object
-      required: [title, status, priority]
+      required: [title, status, priority, voc_type_id, menu_id]
       properties:
         title:
           type: string

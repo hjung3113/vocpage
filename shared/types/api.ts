@@ -1046,11 +1046,11 @@ export interface components {
       status: components['schemas']['VocStatus'];
       priority: components['schemas']['VocPriority'];
       /** Format: uuid */
-      voc_type_id?: string;
+      voc_type_id: string;
       /** Format: uuid */
       system_id?: string | null;
       /** Format: uuid */
-      menu_id?: string;
+      menu_id: string;
       /** Format: uuid */
       assignee_id?: string | null;
       /** Format: uuid */
@@ -1081,11 +1081,11 @@ export interface components {
       status: components['schemas']['VocStatus'];
       priority: components['schemas']['VocPriority'];
       /** Format: uuid */
-      voc_type_id?: string;
+      voc_type_id: string;
       /** Format: uuid */
       system_id?: string;
       /** Format: uuid */
-      menu_id?: string;
+      menu_id: string;
       /** Format: uuid */
       assignee_id?: string;
       /** Format: uuid */
