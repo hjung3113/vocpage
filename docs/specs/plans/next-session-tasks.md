@@ -1,9 +1,63 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-01 (**Phase 8 Wave 1 종료** — PR #110/#111/#112/#113 머지)
-> 현재 위치: **Phase 8 Wave 2 진입 대기** — closure report `phase-8-wave1-closure-report.md` + 회고 `phase-8-pattern.md` 사용자 검토 + follow-up A/C 마감 후 진입
+> 최종 업데이트: 2026-05-01 (**Phase 8 Wave 1 종료 + 사용자 수락 + Wave 1 보강 우선** — PR #110/#111/#112/#113/#114/#115 머지)
+> 현재 위치: **Phase 8 Wave 1 보강 (option-2) 대기** — Wave 1 vertical slice가 prototype 시각 깊이에 미달, Wave 2 진입 전 `/voc`를 prototype 수준으로 끌어올림. 보강 plan은 다음 세션 시작 시 인터뷰 → 설계 → 구현계획 순으로 수립.
 > Wave 3 결과: PR #93 W3-A / #94 W3-B / #95 W3-C 모두 머지 + 갭 재스캔 결론 0 잔여
 > R-4 (tsx watch) 이미 완료 — backend `dev` 스크립트 `tsx watch` (commit 809e267)
+
+---
+
+## 다음 세션 — Wave 1 보강 plan (option-2)
+
+> **트리거**: 사용자가 closure-report `User acceptance` 절을 검토하며 prototype 대비 `/voc` 시각 깊이 부족을 지적 → Wave 2 진입 전 보강 PR 1건 추가하기로 결정.
+> **방식 (확정)**: 인터뷰 → 설계 → 구현계획 → 구현 → **5명 OMC subagent 리뷰 (code-reviewer · security-reviewer · verifier · test-engineer · architect) × (정량 · 정성 · 리스크) 3관점**. 절대 self-review 금지.
+> **PR 흐름**: 사용자 직접 push + PR + merge.
+
+### 보강 범위 + 사전 테스트 계약 (closure-report `User acceptance` 절 기준 — 다음 세션에서 재합의)
+
+> **Tests-first gate (hard rule per `CLAUDE.md` Working Style)**: 각 행마다 "사전 테스트 계약" 컬럼의 테스트가 **구현 전에 작성되고 fail 하는 것을 확인**한 뒤에야 해당 행 구현 진입. 인터뷰 결과로 계약 변경 시 테스트도 동시 갱신.
+
+| 영역             | Prototype                                                              | 현재 FE (`VocListPage`)                 | 보강 후 목표                   | 사전 테스트 계약 (RTL/integration)                                                                                         |
+| ---------------- | ---------------------------------------------------------------------- | --------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Topbar           | "전체 VOC" + count 뱃지 + 검색박스 + 알림 bell + "새 VOC 등록"         | `<PageTitle title="VOC" />` 만          | prototype 동등                 | RTL: 카운트 뱃지 텍스트, 검색 input `aria-label`, 알림 bell 버튼, "새 VOC 등록" CTA 클릭 시 모달 open                      |
+| 상태 필터        | 6 pill (전체 / 접수 / 검토중 / 처리중 / 드랍 / 완료) + 아이콘 + 한국어 | shadcn Button(영문 enum 그대로)         | prototype 동등                 | RTL: 6 pill 모두 `aria-pressed` 토글 + 클릭 시 list re-query (Query observer 호출 횟수)                                    |
+| 고급 필터        | "필터 더보기" panel — 담당자 / 우선순위 / 유형 / 태그 + 초기화         | 없음 (q + status만)                     | prototype 동등                 | RTL: 패널 토글 visibility, 담당자 chip 다중 선택 + filter prop, 초기화 버튼 → 모든 chip cleared                            |
+| 정렬             | sort chips 6종 + 헤더 토글 + 활성 표시                                 | 없음                                    | prototype 동등                 | RTL: sort chip 6종 클릭 시 active class + sort prop 전달, 헤더 클릭 시 asc/desc 토글                                       |
+| 리스트 컬럼      | 6열 (이슈 ID / 제목 / 상태 / 담당자 / 우선순위 / 등록일)               | 4열 (Issue / Title / Status / Priority) | 6열 (담당자 + 등록일 추가)     | RTL: 6 `<th>` headers, 각 row 6 `<td>`; 담당자 미배정 시 "—" rendering                                                     |
+| Pagination       | `paginationRow`                                                        | 없음                                    | prototype 동등                 | RTL: 페이지 버튼 클릭 시 `page` prop 변경; "다음" 비활성화 (last page); item count 표기                                    |
+| 새 VOC 등록 모달 | Toast UI Editor 포함                                                   | 없음                                    | prototype 동등 (Toast UI 도입) | RTL: 모달 open/close, 필수 필드 validation, Toast UI editor 인스턴스 mount(jsdom 한계 → editor mock 또는 integration test) |
+| 알림 드롭다운    | bell + dot                                                             | 없음                                    | prototype 동등                 | RTL: dot visibility(unread > 0), 클릭 시 드롭다운 open + 항목 list 렌더링                                                  |
+| 검토 드로어 깊이 | 풀 스펙                                                                | 161줄 골격                              | prototype 동등                 | RTL: 추가 필드별(첨부 / 코멘트 / 변경 이력 등) 가시성 + 권한 분기 (user vs manager/admin)                                  |
+
+### 다음 세션 인터뷰 항목 (모호점 90% 이상 해소)
+
+1. **Toast UI Editor 도입 시점** — 보강 PR 안에 포함 vs 별도 후속 PR (의존 차이: ~5MB).
+2. **고급 필터 데이터 source** — fixture·MSW handlers에 담당자/태그 마스터 필요 → 어떻게 추가?
+3. **계약 변경 영역** — `shared/contracts/voc/io.ts`에 sort_by/sort_dir/page/per_page/assignees/priorities/tag_ids/voc_type_ids 추가 시 BE repository 동시 갱신?
+4. **PR 분할 vs 단일** — 시각/계약/BE를 하나로 vs 3개로 (codex 패턴 §3 참조).
+5. **시각 회귀 캡처 시점** — 보강 PR이 Wave 5 close-gate 시각 회귀를 미리 흡수할지.
+6. **새 VOC 등록 모달의 ROC** — 사용자 권한별 가시성 / 첨부 / 자동 태그.
+7. **prototype의 `?mode=admin` role pill 토글** — 보강 PR에서 다룰지 Wave 2로 이연할지.
+8. **TDD 단위** — 시각 컴포넌트 RTL 1건 vs 다중 컴포넌트 분리 / "시각만" RTL 가능 여부.
+9. **OSS 라이선스 인벤토리** — Toast UI / 추가 shadcn / lucide 아이콘 — phase-8.md §7.2 self-host 규칙.
+
+### 다음 세션 진행 순서
+
+1. 본 §"다음 세션 — Wave 1 보강 plan" 읽고 인터뷰 9개 시작 (사용자 응답 후 90% 미만 항목은 추가 질문). 인터뷰 순서 의존성: **Q4 (PR 분할) → Q5 (시각 회귀 시점) → Q1 (Toast UI)** 순서로 풀어야 의존이 깨끗하게 분해됨.
+2. 합의 결과를 `phase-8.md` Wave 1.5 entry + ADR로 promotion (architect 권고). 신규 doc은 §6 체크리스트 fail 시에만 생성. `next-session-tasks.md` Wave 1.5 절은 promotion 후 3-line pointer로 축소.
+3. 설계 + 구현계획 → 사용자 승인.
+4. **TDD cycle (행 단위, 위 표 "사전 테스트 계약" 컬럼 기준)**:
+   - 4-1. 실패 테스트 작성 → `npm test` 실행 → **테스트 fail 확인** (red).
+   - 4-2. 최소 구현 → `npm test` → **테스트 pass 확인** (green).
+   - 4-3. 리팩토링 (테스트 그대로 유지) → `npm test` → 여전히 pass.
+   - 다음 행으로. 모든 9행 완료 전 PR push 금지.
+5. **시각 회귀 트래킹** — Q5 답이 "Wave 1.5에서 흡수"라면 `phase-8.md` Wave 5 close-gate 시각 회귀 항목에 "12 - X 화면" 갱신 + `nextgen-backlog.md`에 차감 기록. Wave 5 게이트 표현 모호 방지.
+6. **5명 OMC subagent 리뷰** (code-reviewer · security-reviewer · verifier · test-engineer · architect) × (정량 · 정성 · 리스크) 3관점 — 1라운드 이상 + 모든 REQUEST_CHANGES 해소.
+7. APPROVE 5/5 시 push + PR + 사용자 merge.
+
+### Wave 2 진입 hard-block
+
+위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + follow-up C (real-BE) 종결 전까지 **Wave 2 implementation 금지**.
 
 ---
 
@@ -61,14 +115,15 @@
 > **스택**: shadcn/ui + TanStack Query/Table + RHF/Zod + MSW + Recharts (폐쇄망 self-host 가능 구성)
 > **운영 전제 (2026-05-01 갱신)**: Wave 0~5는 **개방망 표준 npm registry**로 진행. 폐쇄망 빌드는 동일 lockfile + `phase-8.md` §7.2 우회 4경로(미러 / 오프라인 캐시 / Verdaccio / git tarball·`npm pack`)로 **사후 재현**. 사내 미러 점검은 Phase 8 종료 후 별도 phase. 단, 진행 중에도 runtime fetch·CDN URL·telemetry zero / self-host / `package-lock.json` commit 강제(폐쇄망 재현 가능성 보존).
 
-| Wave | 범위                                                                                                                                                   | PR 수 | 상태                                                                                    |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | --------------------------------------------------------------------------------------- |
-| 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint(max-lines), CI 매트릭스, PR template, 폰트 self-host 점검 | 1     | ✅ PR #102                                                                              |
-| 1    | **기준 화면** — VOC 리스트 + 검토 드로어 (vertical slice) + 회고 `phase-8-pattern.md` + RTL F-T4/F-T5 보강                                             | 4     | ✅ #110/#111/#112/#113 — closure report 사용자 검토 + follow-up A/C 마감 후 Wave 2 진입 |
-| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                                                                  | 3     | Wave 1 게이트 통과 후                                                                   |
-| 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users) — 계약 1 + FE/BE 묶음 4                                                                   | 5     | 병렬 가능                                                                               |
-| 4    | 공지/FAQ + Notice popup                                                                                                                                | 3     | 병렬 가능                                                                               |
-| 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 — N-03 BE polling 필수                                                                                              | 3     | close gate                                                                              |
+| Wave | 범위                                                                                                                                                   | PR 수 | 상태                                                                                              |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------- |
+| 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint(max-lines), CI 매트릭스, PR template, 폰트 self-host 점검 | 1     | ✅ PR #102                                                                                        |
+| 1    | **기준 화면** — VOC 리스트 + 검토 드로어 (vertical slice) + 회고 `phase-8-pattern.md` + RTL F-T4/F-T5 보강                                             | 4     | ✅ #110/#111/#112/#113 — closure report 사용자 수락 (#114), Wave 1 보강 (option-2) 진행 후 Wave 2 |
+| 1.5  | **Wave 1 보강 (option-2)** — `/voc` prototype 시각·UX 동등화 (topbar / 고급필터 / 정렬 / 6열 / pagination / 등록모달 / 알림)                           | 1+    | ⏳ 다음 세션 — 인터뷰 9개 → 설계 → 구현계획 → 구현 → 5 OMC review                                 |
+| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                                                                  | 3     | Wave 1 보강 + follow-up A/C 종결 후                                                               |
+| 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users) — 계약 1 + FE/BE 묶음 4                                                                   | 5     | 병렬 가능                                                                                         |
+| 4    | 공지/FAQ + Notice popup                                                                                                                                | 3     | 병렬 가능                                                                                         |
+| 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 — N-03 BE polling 필수                                                                                              | 3     | close gate                                                                                        |
 
 **Phase 8 close 조건** (계획서 §2 Wave 5 close 참조):
 

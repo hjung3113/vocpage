@@ -187,3 +187,62 @@ and a new PR is warranted.
 
 Nothing in the Wave 1 work hit the 4-round codex ceiling or the forbidden
 action set. Closure is clean.
+
+---
+
+## User acceptance — 2026-05-01 (post-closure session)
+
+User reviewed this report and **accepted Wave 1 ship state**, but
+**deferred Wave 2 entry** after a side-by-side check of the prototype
+(`prototype/prototype.html` `#page-voc`) against the merged FE
+(`frontend/src/components/voc/VocListPage.tsx`).
+
+### Gap finding (informal)
+
+Current `/voc` is functionally a contract/MSW PoC; visually it lacks
+prototype parity in:
+
+- topbar (count badge, search box, notif bell, "새 VOC 등록" button)
+- 6-status pill bar (현재는 영문 enum 그대로, 아이콘·한국어 라벨 없음)
+- "필터 더보기" panel (담당자 / 우선순위 / 유형 / 태그 — 현재는 q + status만)
+- sort chips toolbar (정렬 기준 6종) + header sort toggles
+- table columns (현재 4열, 프로토타입은 6열 — 담당자 + 등록일 누락)
+- pagination row
+- "새 VOC 등록" modal (Toast UI Editor)
+- notification dropdown
+- review drawer 시각적 깊이 (현재 161줄 골격)
+
+### Decision: option-2 (Wave 1 보강 우선)
+
+Replicating Wave 1's thinness across Wave 2~5 would compound a visual
+gap that the Wave 5 close-gate (시각 회귀) would then have to clean up
+in five places at once. Cheaper to lift `/voc` once now and let Wave 2
+inherit the higher floor.
+
+**New direction:** add a Wave 1 보강 PR that brings `/voc` to prototype
+parity, then proceed to Wave 2 from a stronger baseline. The 보강 plan
+itself (mapping prototype components → React, contract deltas, test
+plan) is **deferred to next session** — it requires interview-driven
+ambiguity removal before implementation per project working rules.
+
+### Effect on Wave 2 prerequisites (recap above)
+
+| Prereq                                 | Status now                                               |
+| -------------------------------------- | -------------------------------------------------------- |
+| 1. closure report exists               | ✅                                                       |
+| 2. Follow-up A (Playwright)            | ⏸ deferred (overlaps Wave 1 보강 — 시나리오 재작성 회피) |
+| 3. Follow-up C (real-BE verify)        | ⏳ this session, separate PR (Docker 시작 후)            |
+| 4. Follow-up D (Lighthouse a11y)       | ✅ 100/100                                               |
+| 5. Dashboard contract skeleton         | ⏸ blocked by Wave 1 보강                                 |
+| 6. Dashboard openapi paths + U2 guards | ⏸ blocked by Wave 1 보강                                 |
+
+**Wave 2 implementation is hard-blocked until Wave 1 보강 PR merges +
+follow-up A/C close.**
+
+### Side note: BE dev crash unblocked
+
+PR #115 (`fix(backend): install pino-pretty devDep + extract
+buildLoggerOptions`) merged this session — `npm run dev` no longer
+crashes at the pino transport. (A separate `AUTH_MODE` env crash
+remains; that path is exercised by docker-compose, addressed via
+follow-up C.)
