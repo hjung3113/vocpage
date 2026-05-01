@@ -10,6 +10,7 @@ interface ToastBodyEditorProps {
 export default function ToastBodyEditor({ value, onChange }: ToastBodyEditorProps) {
   const ref = useRef<Editor | null>(null);
 
+  // React 18 Strict Mode 이중 mount 방지 가드
   useEffect(() => {
     const inst = ref.current?.getInstance();
     if (!inst) return;

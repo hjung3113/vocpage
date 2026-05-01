@@ -21,10 +21,26 @@ vi.mock('../../../../api/voc', () => ({
 
 import { vocApi } from '../../../../api/voc';
 
-function renderDrawer(role: Role, vocId: string, opts: { deleted?: boolean } = {}) {
+function makeAxiosError(status: number) {
+  const err = new Error(`Request failed with status code ${status}`) as Error & {
+    response: { status: number };
+  };
+  (err as { response: { status: number } }).response = { status };
+  return err;
+}
+
+function renderDrawer(
+  role: Role,
+  vocId: string,
+  opts: { deleted?: boolean; errorStatus?: number } = {},
+) {
   const target = VOC_FIXTURES.find((r) => r.id === vocId)!;
   const detail = opts.deleted ? { ...target, deleted_at: new Date().toISOString() } : target;
-  vi.mocked(vocApi.get).mockResolvedValue(detail);
+  if (opts.errorStatus !== undefined) {
+    vi.mocked(vocApi.get).mockRejectedValue(makeAxiosError(opts.errorStatus));
+  } else {
+    vi.mocked(vocApi.get).mockResolvedValue(detail);
+  }
   vi.mocked(vocApi.history).mockResolvedValue([...VOC_HISTORY_FIXTURES]);
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -93,5 +109,17 @@ describe('VocReviewDrawer — Wave D D1', () => {
     const historyTab = screen.getByRole('tab', { name: '변경이력' });
     await userEvent.click(historyTab);
     await waitFor(() => expect(screen.getAllByRole('listitem').length).toBeGreaterThanOrEqual(1));
+  });
+
+  it('403 에러 시 VocPermissionGate 표시', async () => {
+    renderDrawer('manager', target.id, { errorStatus: 403 });
+    await waitFor(() => expect(screen.getByTestId('voc-permission-gate')).toBeInTheDocument());
+    expect(screen.queryByText('오류가 발생했습니다.')).not.toBeInTheDocument();
+  });
+
+  it('500 에러 시 ErrorState 표시, PermissionGate 미표시', async () => {
+    renderDrawer('manager', target.id, { errorStatus: 500 });
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.queryByTestId('voc-permission-gate')).not.toBeInTheDocument();
   });
 });

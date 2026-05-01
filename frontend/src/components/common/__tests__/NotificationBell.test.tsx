@@ -4,8 +4,21 @@ import { vi } from 'vitest';
 import { NotificationBell } from '../NotificationBell';
 
 const items = [
-  { id: 'n1', label: '새 VOC', href: '/voc/1', createdAt: '2026-05-01T10:00:00Z' },
-  { id: 'n2', label: '댓글 달림', createdAt: '2026-05-01T11:00:00Z' },
+  {
+    id: 'n1',
+    type: 'assigned' as const,
+    label: '새 VOC',
+    href: '/voc/1',
+    createdAt: '2026-05-01T10:00:00Z',
+    read: false,
+  },
+  {
+    id: 'n2',
+    type: 'comment' as const,
+    label: '댓글 달림',
+    createdAt: '2026-05-01T11:00:00Z',
+    read: false,
+  },
 ];
 
 describe('NotificationBell', () => {

@@ -27,10 +27,10 @@ export interface VocAdvancedFiltersProps {
 }
 
 const PRIORITIES: ReadonlyArray<{ value: VocPriority; label: string }> = [
-  { value: 'urgent', label: 'urgent' },
-  { value: 'high', label: 'high' },
-  { value: 'medium', label: 'medium' },
-  { value: 'low', label: 'low' },
+  { value: 'urgent', label: '긴급' },
+  { value: 'high', label: '높음' },
+  { value: 'medium', label: '보통' },
+  { value: 'low', label: '낮음' },
 ];
 
 function toggleItem<T>(list: T[] | undefined, item: T): T[] {

@@ -96,7 +96,13 @@ export function VocAttachmentsPanel({ items, canUpload }: AttachmentsPanelProps)
               className="flex items-center justify-between rounded border p-2 text-sm"
               style={{ borderColor: 'var(--border-standard)' }}
             >
-              <a href={a.href} className="truncate" style={{ color: 'var(--brand)' }}>
+              <a
+                href={a.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="truncate"
+                style={{ color: 'var(--brand)' }}
+              >
                 {a.name}
               </a>
               <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>

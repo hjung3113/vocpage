@@ -4,8 +4,21 @@ import { vi } from 'vitest';
 import { VocNotificationsDropdown } from '../VocNotificationsDropdown';
 
 const items = [
-  { id: 'n1', label: '새 VOC 등록됨', href: '/voc/1', createdAt: '2026-05-01T10:00:00Z' },
-  { id: 'n2', label: '댓글이 달렸습니다', createdAt: '2026-05-02T10:00:00Z' },
+  {
+    id: 'n1',
+    type: 'assigned' as const,
+    label: '새 VOC 등록됨',
+    href: '/voc/1',
+    createdAt: '2026-05-01T10:00:00Z',
+    read: false,
+  },
+  {
+    id: 'n2',
+    type: 'comment' as const,
+    label: '댓글이 달렸습니다',
+    createdAt: '2026-05-02T10:00:00Z',
+    read: false,
+  },
 ];
 
 describe('VocNotificationsDropdown', () => {

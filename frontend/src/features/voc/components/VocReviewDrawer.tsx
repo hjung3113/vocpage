@@ -19,6 +19,7 @@ import {
 } from '../../../../../shared/contracts/voc';
 import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
 import { LoadingState } from '../../../components/common/LoadingState';
+import { ErrorState } from '../../../components/common/ErrorState';
 import {
   VocCommentsPanel,
   VocAttachmentsPanel,
@@ -86,7 +87,13 @@ export function VocReviewDrawer({
           <DialogTitle>{voc ? voc.title : 'VOC'}</DialogTitle>
         </DialogHeader>
         {detail.isLoading && <LoadingState />}
-        {detail.isError && <VocPermissionGate reason="role" />}
+        {detail.isError &&
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ((detail.error as any)?.response?.status === 403 ? (
+            <VocPermissionGate reason="role" />
+          ) : (
+            <ErrorState />
+          ))}
         {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
         {voc && !blockedDeleted && (
           <div className="flex flex-col gap-4 overflow-y-auto py-2">

@@ -8,13 +8,9 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { cn } from '../../lib/utils';
+import type { NotificationItem } from '../../../../shared/contracts/notification/io';
 
-export interface NotificationItem {
-  id: string;
-  label: string;
-  href?: string;
-  createdAt: string;
-}
+export type { NotificationItem };
 
 export interface NotificationBellProps {
   unreadCount: number;

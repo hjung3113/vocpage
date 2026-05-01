@@ -73,8 +73,8 @@ describe('VocAdvancedFilters', () => {
 
   it('marks both selected priorities as aria-pressed=true', () => {
     renderClosed({ open: true, value: { priorities: ['urgent', 'high'] } });
-    expect(screen.getByRole('button', { name: /urgent/i })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: /^high$/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /긴급/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /^높음$/i })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('calls onReset when 초기화 clicked', async () => {
