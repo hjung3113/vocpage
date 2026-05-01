@@ -40,3 +40,4 @@ admin-*.png
 
 # Uploads (multer)
 uploads/
+.claude/scheduled_tasks.lock
