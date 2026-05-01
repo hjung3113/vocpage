@@ -9,7 +9,9 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --max-warnings=0 && npm run lint:tokens",
-    "lint:tokens": "node eslint-rules/check-no-raw-color.cjs src/"
+    "lint:tokens": "node eslint-rules/check-no-raw-color.cjs src/",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -37,8 +39,7 @@
     "zod": "^4.4.1"
   },
   "devDependencies": {
-    "http-server": "^14.1.1",
-    "playwright": "^1.52.0",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.0.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -52,8 +53,10 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-tailwindcss": "^3.18.3",
+    "http-server": "^14.1.1",
     "jsdom": "^29.0.2",
     "msw": "^2.14.2",
+    "playwright": "^1.52.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.4.5",
     "vite": "^5.2.10",
