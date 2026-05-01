@@ -1,3 +1,83 @@
+// ── W3-C A: User role drawer readonly gate ────────────────────────────────────
+// spec: feature-voc.md §8.3 — User은 댓글 작성·첨부 권한 없음 → fail-closed
+function applyDrawerUserReadonly(vocId) {
+  // Disable comment input area
+  const commentInput = document.getElementById('new-comment-input-' + vocId);
+  if (commentInput) {
+    commentInput.disabled = true;
+    commentInput.placeholder = '';
+  }
+  const commentInputWrap = commentInput ? commentInput.closest('.comment-input') : null;
+  if (commentInputWrap) {
+    commentInputWrap.classList.add('comment-input--readonly');
+  }
+
+  // Inject inline notice before comment input (not a toast)
+  const commentsSection = document.querySelector('.d-comments');
+  if (commentsSection && !commentsSection.querySelector('.d-readonly-notice')) {
+    const notice = document.createElement('div');
+    notice.className = 'd-readonly-notice';
+    notice.setAttribute('role', 'status');
+    notice.textContent = '조회만 가능합니다 (권한 없음)';
+    const inputWrap = commentsSection.querySelector('.comment-input');
+    if (inputWrap) {
+      commentsSection.insertBefore(notice, inputWrap);
+    } else {
+      commentsSection.appendChild(notice);
+    }
+  }
+
+  // Disable attachment zone
+  const attZone = document.getElementById('att-zone-' + vocId);
+  if (attZone) {
+    attZone.classList.add('att-zone--readonly');
+    const drop = attZone.querySelector('.att-drop');
+    if (drop) {
+      drop.classList.add('att-drop--disabled');
+      drop.innerHTML =
+        '<span style="color:var(--text-quaternary)">첨부 권한 없음 (조회 전용)</span>';
+    }
+    const removeButtons = attZone.querySelectorAll('.att-remove');
+    removeButtons.forEach(function (btn) {
+      btn.style.display = 'none';
+    });
+  }
+}
+
+// Re-apply drawer user gate when role changes while drawer is open
+document.addEventListener('role:change', function (e) {
+  const drawer = document.getElementById('drawer');
+  if (!drawer || !drawer.classList.contains('open')) return;
+  const vocId = drawer.dataset.openVocId;
+  if (!vocId) return;
+  const newRole = e.detail && e.detail.role;
+
+  // Remove existing readonly notice if switching away from user
+  const existingNotice = document.querySelector('.d-readonly-notice');
+  if (existingNotice) existingNotice.remove();
+
+  // Re-enable comment input
+  const commentInput = document.getElementById('new-comment-input-' + vocId);
+  if (commentInput) {
+    commentInput.disabled = false;
+    commentInput.placeholder = '댓글을 입력하세요 (Markdown 지원, Toast UI Editor 마운트 예정)';
+  }
+  const commentInputWrap = commentInput ? commentInput.closest('.comment-input') : null;
+  if (commentInputWrap) commentInputWrap.classList.remove('comment-input--readonly');
+
+  // Re-enable attachment zone
+  const attZone = document.getElementById('att-zone-' + vocId);
+  if (attZone) {
+    attZone.classList.remove('att-zone--readonly');
+    const drop = attZone.querySelector('.att-drop');
+    if (drop) drop.classList.remove('att-drop--disabled');
+  }
+
+  if (newRole === 'user') {
+    applyDrawerUserReadonly(vocId);
+  }
+});
+
 // ── C-02 Due Date helpers ────────────────────────────────────────────────────
 // calcDueDate(priority, baseDate?) → 'YYYY-MM-DD'
 // urgent=+7d, high=+14d, medium=+30d, low=+90d (feature-voc.md §8.4.1)
@@ -171,11 +251,20 @@ function openDrawer(id) {
     </div>`;
 
   document.getElementById('drawerOverlay').classList.add('open');
-  document.getElementById('drawer').classList.add('open');
+  const drawerEl = document.getElementById('drawer');
+  drawerEl.classList.add('open');
+  drawerEl.dataset.openVocId = id;
   document.querySelectorAll('.voc-row').forEach((r) => r.classList.remove('selected'));
   const row = document.getElementById('row-' + id);
   if (row) row.classList.add('selected');
   lucide.createIcons();
+
+  // W3-C A: User role — fail-closed comment input + attachment zone
+  // spec: feature-voc.md §8.3 (User: 댓글 쓰기 권한 없음)
+  const drawerRole = (window.currentUser && window.currentUser.role) || 'user';
+  if (drawerRole === 'user') {
+    applyDrawerUserReadonly(id);
+  }
 
   // N-02: attach charcount to drawer comment input — pass explicit submit button to avoid wrong btn-primary
   if (typeof window.attachCharCount === 'function') {
