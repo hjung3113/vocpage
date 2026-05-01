@@ -8,6 +8,16 @@ import { PageTitle } from './components/layout/PageTitle';
 const MockLoginPage =
   import.meta.env.VITE_AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
 
+const VocPage = lazy(() => import('./pages/VocPage'));
+
+function VocRoute() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <VocPage />
+    </Suspense>
+  );
+}
+
 function MockLoginRoute() {
   if (!MockLoginPage) return <Navigate to="/" replace />;
   return (
@@ -44,7 +54,7 @@ export const router = createBrowserRouter([
     element: <AppShell />,
     children: [
       { index: true, element: <Navigate to="/voc" replace /> },
-      { path: 'voc', element: <StubPage title="VOC" /> },
+      { path: 'voc', element: <VocRoute /> },
       { path: 'dashboard', element: <StubPage title="Dashboard" /> },
       { path: 'notice', element: <StubPage title="공지" /> },
       { path: 'faq', element: <StubPage title="FAQ" /> },
