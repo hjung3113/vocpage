@@ -66,7 +66,7 @@ describe('VocTable', () => {
     expect(headers[5]).toHaveTextContent('등록일');
   });
 
-  it('renders 6 td cells per row', () => {
+  it('renders 6 gridcells per row', () => {
     render(
       <VocTable
         rows={[rows[0]!]}
@@ -77,7 +77,7 @@ describe('VocTable', () => {
         assigneeMap={assigneeMap}
       />,
     );
-    const cells = screen.getAllByRole('cell');
+    const cells = screen.getAllByRole('gridcell');
     expect(cells).toHaveLength(6);
   });
 

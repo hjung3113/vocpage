@@ -249,3 +249,70 @@ body {
     0 1px 0 var(--border-subtle),
     0 2px 8px light-dark(oklch(80% 0.01 260 / 0.08), oklch(5% 0.01 265 / 0.3));
 }
+
+/* C-7 VocRow — hover/selected backgrounds reference --voc-row-hover-bg / --voc-row-selected-bg
+   (token wraps oklch literal; see Phase B PR that introduced those tokens). */
+/* === C-7 VocRow styles START ===
+   Token-purity guarded block (rules below must use var(--*) only). */
+.voc-row {
+  transition: background 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.voc-row:hover {
+  background: var(--voc-row-hover-bg);
+}
+.voc-row:hover .voc-title-text {
+  color: var(--text-primary);
+  transition: color 0.15s;
+}
+.voc-row.is-selected {
+  background: var(--voc-row-selected-bg);
+  outline: 1px solid var(--brand-border);
+  outline-offset: -1px;
+  z-index: 1;
+  position: relative;
+}
+.voc-row.is-selected .voc-title-text {
+  color: var(--accent);
+}
+.voc-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.voc-row-issue-code {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.04em;
+  padding-right: var(--sp-2);
+}
+.voc-row-title {
+  font-size: 13px;
+  font-weight: 510;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  letter-spacing: -0.1px;
+  padding-right: var(--sp-2);
+}
+.voc-row-title .voc-title-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.voc-row-created-at {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding-right: var(--sp-2);
+}
+.voc-row-expand {
+  width: 14px;
+  height: 14px;
+  color: var(--text-quaternary);
+}
+/* === C-7 VocRow styles END === */

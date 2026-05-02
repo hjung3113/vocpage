@@ -1,11 +1,6 @@
-import { DataTable } from '../../../components/common/DataTable';
-import type { DataTableColumn } from '../../../components/common/DataTable';
-import { VocStatusBadge } from '../../../components/voc/VocStatusBadge';
-import { VocPriorityBadge } from '../../../components/voc/VocPriorityBadge';
-import { VocAssignee } from '../../../components/voc/VocAssignee';
+import { VocListHeader } from '../../../components/voc/VocListHeader';
+import { VocRow } from '../../../components/voc/VocRow';
 import type { VocListResponse, VocSortColumn, SortDir } from '../../../../../shared/contracts/voc';
-
-type Row = VocListResponse['rows'][number];
 
 interface VocTableProps {
   rows: VocListResponse['rows'];
@@ -24,64 +19,37 @@ export function VocTable({
   onRowClick,
   assigneeMap,
 }: VocTableProps) {
-  const columns: DataTableColumn<Row>[] = [
-    {
-      key: 'issue_code',
-      header: '이슈 ID',
-      sortable: true,
-      cellClassName: 'font-mono text-xs',
-      render: (row) => row.issue_code,
-    },
-    {
-      key: 'title',
-      header: '제목',
-      sortable: false,
-      render: (row) => row.title,
-    },
-    {
-      key: 'status',
-      header: '상태',
-      sortable: true,
-      render: (row) => <VocStatusBadge status={row.status} />,
-    },
-    {
-      key: 'assignee_id',
-      header: '담당자',
-      sortable: false,
-      render: (row) => (
-        <VocAssignee name={row.assignee_id ? (assigneeMap[row.assignee_id] ?? null) : null} />
-      ),
-    },
-    {
-      key: 'priority',
-      header: '우선순위',
-      sortable: true,
-      render: (row) => <VocPriorityBadge priority={row.priority} />,
-    },
-    {
-      key: 'created_at',
-      header: '등록일',
-      sortable: true,
-      render: (row) => row.created_at.slice(0, 10),
-    },
-  ];
-
   return (
-    <div data-pcomp="voc-table" data-testid="voc-table">
-      <DataTable<Row>
-        columns={columns}
-        rows={rows}
-        rowKey={(row) => row.id}
-        sortKey={sortBy}
-        sortDir={sortDir}
-        onSort={(key) => onSort(key as VocSortColumn)}
-        onRowClick={(row) => onRowClick(row.id)}
-        emptyState={
-          <div className="py-12 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
-            데이터가 없습니다
-          </div>
-        }
-      />
+    <div
+      data-pcomp="voc-table"
+      data-testid="voc-table"
+      role="grid"
+      aria-label="VOC 목록"
+      className="voc-table-grid"
+    >
+      <VocListHeader sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+      {rows.length === 0 ? (
+        <div
+          className="voc-table-empty"
+          style={{
+            padding: '48px 0',
+            textAlign: 'center',
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+          }}
+        >
+          데이터가 없습니다
+        </div>
+      ) : (
+        rows.map((row) => (
+          <VocRow
+            key={row.id}
+            row={row}
+            assigneeMap={assigneeMap}
+            onClick={() => onRowClick(row.id)}
+          />
+        ))
+      )}
     </div>
   );
 }
