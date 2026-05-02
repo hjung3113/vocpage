@@ -20,12 +20,15 @@
 
 All badges are `sm` size. No badges appear in VOC detail (expand-in-place) or VocSubRow beyond what is listed here.
 
-| #   | Badge               | Archetype   | Variant enum                   | iconMode                       | Size | Dynamic?                                                                 | Source file (current)                              | Ship status   |
-| --- | ------------------- | ----------- | ------------------------------ | ------------------------------ | ---- | ------------------------------------------------------------------------ | -------------------------------------------------- | ------------- |
-| 1   | 유형 (Type)         | TextMark    | per type slug (4 v1 values)    | `icon-only`                    | `sm` | static enum (admin-managed, user-customizable in v2)                     | `VocTypeBadge` (new — C-2.6)                       | new           |
-| 2   | 태그 (Tag)          | OutlineChip | `tag` (single neutral variant) | `icon+text` (icon = `#` glyph) | `sm` | dynamic (admin + user adds tags)                                         | `VocTagPill` (new — C-3)                           | new           |
-| 3   | 상태 (Status)       | SolidChip   | per status slug (5 values)     | `dot+text`                     | `sm` | static enum (5 values, locked per requirements.md §1.4 + plan §C1.D1~D6) | `frontend/src/components/voc/VocStatusBadge.tsx`   | shipped (C-1) |
-| 4   | 우선순위 (Priority) | TextMark    | per priority value (4 values)  | `icon+text`                    | `sm` | static enum                                                              | `frontend/src/components/voc/VocPriorityBadge.tsx` | shipped (C-2) |
+| #   | Badge       | Archetype | Variant enum                   | iconMode                       | Size | Dynamic?                                             | Source file (current)        | Ship status      |
+| --- | ----------- | --------- | ------------------------------ | ------------------------------ | ---- | ---------------------------------------------------- | ---------------------------- | ---------------- |
+| 1   | 유형 (Type) | TextMark  | per type slug (4 v1 values)    | `icon-only`                    | `sm` | static enum (admin-managed, user-customizable in v2) | `VocTypeBadge` (new — C-2.6) | new              |
+| 2   | 태그 (Tag)  | TextMark  | `tag` (single neutral variant) | `icon+text` (icon = `#` glyph) | `xs` | dynamic (admin + user adds tags)                     | `VocTagPill` (new — C-3)     | new [^tag-pivot] |
+
+[^tag-pivot]:
+    **[AMENDED 2026-05-02 post-PR-144 visual review]** — original spec said `OutlineChip` archetype with `sm` size. After user visual review on PR #144 ("테두리/배경 없는 회색 글씨로 더 작게"), VocTagPill was rewritten as a `TextMark` wrapper at the new `size='xs'` (10.5px), `weight: 500`, color `var(--text-quaternary)`, `#` glyph prefix. Rationale: tag pills must recede in the row hierarchy and not compete with content titles (uidesign.md §7 Identity tier). The OutlineChip primitive itself is preserved (see §2.2) for future tag-like use cases requiring chip prominence.
+    | 3 | 상태 (Status) | SolidChip | per status slug (5 values) | `dot+text` | `sm` | static enum (5 values, locked per requirements.md §1.4 + plan §C1.D1~D6) | `frontend/src/components/voc/VocStatusBadge.tsx` | shipped (C-1) |
+    | 4 | 우선순위 (Priority) | TextMark | per priority value (4 values) | `icon+text` | `sm` | static enum | `frontend/src/components/voc/VocPriorityBadge.tsx` | shipped (C-2) |
 
 **Notes:**
 
@@ -44,24 +47,25 @@ All badges are `sm` size. No badges appear in VOC detail (expand-in-place) or Vo
 
 **Visual spec:**
 
-- Height: `--chip-height-sm` (20px)
+- Height: `--chip-height-sm` (20px) when `size='sm'`; **no fixed cell height when `size='xs'`** (flows at natural line height — see note below)
 - Padding: `0` (no horizontal padding — text sits flush in the cell; icon gap handled by gap token)
 - Background: none
 - Border: none
 - Border-radius: n/a
-- Font-size: `--chip-font-size-sm` (11.5px) — metadata tier (uidesign.md §7 Table Typography)
+- Font-size: `--chip-font-size-sm` (11.5px) for `size='sm'`; `--chip-font-size-xs` (10.5px) for `size='xs'` — metadata tier (uidesign.md §7 Table Typography)
 - Gap (icon↔text): `--chip-gap` (4px)
-- Font-weight: **fixed per variant** — callsite cannot override
+- Font-weight: **wrapper-controlled** (numeric `400|500|600|700`) — passed in by the domain wrapper, not encapsulated per archetype variant. **[AMENDED 2026-05-02 post-PR-144 visual review — original: "fixed per variant — callsite cannot override"; rationale: weight is determined by the domain wrapper itself (e.g. `VocPriorityBadge` urgent=700/high=400 split, `VocTagPill` constant 500, `VocTypeBadge` per-type table). Encapsulating weight inside the primitive would force the primitive to know about every domain enum.]** Callsites in `features/voc/**` still never set weight directly — they call the wrapper, which sets weight. The closure boundary is at the wrapper, not the primitive.
 
 **Props:**
 
 ```ts
 interface TextMarkProps {
-  variant: VocTypeVariant | VocPriorityVariant; // closed set, no free color prop
+  variant: VocTypeVariant | VocPriorityVariant | 'tag'; // closed set, no free color prop
   iconMode: 'icon-only' | 'icon+text';
-  icon: LucideIcon;
+  icon: LucideIcon | '#'; // '#' is a literal glyph, not a lucide icon (used by VocTagPill)
   label: string; // required even for icon-only (used as aria-label)
-  size?: 'sm'; // VOC uses sm exclusively; md reserved for future
+  size?: 'sm' | 'xs'; // 'sm' default (11.5px, fixed cell height); 'xs' (10.5px, no fixed cell height) added post-PR-144 for VocTagPill
+  weight?: 400 | 500 | 600 | 700; // wrapper-controlled numeric weight
 }
 ```
 
@@ -88,7 +92,7 @@ _Priority variants (VocPriorityBadge → TextMark):_
 
 _Type variants (VocTypeBadge → TextMark) — see §3 for full icon+color mapping._
 
-**Used by:** `VocPriorityBadge`, `VocTypeBadge`
+**Used by:** `VocPriorityBadge` (size='sm', icon=lucide), `VocTypeBadge` (size='sm', icon=lucide, iconMode='icon-only'), `VocTagPill` (size='xs', icon='#', iconMode='icon+text', weight=500, color=`var(--text-quaternary)`) — VocTagPill added post-PR-144 visual review.
 
 ---
 
@@ -120,9 +124,9 @@ interface OutlineChipProps {
 
 **Variants:** single neutral variant (no enum — OutlineChip is always brand-tinted for VOC tags)
 
-**Used by:** `VocTagPill`
+**Used by:** **[AMENDED 2026-05-02 post-PR-144 visual review — original: `VocTagPill`]** No current VOC consumer. The OutlineChip primitive is **retained for future tag-like use cases requiring chip prominence** (e.g. `source='import'` "Jira Imported" badge per §6 Deferred decisions, future filter-pill variants). The primitive is shipped and tested in C-2.6.
 
-**Note:** This matches the existing "Tag Pill (Auto-tag)" spec in uidesign.md §5 exactly. The primitive formalizes what was already described there.
+**Note:** Originally described as the implementation of "Tag Pill (Auto-tag)" in uidesign.md §5. After the PR-144 visual review, VocTagPill switched to the TextMark archetype at `size='xs'`; uidesign.md §5 was amended in lockstep to describe the text-only quiet style. The OutlineChip spec remains here unchanged because the chip-style tag visual is still valid for non-row contexts (filter UI, badges in headings) — only the in-row VOC tag pill changed archetypes.
 
 ---
 
@@ -174,14 +178,17 @@ All tokens already exist in `frontend/src/styles/index.css` (shipped in C-1 and 
 
 The 4 VOC badges decompose exhaustively into 3 archetypes:
 
-| Property            | TextMark                 | OutlineChip                   | SolidChip                     |
-| ------------------- | ------------------------ | ----------------------------- | ----------------------------- |
-| Has background fill | No                       | Translucent (brand-bg)        | Yes (semantic, opaque)        |
-| Has border          | No                       | Yes (neutral brand-border)    | Yes (semantic)                |
-| Border-radius       | n/a                      | `--chip-radius-pill` (9999px) | `--chip-radius-pill` (9999px) |
-| Icon semantics      | Domain-specific (lucide) | Structural glyph (`#`)        | Dot only                      |
-| Color signal        | Text color = semantic    | Neutral (always brand-tinted) | Bg+border+fg trio = semantic  |
-| Closed set?         | Yes (enum-driven)        | No (dynamic strings)          | Yes (enum-driven)             |
+| Property            | TextMark                                                                                      | OutlineChip                   | SolidChip                     |
+| ------------------- | --------------------------------------------------------------------------------------------- | ----------------------------- | ----------------------------- |
+| Has background fill | No                                                                                            | Translucent (brand-bg)        | Yes (semantic, opaque)        |
+| Has border          | No                                                                                            | Yes (neutral brand-border)    | Yes (semantic)                |
+| Border-radius       | n/a                                                                                           | `--chip-radius-pill` (9999px) | `--chip-radius-pill` (9999px) |
+| Icon semantics      | Domain-specific (lucide) **OR structural glyph (`#`) when `size='xs'`** [^icon-prop-widening] | Structural glyph (`#`)        | Dot only                      |
+
+[^icon-prop-widening]:
+    **[AMENDED 2026-05-02 post-PR-144 visual review]** TextMark's `icon` prop type widened from `LucideIcon` to `LucideIcon | '#'` to support the VocTagPill use case (text-only quiet tag). This is a **prop-surface widening**, not an archetype merge — the differentiating axes between TextMark and OutlineChip remain (background fill, border, color signal). The same `#` glyph appearing in two archetypes does not collapse them; it simply means the structural-tag glyph is a content choice that either archetype can render. Color/fill/border axes still separate the archetypes per the §2.4 narrative below.
+    | Color signal | Text color = semantic | Neutral (always brand-tinted) | Bg+border+fg trio = semantic |
+    | Closed set? | Yes (enum-driven) | No (dynamic strings) | Yes (enum-driven) |
 
 For the 4 VOC badges enumerated in §1, no 4th archetype is required:
 
@@ -282,15 +289,16 @@ These icon+color assignments are **ratified** as of C-2 (VocPriorityBadge shippe
 
 These tokens are added to `frontend/src/styles/index.css` `:root` block and documented in uidesign.md §13 (new Badge System section — note: §14 is the Admin·Notice·FAQ section renumbered in this review iteration). They are shared between all primitives AND interactive components (FilterChip, SortControl) via CSS only — no shared component code.
 
-| Token                   | Value    | Used by                                         | Notes                                                                                                                                        |
-| ----------------------- | -------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--chip-height-sm`      | `20px`   | TextMark, OutlineChip, SolidChip, FilterChip    | Consistent row-height budget for all badge/chip types                                                                                        |
-| `--chip-padding-x-sm`   | `8px`    | OutlineChip, SolidChip                          | Horizontal padding inside chip container; TextMark uses 0. Reconciled to match shipped `VocStatusBadge` (`index.css:183` `padding: 2px 8px`) |
-| `--chip-radius-pill`    | `9999px` | OutlineChip, SolidChip, FilterChip              | Full pill — matches existing Tag Pill (uidesign.md §5) and shipped `.status-badge` (`index.css` L184)                                        |
-| `--chip-radius-rounded` | `4px`    | (reserved — no current VOC archetype uses this) | Rectangular — available for future archetypes (e.g. CountPill or notice chips); not used by any v1 badge                                     |
-| `--chip-font-size-sm`   | `11.5px` | TextMark, OutlineChip, SolidChip, FilterChip    | Metadata tier (uidesign.md §7 VOC List Typography Tiers)                                                                                     |
-| `--chip-gap`            | `4px`    | TextMark, OutlineChip, SolidChip                | Gap between icon and text                                                                                                                    |
-| `--chip-dot-size`       | `6px`    | SolidChip                                       | Status dot diameter — matches existing spec in uidesign.md §5                                                                                |
+| Token                   | Value    | Used by                                         | Notes                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--chip-height-sm`      | `20px`   | TextMark, OutlineChip, SolidChip, FilterChip    | Consistent row-height budget for all badge/chip types                                                                                                                                                                                                                                                                                                                             |
+| `--chip-padding-x-sm`   | `8px`    | OutlineChip, SolidChip                          | Horizontal padding inside chip container; TextMark uses 0. Reconciled to match shipped `VocStatusBadge` (`index.css:183` `padding: 2px 8px`)                                                                                                                                                                                                                                      |
+| `--chip-radius-pill`    | `9999px` | OutlineChip, SolidChip, FilterChip              | Full pill — matches existing Tag Pill (uidesign.md §5) and shipped `.status-badge` (`index.css` L184)                                                                                                                                                                                                                                                                             |
+| `--chip-radius-rounded` | `4px`    | (reserved — no current VOC archetype uses this) | Rectangular — available for future archetypes (e.g. CountPill or notice chips); not used by any v1 badge                                                                                                                                                                                                                                                                          |
+| `--chip-font-size-sm`   | `11.5px` | TextMark, OutlineChip, SolidChip, FilterChip    | Metadata tier (uidesign.md §7 VOC List Typography Tiers)                                                                                                                                                                                                                                                                                                                          |
+| `--chip-font-size-xs`   | `10.5px` | TextMark (`size='xs'`)                          | Compact text-only marks (Tag pill). **[AMENDED 2026-05-02 post-PR-144 visual review]** Added for VocTagPill quiet style. There is intentionally no `--chip-height-xs` — xs primitives flow at natural line height (no fixed cell height) per the design intent of "quiet/recede" tags. Single-token addition (≤3 leaf policy per §5.1) — shipped in C-3 PR, not Phase B addendum. |
+| `--chip-gap`            | `4px`    | TextMark, OutlineChip, SolidChip                | Gap between icon and text                                                                                                                                                                                                                                                                                                                                                         |
+| `--chip-dot-size`       | `6px`    | SolidChip                                       | Status dot diameter — matches existing spec in uidesign.md §5                                                                                                                                                                                                                                                                                                                     |
 
 **Total: 7 new tokens.** Per §5.1 precedent policy (`wave-1-6-phase-c-precedent.md`): ≤3 leaf tokens can be added inside a component PR; ≥4 requires a Phase B addendum. **7 tokens → these must ship in a dedicated Phase B addendum PR (B-add-2), separate from C-2.6 implementation.** (See §7 acceptance criteria.)
 
@@ -298,13 +306,13 @@ These tokens are added to `frontend/src/styles/index.css` `:root` block and docu
 
 ### §4.2 Reused existing tokens (no change)
 
-| Token                                      | Already defined in                 | Used by                               |
-| ------------------------------------------ | ---------------------------------- | ------------------------------------- |
-| `--status-{slug}-bg/fg/border` (×5 sets)   | `index.css` (C-1 + Phase B violet) | SolidChip via VocStatusBadge          |
-| `--status-red`, `--status-orange`          | `index.css` (Phase B, C-2)         | TextMark via VocPriorityBadge         |
-| `--text-tertiary`, `--text-quaternary`     | `index.css` (original)             | TextMark via VocPriorityBadge         |
-| `--brand-bg`, `--brand-border`, `--accent` | `index.css` (original)             | OutlineChip via VocTagPill            |
-| `--status-green`                           | `index.css` (original)             | TextMark via VocTypeBadge (개선 제안) |
+| Token                                      | Already defined in                 | Used by                                                                                                                                                                  |
+| ------------------------------------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--status-{slug}-bg/fg/border` (×5 sets)   | `index.css` (C-1 + Phase B violet) | SolidChip via VocStatusBadge                                                                                                                                             |
+| `--status-red`, `--status-orange`          | `index.css` (Phase B, C-2)         | TextMark via VocPriorityBadge                                                                                                                                            |
+| `--text-tertiary`, `--text-quaternary`     | `index.css` (original)             | TextMark via VocPriorityBadge; `--text-quaternary` also via VocTagPill (post-PR-144 pivot)                                                                               |
+| `--brand-bg`, `--brand-border`, `--accent` | `index.css` (original)             | OutlineChip — no current VOC consumer (reserved for future filter/import badges) [AMENDED 2026-05-02 post-PR-144 visual review — original: "OutlineChip via VocTagPill"] |
+| `--status-green`                           | `index.css` (original)             | TextMark via VocTypeBadge (개선 제안)                                                                                                                                    |
 
 ---
 
@@ -434,8 +442,9 @@ Tests to keep green (from `VocStatusBadge.test.tsx` — 6 tests total):
 
 ### C-3 (VocTagPill)
 
-- [ ] C-3 implementer builds `VocTagPill` as an `OutlineChip` wrapper using §2.2 spec
-- [ ] `OutlineChip` primitive shipped in C-2.6 — C-3 cannot start until C-2.6 lands
+- [ ] ~~C-3 implementer builds `VocTagPill` as an `OutlineChip` wrapper using §2.2 spec~~ **[AMENDED 2026-05-02 post-PR-144 visual review — original: OutlineChip wrapper; rationale: user visual review rejected chip prominence ("테두리/배경 없는 회색 글씨로 더 작게").]**
+- [ ] **[AMENDED 2026-05-02 post-PR-144 visual review]** C-3 implementer builds `VocTagPill` as a `TextMark` wrapper at `size='xs'` (10.5px), `weight=500`, color `var(--text-quaternary)`, `iconMode='icon+text'`, `icon='#'`. The new `--chip-font-size-xs: 10.5px` token is added in the same PR (single-token addition, ≤3 leaf policy per §5.1).
+- [ ] `TextMark` primitive shipped in C-2.6 — C-3 cannot start until C-2.6 lands. (OutlineChip primitive also shipped in C-2.6 but no longer consumed by VocTagPill.)
 
 ### C-4 (VocSubRow)
 

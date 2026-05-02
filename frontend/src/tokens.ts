@@ -46,6 +46,7 @@ export const tokens = {
   chipRadiusPill: '9999px',
   chipRadiusRounded: '4px',
   chipFontSizeSm: '11.5px',
+  chipFontSizeXs: '10.5px',
   chipGap: '4px',
   chipDotSize: '6px',
 } as const;

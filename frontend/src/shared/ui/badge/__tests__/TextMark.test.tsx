@@ -132,4 +132,57 @@ describe('TextMark', () => {
     const el = screen.getByTestId('text-mark-bug');
     expect(el).toHaveAttribute('aria-label', '유형 버그');
   });
+
+  it("icon='#' + iconMode='icon+text': renders aria-hidden # span then label text", () => {
+    render(
+      <TextMark
+        variant="tag"
+        iconMode="icon+text"
+        icon="#"
+        label="UX"
+        color="var(--text-secondary)"
+        weight={400}
+      />,
+    );
+    const el = screen.getByTestId('text-mark-tag');
+    const hashSpan = el.querySelector('span[aria-hidden="true"]');
+    expect(hashSpan).not.toBeNull();
+    expect(hashSpan?.textContent).toBe('#');
+    expect(el.textContent).toContain('UX');
+    expect(el.querySelector('svg')).toBeNull();
+  });
+
+  it("size='sm' (default): inline style has height var(--chip-height-sm) and font-size var(--chip-font-size-sm)", () => {
+    render(
+      <TextMark
+        variant="sm-test"
+        iconMode="icon-only"
+        icon={Tag}
+        label="SM"
+        color="var(--accent)"
+        weight={400}
+        size="sm"
+      />,
+    );
+    const style = screen.getByTestId('text-mark-sm-test').getAttribute('style') ?? '';
+    expect(style).toContain('var(--chip-height-sm)');
+    expect(style).toContain('var(--chip-font-size-sm)');
+  });
+
+  it("size='xs': inline style has no height property, font-size is var(--chip-font-size-xs)", () => {
+    render(
+      <TextMark
+        variant="xs-test"
+        iconMode="icon-only"
+        icon={Tag}
+        label="XS"
+        color="var(--accent)"
+        weight={400}
+        size="xs"
+      />,
+    );
+    const style = screen.getByTestId('text-mark-xs-test').getAttribute('style') ?? '';
+    expect(style).not.toContain('height');
+    expect(style).toContain('var(--chip-font-size-xs)');
+  });
 });
