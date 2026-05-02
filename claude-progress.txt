@@ -18,9 +18,16 @@
    `--status-processing-{bg,fg,border}` hue 152→290°(light)/288°(dark) +
    orphan `--status-dot-processing` align + WCAG AA 통과 (codex 직접 계산 7.72:1) +
    uidesign.md §10 동기화. TDD spot test 4 case (RED→GREEN). 사용자 시각 검수 OK.
+→ **Wave 1.6 Phase C batch plan MERGED** (PR #134, merge `b013f0a`, 2026-05-02) —
+   `wave-1-6-voc-parity.md` §7.2/§7.3 추가. 19 rebuild 잔여를 6 batch (α~ζ) + 1 addendum
+   (B-add-1 avatar 6 토큰)로 분할. critical path 8 sequential 단계, 추정 6~10 세션.
+   결정 잠금: VocAssignee 6 토큰 → addendum / AppShell → Phase D 일괄 점검 / Topbar →
+   NotifButton 머지 후.
 
-→ **다음 세션 첫 작업** = **Phase C-2 (VocPriorityBadge)** — `wave-1-6-phase-c-precedent.md`
-   per-leaf 체크리스트 적용. 결정 잠금 (deep-interview 2026-05-02 합의):
+→ **다음 세션 첫 작업** = **Batch C-α 시작 = Phase C-2 (VocPriorityBadge)**.
+   §7.2 Batch α 진행 순서: **C-2 (now) → C-3 ∥ C-4 → B-add-1 → C-5 → C-6 → C-7**.
+   룰북 = `wave-1-6-phase-c-precedent.md` per-leaf 체크리스트. 결정 잠금
+   (deep-interview 2026-05-02 합의):
    - C1: high 색은 **prototype `--status-orange/-bg/-border` 3종 FE 도입** (hue 45°). §5.1 정책
      에 따라 ≤3 토큰 + 1 컴포넌트 전용 → leaf PR 동봉 OK + uidesign.md §10/§12 동시 갱신.
      값: `bg light-dark(oklch(94% 0.03 45), oklch(18% 0.06 45))`,
@@ -36,7 +43,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, **다음 = C-2 priority** / 16 leaf 잔여 / §5.2 진행 순서)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, **다음 = Batch C-α / C-2 priority** / 19 rebuild 잔여 / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
