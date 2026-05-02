@@ -2470,7 +2470,7 @@ components:
 
     VocListItem:
       type: object
-      required: [id, issue_code, title, status, priority, voc_type_id, system_id, menu_id, assignee_id, author_id, parent_id, source, due_date, created_at, updated_at, has_children, notes_count]
+      required: [id, issue_code, title, status, priority, voc_type_id, system_id, menu_id, assignee_id, author_id, parent_id, source, due_date, created_at, updated_at, has_children, notes_count, tags]
       properties:
         id:
           type: string
@@ -2520,6 +2520,10 @@ components:
         notes_count:
           type: integer
           minimum: 0
+        tags:
+          type: array
+          items:
+            type: string
 
     PaginatedVocs:
       type: object

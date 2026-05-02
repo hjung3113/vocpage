@@ -27,6 +27,7 @@ const row: VocRowData = {
   priority: 'high',
   assignee_id: 'user-123',
   created_at: '2026-05-01T10:00:00Z',
+  tags: ['버그', '긴급'],
   ...COMMON_FIELDS,
 };
 
@@ -34,6 +35,12 @@ const unassignedRow: VocRowData = {
   ...row,
   id: 'row-2',
   assignee_id: null,
+};
+
+const noTagsRow: VocRowData = {
+  ...row,
+  id: 'row-3',
+  tags: [],
 };
 
 const assigneeMap: Record<string, string> = {
@@ -131,5 +138,23 @@ describe('VocRow', () => {
     render(<VocRow row={row} assigneeMap={assigneeMap} onClick={onClick} />);
     fireEvent.keyDown(screen.getByTestId('voc-row'), { key: ' ' });
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders a VocTagPill for each tag inside .tag-row', () => {
+    const { container } = render(<VocRow row={row} assigneeMap={assigneeMap} onClick={() => {}} />);
+    const tagRow = container.querySelector('.tag-row');
+    expect(tagRow).not.toBeNull();
+    const pills = screen.getAllByTestId('voc-tag-pill');
+    expect(pills).toHaveLength(2);
+    expect(pills[0]).toHaveAttribute('data-tag-name', '버그');
+    expect(pills[1]).toHaveAttribute('data-tag-name', '긴급');
+  });
+
+  it('omits .tag-row when tags array is empty', () => {
+    const { container } = render(
+      <VocRow row={noTagsRow} assigneeMap={assigneeMap} onClick={() => {}} />,
+    );
+    expect(container.querySelector('.tag-row')).toBeNull();
+    expect(screen.queryAllByTestId('voc-tag-pill')).toHaveLength(0);
   });
 });

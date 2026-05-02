@@ -5,6 +5,7 @@ import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
 import { VocStatusBadge } from './VocStatusBadge';
 import { VocPriorityBadge } from './VocPriorityBadge';
 import { VocAssignee } from './VocAssignee';
+import { VocTagPill } from './VocTagPill';
 
 type VocRowData = VocListResponse['rows'][number];
 
@@ -54,6 +55,13 @@ export function VocRow({ row, assigneeMap, selected = false, onClick }: VocRowPr
 
       <div role="gridcell" className="voc-row-title">
         <span className="voc-title-text">{row.title}</span>
+        {row.tags.length > 0 && (
+          <div className="tag-row">
+            {row.tags.map((tag) => (
+              <VocTagPill key={tag} name={tag} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div role="gridcell">

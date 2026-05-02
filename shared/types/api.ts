@@ -1347,6 +1347,7 @@ export interface components {
       updated_at: string;
       has_children: boolean;
       notes_count: number;
+      tags: string[];
     };
     PaginatedVocs: {
       rows: components['schemas']['VocListItem'][];

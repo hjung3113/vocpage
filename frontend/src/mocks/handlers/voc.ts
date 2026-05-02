@@ -15,7 +15,16 @@ import {
   VOC_TAG_RELATIONS,
   FIXTURE_USERS,
 } from '../../../../shared/fixtures/voc.fixtures';
+import { TAG_FIXTURES } from '../../../../shared/fixtures/master.fixtures';
 import { VocListQuery } from '../../../../shared/contracts/voc';
+
+const TAG_NAME_BY_ID = new Map(TAG_FIXTURES.map((t) => [t.id, t.name] as const));
+function tagsForVoc(vocId: string): string[] {
+  return VOC_TAG_RELATIONS.filter((rel) => rel.voc_id === vocId)
+    .map((rel) => TAG_NAME_BY_ID.get(rel.tag_id))
+    .filter((n): n is string => typeof n === 'string')
+    .sort();
+}
 
 type Voc = (typeof VOC_FIXTURES)[number];
 type Note = (typeof VOC_NOTES_FIXTURES)[number];
@@ -143,6 +152,7 @@ export const vocHandlers = [
       ...r,
       has_children: false,
       notes_count: notes.filter((n) => n.voc_id === r.id).length,
+      tags: tagsForVoc(r.id),
     }));
     return HttpResponse.json({ rows: slice, page, per_page, total });
   }),

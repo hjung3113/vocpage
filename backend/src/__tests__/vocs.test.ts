@@ -72,7 +72,16 @@ jest.mock('../repository/voc', () => {
         }
         const total = filtered.length;
         const start = (page - 1) * per_page;
-        return { rows: filtered.slice(start, start + per_page), total };
+        // listVocs projects `tags: string[]` via correlated subquery in prod
+        // (`backend/src/repository/voc.ts` array_agg). Mock surfaces the same
+        // shape — empty by default; tests that need wired tags can override
+        // via repoMock.listVocs.mockResolvedValueOnce.
+        return {
+          rows: filtered
+            .slice(start, start + per_page)
+            .map((r) => ({ ...r, tags: [] as string[] })),
+          total,
+        };
       },
     ),
     getVocById: jest.fn(async (id: string, opts: { includeDeleted?: boolean } = {}) => {
@@ -212,6 +221,31 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
     const res = await agent.get('/api/vocs?per_page=999');
     expect(res.status).toBe(400);
     expect(res.body.error?.code).toBe('VALIDATION_ERROR');
+  });
+
+  test('B-T2.5 GET /api/vocs projects tags array per row (issue 156 contract)', async () => {
+    // Wire a single row's tags through the repo mock so the route → service →
+    // contract path is exercised end-to-end. Guards against future regression
+    // where service silently drops the field (e.g. reverting to `?? []`).
+    const targetId = VOC_FIXTURES.find((r) => r.deleted_at === null)!.id;
+    repoMock.listVocs.mockResolvedValueOnce({
+      rows: VOC_FIXTURES.filter((r) => r.deleted_at === null)
+        .slice(0, 3)
+        .map((r) => ({
+          ...r,
+          tags: r.id === targetId ? ['버그', '긴급'] : [],
+        })),
+      total: 3,
+    });
+    const agent = await loginAs('manager');
+    const res = await agent.get('/api/vocs?per_page=20');
+    expect(res.status).toBe(200);
+    const parsed = VocListResponse.parse(res.body);
+    const target = parsed.rows.find((r) => r.id === targetId);
+    expect(target?.tags).toEqual(['버그', '긴급']);
+    for (const row of parsed.rows) {
+      expect(Array.isArray(row.tags)).toBe(true);
+    }
   });
 
   test('B-T3 dev PATCH on someone else’s VOC returns 403 FORBIDDEN action=changeStatus', async () => {

@@ -15,6 +15,7 @@ const COMMON_FIELDS = {
   updated_at: '2026-05-01T10:00:00Z',
   has_children: false,
   notes_count: 0,
+  tags: [] as string[],
 };
 
 const rows: VocListResponse['rows'] = [
