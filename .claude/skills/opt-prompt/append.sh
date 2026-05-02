@@ -11,7 +11,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG="$(cd "$SCRIPT_DIR/../.." && pwd)/opt-prompt-log.jsonl"
+# Log lives under $HOME so it survives branch switches and repo cleans.
+# Override with OPT_PROMPT_LOG=/abs/path for tests.
+LOG="${OPT_PROMPT_LOG:-$HOME/.claude/opt-prompt/opt-prompt-log.jsonl}"
+mkdir -p "$(dirname "$LOG")"
 LOCK_DIR="$LOG.lock.d"
 TRANSCRIPT_DIR="$HOME/.claude/projects/-Users-hyojung-Desktop-2026-vocpage"
 LOCK_TIMEOUT=10  # seconds

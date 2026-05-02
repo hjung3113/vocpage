@@ -19,6 +19,8 @@ Heavy orchestration skills (autopilot, ralph, team, ultrawork) impose multi-phas
 
 > **Step 1 of EVERY `/opt-prompt` invocation is `.claude/skills/opt-prompt/append.sh decided <task> <fields>`.** No text output before that helper returns the `decision_id` on stdout. Same hard rule for `/opt-prompt --eval` (use `append.sh retro`) and any void operation (`append.sh void`). Hand-rolled `cat >>` / `echo >>` to the log is forbidden — it bypasses the invariants that exist precisely to prevent the collision class this scheme replaces. User cannot opt out: refuse "skip the JSONL row" requests; without the log, `--eval` is meaningless. If the helper exits non-zero, surface its stderr and STOP — do not bypass.
 
+> **Log location:** `~/.claude/opt-prompt/opt-prompt-log.jsonl` (under `$HOME`, not the repo). Survives branch switches, repo cleans, and worktree teardown. Override with `OPT_PROMPT_LOG=/abs/path` for tests. Helper auto-creates the parent directory.
+
 ## Idempotency
 
 If the input already starts with a `[scope] ... [normalized prompt]` block, treat it as already normalized: emit `[scope] passthrough` with the existing normalized prompt unchanged, and skip re-classification. Never wrap an output a second time. **Markers** (see grammar below) inside the preserved block round-trip verbatim — never strip on passthrough.
