@@ -24,21 +24,31 @@
    결정 잠금: VocAssignee 6 토큰 → addendum / AppShell → Phase D 일괄 점검 / Topbar →
    NotifButton 머지 후.
 
-→ **다음 세션 첫 작업** = **Batch C-α 시작 = Phase C-2 (VocPriorityBadge)**.
-   §7.2 Batch α 진행 순서: **C-2 (now) → C-3 ∥ C-4 → B-add-1 → C-5 → C-6 → C-7**.
-   룰북 = `wave-1-6-phase-c-precedent.md` per-leaf 체크리스트. 결정 잠금
-   (deep-interview 2026-05-02 합의):
-   - C1: high 색은 **prototype `--status-orange/-bg/-border` 3종 FE 도입** (hue 45°). §5.1 정책
-     에 따라 ≤3 토큰 + 1 컴포넌트 전용 → leaf PR 동봉 OK + uidesign.md §10/§12 동시 갱신.
-     값: `bg light-dark(oklch(94% 0.03 45), oklch(18% 0.06 45))`,
-        `fg/--status-orange light-dark(oklch(58% 0.20 45), oklch(74% 0.17 45))`,
-        `border light-dark(oklch(78% 0.09 45), oklch(30% 0.09 45))`.
-   - C2: 컴포넌트는 `frontend/src/components/voc/VocPriorityBadge.tsx` 단독 신설 (C-1 패턴).
-   - C3: 한글 슬러그 매핑 N/A (영문 union urgent|high|medium|low). §3 (7) N/A 처리.
-   - C4: icon — **lucide-react** 신규 의존성 (Flame / ChevronUp / Minus / ChevronDown).
-   - C5: font-weight urgent 700 / high 600 / medium·low 400 (prototype 그대로).
-   - 호출부: VocTable 내부 priority 셀 inline → `<VocPriorityBadge priority={voc.priority} />`.
-   - per-leaf 체크리스트 7항목 모두 강제 (slug N/A 1건만 통과).
+→ **Wave 1.6 Phase C-2 MERGED** (PR #136, merge `c0a7518`, 2026-05-02) — VocPriorityBadge.
+   초기 구현은 prototype `--status-orange-bg/-border` 3-token chip 형태였으나, 사용자 시각 검수에서
+   "영어 라벨 + 배경 없는 텍스트-only" 스타일로 디자인 변경 결정. 최종:
+   - 라벨: `Urgent / High / Medium / Low` (영문). VOC 테이블 컬럼 헤더 `우선순위`는 한글 유지.
+   - 색: urgent `--status-red` bold / high `--status-orange` semibold / medium `--text-tertiary`
+     normal / low `--text-quaternary` normal. bg/border/padding 없음.
+   - 토큰: `--status-orange` (1개)만 도입, `--status-orange-bg/-border`는 본 PR에서 제거.
+   - aria-label: `Priority ${label}` (영문).
+   - 4 reviewer (architect/code-reviewer/test-engineer/designer) + codex adversarial 통과.
+     Codex 2 medium 발견 (visual-diff selector `.d-badge-*`→`.pri-badge.p-*` / §5↔CSS drift) 둘 다 적용.
+     Designer가 초기 chip 격상 FAIL 지적 → 결국 사용자 결정으로 text-only 회귀하며 spec drift 자연 해소.
+   - 정본 spec: `uidesign.md §5 Priority Badge` + `§10 --status-orange` + screenshot
+     `docs/screenshots/wave-1-6/phase-c-2-priority-badge.png`.
+
+→ **다음 세션 첫 작업** = **Batch C-α 계속 = C-3 ∥ C-4 (병렬)**.
+   §7.2 Batch α 진행 순서: ~~C-2~~ → **C-3 ∥ C-4 (now)** → B-add-1 → C-5 → C-6 → C-7.
+   룰북 = `wave-1-6-phase-c-precedent.md` per-leaf 체크리스트.
+   - C-3 = VocTagPill, C-4 = VocSubRow (정확 컴포넌트는 `wave-1-6-voc-parity.md` §7.2 확인).
+   - **C-2 디자인 정책 적용 영향**: 향후 leaf 들 chip vs text-only 격상은 **사용자 시각 검수에서
+     판단** (precedent rulebook §3 항목 5). 무조건 chip 가정 금지.
+   - 알려진 follow-up:
+     - badge-family `font-size` 통일 (C-1 status-badge 11px vs C-2 priority-badge 11.5px) →
+       Phase D 일괄 정리 또는 별도 micro-PR.
+     - mock data에 priority `low` 미포함 (`MSW handlers` cycle 3-step) → mock 보강 follow-up.
+     - `p-${priority}` 암묵 className contract → 명시적 cssClass 필드 도입 (precedent doc 업데이트).
 
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
