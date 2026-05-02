@@ -631,6 +631,18 @@ Full token set — copy into `:root` as the single source of truth.
   --status-drop-fg: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
   --status-drop-border: light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
 
+  /* VOC row state backgrounds (Wave 1.6 Phase B — prototype list.css:L83/L90) */
+  --voc-row-hover-bg: light-dark(oklch(94% 0.014 257), oklch(21% 0.028 261));
+  --voc-row-selected-bg: light-dark(oklch(90% 0.03 260), oklch(24% 0.042 262));
+
+  /* Mini-avatar palette — muted, distinct from brand blue (prototype list.css:L289–L303) */
+  --avatar-steel: oklch(44% 0.08 255);
+  --avatar-teal: oklch(42% 0.1 155);
+  --avatar-violet: oklch(42% 0.1 300);
+
+  /* Inline highlight (`<mark>`, prototype misc.css:L17) */
+  --mark-bg: oklch(75% 0.16 72 / 0.35);
+
   /* Role pill — Admin · Manager · Dev · User (D18 / D20, 2026-04-26) */
   /* admin / manager / user reuse existing brand & status tokens; only `dev` requires net-new tokens. */
   --role-dev-fg: light-dark(
@@ -1059,7 +1071,7 @@ Three severity tiers — every Notice list row leads with one of these.
 
 > Spec lives in `feature-notice-faq.md §10.3.2`. Visual contract:
 
-- Reuse the standard Modal pattern (overlay = `var(--overlay)`, dialog surface = `var(--bg-surface)` with `box-shadow: var(--shadow-dialog)`).
+- Reuse the standard Modal pattern (overlay = `var(--bg-overlay)`, dialog surface = `var(--bg-surface)` with `box-shadow: var(--shadow-dialog)`).
 - Severity badge in the header (`§13.6.1`), title in `font-size: 16px; font-weight: 700`, body in `font-size: 13.5px; color: var(--text-secondary)`.
 - Footer holds two controls aligned right: `[ ] 오늘 하루 보지 않기` (checkbox, `var(--text-tertiary)` label) and primary `닫기` button (`.admin-btn` ghost variant).
 
