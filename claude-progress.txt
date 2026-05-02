@@ -120,8 +120,43 @@
    - 9-항목 인하우스 패널 SHIP 9/9. 사용자 검수 대체 = live /voc 통합 캡처 PNG.
    - Screenshots: `docs/specs/reviews/c-5-voc-assignee.png` (데모 HTML) + `c-5-voc-assignee-live.png` (실 통합).
 
-→ **다음 세션 첫 작업** = **C-6 VocListHeader → C-7 VocRow** (VocTable.tsx 충돌로 sequential).
-   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → ~~C-3 ∥ C-4~~ → ~~B-add-1~~(폐기) → ~~C-5~~ → **C-6 → C-7**.
+→ **Wave 1.6 Phase C-6 MERGED** (PR #148, merge `9f5004e`, 2026-05-02) — VocListHeader (standalone).
+   - VocListHeader.tsx (129L) + test (125L) + index.css scoped CSS class. 7-cell sticky grid
+     (`22px 144px 1fr 115px 108px 84px 96px`), prototype `.list-header` (list.css:1-60) 포팅.
+   - sortable: `issue_code / status / priority / created_at` (4종, `<button role="columnheader">`).
+     non-sortable: expand placeholder (`role="presentation"`, accessible name 회피) / 제목 / 담당자.
+   - Sort affordance: ChevronUp(asc) / ChevronDown(desc) 11×11, opacity 0.35 → 1, sortFlip @keyframes
+     (`scaleY(0.4)→1`, 0.22s cubic-bezier(0.16,1,0.3,1)). `key={sortDir}` 으로 방향 변경 시 remount 재생.
+   - A11y: `role="row"` + cell `role="columnheader"` + `aria-sort` (asc/desc/none) + `aria-label="정렬: {label}"`
+     (방향은 aria-sort에 위임, 중복 announce 회피). JSDoc에 parent must provide `role="grid"` 명시 (C-7 책임).
+   - 토큰 정책: 신규 design token 0. CSS scoped class `.voc-list-header-{container,hcell,icon}` +
+     `@keyframes vocListHeaderSortFlip` 만 `index.css` 추가 (transition / :hover / keyframes —
+     인라인으로 표현 불가). container box-shadow는 prototype 2-layer (`light-dark` wrapped color-space) 포팅.
+   - 5-reviewer 병렬 적대적 리뷰 + 7건 fix 적용:
+     - architect (opus): A3 2-layer shadow + B1 focus-visible + C1 inline+class 중복 해소
+     - code-reviewer (opus): B2 expand cell empty columnheader → role=presentation + C2 token-purity 테스트가
+       index.css C-6 마커 블록도 검사
+     - designer (sonnet): A3 / B1 / C3 expand padding-right 누수 0
+     - security (sonnet): SHIP (0 findings)
+     - test-engineer (sonnet): B1 expand 빈 라벨 검증 추가; B2 `sortBy='title'` non-sortable은
+       `VocSortColumn` enum (`['created_at','updated_at','priority','status','due_date','issue_code']`) 미포함으로
+       TS-prevented; A1 TDD 단일 커밋 process note acknowledged.
+   - 12/12 vitest GREEN, build clean. lint:tokens는 코멘트 내 `oklch(` 부분문자열도 차단 → 코멘트
+     "light-dark wrapped color-space literals" 로 rephrase 필요 (별도 커밋 4c771ec).
+   - VocTable.tsx 미수정 — 통합은 C-7에서.
+   - Screenshots: `docs/screenshots/wave-1-6/phase-c-6-list-header.png` (initial preview) +
+     `phase-c-6-list-header-final.png` (post-adversarial).
+
+→ **다음 세션 첫 작업** = **C-7 VocRow** (sequential closer, VocTable.tsx 통합).
+   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → ~~C-3 ∥ C-4~~ → ~~B-add-1~~(폐기) → ~~C-5~~ → ~~C-6~~ → **C-7**.
+   - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
+     22px expand-btn + 6 cell). VocTable.tsx 재합성 — `<DataTable>` → `<VocListHeader> + <VocRow[]>`.
+     parent에 `role="grid"` 부여하여 C-6의 a11y contract 충족 (column/row chain 완성).
+   - Phase B PR #128 시점 이미 추가된 `--voc-row-hover-bg` (`index.css:149`) + `--voc-row-selected-bg` (line 150) 사용.
+     신규 토큰 0 유지. expand-btn 자체는 prototype `.expand-btn` (list.css:114-128) 포팅 — 별도 컴포넌트로 빼지 않고 inline.
+   - VocSubRow는 C-4에서 이미 있음 — VocRow가 자식으로 호출하는 합성 패턴.
+   - C-6 deferral 항목 자동 흡수: visual-diff harness PASS line (parent role=grid 환경에서 측정),
+     prefers-reduced-motion guard (선택), responsive px width 정책 결정.
    룰북 = `wave-1-6-phase-c-precedent.md` per-leaf + 신규 audit `wave-1-6-voc-badge-audit.md` §7 acceptance.
    - **B-add-2** (token-only PR): 7 chip 토큰을 `frontend/src/tokens.ts` SSOT에 추가 + `index.css :root` 미러 +
      기존 raw `9999px` literals (Tag Pill `uidesign §5`, Filter Tab) → `var(--chip-radius-pill)` 마이그.
@@ -143,7 +178,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, C-3 ✅, C-4 ✅, ~~B-add-1~~(폐기), C-5 ✅, **다음 = C-6 → C-7** / §7.2 batch 순서: α→β→γ→δ→ε→ζ)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, C-3 ✅, C-4 ✅, ~~B-add-1~~(폐기), C-5 ✅, C-6 ✅, **다음 = C-7** / §7.2 batch 순서: α→β→γ→δ→ε→ζ)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
