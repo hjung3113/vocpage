@@ -164,6 +164,16 @@
 
   /* Overlay (modal/dialog scrim) — light/dark mirror, ~60% opacity black */
   --bg-overlay: light-dark(oklch(0% 0 0 / 0.45), oklch(0% 0 0 / 0.6));
+
+  /* Chip dimensions (Wave 1.6 B-add-2 — shared across TextMark/OutlineChip/SolidChip/FilterChip)
+     SSOT: tokens.ts; mirrored here for CSS consumers. Theme-independent. */
+  --chip-height-sm: 20px;
+  --chip-padding-x-sm: 8px;
+  --chip-radius-pill: 9999px;
+  --chip-radius-rounded: 4px;
+  --chip-font-size-sm: 11.5px;
+  --chip-gap: 4px;
+  --chip-dot-size: 6px;
 }
 
 body {
@@ -181,7 +191,7 @@ body {
   font-weight: 600;
   white-space: nowrap;
   padding: 2px 8px;
-  border-radius: 9999px;
+  border-radius: var(--chip-radius-pill);
 }
 .status-badge .status-dot {
   width: 6px;
