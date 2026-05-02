@@ -1,6 +1,4 @@
 import { SlidersHorizontal, X } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { cn } from '../../../lib/utils';
 import type {
   AssigneeListItem,
   TagListItem,
@@ -55,25 +53,23 @@ function ChipGroup<T extends string>({
 }: ChipGroupProps<T>) {
   const labelId = `${groupId}-label`;
   return (
-    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
-      <span id={labelId} className="text-xs text-[color:var(--text-secondary)]">
+    <div role="group" aria-labelledby={labelId} className="advanced-filters-section">
+      <span id={labelId} className="advanced-filters-section-label">
         {label}
       </span>
-      <div className="flex flex-wrap gap-2">
+      <div className="advanced-filters-chips">
         {items.map((item) => {
           const pressed = (selected ?? []).includes(item.value);
+          const chipClass = pressed
+            ? 'advanced-filters-chip advanced-filters-chip--active'
+            : 'advanced-filters-chip';
           return (
             <button
               key={item.value}
               type="button"
               aria-pressed={pressed}
               onClick={() => onToggleItem(toggleItem(selected, item.value))}
-              className={cn(
-                'rounded-full border px-3 py-1 text-xs transition-colors',
-                pressed
-                  ? 'border-[color:var(--brand)] bg-[color:var(--brand)] text-[color:var(--text-on-brand)]'
-                  : 'border-[color:var(--border-standard)] bg-[color:var(--bg-elevated)] text-[color:var(--text-primary)] hover:border-[color:var(--brand)]',
-              )}
+              className={chipClass}
             >
               {item.label}
             </button>
@@ -97,71 +93,62 @@ export function VocAdvancedFilters({
   return (
     <div className="flex flex-col">
       {/* Toggle row — intentionally outside data-pcomp root so harness measures panel only */}
-      <div className="flex items-center justify-between px-6 py-2">
-        <Button
+      <div className="advanced-filters-toggle-row">
+        <button
           type="button"
-          variant="outline"
-          size="sm"
           onClick={onToggle}
           aria-expanded={open}
-          className="border-[color:var(--border-standard)] text-[color:var(--text-secondary)]"
+          className="advanced-filters-toggle"
         >
-          <SlidersHorizontal className="mr-2 h-4 w-4" />
+          <SlidersHorizontal className="advanced-filters-toggle-icon" aria-hidden />
           필터 더보기
-        </Button>
+        </button>
         {open && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="text-[color:var(--text-secondary)]"
-          >
-            <X className="mr-1 h-4 w-4" />
+          <button type="button" onClick={onReset} className="advanced-filters-reset">
+            <X className="advanced-filters-toggle-icon" aria-hidden />
             초기화
-          </Button>
+          </button>
         )}
       </div>
-      {/* Panel — data-pcomp root; only rendered when open */}
-      {open && (
-        <div
-          data-pcomp="voc-advanced-filters"
-          className="grid gap-4 px-6 py-4 sm:grid-cols-2"
-          style={{
-            background: 'var(--bg-panel)',
-            borderBottom: '1px solid var(--border-subtle)',
-          }}
-        >
-          <ChipGroup
-            groupId="adv-assignees"
-            label="담당자"
-            items={assignees.map((a) => ({ value: a.id, label: a.display_name }))}
-            selected={value.assignees}
-            onToggleItem={(next) => onChange({ ...value, assignees: next })}
-          />
-          <ChipGroup
-            groupId="adv-priorities"
-            label="우선순위"
-            items={PRIORITIES}
-            selected={value.priorities}
-            onToggleItem={(next) => onChange({ ...value, priorities: next as VocPriority[] })}
-          />
-          <ChipGroup
-            groupId="adv-voc-types"
-            label="유형"
-            items={vocTypes.map((t) => ({ value: t.id, label: t.name }))}
-            selected={value.voc_type_ids}
-            onToggleItem={(next) => onChange({ ...value, voc_type_ids: next })}
-          />
-          <ChipGroup
-            groupId="adv-tags"
-            label="태그"
-            items={tags.map((t) => ({ value: t.id, label: t.name }))}
-            selected={value.tag_ids}
-            onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
-          />
+      {/* Panel — always rendered; grid-template-rows + aria-hidden drive open/closed state */}
+      <div
+        data-pcomp="voc-advanced-filters"
+        className={open ? 'advanced-filters advanced-filters--open' : 'advanced-filters'}
+        aria-hidden={!open}
+      >
+        <div className="advanced-filters-grid-wrapper">
+          <div className="advanced-filters-grid">
+            <ChipGroup
+              groupId="adv-assignees"
+              label="담당자"
+              items={assignees.map((a) => ({ value: a.id, label: a.display_name }))}
+              selected={value.assignees}
+              onToggleItem={(next) => onChange({ ...value, assignees: next })}
+            />
+            <ChipGroup
+              groupId="adv-priorities"
+              label="우선순위"
+              items={PRIORITIES}
+              selected={value.priorities}
+              onToggleItem={(next) => onChange({ ...value, priorities: next as VocPriority[] })}
+            />
+            <ChipGroup
+              groupId="adv-voc-types"
+              label="유형"
+              items={vocTypes.map((t) => ({ value: t.id, label: t.name }))}
+              selected={value.voc_type_ids}
+              onToggleItem={(next) => onChange({ ...value, voc_type_ids: next })}
+            />
+            <ChipGroup
+              groupId="adv-tags"
+              label="태그"
+              items={tags.map((t) => ({ value: t.id, label: t.name }))}
+              selected={value.tag_ids}
+              onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
+            />
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
