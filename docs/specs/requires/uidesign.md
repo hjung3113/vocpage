@@ -814,7 +814,110 @@ OS/browser dark mode setting automatically switches the entire theme.
 
 ---
 
-## 13. Admin · Notice · FAQ Components
+## 13. Badge System
+
+> Canonical source for VOC scope: `docs/specs/reviews/wave-1-6-voc-badge-audit.md` (C-2.5).
+> This section defines the design-system–level contract. VOC-specific icon/color mappings live in the audit doc.
+
+### 13.0 Presentational-only rule
+
+All badge and chip **primitives** are `<span>`-based. No click handler, no focus management, no ARIA role beyond natural element semantics. Interactive chip components (`FilterChip`, `SortControl`) are `<button>`-based and share **CSS dimension tokens only** — never component code. The prop `interactive?: boolean` on a primitive is forbidden.
+
+### 13.1 Primitive archetypes
+
+Three archetypes cover all VOC badge use cases. Additional archetypes require a new audit.
+
+| Archetype       | Background                      | Border                              | Icon                       | Border-radius           | Used for                                                  |
+| --------------- | ------------------------------- | ----------------------------------- | -------------------------- | ----------------------- | --------------------------------------------------------- |
+| **TextMark**    | none                            | none                                | lucide (domain-specific)   | n/a                     | Semantic color signal, no chip container. Priority, Type. |
+| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. Tags.           |
+| **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                   | `--chip-radius-rounded` | Status with filled background. Status.                    |
+
+### 13.2 Shared dimension tokens (`--chip-*`)
+
+These tokens are defined in `frontend/src/styles/index.css` `:root` and shared between all primitives and interactive chip components. Color tokens are **not** shared — each component owns its own color logic.
+
+```css
+--chip-height-sm: 20px; /* consistent row-height budget across all badge/chip types */
+--chip-padding-x-sm: 7px; /* horizontal padding inside OutlineChip / SolidChip */
+--chip-radius-pill: 9999px; /* full pill — OutlineChip, FilterChip */
+--chip-radius-rounded: 4px; /* rectangular — SolidChip */
+--chip-font-size-sm: 11.5px; /* metadata tier (§7 VOC List Typography Tiers) */
+--chip-gap: 4px; /* gap between icon and text */
+--chip-dot-size: 6px; /* status dot diameter in SolidChip */
+```
+
+These 7 tokens ship in **B-add-2** (Phase B addendum PR), per §5.1 ≥4-token policy from `wave-1-6-phase-c-precedent.md`. Implementation primitives ship in C-2.6, after B-add-2 is merged.
+
+### 13.3 TextMark spec
+
+```css
+/* no background, no border, no padding */
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+font-size: var(--chip-font-size-sm);
+/* font-weight: fixed per variant — callsite cannot override */
+```
+
+- `icon-only` mode: render icon only; `aria-label` carries the text label
+- `icon+text` mode: render icon + label side by side
+- Color = text color only (no background fill)
+
+### 13.4 OutlineChip spec
+
+```css
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+height: var(--chip-height-sm);
+padding: 2px var(--chip-padding-x-sm);
+background: var(--brand-bg);
+border: 1px solid var(--brand-border);
+border-radius: var(--chip-radius-pill);
+font-size: var(--chip-font-size-sm);
+font-weight: 600;
+color: var(--accent);
+```
+
+### 13.5 SolidChip spec
+
+```css
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+height: var(--chip-height-sm);
+padding: 2px var(--chip-padding-x-sm);
+/* background, color, border: set per variant via --status-{slug}-{bg|fg|border} */
+border-radius: var(--chip-radius-rounded);
+font-size: var(--chip-font-size-sm);
+font-weight: 600;
+```
+
+Dot element:
+
+```css
+.chip-dot {
+  width: var(--chip-dot-size);
+  height: var(--chip-dot-size);
+  border-radius: 9999px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+```
+
+### 13.6 Prop surface (closed set — all archetypes)
+
+- `variant`: enum only — no free `color` prop
+- `size`: `'sm' | 'md'` — VOC uses `sm` exclusively; `md` reserved for future use (requires separate audit to open)
+- `iconMode` + `icon`: only customization surface for TextMark
+- `bold` / `font-weight`: fixed per archetype — callsite cannot override
+
+### 13.7 Interactive components — token sharing boundary
+
+`FilterChip` and `SortControl` share `--chip-*` dimension tokens with primitives. They do **not** share color tokens or component code. They are `<button>`-based with full hover/active/focus/aria-pressed semantics. Out of scope for this section — detailed spec deferred to filter UI work phase.
+
+## 14. Admin · Notice · FAQ Components
 
 > Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
 
