@@ -65,6 +65,17 @@ interface TextMarkProps {
 }
 ```
 
+> **VocTypeBadge dynamic type contract:** `VocTypeBadge` accepts a single-shape prop (`slug: string; name: string; color?: string`) rather than a discriminated union. When `slug` matches a v1 known value (`bug|feature-request|improvement|inquiry`), the component uses the fixed icon+color mapping from §3. When `slug` does not match, it falls through to the unknown-type fallback (see §3 below). This single shape is preferred over a discriminated union because: (1) callsites always have a DB row with both `slug` and `name` available — no callsite needs to distinguish "known vs unknown" in its own code, and (2) the union form would require callsites to predicate on `VocTypeVariant` membership before constructing props, leaking domain knowledge upward.
+>
+> ```ts
+> // VocTypeBadge-specific prop shape (not part of generic TextMarkProps):
+> interface VocTypeBadgeProps {
+>   slug: string; // from voc_types.slug — known seed slugs use fixed mapping; others hit fallback
+>   name: string; // from voc_types.name — used as aria-label and tooltip for all cases
+>   color?: string; // admin-set hex — deferred to v2 (intentionally ignored in v1, see §3)
+> }
+> ```
+
 **Variants and color mapping:**
 
 _Priority variants (VocPriorityBadge → TextMark):_
@@ -125,12 +136,14 @@ interface OutlineChipProps {
 - Padding: `2px var(--chip-padding-x-sm)` → `2px 8px`
 - Background: `var(--status-{slug}-bg)` (per-variant)
 - Border: `1px solid var(--status-{slug}-border)` (per-variant)
-- Border-radius: `--chip-radius-rounded` (4px) — rectangular, not pill
+- Border-radius: `--chip-radius-pill` (9999px) — full pill, matches existing shipped `.status-badge` visual (`frontend/src/styles/index.css` L184)
 - Font-size: `--chip-font-size-sm` (11.5px)
 - Gap: `--chip-gap` (4px)
 - Font-weight: 600 (fixed)
 - Color: `var(--status-{slug}-fg)` (per-variant)
 - Dot: `--chip-dot-size` (6px) circle, same color as text (`currentColor`)
+
+> **Radius note:** SolidChip uses pill radius (`var(--chip-radius-pill)`) to match the existing shipped `.status-badge` visual (`frontend/src/styles/index.css` L184: `border-radius: 9999px`). The earlier `--chip-radius-rounded` (4px) entry was incorrect — the §2.4 rationale ("pill = tag/dynamic, rounded = state/closed-enum") is updated below to reflect this correction.
 
 **Props:**
 
@@ -161,13 +174,14 @@ All tokens already exist in `frontend/src/styles/index.css` (shipped in C-1 and 
 
 The 4 VOC badges decompose exhaustively into 3 archetypes:
 
-| Property            | TextMark                 | OutlineChip                   | SolidChip                    |
-| ------------------- | ------------------------ | ----------------------------- | ---------------------------- |
-| Has background fill | No                       | Translucent (brand-bg)        | Yes (semantic)               |
-| Has border          | No                       | Yes (neutral brand-border)    | Yes (semantic)               |
-| Icon semantics      | Domain-specific (lucide) | Structural glyph (`#`)        | Dot only                     |
-| Color signal        | Text color = semantic    | Neutral (always brand-tinted) | Bg+border+fg trio = semantic |
-| Closed set?         | Yes (enum-driven)        | No (dynamic strings)          | Yes (enum-driven)            |
+| Property            | TextMark                 | OutlineChip                   | SolidChip                     |
+| ------------------- | ------------------------ | ----------------------------- | ----------------------------- |
+| Has background fill | No                       | Translucent (brand-bg)        | Yes (semantic, opaque)        |
+| Has border          | No                       | Yes (neutral brand-border)    | Yes (semantic)                |
+| Border-radius       | n/a                      | `--chip-radius-pill` (9999px) | `--chip-radius-pill` (9999px) |
+| Icon semantics      | Domain-specific (lucide) | Structural glyph (`#`)        | Dot only                      |
+| Color signal        | Text color = semantic    | Neutral (always brand-tinted) | Bg+border+fg trio = semantic  |
+| Closed set?         | Yes (enum-driven)        | No (dynamic strings)          | Yes (enum-driven)             |
 
 For the 4 VOC badges enumerated in §1, no 4th archetype is required:
 
@@ -183,9 +197,10 @@ For the 4 VOC badges enumerated in §1, no 4th archetype is required:
 
 **Why OutlineChip and SolidChip are separate archetypes and not one chip with `variant='outline'|'solid'`:**
 
-- `border-radius` is load-bearing semantic signal: pill (9999px) = "tag/dynamic content", rounded (4px) = "state/closed-enum". Collapsing them into one component would require callsites to specify radius intent explicitly, defeating encapsulation.
-- Color-source axis differs: OutlineChip is single-neutral (always brand-tinted regardless of content), SolidChip is per-domain-enum (color driven by variant). Merging forces callsites to reason on both shape and color axes simultaneously.
-- Merging would force callsites to think on both axes simultaneously, defeating the wrapper-encapsulation goal of this audit.
+- Both archetypes use pill radius (`9999px`) — radius is therefore NOT the differentiating axis between them. The separation is entirely on the color-source axis.
+- Color-source axis differs: OutlineChip is single-neutral (always brand-tinted regardless of content), SolidChip is per-domain-enum (color driven by variant, three tokens: bg + fg + border). Merging forces callsites to reason on both fill and color axes simultaneously.
+- Background fill differs: OutlineChip is translucent brand-bg; SolidChip is opaque semantic bg. Same radius, fundamentally different visual weight and semantic intent.
+- Merging would force callsites to specify both fill strategy and color source, defeating the wrapper-encapsulation goal of this audit.
 
 ---
 
@@ -204,14 +219,26 @@ The `voc_types` seed data contains 4 initial values (requirements.md §4: `버�
 | 개선 제안 | `improvement`     | `Wrench`                | Tool/fix connotation, distinct from feature   | `var(--status-green)`  | 500                  |
 | 문의      | `inquiry`         | `MessageCircleQuestion` | Question/inquiry, direct semantic match       | `var(--text-tertiary)` | 400                  |
 
-**Type icon — admin color override + 5th-type fallback:**
+**Unknown / admin-created type fallback (v1):**
+
+When `slug` does not match a v1 known value (`bug|feature-request|improvement|inquiry`), `VocTypeBadge` renders:
+
+- icon: `Tag` (lucide)
+- color token: `--text-tertiary`
+- tooltip: `name` (admin-set)
+
+This contract is testable: a non-seed slug must render the fallback icon, not throw or return empty. Required acceptance test in C-2.6 (see §7).
+
+**Type icon — admin color override:**
 
 - v1 type icon uses `--status-*` / `--text-*` tokens; admin-set `voc_types.color` (hex) is intentionally NOT applied to the icon in v1 to preserve table density and color consistency. Re-evaluation in v2 alongside icon customization.
-- If admin adds a 5th+ type before v2: fallback icon = lucide `Tag`, color = `var(--text-tertiary)`. Confirm with user before C-2.6 ships.
 
 **Type variant TS union:**
 
 ```ts
+// Known seed slugs — used internally by VocTypeBadge for fixed icon+color mapping.
+// VocTypeBadge's public prop is { slug: string; name: string; color?: string } — NOT this union.
+// Callsites never import VocTypeVariant; it is an implementation detail of VocTypeBadge.
 export type VocTypeVariant = 'bug' | 'feature-request' | 'improvement' | 'inquiry';
 ```
 
@@ -255,19 +282,19 @@ These icon+color assignments are **ratified** as of C-2 (VocPriorityBadge shippe
 
 These tokens are added to `frontend/src/styles/index.css` `:root` block and documented in uidesign.md §13 (new Badge System section — note: §14 is the Admin·Notice·FAQ section renumbered in this review iteration). They are shared between all primitives AND interactive components (FilterChip, SortControl) via CSS only — no shared component code.
 
-| Token                   | Value    | Used by                                      | Notes                                                                                                                                        |
-| ----------------------- | -------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--chip-height-sm`      | `20px`   | TextMark, OutlineChip, SolidChip, FilterChip | Consistent row-height budget for all badge/chip types                                                                                        |
-| `--chip-padding-x-sm`   | `8px`    | OutlineChip, SolidChip                       | Horizontal padding inside chip container; TextMark uses 0. Reconciled to match shipped `VocStatusBadge` (`index.css:183` `padding: 2px 8px`) |
-| `--chip-radius-pill`    | `9999px` | OutlineChip, FilterChip                      | Full pill — matches existing Tag Pill in uidesign.md §5                                                                                      |
-| `--chip-radius-rounded` | `4px`    | SolidChip                                    | Rectangular — matches existing Status Badge in uidesign.md §5                                                                                |
-| `--chip-font-size-sm`   | `11.5px` | TextMark, OutlineChip, SolidChip, FilterChip | Metadata tier (uidesign.md §7 VOC List Typography Tiers)                                                                                     |
-| `--chip-gap`            | `4px`    | TextMark, OutlineChip, SolidChip             | Gap between icon and text                                                                                                                    |
-| `--chip-dot-size`       | `6px`    | SolidChip                                    | Status dot diameter — matches existing spec in uidesign.md §5                                                                                |
+| Token                   | Value    | Used by                                         | Notes                                                                                                                                        |
+| ----------------------- | -------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--chip-height-sm`      | `20px`   | TextMark, OutlineChip, SolidChip, FilterChip    | Consistent row-height budget for all badge/chip types                                                                                        |
+| `--chip-padding-x-sm`   | `8px`    | OutlineChip, SolidChip                          | Horizontal padding inside chip container; TextMark uses 0. Reconciled to match shipped `VocStatusBadge` (`index.css:183` `padding: 2px 8px`) |
+| `--chip-radius-pill`    | `9999px` | OutlineChip, SolidChip, FilterChip              | Full pill — matches existing Tag Pill (uidesign.md §5) and shipped `.status-badge` (`index.css` L184)                                        |
+| `--chip-radius-rounded` | `4px`    | (reserved — no current VOC archetype uses this) | Rectangular — available for future archetypes (e.g. CountPill or notice chips); not used by any v1 badge                                     |
+| `--chip-font-size-sm`   | `11.5px` | TextMark, OutlineChip, SolidChip, FilterChip    | Metadata tier (uidesign.md §7 VOC List Typography Tiers)                                                                                     |
+| `--chip-gap`            | `4px`    | TextMark, OutlineChip, SolidChip                | Gap between icon and text                                                                                                                    |
+| `--chip-dot-size`       | `6px`    | SolidChip                                       | Status dot diameter — matches existing spec in uidesign.md §5                                                                                |
 
 **Total: 7 new tokens.** Per §5.1 precedent policy (`wave-1-6-phase-c-precedent.md`): ≤3 leaf tokens can be added inside a component PR; ≥4 requires a Phase B addendum. **7 tokens → these must ship in a dedicated Phase B addendum PR (B-add-2), separate from C-2.6 implementation.** (See §7 acceptance criteria.)
 
-> **§12.1 SSOT gap:** New `--chip-*` tokens are placed in `index.css :root` to match the precedent of existing `--status-*` tokens (L626–640). The `tokens.ts` SSOT migration declared in uidesign §12.1 is currently unrealized for these chip-family tokens; propagation to `tokens.ts` is tracked as a separate follow-up and is NOT in scope of B-add-2 or C-2.6.
+> **§12.1 SSOT gap (partially closed):** B-add-2 closes the SSOT gap for chip tokens by writing to `tokens.ts` first and mirroring to `index.css :root` in the same PR. Broader `--status-*` token migration (and remaining hand-authored `:root` tokens) remains a separate follow-up tracked in §6 Deferred decisions.
 
 ### §4.2 Reused existing tokens (no change)
 
@@ -308,15 +335,16 @@ Out of scope for this audit. They share `--chip-*` dimension tokens with primiti
 
 ## §6. Deferred decisions (explicit tracking)
 
-| Decision                      | Trigger condition                                           | Target phase / doc                                                       |
-| ----------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| 유형 아이콘 사용자 커스텀     | 유형관리 admin page 구현 시점                               | v2 / TBD — `voc_types` table will need an `icon` column or FE config map |
-| CountPill archetype 추가 여부 | 다른 페이지 audit (공지/FAQ/휴지통/사이드바 카운트 등) 시점 | 별도 audit doc (post Wave 1.6)                                           |
-| FilterChip 구현 상세          | filter UI 작업 phase                                        | TBD — shares `--chip-*` tokens, separate PR                              |
-| SortControl 구현 상세         | sort UI 작업 phase                                          | TBD                                                                      |
-| "Jira Imported" source badge  | `source='import'` UI 구현 시점 (requirements.md §4)         | OutlineChip 사용 예정 — 구현 PR에서 확정                                 |
-| `voc_types.icon` DB 컬럼 추가 | v2 유형관리 admin page 기획 확정 시                         | migration + API 확장 PR                                                  |
-| `md` size variant 개방 여부   | VOC 외 다른 페이지에서 bigger badge 필요 시                 | 별도 audit에서 확정                                                      |
+| Decision                                                                                                | Trigger condition                                           | Target phase / doc                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 유형 아이콘 사용자 커스텀                                                                               | 유형관리 admin page 구현 시점                               | v2 admin custom type → tooltip + icon + color all admin-set; the unknown fallback contract added in v1 already provides the prop shape (`slug: string; name: string; color?: string`), only the _resolution_ (admin DB → icon registry) needs to be wired in v2. `voc_types` table will need an `icon` column or FE config map. |
+| CountPill archetype 추가 여부                                                                           | 다른 페이지 audit (공지/FAQ/휴지통/사이드바 카운트 등) 시점 | 별도 audit doc (post Wave 1.6)                                                                                                                                                                                                                                                                                                  |
+| FilterChip 구현 상세                                                                                    | filter UI 작업 phase                                        | TBD — shares `--chip-*` tokens, separate PR                                                                                                                                                                                                                                                                                     |
+| SortControl 구현 상세                                                                                   | sort UI 작업 phase                                          | TBD                                                                                                                                                                                                                                                                                                                             |
+| "Jira Imported" source badge                                                                            | `source='import'` UI 구현 시점 (requirements.md §4)         | OutlineChip 사용 예정 — 구현 PR에서 확정                                                                                                                                                                                                                                                                                        |
+| `voc_types.icon` DB 컬럼 추가                                                                           | v2 유형관리 admin page 기획 확정 시                         | migration + API 확장 PR                                                                                                                                                                                                                                                                                                         |
+| `md` size variant 개방 여부                                                                             | VOC 외 다른 페이지에서 bigger badge 필요 시                 | 별도 audit에서 확정                                                                                                                                                                                                                                                                                                             |
+| Migrate existing `--status-*` tokens (and remaining hand-authored `:root` tokens) into `tokens.ts` SSOT | Next token-touching PR after C-2.6                          | Separate refactoring PR (post-Wave 1.6)                                                                                                                                                                                                                                                                                         |
 
 ---
 
@@ -329,7 +357,8 @@ Out of scope for this audit. They share `--chip-*` dimension tokens with primiti
 
 ### B-add-2 (새 Phase B addendum — `--chip-*` 토큰 PR)
 
-- [ ] 7개 `--chip-*` 토큰이 `frontend/src/styles/index.css` `:root`에 추가됨
+- [ ] 7개 `--chip-*` 토큰 값을 `frontend/src/tokens.ts` (SSOT)에 먼저 추가하고, 같은 PR에서 `index.css :root`에 CSS custom property로 미러링함. 두 파일의 값이 일치해야 함.
+- [ ] 값 일치 검증: `grep -E 'chip' frontend/src/tokens.ts` 와 `grep -E '\-\-chip-' frontend/src/styles/index.css` 결과를 비교하여 7개 토큰이 양쪽에 동일한 값으로 존재함을 확인
 - [ ] uidesign.md §13 Badge System 섹션이 동시 갱신됨
 - [ ] 토큰 lint 통과 (`grep -rE '#[0-9a-fA-F]{3,8}\b' src/` → 0 hits outside token definition)
 - [ ] Tag Pill (uidesign §5, L197/L209) and Filter Tab raw `9999px` literals → migrated to `var(--chip-radius-pill)` atomically in same PR. Confirmed literals: uidesign.md L197, L209 (tag pill / filter tab `border-radius: 9999px`)
@@ -401,6 +430,7 @@ Tests to keep green (from `VocStatusBadge.test.tsx` — 6 tests total):
 - Icon presence matches `iconMode`: `icon-only` → icon present, no text rendered; `icon+text` → both present; `dot+text` → dot child present
 - No `onClick` handler attached to any primitive `<span>`
 - No inline `style` attribute leaks (existing `does not leak inline style` tests preserved)
+- **VocTypeBadge unknown slug fallback:** `<VocTypeBadge slug="custom-foo" name="Custom Foo" />` → assert `data-testid="text-mark-unknown"`, lucide `Tag` icon present, color = `var(--text-tertiary)` (does not throw, does not render empty)
 
 ### C-3 (VocTagPill)
 
