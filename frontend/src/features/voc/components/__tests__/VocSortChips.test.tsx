@@ -42,4 +42,39 @@ describe('VocSortChips', () => {
     await user.click(screen.getByRole('radio', { name: /우선순위/ }));
     expect(onChange).toHaveBeenCalledWith('priority', 'asc');
   });
+
+  it('renders list-toolbar wrapper with sort-label "정렬" prefix (prototype parity)', () => {
+    const { container } = render(
+      <VocSortChips sortBy="created_at" sortDir="desc" onChange={() => {}} />,
+    );
+    const toolbar = container.querySelector('.list-toolbar');
+    expect(toolbar).not.toBeNull();
+    const label = container.querySelector('.sort-label');
+    expect(label?.textContent).toBe('정렬');
+    expect(container.querySelector('.sort-chips')).not.toBeNull();
+  });
+
+  it('applies .sort-chip on every chip and .sort-chip--active only on active', () => {
+    const { container } = render(
+      <VocSortChips sortBy="priority" sortDir="desc" onChange={() => {}} />,
+    );
+    const chips = container.querySelectorAll('.sort-chip');
+    expect(chips.length).toBe(6);
+    const active = container.querySelectorAll('.sort-chip--active');
+    expect(active.length).toBe(1);
+    expect(active[0]?.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('renders .sort-chip-icon arrow on active chip only', () => {
+    const { container, rerender } = render(
+      <VocSortChips sortBy="priority" sortDir="desc" onChange={() => {}} />,
+    );
+    const iconsDesc = container.querySelectorAll('.sort-chip-icon');
+    expect(iconsDesc.length).toBe(1);
+    expect(iconsDesc[0]?.textContent).toBe('↓');
+    rerender(<VocSortChips sortBy="priority" sortDir="asc" onChange={() => {}} />);
+    const iconsAsc = container.querySelectorAll('.sort-chip-icon');
+    expect(iconsAsc.length).toBe(1);
+    expect(iconsAsc[0]?.textContent).toBe('↑');
+  });
 });
