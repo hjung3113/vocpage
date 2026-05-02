@@ -38,8 +38,10 @@ export interface ListVocsParams {
   includeDeleted?: boolean;
 }
 
+export type ListVocsRow = Voc & { tags: string[] };
+
 export interface ListVocsResult {
-  rows: Voc[];
+  rows: ListVocsRow[];
   total: number;
 }
 
@@ -86,10 +88,17 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
   // sort_by/sort_dir are zod-enum validated upstream; safe to interpolate.
   const rows = (
     await pool.query(
-      `SELECT * FROM vocs ${where} ORDER BY ${params.sort_by} ${params.sort_dir} LIMIT $${i++} OFFSET $${i++}`,
+      `SELECT vocs.*, COALESCE(
+         (SELECT array_agg(t.name ORDER BY t.name)
+            FROM voc_tags vt
+            JOIN tags t ON t.id = vt.tag_id
+           WHERE vt.voc_id = vocs.id),
+         ARRAY[]::text[]
+       ) AS tags
+       FROM vocs ${where} ORDER BY ${params.sort_by} ${params.sort_dir} LIMIT $${i++} OFFSET $${i++}`,
       [...values, params.per_page, offset],
     )
-  ).rows as Voc[];
+  ).rows as ListVocsRow[];
   const totalRow = await pool.query(`SELECT count(*)::int AS n FROM vocs ${where}`, values);
   return { rows, total: totalRow.rows[0]?.n ?? 0 };
 }

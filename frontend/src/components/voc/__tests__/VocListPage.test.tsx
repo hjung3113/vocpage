@@ -64,7 +64,7 @@ describe('VocListPage — Wave 1 RTL', () => {
   it('F-T3 행 노출 + 필터 칩 클릭', async () => {
     const live = VOC_FIXTURES.filter((r) => r.deleted_at === null);
     vi.mocked(vocApi.list).mockResolvedValue({
-      rows: live.slice(0, 5).map((r) => ({ ...r, has_children: false, notes_count: 0 })),
+      rows: live.slice(0, 5).map((r) => ({ ...r, has_children: false, notes_count: 0, tags: [] })),
       page: 1,
       per_page: 50,
       total: 5,
@@ -78,7 +78,7 @@ describe('VocListPage — Wave 1 RTL', () => {
   it('F-T4a user role: drawer 열려도 note 작성 form 비노출', async () => {
     const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
     vi.mocked(vocApi.list).mockResolvedValue({
-      rows: [{ ...target, has_children: false, notes_count: 0 }],
+      rows: [{ ...target, has_children: false, notes_count: 0, tags: [] }],
       page: 1,
       per_page: 50,
       total: 1,
@@ -94,7 +94,7 @@ describe('VocListPage — Wave 1 RTL', () => {
   it('F-T4b manager role contrast: 같은 vocId에서 note form은 노출 (gate 조건이 user 전용임을 증명)', async () => {
     const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
     vi.mocked(vocApi.list).mockResolvedValue({
-      rows: [{ ...target, has_children: false, notes_count: 0 }],
+      rows: [{ ...target, has_children: false, notes_count: 0, tags: [] }],
       page: 1,
       per_page: 50,
       total: 1,
@@ -113,7 +113,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     // click in a real browser).
     const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
     vi.mocked(vocApi.list).mockResolvedValue({
-      rows: [{ ...target, has_children: false, notes_count: 0 }],
+      rows: [{ ...target, has_children: false, notes_count: 0, tags: [] }],
       page: 1,
       per_page: 50,
       total: 1,

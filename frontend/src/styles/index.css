@@ -315,6 +315,12 @@ body {
   height: 14px;
   color: var(--text-quaternary);
 }
+.voc-row-title .tag-row {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-left: var(--sp-2);
+}
 /* === C-7 VocRow styles END === */
 
 /* === C-8 VocSortChips styles START === */

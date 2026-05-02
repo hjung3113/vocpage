@@ -48,6 +48,7 @@ const live = VOC_FIXTURES.filter((r) => r.deleted_at === null).map((r) => ({
   ...r,
   has_children: false,
   notes_count: 0,
+  tags: [] as string[],
 }));
 
 function rowsByStatus(status: VocStatus) {
