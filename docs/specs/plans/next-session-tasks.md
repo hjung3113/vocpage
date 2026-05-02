@@ -21,9 +21,18 @@
 | follow-up C-1 (Docker fix)      | backend Dockerfile `COPY shared/`, `docker-compose.yml` `./shared:/app/shared` 마운트                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | ✅ 본 PR (`docs/wave1-followup-c-verify`)         |
 | follow-up C-2 (seed UUID fix)   | `backend/seeds/dev_seed.sql` user UUIDs를 `FIXTURE_USERS` 정식 v4로 교체 + FK cascade(`vocs.author_id`/`assignee_id`, `comments.author_id`) + `backend/src/__tests__/seed-fixture-parity.test.ts` 회귀 (pg-mem 기반 `VocListResponse.parse` smoke) 추가                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | ⏳ 다음 세션 단독 PR `feat/wave1-followup-c-seed` |
 
+### Wave 1.6 — `/voc` prototype 100% 디자인 일치화 (신규, 2026-05-02)
+
+> **트리거**: PR #125 머지(2026-05-02) 후 사용자 결정 — Follow-up A의 token-only 13건 + 9 SKIP 잔재로는 부족. `/voc` 한 화면을 prototype과 픽셀/컴포넌트/상호작용 수준에서 완전 일치시킨 뒤 다음 단계로 간다.
+> **접근 (재정의 2026-05-02)**: token tuning이 아니라 **prototype 시각 위계 기준의 컴포넌트 트리 재구성**. Phase A(분해 산출물) → B(토큰 갭) → C(컴포넌트 1개씩 rebuild) → D(종합 검증). 정본 plan: [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md).
+> **범위 (D1)**: `/voc` 페이지 + 그 페이지가 사용하는 공통 셸(AppShell, Header, Sidebar). 다른 화면은 손대지 않는다.
+> **분석 자료 (D2)**: `prototype/prototype.html` + `prototype/css/**` + `prototype/js/**` 전부. 분량 ~18.7k 줄 → subagent 3종 병렬 (HTML 구조 / CSS 토큰·상태 / JS 인터랙션).
+> **진행 방식 (D10 번복)**: Phase 진행 중 autopilot/ralph 자동화 사용 허용. **머지·완료 선언은 사용자 검수 후에만**. Phase 게이트 미승인 시 다음 Phase 시작 금지.
+> **금지**: Wave 2 (Dashboard) 및 Follow-up C-2 (seed UUID v4) 진입은 본 Wave 종료 전까지 **hard-block**.
+
 ### Wave 2 진입 hard-block
 
-위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + follow-up C-2 (seed UUID fix) 종결 전까지 **Wave 2 implementation 금지**. follow-up C-1은 본 PR로 종결.
+위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + **Wave 1.6 (`/voc` prototype 일치화)** + follow-up C-2 (seed UUID fix) 종결 전까지 **Wave 2 implementation 금지**. follow-up C-1은 본 PR로 종결. 진행 순서: Wave 1.6 → Follow-up C-2 → Wave 2.
 
 ---
 
