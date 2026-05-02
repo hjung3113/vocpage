@@ -1,5 +1,7 @@
 # B-4a `?mode=admin` URL 토글 (Wave 2 #3) — 설계 노트
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > 작성일: 2026-04-30
 > 브랜치: `feat/b-4a-mode-admin-url`
 > 상태: **R1 코드 완료, 5인 리뷰 미진행 (다음 세션)**

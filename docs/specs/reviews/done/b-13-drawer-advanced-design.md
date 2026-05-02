@@ -1,5 +1,7 @@
 # B-13 VOC 드로어 고급 5종 (Wave 2 #6) — 설계 노트
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > 작성일: 2026-05-01
 > 브랜치: `feat/b-13-drawer-advanced` (다음 단계)
 > 선행: B-4b 완료 후 진행
