@@ -230,6 +230,17 @@
    /opt-prompt decision id `opt-20260502T194032Z-c-9-voc-advanced-filters` (retro 는 헬퍼 로그
    `$HOME` 이전 전 손실로 미기재).
 
+→ **Post-merge 사용자 피드백 (2026-05-03, C-9 직후)** — `/voc` 시각 검수에서 3건 발견. 구현 보류, 기록만:
+   - **F-1 정렬 칩↔헤더 정렬 불일치**: 칩 6개 vs 헤더 4개(title/assignee 누락). 사용자 결정 = **Option A
+     (칩 제거 + 헤더 6개 모두 정렬 가능)**. C-8 산출물 일부 롤백.
+   - **F-2 제목 좌측 voc_type 뱃지 누락**: `VocRow.tsx:55-66` 가 `<VocTypeBadge>` 미호출. contract 변경 불필요
+     (`VocListItem.voc_type_id` + master `vocTypes` 이미 가용 — `vocTypeMap` prop drill 만 추가).
+   - **F-3 필터 더보기 토글 위치 + 검색 placeholder**: prototype 은 status chips 행 **우측 끝**에 토글
+     배치 (한 줄). 현재 React 는 별도 줄. 또 `VocTopbar.tsx:46` placeholder `"검색..."` → prototype
+     `"제목, 본문 검색..."` 1줄 수정 동반.
+   상세는 `docs/specs/plans/wave-1-6-voc-parity.md §12`. 처리 시점 추천: **Phase D 진입 전 단일
+   follow-up PR (F-1/F-2/F-3 묶음)** 또는 Phase D 흡수 — 사용자 결정 대기. C-10 진입은 막지 않음.
+
 → **다음 세션 첫 작업** = **β-batch 잔여 C-10 진입** (NotifButton + NotifPanel — ζ batch C-19 Topbar prerequisite).
    그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
