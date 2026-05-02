@@ -104,8 +104,24 @@
      `uidesign.md` §5 / §10 / §13 + `wave-1-6-voc-parity.md` §7.2 leaf 모두 동기화.
      screenshots: `docs/screenshots/wave-1-6/c-3-tag-pill-v2-textmark-xs.png` (PR comment 첨부).
 
-→ **다음 세션 첫 작업** = **B-add-1 (VocAssignee 6 avatar 토큰 — Phase B addendum 분리)** → 이어서 **C-5 VocAssignee**.
-   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → ~~C-3 ∥ C-4~~ → **B-add-1 (now)** → C-5 → C-6 → C-7.
+→ **Wave 1.6 Phase C-5 MERGED** (PR #146, merge `4feee35`, 2026-05-02) — VocAssignee + VocTable wire-up.
+   - VocAssignee.tsx (78L) — `{ name: string|null, colorClass?: 'steel'|'teal'|'violet' }`. 미배정 시 `UserX + 미배정`,
+     배정 시 22px 원형 이니셜 + 이름 (text-tertiary 11.5px). `hashAssigneeColor(name) % 3 → steel|teal|violet`
+     (deterministic). `colorClass` prop으로 caller override 가능 (mock data layer / parity testing 대비).
+   - **B-add-1 폐기**: 잠긴 plan §7.2는 "avatar colorCls 6 토큰 → §5.1 ≥4 → addendum 별도 PR" 강제했으나,
+     decomposition.md:511 "6종" 표기가 prototype 실제(`list.css:L289–L303` default+.g+.p = 3종, `helpers.js:L19`
+     `assigneeCls` 단일 string)와 어긋난 오기였음. 실 토큰 3개(`--avatar-steel/-teal/-violet`)는 Phase B PR #128
+     시점 이미 `index.css:153–155` 추가 완료. §5.1 ≤3 leaf 정책상 inline 동봉 가능 → addendum PR 불필요.
+     `decomposition.md:511` + `parity.md §7.2 α-batch / §7.3 critical path / PR 카운트 22→21` 모두 AMENDED 동기화.
+   - VocTable.tsx 인라인 plain-text 렌더 → `<VocAssignee />` 교체 (precedent §C1.D8 구버전 동시 삭제).
+   - 11/11 unit (RED→GREEN) + VocTable 7/7 + integration 5/5. Build green, full FE suite 286 PASS.
+   - Codex adversarial 5건 처리: P1 wire (적용) / P2 hash 정확 매핑 (architectural prop override + C-7로 이관) /
+     P2 test 강화 (적용) / P2 visual-diff snapshot (Phase D로 deferral, C-1~C-4 선례 일치) / P3 empty/whitespace (적용).
+   - 9-항목 인하우스 패널 SHIP 9/9. 사용자 검수 대체 = live /voc 통합 캡처 PNG.
+   - Screenshots: `docs/specs/reviews/c-5-voc-assignee.png` (데모 HTML) + `c-5-voc-assignee-live.png` (실 통합).
+
+→ **다음 세션 첫 작업** = **C-6 VocListHeader → C-7 VocRow** (VocTable.tsx 충돌로 sequential).
+   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → ~~C-3 ∥ C-4~~ → ~~B-add-1~~(폐기) → ~~C-5~~ → **C-6 → C-7**.
    룰북 = `wave-1-6-phase-c-precedent.md` per-leaf + 신규 audit `wave-1-6-voc-badge-audit.md` §7 acceptance.
    - **B-add-2** (token-only PR): 7 chip 토큰을 `frontend/src/tokens.ts` SSOT에 추가 + `index.css :root` 미러 +
      기존 raw `9999px` literals (Tag Pill `uidesign §5`, Filter Tab) → `var(--chip-radius-pill)` 마이그.
@@ -127,7 +143,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, C-3 ✅, C-4 ✅, **다음 = B-add-1 → C-5** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, C-3 ✅, C-4 ✅, ~~B-add-1~~(폐기), C-5 ✅, **다음 = C-6 → C-7** / §7.2 batch 순서: α→β→γ→δ→ε→ζ)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
