@@ -44,8 +44,12 @@ Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Arc
 
 ## Core Rules
 
-- **Map → search → inspect** — use folder `CLAUDE.md` maps to choose likely domains, `rg` for exact text, Graphify for big-picture relationships, and Serena for exact symbols.
-- **`rg` before Read** — use `rg` for filenames, keywords, error messages, API paths, env vars, and literal strings; never read broad directories or large files end-to-end unless necessary.
+- **Tool routing — match task to tool, picking the wrong tool wastes tokens and is itself a rule violation:**
+  - TS/TSX symbol body / references / rename → **Serena** (`get_symbols_overview`, `find_symbol`, `find_referencing_symbols`, `rename_symbol`)
+  - Cross-file keyword / literal / error string / file discovery → **`rg -n`**
+  - Known small range or tight cluster needing imports+body together → **`Read`** with `offset`/`limit` (or `sed -n 'A,Bp'`)
+  - Architecture map / dependency graph / UI→API→DB flow / "what connects to X" → **Graphify** — required at least once before a wide refactor or first entry into an unfamiliar feature; details below
+  - **Never** `cat <file>` to dump source, **never** `Read` a whole TS/TSX file you could `find_symbol` instead, **never** re-read a file already in context. Exception: config/JSON under ~1KB.
 - **Parallel tool calls** — independent tool calls go in one message, not sequential
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe through `| tail -20`; never print full traces
@@ -100,19 +104,6 @@ A refactor changes structure without changing observable behavior. Refactor and 
 - **After (in order):** update all references (imports, dynamic strings, config, `docs/specs/**`, plan files, README/CLAUDE.md, comments) → `rg -n "<old>"` returns 0 hits → Serena reference checks when symbols moved/renamed → typecheck passes → tests pass → exercise the touched surface (UI: browser; API: endpoint).
 - **Escalate to `code-reviewer`** only when public API surface changed, ≥3 modules touched, or DB schema/migration involved.
 
-## Graphify usage
+## Graphify
 
-Knowledge graph at `graphify-out/`.
-
-Use Graphify only for architecture-level, cross-domain, dependency, flow, or docs-to-code relationship questions.
-
-Examples: understand the overall flow; find which modules are connected to a feature; map UI → API → database; compare docs/specs with implementation; identify main modules before editing.
-
-Use `graphify-out/GRAPH_REPORT.md` for orientation only, not before every search. If `graphify-out/wiki/index.md` exists, use it for graph navigation instead of reading raw files.
-
-Use `/graphify query`, `/graphify path`, and `/graphify explain` for specific graph questions.
-
-Do not use Graphify for simple literal searches — use `rg`.
-Do not use Graphify as a replacement for Serena symbol inspection — use Serena for exact definitions, references, call chains, class/function bodies, and refactoring.
-
-After modifying code files, run `graphify update .` to keep the graph current.
+Knowledge graph at `graphify-out/`. Triggered by the routing rule above (architecture / dependency / cross-domain flow questions only). Prefer `graphify-out/wiki/index.md` over raw files; specific queries via `/graphify query|path|explain`. After modifying code files, run `graphify update .` to keep the graph current.
