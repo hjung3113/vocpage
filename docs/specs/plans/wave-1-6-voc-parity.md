@@ -86,7 +86,7 @@ Phase D: 종합 검증
 ### 5.3 게이트 통과 조건
 
 - 컴포넌트 맵에 처리 라벨(reuse / token-align / rebuild / delete) 빠짐 없음
-- §7 임계가 prototype 캡처와 production 캡처를 실제 비교한 수치임
+- §7 임계 표가 존재하고 컴포넌트별 항목이 빠짐 없음 (Phase A에서는 잠정 추정값 허용 — 실측 캘리브레이션은 Phase B 종료 직후 별도 단계에서 수행)
 - 사용자 승인
 
 ## 6. Phase B 상세

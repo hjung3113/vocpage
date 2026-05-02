@@ -376,15 +376,16 @@ Production 대응: `frontend/src/features/voc/components/VocReviewDrawer.tsx` + 
 
 본 절은 §5의 컴포넌트 props 명세보다 우선한다. props 시그니처가 무엇이든 아래 규칙은 동일 의미로 보존되어야 한다.
 
-| ID  | 규칙                                                                                                              | 출처                               | Phase C 검증 방법                                         |
-| --- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------- | --------------------------------------------- | ------------------------------------- | ----------------------------------------------------------- |
-| I-1 | 댓글 편집/삭제는 `currentUserId === comment.author_id`인 경우에만 본인용 메뉴 노출. role과 무관하게 fail-closed   | `drawer-comments.js:L18` `isOwner` | unit test: 다른 author_id 댓글에 메뉴 없음                |
-| I-2 | Admin/Manager는 본인이 아니어도 댓글 삭제 가능 (서버 가드 전제). 단 client는 명시적 role check 필요 — 모르면 숨김 | `role-state.js` 사용자 가드 패턴   | unit test: role=admin이면 다른 author 댓글 삭제 버튼 노출 |
-| I-3 | `voc.review_status === 'approved'`이면 status select / assignee select 비활성화                                   | `drawer-advanced.js:L26`           | unit test: review_status=approved → select disabled       |
-| I-4 | 첨부 제한: maxCount=5, maxBytes=10*1024*1024 (10 MiB), acceptMime = `image/png                                    | jpeg                               | gif                                                       | webp`만. modal과 drawer 양쪽이 동일 상수 공유 | `modal.js:L33` + `drawer-core.js:L97` | unit test: 6번째 파일 거부, 11MB 거부, application/pdf 거부 |
-| I-5 | 서브태스크 1레벨 제한 — VOC가 `parentId` 보유 시 sub 추가 UI 숨김                                                 | `drawer-core.js:L34`               | unit test: parentId 있는 voc → addSub 버튼 없음           |
-| I-6 | 내부 노트 표시: User=숨김, Dev=본인 작성/담당 VOC만, Manager/Admin=항상 노출                                      | `internal-notes.js` 진입부         | unit test: role 4종 × ownership 매트릭스                  |
-| I-7 | role-allow는 cosmetic only. 모든 mutation은 서버 가드 필요                                                        | `role-state.js:L5–L10`             | 통합 test: API 403 → UI 적절 처리                         |
+| ID  | 규칙                                                                                                                                                                                     | 출처                                                    | Phase C 검증 방법                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------- |
+| I-1 | 댓글 편집/삭제는 `currentUserId === comment.author_id`인 경우에만 본인용 메뉴 노출. role과 무관하게 fail-closed (prototype `drawer-comments.js:43-58` 확인 — `own=true` 외 메뉴 미렌더). | `drawer-comments.js:L18` `isOwner` + `:43-58` 렌더 분기 | unit test: 다른 author_id 댓글에 메뉴 없음                  |
+| I-2 | `voc.review_status === 'approved'`이면 status select / assignee select 비활성화                                                                                                          | `drawer-advanced.js:L26`                                | unit test: review_status=approved → select disabled         |
+| I-3 | 첨부 제한: `maxCount=5`, `maxBytes=10485760` (10 MiB), `acceptMime`은 `image/png`, `image/jpeg`, `image/gif`, `image/webp`만 허용. modal과 drawer 양쪽이 동일 상수 공유                  | `modal.js:L33` + `drawer-core.js:L97`                   | unit test: 6번째 파일 거부, 11MB 거부, application/pdf 거부 |
+| I-4 | 서브태스크 1레벨 제한 — VOC가 `parentId` 보유 시 sub 추가 UI 숨김                                                                                                                        | `drawer-core.js:L34`                                    | unit test: parentId 있는 voc → addSub 버튼 없음             |
+| I-5 | 내부 노트 표시: User=숨김, Dev=본인 작성/담당 VOC만, Manager/Admin=항상 노출                                                                                                             | `internal-notes.js` 진입부                              | unit test: role 4종 × ownership 매트릭스                    |
+| I-6 | role-allow는 cosmetic only. 모든 mutation은 서버 가드 필요                                                                                                                               | `role-state.js:L5–L10`                                  | 통합 test: API 403 → UI 적절 처리                           |
+
+> **Admin/Manager의 타인 댓글 삭제 권한**은 prototype에 없음 (메뉴 자체가 미렌더). 향후 Wave에서 정책으로 추가하려면 backend 계약 + UI 분리 PR로 별도 처리. 본 Wave는 `own=true` fail-closed만 보존.
 
 > Phase C 진행 시 단일 모듈 `frontend/src/features/voc/permissions.ts`(가칭)에 위 규칙을 함수로 캡슐화하고 컴포넌트는 호출만 하도록 통일 권고. 신설 여부는 Phase C 첫 컴포넌트 작업 시 결정.
 
@@ -501,7 +502,7 @@ Permission 표 (cosmetic — 서버측 가드 필수):
 | NotifButton + NotifPanel | 알림 드롭다운                           | items, onItemClick               | open/closed, type filter        | 타입 7종                            | `prototype.html:L1007–L1024` + `notif.js`                                    | `features/voc/components/VocNotificationsDropdown.tsx`                   | **rebuild** (chip filter + nav 행동)                    |
 | VocStatusFilters         | 상태 pill bar                           | active, onChange                 | hover/active                    | 6 status                            | `prototype.html:L118–L130` + `filters.js`                                    | `features/voc/components/VocStatusFilters.tsx`                           | **token-align**                                         |
 | VocAdvancedFilters       | 4-group chip 패널                       | filters, onToggle, onClear       | open/closed, chip active        | assignee/priority/type/tag          | `prototype.html:L133–L165` + `filters.js`                                    | `features/voc/components/VocAdvancedFilters.tsx`                         | **rebuild** (열림 애니메이션 + chip active 시각)        |
-| VocSortChips             | 정렬 칩 그룹                            | sortKey, sortDir, onChange       | radio active                    | 6 keys                              | `prototype.html:L171–L179` + `voc-list.js`                                   | `features/voc/components/VocSortChips.tsx`                               | **token-align**                                         |
+| VocSortChips             | 정렬 칩 그룹                            | sortKey, sortDir, onChange       | radio active                    | 6 keys (mapping 필요)               | `prototype.html:L171–L179` + `voc-list.js`                                   | `features/voc/components/VocSortChips.tsx`                               | **rebuild** (정렬 키 mapping 필요 — §5.1 참고)          |
 | VocListHeader            | sticky 표 헤더                          | sortKey, onSort                  | sort-active 애니메이션          | —                                   | `prototype.html:L181–L189`                                                   | (`VocTable.tsx` 내부)                                                    | **rebuild** (grid columns 정확히, sort 화살표 keyframe) |
 | VocRow                   | 데이터 행                               | voc, selected, onClick           | hover/selected/expanded         | with subs / without                 | `voc-list.js:L109`                                                           | (`VocTable.tsx` 내부)                                                    | **rebuild** (raw OKLCH 토큰화 후 시각 위계 재구성)      |
 | VocSubRow                | 서브태스크 행                           | sub, parentId                    | hover/selected                  | —                                   | `voc-list.js` (subs 분기)                                                    | (없음)                                                                   | **rebuild**                                             |
@@ -522,7 +523,26 @@ Permission 표 (cosmetic — 서버측 가드 필수):
 
 총 25개 행. **rebuild 17개 / token-align 7개 / reuse 0개 / delete 0개**. (현 production 컴포넌트 일부는 rebuild 시 1:1 교체.)
 
-> **Phase C 진행 순서 잠정**: leaf → composite → shell.
+### 5.1 VocSortChips 정렬 키 매핑 (rebuild 필수 컨텍스트)
+
+prototype 정렬 키와 production API 정렬 키가 다르므로 단순 token swap 불가. Phase C에서 다음 매핑을 컴포넌트 내부에 캡슐화하거나 별도 어댑터로 분리한다.
+
+| prototype key (`data-sort-key`) | 라벨 (prototype) | production `VocSortColumn` 매핑 | 비고                                                            |
+| ------------------------------- | ---------------- | ------------------------------- | --------------------------------------------------------------- |
+| `date`                          | 등록일           | `created_at`                    | 1:1                                                             |
+| `id`                            | 이슈 ID          | `issue_code`                    | 표시 라벨 동일                                                  |
+| `title`                         | 제목             | **없음**                        | production 미지원 — UI에서 제외하거나 client-side sort fallback |
+| `status`                        | 상태             | `status`                        | 1:1                                                             |
+| `priority`                      | 우선순위         | `priority`                      | 1:1                                                             |
+| `assignee`                      | 담당자           | **없음**                        | production 미지원 — UI에서 제외                                 |
+| (없음)                          | —                | `updated_at`                    | production 추가 — 칩 추가 검토                                  |
+| (없음)                          | —                | `due_date`                      | production 추가 — 칩 추가 검토                                  |
+
+결정 (Phase C 진입 시 사용자 확정 필요): 우선 prototype 6 키 중 production이 지원하는 4개(date/id/status/priority)만 노출. title/assignee는 production API 확장(Wave 2+) 후 추가. updated_at/due_date 추가 노출 여부는 별도 결정.
+
+### 5.2 Phase C 진행 순서
+
+> **순서 잠정**: leaf → composite → shell.
 >
 > 1. VocStatusBadge → VocPriorityBadge → VocTagPill → VocAssignee → VocStatusFilters / VocSortChips
 > 2. VocPaginationBar → VocListHeader → VocRow → VocSubRow → VocTable 합성
@@ -537,12 +557,12 @@ Permission 표 (cosmetic — 서버측 가드 필수):
 
 ### 6.1 `#fff` 하드코딩 (prototype CSS 내부)
 
-| 위치                                       | 사용                       |
-| ------------------------------------------ | -------------------------- |
-| `prototype/css/components/topbar.css:L129` | `.btn-primary` 텍스트      |
-| `prototype/css/components/filter.css:L72`  | `.fc-badge` 텍스트         |
-| `prototype/css/layout/sidebar.css:L112`    | `.nav-badge.accent` 텍스트 |
-| `prototype/css/components/list.css:L292`   | `.mini-av` 텍스트          |
+| 위치                                    | 사용                       |
+| --------------------------------------- | -------------------------- |
+| `prototype/css/layout/topbar.css:L129`  | `.btn-primary` 텍스트      |
+| `prototype/css/layout/filter.css:L72`   | `.fc-badge` 텍스트         |
+| `prototype/css/layout/sidebar.css:L112` | `.nav-badge.accent` 텍스트 |
+| `prototype/css/layout/list.css:L292`    | `.mini-av` 텍스트          |
 
 → production은 `--text-on-brand` 토큰 보유. Phase B에서 일괄 치환하며 production tokens.css에 동일 토큰 존재 보장.
 
@@ -635,9 +655,9 @@ Phase B 엔지니어가 본 Wave에서 처리해야 할 토큰 작업의 단일 
 
 allowlist 위치: `scripts/visual-diff/allowlist.json` (Phase D 진입 시 신설). 항목 schema: `{node, reason, owner, expires_at}`.
 
-### 7.2 컴포넌트별 픽셀 diff 허용치 (잠정 — Phase A 종료 시 prototype 캡처 후 확정)
+### 7.2 컴포넌트별 픽셀 diff 허용치 (Phase A 잠정 — Phase B 종료 후 캘리브레이션에서 실측 갱신)
 
-> 잠정 임계는 Wave 1.5 PR #125의 토큰 정렬 후 측정값을 기반으로 한다. Phase A 게이트 통과 직전 prototype 1440×900 캡처 vs production 캡처 실측으로 본 표 갱신.
+> 잠정 임계는 Wave 1.5 PR #125의 토큰 정렬 후 측정값을 기반으로 한 추정. plan §5.3 게이트 개정에 따라 Phase A에서는 표가 컴포넌트별로 채워져 있으면 통과, 실측 수치는 Phase B 종료 직후 별도 캘리브레이션 단계(prototype 1440×900 캡처 vs production 캡처 비교)에서 본 표를 갱신한다. Phase C 진입 전 본 표가 실측으로 갱신되어 있어야 한다.
 
 | 컴포넌트             | 잠정 max diff (%) | 비고                                       |
 | -------------------- | ----------------- | ------------------------------------------ |
