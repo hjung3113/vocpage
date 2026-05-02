@@ -35,8 +35,11 @@ describe('VocSubRow', () => {
     expect(screen.getByTestId('trailing-slot')).toBeInTheDocument();
   });
 
-  it('has aria-label="서브태스크 {title}"', () => {
+  it('has aria-label="서브태스크 {title} 열기"', () => {
     render(<VocSubRow status="처리중" title="제목A" />);
-    expect(screen.getByTestId('voc-sub-row')).toHaveAttribute('aria-label', '서브태스크 제목A');
+    expect(screen.getByTestId('voc-sub-row')).toHaveAttribute(
+      'aria-label',
+      '서브태스크 제목A 열기',
+    );
   });
 });

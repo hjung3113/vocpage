@@ -11,16 +11,19 @@ describe('VocTagPill', () => {
     render(<VocTagPill name="UX" />);
     const hash = screen.getByText('#');
     expect(hash).toHaveAttribute('aria-hidden', 'true');
+    const chip = screen.getByTestId('outline-chip');
+    expect(chip).toHaveTextContent(/^#\s*UX$/);
   });
 
-  it('has data-testid="voc-tag-pill-{name}"', () => {
-    render(<VocTagPill name="UX" />);
-    expect(screen.getByTestId('voc-tag-pill-UX')).toBeInTheDocument();
+  it('has stable data-testid="voc-tag-pill" with name in data-tag-name', () => {
+    render(<VocTagPill name="UX bug" />);
+    const pill = screen.getByTestId('voc-tag-pill');
+    expect(pill).toHaveAttribute('data-tag-name', 'UX bug');
   });
 
   it('has aria-label "태그 {name}"', () => {
     render(<VocTagPill name="UX" />);
-    expect(screen.getByTestId('voc-tag-pill-UX')).toHaveAttribute('aria-label', '태그 UX');
+    expect(screen.getByTestId('voc-tag-pill')).toHaveAttribute('aria-label', '태그 UX');
   });
 
   it('internally renders an OutlineChip (data-testid="outline-chip" in DOM)', () => {

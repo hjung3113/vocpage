@@ -6,7 +6,7 @@ export interface VocTagPillProps {
 
 export function VocTagPill({ name }: VocTagPillProps) {
   return (
-    <span data-testid={`voc-tag-pill-${name}`} aria-label={`태그 ${name}`}>
+    <span data-testid="voc-tag-pill" data-tag-name={name} aria-label={`태그 ${name}`}>
       <OutlineChip label={name} icon="#" />
     </span>
   );
