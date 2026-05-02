@@ -147,8 +147,29 @@
    - Screenshots: `docs/screenshots/wave-1-6/phase-c-6-list-header.png` (initial preview) +
      `phase-c-6-list-header-final.png` (post-adversarial).
 
-→ **다음 세션 첫 작업** = **C-7 VocRow** (sequential closer, VocTable.tsx 통합).
-   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → ~~C-3 ∥ C-4~~ → ~~B-add-1~~(폐기) → ~~C-5~~ → ~~C-6~~ → **C-7**.
+→ **Wave 1.6 Phase C-7 MERGED** (PR #150, merge `c97f19c`, 2026-05-02) — VocRow + VocTable grid 재합성.
+   `frontend/src/components/voc/VocRow.tsx` 신설 (76줄, 52px height, prototype `.voc-row` 포팅,
+   hover/selected 상태, 키보드 a11y Enter/Space, 7-cell grid `22px 144px 1fr 115px 108px 84px 96px`).
+   VocTable.tsx 재합성 — `<DataTable>` 제거 → `<div role="grid" aria-label="VOC 목록"><VocListHeader/><VocRow[]/></div>`.
+   Phase B PR #128 토큰 (`--voc-row-hover-bg` / `--voc-row-selected-bg`) 재사용 — 신규 토큰 0.
+   `=== C-7 VocRow styles ===` token-only marker block (token-purity scan 추가) +
+   `vocGridLayout.ts` 신설 (VOC_GRID_COLUMNS / VOC_GRID_PADDING_X 공유 상수 — VocRow ↔ VocListHeader 중복 제거).
+   5 reviewer adversarial: architect FIX_REQUIRED (empty-state in role=grid + grid-cols 중복 + inline style)
+   + designer FIX_REQUIRED (token 확인 + title gap + expand hover) + code-reviewer/security/test-engineer SHIP.
+   적용된 fix 3건 — empty-state를 role=grid 외부로 이동 + `.voc-table-empty` 클래스화 +
+   `gridTemplateColumns` 공유 상수화 + role=grid/empty-state 명시 test 2개 추가.
+   Deferral: expand-btn hover transform (expand 인터랙션 미구현 — subtask wave) /
+   title gap (inline 형제 없음 — YAGNI). 303 FE + 92 BE tests green. 스크린샷 `wave-1-6-c-7-vocrow.png`.
+   C-6 deferral 자동 흡수: visual-diff harness (parent role=grid 환경에서 측정 가능).
+→ **[CORRECTION 2026-05-02]** 직전 기재 오류 — "Phase C complete / 다음 = Phase D"는 사실
+   plan §7.2의 **α-batch (C-1~C-7)만 완료**. β/γ/δ/ε/ζ **12 PR이 통째로 미착수**.
+   미진행: β(C-8 SortChips ∥ C-9 AdvancedFilters ∥ C-10 NotifButton+Panel) / γ(C-11 CreateModal+AttachmentZone) /
+   δ(C-12 ReviewDrawer → C-13 ReviewTabs) / ε(C-14 CommentList ∥ C-15 InternalNotes ∥ C-16 SubTaskList) /
+   ζ(C-17 SidebarUserSwitcher → C-18 Sidebar ∥ C-19 Topbar). Phase D는 §8 정의상 종합 검증이라 모든
+   batch 머지 후에만 진입 가능 — 직진 불가. 사용자 시각 검수에서 navbar/레이아웃 깨진 것으로 확인됨
+   (ζ 미진행이 원인).
+→ **다음 세션 첫 작업** = **β-batch 진입** (C-8 ∥ C-9 ∥ C-10, 3 슬롯 병렬). 이후 γ → δ → ε → ζ → Phase D.
+   §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
      22px expand-btn + 6 cell). VocTable.tsx 재합성 — `<DataTable>` → `<VocListHeader> + <VocRow[]>`.
      parent에 `role="grid"` 부여하여 C-6의 a11y contract 충족 (column/row chain 완성).
@@ -178,8 +199,8 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, C-3 ✅, C-4 ✅, ~~B-add-1~~(폐기), C-5 ✅, C-6 ✅, **다음 = C-7** / §7.2 batch 순서: α→β→γ→δ→ε→ζ)
-- ⏳ Phase D — 종합 검증
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / **β γ δ ε ζ 미착수: C-8~C-19 12 PR**)
+- ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
 **Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
