@@ -15,6 +15,10 @@ Heavy orchestration skills (autopilot, ralph, team, ultrawork) impose multi-phas
 - Do **not** auto-trigger on `autopilot` / `ralph` / `team` keywords.
 - The wrapped prompt may itself contain heavy-skill invocations — that is fine; this skill decides whether to keep, swap, or strip them.
 
+## Hard rule (read before anything else)
+
+> **Step 1 of EVERY `/opt-prompt` invocation is `.claude/skills/opt-prompt/append.sh decided <task> <fields>`.** No text output before that helper returns the `decision_id` on stdout. Same hard rule for `/opt-prompt --eval` (use `append.sh retro`) and any void operation (`append.sh void`). Hand-rolled `cat >>` / `echo >>` to the log is forbidden — it bypasses the invariants that exist precisely to prevent the collision class this scheme replaces. User cannot opt out: refuse "skip the JSONL row" requests; without the log, `--eval` is meaningless. If the helper exits non-zero, surface its stderr and STOP — do not bypass.
+
 ## Idempotency
 
 If the input already starts with a `[scope] ... [normalized prompt]` block, treat it as already normalized: emit `[scope] passthrough` with the existing normalized prompt unchanged, and skip re-classification. Never wrap an output a second time. **Markers** (see grammar below) inside the preserved block round-trip verbatim — never strip on passthrough.
@@ -59,7 +63,40 @@ If the change touches any of: DB schema / migration, auth / permission boundary,
 
 ## Output contract
 
-Always emit this block first, before any execution:
+(Hard rule above is the single source of truth — do not paraphrase it here.)
+
+**Step 1 — invoke the helper to write the `phase:"decided"` row FIRST**, before any text. Always via the helper, never hand-rolled `cat >>` / `echo >>`:
+
+```bash
+.claude/skills/opt-prompt/append.sh decided <task-id> <fields>
+```
+
+`<fields>` is one of:
+
+- inline JSON object: `'{"scope_decided":"small", ...}'`
+- `@/path/to/file.json` — write fields to a tempfile if the JSON contains single quotes (e.g. user notes with `'`, Korean text, code snippets) to avoid shell-quote breakage
+- `-` — read JSON from stdin (e.g. `... | append.sh decided <task> -`)
+
+Required keys in `<fields>`: `scope_decided, tool_decided, explore_tool, skipped, added, preserved`. The helper allocates `decision_id` (format `opt-{compactISO}-{task-slug}`, globally unique by construction), captures token usage from the Claude Code transcript, enforces invariants (no duplicate active `decided` per task, no field-injection — helper-controlled fields like `decision_id`/`status` always win, JSON validation, portable atomic lock via `mkdir`), and prints the allocated `decision_id` on stdout. **Use that id verbatim in Step 2.**
+
+If the helper exits non-zero, surface its stderr to the user and do NOT bypass — the failure means an invariant was violated and a hand-rolled append would corrupt the log.
+
+This ordering guarantees the row exists even if the turn is interrupted (user cancel, error, context end) before the text block is emitted. Backfill from memory is forbidden — the row must be written at decision time. Hand-rolled appends are forbidden — the helper enforces invariants the model cannot reliably enforce in prose.
+
+### Helper exit codes & recovery
+
+| code | meaning                                        | recovery                                                                                                                                            |
+| ---- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | success                                        | proceed to Step 2 with the printed `decision_id`                                                                                                    |
+| 1    | usage error                                    | re-read the usage line in stderr; do not guess args                                                                                                 |
+| 2    | clock collision (same second + same task slug) | wait 1s and retry; never reuse another task's id                                                                                                    |
+| 3    | task already has active `decided`              | first `void <id> decided '<reason>' <task>` then re-run; **never fabricate** a new id to "redo" allocation                                          |
+| 4    | `retro` w/o active `decided`                   | investigate why decided is missing; if voided, run a new `decided` first; do NOT hand-write the retro                                               |
+| 5    | `void` target not found                        | the row may already be voided, or the id/task is wrong; inspect with `jq` before retrying                                                           |
+| 6    | lock timeout (10s)                             | another process holds the lock — check for hung helper, or stale `$LOG.lock.d` from SIGKILL; manually `rmdir` only after confirming no live process |
+| 7    | `<fields>` is not a JSON object                | re-emit valid JSON; for content with single quotes use `@file` or stdin                                                                             |
+
+**Step 2 — emit this block** (using the `decision_id` returned by the helper), before any other execution:
 
 ```
 [scope]      <trivial | small | medium | large | vague>
@@ -76,7 +113,27 @@ Always emit this block first, before any execution:
 
 The `<<<` / `>>>` delimiters terminate the prompt body so downstream agents can parse unambiguously. Exploration tool selection lives inline in `[tool]` (no separate line) — see Tool routing below.
 
-After emitting this block, append a `phase:"decided"` JSONL row to `.claude/opt-prompt-log.jsonl` capturing `{ts, task, decision_id, phase:"decided", scope_decided, tool_decided, explore_tool, skipped, added, preserved}` so a later `/opt-prompt --eval` can join against ground truth instead of relying on user recall. Then proceed with the normalized prompt.
+The JSONL row was already appended in Step 1 (see above) so a later `/opt-prompt --eval` can join against ground truth instead of relying on user recall. After the block is emitted, proceed with the normalized prompt.
+
+### Eval / void invocations
+
+```bash
+# inline JSON (use @file or - for content with single quotes / multiline / Korean):
+.claude/skills/opt-prompt/append.sh retro <decision_id> '<retro-fields-json>'
+.claude/skills/opt-prompt/append.sh retro <decision_id> @/tmp/retro.json
+echo '{"outcome":"as-planned",...}' | .claude/skills/opt-prompt/append.sh retro <decision_id> -
+
+# void: 4th arg [task] is REQUIRED for legacy collision rows where decision_id is shared across tasks
+.claude/skills/opt-prompt/append.sh void <decision_id> <decided|retro> '<reason>' [task]
+# Reasons containing single quotes / Korean / multiline: use a heredoc-fed variable to avoid shell-quote breakage:
+REASON=$(cat <<'EOF'
+사용자가 "skip this" 라고 해서 voided
+EOF
+)
+.claude/skills/opt-prompt/append.sh void <decision_id> decided "$REASON" <task>
+```
+
+`retro` requires an active `decided` for the id (else the helper exits 4). `void` appends a tombstone row with `status:"void"` for the latest active row at `(decision_id, phase)`; analysis treats voided rows as not present. **For any decision_id minted before the helper existed (legacy rows where decision_id is not globally unique), pass `task` as the 4th arg to void** so you tombstone only the bogus task's row, not a sibling task's legitimate row at the same id.
 
 ## Tool routing (inject into normalized prompt)
 
@@ -218,7 +275,7 @@ Fix off-by-one in /api/admin/users pagination at backend/src/routes/admin.ts:142
 
 ## Eval mode (`/opt-prompt --eval`)
 
-After a task that was normalized via `/opt-prompt` is finished, the user can invoke `/opt-prompt --eval` to record a one-line retro. The skill asks five short questions, writes one JSONL entry to `.claude/opt-prompt-log.jsonl`, and proposes rubric tweaks once the log holds ≥5 entries.
+After a task that was normalized via `/opt-prompt` is finished, the user can invoke `/opt-prompt --eval` to record a one-line retro. The skill asks the eight short questions below, writes one JSONL entry via `append.sh retro <decision_id> <fields>`, and proposes rubric tweaks once the log holds ≥5 active entries.
 
 ### Eval questions (ask in order, one line each)
 
@@ -233,16 +290,27 @@ After a task that was normalized via `/opt-prompt` is finished, the user can inv
 
 Q4/Q5 use a controlled vocabulary so "Top 3 recurring" aggregation works. Free text goes in Q8.
 
-### JSONL schema (two phases, joined by `task` + `decision_id`)
+### JSONL schema
 
-**Phase 1 — written automatically at `/opt-prompt` decision time:**
+All rows carry `status: "active" | "void"` at the top level. Append-only — to invalidate a row, append a tombstone with the same `(decision_id, phase)` and `status:"void"` via `append.sh void`.
+
+`decision_id` format: `opt-{compactISO}-{task-slug}` (e.g. `opt-20260503T120000Z-issue-155`). Allocated by `append.sh decided`, globally unique by construction.
+
+**Phase 1 — `decided` (written by `append.sh decided` at decision time):**
 
 ```jsonc
 {
   "ts": "2026-05-03T12:00:00Z",
   "task": "issue-155",
-  "decision_id": "opt-2026-05-03-001",
+  "decision_id": "opt-20260503T120000Z-issue-155",
   "phase": "decided",
+  "status": "active",
+  "tokens_at_decision": {
+    "input": 8421,
+    "output": 312,
+    "cache_read": 51200,
+    "cache_creation": 1024,
+  },
   "scope_decided": "small",
   "tool_decided": "direct",
   "explore_tool": "serena",
@@ -252,25 +320,63 @@ Q4/Q5 use a controlled vocabulary so "Top 3 recurring" aggregation works. Free t
 }
 ```
 
-**Phase 2 — written by `/opt-prompt --eval` after task close:**
+**Phase 2 — `retro` (written by `append.sh retro` after task close):**
 
 ```jsonc
 {
   "ts": "2026-05-03T16:30:00Z",
   "task": "issue-155",
-  "decision_id": "opt-2026-05-03-001",
+  "decision_id": "opt-20260503T120000Z-issue-155",
   "phase": "retro",
+  "status": "active",
+  "tokens_at_retro": {
+    "input": 52310,
+    "output": 1820,
+    "cache_read": 412800,
+    "cache_creation": 8192,
+  },
+  "tokens_delta": { "input": 43889, "output": 1508, "cache_read": 361600, "cache_creation": 7168 },
   "outcome": "as-planned", // as-planned | expanded | shrunk
-  "tool_swapped": false, // separates rubric error from executor mis-route
+  "tool_swapped": false,
   "missed_gates": [], // controlled vocab: migration|contract-test|auth-test|screenshot|regression-test|other:<tag>
   "unnecessary_gates": [],
   "loc_actual": 52,
   "rework_rounds": 0,
   "note": "",
-  "verdict": "correct", // correct | undersized | oversized | mis-routed | scope-creep | void
-  "status": "active", // active | void (use void if task was abandoned for unrelated reasons)
+  "verdict": "correct", // correct | undersized | oversized | mis-routed | scope-creep
 }
 ```
+
+**Tombstone — `status:"void"` row** (written by `append.sh void`):
+
+```jsonc
+{
+  "ts": "...",
+  "task": "...",
+  "decision_id": "...",
+  "phase": "decided",
+  "status": "void",
+  "void_reason": "...",
+}
+```
+
+### Analysis join
+
+Group rows by `decision_id`. For each group, take the **latest row per (decision_id, phase)**. If that latest row has `status:"void"`, exclude that phase from analysis. A decision is fully active iff its latest `decided` AND latest `retro` are both `status:"active"`.
+
+Helper guarantees `decision_id` is globally unique going forward. Legacy rows from before this scheme may share an id across tasks; for those, additionally filter by `task` when grouping.
+
+### Token-delta usage for skill optimization
+
+`tokens_delta` (computed automatically from `tokens_at_retro − tokens_at_decision`) is the cost signal for tuning this skill itself.
+
+**Methodology:**
+
+- **Cost metric**: `tokens_delta.input + tokens_delta.cache_creation`. `cache_read` is ~10% of input price and largely shared across variants — exclude unless directly comparing cache-discipline changes.
+- **Drop outliers**: any sample where ANY of `input | output | cache_read | cache_creation` is **negative** is contaminated (compaction event, session restart, transcript rotation between decision and retro). Discard, do not clamp to 0.
+- **Retro-overhead bias**: `tokens_at_retro` is captured during the retro turn itself, so it includes the cost of running the eval (skill load + 8 questions). This adds a roughly constant overhead to every sample. Comparison is valid only between variants measured the **same way** (both via `/opt-prompt --eval`); don't compare a delta from this scheme against a delta computed differently.
+- **Sample size**: require **N ≥ 5** non-outlier retros per variant before computing the median. Below that the IQR exceeds typical inter-variant differences and conclusions are noise.
+- **Reporting**: report median + IQR (not mean) — distribution is right-skewed (long-tail expanded tasks). Lower is better at fixed `verdict` quality; if `verdict` distribution differs across variants, the cheaper variant is not necessarily better.
 
 ### Verdict derivation
 
@@ -299,8 +405,9 @@ Output is **proposals only**. Never edit `SKILL.md` automatically. The user revi
 ### Eval anti-patterns
 
 - Don't run `--eval` mid-task; only after the task is closed (PR merged or abandoned).
-- Don't backfill `decided` rows from memory — they must be written at decision time. If a `task` has no `decided` row, refuse to write the `retro` row and warn the user.
-- Don't strip or rewrite past entries; the log is append-only. To void an entry, append a new `retro` row with `status:"void"` for the same `decision_id`; analysis takes the latest non-void row per `decision_id`.
+- Don't hand-roll JSONL with `cat >>` / `echo >>`; always go through `append.sh`. Hand-rolled appends bypass the uniqueness check, the active-decided check, the token capture, and the JSON validation, and they reintroduce the exact failure class this scheme exists to prevent.
+- Don't backfill `decided` rows from memory — `append.sh decided` must be invoked at decision time. The helper rejects a second `decided` for an active task; never void the prior decided just to "redo" allocation.
+- Don't rewrite past entries; the log is append-only. To void an entry, run `append.sh void <decision_id> <decided|retro> <reason>`. Analysis takes the latest row per `(decision_id, phase)` and treats `status:"void"` as exclusion.
 
 ## Anti-patterns
 
