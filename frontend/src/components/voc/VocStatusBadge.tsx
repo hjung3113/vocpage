@@ -1,15 +1,15 @@
 import type { VocStatus } from '../../../../shared/contracts/voc';
 import { VOC_STATUS_SLUG } from '../../lib/voc-status-slug';
+import { SolidChip } from '../../shared/ui/badge';
 
 export function VocStatusBadge({ status }: { status: VocStatus }) {
+  const slug = VOC_STATUS_SLUG[status];
   return (
-    <span
-      className={`status-badge s-${VOC_STATUS_SLUG[status]}`}
-      data-testid={`status-badge-${status}`}
-      aria-label={`상태 ${status}`}
-    >
-      <span className="status-dot" aria-hidden="true" />
-      {status}
-    </span>
+    <SolidChip
+      variant={slug}
+      label={status}
+      extraTestId={`status-badge-${status}`}
+      ariaLabelOverride={`상태 ${status}`}
+    />
   );
 }

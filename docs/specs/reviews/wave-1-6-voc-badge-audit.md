@@ -82,7 +82,7 @@ _Priority variants (VocPriorityBadge → TextMark):_
 | Variant | Color token | Font-weight |
 |---|---|---|
 | `urgent` | `var(--status-red)` | 700 |
-| `high` | `var(--status-orange)` | 600 |
+| `high` | `var(--status-orange)` | 400 |
 | `medium` | `var(--text-tertiary)` | 400 |
 | `low` | `var(--text-quaternary)` | 400 |
 
@@ -258,7 +258,7 @@ Verified from `frontend/src/components/voc/VocPriorityBadge.tsx` (icons) and `fr
 | Priority | Lucide icon   | Color token              | Font-weight | Source                                        |
 | -------- | ------------- | ------------------------ | ----------- | --------------------------------------------- |
 | `urgent` | `Flame`       | `var(--status-red)`      | 700         | preserved from current `VocPriorityBadge.tsx` |
-| `high`   | `ChevronUp`   | `var(--status-orange)`   | 600         | preserved                                     |
+| `high`   | `ChevronUp`   | `var(--status-orange)`   | 400         | C-2.6 user 결정 (이전 600 → 400, bold 제거)   |
 | `medium` | `Minus`       | `var(--text-tertiary)`   | 400         | preserved                                     |
 | `low`    | `ChevronDown` | `var(--text-quaternary)` | 400         | preserved                                     |
 
