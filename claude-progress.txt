@@ -53,8 +53,19 @@
    리뷰: 내부 3 round (architect/critic/verifier 모두 SHIP) + Codex adversarial (high+medium 2건 모두 적용)
    + refactoring review (5 체크리스트 / radius 모순 적용). 4 commits + 1 reviewer-fix commit.
 
-→ **다음 세션 첫 작업** = **B-add-2 (chip 7 토큰) → C-2.6 (primitive 3개 + wrapper refactor)**.
-   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → **B-add-2 (now)** → **C-2.6** → C-3 ∥ C-4 → B-add-1 → C-5 → C-6 → C-7.
+→ **Wave 1.6 B-add-2 MERGED** (PR #140, 2026-05-02) — chip token SSOT.
+   `frontend/src/tokens.ts` 7 chip 토큰 추가 (`chipHeightSm/PaddingXSm/RadiusPill/RadiusRounded/FontSizeSm/Gap/DotSize`)
+   + `frontend/src/styles/index.css :root` 동등 미러 (`--chip-height-sm` … `--chip-dot-size`) +
+   `.status-badge` 유일 raw `9999px` literal → `var(--chip-radius-pill)` 마이그.
+   값: 20px / 8px / 9999px / 4px / 11.5px / 4px / 6px (audit §7 spec 일치). Filter Tab raw literal은
+   `uidesign.md` spec text 안에만 존재 → 본 PR scope 외, C-2.6/C-3에서 자연 흡수.
+   Acceptance: grep parity 7↔7 / 204 FE tests green / production build clean / 5 CI checks pass /
+   Codex adversarial review **ship — zero findings**. 시각 검수: `/voc` 5 status badge pill radius
+   유지 확인 (screenshot `docs/screenshots/wave-1-6/b-add-2-chip-tokens-voc-list.png`).
+   `chipRadiusRounded` (4px)는 reserved — v1 caller 0개, audit §4.1 명시 deferred to CountPill.
+
+→ **다음 세션 첫 작업** = **C-2.6 (primitive 3개 + wrapper refactor)**.
+   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → **C-2.6 (now)** → C-3 ∥ C-4 → B-add-1 → C-5 → C-6 → C-7.
    룰북 = `wave-1-6-phase-c-precedent.md` per-leaf + 신규 audit `wave-1-6-voc-badge-audit.md` §7 acceptance.
    - **B-add-2** (token-only PR): 7 chip 토큰을 `frontend/src/tokens.ts` SSOT에 추가 + `index.css :root` 미러 +
      기존 raw `9999px` literals (Tag Pill `uidesign §5`, Filter Tab) → `var(--chip-radius-pill)` 마이그.
@@ -76,7 +87,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, **다음 = B-add-2 → C-2.6** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1/B-add-2)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, **다음 = C-2.6** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
