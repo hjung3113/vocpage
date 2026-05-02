@@ -6,7 +6,7 @@ describe('VocPriorityBadge', () => {
   type Case = [VocPriority, string, string, number];
   const cases: Case[] = [
     ['urgent', 'Urgent', 'flame', 700],
-    ['high', 'High', 'chevron-up', 600],
+    ['high', 'High', 'chevron-up', 400],
     ['medium', 'Medium', 'minus', 400],
     ['low', 'Low', 'chevron-down', 400],
   ];

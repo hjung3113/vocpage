@@ -7,7 +7,7 @@ const PRIORITY_CONFIG: Record<
   { label: string; Icon: LucideIcon; color: string; weight: 400 | 500 | 600 | 700 }
 > = {
   urgent: { label: 'Urgent', Icon: Flame, color: 'var(--status-red)', weight: 700 },
-  high: { label: 'High', Icon: ChevronUp, color: 'var(--status-orange)', weight: 600 },
+  high: { label: 'High', Icon: ChevronUp, color: 'var(--status-orange)', weight: 400 },
   medium: { label: 'Medium', Icon: Minus, color: 'var(--text-tertiary)', weight: 400 },
   low: { label: 'Low', Icon: ChevronDown, color: 'var(--text-quaternary)', weight: 400 },
 };
