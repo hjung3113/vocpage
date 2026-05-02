@@ -66,7 +66,7 @@ describe('VocTable', () => {
     expect(headers[5]).toHaveTextContent('등록일');
   });
 
-  it('renders 6 td cells per row', () => {
+  it('renders 6 gridcells per row', () => {
     render(
       <VocTable
         rows={[rows[0]!]}
@@ -77,7 +77,7 @@ describe('VocTable', () => {
         assigneeMap={assigneeMap}
       />,
     );
-    const cells = screen.getAllByRole('cell');
+    const cells = screen.getAllByRole('gridcell');
     expect(cells).toHaveLength(6);
   });
 
@@ -108,6 +108,38 @@ describe('VocTable', () => {
     );
     const priorityHeader = screen.getByRole('columnheader', { name: /우선순위/ });
     expect(priorityHeader).toHaveAttribute('aria-sort', 'descending');
+  });
+
+  it('container has role="grid" and aria-label', () => {
+    render(
+      <VocTable
+        rows={rows}
+        sortBy="created_at"
+        sortDir="desc"
+        onSort={vi.fn()}
+        onRowClick={vi.fn()}
+        assigneeMap={assigneeMap}
+      />,
+    );
+    const grid = screen.getByRole('grid');
+    expect(grid).toHaveAttribute('aria-label', 'VOC 목록');
+  });
+
+  it('renders empty state when rows is empty (outside grid)', () => {
+    render(
+      <VocTable
+        rows={[]}
+        sortBy="created_at"
+        sortDir="desc"
+        onSort={vi.fn()}
+        onRowClick={vi.fn()}
+        assigneeMap={assigneeMap}
+      />,
+    );
+    expect(screen.getByTestId('voc-table-empty')).toHaveTextContent('데이터가 없습니다');
+    // Empty state is NOT inside role=grid (no rows means just the header inside grid)
+    const grid = screen.getByRole('grid');
+    expect(grid).not.toContainElement(screen.getByTestId('voc-table-empty'));
   });
 
   it('calls onRowClick with row id when row is clicked', async () => {
