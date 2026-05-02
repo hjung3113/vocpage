@@ -23,7 +23,7 @@ import type {
   VocHistoryEntry,
 } from '../../../shared/contracts/voc';
 
-function toListItem(v: Voc & { tags?: string[] }) {
+function toListItem(v: Voc & { tags: string[] }) {
   return {
     id: v.id,
     issue_code: v.issue_code,
@@ -42,7 +42,7 @@ function toListItem(v: Voc & { tags?: string[] }) {
     updated_at: v.updated_at,
     has_children: false,
     notes_count: 0,
-    tags: v.tags ?? [],
+    tags: v.tags,
   };
 }
 
