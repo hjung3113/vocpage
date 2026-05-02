@@ -205,6 +205,17 @@
    merge. Follow-up: **#166** (`--sp-5` ↔ AppShell `p-6` silent coupling 을 시맨틱 토큰으로 정리 +
    visual-regression 가드 — 다음 wave 이월).
 
+→ **Issue #166 MERGED** (PR #169, merge `e2c2cd6`, 2026-05-03) — sticky 헤더 ↔ AppShell padding 토큰화.
+   `--app-main-pad` 시맨틱 토큰을 `frontend/src/styles/index.css` SSOT 으로 신설하여
+   `AppShell <main>` 의 `padding` 과 `VocListHeader` 의 sticky `top` compensation 두 consumer 가
+   동일 토큰을 참조하도록 정리. 이전 PR #165 의 `--sp-5` silent coupling 제거. 회귀 가드:
+   `VocListHeader.test.tsx` 가 sticky `top` 의 `--app-main-pad` 참조를 강제하고,
+   신설 `frontend/src/components/layout/__tests__/AppShell.tokens.test.ts` (3 assertion) 가
+   `<main>` 측 결합도 정적 검사 (Tailwind `p-N` / raw `--sp-*` 금지). `/opt-prompt` small 사이즈 →
+   직접 Serena+rg → PR → code-reviewer agent 1× → P2 (AppShell coupling test) + P3 (token rename
+   `--app-main-pad-y` → `--app-main-pad`) 적용 → merge. Out-of-scope: `vocGridLayout.ts` 의
+   `--sp-5` consumer (별도 follow-up 가능).
+
 → **다음 세션 첫 작업** = **β-batch 잔여 C-9 ∥ C-10 진입** (서로 다른 파일·의존 0, 병렬 PR 가능).
    그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
@@ -237,7 +248,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + #155/#156/#162 follow-up ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + #155/#156/#162/#166 follow-up ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
@@ -256,7 +267,9 @@
 - eslint `no-restricted-imports` — `shared/contracts/voc/*` deep path 금지 (C1.D6 enforcement)
 - grep-based CI — `shared/contracts/**`/`backend/**`/`frontend/src/lib/api/**`에 `VOC_*_SLUG` 0 hits (C1.D2 enforcement)
 - `--status-purple` (hue 290°, 0 callers) 사용 시점 — `--status-processing` family와의 hue 공유 재검토
-- **Issue #166** — sticky-header ↔ AppShell `<main>` padding 결합을 시맨틱 토큰 (`--app-main-pad-y`)으로 정리 +
-  visual-regression 가드 추가. PR #165 (Issue #162) 의 `--sp-5` silent coupling fix.
+- ~~**Issue #166** — sticky-header ↔ AppShell `<main>` padding 결합을 시맨틱 토큰으로 정리~~ → **MERGED** (PR #169).
+- **Issue #166 후속 후보** — `frontend/src/components/voc/vocGridLayout.ts` 의 `VOC_GRID_PADDING_X = 'var(--sp-5)'` 가
+  AppShell `--app-main-pad` 와 시각적으로 동일 (24px) 하지만 의도 결합 여부 미정. row 가장자리 정렬을
+  의도한다면 별도 시맨틱 토큰 승격 필요. 별도 issue 가치 판단 후 결정.
 
 **Wave 2 prerequisites**: Follow-up A (Playwright) + C-2 (seed UUID) 종결.
