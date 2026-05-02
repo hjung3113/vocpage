@@ -262,12 +262,12 @@ gap: 5px;
 
 ### Priority Badge
 
-- Icon (Flame / ChevronUp / Minus / ChevronDown via lucide-react) + text combination
-- Urgent: `var(--status-red)` bg `var(--status-red-bg)` border `var(--status-red-border)` — `font-weight: 700`
-- High: `var(--status-orange)` bg `var(--status-orange-bg)` border `var(--status-orange-border)` — `font-weight: 600`
-- Medium: `var(--text-tertiary)` — `font-weight: 400`
-- Low: `var(--text-quaternary)` — `font-weight: 400`
-- `font-size: 11.5px` — metadata tier; weight + hue both carry the semantic signal
+- Icon (Flame / ChevronUp / Minus / ChevronDown via lucide-react) + text combination, rendered as a 3-token chip (bg + border + fg)
+- Urgent: `var(--status-red)` fg / `var(--status-red-bg)` bg / `var(--status-red-border)` — `font-weight: 700`
+- High: `var(--status-orange)` fg / `var(--status-orange-bg)` bg / `var(--status-orange-border)` — `font-weight: 600`
+- Medium: `var(--text-secondary)` fg / `var(--bg-elevated)` bg / `var(--border-standard)` — `font-weight: 400`
+- Low: `var(--text-tertiary)` fg / `var(--bg-elevated)` bg / `var(--border-standard)` — `font-weight: 400`
+- `font-size: 11px` — badge-family convention (matches `.status-badge`); weight + hue both carry the semantic signal. Naked metadata text in the same row continues to use the 11.5px tier described in §7 — chip-internal text is one notch tighter to balance the surrounding chrome.
 - Implementation: `frontend/src/components/voc/VocPriorityBadge.tsx` (Wave 1.6 Phase C-2)
 
 ### Card & Container

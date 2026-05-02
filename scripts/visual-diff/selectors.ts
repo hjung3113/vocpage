@@ -109,7 +109,8 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
   },
   {
     componentId: 'voc-priority-badge',
-    proto: '.list-area .d-badge-urgent, .list-area .d-badge-high, .list-area .d-badge-medium',
+    proto:
+      '.list-area .pri-badge.p-urgent, .list-area .pri-badge.p-high, .list-area .pri-badge.p-medium, .list-area .pri-badge.p-low',
     react: '[data-testid^="priority-badge-"]',
     isOverlay: false,
   },
