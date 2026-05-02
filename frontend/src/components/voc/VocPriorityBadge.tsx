@@ -20,7 +20,7 @@ export function VocPriorityBadge({ priority }: { priority: VocPriority }) {
       aria-label={`우선순위 ${label}`}
     >
       <span className="priority-icon">
-        <Icon size={11} className={`lucide-${iconName}`} aria-hidden={true} />
+        <Icon size={11} className={`lucide-${iconName}`} aria-hidden="true" />
       </span>
       {label}
     </span>
