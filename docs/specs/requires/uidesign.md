@@ -190,6 +190,23 @@ box-shadow: 0 0 0 3px var(--brand-bg);
 
 ### Tag Pill (Auto-tag)
 
+> **[AMENDED 2026-05-02 post-PR-144 visual review]** — In-row VOC tag pill switched from chip-style to text-only quiet style after user visual review ("테두리/배경 없는 회색 글씨로 더 작게"). The chip-style spec below is **retained** for non-row contexts (filter UI, badges in headings, future imported-source badges) and is the canonical OutlineChip primitive (`docs/specs/reviews/wave-1-6-voc-badge-audit.md` §2.2). For the in-row VOC tag visual, use the TextMark variant immediately below. Cross-reference: audit §1 row 2.
+
+**In-row VOC tag (current — TextMark `size='xs'`):**
+
+```css
+/* no background, no border, no padding */
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+color: var(--text-quaternary);
+font-size: var(--chip-font-size-xs); /* 10.5px */
+font-weight: 500;
+/* `#` glyph prefix rendered as text, not lucide icon */
+```
+
+**Chip-style tag (legacy / non-row contexts — OutlineChip):**
+
 ```css
 background: var(--brand-bg);
 border: 1px solid var(--brand-border);
@@ -827,11 +844,11 @@ All badge and chip **primitives** are `<span>`-based. No click handler, no focus
 
 Three archetypes cover all VOC badge use cases. Additional archetypes require a new audit.
 
-| Archetype       | Background                      | Border                              | Icon                       | Border-radius           | Used for                                                  |
-| --------------- | ------------------------------- | ----------------------------------- | -------------------------- | ----------------------- | --------------------------------------------------------- |
-| **TextMark**    | none                            | none                                | lucide (domain-specific)   | n/a                     | Semantic color signal, no chip container. Priority, Type. |
-| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. Tags.           |
-| **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                   | `--chip-radius-rounded` | Status with filled background. Status.                    |
+| Archetype       | Background                      | Border                              | Icon                                            | Border-radius           | Used for                                                                                                                                                                                                                             |
+| --------------- | ------------------------------- | ----------------------------------- | ----------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **TextMark**    | none                            | none                                | lucide (domain-specific) or `#` glyph (xs only) | n/a                     | Semantic color signal, no chip container. Priority, Type, **Tag (size='xs')**. **[AMENDED 2026-05-02 post-PR-144]** size variant `'sm' \| 'xs'` — `'xs'` (10.5px) used by VocTagPill, no fixed cell height.                          |
+| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide                      | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. **[AMENDED 2026-05-02 post-PR-144]** No current VOC consumer — primitive retained for future tag-like use cases requiring chip prominence (e.g. Jira-imported source badge, filter pills). |
+| **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                                        | `--chip-radius-rounded` | Status with filled background. Status.                                                                                                                                                                                               |
 
 ### 13.2 Shared dimension tokens (`--chip-*`)
 
@@ -843,6 +860,7 @@ These tokens are defined in `frontend/src/styles/index.css` `:root` and shared b
 --chip-radius-pill: 9999px; /* full pill — OutlineChip, FilterChip */
 --chip-radius-rounded: 4px; /* rectangular — SolidChip */
 --chip-font-size-sm: 11.5px; /* metadata tier (§7 VOC List Typography Tiers) */
+--chip-font-size-xs: 10.5px; /* compact text-only marks (Tag pill) — added post-PR-144 visual review */
 --chip-gap: 4px; /* gap between icon and text */
 --chip-dot-size: 6px; /* status dot diameter in SolidChip */
 ```
@@ -863,6 +881,9 @@ font-size: var(--chip-font-size-sm);
 - `icon-only` mode: render icon only; `aria-label` carries the text label
 - `icon+text` mode: render icon + label side by side
 - Color = text color only (no background fill)
+- **size variant** (added 2026-05-02 post-PR-144): `'sm'` (11.5px, default, used by Priority/Type) or `'xs'` (10.5px, used by VocTagPill — no fixed cell height; flows at natural line height for the "quiet/recede" tag visual)
+- **icon prop** widened to `LucideIcon | '#'` — `'#'` is a literal glyph used by VocTagPill at `size='xs'` (not a lucide icon)
+- **weight prop** is wrapper-controlled (numeric `400|500|600|700`); the primitive does not encapsulate per-variant weight (rationale: weight is determined by domain wrapper — see audit §2.1 amended note)
 
 ### 13.4 OutlineChip spec
 
@@ -909,9 +930,9 @@ Dot element:
 ### 13.6 Prop surface (closed set — all archetypes)
 
 - `variant`: enum only — no free `color` prop
-- `size`: `'sm'` — VOC uses `sm` exclusively; `'md'` reserved — opening requires a separate audit (closed-prop-surface principle)
+- `size`: `'sm' | 'xs'` — `'sm'` default; `'xs'` added post-PR-144 for TextMark-only (VocTagPill). `'md'` still reserved — opening requires a separate audit (closed-prop-surface principle)
 - `iconMode` + `icon`: only customization surface for TextMark
-- `bold` / `font-weight`: fixed per archetype — callsite cannot override
+- `bold` / `font-weight`: **wrapper-controlled** for TextMark (numeric `400|500|600|700`, set by domain wrapper); fixed for OutlineChip (600) and SolidChip (600). Callsites in `features/voc/**` still never set weight directly — they call the wrapper. **[AMENDED 2026-05-02 post-PR-144 visual review — original: "fixed per archetype — callsite cannot override"]**
 
 ### 13.7 Interactive components — token sharing boundary
 
