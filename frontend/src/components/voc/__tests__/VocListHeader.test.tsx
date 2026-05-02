@@ -3,34 +3,30 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { VocListHeader } from '../VocListHeader';
 
-const CELL_KEYS = [
-  'expand',
-  'issue_code',
-  'title',
-  'status',
-  'assignee',
-  'priority',
-  'created_at',
-] as const;
+const CELL_KEYS = ['issue_code', 'title', 'status', 'assignee', 'priority', 'created_at'] as const;
 
 describe('VocListHeader', () => {
-  it('renders 7 cells in correct order', () => {
+  it('renders 6 columnheaders in correct order (expand is presentation)', () => {
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
     const cells = screen.getAllByRole('columnheader');
-    expect(cells).toHaveLength(7);
+    expect(cells).toHaveLength(6);
     cells.forEach((cell, i) => {
       expect(cell.getAttribute('data-testid')).toBe(`voc-list-header-cell-${CELL_KEYS[i]}`);
     });
   });
 
+  it('expand cell has role="presentation" (no semantic column)', () => {
+    render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
+    const expand = screen.getByTestId('voc-list-header-cell-expand');
+    expect(expand).toHaveAttribute('role', 'presentation');
+  });
+
   it('sortable cells render as buttons; non-sortable as divs', () => {
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
-    // sortable: issue_code, status, priority, created_at
     expect(screen.getByTestId('voc-list-header-cell-issue_code').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-status').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-priority').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-created_at').tagName).toBe('BUTTON');
-    // non-sortable: expand, title, assignee
     expect(screen.getByTestId('voc-list-header-cell-expand').tagName).toBe('DIV');
     expect(screen.getByTestId('voc-list-header-cell-title').tagName).toBe('DIV');
     expect(screen.getByTestId('voc-list-header-cell-assignee').tagName).toBe('DIV');
@@ -76,6 +72,22 @@ describe('VocListHeader', () => {
     expect(src).not.toMatch(/oklch\s*\(/i);
   });
 
+  // Token-purity scan for the C-6 CSS block.
+  // Contract: rules between `=== C-6 VocListHeader styles START ===` and
+  // `=== C-6 VocListHeader styles END ===` MUST be token-only (no hex, no raw oklch).
+  // The container shadow lives outside the marker block (Phase B precedent allows
+  // light-dark(oklch(...)) literals in CSS for prototype-fidelity shadows).
+  it('C-6 CSS block (between START/END markers) contains no hex or raw OKLCH', () => {
+    const css = readFileSync(resolve(__dirname, '..', '..', '..', 'styles', 'index.css'), 'utf-8');
+    const start = css.indexOf('=== C-6 VocListHeader styles START ===');
+    const end = css.indexOf('=== C-6 VocListHeader styles END ===');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const block = css.slice(start, end);
+    expect(block).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    expect(block).not.toMatch(/oklch\s*\(/i);
+  });
+
   it('Korean header text renders correctly', () => {
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
     expect(screen.getByTestId('voc-list-header-cell-issue_code')).toHaveTextContent('이슈 ID');
@@ -91,18 +103,13 @@ describe('VocListHeader', () => {
     const container = screen.getByTestId('voc-list-header');
     expect(container).toHaveAttribute('data-pcomp', 'voc-list-header');
     expect(container).toHaveAttribute('role', 'row');
+    expect(container.className).toContain('voc-list-header-container');
   });
 
-  it('every cell has columnheader role', () => {
-    render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
-    const headers = screen.getAllByRole('columnheader');
-    expect(headers).toHaveLength(7);
-  });
-
-  it('active sortable cell has Korean aria-label with direction', () => {
+  it('sortable cell aria-label is label-only (direction conveyed by aria-sort)', () => {
     render(<VocListHeader sortBy="issue_code" sortDir="asc" onSort={() => {}} />);
     const cell = screen.getByTestId('voc-list-header-cell-issue_code');
-    expect(cell.getAttribute('aria-label')).toMatch(/이슈 ID/);
-    expect(cell.getAttribute('aria-label')).toMatch(/오름차순/);
+    expect(cell.getAttribute('aria-label')).toBe('정렬: 이슈 ID');
+    expect(cell.getAttribute('aria-label')).not.toMatch(/오름차순|내림차순/);
   });
 });
