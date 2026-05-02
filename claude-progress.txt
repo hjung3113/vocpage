@@ -196,6 +196,15 @@
    `.claude/skills/opt-prompt/` (~268L) — 단일 task 평가 후 워크플로우 복잡도 자동 조정 + eval 모드
    self-improvement 피드백 루프. `/opt-prompt` 명시 호출만 트리거 (자동 키워드 인식 차단).
 
+→ **Issue #162 MERGED** (PR #165, merge `eba12c8`, 2026-05-03) — sticky 헤더 갭 수정.
+   `VocListHeader` `position: sticky; top: 0` 가 `<main>`의 `p-6` (24px) padding-top 안쪽 edge에
+   걸려서 그 위 24px 영역으로 행이 비쳐 보이던 버그. `top: calc(0px - var(--sp-5))` 로 sticky 정지점을
+   24px 위로 끌어올려 opaque 헤더 배경이 패딩 갭을 덮도록 수정 (코드 변경 4줄). before/after 스크린샷
+   `docs/specs/screenshots/issue-162/{before,after}.png` 첨부. `/opt-prompt` small 사이즈 적용 →
+   직접 Serena+rg → PR → codex adversarial 시도 (CLI hang) → 사용자 승인 후 수동 self-review →
+   merge. Follow-up: **#166** (`--sp-5` ↔ AppShell `p-6` silent coupling 을 시맨틱 토큰으로 정리 +
+   visual-regression 가드 — 다음 wave 이월).
+
 → **다음 세션 첫 작업** = **β-batch 잔여 C-9 ∥ C-10 진입** (서로 다른 파일·의존 0, 병렬 PR 가능).
    그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
@@ -228,7 +237,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + #155/#156 follow-up ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + #155/#156/#162 follow-up ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
@@ -247,5 +256,7 @@
 - eslint `no-restricted-imports` — `shared/contracts/voc/*` deep path 금지 (C1.D6 enforcement)
 - grep-based CI — `shared/contracts/**`/`backend/**`/`frontend/src/lib/api/**`에 `VOC_*_SLUG` 0 hits (C1.D2 enforcement)
 - `--status-purple` (hue 290°, 0 callers) 사용 시점 — `--status-processing` family와의 hue 공유 재검토
+- **Issue #166** — sticky-header ↔ AppShell `<main>` padding 결합을 시맨틱 토큰 (`--app-main-pad-y`)으로 정리 +
+  visual-regression 가드 추가. PR #165 (Issue #162) 의 `--sp-5` silent coupling fix.
 
 **Wave 2 prerequisites**: Follow-up A (Playwright) + C-2 (seed UUID) 종결.
