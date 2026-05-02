@@ -527,18 +527,16 @@ Permission 표 (cosmetic — 서버측 가드 필수):
 
 prototype 정렬 키와 production API 정렬 키가 다르므로 단순 token swap 불가. Phase C에서 다음 매핑을 컴포넌트 내부에 캡슐화하거나 별도 어댑터로 분리한다.
 
-| prototype key (`data-sort-key`) | 라벨 (prototype) | production `VocSortColumn` 매핑 | 비고                                                            |
-| ------------------------------- | ---------------- | ------------------------------- | --------------------------------------------------------------- |
-| `date`                          | 등록일           | `created_at`                    | 1:1                                                             |
-| `id`                            | 이슈 ID          | `issue_code`                    | 표시 라벨 동일                                                  |
-| `title`                         | 제목             | **없음**                        | production 미지원 — UI에서 제외하거나 client-side sort fallback |
-| `status`                        | 상태             | `status`                        | 1:1                                                             |
-| `priority`                      | 우선순위         | `priority`                      | 1:1                                                             |
-| `assignee`                      | 담당자           | **없음**                        | production 미지원 — UI에서 제외                                 |
-| (없음)                          | —                | `updated_at`                    | production 추가 — 칩 추가 검토                                  |
-| (없음)                          | —                | `due_date`                      | production 추가 — 칩 추가 검토                                  |
+| prototype key (`data-sort-key`) | 라벨 (prototype) | production `VocSortColumn` 매핑 | 비고                                                   |
+| ------------------------------- | ---------------- | ------------------------------- | ------------------------------------------------------ |
+| `date`                          | 등록일           | `created_at`                    | 1:1                                                    |
+| `id`                            | 이슈 ID          | `issue_code`                    | 표시 라벨 동일                                         |
+| `title`                         | 제목             | `title`                         | Issue 155 — production 지원 추가 (feature-voc.md §9.5) |
+| `status`                        | 상태             | `status`                        | 1:1                                                    |
+| `priority`                      | 우선순위         | `priority`                      | 1:1                                                    |
+| `assignee`                      | 담당자           | `assignee`                      | Issue 155 — wire 토큰; BE는 `assignee_id` 컬럼 정렬    |
 
-결정 (Phase C 진입 시 사용자 확정 필요): 우선 prototype 6 키 중 production이 지원하는 4개(date/id/status/priority)만 노출. title/assignee는 production API 확장(Wave 2+) 후 추가. updated_at/due_date 추가 노출 여부는 별도 결정.
+결정 (Issue 155 적용 완료): prototype 6 키 모두 production이 지원. `updated_at` / `due_date`는 spec §9.5에서 제외됨.
 
 ### 5.2 Phase C 진행 순서
 

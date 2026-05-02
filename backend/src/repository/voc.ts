@@ -85,9 +85,19 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
   }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const offset = (params.page - 1) * params.per_page;
-  // sort_by/sort_dir are zod-enum validated upstream; safe to interpolate.
-  // `assignee` is the wire/URL token (per feature-voc.md §9.5); DB column is `assignee_id`.
-  const sortColumn = params.sort_by === 'assignee' ? 'assignee_id' : params.sort_by;
+  // Defense-in-depth: even though sort_by is zod-enum validated upstream,
+  // the repo function may be called from non-HTTP paths. Local allowlist maps
+  // wire token (per feature-voc.md §9.5) → DB column.
+  const SORT_COLUMN_MAP: Record<ListVocsParams['sort_by'], string> = {
+    issue_code: 'issue_code',
+    title: 'title',
+    status: 'status',
+    assignee: 'assignee_id',
+    priority: 'priority',
+    created_at: 'created_at',
+  };
+  const sortColumn = SORT_COLUMN_MAP[params.sort_by];
+  const sortDir = params.sort_dir === 'asc' ? 'ASC' : 'DESC';
   const rows = (
     await pool.query(
       `SELECT vocs.*, COALESCE(
@@ -97,7 +107,7 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
            WHERE vt.voc_id = vocs.id),
          ARRAY[]::text[]
        ) AS tags
-       FROM vocs ${where} ORDER BY ${sortColumn} ${params.sort_dir} LIMIT $${i++} OFFSET $${i++}`,
+       FROM vocs ${where} ORDER BY ${sortColumn} ${sortDir} LIMIT $${i++} OFFSET $${i++}`,
       [...values, params.per_page, offset],
     )
   ).rows as ListVocsRow[];
