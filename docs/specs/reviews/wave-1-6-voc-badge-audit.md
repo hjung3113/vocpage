@@ -215,6 +215,13 @@ The `voc_types` seed data contains 4 initial values (requirements.md §4: `버�
 export type VocTypeVariant = 'bug' | 'feature-request' | 'improvement' | 'inquiry';
 ```
 
+**Status and priority variant TS unions** (source: `frontend/src/components/voc/VocStatusBadge.tsx` → `frontend/src/lib/voc-status-slug.ts` → `shared/contracts/voc/entity.ts`; `frontend/src/components/voc/VocPriorityBadge.tsx` → `shared/contracts/voc/entity.ts`):
+
+```ts
+export type VocStatusVariant = 'received' | 'reviewing' | 'processing' | 'done' | 'drop';
+export type VocPriorityVariant = 'urgent' | 'high' | 'medium' | 'low';
+```
+
 ---
 
 ## §3.2 Priority icon mapping (v1 fixed)
@@ -326,6 +333,7 @@ Out of scope for this audit. They share `--chip-*` dimension tokens with primiti
 - [ ] uidesign.md §13 Badge System 섹션이 동시 갱신됨
 - [ ] 토큰 lint 통과 (`grep -rE '#[0-9a-fA-F]{3,8}\b' src/` → 0 hits outside token definition)
 - [ ] Tag Pill (uidesign §5, L197/L209) and Filter Tab raw `9999px` literals → migrated to `var(--chip-radius-pill)` atomically in same PR. Confirmed literals: uidesign.md L197, L209 (tag pill / filter tab `border-radius: 9999px`)
+- [ ] §5 Tag Pill spec text (uidesign.md L197) is updated in the same PR to reference `var(--chip-radius-pill)` rather than the raw `9999px` literal — the spec text and the implementation token must move together.
 
 ### C-2.6 (Primitive Implementation + existing wrapper refactor)
 

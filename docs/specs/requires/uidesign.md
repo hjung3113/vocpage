@@ -909,7 +909,7 @@ Dot element:
 ### 13.6 Prop surface (closed set — all archetypes)
 
 - `variant`: enum only — no free `color` prop
-- `size`: `'sm' | 'md'` — VOC uses `sm` exclusively; `md` reserved for future use (requires separate audit to open)
+- `size`: `'sm'` — VOC uses `sm` exclusively; `'md'` reserved — opening requires a separate audit (closed-prop-surface principle)
 - `iconMode` + `icon`: only customization surface for TextMark
 - `bold` / `font-weight`: fixed per archetype — callsite cannot override
 

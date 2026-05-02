@@ -1,5 +1,7 @@
 # Progress Archive
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > `claude-progress.txt`에서 분리된 완료 이력. 최신 진행은 `claude-progress.txt`만 보면 된다.
 > 분리 기준: Wave 2 종료(2026-05-01)까지의 누적 이력 전체.
 > 검색용 — 신규 진입 시 읽지 말고, 특정 결정/PR 컨텍스트 추적 시에만 grep.
