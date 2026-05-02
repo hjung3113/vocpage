@@ -20,12 +20,12 @@ import { Uuid } from '../common';
 export { Uuid };
 
 export const VocSortColumn = z.enum([
-  'created_at',
-  'updated_at',
-  'priority',
-  'status',
-  'due_date',
   'issue_code',
+  'title',
+  'status',
+  'assignee',
+  'priority',
+  'created_at',
 ]);
 export type VocSortColumn = z.infer<typeof VocSortColumn>;
 

@@ -31,7 +31,7 @@ export interface ListVocsParams {
   priorities?: VocPriority[];
   tag_ids?: string[];
   q?: string;
-  sort_by: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
+  sort_by: 'issue_code' | 'title' | 'status' | 'assignee' | 'priority' | 'created_at';
   sort_dir: 'asc' | 'desc';
   page: number;
   per_page: number;
@@ -86,6 +86,8 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const offset = (params.page - 1) * params.per_page;
   // sort_by/sort_dir are zod-enum validated upstream; safe to interpolate.
+  // `assignee` is the wire/URL token (per feature-voc.md §9.5); DB column is `assignee_id`.
+  const sortColumn = params.sort_by === 'assignee' ? 'assignee_id' : params.sort_by;
   const rows = (
     await pool.query(
       `SELECT vocs.*, COALESCE(
@@ -95,7 +97,7 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
            WHERE vt.voc_id = vocs.id),
          ARRAY[]::text[]
        ) AS tags
-       FROM vocs ${where} ORDER BY ${params.sort_by} ${params.sort_dir} LIMIT $${i++} OFFSET $${i++}`,
+       FROM vocs ${where} ORDER BY ${sortColumn} ${params.sort_dir} LIMIT $${i++} OFFSET $${i++}`,
       [...values, params.per_page, offset],
     )
   ).rows as ListVocsRow[];
