@@ -1,4 +1,4 @@
-import { OutlineChip } from '../../shared/ui/badge';
+import { TextMark } from '../../shared/ui/badge';
 
 export interface VocTagPillProps {
   name: string;
@@ -6,8 +6,18 @@ export interface VocTagPillProps {
 
 export function VocTagPill({ name }: VocTagPillProps) {
   return (
-    <span data-testid="voc-tag-pill" data-tag-name={name} aria-label={`태그 ${name}`}>
-      <OutlineChip label={name} icon="#" />
+    <span data-testid="voc-tag-pill" data-tag-name={name}>
+      <TextMark
+        variant="tag"
+        iconMode="icon+text"
+        icon="#"
+        label={name}
+        size="xs"
+        weight={500}
+        color="var(--text-quaternary)"
+        extraTestId="text-mark-tag"
+        ariaLabelOverride={`태그 ${name}`}
+      />
     </span>
   );
 }

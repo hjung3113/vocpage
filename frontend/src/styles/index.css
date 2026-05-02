@@ -172,6 +172,7 @@
   --chip-radius-pill: 9999px;
   --chip-radius-rounded: 4px;
   --chip-font-size-sm: 11.5px;
+  --chip-font-size-xs: 10.5px;
   --chip-gap: 4px;
   --chip-dot-size: 6px;
 }

@@ -7,12 +7,12 @@ describe('VocTagPill', () => {
     expect(screen.getByText('UX')).toBeInTheDocument();
   });
 
-  it('renders # glyph (aria-hidden) preceding the label', () => {
+  it('renders # glyph (aria-hidden) preceding the label in document order', () => {
     render(<VocTagPill name="UX" />);
     const hash = screen.getByText('#');
     expect(hash).toHaveAttribute('aria-hidden', 'true');
-    const chip = screen.getByTestId('outline-chip');
-    expect(chip).toHaveTextContent(/^#\s*UX$/);
+    const pill = screen.getByTestId('voc-tag-pill');
+    expect(pill).toHaveTextContent(/^#UX$/);
   });
 
   it('has stable data-testid="voc-tag-pill" with name in data-tag-name', () => {
@@ -21,13 +21,14 @@ describe('VocTagPill', () => {
     expect(pill).toHaveAttribute('data-tag-name', 'UX bug');
   });
 
-  it('has aria-label "태그 {name}"', () => {
+  it('delegates to TextMark primitive (not OutlineChip)', () => {
     render(<VocTagPill name="UX" />);
-    expect(screen.getByTestId('voc-tag-pill')).toHaveAttribute('aria-label', '태그 UX');
+    expect(screen.getByTestId('text-mark-tag')).toBeInTheDocument();
+    expect(screen.queryByTestId('outline-chip')).not.toBeInTheDocument();
   });
 
-  it('internally renders an OutlineChip (data-testid="outline-chip" in DOM)', () => {
+  it('TextMark child has aria-label "태그 {name}" (override)', () => {
     render(<VocTagPill name="UX" />);
-    expect(screen.getByTestId('outline-chip')).toBeInTheDocument();
+    expect(screen.getByTestId('text-mark-tag')).toHaveAttribute('aria-label', '태그 UX');
   });
 });
