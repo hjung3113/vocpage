@@ -450,16 +450,19 @@ body {
   color: var(--text-primary);
 }
 .advanced-filters {
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   transition:
-    max-height 0.18s ease-out,
-    opacity 0.15s ease-out;
+    grid-template-rows 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
 }
 .advanced-filters--open {
-  max-height: 600px;
+  grid-template-rows: 1fr;
   opacity: 1;
+}
+.advanced-filters > .advanced-filters-grid-wrapper {
+  overflow: hidden;
 }
 .advanced-filters-grid {
   display: grid;
@@ -518,14 +521,14 @@ body {
   outline-offset: 1px;
 }
 .advanced-filters-chip--active {
-  border-color: var(--brand);
-  background: var(--brand);
-  color: var(--text-on-brand);
+  border-color: var(--accent);
+  background: var(--brand-bg);
+  color: var(--accent);
   font-weight: 600;
 }
 .advanced-filters-chip--active:hover {
-  border-color: var(--brand);
-  color: var(--text-on-brand);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 /* === C-9 VocAdvancedFilters styles END === */
 

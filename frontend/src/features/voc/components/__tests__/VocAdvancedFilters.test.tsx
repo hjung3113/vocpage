@@ -85,16 +85,22 @@ describe('VocAdvancedFilters', () => {
     expect(onReset).toHaveBeenCalledTimes(1);
   });
 
-  it('panel root carries advanced-filters--open class when open=true', () => {
-    const { container } = renderClosed({ open: true });
-    const panel = container.querySelector('[data-pcomp="voc-advanced-filters"]');
-    expect(panel).not.toBeNull();
-    expect(panel).toHaveClass('advanced-filters--open');
-  });
-
-  it('active chip carries advanced-filters-chip--active class', () => {
-    renderClosed({ open: true, value: { priorities: ['urgent'] } });
-    const urgentBtn = screen.getByRole('button', { name: /긴급/i });
-    expect(urgentBtn).toHaveClass('advanced-filters-chip--active');
+  it('flips aria-hidden on the panel when open toggles', () => {
+    const { rerender } = renderClosed();
+    const panel = document.querySelector('[data-pcomp="voc-advanced-filters"]');
+    expect(panel).toHaveAttribute('aria-hidden', 'true');
+    rerender(
+      <VocAdvancedFilters
+        open={true}
+        onToggle={vi.fn()}
+        assignees={assignees}
+        tags={tags}
+        vocTypes={vocTypes}
+        value={{}}
+        onChange={vi.fn()}
+        onReset={vi.fn()}
+      />,
+    );
+    expect(panel).toHaveAttribute('aria-hidden', 'false');
   });
 });

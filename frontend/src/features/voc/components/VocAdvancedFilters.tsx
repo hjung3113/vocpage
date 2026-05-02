@@ -110,13 +110,13 @@ export function VocAdvancedFilters({
           </button>
         )}
       </div>
-      {/* Panel — always rendered; open class drives max-height+opacity transition */}
+      {/* Panel — always rendered; grid-template-rows + aria-hidden drive open/closed state */}
       <div
         data-pcomp="voc-advanced-filters"
         className={open ? 'advanced-filters advanced-filters--open' : 'advanced-filters'}
         aria-hidden={!open}
       >
-        {open && (
+        <div className="advanced-filters-grid-wrapper">
           <div className="advanced-filters-grid">
             <ChipGroup
               groupId="adv-assignees"
@@ -147,7 +147,7 @@ export function VocAdvancedFilters({
               onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
             />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
