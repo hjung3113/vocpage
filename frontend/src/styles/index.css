@@ -85,6 +85,17 @@
   --sp-5: 24px;
   --sp-6: 32px;
 
+  /*
+   * Semantic layout token — vertical padding of AppShell <main>.
+   * Single source of truth for the AppShell main padding ↔ sticky-header
+   * compensation pair. Consumers:
+   *   - components/layout/AppShell.tsx (main padding)
+   *   - components/voc/VocListHeader.tsx (sticky top offset)
+   * Keep these two coupled via this token; never hard-code Tailwind p-*
+   * or --sp-* directly on either side. (Issue 166)
+   */
+  --app-main-pad-y: var(--sp-5);
+
   /* Typography */
   --font-ui:
     'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',

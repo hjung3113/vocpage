@@ -106,6 +106,14 @@ describe('VocListHeader', () => {
     expect(container.className).toContain('voc-list-header-container');
   });
 
+  it('sticky top references --app-main-pad-y semantic token (not raw spacing)', () => {
+    render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
+    const container = screen.getByTestId('voc-list-header');
+    const top = (container as HTMLElement).style.top;
+    expect(top).toContain('--app-main-pad-y');
+    expect(top).not.toContain('--sp-5');
+  });
+
   it('sortable cell aria-label is label-only (direction conveyed by aria-sort)', () => {
     render(<VocListHeader sortBy="issue_code" sortDir="asc" onSort={() => {}} />);
     const cell = screen.getByTestId('voc-list-header-cell-issue_code');

@@ -32,7 +32,10 @@ export function AppShell() {
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar title={title} />
-        <main className="flex-1 overflow-auto bg-[color:var(--bg-app)] p-6">
+        <main
+          className="flex-1 overflow-auto bg-[color:var(--bg-app)]"
+          style={{ padding: 'var(--app-main-pad-y)' }}
+        >
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>

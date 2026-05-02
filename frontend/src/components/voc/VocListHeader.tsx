@@ -43,10 +43,12 @@ const CONTAINER_STYLE: CSSProperties = {
   borderBottom: '2px solid var(--border-subtle)',
   background: 'var(--bg-panel)',
   position: 'sticky',
-  // Extend up by AppShell <main>'s padding-top (--sp-5 = 24px, matches Tailwind p-6
-  // in AppShell.tsx) so the sticky header covers the scroll-port padding region
-  // instead of leaving a transparent gap where rows bleed through. (Issue 162)
-  top: 'calc(0px - var(--sp-5))',
+  // Pull the sticky stop up by AppShell <main>'s vertical padding so the header
+  // covers the scroll-port padding region instead of leaving a transparent gap
+  // where rows bleed through. The shared semantic token --app-main-pad-y is the
+  // single source of truth for that coupling — never substitute --sp-* here.
+  // (Issues 162, 166)
+  top: 'calc(0px - var(--app-main-pad-y))',
   zIndex: 10,
 };
 
