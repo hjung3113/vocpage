@@ -43,7 +43,10 @@ const CONTAINER_STYLE: CSSProperties = {
   borderBottom: '2px solid var(--border-subtle)',
   background: 'var(--bg-panel)',
   position: 'sticky',
-  top: 0,
+  // Extend up by AppShell <main>'s padding-top (--sp-5 = 24px, matches Tailwind p-6
+  // in AppShell.tsx) so the sticky header covers the scroll-port padding region
+  // instead of leaving a transparent gap where rows bleed through. (Issue 162)
+  top: 'calc(0px - var(--sp-5))',
   zIndex: 10,
 };
 
