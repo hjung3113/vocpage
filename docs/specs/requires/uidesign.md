@@ -610,7 +610,7 @@ Full token set — copy into `:root` as the single source of truth.
   /* Status dot colors — VOC list row indicator (matches status enum) */
   --status-dot-received: light-dark(oklch(60% 0.01 260), oklch(48% 0.01 260)); /* 접수됨 */
   --status-dot-reviewing: light-dark(oklch(48% 0.19 244), oklch(66% 0.18 242)); /* 검토중 */
-  --status-dot-processing: light-dark(oklch(48% 0.17 152), oklch(64% 0.19 155)); /* 처리중 */
+  --status-dot-processing: light-dark(oklch(40% 0.2 290), oklch(70% 0.18 288)); /* 처리중 */
   --status-dot-done: light-dark(oklch(46% 0.19 155), oklch(63% 0.21 158)); /* 완료 */
   --status-dot-drop: light-dark(oklch(60% 0.18 70), oklch(70% 0.17 72)); /* 드랍 */
 
@@ -621,9 +621,9 @@ Full token set — copy into `:root` as the single source of truth.
   --status-reviewing-bg: light-dark(oklch(91% 0.035 242), oklch(21% 0.05 245));
   --status-reviewing-fg: light-dark(oklch(45% 0.18 245), oklch(68% 0.17 242));
   --status-reviewing-border: light-dark(oklch(78% 0.06 242), oklch(32% 0.07 244));
-  --status-processing-bg: light-dark(oklch(91% 0.04 152), oklch(20% 0.055 154));
-  --status-processing-fg: light-dark(oklch(42% 0.17 152), oklch(66% 0.19 155));
-  --status-processing-border: light-dark(oklch(76% 0.065 152), oklch(30% 0.075 154));
+  --status-processing-bg: light-dark(oklch(91% 0.05 290), oklch(22% 0.055 288));
+  --status-processing-fg: light-dark(oklch(40% 0.2 290), oklch(70% 0.18 288));
+  --status-processing-border: light-dark(oklch(78% 0.07 290), oklch(32% 0.08 288));
   --status-done-bg: light-dark(oklch(91% 0.038 155), oklch(20% 0.05 158));
   --status-done-fg: light-dark(oklch(40% 0.18 155), oklch(65% 0.2 158));
   --status-done-border: light-dark(oklch(75% 0.065 155), oklch(30% 0.072 158));
