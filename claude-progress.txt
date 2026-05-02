@@ -64,8 +64,25 @@
    유지 확인 (screenshot `docs/screenshots/wave-1-6/b-add-2-chip-tokens-voc-list.png`).
    `chipRadiusRounded` (4px)는 reserved — v1 caller 0개, audit §4.1 명시 deferred to CountPill.
 
-→ **다음 세션 첫 작업** = **C-2.6 (primitive 3개 + wrapper refactor)**.
-   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → **C-2.6 (now)** → C-3 ∥ C-4 → B-add-1 → C-5 → C-6 → C-7.
+→ **Wave 1.6 Phase C-2.6 MERGED** (PR #142, merge `8115741`, 2026-05-02) — primitive 3종 + VocTypeBadge 신설 + wrapper refactor.
+   `frontend/src/shared/ui/badge/{TextMark,OutlineChip,SolidChip}.tsx` 신규 (TDD RED→GREEN, span-only,
+   no role, dimension은 `--chip-*` 토큰으로 inline-style 매핑) + `voc-type-icon.ts` slug→{Icon,color,weight}
+   + fallback (`Tag`/`--text-tertiary`) + `VocTypeBadge` (단일 prop shape `{slug,name,color?}`, color v1 ignore,
+   unknown은 audit §3 mandate대로 `data-testid="text-mark-unknown"`) + VocStatusBadge / VocPriorityBadge
+   내부 위임 refactor (public API + outer testid + aria-label 보존). `.status-badge*` / `.priority-badge*` /
+   `.s-*` / `.p-*` / `.status-dot` / `.priority-icon` ~85 LOC index.css 동일 PR 삭제. 신규 토큰 0개
+   (B-add-2 chip 토큰 재사용). 모든 파일 ≤45 LOC (≤200 한도).
+   - 사용자 시각 검수 결정: **High 우선순위 bold 제거** — `weight 600 → 400` (Urgent 700만 강조 유지) +
+     audit §3.2 / §2.1 priority 표 동기화.
+   - 검증: 249 vitest pass / tsc / build / lint:tokens / 0 hex 모두 그린.
+   - Codex adversarial review: BLOCKER 1건 (unknown testid) + MEDIUM 1건 (구조 단언 부재) 둘 다 적용,
+     HIGH 1건 (chip 토큰 4px/11.5px vs 레거시 5px/11px) audit §2.3 의도된 통합으로 거부 — 시각 검수
+     스크린샷이 parity 증명. 자체 재리뷰 후 적용 여부 결정.
+   - 정본 spec: `docs/specs/reviews/wave-1-6-voc-badge-audit.md` §2/§3/§7 + screenshot
+     `docs/screenshots/wave-1-6/c-2-6-primitives-voc-list.png`.
+
+→ **다음 세션 첫 작업** = **C-3 (VocTagPill — OutlineChip wrapper)** ∥ **C-4 (VocSubRow — 기존 wrapper만)**.
+   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → **C-3 ∥ C-4 (now)** → B-add-1 → C-5 → C-6 → C-7.
    룰북 = `wave-1-6-phase-c-precedent.md` per-leaf + 신규 audit `wave-1-6-voc-badge-audit.md` §7 acceptance.
    - **B-add-2** (token-only PR): 7 chip 토큰을 `frontend/src/tokens.ts` SSOT에 추가 + `index.css :root` 미러 +
      기존 raw `9999px` literals (Tag Pill `uidesign §5`, Filter Tab) → `var(--chip-radius-pill)` 마이그.
@@ -87,7 +104,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, **다음 = C-2.6** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, **다음 = C-3 ∥ C-4** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
