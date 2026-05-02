@@ -84,4 +84,17 @@ describe('VocAdvancedFilters', () => {
     await user.click(screen.getByRole('button', { name: /초기화/ }));
     expect(onReset).toHaveBeenCalledTimes(1);
   });
+
+  it('panel root carries advanced-filters--open class when open=true', () => {
+    const { container } = renderClosed({ open: true });
+    const panel = container.querySelector('[data-pcomp="voc-advanced-filters"]');
+    expect(panel).not.toBeNull();
+    expect(panel).toHaveClass('advanced-filters--open');
+  });
+
+  it('active chip carries advanced-filters-chip--active class', () => {
+    renderClosed({ open: true, value: { priorities: ['urgent'] } });
+    const urgentBtn = screen.getByRole('button', { name: /긴급/i });
+    expect(urgentBtn).toHaveClass('advanced-filters-chip--active');
+  });
 });
