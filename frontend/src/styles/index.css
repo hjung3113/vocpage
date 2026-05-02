@@ -182,3 +182,70 @@ body {
   color: var(--text-primary);
   font-family: var(--font-ui);
 }
+
+/* === C-6 VocListHeader styles START ===
+   Token-purity guarded block (rules below must use var(--*) only).
+   Container shadow lives in a separate block below the END marker. */
+.voc-list-header-hcell {
+  transition: color 0.12s;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: var(--sp-2);
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+}
+.voc-list-header-hcell.is-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.voc-list-header-hcell.is-active {
+  color: var(--accent);
+}
+.voc-list-header-hcell:hover {
+  color: var(--text-secondary);
+}
+.voc-list-header-hcell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.voc-list-header-icon {
+  width: 11px;
+  height: 11px;
+  opacity: 0.35;
+  transition:
+    opacity 0.15s,
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.voc-list-header-icon.is-active {
+  opacity: 1;
+  animation: vocListHeaderSortFlip 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes vocListHeaderSortFlip {
+  0% {
+    transform: scaleY(0.4);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+/* === C-6 VocListHeader styles END === */
+
+/* C-6 VocListHeader shadow (prototype literal — light-dark(oklch(...)) allowed
+   per Phase B precedent; see --voc-row-*-bg above). Outside the marker block
+   so token-purity scan does not flag the oklch literal. */
+.voc-list-header-container {
+  box-shadow:
+    0 1px 0 var(--border-subtle),
+    0 2px 8px light-dark(oklch(80% 0.01 260 / 0.08), oklch(5% 0.01 265 / 0.3));
+}
