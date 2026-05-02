@@ -1625,7 +1625,7 @@ export interface operations {
       query?: {
         page?: components['parameters']['page'];
         per_page?: number;
-        sort_by?: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
+        sort_by?: 'issue_code' | 'title' | 'status' | 'assignee' | 'priority' | 'created_at';
         sort_dir?: 'asc' | 'desc';
         /** @description Repeat to filter by multiple statuses. */
         status?: components['schemas']['VocStatus'][];

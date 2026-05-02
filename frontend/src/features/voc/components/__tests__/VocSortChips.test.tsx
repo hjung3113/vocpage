@@ -13,12 +13,12 @@ describe('VocSortChips', () => {
     render(<VocSortChips sortBy="created_at" sortDir="desc" onChange={() => {}} />);
     const radios = screen.getAllByRole('radio');
     expect(radios.length).toBe(6);
-    expect(screen.getByRole('radio', { name: /등록일/ })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /수정일/ })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /우선순위/ })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /상태/ })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /마감일/ })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /이슈 ID/ })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /제목/ })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /상태/ })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /담당자/ })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /우선순위/ })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /등록일/ })).toBeInTheDocument();
   });
 
   it('sets aria-checked="true" on sortBy chip', () => {

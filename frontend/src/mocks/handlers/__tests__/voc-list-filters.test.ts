@@ -95,6 +95,24 @@ describe('MSW GET /api/vocs — query 필터/정렬 동기화 (BE 미러)', () =
     }
   });
 
+  it('sort_by=title sort_dir=asc → 제목 오름차순', async () => {
+    const { status, body } = await list('sort_by=title&sort_dir=asc&per_page=100');
+    expect(status).toBe(200);
+    for (let i = 1; i < body.rows.length; i += 1) {
+      expect(body.rows[i - 1]!.title.localeCompare(body.rows[i]!.title)).toBeLessThanOrEqual(0);
+    }
+  });
+
+  it('sort_by=assignee sort_dir=asc → assignee_id 오름차순 (null은 끝)', async () => {
+    const { status, body } = await list('sort_by=assignee&sort_dir=asc&per_page=100');
+    expect(status).toBe(200);
+    for (let i = 1; i < body.rows.length; i += 1) {
+      const prev = body.rows[i - 1]!.assignee_id ?? '';
+      const cur = body.rows[i]!.assignee_id ?? '';
+      expect(prev <= cur).toBe(true);
+    }
+  });
+
   it('per_page=999 → 400 회귀 (기존 가드 유지)', async () => {
     const res = await fetch(`${window.location.origin}/api/vocs?per_page=999`, {
       headers: { 'x-mock-role': 'manager' },

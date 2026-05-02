@@ -35,7 +35,7 @@ jest.mock('../repository/voc', () => {
         tag_ids?: string[];
         per_page?: number;
         page?: number;
-        sort_by?: 'created_at' | 'updated_at' | 'priority' | 'status' | 'due_date' | 'issue_code';
+        sort_by?: 'issue_code' | 'title' | 'status' | 'assignee' | 'priority' | 'created_at';
         sort_dir?: 'asc' | 'desc';
         includeDeleted?: boolean;
       }) => {
@@ -60,7 +60,7 @@ jest.mock('../repository/voc', () => {
         // unless test wires tags via store mutation. EXISTS-subquery-equivalent.
         if (params.sort_by) {
           const dir = params.sort_dir === 'asc' ? 1 : -1;
-          const key = params.sort_by;
+          const key = params.sort_by === 'assignee' ? 'assignee_id' : params.sort_by;
           filtered = [...filtered].sort((a, b) => {
             const av = (a as unknown as Record<string, unknown>)[key];
             const bv = (b as unknown as Record<string, unknown>)[key];
@@ -306,14 +306,7 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
 
   // ─── PR-α (Wave 1.5) — sort_by / sort_dir / per_page / multi-filter ───
   describe('Wave 1.5 §1.5-A — extended list contract', () => {
-    test.each([
-      'created_at',
-      'updated_at',
-      'priority',
-      'status',
-      'due_date',
-      'issue_code',
-    ] as const)(
+    test.each(['issue_code', 'title', 'status', 'assignee', 'priority', 'created_at'] as const)(
       'sort_by=%s returns 200 + parsed VocListResponse + repo called with sort_by/sort_dir',
       async (col) => {
         const agent = await loginAs('manager');

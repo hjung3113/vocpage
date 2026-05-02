@@ -5,12 +5,12 @@ import type {
 } from '../../../../../shared/contracts/voc';
 
 const SORT_LABELS: Record<VocSortColumnType, string> = {
-  created_at: '등록일',
-  updated_at: '수정일',
-  priority: '우선순위',
-  status: '상태',
-  due_date: '마감일',
   issue_code: '이슈 ID',
+  title: '제목',
+  status: '상태',
+  assignee: '담당자',
+  priority: '우선순위',
+  created_at: '등록일',
 };
 
 const COLUMNS = VocSortColumn.options;

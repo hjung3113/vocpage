@@ -125,17 +125,17 @@ export const vocHandlers = [
           av = STATUS_RANK[a.status] ?? 99;
           bv = STATUS_RANK[b.status] ?? 99;
           break;
-        case 'due_date':
-          av = a.due_date ?? '';
-          bv = b.due_date ?? '';
-          break;
         case 'issue_code':
           av = a.issue_code;
           bv = b.issue_code;
           break;
-        case 'updated_at':
-          av = a.updated_at;
-          bv = b.updated_at;
+        case 'title':
+          av = a.title;
+          bv = b.title;
+          break;
+        case 'assignee':
+          av = a.assignee_id ?? '';
+          bv = b.assignee_id ?? '';
           break;
         default:
           av = a.created_at;
