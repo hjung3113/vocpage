@@ -34,7 +34,7 @@ export function AppShell() {
         <TopBar title={title} />
         <main
           className="flex-1 overflow-auto bg-[color:var(--bg-app)]"
-          style={{ padding: 'var(--app-main-pad-y)' }}
+          style={{ padding: 'var(--app-main-pad)' }}
         >
           <ErrorBoundary>
             <Outlet />

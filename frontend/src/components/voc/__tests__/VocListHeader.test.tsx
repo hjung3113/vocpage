@@ -106,11 +106,11 @@ describe('VocListHeader', () => {
     expect(container.className).toContain('voc-list-header-container');
   });
 
-  it('sticky top references --app-main-pad-y semantic token (not raw spacing)', () => {
+  it('sticky top references --app-main-pad semantic token (not raw spacing)', () => {
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
     const container = screen.getByTestId('voc-list-header');
     const top = (container as HTMLElement).style.top;
-    expect(top).toContain('--app-main-pad-y');
+    expect(top).toContain('--app-main-pad');
     expect(top).not.toContain('--sp-5');
   });
 

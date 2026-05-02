@@ -94,7 +94,7 @@
    * Keep these two coupled via this token; never hard-code Tailwind p-*
    * or --sp-* directly on either side. (Issue 166)
    */
-  --app-main-pad-y: var(--sp-5);
+  --app-main-pad: var(--sp-5);
 
   /* Typography */
   --font-ui:

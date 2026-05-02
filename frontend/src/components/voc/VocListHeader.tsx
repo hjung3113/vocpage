@@ -45,10 +45,10 @@ const CONTAINER_STYLE: CSSProperties = {
   position: 'sticky',
   // Pull the sticky stop up by AppShell <main>'s vertical padding so the header
   // covers the scroll-port padding region instead of leaving a transparent gap
-  // where rows bleed through. The shared semantic token --app-main-pad-y is the
+  // where rows bleed through. The shared semantic token --app-main-pad is the
   // single source of truth for that coupling — never substitute --sp-* here.
   // (Issues 162, 166)
-  top: 'calc(0px - var(--app-main-pad-y))',
+  top: 'calc(0px - var(--app-main-pad))',
   zIndex: 10,
 };
 
