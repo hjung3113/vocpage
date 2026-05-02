@@ -168,7 +168,25 @@
    ζ(C-17 SidebarUserSwitcher → C-18 Sidebar ∥ C-19 Topbar). Phase D는 §8 정의상 종합 검증이라 모든
    batch 머지 후에만 진입 가능 — 직진 불가. 사용자 시각 검수에서 navbar/레이아웃 깨진 것으로 확인됨
    (ζ 미진행이 원인).
-→ **다음 세션 첫 작업** = **β-batch 진입** (C-8 ∥ C-9 ∥ C-10, 3 슬롯 병렬). 이후 γ → δ → ε → ζ → Phase D.
+
+→ **Wave 1.6 Phase C-8 MERGED** (PR #153, merge `57b56e8`, 2026-05-02) — VocSortChips rebuild.
+   Tailwind+inline style → prototype 클래스(`.list-toolbar` / `.sort-label` / `.sort-chip[--active]` /
+   `.sort-chip-icon`) 마이그. CSS는 `index.css` `=== C-8 VocSortChips styles ===` marker block.
+   신규 토큰 0. props 시그니처(`sortBy/sortDir/onChange`) 불변. a11y `radiogroup aria-label="정렬"` +
+   icon `aria-hidden`. TDD RED `553c63f` → GREEN `83c5738`. 8/8 컴포넌트 + 306/306 FE 전체 PASS.
+   Codex 1차 review clean. Codex `/codex:adversarial-review` 2차 HIGH 1건 — 정렬 컬럼셋이 spec
+   line 345 (`issue_code|title|status|assignee|priority|created_at`)와 drift (현 enum:
+   `created_at|updated_at|priority|status|due_date|issue_code`). C-8 visual rebuild 스코프 외로
+   판정, follow-up 분리. 사용자 시각 검수에서 VocRow에 `VocTagPill` 통합 누락 추가 발견 (C-7 gap).
+   Screenshot `docs/specs/screenshots/wave-1-6-c-8-voc-sort-chips.png`.
+
+→ **다음 세션 첫 작업** = **issue #155 + #156 처리 후 β-batch 잔여 (C-9 ∥ C-10) 진입**.
+   - **#155** VocSortChips 컬럼셋 spec align (BE+FE+contract 3-layer, `shared/contracts/voc.ts`
+     VocSortColumn 교체 + BE `/api/vocs?sort=` 핸들러에 `title`/`assignee` SQL 추가 +
+     `updated_at`/`due_date` 제거 + URL state 마이그레이션 fallback)
+   - **#156** VocRow 태그 통합 (FE 단일, VocRow에 `<div class="tag-row"><VocTagPill>` 추가 +
+     `.tag-row` CSS + RED→GREEN 테스트). C-7 precedent (5) 사용자 시각 검수 누락분.
+   - 이후 β-batch 잔여 C-9 ∥ C-10 (서로 다른 파일·의존 0). 그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
      22px expand-btn + 6 cell). VocTable.tsx 재합성 — `<DataTable>` → `<VocListHeader> + <VocRow[]>`.
@@ -199,7 +217,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / **β γ δ ε ζ 미착수: C-8~C-19 12 PR**)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
