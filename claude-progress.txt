@@ -81,8 +81,31 @@
    - 정본 spec: `docs/specs/reviews/wave-1-6-voc-badge-audit.md` §2/§3/§7 + screenshot
      `docs/screenshots/wave-1-6/c-2-6-primitives-voc-list.png`.
 
-→ **다음 세션 첫 작업** = **C-3 (VocTagPill — OutlineChip wrapper)** ∥ **C-4 (VocSubRow — 기존 wrapper만)**.
-   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → **C-3 ∥ C-4 (now)** → B-add-1 → C-5 → C-6 → C-7.
+→ **Wave 1.6 Phase C-3 + C-4 MERGED** (PR #144, merge `d2f0762`, 2026-05-02) — VocTagPill + VocSubRow + TextMark 확장.
+   `frontend/src/components/voc/VocTagPill.tsx` (TextMark wrapper, size='xs', '#' glyph) +
+   `frontend/src/features/voc/components/VocSubRow.tsx` (VocStatusBadge + trailing slot — 기존 wrapper만,
+   새 badge 0개). 신규 토큰 1개 (`--chip-font-size-xs: 10.5px` — audit §5.1 ≤3 leaf 동봉 OK).
+   - **C-3 디자인 피벗**: 초기 구현은 audit §1 락대로 OutlineChip wrapper(brand-bg + border + 9999px).
+     사용자 시각 검수에서 "테두리/배경 없는 회색 글씨로 더 작게" → TextMark `size='xs'` (10.5px,
+     `--text-quaternary`, weight 500, '#' prefix)로 재작성. **TextMark primitive API 확장**:
+     `icon: LucideIcon | '#'` + `size?: 'sm' | 'xs'` (default 'sm', backward compatible). **신규 4번째
+     archetype 도입 없음** — audit §2.4 closure 유지. 기존 wrapper(VocType/Status/Priority) regression 0.
+   - **C-4**: VocSubRow는 prototype `sub-row` div를 React `<button>`으로 재현. props
+     `{ status, title, onClick?, trailing? }`. trailing slot은 C-5 VocAssignee 진입 시 채워질 자리.
+     production wiring (VocReviewDrawer 통합)은 audit §7 범위 외 — C-7 VocRow 또는 Phase D에서 흡수.
+   - **검증**: 263 vitest pass / build clean / no hex|OKLCH / lint 그린 / 4 commits + 4 documents synced.
+   - **리뷰**: codex adversarial (SHIP, 1 medium + 3 low → 3건 적용 / 1건 사유 명시 거부) +
+     Sonnet 3-expert review (20/30 FIX → BLOCKER 1 spec sync + HIGH 1 TextMark 직접 테스트 +
+     MEDIUM 1 xs height 주석 + LOW 1 weight prop 모두 적용) + Sonnet verifier 재검증
+     (stale cross-ref 1건 발견 → c037571에서 해결).
+   - **AMENDED 정책 도입**: 잠긴 spec line 변경 시 strikethrough + 원문 인용 + 사유 + 날짜 footnote
+     (`[AMENDED 2026-05-02 post-PR-144 visual review]`) 적용. 향후 wrapper 디자인 피벗 시 동일 패턴 사용.
+   - **정본 spec**: `wave-1-6-voc-badge-audit.md` §1 row 2 / §2.1 / §2.2 / §2.4 / §4.1 / §4.2 / §7 +
+     `uidesign.md` §5 / §10 / §13 + `wave-1-6-voc-parity.md` §7.2 leaf 모두 동기화.
+     screenshots: `docs/screenshots/wave-1-6/c-3-tag-pill-v2-textmark-xs.png` (PR comment 첨부).
+
+→ **다음 세션 첫 작업** = **B-add-1 (VocAssignee 6 avatar 토큰 — Phase B addendum 분리)** → 이어서 **C-5 VocAssignee**.
+   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → ~~B-add-2~~ → ~~C-2.6~~ → ~~C-3 ∥ C-4~~ → **B-add-1 (now)** → C-5 → C-6 → C-7.
    룰북 = `wave-1-6-phase-c-precedent.md` per-leaf + 신규 audit `wave-1-6-voc-badge-audit.md` §7 acceptance.
    - **B-add-2** (token-only PR): 7 chip 토큰을 `frontend/src/tokens.ts` SSOT에 추가 + `index.css :root` 미러 +
      기존 raw `9999px` literals (Tag Pill `uidesign §5`, Filter Tab) → `var(--chip-radius-pill)` 마이그.
@@ -104,7 +127,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, **다음 = C-3 ∥ C-4** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, B-add-2 ✅, C-2.6 ✅, C-3 ✅, C-4 ✅, **다음 = B-add-1 → C-5** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
