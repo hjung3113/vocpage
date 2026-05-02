@@ -262,12 +262,13 @@ gap: 5px;
 
 ### Priority Badge
 
-- Icon (arrow up/down/dash) + text combination
-- Urgent: `oklch(58% 0.22 25)` (red) — icon + `font-weight: 700`
-- High: `oklch(60% 0.18 45)` (orange-red) — `font-weight: 600`
+- Icon (Flame / ChevronUp / Minus / ChevronDown via lucide-react) + text combination
+- Urgent: `var(--status-red)` bg `var(--status-red-bg)` border `var(--status-red-border)` — `font-weight: 700`
+- High: `var(--status-orange)` bg `var(--status-orange-bg)` border `var(--status-orange-border)` — `font-weight: 600`
 - Medium: `var(--text-tertiary)` — `font-weight: 400`
 - Low: `var(--text-quaternary)` — `font-weight: 400`
-- `font-size: 11.5px` — metadata tier, weight carries the semantic signal
+- `font-size: 11.5px` — metadata tier; weight + hue both carry the semantic signal
+- Implementation: `frontend/src/components/voc/VocPriorityBadge.tsx` (Wave 1.6 Phase C-2)
 
 ### Card & Container
 
@@ -599,11 +600,17 @@ Full token set — copy into `:root` as the single source of truth.
   --status-red: oklch(58% 0.22 25); /* urgent, form required */
   --status-blue: light-dark(oklch(50% 0.18 242), oklch(67% 0.17 240)); /* info */
   --status-purple: light-dark(oklch(52% 0.22 290), oklch(72% 0.16 290)); /* regex tag-rule */
+  --status-orange: light-dark(
+    oklch(58% 0.2 45),
+    oklch(74% 0.17 45)
+  ); /* priority high (Wave 1.6 Phase C-2) */
 
   --status-amber-bg: light-dark(oklch(94% 0.025 72), oklch(18% 0.05 72));
   --status-amber-border: light-dark(oklch(78% 0.09 72), oklch(30% 0.09 72));
   --status-red-bg: light-dark(oklch(94% 0.03 25), oklch(18% 0.07 25));
   --status-red-border: light-dark(oklch(78% 0.1 25), oklch(30% 0.1 25));
+  --status-orange-bg: light-dark(oklch(94% 0.03 45), oklch(18% 0.06 45));
+  --status-orange-border: light-dark(oklch(78% 0.09 45), oklch(30% 0.09 45));
   --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
   --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
 
