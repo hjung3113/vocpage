@@ -24,7 +24,6 @@ export interface VocSortChipsProps {
 export function VocSortChips({ sortBy, sortDir, onChange }: VocSortChipsProps) {
   function handleClick(col: VocSortColumnType) {
     if (col === sortBy) {
-      // toggle direction
       onChange(col, sortDir === 'desc' ? 'asc' : 'desc');
     } else {
       onChange(col, 'desc');
@@ -32,41 +31,31 @@ export function VocSortChips({ sortBy, sortDir, onChange }: VocSortChipsProps) {
   }
 
   return (
-    <div
-      data-pcomp="voc-sort-chips"
-      role="radiogroup"
-      aria-label="정렬"
-      className="flex items-center gap-2 flex-nowrap overflow-x-auto px-6 py-1.5 scrollbar-none"
-      style={{
-        background: 'var(--bg-panel)',
-        borderBottom: '1px solid var(--border-subtle)',
-      }}
-    >
-      {COLUMNS.map((col) => {
-        const isActive = col === sortBy;
-        return (
-          <button
-            key={col}
-            role="radio"
-            type="button"
-            aria-checked={isActive}
-            onClick={() => handleClick(col)}
-            className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium transition-colors"
-            style={{
-              background: isActive ? 'var(--brand)' : 'var(--bg-elevated)',
-              color: isActive ? 'var(--text-on-brand)' : 'var(--text-primary)',
-              border: '1px solid var(--border-standard)',
-            }}
-          >
-            {SORT_LABELS[col]}
-            {isActive && (
-              <span aria-hidden className="text-xs">
-                {sortDir === 'desc' ? '↓' : '↑'}
-              </span>
-            )}
-          </button>
-        );
-      })}
+    <div className="list-toolbar" data-pcomp="voc-sort-chips">
+      <span className="sort-label">정렬</span>
+      <div className="sort-chips" role="radiogroup" aria-label="정렬">
+        {COLUMNS.map((col) => {
+          const isActive = col === sortBy;
+          const className = isActive ? 'sort-chip sort-chip--active' : 'sort-chip';
+          return (
+            <button
+              key={col}
+              role="radio"
+              type="button"
+              aria-checked={isActive}
+              onClick={() => handleClick(col)}
+              className={className}
+            >
+              {SORT_LABELS[col]}
+              {isActive && (
+                <span aria-hidden className="sort-chip-icon">
+                  {sortDir === 'desc' ? '↓' : '↑'}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
