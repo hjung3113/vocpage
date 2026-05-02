@@ -11,17 +11,37 @@
    테스트: BE 92 pass + 7 todo / FE 122 pass.
 → **Follow-up A MERGED** (PR #125, 2026-05-02) — `/voc` 시각 동등화 4단계 + happy-path e2e 완료.
    visual-diff harness + 13 token-only fixes + 24 PNG + 1.8s e2e. token-only 한계로 9 SKIP 잔존.
-→ **Wave 1.6 신설 + 재정의 (2026-05-02)** — `/voc` prototype 100% 디자인 일치화.
-   접근: token tuning 폐기 → **prototype 시각 위계 기준 컴포넌트 트리 재구성**.
-   범위(D1): `/voc` 페이지 + 공통 셸(AppShell/Header/Sidebar) 한정.
-   분석 자료(D2): prototype.html + css/** + js/** 전체(~18.7k줄), subagent 3종 병렬.
-   자동화(D10 번복): Phase 진행 중 autopilot/ralph 허용. 머지·완료 선언은 사용자 검수 후만.
-   Phase: A(분해) → B(토큰 갭) → C(컴포넌트 1개씩 rebuild) → D(검증). 게이트마다 사용자 승인.
-   정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`.
-   금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전).
-→ **다음 세션 첫 작업**: Phase A 착수.
-   순서: ① plan §5 정독 → ② subagent 3종 dispatch (HTML 구조 / CSS 토큰·상태 / JS 인터랙션)
-   → ③ `docs/specs/requires/voc-prototype-decomposition.md` 합본 → ④ 사용자 검수 → Phase B 게이트.
+→ **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물 완료.
+   `voc-prototype-decomposition.md` ~700줄 + plan `wave-1-6-voc-parity.md`.
+   리뷰: architect/critic/document-specialist 3종 internal + codex adversarial 1종 → critical/high 9건 fix 적용.
+   plan §5.3 amend: §7 임계 실측은 Phase B 종료 후 캘리브레이션 단계로 이전.
+→ **다음 세션 첫 작업**: Wave 1.6 **Phase B (토큰 갭 채우기)** 착수.
+   범위: §6.5 통합 체크리스트 (status 트리오 15개 spec→CSS 동기화, raw OKLCH 토큰화 4종, #fff→`--text-on-brand` 치환, overlay 이름 정합). 컴포넌트 코드 변경 금지.
+   파일: `frontend/src/styles/index.css` 추가 + `docs/specs/requires/uidesign.md` §10·§12 동기화.
+   게이트: 토큰 lint 통과(§7.3 색상 literal regex 3종) + 사용자 승인 → Phase C 진입.
+
+**다음 세션 자동 시작 프롬프트** (그대로 붙여넣기):
+
+```
+/oh-my-claudecode:autopilot Wave 1.6 Phase B 착수.
+산출물: docs/specs/requires/voc-prototype-decomposition.md §6.5 체크리스트 그대로 적용.
+- §A: status 트리오 15개를 uidesign.md:618-632에서 frontend/src/styles/index.css로 복사 동기화
+- §B: --voc-row-hover-bg, --voc-row-selected-bg, --avatar-{steel,teal,violet}, --mark-bg 신규 정의 (uidesign.md §10 + index.css 동시)
+- §C: uidesign.md:1062 var(--overlay) 표기 → var(--bg-overlay) 정정
+- 컴포넌트 코드 변경 금지 (style 파일 + 문서만)
+워크플로우: 설계(plan §6 정독) → 구현(/gated-team-dev 가능시 사용) → 리뷰(architect/code-reviewer/critic 3종 + codex:adversarial-review). 셀프 리뷰 금지. 각 리뷰어는 3개 관점 체크리스트.
+복잡도에 맞는 모델 할당. 종료 전 300줄 초과 코드 있으면 SRP에 따라 분리.
+PR 올린 후 codex 리뷰 → 수정사항 발생 시 적용 여부 자체 판단 후 반영.
+워치독 백그라운드 1개 운영, 멈추면 재개.
+머지·완료 선언은 사용자 검수 후만.
+```
+
+**Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
+- ✅ Phase A — 분해 산출물 (PR #126 merged)
+- ⏳ Phase B — 토큰 갭 채우기 (다음 세션)
+- Phase C — 컴포넌트 1개씩 rebuild (Phase B 통과 후)
+- Phase D — 종합 검증
+- 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
 **Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
 
