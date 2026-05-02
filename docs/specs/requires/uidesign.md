@@ -262,12 +262,15 @@ gap: 5px;
 
 ### Priority Badge
 
-- Icon (Flame / ChevronUp / Minus / ChevronDown via lucide-react) + text combination, rendered as a 3-token chip (bg + border + fg)
-- Urgent: `var(--status-red)` fg / `var(--status-red-bg)` bg / `var(--status-red-border)` — `font-weight: 700`
-- High: `var(--status-orange)` fg / `var(--status-orange-bg)` bg / `var(--status-orange-border)` — `font-weight: 600`
-- Medium: `var(--text-secondary)` fg / `var(--bg-elevated)` bg / `var(--border-standard)` — `font-weight: 400`
-- Low: `var(--text-tertiary)` fg / `var(--bg-elevated)` bg / `var(--border-standard)` — `font-weight: 400`
-- `font-size: 11px` — badge-family convention (matches `.status-badge`); weight + hue both carry the semantic signal. Naked metadata text in the same row continues to use the 11.5px tier described in §7 — chip-internal text is one notch tighter to balance the surrounding chrome.
+- **Text-only style** (no chip background or border): icon + label.
+- English labels: `Urgent` / `High` / `Medium` / `Low`. The column header in the VOC list (`우선순위`) stays in Korean.
+- Icons via lucide-react: Flame / ChevronUp / Minus / ChevronDown.
+- Urgent: `var(--status-red)` — `font-weight: 700`
+- High: `var(--status-orange)` — `font-weight: 600`
+- Medium: `var(--text-tertiary)` — `font-weight: 400`
+- Low: `var(--text-quaternary)` — `font-weight: 400`
+- `font-size: 11.5px` — metadata tier (§7). Color + weight together carry the semantic signal; the absence of a chip keeps the row visually quiet.
+- aria-label: `Priority ${label}` (English, matches the label).
 - Implementation: `frontend/src/components/voc/VocPriorityBadge.tsx` (Wave 1.6 Phase C-2)
 
 ### Card & Container
@@ -609,8 +612,6 @@ Full token set — copy into `:root` as the single source of truth.
   --status-amber-border: light-dark(oklch(78% 0.09 72), oklch(30% 0.09 72));
   --status-red-bg: light-dark(oklch(94% 0.03 25), oklch(18% 0.07 25));
   --status-red-border: light-dark(oklch(78% 0.1 25), oklch(30% 0.1 25));
-  --status-orange-bg: light-dark(oklch(94% 0.03 45), oklch(18% 0.06 45));
-  --status-orange-border: light-dark(oklch(78% 0.09 45), oklch(30% 0.09 45));
   --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
   --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
 

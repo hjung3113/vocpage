@@ -5,10 +5,10 @@ import type { VocPriority } from '../../../../../shared/contracts/voc';
 describe('VocPriorityBadge', () => {
   type Case = [VocPriority, string, string, string];
   const cases: Case[] = [
-    ['urgent', '긴급', 'flame', 'font-bold'],
-    ['high', '높음', 'chevron-up', 'font-semibold'],
-    ['medium', '보통', 'minus', 'font-normal'],
-    ['low', '낮음', 'chevron-down', 'font-normal'],
+    ['urgent', 'Urgent', 'flame', 'font-bold'],
+    ['high', 'High', 'chevron-up', 'font-semibold'],
+    ['medium', 'Medium', 'minus', 'font-normal'],
+    ['low', 'Low', 'chevron-down', 'font-normal'],
   ];
 
   it.each(cases)(
@@ -20,7 +20,7 @@ describe('VocPriorityBadge', () => {
       expect(el).toBeInTheDocument();
       expect(el).toHaveClass('priority-badge', `p-${priority}`);
       expect(el).toHaveTextContent(label);
-      expect(el).toHaveAttribute('aria-label', `우선순위 ${label}`);
+      expect(el).toHaveAttribute('aria-label', `Priority ${label}`);
 
       // font-weight class on the element
       expect(el).toHaveClass(weightClass);
