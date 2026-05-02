@@ -1,16 +1,10 @@
 import { DataTable } from '../../../components/common/DataTable';
 import type { DataTableColumn } from '../../../components/common/DataTable';
 import { VocStatusBadge } from '../../../components/voc/VocStatusBadge';
+import { VocPriorityBadge } from '../../../components/voc/VocPriorityBadge';
 import type { VocListResponse, VocSortColumn, SortDir } from '../../../../../shared/contracts/voc';
 
 type Row = VocListResponse['rows'][number];
-
-const PRIORITY_LABEL: Record<string, string> = {
-  urgent: '긴급',
-  high: '높음',
-  medium: '보통',
-  low: '낮음',
-};
 
 interface VocTableProps {
   rows: VocListResponse['rows'];
@@ -59,7 +53,7 @@ export function VocTable({
       key: 'priority',
       header: '우선순위',
       sortable: true,
-      render: (row) => PRIORITY_LABEL[row.priority] ?? row.priority,
+      render: (row) => <VocPriorityBadge priority={row.priority} />,
     },
     {
       key: 'created_at',

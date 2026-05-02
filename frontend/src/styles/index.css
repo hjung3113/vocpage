@@ -111,6 +111,10 @@
   --status-amber-border: light-dark(oklch(78% 0.09 72), oklch(30% 0.09 72));
   --status-red-bg: light-dark(oklch(94% 0.03 25), oklch(18% 0.07 25));
   --status-red-border: light-dark(oklch(78% 0.1 25), oklch(30% 0.1 25));
+  --status-orange: light-dark(
+    oklch(58% 0.2 45),
+    oklch(74% 0.17 45)
+  ); /* priority high (Wave 1.6 Phase C-2) */
   --status-purple-bg: light-dark(oklch(94% 0.025 290), oklch(18% 0.06 290));
   --status-purple-border: light-dark(oklch(78% 0.08 290), oklch(30% 0.09 290));
 
@@ -224,4 +228,31 @@ body {
 }
 .status-badge.s-drop .status-dot {
   background: var(--status-drop-fg);
+}
+
+/* Priority badge — VocPriorityBadge component (Wave 1.6 Phase C-2)
+   Text-only style: icon + label, no chip background or border. */
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.priority-badge .priority-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.priority-badge.p-urgent {
+  color: var(--status-red);
+}
+.priority-badge.p-high {
+  color: var(--status-orange);
+}
+.priority-badge.p-medium {
+  color: var(--text-tertiary);
+}
+.priority-badge.p-low {
+  color: var(--text-quaternary);
 }

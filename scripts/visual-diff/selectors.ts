@@ -15,7 +15,8 @@ export type ComponentId =
   | 'voc-review-drawer'
   | 'notification-bell'
   | 'pagination'
-  | 'data-table';
+  | 'data-table'
+  | 'voc-priority-badge';
 
 export interface SelectorEntry {
   componentId: ComponentId;
@@ -104,6 +105,13 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
     componentId: 'data-table',
     proto: '.list-header',
     react: 'thead[data-pcomp="data-table"]',
+    isOverlay: false,
+  },
+  {
+    componentId: 'voc-priority-badge',
+    proto:
+      '.list-area .pri-badge.p-urgent, .list-area .pri-badge.p-high, .list-area .pri-badge.p-medium, .list-area .pri-badge.p-low',
+    react: '[data-testid^="priority-badge-"]',
     isOverlay: false,
   },
 ] as const;
