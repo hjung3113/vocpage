@@ -13,6 +13,18 @@ import { z } from 'zod';
 export const VocStatus = z.enum(['접수', '검토중', '처리중', '완료', '드랍']);
 export type VocStatus = z.infer<typeof VocStatus>;
 
+/** Maps Korean VocStatus enum → English slug used in CSS class names + design tokens. */
+export const VOC_STATUS_SLUG: Record<
+  VocStatus,
+  'received' | 'reviewing' | 'processing' | 'done' | 'drop'
+> = {
+  접수: 'received',
+  검토중: 'reviewing',
+  처리중: 'processing',
+  완료: 'done',
+  드랍: 'drop',
+} as const;
+
 export const VocPriority = z.enum(['urgent', 'high', 'medium', 'low']);
 export type VocPriority = z.infer<typeof VocPriority>;
 
