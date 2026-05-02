@@ -1,5 +1,7 @@
 # Phase 8 Wave 1 — 설계 계획 (VOC 리스트 + 검토 드로어 vertical slice)
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > 작성: 2026-05-01
 > 선행: Phase 8 Wave 0 머지 (PR #102), 8-PR1 권한 인프라 머지 (PR #103)
 > 정본 spec: `docs/specs/plans/phase-8.md` §"Wave 1" (line 186~250)

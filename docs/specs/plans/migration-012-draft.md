@@ -1,7 +1,7 @@
 # Migration 012 — Add `dev` Role (DRAFT)
 
 > **상태**: DRAFT — DDL/롤백 spec 단계. 실파일 `backend/migrations/012_add_dev_role.sql`은 **구현 phase 승인 후** 본 문서 기반으로 생성.
-> **관련 결정**: Phase F (D18 — `dev` role 도입). 근거는 `docs/specs/plans/progress-archive.md` Phase F 항목 + `docs/specs/requires/uidesign.md §13` (role-dev 토큰).
+> **관련 결정**: Phase F (D18 — `dev` role 도입). 근거는 `docs/specs/plans/progress-archive.md` Phase F 항목 + `docs/specs/requires/uidesign.md §14` (role-dev 토큰).
 
 ---
 
@@ -118,7 +118,7 @@ ON CONFLICT (id) DO NOTHING;
 - [ ] `POST /api/auth/mock-login` body validator: enum 확장.
 - [ ] BE 권한 미들웨어: `requirements.md` §8.3 매트릭스 + `feature-voc.md` §8.4-bis `assertCanManageVoc` 적용.
 - [ ] FE role guard hook (`useRequireRole`, `useCanAccessDashboard` 등) 분기 갱신.
-- [ ] role-pill UI 컴포넌트에 `dev` variant 추가 — uidesign.md §13.3 매핑.
+- [ ] role-pill UI 컴포넌트에 `dev` variant 추가 — uidesign.md §14.3 매핑.
 - [ ] BE 테스트: User/Dev/Manager/Admin × VOC ownership 매트릭스 회귀 케이스.
 
 ## 6. 호환성 노트

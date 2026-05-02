@@ -814,19 +814,122 @@ OS/browser dark mode setting automatically switches the entire theme.
 
 ---
 
-## 13. Admin · Notice · FAQ Components
+## 13. Badge System
+
+> Canonical source for VOC scope: `docs/specs/reviews/wave-1-6-voc-badge-audit.md` (C-2.5).
+> This section defines the design-system–level contract. VOC-specific icon/color mappings live in the audit doc.
+
+### 13.0 Presentational-only rule
+
+All badge and chip **primitives** are `<span>`-based. No click handler, no focus management, no ARIA role beyond natural element semantics. Interactive chip components (`FilterChip`, `SortControl`) are `<button>`-based and share **CSS dimension tokens only** — never component code. The prop `interactive?: boolean` on a primitive is forbidden.
+
+### 13.1 Primitive archetypes
+
+Three archetypes cover all VOC badge use cases. Additional archetypes require a new audit.
+
+| Archetype       | Background                      | Border                              | Icon                       | Border-radius           | Used for                                                  |
+| --------------- | ------------------------------- | ----------------------------------- | -------------------------- | ----------------------- | --------------------------------------------------------- |
+| **TextMark**    | none                            | none                                | lucide (domain-specific)   | n/a                     | Semantic color signal, no chip container. Priority, Type. |
+| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. Tags.           |
+| **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                   | `--chip-radius-rounded` | Status with filled background. Status.                    |
+
+### 13.2 Shared dimension tokens (`--chip-*`)
+
+These tokens are defined in `frontend/src/styles/index.css` `:root` and shared between all primitives and interactive chip components. Color tokens are **not** shared — each component owns its own color logic.
+
+```css
+--chip-height-sm: 20px; /* consistent row-height budget across all badge/chip types */
+--chip-padding-x-sm: 8px; /* horizontal padding inside OutlineChip / SolidChip */
+--chip-radius-pill: 9999px; /* full pill — OutlineChip, FilterChip */
+--chip-radius-rounded: 4px; /* rectangular — SolidChip */
+--chip-font-size-sm: 11.5px; /* metadata tier (§7 VOC List Typography Tiers) */
+--chip-gap: 4px; /* gap between icon and text */
+--chip-dot-size: 6px; /* status dot diameter in SolidChip */
+```
+
+These 7 tokens ship in **B-add-2** (Phase B addendum PR), per §5.1 ≥4-token policy from `wave-1-6-phase-c-precedent.md`. Implementation primitives ship in C-2.6, after B-add-2 is merged.
+
+### 13.3 TextMark spec
+
+```css
+/* no background, no border, no padding */
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+font-size: var(--chip-font-size-sm);
+/* font-weight: fixed per variant — callsite cannot override */
+```
+
+- `icon-only` mode: render icon only; `aria-label` carries the text label
+- `icon+text` mode: render icon + label side by side
+- Color = text color only (no background fill)
+
+### 13.4 OutlineChip spec
+
+```css
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+height: var(--chip-height-sm);
+padding: 2px var(--chip-padding-x-sm);
+background: var(--brand-bg);
+border: 1px solid var(--brand-border);
+border-radius: var(--chip-radius-pill);
+font-size: var(--chip-font-size-sm);
+font-weight: 600;
+color: var(--accent);
+```
+
+### 13.5 SolidChip spec
+
+```css
+display: inline-flex;
+align-items: center;
+gap: var(--chip-gap);
+height: var(--chip-height-sm);
+padding: 2px var(--chip-padding-x-sm);
+/* background, color, border: set per variant via --status-{slug}-{bg|fg|border} */
+border-radius: var(--chip-radius-rounded);
+font-size: var(--chip-font-size-sm);
+font-weight: 600;
+```
+
+Dot element:
+
+```css
+.chip-dot {
+  width: var(--chip-dot-size);
+  height: var(--chip-dot-size);
+  border-radius: 9999px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+```
+
+### 13.6 Prop surface (closed set — all archetypes)
+
+- `variant`: enum only — no free `color` prop
+- `size`: `'sm'` — VOC uses `sm` exclusively; `'md'` reserved — opening requires a separate audit (closed-prop-surface principle)
+- `iconMode` + `icon`: only customization surface for TextMark
+- `bold` / `font-weight`: fixed per archetype — callsite cannot override
+
+### 13.7 Interactive components — token sharing boundary
+
+`FilterChip` and `SortControl` share `--chip-*` dimension tokens with primitives. They do **not** share color tokens or component code. They are `<button>`-based with full hover/active/focus/aria-pressed semantics. Out of scope for this section — detailed spec deferred to filter UI work phase.
+
+## 14. Admin · Notice · FAQ Components
 
 > Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
 
-### 13.1 Admin Topbar / Body / Card
+### 14.1 Admin Topbar / Body / Card
 
-Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users — Notice/FAQ admin lives inline on its page, see §13.8).
+Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users — Notice/FAQ admin lives inline on its page, see §14.8).
 
 - `.admin-topbar` — sticky page-header band: title (`font-size: 15px; font-weight: 700`), action slot on the right, `padding: 12px 24px`, `background: var(--bg-panel)`, `border-bottom: 1px solid var(--border-subtle)`.
 - `.admin-body` — scroll container, `flex: 1; overflow-y: auto; padding: 24px`.
 - `.admin-card` — grouping panel inside the body: `background: var(--bg-surface); border: 1px solid var(--border-standard); border-radius: 8px; padding: 16px`. Cards stack with `var(--sp-5)` gap.
 
-### 13.2 Admin Table
+### 14.2 Admin Table
 
 ```css
 .admin-table {
@@ -852,7 +955,7 @@ Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users �
 }
 ```
 
-### 13.2.1 Admin Button (`.admin-btn`)
+### 14.2.1 Admin Button (`.admin-btn`)
 
 Primary action button used inside `.admin-topbar` and as the inline "관리" entry button on Notice/FAQ pages.
 
@@ -881,7 +984,7 @@ Primary action button used inside `.admin-topbar` and as the inline "관리" ent
 
 Iconography: optional 13×13 SVG icon at the leading edge.
 
-### 13.3 Role Pill (`.role-pill`)
+### 14.3 Role Pill (`.role-pill`)
 
 Compact identity badge shown next to display name in user lists, member pickers, and the topbar avatar tooltip. Four variants for the four-role enum (D18).
 
@@ -919,7 +1022,7 @@ Compact identity badge shown next to display name in user lists, member pickers,
 
 Order in any role legend: Admin → Manager → Dev → User (descending capability).
 
-### 13.4 Type Badge (`.type-badge-admin`)
+### 14.4 Type Badge (`.type-badge-admin`)
 
 Small label used in the Admin VOC-Types table to render the `voc_types.color` swatch as a colored chip. Background is the type's own color (passed inline as a token reference, never as raw hex), text uses `var(--text-on-brand)`.
 
@@ -935,7 +1038,7 @@ Small label used in the Admin VOC-Types table to render the `voc_types.color` sw
 
 > Token-color contract: `voc_types.color` stored as the **token name** (e.g. `--type-bug`) referenced from the global token sheet — not as a raw hex. Migration follow-up if current schema stores hex.
 
-### 13.5 Status Dot (`.status-dot`)
+### 14.5 Status Dot (`.status-dot`)
 
 7×7 round indicator used in admin tables to show per-row activation state.
 
@@ -956,9 +1059,9 @@ Small label used in the Admin VOC-Types table to render the `voc_types.color` sw
 }
 ```
 
-### 13.6 Notice Components
+### 14.6 Notice Components
 
-#### 13.6.1 Notice Severity Badge (`.notice-badge`)
+#### 14.6.1 Notice Severity Badge (`.notice-badge`)
 
 Three severity tiers — every Notice list row leads with one of these.
 
@@ -988,7 +1091,7 @@ Three severity tiers — every Notice list row leads with one of these.
 }
 ```
 
-#### 13.6.2 Notice Row + Body
+#### 14.6.2 Notice Row + Body
 
 ```css
 .notice-row {
@@ -1016,7 +1119,7 @@ Three severity tiers — every Notice list row leads with one of these.
 }
 ```
 
-### 13.7 FAQ Components
+### 14.7 FAQ Components
 
 ```css
 .faq-item {
@@ -1064,26 +1167,26 @@ Three severity tiers — every Notice list row leads with one of these.
 }
 ```
 
-### 13.8 Admin Mode Entry Button (Page Header Action Slot)
+### 14.8 Admin Mode Entry Button (Page Header Action Slot)
 
 > Added in tandem with `feature-notice-faq.md §10.5` (D19). Replaces the previously-planned Admin-tab subtab.
 
 - Renders **only** for `role ∈ {admin, manager}`. User/Dev never receive this DOM node — guard at the component tree, not via `display: none`.
-- Visual: reuse `.admin-btn` from §13.2.1.
+- Visual: reuse `.admin-btn` from §14.2.1.
 - Activation contract: clicking the button flips a `?mode=admin` URL query param. Read mode is the absence of the param. The toggle MUST survive page reload, browser back/forward, and shareable links.
 - When `mode=admin`, the host page (Notice / FAQ) renders inline admin actions: register/edit/delete row controls, visibility toggle switch, Soft-Delete button. The page route does not change.
 - Recommended placement: right edge of the page header band, vertically aligned with the page title. On widths < 640px the button collapses to icon only (gear glyph) without changing semantics.
 - Implementation note (FE): admin-only handlers and form components MUST be loaded via dynamic `import()` so they do not ship in the user/Dev bundle.
 
-### 13.9 Login-time Notice Popup
+### 14.9 Login-time Notice Popup
 
 > Spec lives in `feature-notice-faq.md §10.3.2`. Visual contract:
 
 - Reuse the standard Modal pattern (overlay = `var(--bg-overlay)`, dialog surface = `var(--bg-surface)` with `box-shadow: var(--shadow-dialog)`).
-- Severity badge in the header (`§13.6.1`), title in `font-size: 16px; font-weight: 700`, body in `font-size: 13.5px; color: var(--text-secondary)`.
-- Footer holds two controls aligned right: `[ ] 오늘 하루 보지 않기` (checkbox, `var(--text-tertiary)` label) and primary `닫기` button (`.admin-btn` ghost variant).
+- Severity badge in the header (`§14.6.1`), title in `font-size: 16px; font-weight: 700`, body in `font-size: 13.5px; color: var(--text-secondary)`.
+- Footer holds two controls aligned right: `[ ] 오늘 하루 보지 않기` (checkbox, `var(--text-tertiary)` label) and primary `닫기` button (`.admin-btn` ghost variant — see §14.2.1).
 
-### 13.10 Sidebar Count Badge (Notice / FAQ)
+### 14.10 Sidebar Count Badge (Notice / FAQ)
 
 Small numeric badge on Notice / FAQ sidebar items.
 
@@ -1101,7 +1204,7 @@ Small numeric badge on Notice / FAQ sidebar items.
 
 Hidden when count === 0. Shows `99+` when count > 99.
 
-### 13.11 Admin Page Non-data States
+### 14.11 Admin Page Non-data States
 
 Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지통) reuse the **Empty / Error / Loading** patterns defined in §5.
 
@@ -1115,9 +1218,9 @@ Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지
 
 ---
 
-### 13.12 Diff / Comparison Tokens
+### 14.12 Diff / Comparison Tokens
 
-Tokens used in payload diff views (Result Review detail drawer, `§13.12` diff panel).
+Tokens used in payload diff views (Result Review detail drawer, `§14.12` diff panel).
 All tokens are defined in `tokens.css` under `:root` and support `light-dark()`.
 
 | Token           | Role                                                                                   |

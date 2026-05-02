@@ -1,5 +1,7 @@
 # B-17 Dashboard 설정 패널 슬라이드인 (Wave 2 #9) — 설계 노트
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > 작성일: 2026-05-01
 > 브랜치: `feat/b-17-dashboard-settings-panel`
 

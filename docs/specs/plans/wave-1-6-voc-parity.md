@@ -117,24 +117,36 @@ Phase D: 종합 검증
 
 원칙: 코딩은 병렬, 머지는 순서대로. 같은 파일 충돌 회피 + 의존성 역피라미드.
 
-총 19 rebuild 잔여 (C-1 VocStatusBadge 완료, PR #129).
+총 19 rebuild 잔여 (C-1 VocStatusBadge 완료, PR #129). C-2 VocPriorityBadge 완료, PR #136.
 
-| Batch | 컴포넌트 (PR 번호 leaf id)                                                                                             | 병렬도     | 의존·메모                                                                                                                                                                |
-| ----- | ---------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **α** | C-2 VocPriorityBadge → C-3 VocTagPill ∥ C-4 VocSubRow → **B-add-1** → C-5 VocAssignee → C-6 VocListHeader → C-7 VocRow | 2 슬롯     | C-2 단독 머지 후 C-3·C-4 동시. C-5는 avatar colorCls 6 토큰 → §5.1 ≥4 → **Phase B addendum 별도 PR(B-add-1) 선행 필수**. C-6/C-7은 VocTable.tsx 충돌로 sequential closer |
-| **β** | C-8 VocSortChips ∥ C-9 VocAdvancedFilters ∥ C-10 NotifButton+NotifPanel                                                | 3 슬롯     | 서로 다른 파일·의존 0                                                                                                                                                    |
-| **γ** | C-11 VocCreateModal+AttachmentZone                                                                                     | 1          | atom 동봉 1 PR. 200줄 초과 시 분할 (§7.1)                                                                                                                                |
-| **δ** | C-12 VocReviewDrawer → C-13 VocReviewTabs                                                                              | sequential | δ shell 의존                                                                                                                                                             |
-| **ε** | C-14 VocCommentList ∥ C-15 VocInternalNotes ∥ C-16 VocSubTaskList                                                      | 3 슬롯     | δ 머지 후 진입                                                                                                                                                           |
-| **ζ** | C-17 SidebarUserSwitcher → C-18 Sidebar ∥ C-19 Topbar                                                                  | 2 슬롯     | C-18은 C-17 popover 의존. C-19는 **β의 NotifButton 머지 후** 시작 (props 충돌 회피)                                                                                      |
+**Pre-α 삽입 (badge primitive layer):**
+
+| Step        | 내용                                                                                                                              | 의존                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| **C-2.5**   | VOC Badge Audit & Archetype Lock (docs PR — **이 PR**)                                                                            | C-2 머지 후          |
+| **B-add-2** | `--chip-*` 7개 토큰 추가 (Phase B addendum) — `index.css` + `uidesign.md §13`                                                     | C-2.5 사용자 승인 후 |
+| **C-2.6**   | Primitive layer 구현 (TextMark / OutlineChip / SolidChip) + VocStatusBadge·VocPriorityBadge 래퍼 리팩터 + VocTypeBadge 신규 (TDD) | B-add-2 머지 후      |
+
+C-3(VocTagPill)은 C-2.6 머지 전 시작 불가. C-4(VocSubRow)는 C-2.6 래퍼 완료 후 진입.
+
+| Batch | 컴포넌트 (PR 번호 leaf id)                                                                                                              | 병렬도     | 의존·메모                                                                                                                                                                  |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **α** | C-2.6 primitive+refactor+VocTypeBadge → C-3 VocTagPill ∥ C-4 VocSubRow → **B-add-1** → C-5 VocAssignee → C-6 VocListHeader → C-7 VocRow | 2 슬롯     | C-2.6 단독 머지 후 C-3·C-4 동시. C-5는 avatar colorCls 6 토큰 → §5.1 ≥4 → **Phase B addendum 별도 PR(B-add-1) 선행 필수**. C-6/C-7은 VocTable.tsx 충돌로 sequential closer |
+| **β** | C-8 VocSortChips ∥ C-9 VocAdvancedFilters ∥ C-10 NotifButton+NotifPanel                                                                 | 3 슬롯     | 서로 다른 파일·의존 0                                                                                                                                                      |
+| **γ** | C-11 VocCreateModal+AttachmentZone                                                                                                      | 1          | atom 동봉 1 PR. 200줄 초과 시 분할 (§7.1)                                                                                                                                  |
+| **δ** | C-12 VocReviewDrawer → C-13 VocReviewTabs                                                                                               | sequential | δ shell 의존                                                                                                                                                               |
+| **ε** | C-14 VocCommentList ∥ C-15 VocInternalNotes ∥ C-16 VocSubTaskList                                                                       | 3 슬롯     | δ 머지 후 진입                                                                                                                                                             |
+| **ζ** | C-17 SidebarUserSwitcher → C-18 Sidebar ∥ C-19 Topbar                                                                                   | 2 슬롯     | C-18은 C-17 popover 의존. C-19는 **β의 NotifButton 머지 후** 시작 (props 충돌 회피)                                                                                        |
 
 - **AppShell**은 token-align 분류이므로 Phase C rebuild 대상 아님. Phase D 종합 검증에서 일괄 점검.
-- Critical path (sequential): C-2 → B-add-1 → C-5 → C-7 → C-11 → C-12 → C-13 → C-19. ≈ 8 단계.
-- 총 PR 수: rebuild 19 PR + addendum 1 PR = **20 PR**. 추정 6~10 세션.
+- Critical path (sequential): C-2.5 → B-add-2 → C-2.6 → B-add-1 → C-5 → C-7 → C-11 → C-12 → C-13 → C-19. ≈ 10 단계.
+- 총 PR 수: rebuild 19 PR + addendum 2 PR (B-add-1, B-add-2) + audit 1 PR (C-2.5) = **22 PR**. 추정 6~10 세션.
 - D9(컴포넌트당 1 PR) 유지. 병렬 슬롯이라도 PR은 별도.
 
 ### 7.3 Batch 진입·종료 게이트
 
+- **C-3 진입 게이트 추가**: C-3는 C-2.6 머지 전 시작 불가 (OutlineChip primitive 의존).
+- **C-4 진입 게이트 추가**: C-4는 C-2.6 래퍼 리팩터 완료 전 시작 불가 (VocTypeBadge 의존).
 - Batch 진입: 직전 Batch 마지막 PR 머지 + 사용자 검수 통과.
 - Batch 내 병렬 슬롯: 각 PR 독립 TDD RED→GREEN, 같은 Batch 내 머지 순서는 충돌 없는 한 자유.
 - Batch 종료 보고: Batch 끝날 때 progress.txt 갱신 + 다음 Batch 첫 leaf 명시.

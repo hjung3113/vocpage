@@ -1,5 +1,7 @@
 # B-5 역할 토글 (Wave 2 #1) — 설계 노트
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > 작성일: 2026-04-30 (Wave 2 진입)
 > 브랜치: `feat/b-5-role-toggle`
 > 선행: Wave 1 종료 (P-5/P-6/P-7/P-8/P-10/P-12 ✅)

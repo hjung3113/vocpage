@@ -1,5 +1,7 @@
 # Progress Archive
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > `claude-progress.txt`에서 분리된 완료 이력. 최신 진행은 `claude-progress.txt`만 보면 된다.
 > 분리 기준: Wave 2 종료(2026-05-01)까지의 누적 이력 전체.
 > 검색용 — 신규 진입 시 읽지 말고, 특정 결정/PR 컨텍스트 추적 시에만 grep.
@@ -10,7 +12,7 @@
 
 **B-5 역할 토글** ✅ R3 PASS — 브랜치 `feat/b-5-role-toggle` 4 commits (R1 21ec5e4 / R2 543b871 / R3 99028af / docs f510795). 5인 평균 R1 83.4 → R2 90.5 → R3 5/5 PASS. 사이드바 .sidebar-user 클릭 → 4역할 popover, data-role-allow nav 분기, --role-dev-\* 토큰, RolePill 4 variants, ARIA menu 키보드 컨트랙트, CustomEvent('role:change'). admin=10/manager=6/dev=3/user=0 visible.
 
-**B-3 공지 로그인 팝업** ✅ R2 PASS — 브랜치 `feat/b-3-notice-popup` 2 commits (R1 df414fe / R2 5b0bea2). 5인 평균 R1 79 → R2 88. uidesign §13.9 + feature-notice-faq §10.3.2 정합 2-panel 모달, notice-popup.js 277줄, notice*dismiss_until*<userId> 키, ARIA dialog/listbox + ↑↓/Home/End/Esc 트랩, .admin-btn-ghost variant 신설. 닫기 버튼만 dismiss 저장, X/Esc/외부클릭 = non-commit. n.level allow-list 보안 fix.
+**B-3 공지 로그인 팝업** ✅ R2 PASS — 브랜치 `feat/b-3-notice-popup` 2 commits (R1 df414fe / R2 5b0bea2). 5인 평균 R1 79 → R2 88. uidesign §14.9 + feature-notice-faq §10.3.2 정합 2-panel 모달, notice-popup.js 277줄, notice*dismiss_until*<userId> 키, ARIA dialog/listbox + ↑↓/Home/End/Esc 트랩, .admin-btn-ghost variant 신설. 닫기 버튼만 dismiss 저장, X/Esc/외부클릭 = non-commit. n.level allow-list 보안 fix.
 
 **B-4a ?mode=admin URL 토글** ✅ R2 + R2.1 — PR #76 머지된 R1을 사후 5인 리뷰 → fix 브랜치 `fix/b-4a-r2-xss-and-monkeypatch` 2 commits f3f42bd + 990f4d7. 평균 R1 architect 78 / code 68 / security 60 / critic 65 → R2 P0 7건 fix: notice-faq.js XSS escape 7건, monkey-patch 제거 → renderFaq inline mount, 슬롯 tree-exclusion 컨트랙트, isAdminMode AND canEnterAdminMode (deep-link UI flash 차단), renderModeBanner role guard, aria-pressed 의미 명확화, DRY 클래스 5종 추출, R2.1 deep-link cold-start 추가 dispatch.
 
@@ -34,7 +36,7 @@
 
 ## Wave 1 (2026-04-30) — autopilot 모드, 5인 전문가 × 3관점 자가 리뷰 금지
 
-- **P-7 D22 태그 마스터** ✅ PR #66 머지 — admin-tag-master.js 170 + modals 184 + data 161, R1 75.7 → R2 90.4 PASS, security 96 / verifier 94.7 / code 91.3 / designer 90 / critic 80. R2 잔여 MAJOR 2건: .type-badge-admin → .tm-kind-badge 분리 + empty state §13.11 토큰.
+- **P-7 D22 태그 마스터** ✅ PR #66 머지 — admin-tag-master.js 170 + modals 184 + data 161, R1 75.7 → R2 90.4 PASS, security 96 / verifier 94.7 / code 91.3 / designer 90 / critic 80. R2 잔여 MAJOR 2건: .type-badge-admin → .tm-kind-badge 분리 + empty state §14.11 토큰.
 - **P-8 D23 휴지통** ✅ PR #67 머지 — admin-trash.js 298 + modals 56 + data 165, critic 73.3 — 글로벌 모달 영구 파손 CRITICAL 2건 발견 → #trConfirmBg 전용 모달 + addEventListener 격리, §9.4.7 vs §15.4 spec 충돌 callout 명시. P-7 .a-btn.primary와 머지 시 충돌 → main 정의 보존.
 - **P-10 External Masters** ✅ PR #69 머지 — admin-external-masters.js 201 + data 55, R1 평균 82.3 → critic 5건 spec 정합 fix: --status-green-bg 미정의 토큰 제거, 콜드스타트 글로벌 배너화, snapshot timestamps 분리, 5분 쿨다운 카운트다운, Q5 source-independence 시연.
 - **P-12 알림 유형 + Urgent 뱃지** ✅ PR #70 머지 — notif.js 59→240 확장, 5 type + Urgent flag (orthogonal), R1 82.5 → security XSS HIGH + critic spec divergence 일괄 fix: n.text 구조화 + escHtml, 위임 리스너, urgent flag-not-type, !important 12건 제거, bell 뱃지 mutually exclusive.

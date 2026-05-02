@@ -1,5 +1,7 @@
 # Prototype Component Inventory (Wave 1 baseline, 2026-04-30)
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 ## Methodology
 
 각 spec 파일의 섹션 번호 + 대표 라인 → prototype.html의 page ID / CSS selector / JS 모듈로 매핑. grep 기반 추출, prototype.html 전체 읽기 금지 원칙 준수.

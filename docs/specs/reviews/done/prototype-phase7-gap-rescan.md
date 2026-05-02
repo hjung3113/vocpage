@@ -1,5 +1,7 @@
 # Prototype vs Spec Gap Rescan — Wave 1 종료 (2026-04-30)
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 ## 컨텍스트
 
 Wave 1 완료 스테이지: P-7 (태그 마스터) / P-8 (휴지통) / P-10 (External Masters) / P-12 (result-review-detail) / P-5 (인벤토리 매핑표) / P-6 (갭 재스캔).

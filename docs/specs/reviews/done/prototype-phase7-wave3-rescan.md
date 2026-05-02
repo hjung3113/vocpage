@@ -1,5 +1,7 @@
 # Phase 7 Wave 3 — 갭 재스캔
 
+> **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
+
 > 작성일: 2026-05-01
 > 목적: Wave 3 종료 시점 prototype ↔ spec 갭 0 잔여 확인
 

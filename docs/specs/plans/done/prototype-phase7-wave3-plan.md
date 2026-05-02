@@ -37,9 +37,9 @@ prototype.html + spec만 보고 React로 옮길 때 **재해석/재결정 없이
 | N-04 | Minor    | 검색 결과 highlight         | feature-voc §9.6      | W3-A     |
 | N-06 | Minor    | 컬럼 정렬 트리거 UI ⚠️ 신규 | feature-voc §9.5      | W3-A     |
 | N-07 | Minor    | 첨부 정상 케이스 UI ⚠️ 신규 | feature-voc §8.5      | W3-A     |
-| C-10 | Critical | Type Badge                  | uidesign §13.4        | W3-B     |
-| C-11 | Critical | Status Dot                  | uidesign §13.5        | W3-B     |
-| C-14 | Critical | Admin 비데이터 상태         | uidesign §13.11       | W3-B/C   |
+| C-10 | Critical | Type Badge                  | uidesign §14.4        | W3-B     |
+| C-11 | Critical | Status Dot                  | uidesign §14.5        | W3-B     |
+| C-14 | Critical | Admin 비데이터 상태         | uidesign §14.11       | W3-B/C   |
 | M-05 | Major    | 외부마스터 필드-매핑        | external-masters §2   | W3-B     |
 | N-05 | Minor    | W7 가로 스크롤              | dashboard W7          | W3-C     |
 | —    | 보강     | Dashboard 위젯 빈 상태      | dashboard W2~W11      | W3-C     |
