@@ -21,7 +21,7 @@ Three-tier app: React SPA → Express REST API → PostgreSQL.
 - Prototype: static HTML visual sandbox → `prototype/CLAUDE.md`
 - Container: Docker Compose (`docker compose up` starts FE + BE + Postgres)
 
-**Rule:** when working inside a sub-directory, read its `CLAUDE.md` first. This file covers cross-cutting governance only.
+**Rule:** folder-level `CLAUDE.md` files are the project map. Before code investigation or editing, use this root file plus the nearest relevant sub-directory `CLAUDE.md` files to choose likely folders/domains. This file covers cross-cutting governance only.
 
 **Prototype-as-reference (shared FE/BE principle):** the prototype is a visual + behavioral reference, **not** production architecture. FE preserves UX while rebuilding cleanly; BE infers real requirements and defines stable contracts. Never copy prototype code directly into production. Detail rules: `frontend/CLAUDE.md` and `backend/CLAUDE.md`.
 
@@ -44,13 +44,15 @@ Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Arc
 
 ## Core Rules
 
-- **Grep/Glob before Read** — search first, never read full files to find one function
+- **Map → search → inspect** — use folder `CLAUDE.md` maps to choose likely domains, `rg` for exact text, Graphify for big-picture relationships, and Serena for exact symbols.
+- **`rg` before Read** — use `rg` for filenames, keywords, error messages, API paths, env vars, and literal strings; never read broad directories or large files end-to-end unless necessary.
 - **Parallel tool calls** — independent tool calls go in one message, not sequential
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe through `| tail -20`; never print full traces
 - **No Read before delete** — files being deleted must never be Read first; just `rm`
-- **Broad grep first pass** — use `--all` and wide keywords on first `git log` grep; never retry with a narrower pattern
+- **Broad git history first pass** — use `--all` and wide keywords on first `git log --grep`; never retry with a narrower pattern
 - **Minimum context for decisions** — for judgment tasks, use only the single most relevant file; open supporting files only if the first is insufficient
+- **Before editing** — summarize selected files/symbols and why they are in scope
 - **Git workflow** — feature branch only (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`); never commit or push to main directly. PRs are opened by the user. Merge with `gh pr merge <n> --merge --delete-branch` (`--squash` and `--rebase` forbidden). After merge: `git branch -D <branch>`. Enforced by hookify rules in `.claude/hookify.block-*.local.md`.
 - Run tests before committing; follow existing code style (read 2–3 nearby files first)
 - No features beyond what the task requires (YAGNI)
@@ -95,13 +97,22 @@ A refactor changes structure without changing observable behavior. Refactor and 
 
 - **Before:** state symbols/files/paths to be changed in chat; ensure tests cover affected behavior (write tests first if not).
 - **During:** `git mv` for file moves; one refactor at a time.
-- **After (in order):** update all references (imports, dynamic strings, config, `docs/specs/**`, plan files, README/CLAUDE.md, comments) → `grep -rn "<old>"` returns 0 hits → typecheck passes → tests pass → exercise the touched surface (UI: browser; API: endpoint).
+- **After (in order):** update all references (imports, dynamic strings, config, `docs/specs/**`, plan files, README/CLAUDE.md, comments) → `rg -n "<old>"` returns 0 hits → Serena reference checks when symbols moved/renamed → typecheck passes → tests pass → exercise the touched surface (UI: browser; API: endpoint).
 - **Escalate to `code-reviewer`** only when public API surface changed, ≥3 modules touched, or DB schema/migration involved.
 
-## graphify
+## Graphify usage
 
 Knowledge graph at `graphify-out/`.
 
-- Before architecture/codebase questions, read `graphify-out/GRAPH_REPORT.md` for god nodes and community structure
-- If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw files
-- After modifying code files, run `graphify update .` to keep the graph current (AST-only, no API cost)
+Use Graphify only for architecture-level, cross-domain, dependency, flow, or docs-to-code relationship questions.
+
+Examples: understand the overall flow; find which modules are connected to a feature; map UI → API → database; compare docs/specs with implementation; identify main modules before editing.
+
+Use `graphify-out/GRAPH_REPORT.md` for orientation only, not before every search. If `graphify-out/wiki/index.md` exists, use it for graph navigation instead of reading raw files.
+
+Use `/graphify query`, `/graphify path`, and `/graphify explain` for specific graph questions.
+
+Do not use Graphify for simple literal searches — use `rg`.
+Do not use Graphify as a replacement for Serena symbol inspection — use Serena for exact definitions, references, call chains, class/function bodies, and refactoring.
+
+After modifying code files, run `graphify update .` to keep the graph current.
