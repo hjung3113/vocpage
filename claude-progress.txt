@@ -9,16 +9,19 @@
    VocReviewDrawer/Tabs 분할 + BE `POST /api/vocs` & history
    라우트 (codex review HIGH+MED 해소).
    테스트: BE 92 pass + 7 todo / FE 122 pass.
-→ **Follow-up A PR-READY** (branch `feat/wave1-followup-a-visual-parity`, 2026-05-02 autopilot)
-   — `/voc` 시각 동등화 + happy-path e2e 4단계 모두 완료, 사용자 검수 대기.
-   - Stage 1: `scripts/visual-diff.ts` Playwright 듀얼-렌더 harness + 12 components data-pcomp markers + MSW auth handlers
-   - Stage 2: 13 token-only 컴포넌트 수정 → HIGH 26→9 (남은 9건은 design §2.C SKIP — table a11y / Radix 내부)
-   - Stage 3: 24 PNG 스크린샷 + voc-visual-screenshots.md 인덱스
-   - Stage 4: `frontend/e2e/voc-happy-path.spec.ts` (Playwright, 1.8s 통과)
-   - 테스트: 189 vitest pass + 1 e2e pass / lint:tokens clean / typecheck clean
-   - 커밋: ~25개, 모두 fix-iteration + 다중 에이전트 리뷰(architect/code-reviewer/security-reviewer/designer/test-engineer) 통과
-→ **다음 세션 첫 작업**: PR 사용자 검수 → 머지 → Follow-up C-2 (seed UUID v4)
-   `feat/wave1-followup-c-seed` 단독 PR → Wave 2 (Dashboard) 진입 가능
+→ **Follow-up A MERGED** (PR #125, 2026-05-02) — `/voc` 시각 동등화 4단계 + happy-path e2e 완료.
+   visual-diff harness + 13 token-only fixes + 24 PNG + 1.8s e2e. token-only 한계로 9 SKIP 잔존.
+→ **Wave 1.6 신설 + 재정의 (2026-05-02)** — `/voc` prototype 100% 디자인 일치화.
+   접근: token tuning 폐기 → **prototype 시각 위계 기준 컴포넌트 트리 재구성**.
+   범위(D1): `/voc` 페이지 + 공통 셸(AppShell/Header/Sidebar) 한정.
+   분석 자료(D2): prototype.html + css/** + js/** 전체(~18.7k줄), subagent 3종 병렬.
+   자동화(D10 번복): Phase 진행 중 autopilot/ralph 허용. 머지·완료 선언은 사용자 검수 후만.
+   Phase: A(분해) → B(토큰 갭) → C(컴포넌트 1개씩 rebuild) → D(검증). 게이트마다 사용자 승인.
+   정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`.
+   금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전).
+→ **다음 세션 첫 작업**: Phase A 착수.
+   순서: ① plan §5 정독 → ② subagent 3종 dispatch (HTML 구조 / CSS 토큰·상태 / JS 인터랙션)
+   → ③ `docs/specs/requires/voc-prototype-decomposition.md` 합본 → ④ 사용자 검수 → Phase B 게이트.
 
 **Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
 
