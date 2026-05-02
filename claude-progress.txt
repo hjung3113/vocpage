@@ -216,7 +216,21 @@
    `--app-main-pad-y` → `--app-main-pad`) 적용 → merge. Out-of-scope: `vocGridLayout.ts` 의
    `--sp-5` consumer (별도 follow-up 가능).
 
-→ **다음 세션 첫 작업** = **β-batch 잔여 C-9 ∥ C-10 진입** (서로 다른 파일·의존 0, 병렬 PR 가능).
+→ **Wave 1.6 Phase C-9 MERGED** (PR #172, merge `8b6c195`, 2026-05-03) — VocAdvancedFilters rebuild.
+   In-place rewrite — inline Tailwind 색상 유틸 + inline `style={{}}` 을 `frontend/src/styles/index.css`
+   `.advanced-filters*` semantic class block 으로 이전. C-8 dash-style 네이밍 컨벤션 미러링.
+   prop contract 무변경 (callsite `VocListPage.tsx:42-56` 그대로). 169→156 LOC.
+   Open/close 애니메이션은 uidesign §9 prescribed pattern 준수: `grid-template-rows: 0fr → 1fr` +
+   easing `cubic-bezier(0.16, 1, 0.3, 1)` (이전 안의 `max-height` 시안은 4-expert 리뷰의
+   design-system blocker 로 잡혀 fixup 적용). Active chip fill 도 fixup 으로 C-8 `.sort-chip--active`
+   미러 (`--brand-bg` + `--accent` outline). 패널은 항상 DOM 에 존재하고 `aria-hidden` 이 open/close
+   신호 — adversarial review 의 visual-harness 우려는 harness 가 attribute 를 읽는 방식으로 흡수.
+   Tests 5→6 (behavioral; class-assertion tautology 2개 → aria-hidden flip guard 1개로 통합).
+   324/324 FE pass, typecheck clean. 적대적 리뷰 4인 (architect/test/designer/critic) 패널 통과.
+   /opt-prompt decision id `opt-20260502T194032Z-c-9-voc-advanced-filters` (retro 는 헬퍼 로그
+   `$HOME` 이전 전 손실로 미기재).
+
+→ **다음 세션 첫 작업** = **β-batch 잔여 C-10 진입** (NotifButton + NotifPanel — ζ batch C-19 Topbar prerequisite).
    그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
@@ -248,7 +262,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + #155/#156/#162/#166 follow-up ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + C-9 ✅ + #155/#156/#162/#166 follow-up ✅** / C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 10 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
