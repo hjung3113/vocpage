@@ -2,31 +2,32 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 1.5 PR-β MERGED** (PR #123, merge `ff3ba0a`,
-   2026-05-02) — `/voc` prototype 시각·UX 동등화 완료.
-   12 신규 컴포넌트 (primitive 3 + VOC composition 9) +
-   integration test + Toast UI Editor lazy chunk (~776kB) +
-   VocReviewDrawer/Tabs 분할 + BE `POST /api/vocs` & history
-   라우트 (codex review HIGH+MED 해소).
-   테스트: BE 92 pass + 7 todo / FE 122 pass.
-→ **Follow-up A MERGED** (PR #125, 2026-05-02) — `/voc` 시각 동등화 4단계 + happy-path e2e 완료.
-   visual-diff harness + 13 token-only fixes + 24 PNG + 1.8s e2e. token-only 한계로 9 SKIP 잔존.
-→ **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물 완료.
+→ **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물.
    `voc-prototype-decomposition.md` ~700줄 + plan `wave-1-6-voc-parity.md`.
-   리뷰: architect/critic/document-specialist 3종 internal + codex adversarial 1종 → critical/high 9건 fix 적용.
-   plan §5.3 amend: §7 임계 실측은 Phase B 종료 후 캘리브레이션 단계로 이전.
-→ **Wave 1.6 Phase B PR OPEN** (PR #128, 2026-05-02) — 토큰 갭 채우기 완료.
-   변경: `frontend/src/styles/index.css` +29 (status 트리오 15개 spec→CSS 동기화 + §B 신규 6개) + `docs/specs/requires/uidesign.md` +13/-1 (§B 신규 6개 + §C `var(--overlay)`→`var(--bg-overlay)` 정정).
-   리뷰: architect/code-reviewer/critic 3종 internal + codex adversarial 1종 — high/critical 0건. critic Major 2건은 사후 docs follow-up으로 분리 (plan §8 ↔ spec §7.3 lint 정합화).
-   상태: 사용자 검수 대기 → 머지 후 Phase C 진입.
+→ **Wave 1.6 Phase B MERGED** (PR #128, 2026-05-02) — 토큰 갭 채우기.
+   `frontend/src/styles/index.css` +29 (status 트리오 15 + 신규 6) + `uidesign.md` +13/-1.
+→ **Wave 1.6 Phase C-1 MERGED** (PR #129, merge `9b615ef`, 2026-05-02) — VocStatusBadge rebuild.
+   변경: `frontend/src/components/voc/VocStatusBadge.tsx` (className 기반 + status-dot + aria-label) +
+   `frontend/src/components/voc/__tests__/VocStatusBadge.test.tsx` (6 tests) +
+   `frontend/src/styles/index.css` (.status-badge + .status-dot + 5 .s-{slug} rules) +
+   `frontend/src/lib/voc-status-slug.ts` (Korean→English-slug 매핑, FE-only).
+   리뷰: architect/code-reviewer/critic 3종 + codex adversarial. 0 blocker. follow-up 3건 반영, 1건(decision-doc) 이연.
+   사용자 검수 발견: 처리중(hue 152°)·완료(hue 155°) 색 거의 동일 — 차회에 처리중을 violet(285°)으로 이동 결정.
 
-→ **다음 세션 첫 작업**: PR #128 머지 후 Wave 1.6 **Phase C (컴포넌트 1개씩 rebuild)** 착수. Phase A 산출물 §5.2 우선순위 표(`voc-prototype-decomposition.md`)에 따라 leaf 컴포넌트부터.
+→ **다음 세션 첫 작업** (3건, 순서 무관, 작은 PR로 분리):
+   1. **Token PR (Phase B 보강)** — `--status-processing-{bg,fg,border}` 3값을 violet(hue ~285°)로 갱신 + `uidesign.md §10/§12` 동기화. 권고값:
+      `bg: light-dark(oklch(91% 0.05 290), oklch(22% 0.055 288))`
+      `fg: light-dark(oklch(48% 0.20 290), oklch(70% 0.18 288))`
+      `border: light-dark(oklch(78% 0.07 290), oklch(32% 0.08 288))`
+   2. **Decision-doc PR** (critic Q3 follow-up) — `docs/specs/plans/wave-1-6-phase-c-precedent.md` 신설:
+      D1=(a) CSS in index.css / D2=(나) FE-only 매핑 / D3=yes status-dot / D4=(a) props 유지 + 한글 클래스 → 영문 슬러그 매핑 컨벤션 + per-leaf 체크리스트(TDD failing-first → lint test → §7.3 scoped → 4 reviewer + codex).
+   3. **Phase C-2 (VocPriorityBadge)** — 단, 시작 전 §6.2 우선순위 토큰 매핑 결정 필요(`--status-orange` vs `--chart-amber` 또는 신규).
 
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
-- ✅ Phase A — 분해 산출물 (PR #126 merged)
-- 🟡 Phase B — 토큰 갭 채우기 (PR #128 open, 머지 대기)
-- ⏳ Phase C — 컴포넌트 1개씩 rebuild (Phase B 머지 후)
-- Phase D — 종합 검증
+- ✅ Phase A — 분해 산출물 (PR #126)
+- ✅ Phase B — 토큰 갭 채우기 (PR #128)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, 16 leaf 잔여 / §5.2 진행 순서 = C-2 priority → C-3 tag → C-4 assignee → ...)
+- ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
 **Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
