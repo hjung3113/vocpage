@@ -31,4 +31,14 @@ describe('OutlineChip', () => {
     expect(el.querySelector('svg')).toBeNull();
     expect(el.textContent).toBe('라벨만');
   });
+
+  it('structural: span tag, no role, no hex/oklch in inline style', () => {
+    render(<OutlineChip label="태그" icon="#" />);
+    const el = screen.getByTestId('outline-chip');
+    expect(el.tagName).toBe('SPAN');
+    expect(el).not.toHaveAttribute('role');
+    const style = el.getAttribute('style') ?? '';
+    expect(style).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
+    expect(style).not.toMatch(/oklch\(/i);
+  });
 });

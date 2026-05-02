@@ -29,12 +29,15 @@ describe('VocTypeBadge', () => {
     expect(svgClass).toContain(iconId.replace('lucide-', '').replace(/-/g, '-'));
   });
 
-  it('unknown slug renders text-mark-unknown testid and Tag icon', () => {
+  it('unknown slug renders text-mark-unknown testid and Tag icon (audit §3)', () => {
     render(<VocTypeBadge slug="custom-foo" name="커스텀" />);
-    const el = screen.getByTestId('voc-type-badge-custom-foo');
+    const el = screen.getByTestId('text-mark-unknown');
     expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute('aria-label', '유형 커스텀');
-    // should not throw
+    expect(screen.queryByTestId('voc-type-badge-custom-foo')).toBeNull();
+    const svg = el.querySelector('svg');
+    expect(svg).not.toBeNull();
+    expect(svg?.getAttribute('class') ?? '').toContain('lucide-tag');
   });
 
   it('color prop ignored — rendering is same with or without it', () => {

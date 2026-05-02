@@ -98,6 +98,25 @@ describe('TextMark', () => {
     expect(screen.getByTestId('voc-type-badge-bug')).toBeInTheDocument();
   });
 
+  it('structural: span tag, no role, no hex/oklch in inline style', () => {
+    render(
+      <TextMark
+        variant="bug"
+        iconMode="icon-only"
+        icon={Tag}
+        label="버그"
+        color="var(--status-red)"
+        weight={600}
+      />,
+    );
+    const el = screen.getByTestId('text-mark-bug');
+    expect(el.tagName).toBe('SPAN');
+    expect(el).not.toHaveAttribute('role');
+    const style = el.getAttribute('style') ?? '';
+    expect(style).not.toMatch(/#[0-9a-fA-F]{3,8}/);
+    expect(style).not.toMatch(/oklch\(/i);
+  });
+
   it('ariaLabelOverride overrides aria-label when provided', () => {
     render(
       <TextMark

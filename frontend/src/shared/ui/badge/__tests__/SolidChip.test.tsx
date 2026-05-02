@@ -43,4 +43,16 @@ describe('SolidChip', () => {
     const el = screen.getByTestId('solid-chip-done');
     expect(el).toHaveAttribute('aria-label', '상태 완료');
   });
+
+  it.each(VARIANTS)('structural: span, no role, no hex/oklch in inline style (%s)', (variant) => {
+    render(<SolidChip variant={variant} label={variant} />);
+    const el = screen.getByTestId(`solid-chip-${variant}`);
+    expect(el.tagName).toBe('SPAN');
+    expect(el).not.toHaveAttribute('role');
+    const style = el.getAttribute('style') ?? '';
+    expect(style).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
+    expect(style).not.toMatch(/oklch\(/i);
+    expect(el).toHaveAttribute('style');
+    expect(style).toContain(`var(--status-${variant}`);
+  });
 });

@@ -19,7 +19,7 @@ export function VocTypeBadge({ slug, name }: VocTypeBadgeProps) {
       label={name}
       color={color}
       weight={weight}
-      extraTestId={`voc-type-badge-${slug}`}
+      extraTestId={isUnknown ? 'text-mark-unknown' : `voc-type-badge-${slug}`}
       ariaLabelOverride={`유형 ${name}`}
     />
   );
