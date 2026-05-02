@@ -13,6 +13,7 @@ const tokens = [
   '--status-processing-bg',
   '--status-processing-fg',
   '--status-processing-border',
+  '--status-dot-processing',
 ] as const;
 
 function hueOf(oklchInner: string): number {
