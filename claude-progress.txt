@@ -38,10 +38,31 @@
    - 정본 spec: `uidesign.md §5 Priority Badge` + `§10 --status-orange` + screenshot
      `docs/screenshots/wave-1-6/phase-c-2-priority-badge.png`.
 
-→ **다음 세션 첫 작업** = **Batch C-α 계속 = C-3 ∥ C-4 (병렬)**.
-   §7.2 Batch α 진행 순서: ~~C-2~~ → **C-3 ∥ C-4 (now)** → B-add-1 → C-5 → C-6 → C-7.
-   룰북 = `wave-1-6-phase-c-precedent.md` per-leaf 체크리스트.
-   - C-3 = VocTagPill, C-4 = VocSubRow (정확 컴포넌트는 `wave-1-6-voc-parity.md` §7.2 확인).
+→ **Wave 1.6 Phase C-2.5 MERGED** (PR #138, merge `a8e3507`, 2026-05-02) — VOC badge audit + 3-archetype lock.
+   `docs/specs/reviews/wave-1-6-voc-badge-audit.md` (~457줄) + `uidesign.md §13 Badge System` 신규 +
+   기존 §13 (Admin·Notice·FAQ) → §14 재번호 + 12 sub-section 갱신 + 5 active doc cross-ref 갱신 +
+   10 archive doc banner. 잠금 결정:
+   - 3 primitive archetype: TextMark / OutlineChip / SolidChip (모두 pill radius, shipped 일치)
+   - 4 semantic wrapper: VocTypeBadge(신설) / VocTagPill(C-3) / VocStatusBadge·VocPriorityBadge(C-2.6 refactor)
+   - VocTypeBadge dynamic contract `{ slug, name, color? }` — admin 추가 타입도 `Tag` fallback 렌더
+   - 7 chip 토큰 (`--chip-{height-sm,padding-x-sm,radius-pill,radius-rounded,font-size-sm,gap,dot-size}`)
+     B-add-2로 분리, `tokens.ts` SSOT 우선 + `index.css` 미러 + grep 일치 검증
+   - presentational vs interactive 하드 분리 — FilterChip/SortControl 별개 `<button>` 컴포넌트
+   - status enum 5값 확정 (`received|reviewing|processing|done|drop`), 6값 모순 수정
+   - C-2.6 self-sufficient — TDD RED spec(data-testid + DOM/aria) + migration delta 포함
+   리뷰: 내부 3 round (architect/critic/verifier 모두 SHIP) + Codex adversarial (high+medium 2건 모두 적용)
+   + refactoring review (5 체크리스트 / radius 모순 적용). 4 commits + 1 reviewer-fix commit.
+
+→ **다음 세션 첫 작업** = **B-add-2 (chip 7 토큰) → C-2.6 (primitive 3개 + wrapper refactor)**.
+   §7.2 새 batch 순서: ~~C-2~~ → ~~C-2.5~~ → **B-add-2 (now)** → **C-2.6** → C-3 ∥ C-4 → B-add-1 → C-5 → C-6 → C-7.
+   룰북 = `wave-1-6-phase-c-precedent.md` per-leaf + 신규 audit `wave-1-6-voc-badge-audit.md` §7 acceptance.
+   - **B-add-2** (token-only PR): 7 chip 토큰을 `frontend/src/tokens.ts` SSOT에 추가 + `index.css :root` 미러 +
+     기존 raw `9999px` literals (Tag Pill `uidesign §5`, Filter Tab) → `var(--chip-radius-pill)` 마이그.
+     Acceptance: `grep -E 'chip' frontend/src/tokens.ts` ↔ `grep -E '\-\-chip-' index.css` 7개 토큰 값 일치.
+   - **C-2.6**: `shared/ui/badge/{TextMark,OutlineChip,SolidChip}.tsx` 신규 (TDD) + 기존 VocStatus/PriorityBadge
+     refactor (Tailwind weight class → 토큰 기반, 5+5 기존 테스트 유지) + VocTypeBadge 신설 (dynamic contract +
+     unknown slug fallback 테스트). ESLint `no-restricted-imports` + CI grep guard로 `interactive?: boolean` 차단.
+   - C-3 = VocTagPill (OutlineChip wrapper, `#` glyph), C-4 = VocSubRow (기존 wrapper만 사용, 새 badge 0개).
    - **C-2 디자인 정책 적용 영향**: 향후 leaf 들 chip vs text-only 격상은 **사용자 시각 검수에서
      판단** (precedent rulebook §3 항목 5). 무조건 chip 가정 금지.
    - 알려진 follow-up:
@@ -49,11 +70,13 @@
        Phase D 일괄 정리 또는 별도 micro-PR.
      - mock data에 priority `low` 미포함 (`MSW handlers` cycle 3-step) → mock 보강 follow-up.
      - `p-${priority}` 암묵 className contract → 명시적 cssClass 필드 도입 (precedent doc 업데이트).
+     - `--status-*` 토큰 `tokens.ts` SSOT 마이그 (chip 외) → C-2.6 후속 별도 refactoring PR.
+     - uidesign.md heading에 stable slug anchor 도입 (§11~§14) → 차후 renumber 시 cross-ref sweep 방지.
 
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, **다음 = Batch C-α / C-2 priority** / 19 rebuild 잔여 / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, C-2 ✅, C-2.5 ✅, **다음 = B-add-2 → C-2.6** / §7.2 batch 순서: α→β→γ→δ→ε→ζ + B-add-1/B-add-2)
 - ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
