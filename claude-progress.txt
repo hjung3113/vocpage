@@ -180,13 +180,24 @@
    판정, follow-up 분리. 사용자 시각 검수에서 VocRow에 `VocTagPill` 통합 누락 추가 발견 (C-7 gap).
    Screenshot `docs/specs/screenshots/wave-1-6-c-8-voc-sort-chips.png`.
 
-→ **다음 세션 첫 작업** = **issue #155 + #156 처리 후 β-batch 잔여 (C-9 ∥ C-10) 진입**.
-   - **#155** VocSortChips 컬럼셋 spec align (BE+FE+contract 3-layer, `shared/contracts/voc.ts`
-     VocSortColumn 교체 + BE `/api/vocs?sort=` 핸들러에 `title`/`assignee` SQL 추가 +
-     `updated_at`/`due_date` 제거 + URL state 마이그레이션 fallback)
-   - **#156** VocRow 태그 통합 (FE 단일, VocRow에 `<div class="tag-row"><VocTagPill>` 추가 +
-     `.tag-row` CSS + RED→GREEN 테스트). C-7 precedent (5) 사용자 시각 검수 누락분.
-   - 이후 β-batch 잔여 C-9 ∥ C-10 (서로 다른 파일·의존 0). 그다음 γ → δ → ε → ζ → Phase D.
+→ **Issue #156 MERGED** (PR #159, merge `c9a8768`, 2026-05-02) — VocRow tag-row 통합.
+   `VocRow.tsx`에 `<div class="tag-row"><VocTagPill .../></div>` 추가 + `.tag-row` CSS
+   (`index.css` C-7 marker block). TDD RED→GREEN. Codex adversarial 1 round 적용.
+   C-7 사용자 시각 검수 누락분 보정. 스크린샷 PR #159 코멘트 첨부.
+
+→ **Issue #155 MERGED** (PR #161, merge `e579475`, 2026-05-02) — VocSortColumn spec align.
+   `shared/contracts/voc.ts` `VocSortColumn` enum 교체 — 제거 `updated_at`/`due_date`,
+   추가 `title`/`assignee`, 유지 `created_at`/`priority`/`status`/`issue_code`. BE `/api/vocs?sort=`
+   핸들러에 `title`/`assignee` SQL 정렬 추가. FE URL state 마이그레이션 fallback (구 query string
+   안전 처리). Codex adversarial 1 round 적용. 스크린샷 `docs/specs/screenshots/wave-1-6-c-8-voc-sort-chips.png`
+   (Issue 155 컨텍스트). C-8 시점 follow-up drift 해소 완료.
+
+→ **opt-prompt skill MERGED** (PR #163, merge `dd6a947`, 2026-05-03) — 자동조종 prompt right-sizer.
+   `.claude/skills/opt-prompt/` (~268L) — 단일 task 평가 후 워크플로우 복잡도 자동 조정 + eval 모드
+   self-improvement 피드백 루프. `/opt-prompt` 명시 호출만 트리거 (자동 키워드 인식 차단).
+
+→ **다음 세션 첫 작업** = **β-batch 잔여 C-9 ∥ C-10 진입** (서로 다른 파일·의존 0, 병렬 PR 가능).
+   그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
      22px expand-btn + 6 cell). VocTable.tsx 재합성 — `<DataTable>` → `<VocListHeader> + <VocRow[]>`.
@@ -217,7 +228,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + #155/#156 follow-up ✅** / C-9·C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 11 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
