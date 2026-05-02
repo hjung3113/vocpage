@@ -306,13 +306,13 @@ These tokens are added to `frontend/src/styles/index.css` `:root` block and docu
 
 ### §4.2 Reused existing tokens (no change)
 
-| Token                                      | Already defined in                 | Used by                               |
-| ------------------------------------------ | ---------------------------------- | ------------------------------------- |
-| `--status-{slug}-bg/fg/border` (×5 sets)   | `index.css` (C-1 + Phase B violet) | SolidChip via VocStatusBadge          |
-| `--status-red`, `--status-orange`          | `index.css` (Phase B, C-2)         | TextMark via VocPriorityBadge         |
-| `--text-tertiary`, `--text-quaternary`     | `index.css` (original)             | TextMark via VocPriorityBadge         |
-| `--brand-bg`, `--brand-border`, `--accent` | `index.css` (original)             | OutlineChip via VocTagPill            |
-| `--status-green`                           | `index.css` (original)             | TextMark via VocTypeBadge (개선 제안) |
+| Token                                      | Already defined in                 | Used by                                                                                                                                                                  |
+| ------------------------------------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--status-{slug}-bg/fg/border` (×5 sets)   | `index.css` (C-1 + Phase B violet) | SolidChip via VocStatusBadge                                                                                                                                             |
+| `--status-red`, `--status-orange`          | `index.css` (Phase B, C-2)         | TextMark via VocPriorityBadge                                                                                                                                            |
+| `--text-tertiary`, `--text-quaternary`     | `index.css` (original)             | TextMark via VocPriorityBadge; `--text-quaternary` also via VocTagPill (post-PR-144 pivot)                                                                               |
+| `--brand-bg`, `--brand-border`, `--accent` | `index.css` (original)             | OutlineChip — no current VOC consumer (reserved for future filter/import badges) [AMENDED 2026-05-02 post-PR-144 visual review — original: "OutlineChip via VocTagPill"] |
+| `--status-green`                           | `index.css` (original)             | TextMark via VocTypeBadge (개선 제안)                                                                                                                                    |
 
 ---
 
