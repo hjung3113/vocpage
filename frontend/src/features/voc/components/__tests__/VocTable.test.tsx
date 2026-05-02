@@ -110,6 +110,38 @@ describe('VocTable', () => {
     expect(priorityHeader).toHaveAttribute('aria-sort', 'descending');
   });
 
+  it('container has role="grid" and aria-label', () => {
+    render(
+      <VocTable
+        rows={rows}
+        sortBy="created_at"
+        sortDir="desc"
+        onSort={vi.fn()}
+        onRowClick={vi.fn()}
+        assigneeMap={assigneeMap}
+      />,
+    );
+    const grid = screen.getByRole('grid');
+    expect(grid).toHaveAttribute('aria-label', 'VOC 목록');
+  });
+
+  it('renders empty state when rows is empty (outside grid)', () => {
+    render(
+      <VocTable
+        rows={[]}
+        sortBy="created_at"
+        sortDir="desc"
+        onSort={vi.fn()}
+        onRowClick={vi.fn()}
+        assigneeMap={assigneeMap}
+      />,
+    );
+    expect(screen.getByTestId('voc-table-empty')).toHaveTextContent('데이터가 없습니다');
+    // Empty state is NOT inside role=grid (no rows means just the header inside grid)
+    const grid = screen.getByRole('grid');
+    expect(grid).not.toContainElement(screen.getByTestId('voc-table-empty'));
+  });
+
   it('calls onRowClick with row id when row is clicked', async () => {
     const user = userEvent.setup();
     const onRowClick = vi.fn();

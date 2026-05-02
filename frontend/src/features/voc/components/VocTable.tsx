@@ -20,35 +20,23 @@ export function VocTable({
   assigneeMap,
 }: VocTableProps) {
   return (
-    <div
-      data-pcomp="voc-table"
-      data-testid="voc-table"
-      role="grid"
-      aria-label="VOC 목록"
-      className="voc-table-grid"
-    >
-      <VocListHeader sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
-      {rows.length === 0 ? (
-        <div
-          className="voc-table-empty"
-          style={{
-            padding: '48px 0',
-            textAlign: 'center',
-            fontSize: 13,
-            color: 'var(--text-secondary)',
-          }}
-        >
+    <div data-pcomp="voc-table" data-testid="voc-table" className="voc-table-wrapper">
+      <div role="grid" aria-label="VOC 목록" className="voc-table-grid">
+        <VocListHeader sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+        {rows.length > 0 &&
+          rows.map((row) => (
+            <VocRow
+              key={row.id}
+              row={row}
+              assigneeMap={assigneeMap}
+              onClick={() => onRowClick(row.id)}
+            />
+          ))}
+      </div>
+      {rows.length === 0 && (
+        <div className="voc-table-empty" data-testid="voc-table-empty">
           데이터가 없습니다
         </div>
-      ) : (
-        rows.map((row) => (
-          <VocRow
-            key={row.id}
-            row={row}
-            assigneeMap={assigneeMap}
-            onClick={() => onRowClick(row.id)}
-          />
-        ))
       )}
     </div>
   );

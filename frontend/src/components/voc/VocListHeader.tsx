@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import type { VocSortColumn, SortDir } from '../../../../shared/contracts/voc';
+import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
 
 export interface VocListHeaderProps {
   sortBy: VocSortColumn;
@@ -35,8 +36,8 @@ const CELLS: CellDef[] = [
 
 const CONTAINER_STYLE: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '22px 144px 1fr 115px 108px 84px 96px',
-  padding: '0 var(--sp-5)',
+  gridTemplateColumns: VOC_GRID_COLUMNS,
+  padding: `0 ${VOC_GRID_PADDING_X}`,
   height: '32px',
   alignItems: 'center',
   borderBottom: '2px solid var(--border-subtle)',

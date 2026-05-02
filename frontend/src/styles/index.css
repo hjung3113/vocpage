@@ -316,3 +316,10 @@ body {
   color: var(--text-quaternary);
 }
 /* === C-7 VocRow styles END === */
+
+.voc-table-empty {
+  padding: 48px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}

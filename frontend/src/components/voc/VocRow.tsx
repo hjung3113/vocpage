@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import type { CSSProperties, KeyboardEvent } from 'react';
 import type { VocListResponse } from '../../../../shared/contracts/voc';
+import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
 import { VocStatusBadge } from './VocStatusBadge';
 import { VocPriorityBadge } from './VocPriorityBadge';
 import { VocAssignee } from './VocAssignee';
@@ -16,8 +17,8 @@ export interface VocRowProps {
 
 const CONTAINER_STYLE: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '22px 144px 1fr 115px 108px 84px 96px',
-  padding: '0 var(--sp-5)',
+  gridTemplateColumns: VOC_GRID_COLUMNS,
+  padding: `0 ${VOC_GRID_PADDING_X}`,
   height: '52px',
   alignItems: 'center',
   cursor: 'pointer',
