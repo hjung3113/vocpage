@@ -2,31 +2,42 @@
 
 ## 다음 세션 시작점
 
-→ **Phase 8 Wave 1.5 PR-β MERGED** (PR #123, merge `ff3ba0a`,
-   2026-05-02) — `/voc` prototype 시각·UX 동등화 완료.
-   12 신규 컴포넌트 (primitive 3 + VOC composition 9) +
-   integration test + Toast UI Editor lazy chunk (~776kB) +
-   VocReviewDrawer/Tabs 분할 + BE `POST /api/vocs` & history
-   라우트 (codex review HIGH+MED 해소).
-   테스트: BE 92 pass + 7 todo / FE 122 pass.
-→ **Follow-up A MERGED** (PR #125, 2026-05-02) — `/voc` 시각 동등화 4단계 + happy-path e2e 완료.
-   visual-diff harness + 13 token-only fixes + 24 PNG + 1.8s e2e. token-only 한계로 9 SKIP 잔존.
-→ **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물 완료.
+→ **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물.
    `voc-prototype-decomposition.md` ~700줄 + plan `wave-1-6-voc-parity.md`.
-   리뷰: architect/critic/document-specialist 3종 internal + codex adversarial 1종 → critical/high 9건 fix 적용.
-   plan §5.3 amend: §7 임계 실측은 Phase B 종료 후 캘리브레이션 단계로 이전.
-→ **Wave 1.6 Phase B PR OPEN** (PR #128, 2026-05-02) — 토큰 갭 채우기 완료.
-   변경: `frontend/src/styles/index.css` +29 (status 트리오 15개 spec→CSS 동기화 + §B 신규 6개) + `docs/specs/requires/uidesign.md` +13/-1 (§B 신규 6개 + §C `var(--overlay)`→`var(--bg-overlay)` 정정).
-   리뷰: architect/code-reviewer/critic 3종 internal + codex adversarial 1종 — high/critical 0건. critic Major 2건은 사후 docs follow-up으로 분리 (plan §8 ↔ spec §7.3 lint 정합화).
-   상태: 사용자 검수 대기 → 머지 후 Phase C 진입.
+→ **Wave 1.6 Phase B MERGED** (PR #128, 2026-05-02) — 토큰 갭 채우기.
+→ **Wave 1.6 Phase C-1 MERGED** (PR #129, merge `9b615ef`, 2026-05-02) — VocStatusBadge rebuild.
+   사용자 검수에서 처리중·완료 hue 충돌 발견 → 차회에 violet 이동 결정.
+→ **Wave 1.6 Phase C precedent doc MERGED** (PR #131, 2026-05-02) —
+   `docs/specs/plans/wave-1-6-phase-c-precedent.md` 룰북 잠금. C1.D1~C1.D6 + per-leaf
+   체크리스트 7항목 (TDD failing-first / §7.3 lint scoped / 4 reviewer + codex /
+   visual-diff SKIP 0 / 사용자 시각 검수 / 구버전 동시 삭제 / FE-only slug 격리) +
+   §3 N/A 절 + §5.1 신규 토큰 도입 정책 (≤3 leaf 동봉 / ≥4 Phase B addendum 분리).
+   리뷰: architect/critic/code-reviewer 3종 + codex adversarial. Q3 a11y aria-label
+   중복은 a11y audit follow-up으로 deferral.
+→ **Wave 1.6 Phase B violet move MERGED** (PR #132, merge `395bf0f`, 2026-05-02) —
+   `--status-processing-{bg,fg,border}` hue 152→290°(light)/288°(dark) +
+   orphan `--status-dot-processing` align + WCAG AA 통과 (codex 직접 계산 7.72:1) +
+   uidesign.md §10 동기화. TDD spot test 4 case (RED→GREEN). 사용자 시각 검수 OK.
 
-→ **다음 세션 첫 작업**: PR #128 머지 후 Wave 1.6 **Phase C (컴포넌트 1개씩 rebuild)** 착수. Phase A 산출물 §5.2 우선순위 표(`voc-prototype-decomposition.md`)에 따라 leaf 컴포넌트부터.
+→ **다음 세션 첫 작업** = **Phase C-2 (VocPriorityBadge)** — `wave-1-6-phase-c-precedent.md`
+   per-leaf 체크리스트 적용. 결정 잠금 (deep-interview 2026-05-02 합의):
+   - C1: high 색은 **prototype `--status-orange/-bg/-border` 3종 FE 도입** (hue 45°). §5.1 정책
+     에 따라 ≤3 토큰 + 1 컴포넌트 전용 → leaf PR 동봉 OK + uidesign.md §10/§12 동시 갱신.
+     값: `bg light-dark(oklch(94% 0.03 45), oklch(18% 0.06 45))`,
+        `fg/--status-orange light-dark(oklch(58% 0.20 45), oklch(74% 0.17 45))`,
+        `border light-dark(oklch(78% 0.09 45), oklch(30% 0.09 45))`.
+   - C2: 컴포넌트는 `frontend/src/components/voc/VocPriorityBadge.tsx` 단독 신설 (C-1 패턴).
+   - C3: 한글 슬러그 매핑 N/A (영문 union urgent|high|medium|low). §3 (7) N/A 처리.
+   - C4: icon — **lucide-react** 신규 의존성 (Flame / ChevronUp / Minus / ChevronDown).
+   - C5: font-weight urgent 700 / high 600 / medium·low 400 (prototype 그대로).
+   - 호출부: VocTable 내부 priority 셀 inline → `<VocPriorityBadge priority={voc.priority} />`.
+   - per-leaf 체크리스트 7항목 모두 강제 (slug N/A 1건만 통과).
 
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
-- ✅ Phase A — 분해 산출물 (PR #126 merged)
-- 🟡 Phase B — 토큰 갭 채우기 (PR #128 open, 머지 대기)
-- ⏳ Phase C — 컴포넌트 1개씩 rebuild (Phase B 머지 후)
-- Phase D — 종합 검증
+- ✅ Phase A — 분해 산출물 (PR #126)
+- ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
+- 🟡 Phase C — 컴포넌트 rebuild (C-1 ✅, **다음 = C-2 priority** / 16 leaf 잔여 / §5.2 진행 순서)
+- ⏳ Phase D — 종합 검증
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
 **Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
@@ -37,5 +48,12 @@
 - NativeSelect 단위 테스트
 - systems/menus placeholder UUID → Wave 3 admin masters에서 query 연결
 - openapi guard 확장 — VocListQuery + masters 3 schema 정합 가드
+
+**Wave 1.6 follow-up (Phase D 또는 별도 PR)**:
+
+- a11y audit — C1.D5 aria-label 중복 패턴 재검토 (시각 텍스트 + aria-label 중복 가능성)
+- eslint `no-restricted-imports` — `shared/contracts/voc/*` deep path 금지 (C1.D6 enforcement)
+- grep-based CI — `shared/contracts/**`/`backend/**`/`frontend/src/lib/api/**`에 `VOC_*_SLUG` 0 hits (C1.D2 enforcement)
+- `--status-purple` (hue 290°, 0 callers) 사용 시점 — `--status-processing` family와의 hue 공유 재검토
 
 **Wave 2 prerequisites**: Follow-up A (Playwright) + C-2 (seed UUID) 종결.
