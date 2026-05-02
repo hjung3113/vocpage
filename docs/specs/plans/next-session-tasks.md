@@ -45,7 +45,7 @@
 | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | P-1  | 미구현 화면 추가 (C1 Result Review 관리자, C2 Internal Notes 드로어, C3 공지 팝업 2-panel)                                              | ✅ B-1 (Wave 1) + B-3 (Wave 2)           |
 | P-2  | 역할별 뷰(admin/manager/user/dev) 변형 demo — `?mode=admin` + role-pill 토글                                                            | ✅ Wave 2 (B-5 + B-4a + B-9, PR #80/#86) |
-| P-3  | uidesign.md §13 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                                                           | 부분 ✅ (잔여 §13.4·5·11 → **W3-B**)     |
+| P-3  | uidesign.md §14 Admin·Notice·FAQ 컴포넌트 12건 prototype 반영                                                                           | 부분 ✅ (잔여 §14.4·5·11 → **W3-B**)     |
 | P-4  | 상태/엣지케이스 패널 (빈 상태, 오류, 로딩, 권한 차단, 길이 초과)                                                                        | → **W3-B/C**                             |
 | P-5  | 섹션별 컴포넌트 인벤토리 + spec(라인) ↔ prototype(셀렉터) 매핑표                                                                        | ✅ Wave 1 (74% coverage)                 |
 | P-6  | prototype vs spec 갭 재스캔                                                                                                             | ✅ Wave 1 (29건 → Wave 2/3 입력)         |

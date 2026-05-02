@@ -839,7 +839,7 @@ These tokens are defined in `frontend/src/styles/index.css` `:root` and shared b
 
 ```css
 --chip-height-sm: 20px; /* consistent row-height budget across all badge/chip types */
---chip-padding-x-sm: 7px; /* horizontal padding inside OutlineChip / SolidChip */
+--chip-padding-x-sm: 8px; /* horizontal padding inside OutlineChip / SolidChip */
 --chip-radius-pill: 9999px; /* full pill — OutlineChip, FilterChip */
 --chip-radius-rounded: 4px; /* rectangular — SolidChip */
 --chip-font-size-sm: 11.5px; /* metadata tier (§7 VOC List Typography Tiers) */
@@ -921,15 +921,15 @@ Dot element:
 
 > Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
 
-### 13.1 Admin Topbar / Body / Card
+### 14.1 Admin Topbar / Body / Card
 
-Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users — Notice/FAQ admin lives inline on its page, see §13.8).
+Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users — Notice/FAQ admin lives inline on its page, see §14.8).
 
 - `.admin-topbar` — sticky page-header band: title (`font-size: 15px; font-weight: 700`), action slot on the right, `padding: 12px 24px`, `background: var(--bg-panel)`, `border-bottom: 1px solid var(--border-subtle)`.
 - `.admin-body` — scroll container, `flex: 1; overflow-y: auto; padding: 24px`.
 - `.admin-card` — grouping panel inside the body: `background: var(--bg-surface); border: 1px solid var(--border-standard); border-radius: 8px; padding: 16px`. Cards stack with `var(--sp-5)` gap.
 
-### 13.2 Admin Table
+### 14.2 Admin Table
 
 ```css
 .admin-table {
@@ -955,7 +955,7 @@ Three-part layout for admin pages (Systems, Menus, VOC Types, Tag Rules, Users �
 }
 ```
 
-### 13.2.1 Admin Button (`.admin-btn`)
+### 14.2.1 Admin Button (`.admin-btn`)
 
 Primary action button used inside `.admin-topbar` and as the inline "관리" entry button on Notice/FAQ pages.
 
@@ -984,7 +984,7 @@ Primary action button used inside `.admin-topbar` and as the inline "관리" ent
 
 Iconography: optional 13×13 SVG icon at the leading edge.
 
-### 13.3 Role Pill (`.role-pill`)
+### 14.3 Role Pill (`.role-pill`)
 
 Compact identity badge shown next to display name in user lists, member pickers, and the topbar avatar tooltip. Four variants for the four-role enum (D18).
 
@@ -1022,7 +1022,7 @@ Compact identity badge shown next to display name in user lists, member pickers,
 
 Order in any role legend: Admin → Manager → Dev → User (descending capability).
 
-### 13.4 Type Badge (`.type-badge-admin`)
+### 14.4 Type Badge (`.type-badge-admin`)
 
 Small label used in the Admin VOC-Types table to render the `voc_types.color` swatch as a colored chip. Background is the type's own color (passed inline as a token reference, never as raw hex), text uses `var(--text-on-brand)`.
 
@@ -1038,7 +1038,7 @@ Small label used in the Admin VOC-Types table to render the `voc_types.color` sw
 
 > Token-color contract: `voc_types.color` stored as the **token name** (e.g. `--type-bug`) referenced from the global token sheet — not as a raw hex. Migration follow-up if current schema stores hex.
 
-### 13.5 Status Dot (`.status-dot`)
+### 14.5 Status Dot (`.status-dot`)
 
 7×7 round indicator used in admin tables to show per-row activation state.
 
@@ -1059,9 +1059,9 @@ Small label used in the Admin VOC-Types table to render the `voc_types.color` sw
 }
 ```
 
-### 13.6 Notice Components
+### 14.6 Notice Components
 
-#### 13.6.1 Notice Severity Badge (`.notice-badge`)
+#### 14.6.1 Notice Severity Badge (`.notice-badge`)
 
 Three severity tiers — every Notice list row leads with one of these.
 
@@ -1091,7 +1091,7 @@ Three severity tiers — every Notice list row leads with one of these.
 }
 ```
 
-#### 13.6.2 Notice Row + Body
+#### 14.6.2 Notice Row + Body
 
 ```css
 .notice-row {
@@ -1119,7 +1119,7 @@ Three severity tiers — every Notice list row leads with one of these.
 }
 ```
 
-### 13.7 FAQ Components
+### 14.7 FAQ Components
 
 ```css
 .faq-item {
@@ -1167,26 +1167,26 @@ Three severity tiers — every Notice list row leads with one of these.
 }
 ```
 
-### 13.8 Admin Mode Entry Button (Page Header Action Slot)
+### 14.8 Admin Mode Entry Button (Page Header Action Slot)
 
 > Added in tandem with `feature-notice-faq.md §10.5` (D19). Replaces the previously-planned Admin-tab subtab.
 
 - Renders **only** for `role ∈ {admin, manager}`. User/Dev never receive this DOM node — guard at the component tree, not via `display: none`.
-- Visual: reuse `.admin-btn` from §13.2.1.
+- Visual: reuse `.admin-btn` from §14.2.1.
 - Activation contract: clicking the button flips a `?mode=admin` URL query param. Read mode is the absence of the param. The toggle MUST survive page reload, browser back/forward, and shareable links.
 - When `mode=admin`, the host page (Notice / FAQ) renders inline admin actions: register/edit/delete row controls, visibility toggle switch, Soft-Delete button. The page route does not change.
 - Recommended placement: right edge of the page header band, vertically aligned with the page title. On widths < 640px the button collapses to icon only (gear glyph) without changing semantics.
 - Implementation note (FE): admin-only handlers and form components MUST be loaded via dynamic `import()` so they do not ship in the user/Dev bundle.
 
-### 13.9 Login-time Notice Popup
+### 14.9 Login-time Notice Popup
 
 > Spec lives in `feature-notice-faq.md §10.3.2`. Visual contract:
 
 - Reuse the standard Modal pattern (overlay = `var(--bg-overlay)`, dialog surface = `var(--bg-surface)` with `box-shadow: var(--shadow-dialog)`).
-- Severity badge in the header (`§13.6.1`), title in `font-size: 16px; font-weight: 700`, body in `font-size: 13.5px; color: var(--text-secondary)`.
-- Footer holds two controls aligned right: `[ ] 오늘 하루 보지 않기` (checkbox, `var(--text-tertiary)` label) and primary `닫기` button (`.admin-btn` ghost variant).
+- Severity badge in the header (`§14.6.1`), title in `font-size: 16px; font-weight: 700`, body in `font-size: 13.5px; color: var(--text-secondary)`.
+- Footer holds two controls aligned right: `[ ] 오늘 하루 보지 않기` (checkbox, `var(--text-tertiary)` label) and primary `닫기` button (`.admin-btn` ghost variant — see §14.2.1).
 
-### 13.10 Sidebar Count Badge (Notice / FAQ)
+### 14.10 Sidebar Count Badge (Notice / FAQ)
 
 Small numeric badge on Notice / FAQ sidebar items.
 
@@ -1204,7 +1204,7 @@ Small numeric badge on Notice / FAQ sidebar items.
 
 Hidden when count === 0. Shows `99+` when count > 99.
 
-### 13.11 Admin Page Non-data States
+### 14.11 Admin Page Non-data States
 
 Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지통) reuse the **Empty / Error / Loading** patterns defined in §5.
 
@@ -1218,9 +1218,9 @@ Admin tables (Notice/FAQ/User/Tag-rules/System-menu/Type/태그 마스터/휴지
 
 ---
 
-### 13.12 Diff / Comparison Tokens
+### 14.12 Diff / Comparison Tokens
 
-Tokens used in payload diff views (Result Review detail drawer, `§13.12` diff panel).
+Tokens used in payload diff views (Result Review detail drawer, `§14.12` diff panel).
 All tokens are defined in `tokens.css` under `:root` and support `light-dark()`.
 
 | Token           | Role                                                                                   |
