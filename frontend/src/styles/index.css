@@ -182,3 +182,29 @@ body {
   color: var(--text-primary);
   font-family: var(--font-ui);
 }
+
+/* VocListHeader (Wave 1.6 C-6) — :hover and sortFlip require CSS rules */
+.voc-list-header-hcell {
+  transition: color 0.12s;
+}
+.voc-list-header-hcell:hover {
+  color: var(--text-secondary);
+}
+.voc-list-header-icon {
+  transition:
+    opacity 0.15s,
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes vocListHeaderSortFlip {
+  0% {
+    transform: scaleY(0.4);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+.voc-list-header-icon.is-active {
+  animation: vocListHeaderSortFlip 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
