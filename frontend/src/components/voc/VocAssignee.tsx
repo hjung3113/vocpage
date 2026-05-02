@@ -1,7 +1,7 @@
 import { UserX } from 'lucide-react';
 
 const COLOR_CLASSES = ['steel', 'teal', 'violet'] as const;
-type AvatarColorClass = (typeof COLOR_CLASSES)[number];
+export type AvatarColorClass = (typeof COLOR_CLASSES)[number];
 
 const COLOR_VAR: Record<AvatarColorClass, string> = {
   steel: 'var(--avatar-steel)',
@@ -9,7 +9,7 @@ const COLOR_VAR: Record<AvatarColorClass, string> = {
   violet: 'var(--avatar-violet)',
 };
 
-function hashToBucket(name: string): AvatarColorClass {
+export function hashAssigneeColor(name: string): AvatarColorClass {
   let h = 0;
   for (let i = 0; i < name.length; i += 1) {
     h = (h * 31 + name.charCodeAt(i)) | 0;
@@ -38,8 +38,15 @@ const CIRCLE_BASE: React.CSSProperties = {
   flexShrink: 0,
 };
 
-export function VocAssignee({ name }: { name: string | null }) {
-  if (!name) {
+export function VocAssignee({
+  name,
+  colorClass,
+}: {
+  name: string | null;
+  colorClass?: AvatarColorClass;
+}) {
+  const trimmed = name?.trim() ?? '';
+  if (!trimmed) {
     return (
       <span
         data-pcomp="VocAssignee"
@@ -53,20 +60,20 @@ export function VocAssignee({ name }: { name: string | null }) {
     );
   }
 
-  const colorClass = hashToBucket(name);
-  const initial = Array.from(name)[0] ?? '';
+  const bucket = colorClass ?? hashAssigneeColor(trimmed);
+  const initial = Array.from(trimmed)[0] ?? '';
 
   return (
     <span
       data-pcomp="VocAssignee"
-      data-testid={`assignee-${colorClass}`}
-      aria-label={`담당자 ${name}`}
+      data-testid={`assignee-${bucket}`}
+      aria-label={`담당자 ${trimmed}`}
       style={ROW_STYLE}
     >
-      <span aria-hidden="true" style={{ ...CIRCLE_BASE, background: COLOR_VAR[colorClass] }}>
+      <span aria-hidden="true" style={{ ...CIRCLE_BASE, background: COLOR_VAR[bucket] }}>
         {initial}
       </span>
-      {name}
+      {trimmed}
     </span>
   );
 }

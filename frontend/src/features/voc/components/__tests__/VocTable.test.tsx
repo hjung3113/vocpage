@@ -81,7 +81,7 @@ describe('VocTable', () => {
     expect(cells).toHaveLength(6);
   });
 
-  it('renders "—" when assignee_id is null', () => {
+  it('renders unassigned VocAssignee when assignee_id is null', () => {
     render(
       <VocTable
         rows={rows}
@@ -92,7 +92,7 @@ describe('VocTable', () => {
         assigneeMap={assigneeMap}
       />,
     );
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getAllByTestId('assignee-unassigned').length).toBeGreaterThan(0);
   });
 
   it('sets aria-sort="descending" on priority header when sortBy="priority" and sortDir="desc"', () => {

@@ -2,6 +2,7 @@ import { DataTable } from '../../../components/common/DataTable';
 import type { DataTableColumn } from '../../../components/common/DataTable';
 import { VocStatusBadge } from '../../../components/voc/VocStatusBadge';
 import { VocPriorityBadge } from '../../../components/voc/VocPriorityBadge';
+import { VocAssignee } from '../../../components/voc/VocAssignee';
 import type { VocListResponse, VocSortColumn, SortDir } from '../../../../../shared/contracts/voc';
 
 type Row = VocListResponse['rows'][number];
@@ -47,7 +48,9 @@ export function VocTable({
       key: 'assignee_id',
       header: '담당자',
       sortable: false,
-      render: (row) => (row.assignee_id ? (assigneeMap[row.assignee_id] ?? row.assignee_id) : '—'),
+      render: (row) => (
+        <VocAssignee name={row.assignee_id ? (assigneeMap[row.assignee_id] ?? null) : null} />
+      ),
     },
     {
       key: 'priority',

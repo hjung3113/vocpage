@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { VocAssignee } from '../VocAssignee';
+import { VocAssignee, hashAssigneeColor } from '../VocAssignee';
 
 describe('VocAssignee', () => {
   it('renders unassigned state when name is null', () => {
@@ -12,6 +12,16 @@ describe('VocAssignee', () => {
     expect(icon?.getAttribute('class') ?? '').toContain('user-x');
   });
 
+  it('treats empty string as unassigned', () => {
+    render(<VocAssignee name="" />);
+    expect(screen.getByTestId('assignee-unassigned')).toBeInTheDocument();
+  });
+
+  it('treats whitespace-only string as unassigned', () => {
+    render(<VocAssignee name="   " />);
+    expect(screen.getByTestId('assignee-unassigned')).toBeInTheDocument();
+  });
+
   it('renders assigned state with initial and name', () => {
     render(<VocAssignee name="홍길동" />);
     const el = screen.getByTestId(/^assignee-(steel|teal|violet)$/);
@@ -22,24 +32,21 @@ describe('VocAssignee', () => {
     expect(initialNode?.textContent).toBe('홍');
   });
 
-  it('initial uses first character of name', () => {
+  it('initial uses first character of name (latin)', () => {
     render(<VocAssignee name="Alice Park" />);
     const initialNode = screen.getByText('A', { selector: '[aria-hidden="true"]' });
     expect(initialNode).toBeInTheDocument();
   });
 
-  it('color class is deterministic for same name', () => {
-    const { unmount } = render(<VocAssignee name="홍길동" />);
-    const first = screen.getByTestId(/^assignee-(steel|teal|violet)$/).getAttribute('data-testid');
-    unmount();
-    render(<VocAssignee name="홍길동" />);
-    const second = screen.getByTestId(/^assignee-(steel|teal|violet)$/).getAttribute('data-testid');
-    expect(first).toBe(second);
+  it('explicit colorClass prop overrides hash', () => {
+    render(<VocAssignee name="홍길동" colorClass="violet" />);
+    expect(screen.getByTestId('assignee-violet')).toBeInTheDocument();
   });
 
-  it('color class differs across all 3 buckets across many names', () => {
+  it('hashAssigneeColor is deterministic and total over the 3 buckets', () => {
+    expect(hashAssigneeColor('홍길동')).toBe(hashAssigneeColor('홍길동'));
     const buckets = new Set<string>();
-    const names = [
+    [
       '홍길동',
       '김철수',
       '이영희',
@@ -50,29 +57,31 @@ describe('VocAssignee', () => {
       'Bob',
       'Carol',
       'Dave',
-    ];
-    names.forEach((name) => {
-      const { unmount } = render(<VocAssignee name={name} />);
-      const id = screen.getByTestId(/^assignee-(steel|teal|violet)$/).getAttribute('data-testid');
-      buckets.add(id ?? '');
-      unmount();
+    ].forEach((n) => {
+      buckets.add(hashAssigneeColor(n));
     });
     expect(buckets.size).toBe(3);
   });
 
-  it('no hex color in className', () => {
-    render(<VocAssignee name="홍길동" />);
-    const el = screen.getByTestId(/^assignee-(steel|teal|violet)$/);
-    expect(el.className).not.toMatch(/#[0-9a-f]/i);
+  it('hashAssigneeColor locks specific name→bucket pairs (regression guard)', () => {
+    expect(hashAssigneeColor('홍길동')).toBe('violet');
+    expect(hashAssigneeColor('이분석')).toBe('steel');
+    expect(hashAssigneeColor('Alice')).toBe('teal');
   });
 
-  it('has data-pcomp marker for visual-diff', () => {
+  it('rendered output contains no hex literal anywhere (className OR inline style)', () => {
+    render(<VocAssignee name="홍길동" />);
+    const el = screen.getByTestId(/^assignee-(steel|teal|violet)$/);
+    expect(el.outerHTML).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+  });
+
+  it('has data-pcomp marker for visual-diff (assigned)', () => {
     render(<VocAssignee name="홍길동" />);
     const el = screen.getByTestId(/^assignee-(steel|teal|violet)$/);
     expect(el).toHaveAttribute('data-pcomp', 'VocAssignee');
   });
 
-  it('unassigned has data-pcomp marker', () => {
+  it('has data-pcomp marker for visual-diff (unassigned)', () => {
     render(<VocAssignee name={null} />);
     const el = screen.getByTestId('assignee-unassigned');
     expect(el).toHaveAttribute('data-pcomp', 'VocAssignee');
