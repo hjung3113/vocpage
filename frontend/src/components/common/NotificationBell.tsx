@@ -32,12 +32,14 @@ export function NotificationBell({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
+          data-pcomp="notification-bell"
           type="button"
           aria-label="알림"
           className={cn(
-            'relative inline-flex h-9 w-9 items-center justify-center rounded-md',
-            'text-[color:var(--text-secondary)] hover:bg-[color:var(--bg-elevated)] hover:text-[color:var(--text-primary)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand)]',
+            'relative inline-flex h-8 w-8 items-center justify-center rounded-lg',
+            'border border-[color:var(--border-subtle)] bg-[color:var(--bg-surface)]',
+            'text-[color:var(--text-tertiary)] hover:bg-[color:var(--bg-elevated)] hover:text-[color:var(--text-primary)]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]',
           )}
         >
           <Bell size={18} aria-hidden />

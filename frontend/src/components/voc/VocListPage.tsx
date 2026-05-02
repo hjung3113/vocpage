@@ -38,7 +38,7 @@ export function VocListPage() {
         onCreate={() => ctrl.create.setOpen(true)}
       />
       <VocStatusFilters value={statusValue} onChange={ctrl.onStatusChange} />
-      <div className="px-6 py-3">
+      <div>
         <VocAdvancedFilters
           open={ctrl.advanced.open}
           onToggle={ctrl.advanced.onToggle}
@@ -56,7 +56,7 @@ export function VocListPage() {
         />
       </div>
       <VocSortChips sortBy={ctrl.sortBy} sortDir={ctrl.sortDir} onChange={ctrl.setSort} />
-      <div className="px-6">
+      <div className="px-6 text-sm">
         {list.isLoading && <LoadingState data-testid="voc-loading" />}
         {list.isError && <ErrorState onRetry={() => list.refetch()} />}
         {!list.isLoading && !list.isError && rows.length === 0 && (

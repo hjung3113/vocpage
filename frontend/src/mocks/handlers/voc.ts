@@ -156,6 +156,7 @@ export const vocHandlers = [
     const created: Voc = {
       id: idHex,
       issue_code: `VOC-${String(store.length + 1).padStart(4, '0')}`,
+      sequence_no: store.length + 1,
       title: payload.title ?? '',
       body: payload.body ?? '',
       status: payload.status ?? '접수',

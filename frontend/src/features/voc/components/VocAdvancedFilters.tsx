@@ -95,8 +95,9 @@ export function VocAdvancedFilters({
   onReset,
 }: VocAdvancedFiltersProps) {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col">
+      {/* Toggle row — intentionally outside data-pcomp root so harness measures panel only */}
+      <div className="flex items-center justify-between px-6 py-2">
         <Button
           type="button"
           variant="outline"
@@ -121,8 +122,16 @@ export function VocAdvancedFilters({
           </Button>
         )}
       </div>
+      {/* Panel — data-pcomp root; only rendered when open */}
       {open && (
-        <div className="grid gap-4 rounded-md border border-[color:var(--border-standard)] bg-[color:var(--bg-elevated)] p-4 sm:grid-cols-2">
+        <div
+          data-pcomp="voc-advanced-filters"
+          className="grid gap-4 px-6 py-4 sm:grid-cols-2"
+          style={{
+            background: 'var(--bg-panel)',
+            borderBottom: '1px solid var(--border-subtle)',
+          }}
+        >
           <ChipGroup
             groupId="adv-assignees"
             label="담당자"

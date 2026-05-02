@@ -15,12 +15,14 @@ export function VocNotificationsDropdown({
   onItemClick,
 }: VocNotificationsDropdownProps) {
   return (
-    <NotificationBell
-      items={items}
-      unreadCount={unreadCount}
-      onMarkAllRead={onMarkAllRead}
-      onItemClick={onItemClick}
-    />
+    <div data-pcomp="voc-notif-dropdown">
+      <NotificationBell
+        items={items}
+        unreadCount={unreadCount}
+        onMarkAllRead={onMarkAllRead}
+        onItemClick={onItemClick}
+      />
+    </div>
   );
 }
 

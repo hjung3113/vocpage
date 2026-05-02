@@ -10,7 +10,8 @@
     "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
     "prepare": "husky",
     "codegen": "openapi-typescript shared/openapi.yaml -o shared/types/api.ts",
-    "check:parity": "tsx scripts/check-fixture-seed-parity.ts"
+    "check:parity": "tsx scripts/check-fixture-seed-parity.ts",
+    "visual-diff": "tsx scripts/visual-diff.ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.7.1",

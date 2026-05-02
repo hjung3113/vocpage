@@ -9,10 +9,16 @@
    VocReviewDrawer/Tabs 분할 + BE `POST /api/vocs` & history
    라우트 (codex review HIGH+MED 해소).
    테스트: BE 92 pass + 7 todo / FE 122 pass.
-→ **다음 세션 첫 작업**: Wave 2 진입 hard-block 해소
-   - Follow-up A (Playwright e2e) — `frontend/e2e/voc-happy-path.spec.ts`
-   - Follow-up C-2 (seed UUID v4) — `feat/wave1-followup-c-seed`
-   - 둘 다 머지 후 Wave 2 (Dashboard) 진입 가능
+→ **Follow-up A PR-READY** (branch `feat/wave1-followup-a-visual-parity`, 2026-05-02 autopilot)
+   — `/voc` 시각 동등화 + happy-path e2e 4단계 모두 완료, 사용자 검수 대기.
+   - Stage 1: `scripts/visual-diff.ts` Playwright 듀얼-렌더 harness + 12 components data-pcomp markers + MSW auth handlers
+   - Stage 2: 13 token-only 컴포넌트 수정 → HIGH 26→9 (남은 9건은 design §2.C SKIP — table a11y / Radix 내부)
+   - Stage 3: 24 PNG 스크린샷 + voc-visual-screenshots.md 인덱스
+   - Stage 4: `frontend/e2e/voc-happy-path.spec.ts` (Playwright, 1.8s 통과)
+   - 테스트: 189 vitest pass + 1 e2e pass / lint:tokens clean / typecheck clean
+   - 커밋: ~25개, 모두 fix-iteration + 다중 에이전트 리뷰(architect/code-reviewer/security-reviewer/designer/test-engineer) 통과
+→ **다음 세션 첫 작업**: PR 사용자 검수 → 머지 → Follow-up C-2 (seed UUID v4)
+   `feat/wave1-followup-c-seed` 단독 PR → Wave 2 (Dashboard) 진입 가능
 
 **Wave 1.5-γ 후속 (defer 항목, 별도 PR)**:
 

@@ -16,8 +16,9 @@ export function VocPaginationBar({ page, perPage, total, onPageChange }: VocPagi
 
   return (
     <div
+      data-pcomp="voc-pagination"
       className="flex items-center justify-between px-6 py-3"
-      style={{ borderTop: '1px solid var(--border-standard)' }}
+      style={{ borderTop: '1px solid var(--border-subtle)' }}
     >
       <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
         {start}-{end} / {total}

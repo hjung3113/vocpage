@@ -103,8 +103,9 @@ export function VocCreateModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        data-pcomp="voc-create-modal"
         aria-label="새 VOC 등록"
-        className="max-w-2xl bg-[color:var(--bg-panel)] text-[color:var(--text-primary)]"
+        className="max-w-2xl bg-[color:var(--bg-surface)] text-[color:var(--text-primary)]"
       >
         <DialogHeader>
           <DialogTitle>새 VOC 등록</DialogTitle>

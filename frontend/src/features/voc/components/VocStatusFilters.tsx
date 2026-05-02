@@ -57,8 +57,12 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
 
   return (
     <div
-      className="flex items-center gap-2 flex-wrap px-6 py-3"
-      style={{ borderBottom: '1px solid var(--border-standard)' }}
+      data-pcomp="voc-status-filters"
+      className="flex items-center gap-2 flex-nowrap overflow-x-auto px-6 h-11 scrollbar-none"
+      style={{
+        background: 'var(--bg-app)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
     >
       {PILLS.map(({ label, value: pillValue, icon: Icon }) => {
         const pressed = isPressed(pillValue);
@@ -75,13 +79,13 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
             onClick={() => handleClick(pillValue)}
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors"
             style={{
-              background: pressed ? (statusBg ?? 'var(--brand)') : 'var(--bg-elevated)',
-              color: pressed
+              background: pressed
                 ? pillValue === 'all'
-                  ? 'var(--text-on-brand)'
-                  : 'var(--text-primary)'
-                : 'var(--text-secondary)',
-              border: '1px solid var(--border-standard)',
+                  ? 'var(--brand-bg, var(--brand))'
+                  : (statusBg ?? 'var(--brand-bg, var(--brand))')
+                : 'var(--bg-elevated)',
+              color: pressed ? 'var(--text-on-brand)' : 'var(--text-secondary)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             <Icon size={13} aria-hidden />

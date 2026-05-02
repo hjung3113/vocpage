@@ -21,8 +21,9 @@ export function VocTopbar({
 }: VocTopbarProps) {
   return (
     <div
-      className="flex items-center gap-4 px-6 py-4"
-      style={{ background: 'var(--bg-panel)', borderBottom: '1px solid var(--border-standard)' }}
+      data-pcomp="voc-topbar"
+      className="flex items-center gap-2 px-6 h-14"
+      style={{ background: 'var(--bg-app)', borderBottom: '1px solid var(--border-subtle)' }}
     >
       {/* Title + badge */}
       <div className="flex items-center gap-2 shrink-0">

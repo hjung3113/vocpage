@@ -51,7 +51,11 @@ export function Pagination({ page, totalPages, onChange, siblingCount = 1 }: Pag
   );
 
   return (
-    <nav aria-label="페이지" className="flex items-center gap-1">
+    <nav
+      data-pcomp="pagination"
+      aria-label="페이지"
+      className="flex items-center justify-center gap-1"
+    >
       {navBtn('이전', page - 1, isFirst)}
       {pages.map((p, idx) =>
         p === ELLIPSIS ? (

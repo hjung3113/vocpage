@@ -45,8 +45,11 @@ export function DataTable<T>({
 
   return (
     <table className="w-full border-collapse text-sm text-[color:var(--text-primary)]">
-      <thead>
-        <tr className="border-b border-[color:var(--border-standard)]">
+      <thead
+        data-pcomp="data-table"
+        style={{ background: 'var(--bg-panel)', borderBottom: '2px solid var(--border-subtle)' }}
+      >
+        <tr>
           {columns.map((col) => {
             const active = sortKey === col.key;
             const sortable = col.sortable && onSort;
@@ -57,7 +60,7 @@ export function DataTable<T>({
                 aria-sort={ariaSortFor(active, sortDir)}
                 onClick={sortable ? () => onSort!(col.key) : undefined}
                 className={cn(
-                  'px-3 py-2 text-left font-medium text-[color:var(--text-secondary)]',
+                  'px-6 py-2 text-left font-medium text-[color:var(--text-secondary)]',
                   sortable && 'cursor-pointer select-none',
                 )}
               >
@@ -92,7 +95,7 @@ export function DataTable<T>({
             {columns.map((col) => (
               <td
                 key={col.key}
-                className={cn('px-3 py-2 text-[color:var(--text-primary)]', col.cellClassName)}
+                className={cn('px-6 py-2 text-[color:var(--text-primary)]', col.cellClassName)}
               >
                 {col.render ? col.render(row) : (row as Record<string, ReactNode>)[col.key]}
               </td>
