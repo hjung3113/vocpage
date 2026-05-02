@@ -39,6 +39,15 @@ export const tokens = {
   statusGreen: 'oklch(55% 0.17 150)',
   statusAmber: 'oklch(70% 0.16 72)',
   statusRed: 'oklch(58% 0.22 25)',
+
+  // Chip dimensions (Wave 1.6 B-add-2 — shared across TextMark/OutlineChip/SolidChip/FilterChip)
+  chipHeightSm: '20px',
+  chipPaddingXSm: '8px',
+  chipRadiusPill: '9999px',
+  chipRadiusRounded: '4px',
+  chipFontSizeSm: '11.5px',
+  chipGap: '4px',
+  chipDotSize: '6px',
 } as const;
 
 export type TokenKey = keyof typeof tokens;
