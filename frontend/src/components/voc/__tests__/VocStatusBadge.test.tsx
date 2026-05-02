@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { VocStatusBadge } from '../VocStatusBadge';
-import type { VocStatus } from '../../../../../shared/contracts/voc/entity';
+import type { VocStatus } from '../../../../../shared/contracts/voc';
 
 describe('VocStatusBadge', () => {
   const cases: Array<[VocStatus, string]> = [
@@ -11,15 +11,18 @@ describe('VocStatusBadge', () => {
     ['드랍', 'drop'],
   ];
 
-  it.each(cases)('renders %s with class s-%s and Korean label text', (status, slug) => {
-    render(<VocStatusBadge status={status} />);
-    const el = screen.getByTestId(`status-badge-${status}`);
-    expect(el).toBeInTheDocument();
-    expect(el).toHaveClass('status-badge', `s-${slug}`);
-    expect(el).toHaveTextContent(status);
-    // status-dot child must exist
-    expect(el.querySelector('.status-dot')).not.toBeNull();
-  });
+  it.each(cases)(
+    'renders %s with class s-%s, Korean label text, status-dot child, and aria-label',
+    (status, slug) => {
+      render(<VocStatusBadge status={status} />);
+      const el = screen.getByTestId(`status-badge-${status}`);
+      expect(el).toBeInTheDocument();
+      expect(el).toHaveClass('status-badge', `s-${slug}`);
+      expect(el).toHaveTextContent(status);
+      expect(el.querySelector('.status-dot')).not.toBeNull();
+      expect(el).toHaveAttribute('aria-label', `상태 ${status}`);
+    },
+  );
 
   it('does not leak inline color/background style (lint hard rule)', () => {
     render(<VocStatusBadge status="접수" />);
