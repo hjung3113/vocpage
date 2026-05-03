@@ -262,8 +262,24 @@
    - VocStatusFilters `rightSlot` 렌더 path 단위 테스트
    최종: 322/322 vitest green, tsc clean. 스크린샷 `docs/specs/reviews/wave-1-6/screenshots/post-c9-f123-bundle.png`.
 
-→ **다음 세션 첫 작업** = **F-bundle deferred minor 3건 cleanup PR** (위 3건, ~50 LOC, FE-only) →
-   완료 후 **β-batch 잔여 C-10 진입** (NotifButton + NotifPanel — ζ batch C-19 Topbar prerequisite).
+→ **F-bundle deferred minor 3건 cleanup PR MERGED** (PR #178, 2026-05-03) — 56 LOC FE-only, 1 commit.
+   - VocAdvancedFiltersToggle: 신규 export `VOC_ADVANCED_FILTERS_PANEL_ID = 'voc-advanced-filters-panel'` 상수 +
+     toggle `aria-controls={...}` + panel `<div id={...}>`. a11y wiring 직접 매칭 테스트 추가.
+   - VocListPage → VocTable → VocRow 통합 테스트: `aria-label="유형 기능 요청"` 카운트로 vocTypeMap end-to-end
+     스레딩 검증. VOC fixtures 의 `voc_type_id` 가 모두 TYPE_PRIMARY (slug `feature`, name `기능 요청`) 라
+     단일 aria-label 매칭으로 row 카운트 비교 가능. 단, slug `feature` 는 `getVocTypeIconConfig` known
+     slug list (`bug`, `feature-request`, `improvement`, `inquiry`) 에 없어 `isUnknown=true` → testid
+     `text-mark-unknown`. aria-label 은 name 기반이라 영향 없음. testid 검증은 의도적으로 스킵.
+   - VocStatusFilters `rightSlot` 2 테스트: with rightSlot → 7 buttons (6 pills + 1), without → 6 buttons + `.ml-auto` 0개.
+   /opt-prompt decision id `opt-20260503T045414Z-f-bundle-minor-cleanup` (retro `oversized` —
+   screenshot gate 가 자동 추가됐으나 a11y attribute + tests-only 변경이라 미적용. opt-prompt
+   Expand list "UI change → screenshot" 조건을 "DOM/style change visible to end user" 로
+   좁힐 후속 issue 후보).
+   1× codex adversarial review clean (no findings). 326/326 vitest green, tsc clean. 스크린샷
+   미첨부 (변경이 ARIA attribute + 테스트 추가뿐, 가시 변화 0).
+   토큰 사용량 (cost metric `input + cache_creation`): **1.16M** (PR #175 baseline 3.39M 의 ~34%).
+
+→ **다음 세션 첫 작업** = **β-batch 잔여 C-10 진입** (NotifButton + NotifPanel — ζ batch C-19 Topbar prerequisite).
    그다음 γ → δ → ε → ζ → Phase D.
    §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
@@ -295,7 +311,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + C-9 ✅ + #155/#156/#162/#166 follow-up ✅** / C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 10 PR)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + C-9 ✅ + F-1/F-2/F-3 bundle ✅ + F-bundle minor cleanup ✅ + #155/#156/#162/#166 follow-up ✅** / C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 10 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
