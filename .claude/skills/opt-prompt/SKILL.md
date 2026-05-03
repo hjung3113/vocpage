@@ -26,6 +26,8 @@ Heavy orchestration skills (autopilot, ralph, team, ultrawork) impose multi-phas
 
 If the input already starts with a `[scope] ... [normalized prompt]` block, treat it as already normalized: emit `[scope] passthrough` with the existing normalized prompt unchanged, and skip re-classification. Never wrap an output a second time. **Markers** (see grammar below) inside the preserved block round-trip verbatim — never strip on passthrough.
 
+> **Passthrough also skips Step 1 helper invocation.** Emitting a fresh `decided` row would create a duplicate (helper exits 3) or a parallel id for the same task. Re-emit the original block verbatim with `[scope] passthrough` and stop — no `append.sh decided` call, no new `decision_id`.
+
 ## Precedence (highest wins)
 
 1. **User-mandated protections** — verbatim phrases ("must have security review", "no direct push") OR `@opt-keep` markers. **Additive only, never override risk-bumped gates.** Markers force inclusion (`type=step|gate`) or refuse insertion (`type=skip`); they never weaken safety.
@@ -80,7 +82,9 @@ If the change touches any of: DB schema / migration, auth / permission boundary,
 - `@/path/to/file.json` — write fields to a tempfile if the JSON contains single quotes (e.g. user notes with `'`, Korean text, code snippets) to avoid shell-quote breakage
 - `-` — read JSON from stdin (e.g. `... | append.sh decided <task> -`)
 
-Required keys in `<fields>`: `scope_decided, tool_decided, explore_tool, skipped, added, preserved`. The helper allocates `decision_id` (format `opt-{compactISO}-{task-slug}`, globally unique by construction), captures token usage from the Claude Code transcript, enforces invariants (no duplicate active `decided` per task, no field-injection — helper-controlled fields like `decision_id`/`status` always win, JSON validation, portable atomic lock via `mkdir`), and prints the allocated `decision_id` on stdout. **Use that id verbatim in Step 2.**
+Required keys in `<fields>`: `scope_decided, tool_decided, explore_tool, skipped, added, preserved`. The helper allocates `decision_id` (format `opt-{compactISO}-{task-slug}`, globally unique by construction), captures the current Claude Code `session_id`, runs `utils/session-stats.sh <session_id>` to write a full sidecar snapshot (`~/.claude/opt-prompt/snapshots/<id>.decided.json`) and embeds a slim `session_summary` (tokens + 7 metrics — see `/opt-prompt-eval` SKILL for the field list) into the row. Enforces invariants (no duplicate active `decided` per task, no field-injection — helper-controlled fields always win, JSON validation, portable atomic lock via `mkdir`). Prints the allocated `decision_id` on stdout. **Use that id verbatim in Step 2.**
+
+Snapshot capture is **fail-soft**: if the session-stats binary or transcript is unreachable, the snapshot file is written as `{}` and `session_summary` becomes `null` — the row is still appended (sizing/decision is the invariant, telemetry is nice-to-have). Override the binary path with `OPT_PROMPT_STATS_BIN`, override the snapshot dir with `OPT_PROMPT_SNAPSHOTS_DIR` (both for tests).
 
 If the helper exits non-zero, surface its stderr to the user and do NOT bypass — the failure means an invariant was violated and a hand-rolled append would corrupt the log.
 
@@ -88,14 +92,14 @@ This ordering guarantees the row exists even if the turn is interrupted (user ca
 
 ### Helper exit codes & recovery (decided-relevant subset)
 
-| code | meaning                                        | recovery                                                                                                                                            |
-| ---- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | success                                        | proceed to Step 2 with the printed `decision_id`                                                                                                    |
-| 1    | usage error                                    | re-read the usage line in stderr; do not guess args                                                                                                 |
-| 2    | clock collision (same second + same task slug) | wait 1s and retry; never reuse another task's id                                                                                                    |
-| 3    | task already has active `decided`              | first run `/opt-prompt-eval` to void it (`append.sh void <id> decided '<reason>' <task>`) then re-run; **never fabricate** a new id                 |
-| 6    | lock timeout (10s)                             | another process holds the lock — check for hung helper, or stale `$LOG.lock.d` from SIGKILL; manually `rmdir` only after confirming no live process |
-| 7    | `<fields>` is not a JSON object                | re-emit valid JSON; for content with single quotes use `@file` or stdin                                                                             |
+| code | meaning                                        | recovery                                                                                                                                                                            |
+| ---- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | success                                        | proceed to Step 2 with the printed `decision_id`                                                                                                                                    |
+| 1    | usage error                                    | re-read the usage line in stderr; do not guess args                                                                                                                                 |
+| 2    | clock collision (same second + same task slug) | wait 1s and retry; never reuse another task's id                                                                                                                                    |
+| 3    | task already has active `decided`              | run `.claude/skills/opt-prompt/append.sh void <existing-id> decided '<reason>' <task>` directly (no skill needed for void), then re-run `/opt-prompt`. **Never fabricate** a new id |
+| 6    | lock timeout (10s)                             | another process holds the lock — check for hung helper, or stale `$LOG.lock.d` from SIGKILL; manually `rmdir` only after confirming no live process                                 |
+| 7    | `<fields>` is not a JSON object                | re-emit valid JSON; for content with single quotes use `@file` or stdin                                                                                                             |
 
 (Codes 4 and 5 are retro/void only — see `.claude/skills/opt-prompt-eval/SKILL.md`.)
 
@@ -299,8 +303,12 @@ Fix off-by-one in /api/admin/users pagination at backend/src/routes/admin.ts:142
 
 ## Closing reminder (emit at end of normalize output)
 
-After the `>>>` block, append **one short line** reminding the user that retro is now an explicit step:
+After the `>>>` block, append a **2-line reminder** showing both eval forms — same-session vs. cross-session:
 
-> `// reminder: when this task closes (PR merged or abandoned), invoke /opt-prompt-eval <decision_id> to record the retro JSONL row.`
+```
+// reminder: when this task closes (PR merged or abandoned), run one of:
+//   /opt-prompt-eval <decision_id>                              # same/live session — sid auto-detected
+//   /opt-prompt-eval <decision_id> --exec-sid <task-session-id> # if you /cleared between task and eval
+```
 
-Substitute the actual `decision_id` from Step 1. This single-line reminder replaces the previously implicit eval flow that lived in this same SKILL.md before the 2-skill split — without it, the retro phase risks being silently dropped.
+Substitute the actual `decision_id` from Step 1. The `--exec-sid` form is for when the task ran in a session that's no longer the latest (e.g., `/clear`'d between task and eval) — pass the original task-execution sid so retro stats reflect the actual work, not the eval-only session. If unsure, omit `--exec-sid` and the helper auto-falls-back to `decided.session_id` when its transcript still exists, else the current session.

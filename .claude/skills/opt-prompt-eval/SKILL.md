@@ -16,23 +16,28 @@ Sister skill to `opt-prompt` (normalize). This skill handles the **post-task ret
 
 ## Hard rule (read before anything else)
 
-> **Step 1 of EVERY `/opt-prompt-eval` invocation is `.claude/skills/opt-prompt/append.sh retro <decision_id> <fields>`** (or `append.sh void <decision_id> <decided|retro> <reason> [task]` for tombstones). No text output before the helper returns. Hand-rolled `cat >>` / `echo >>` to the log is forbidden — it bypasses uniqueness, active-decided invariant, token capture, and JSON validation. User cannot opt out: refuse "skip the JSONL row" requests; without the log, retro analysis is meaningless. If the helper exits non-zero, surface its stderr and STOP — do not bypass.
+> **Step 1 of EVERY `/opt-prompt-eval` invocation is `.claude/skills/opt-prompt/append.sh retro <decision_id> <fields>`** (or `append.sh void <decision_id> <decided|retro> <reason> [task]` for tombstones). No text output before the helper returns. Hand-rolled `cat >>` / `echo >>` to the log is forbidden — it bypasses uniqueness, active-decided invariant, session-stats capture (snapshot file + `session_summary` embedding), and JSON validation. User cannot opt out: refuse "skip the JSONL row" requests; without the log, retro analysis is meaningless. If the helper exits non-zero, surface its stderr and STOP — do not bypass.
 
-> **Helper location**: `.claude/skills/opt-prompt/append.sh` (lives next to the normalize skill — same script services both skills). **Log location**: `~/.claude/opt-prompt/opt-prompt-log.jsonl` (HOME-relative, survives branch switches). Override with `OPT_PROMPT_LOG=/abs/path` for tests.
+> **Helper location**: `.claude/skills/opt-prompt/append.sh` (lives next to the normalize skill — same script services both skills). **Log location**: `~/.claude/opt-prompt/opt-prompt-log.jsonl` (HOME-relative, survives branch switches). **Snapshot dir**: `~/.claude/opt-prompt/snapshots/<decision_id>.{decided,retro}.json` — full session-stats JSON per phase, written by the helper as a sidecar to the slim `session_summary` embedded in the row. Overrides for tests: `OPT_PROMPT_LOG=/abs/path`, `OPT_PROMPT_SNAPSHOTS_DIR=/abs/dir`, `OPT_PROMPT_STATS_BIN=/abs/session-stats.sh`.
 
 ## Workflow
 
-### Retro mode — `/opt-prompt-eval <decision_id>`
+### Retro mode — `/opt-prompt-eval <decision_id> [--exec-sid <sid>]`
 
 1. Confirm `<decision_id>` is provided. If missing, ask the user once: "Which decision_id? (format `opt-{compactISO}-{task-slug}`)". Never guess.
-2. Ask the **8 retro questions below**, one line each, in order.
-3. Build a JSON `<fields>` object from the answers.
-4. Invoke `.claude/skills/opt-prompt/append.sh retro <decision_id> <fields>` (use `@/tmp/file.json` or stdin `-` for fields containing single quotes / Korean / multiline).
-5. On success, surface the appended row's `decision_id` and `verdict` to the user. STOP — do not analyze.
+2. Parse optional `--exec-sid <session_id>` from the user's prompt. Pass it through to the helper unchanged. If the user typed it inside the literal command line (e.g., `/opt-prompt-eval opt-...-foo --exec-sid abc-123`), forward verbatim. Don't fabricate a sid if the user didn't supply one.
+3. Ask the **8 retro questions below**, one line each, in order.
+4. Build a JSON `<fields>` object from the answers.
+5. Invoke `.claude/skills/opt-prompt/append.sh retro <decision_id> <fields> [--exec-sid <sid>]` (use `@/tmp/file.json` or stdin `-` for fields containing single quotes / Korean / multiline). The helper resolves the snapshot session by precedence: **(B) explicit `--exec-sid`** > **(C) `decided.session_id`** if its transcript still exists > **current latest session**. Then runs `utils/session-stats.sh <resolved_sid>` to write `~/.claude/opt-prompt/snapshots/<decision_id>.retro.json`, and embeds the slim `session_summary` (tokens + 7 metrics) + `tokens_delta` (only when resolved sid matches decided sid; `null` otherwise) into the row.
+6. On success, surface the appended row's `decision_id` and `verdict` to the user. STOP — do not analyze.
+
+**When does `--exec-sid` matter?** If you ran `/opt-prompt`, then did the work, then `/clear`'d, then opened a fresh session for eval — the helper's auto-fallback (C) only works if the original transcript file still exists at `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/<sid>.jsonl`. It usually does (Claude Code keeps transcripts), so most of the time you can omit `--exec-sid` and trust auto-fallback. Pass it explicitly when (a) you want to be unambiguous about which session reflects the task, (b) the task ran in a different session from `/opt-prompt` (rare — e.g., decision in session A, but actual implementation in session B because you context-switched).
 
 ### Review mode — `/opt-prompt-eval --review`
 
 Read the log, join `decided` ↔ `retro` rows by `decision_id`, exclude `status:"void"`. Then report:
+
+**Tier 1 — qualitative cohorts (always):**
 
 - **Global**: hit rate (`correct` / non-void total). Require ≥5 non-void entries before any proposal is emitted.
 - **Per scope**: hit rate per `scope_decided`. Require ≥5 entries **for that scope** before flagging it. Scopes below threshold → counts only, no proposal.
@@ -40,6 +45,25 @@ Read the log, join `decided` ↔ `retro` rows by `decision_id`, exclude `status:
 - **Top 3 recurring `missed_gates`** (across all entries) → candidate additions to the normalize skill's Expand list.
 - **Top 3 recurring `unnecessary_gates`** → candidate removals from the rubric.
 - **Mis-routed cluster**: if `mis-routed` ≥3 entries, separate diagnosis — the rubric is fine, the tool selection logic isn't.
+
+**Tier 2 — quantitative cohorts from `session_summary` (when ≥5 retros have non-null `session_summary`):**
+
+Compare median values per verdict cohort. Require N≥5 in the cohort before reporting. Read directly from the JSONL row's `session_summary` — no sidecar load needed for these.
+
+- `tokens.grand_total` — `oversized` should not exceed `correct`; if it does, gates being added are paying for themselves in surprises elsewhere (or rubric is mis-classifying).
+- `cache_invalidation_events` — `undersized` cohort should be elevated (scope creep ⇒ context churn).
+- `subagent_calls` — same: elevated `subagent_calls` in `undersized`/`mis-routed` cohorts is a signal that the rubric under-allocated the workflow tier.
+- `bash_failures` — elevated in any cohort = pre-flight check candidate (e.g., `npm run lint` before commit).
+- `top3_tools` — recurring tool across cohorts (e.g., `Read` dominating across all `oversized` cases) suggests a routing rule violation worth surfacing.
+- `claudemd_reads` — high count across many tasks → CLAUDE.md slimming candidate (cache invalidation magnifier).
+
+**Tier 3 — sidecar deep-dive (only when Tier 2 flags a cohort):**
+
+When a Tier 2 metric flags a cohort, read the per-row `~/.claude/opt-prompt/snapshots/<id>.{decided,retro}.json` for the affected ids and look at fields not in `session_summary`: `by_prompt[]` for which user prompts dominated tokens, `tool_use_details.read.top_files` for which files were over-read, `subagents.agents[]` for which subagent type/prompt drove cost, `pause_distribution` for human-in-the-loop gaps. Use these to make the proposal **specific** ("rubric should down-weight tasks where top read file is `frontend/CLAUDE.md` ×N").
+
+**Cross-session caveat**: when `session_id_decided != session_id_retro`, `tokens_delta` is `null` and Tier-2 token comparisons are invalid for that row. Other Tier-2 metrics (counts, tool patterns) still reflect the retro session and are usable, but flag the cohort as cross-session-mixed in the report.
+
+**Backwards-compat for legacy rows**: rows written before this scheme have no `session_summary` — fall back to top-level `tokens_at_decision`/`tokens_at_retro`/`tokens_delta` if present, else exclude from Tier-2.
 
 Output is **proposals only**. Never edit the normalize SKILL.md automatically. The user reviews and accepts changes manually.
 
@@ -64,6 +88,11 @@ Q4/Q5 use a controlled vocabulary so "Top 3 recurring" aggregation works. Free t
 .claude/skills/opt-prompt/append.sh retro <decision_id> @/tmp/retro.json
 echo '{"outcome":"as-planned",...}' | .claude/skills/opt-prompt/append.sh retro <decision_id> -
 
+# Optional: --exec-sid <sid> tells the helper which session to snapshot for retro stats.
+# Use when the task ran in a session different from the latest (e.g., /clear'd between task and eval).
+# Precedence: explicit --exec-sid > decided.session_id (if its transcript still exists) > current latest.
+.claude/skills/opt-prompt/append.sh retro <decision_id> @/tmp/retro.json --exec-sid c4b8a60b-fa3f-4335-9540-9f607f69074d
+
 # void: 4th arg [task] is REQUIRED for legacy collision rows where decision_id is shared across tasks
 .claude/skills/opt-prompt/append.sh void <decision_id> <decided|retro> '<reason>' [task]
 # Reasons containing single quotes / Korean / multiline: use a heredoc-fed variable to avoid shell-quote breakage:
@@ -78,14 +107,14 @@ EOF
 
 ## Helper exit codes (eval-relevant subset)
 
-| code | meaning                         | recovery                                                                                                                            |
-| ---- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | success                         | proceed; surface appended row to user                                                                                               |
-| 1    | usage error                     | re-read the usage line in stderr; do not guess args                                                                                 |
-| 4    | `retro` w/o active `decided`    | investigate why decided is missing; if voided, ask user to run a new `/opt-prompt` first; do NOT hand-write the retro               |
-| 5    | `void` target not found         | the row may already be voided, or the id/task is wrong; inspect with `jq` before retrying                                           |
-| 6    | lock timeout (10s)              | another process holds the lock — check for hung helper, or stale `$LOG.lock.d` from SIGKILL; manually `rmdir` only after confirming |
-| 7    | `<fields>` is not a JSON object | re-emit valid JSON; for content with single quotes use `@file` or stdin                                                             |
+| code | meaning                         | recovery                                                                                                                                                      |
+| ---- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | success                         | proceed; surface appended row to user                                                                                                                         |
+| 1    | usage error                     | re-read the usage line in stderr; do not guess args                                                                                                           |
+| 4    | `retro` w/o active `decided`    | STOP and tell the user verbatim: "Run `/opt-prompt <task>` first to mint a new decided row; this skill cannot mint decided rows." Do NOT hand-write the retro |
+| 5    | `void` target not found         | the row may already be voided, or the id/task is wrong; inspect with `jq` before retrying                                                                     |
+| 6    | lock timeout (10s)              | another process holds the lock — check for hung helper, or stale `$LOG.lock.d` from SIGKILL; manually `rmdir` only after confirming                           |
+| 7    | `<fields>` is not a JSON object | re-emit valid JSON; for content with single quotes use `@file` or stdin                                                                                       |
 
 (Full table including `decided`-only codes lives in `.claude/skills/opt-prompt/SKILL.md`.)
 
@@ -104,11 +133,22 @@ All rows carry `status: "active" | "void"` at the top level. Append-only — to 
   "decision_id": "opt-20260503T120000Z-issue-155",
   "phase": "decided",
   "status": "active",
-  "tokens_at_decision": {
-    "input": 8421,
-    "output": 312,
-    "cache_read": 51200,
-    "cache_creation": 1024,
+  "session_id": "c4b8a60b-fa3f-4335-9540-9f607f69074d",
+  "session_summary": {
+    "api_calls": 14,
+    "tokens": {
+      "input_uncached": 8421,
+      "cache_create": 1024,
+      "cache_read": 51200,
+      "output": 312,
+      "grand_total": 60957,
+    },
+    "cache_invalidation_events": 0,
+    "bash_failures": 0,
+    "subagent_calls": 0,
+    "top3_tools": { "Read": 6, "Bash": 3, "Edit": 2 },
+    "claudemd_reads": 1,
+    "p90_pause_min": 0.04,
   },
   "scope_decided": "small",
   "tool_decided": "direct",
@@ -119,6 +159,8 @@ All rows carry `status: "active" | "void"` at the top level. Append-only — to 
 }
 ```
 
+Sidecar (full session-stats JSON, ~5–500 KB) lives at `~/.claude/opt-prompt/snapshots/<decision_id>.decided.json` for Tier-3 deep-dive. Slim `session_summary` (above) is enough for Tier-1/Tier-2 review without opening the sidecar.
+
 **Phase 2 — `retro`** (written by THIS skill via `append.sh retro` after task close):
 
 ```jsonc
@@ -128,13 +170,31 @@ All rows carry `status: "active" | "void"` at the top level. Append-only — to 
   "decision_id": "opt-20260503T120000Z-issue-155",
   "phase": "retro",
   "status": "active",
-  "tokens_at_retro": {
-    "input": 52310,
-    "output": 1820,
-    "cache_read": 412800,
-    "cache_creation": 8192,
+  "session_id": "c4b8a60b-fa3f-4335-9540-9f607f69074d",
+  "session_summary": {
+    "api_calls": 47,
+    "tokens": {
+      "input_uncached": 52310,
+      "cache_create": 8192,
+      "cache_read": 412800,
+      "output": 1820,
+      "grand_total": 475122,
+    },
+    "cache_invalidation_events": 1,
+    "bash_failures": 1,
+    "subagent_calls": 0,
+    "top3_tools": { "Read": 18, "Bash": 12, "Edit": 6 },
+    "claudemd_reads": 3,
+    "p90_pause_min": 6.1,
+    // tokens_delta is null when session_id_decided != session_id_retro
+    "tokens_delta": {
+      "input_uncached": 43889,
+      "cache_create": 7168,
+      "cache_read": 361600,
+      "output": 1508,
+      "grand_total": 414165,
+    },
   },
-  "tokens_delta": { "input": 43889, "output": 1508, "cache_read": 361600, "cache_creation": 7168 },
   "outcome": "as-planned", // as-planned | expanded | shrunk
   "tool_swapped": false,
   "missed_gates": [], // controlled vocab: migration|contract-test|auth-test|screenshot|regression-test|other:<tag>
@@ -145,6 +205,8 @@ All rows carry `status: "active" | "void"` at the top level. Append-only — to 
   "verdict": "correct", // correct | undersized | oversized | mis-routed | scope-creep
 }
 ```
+
+Sidecar at `~/.claude/opt-prompt/snapshots/<decision_id>.retro.json` mirrors the decided sidecar.
 
 **Tombstone — `status:"void"`** (written by `append.sh void`):
 
@@ -167,15 +229,16 @@ Helper guarantees `decision_id` is globally unique going forward. Legacy rows fr
 
 ## Token-delta usage for skill optimization
 
-`tokens_delta` (computed automatically from `tokens_at_retro − tokens_at_decision`) is the cost signal for tuning the normalize skill itself.
+`session_summary.tokens_delta` (computed automatically from retro − decided session-stats output, but **only when both phases ran in the same Claude Code session** — `null` otherwise) is the cost signal for tuning the normalize skill itself.
 
 **Methodology:**
 
-- **Cost metric**: `tokens_delta.input + tokens_delta.cache_creation`. `cache_read` is ~10% of input price and largely shared across variants — exclude unless directly comparing cache-discipline changes.
-- **Drop outliers**: any sample where ANY of `input | output | cache_read | cache_creation` is **negative** is contaminated (compaction event, session restart, transcript rotation between decision and retro). Discard, do not clamp to 0.
-- **Retro-overhead bias**: `tokens_at_retro` is captured during the retro turn itself, so it includes the cost of running the eval (skill load + 8 questions). This adds a roughly constant overhead to every sample. Comparison is valid only between variants measured the **same way** (both via `/opt-prompt-eval`); don't compare a delta from this scheme against a delta computed differently.
-- **Sample size**: require **N ≥ 5** non-outlier retros per variant before computing the median. Below that the IQR exceeds typical inter-variant differences and conclusions are noise.
-- **Reporting**: report median + IQR (not mean) — distribution is right-skewed (long-tail expanded tasks). Lower is better at fixed `verdict` quality; if `verdict` distribution differs across variants, the cheaper variant is not necessarily better.
+- **Cost metric**: `session_summary.tokens_delta.input_uncached + session_summary.tokens_delta.cache_create`. `cache_read` is ~10% of input price and largely shared across variants — exclude unless directly comparing cache-discipline changes.
+- **Drop nulls and outliers**: rows with `tokens_delta == null` are cross-session (decided and retro happened in different Claude Code sessions) — exclude from cost analysis. Other Tier-2 metrics still apply. Any sample where `input_uncached` or `cache_create` is **negative** is contaminated (compaction event, transcript rotation) — discard, don't clamp. Negative `cache_read`/`output` may legitimately occur (lighter retro session, fewer outputs) and are kept.
+- **Retro-overhead bias**: retro session-stats is captured during the retro turn itself, so it includes the cost of running the eval (skill load + 8 questions + session-stats invocation). Roughly constant overhead per sample. Comparison is valid only between variants measured the **same way** (both via `/opt-prompt-eval`).
+- **Sample size**: require **N ≥ 5** non-null, non-outlier retros per variant before computing the median.
+- **Reporting**: report median + IQR (not mean) — distribution is right-skewed. Lower is better at fixed `verdict` quality; if `verdict` distribution differs across variants, the cheaper variant is not necessarily better.
+- **Legacy rows**: rows from before the session_summary scheme have top-level `tokens_at_decision`/`tokens_at_retro`/`tokens_delta` with the older 4-key shape (`input/output/cache_read/cache_creation`). Map old `cache_creation` → new `cache_create` and old `input` → new `input_uncached` when including legacy rows in a variant comparison.
 
 ## Verdict derivation
 
@@ -191,8 +254,10 @@ Evaluated in order; first match wins:
 ## Anti-patterns
 
 - Don't run `/opt-prompt-eval` mid-task; only after the task is closed (PR merged or abandoned).
-- Don't hand-roll JSONL with `cat >>` / `echo >>`; always go through `append.sh`. Hand-rolled appends bypass the uniqueness check, the active-decided check, the token capture, and the JSON validation, and they reintroduce the exact failure class this scheme exists to prevent.
+- Don't hand-roll JSONL with `cat >>` / `echo >>`; always go through `append.sh`. Hand-rolled appends bypass the uniqueness check, the active-decided check, the session-stats snapshot/`session_summary` capture, and the JSON validation, and they reintroduce the exact failure class this scheme exists to prevent.
 - Don't backfill `decided` rows from this skill — `append.sh decided` is the normalize skill's responsibility, written at decision time. If a `decided` row is missing or voided, ask the user to re-run `/opt-prompt` for that task first.
 - Don't rewrite past entries; the log is append-only. To void an entry, run `append.sh void <decision_id> <decided|retro> <reason>`. Analysis takes the latest row per `(decision_id, phase)` and treats `status:"void"` as exclusion.
 - Don't size, normalize, or rewrite a fresh prompt here — that is the `/opt-prompt` skill's job. Refuse and redirect.
 - Don't auto-trigger on `eval` / `retro` / `review` keywords; only on explicit `/opt-prompt-eval`.
+- **`/clear` between task and eval gives bogus retro stats** — if you `/clear`'d and the new session can't reach the original task transcript, retro `session_summary` will reflect only the eval session (tiny `api_calls`, near-zero deltas), `tokens_delta` will be `null`, and the row's `session_id` won't match the decided `session_id`. Recovery: `append.sh void <id> retro 'wrong session captured'` then `/opt-prompt-eval <id> --exec-sid <original-task-sid>`. Find the original sid via `ls -t ~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/*.jsonl`. Confirm by comparing the row's `session_id` against decided's.
+- **Don't run `/opt-prompt-eval --review` while tasks are mid-flight** — before analysis, count active `decided` rows with no matching active `retro`. If >0, print `WARNING: N tasks in-flight (no retro yet) — excluded from cohort analysis` and list their `decision_id`s, then proceed with the rest. Mid-flight rows are not voided, just excluded from this run's cohort math.
