@@ -105,7 +105,21 @@
 
 검증 칸은 `docs/specs/reviews/token-discipline-verification.md`로 분리되어 있음. 다음 fresh 세션이 그 문서의 row를 직접 채움.
 
-### 2단계 — 다음 세션 작업: 본 브랜치 1.2-A 적용 (batch 1 잔여)
+### 다음 세션 진입점 (2026-05-04+)
+
+**우선 작업: 검증 가이드 문서 신규 작성** — fresh 세션이 PR #184 (main merged) 적용 전후 비교 측정을 일관 절차로 수행할 수 있게 하는 단일 진입 문서. 위치 후보: `docs/specs/reviews/token-discipline-test-guide.md` (verification.md와 별도 — verification.md는 row 박제용, test-guide는 measurement 절차 SOP).
+
+문서 골격 후보:
+
+- 측정 환경 정의 (fresh 세션 = 새 Claude Code 인스턴스, vocpage 디렉토리 진입, baseline 5K 이내 컨텍스트)
+- baseline (PR #184 직전 main commit `668eaaa`) vs after (`6fc1cbe`) 측정 protocol
+- 5건 patch별 절감 계산 절차 (cache_creation / cache_read / cost\* 0.05·0.10·0.15 가중치 sensitivity)
+- 측정 task 표준화 (예: PR#175/178/180/182 reproduction task 3-5종 + retro JSONL 비교)
+- verdict 기준 (PASS / FAIL / NEEDS-REVIEW) + verification.md row 채우는 방법
+
+**그 후 batch 2 진입 결정** — verification 측정 결과 보고 1.1-B / 1.1-C / 1.2-B / 1.3-B / Tier 2 / 1.5 중 ROI 높은 순으로.
+
+### 2단계 (완료) — 본 브랜치 1.2-A 적용 (batch 1 잔여)
 
 **현황 (2026-05-03 본 세션 결과)**:
 
@@ -120,8 +134,8 @@
 **전략**:
 
 1. ✅ 본 브랜치 위에서 1.2-A 직접 적용 완료 (4 commit).
-2. ⏳ 다음 단계 — 별도 브랜치를 main에서 분기 → 1.3-A + 1.4 + 1.1-A + 2.5 + 1.2-A = 총 5건을 한 묶음으로 main 머지.
-3. ⏳ 검증 (verification 문서 row 채움)은 main 머지된 5건을 fresh 세션이 한 번에 처리.
+2. ✅ main 분기 + 5건 한 묶음 머지 완료 — **PR #184 merged 2026-05-03 (merge commit `6fc1cbe`)**. 분기 브랜치 `feat/token-discipline-batch1` 6 commit (1.4 / 2.5 QW / 1.2-A step 1·2·3 / docs/specs/README.md align). PR 본문은 generic 표현 (Tier·token-discipline 명칭 회피, blind test 보존). 1.3-A + 1.1-A는 외부 settings 변경이라 repo cherry-pick 없음 — PR 본문/changelog 메타로만.
+3. ⏳ 검증 (verification 문서 row 채움)은 main 머지된 5건 효과를 fresh 세션이 처리. 검증 가이드 문서는 다음 세션에서 신규 작성 (아래 §"다음 세션 진입점" 참조).
 
 **1.2-A 작업 (적용 완료)**:
 
