@@ -15,13 +15,31 @@ export interface VocAdvancedFiltersValue {
 
 export interface VocAdvancedFiltersProps {
   open: boolean;
-  onToggle: () => void;
   assignees: AssigneeListItem[];
   tags: TagListItem[];
   vocTypes: VocTypeListItem[];
   value: VocAdvancedFiltersValue;
   onChange: (next: VocAdvancedFiltersValue) => void;
   onReset: () => void;
+}
+
+export interface VocAdvancedFiltersToggleProps {
+  open: boolean;
+  onToggle: () => void;
+}
+
+export function VocAdvancedFiltersToggle({ open, onToggle }: VocAdvancedFiltersToggleProps) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="advanced-filters-toggle"
+    >
+      <SlidersHorizontal className="advanced-filters-toggle-icon" aria-hidden />
+      필터 더보기
+    </button>
+  );
 }
 
 const PRIORITIES: ReadonlyArray<{ value: VocPriority; label: string }> = [
@@ -82,7 +100,6 @@ function ChipGroup<T extends string>({
 
 export function VocAdvancedFilters({
   open,
-  onToggle,
   assignees,
   tags,
   vocTypes,
@@ -91,62 +108,49 @@ export function VocAdvancedFilters({
   onReset,
 }: VocAdvancedFiltersProps) {
   return (
-    <div className="flex flex-col">
-      {/* Toggle row — intentionally outside data-pcomp root so harness measures panel only */}
-      <div className="advanced-filters-toggle-row">
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          className="advanced-filters-toggle"
-        >
-          <SlidersHorizontal className="advanced-filters-toggle-icon" aria-hidden />
-          필터 더보기
-        </button>
+    <div
+      data-pcomp="voc-advanced-filters"
+      className={open ? 'advanced-filters advanced-filters--open' : 'advanced-filters'}
+      aria-hidden={!open}
+    >
+      <div className="advanced-filters-grid-wrapper">
         {open && (
-          <button type="button" onClick={onReset} className="advanced-filters-reset">
-            <X className="advanced-filters-toggle-icon" aria-hidden />
-            초기화
-          </button>
-        )}
-      </div>
-      {/* Panel — always rendered; grid-template-rows + aria-hidden drive open/closed state */}
-      <div
-        data-pcomp="voc-advanced-filters"
-        className={open ? 'advanced-filters advanced-filters--open' : 'advanced-filters'}
-        aria-hidden={!open}
-      >
-        <div className="advanced-filters-grid-wrapper">
-          <div className="advanced-filters-grid">
-            <ChipGroup
-              groupId="adv-assignees"
-              label="담당자"
-              items={assignees.map((a) => ({ value: a.id, label: a.display_name }))}
-              selected={value.assignees}
-              onToggleItem={(next) => onChange({ ...value, assignees: next })}
-            />
-            <ChipGroup
-              groupId="adv-priorities"
-              label="우선순위"
-              items={PRIORITIES}
-              selected={value.priorities}
-              onToggleItem={(next) => onChange({ ...value, priorities: next as VocPriority[] })}
-            />
-            <ChipGroup
-              groupId="adv-voc-types"
-              label="유형"
-              items={vocTypes.map((t) => ({ value: t.id, label: t.name }))}
-              selected={value.voc_type_ids}
-              onToggleItem={(next) => onChange({ ...value, voc_type_ids: next })}
-            />
-            <ChipGroup
-              groupId="adv-tags"
-              label="태그"
-              items={tags.map((t) => ({ value: t.id, label: t.name }))}
-              selected={value.tag_ids}
-              onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
-            />
+          <div className="advanced-filters-panel-header">
+            <button type="button" onClick={onReset} className="advanced-filters-reset">
+              <X className="advanced-filters-toggle-icon" aria-hidden />
+              초기화
+            </button>
           </div>
+        )}
+        <div className="advanced-filters-grid">
+          <ChipGroup
+            groupId="adv-assignees"
+            label="담당자"
+            items={assignees.map((a) => ({ value: a.id, label: a.display_name }))}
+            selected={value.assignees}
+            onToggleItem={(next) => onChange({ ...value, assignees: next })}
+          />
+          <ChipGroup
+            groupId="adv-priorities"
+            label="우선순위"
+            items={PRIORITIES}
+            selected={value.priorities}
+            onToggleItem={(next) => onChange({ ...value, priorities: next as VocPriority[] })}
+          />
+          <ChipGroup
+            groupId="adv-voc-types"
+            label="유형"
+            items={vocTypes.map((t) => ({ value: t.id, label: t.name }))}
+            selected={value.voc_type_ids}
+            onToggleItem={(next) => onChange({ ...value, voc_type_ids: next })}
+          />
+          <ChipGroup
+            groupId="adv-tags"
+            label="태그"
+            items={tags.map((t) => ({ value: t.id, label: t.name }))}
+            selected={value.tag_ids}
+            onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
+          />
         </div>
       </div>
     </div>

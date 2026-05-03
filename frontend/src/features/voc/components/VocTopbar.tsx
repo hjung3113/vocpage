@@ -50,7 +50,7 @@ export function VocTopbar({
           role="searchbox"
           aria-label="검색"
           type="search"
-          placeholder="검색..."
+          placeholder="제목, 본문 검색..."
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           className="pl-8"

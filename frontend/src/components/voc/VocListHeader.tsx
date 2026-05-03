@@ -27,9 +27,9 @@ interface CellDef {
 const CELLS: CellDef[] = [
   { key: 'expand', label: '' },
   { key: 'issue_code', label: '이슈 ID', sortKey: 'issue_code' },
-  { key: 'title', label: '제목' },
+  { key: 'title', label: '제목', sortKey: 'title' },
   { key: 'status', label: '상태', sortKey: 'status' },
-  { key: 'assignee', label: '담당자' },
+  { key: 'assignee', label: '담당자', sortKey: 'assignee' },
   { key: 'priority', label: '우선순위', sortKey: 'priority' },
   { key: 'created_at', label: '등록일', sortKey: 'created_at' },
 ];

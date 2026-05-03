@@ -6,12 +6,19 @@ import { VocStatusBadge } from './VocStatusBadge';
 import { VocPriorityBadge } from './VocPriorityBadge';
 import { VocAssignee } from './VocAssignee';
 import { VocTagPill } from './VocTagPill';
+import { VocTypeBadge } from './VocTypeBadge';
 
 type VocRowData = VocListResponse['rows'][number];
+
+export interface VocTypeMapEntry {
+  slug: string;
+  name: string;
+}
 
 export interface VocRowProps {
   row: VocRowData;
   assigneeMap: Record<string, string>;
+  vocTypeMap?: Record<string, VocTypeMapEntry>;
   selected?: boolean;
   onClick: () => void;
 }
@@ -26,7 +33,8 @@ const CONTAINER_STYLE: CSSProperties = {
   borderBottom: '1px solid var(--border-subtle)',
 };
 
-export function VocRow({ row, assigneeMap, selected = false, onClick }: VocRowProps) {
+export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick }: VocRowProps) {
+  const vocType = vocTypeMap?.[row.voc_type_id];
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -54,6 +62,7 @@ export function VocRow({ row, assigneeMap, selected = false, onClick }: VocRowPr
       </div>
 
       <div role="gridcell" className="voc-row-title">
+        {vocType && <VocTypeBadge slug={vocType.slug} name={vocType.name} />}
         <span className="voc-title-text">{row.title}</span>
         {row.tags.length > 0 && (
           <div className="tag-row">

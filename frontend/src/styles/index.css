@@ -396,12 +396,10 @@ body {
 /* === C-8 VocSortChips styles END === */
 
 /* === C-9 VocAdvancedFilters styles START === */
-.advanced-filters-toggle-row {
+.advanced-filters-panel-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 24px;
-  background: var(--bg-panel);
+  justify-content: flex-end;
+  padding: 6px 24px 0;
 }
 .advanced-filters-toggle {
   display: inline-flex;
