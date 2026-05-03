@@ -15,12 +15,9 @@ If this PR closes a phase / wave / PR, do this once before the merge:
 4. `git mv` finished plans under `docs/specs/plans/` to `plans/done/`.
 5. If a merged phase is quoted by an active doc, inline the fact or keep only a link (no archive citations).
 6. Append a one-line Changelog entry to the relevant `phase-*.md` (date + ID + summary).
-7. **Refresh `CLAUDE.md` for every folder this PR touched — only if it earns its tokens.** A redundant child is a net loss (auto-loaded on entry).
-   - **Update** when role / "when to look where" / cross-file invariants changed.
-   - **Create only if** the folder carries signal a future session can't infer from the folder name, parent `CLAUDE.md`, or a single `ls`.
-   - **Do not create** in: `__tests__/`, `__snapshots__/`, `cache/`, `done/`, leaf `screenshots/`, gitignored runtime dirs, dot-folders.
-   - **Delete** an existing child if its content collapses to a paraphrase of the folder name or parent.
-   - Scope: only `## Role` and `## When to look where` sections.
+7. **CLAUDE.md 8-keep set** — only `root`, `.claude`, `frontend`, `backend`, `frontend/src`, `backend/src`, `docs`, `prototype`. Update one of these only if its `## Role` / `## When to look where` changed in this PR.
+   - No new leaf CLAUDE.md outside the 8-keep set — fold any directory guidance into the nearest ancestor.
+   - No stub on delete — `→ ancestor.md` one-liners are auto-loaded noise.
 8. Re-verify typecheck/lint clean.
 
 **Exceptions:** `docs/<topic>` branch or trivial 1-line fixes may skip. User decides.
