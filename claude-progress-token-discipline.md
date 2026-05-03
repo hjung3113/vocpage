@@ -55,16 +55,29 @@
 
 본 브랜치 PR #177은 **머지하지 않음** (blind test 환경 보존). 다음 세션이 본 브랜치 위에서 plan §8 실행.
 
+### Tier 1.3-A 적용 결과 (2026-05-03 세션, 미검증)
+
+이중 등록 실측 확인 후 plugin form 제거 + matcher 정리 완료. **변경 자체는 다음 fresh 세션에서 발효**됨.
+
+| 파일                                     | 변경                                                                                     | 백업            |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------- | --------------- |
+| `vocpage/.claude/settings.local.json:13` | `serena@claude-plugins-official: true → false`                                           | `.bak.20260503` |
+| `~/.claude/settings.json:61`             | PostToolUse matcher `mcp__serena__.*\|mcp__plugin_serena_serena__.*` → `mcp__serena__.*` | `.bak.20260503` |
+
+근거: direct serena (`~/.claude.json:2208`, `/Users/hyojung/.local/bin/serena`)는 `--context=claude-code`로 surface 18개(심볼 위주)만 노출, plugin form은 풀 surface 29개 노출. plugin에만 있는 11개(`search_for_pattern`, `find_file`, `list_dir`, `execute_shell_command`, `read_file`, `find_declaration`, `find_implementations`, `activate_project`, `create_text_file`, `get_current_config`, `get_diagnostics_for_file`)는 vocpage 룰상 native 도구로 대체 가능.
+
+**다음 세션 검증 체크리스트** (Tier 1.4 시작 전 반드시 통과):
+
+1. `claude mcp list | grep -i serena` → `serena: serena start-mcp-server …` 1줄만 보여야 함 (`plugin:serena:serena` 사라짐)
+2. deferred tools list에서 `mcp__plugin_serena_serena__*` prefix 0건 + `mcp__serena__*` 18개 잔존
+3. `vocpage/.claude/settings.json`의 `serena-hooks` 훅이 정상 fire하는지 (PreToolUse / SessionStart / Stop) — 세션 로그에 hook output 확인
+4. 어느 항목 하나라도 실패하면 즉시 rollback: `mv .bak.20260503 원본` (두 파일)
+
 ### 2단계 — plan §8 실행 순서 (v4.1: 1.3-A + 1.4 옵션 E 우선)
 
 ```
-1. Tier 1.3-A — Serena 이중 등록 정리 (우선)
-   - 사전 trace: cat ~/.claude/claude_desktop_config.json 2>/dev/null;
-     ls -la ~/.claude/mcp*.json 2>/dev/null;
-     ls -la ~/.claude/plugins/**/serena* 2>/dev/null;
-     grep -rn "plugin_serena_serena\|mcp__serena__" ~/.claude/*.json 2>/dev/null | head -20
-   - 0건이면 즉시 stop, 사용자 인계
-   - 백업(.bak.YYYYMMDD) → plugin namespace entry 제거 → JSON validate
+1. Tier 1.3-A — Serena 이중 등록 정리 (우선)  ✅ 적용 완료 (2026-05-03), 검증 미완
+   - 검증: 위 체크리스트 4항 통과 후 다음 단계로
 
 2. Tier 1.4 옵션 E — opt-prompt SKILL을 2 skill로 split (우선)
    - .claude/skills/opt-prompt/ → normalize 모드만 (1–277 + 407–452 잔류)
