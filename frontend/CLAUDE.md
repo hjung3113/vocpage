@@ -63,3 +63,11 @@ Full token reference: `docs/specs/requires/uidesign.md §10 CSS Reference` and `
 - Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)
 
 Key tokens: `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--brand)` / `var(--accent)` / `var(--text-primary)` / `var(--text-secondary)`
+
+## Sub-tree map (non-src)
+
+- `docs/` — FE-local notes/screenshots. Canonical specs = root `docs/specs/`. Wave-scoped FE evidence → `docs/screenshots/<wave>/`.
+- `e2e/` — Playwright (page-spanning flows, real-browser regressions: focus/keyboard/scroll). Component/unit tests → Vitest under `src/**/__tests__/`.
+- `eslint-rules/` — project-local custom ESLint (e.g. token-purity: no hex/raw OKLCH outside `src/tokens.ts`). Wired in `.eslintrc.base.js`.
+- `public/` — Vite static assets, served verbatim from site root. Self-hosted webfonts (Pretendard Variable UI, D2Coding code) in `public/fonts/`, referenced by `@font-face` in `src/styles/`. Typography spec: `uidesign.md`.
+- `src/` — see `src/CLAUDE.md`.

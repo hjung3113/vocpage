@@ -118,3 +118,14 @@ A refactor changes structure without changing observable behavior. Refactor and 
 ## Graphify
 
 Knowledge graph at `graphify-out/`. Triggered by the routing rule above (architecture / dependency / cross-domain flow questions only). Prefer `graphify-out/wiki/index.md` over raw files; specific queries via `/graphify query|path|explain`. After modifying code files, run `graphify update .` to keep the graph current.
+
+## Top-level directories
+
+- `benchmark/` — visual ground-truth PNGs (`01-…`–`22-…`) compared by `scripts/visual-diff.ts`. Index: `INDEX.md`. New screen = baseline + INDEX row.
+- `graphify-out/` — auto-generated knowledge-graph output. Do not hand-edit. Architecture/community Q → `GRAPH_REPORT.md` or `wiki/index.md`. Refresh: `graphify update .`.
+- `scripts/` — repo utilities. Fixture↔seed parity: `check-fixture-seed-parity.ts`. Shadcn token rewrite: `shadcn-token-rewrite.ts`. Visual diff: `visual-diff.ts` + `visual-diff/` (helpers + `__tests__/`).
+- `shared/` — types/zod-schemas/fixtures used by **both** FE+BE.
+  - `shared/types/` — TS domain entities/enums/response shapes. Single-side types stay in that side.
+  - `shared/contracts/` — zod schemas (FE forms + BE route input, single source). Sub-trees: `voc/`, `notification/`, `master/` (source data in `backend/config/masters/`).
+  - `shared/fixtures/` — FE MSW + BE seed shared data; parity enforced by `scripts/check-fixture-seed-parity.ts`.
+  - REST contract reference → `shared/openapi.yaml`.
