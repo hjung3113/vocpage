@@ -4,7 +4,7 @@ VOC(Voice of Customer) 관리 시스템 — 사내 분석 시스템에 통합되
 
 Linear의 간결한 UX + Jira의 관리 기능을 결합. Samsung Blue 디자인 시스템 (OS 테마 자동 연동, dark/light 양방향 지원).
 
-> **현재 상태**: Phase 8 Wave 1 종료 + Wave 1.5 보강 대기. `/voc` 리스트 + 검토 드로어 vertical slice 가 React + Express + PostgreSQL 로 동작 중이며, prototype 시각 깊이 보강 PR 진입 전입니다. Wave 0~5 정본 plan: [`docs/specs/plans/phase-8.md`](docs/specs/plans/phase-8.md).
+> **현재 상태**: Phase 8 Wave 1.6 진행 중 (`/voc` prototype parity, Phase C δ-batch — C-12 머지, C-13 다음). Wave 1.5 시각 동등화 + Playwright e2e 머지 완료, Wave 1.7 Phase A(VOC 등록 모달 spec/contract, PR #185) 머지 완료. Wave 0~5 정본 plan: [`docs/specs/plans/phase-8.md`](docs/specs/plans/phase-8.md). 진행 포인터: [`claude-progress.txt`](claude-progress.txt) (첫 30줄).
 
 ---
 

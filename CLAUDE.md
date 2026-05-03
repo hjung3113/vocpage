@@ -72,6 +72,14 @@ No implementation without a written spec section covering it.
 
 Documentation hygiene canonical source: **`docs/specs/README.md`**. Consult it before creating, moving, or cleaning up any doc.
 
+**Index IDs (Wave / Phase / Task / FU)** — when assigning, citing, or closing any ID, consult these three canonical sources:
+
+- Rules — `docs/specs/README.md §7` (R1–R7: append-only / flat integer / grouping is metadata / Issue# is cross-ref / no bundle IDs / closed waves use FU bucket / one work unit per ID)
+- Wave lineage + batch glossary — `docs/specs/plans/wave-index.md`
+- Follow-up flat-ID register — `docs/specs/plans/followup-bucket.md`
+
+Before assigning a new ID, check the next free integer in `wave-index.md`. Follow-ups against closed waves get the next `FU-NNN` in `followup-bucket.md`. On merge, update the status column in both docs and sync the first 30 lines of `claude-progress.txt`.
+
 ## Input Interpretation
 
 Normalize a request into this frame before coding. Ask only about items that materially affect the result; otherwise state the assumption and proceed.
