@@ -115,43 +115,45 @@ export function VocAdvancedFilters({
     >
       <div className="advanced-filters-grid-wrapper">
         {open && (
-          <div className="advanced-filters-panel-header">
-            <button type="button" onClick={onReset} className="advanced-filters-reset">
-              <X className="advanced-filters-toggle-icon" aria-hidden />
-              초기화
-            </button>
-          </div>
+          <>
+            <div className="advanced-filters-panel-header">
+              <button type="button" onClick={onReset} className="advanced-filters-reset">
+                <X className="advanced-filters-toggle-icon" aria-hidden />
+                초기화
+              </button>
+            </div>
+            <div className="advanced-filters-grid">
+              <ChipGroup
+                groupId="adv-assignees"
+                label="담당자"
+                items={assignees.map((a) => ({ value: a.id, label: a.display_name }))}
+                selected={value.assignees}
+                onToggleItem={(next) => onChange({ ...value, assignees: next })}
+              />
+              <ChipGroup
+                groupId="adv-priorities"
+                label="우선순위"
+                items={PRIORITIES}
+                selected={value.priorities}
+                onToggleItem={(next) => onChange({ ...value, priorities: next as VocPriority[] })}
+              />
+              <ChipGroup
+                groupId="adv-voc-types"
+                label="유형"
+                items={vocTypes.map((t) => ({ value: t.id, label: t.name }))}
+                selected={value.voc_type_ids}
+                onToggleItem={(next) => onChange({ ...value, voc_type_ids: next })}
+              />
+              <ChipGroup
+                groupId="adv-tags"
+                label="태그"
+                items={tags.map((t) => ({ value: t.id, label: t.name }))}
+                selected={value.tag_ids}
+                onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
+              />
+            </div>
+          </>
         )}
-        <div className="advanced-filters-grid">
-          <ChipGroup
-            groupId="adv-assignees"
-            label="담당자"
-            items={assignees.map((a) => ({ value: a.id, label: a.display_name }))}
-            selected={value.assignees}
-            onToggleItem={(next) => onChange({ ...value, assignees: next })}
-          />
-          <ChipGroup
-            groupId="adv-priorities"
-            label="우선순위"
-            items={PRIORITIES}
-            selected={value.priorities}
-            onToggleItem={(next) => onChange({ ...value, priorities: next as VocPriority[] })}
-          />
-          <ChipGroup
-            groupId="adv-voc-types"
-            label="유형"
-            items={vocTypes.map((t) => ({ value: t.id, label: t.name }))}
-            selected={value.voc_type_ids}
-            onToggleItem={(next) => onChange({ ...value, voc_type_ids: next })}
-          />
-          <ChipGroup
-            groupId="adv-tags"
-            label="태그"
-            items={tags.map((t) => ({ value: t.id, label: t.name }))}
-            selected={value.tag_ids}
-            onToggleItem={(next) => onChange({ ...value, tag_ids: next })}
-          />
-        </div>
       </div>
     </div>
   );

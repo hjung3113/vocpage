@@ -78,6 +78,13 @@ describe('VocAdvancedFilters', () => {
     expect(onReset).toHaveBeenCalledTimes(1);
   });
 
+  it('codex-fix: no chip buttons in DOM when closed (no aria-hidden focus trap)', () => {
+    renderClosed();
+    expect(screen.queryByRole('button', { name: /김관리/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /긴급/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /초기화/ })).not.toBeInTheDocument();
+  });
+
   it('flips aria-hidden on the panel when open toggles', () => {
     const { rerender } = renderClosed();
     const panel = document.querySelector('[data-pcomp="voc-advanced-filters"]');
