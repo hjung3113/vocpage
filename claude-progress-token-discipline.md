@@ -102,13 +102,14 @@
 
 검증 칸은 `docs/specs/reviews/token-discipline-verification.md`로 분리되어 있음. 다음 fresh 세션이 그 문서의 row를 직접 채움.
 
-### 2단계 — 다음 세션 작업: batch 1 적용 + main 머지 (검증은 그 다음 세션)
+### 2단계 — 다음 세션 작업: 본 브랜치에 batch 1 적용
 
-**전략 결정 (2026-05-03 사용자 확정)**:
+**전략 (2026-05-03 사용자 확정, 명확히)**:
 
-- 검증은 **나중에 한꺼번에**. 이번 batch 1 + 이미 적용된 1.3-A + 1.4 까지 합쳐서 fresh 세션 1회로 verification 문서 일괄 채움.
-- 본 `docs/token-discipline-plan` 브랜치는 plan + verification 본문용으로 **계속 유지** (PR #177 머지 보류).
-- batch 1은 별도 신규 브랜치 `feat/token-discipline-batch1` (또는 동등 이름)을 main에서 분기 → 3 commit → PR → main 머지.
+1. **다음 세션은 본 브랜치 (`docs/token-discipline-plan`) 위에서 그대로 진행** — 신규 브랜치 만들지 말 것.
+2. 본 브랜치에 batch 1 (1.2-A + 1.1-A + 2.5 Quick Wins, 3건) 3 commit 적용.
+3. **그 이후 별도 브랜치를 main에서 분기 → 1.3-A + 1.4 + batch 1 = 총 5건을 한 묶음으로 main에 머지** (5 commit cherry-pick 또는 squash).
+4. 검증 (verification 문서 row 채움)은 main 머지된 5건을 fresh 세션이 한 번에 처리.
 
 **batch 1 — 부작용 거의 없는 + 거의 확실한 3개 (최종 확정)**:
 
@@ -133,13 +134,13 @@
 - **1.3-B** (SessionStart Serena schema pre-load): paired test 권장.
 - **Tier 2** (CLAUDE.md routing 룰 강화): 행동 교정 측면 — Quick Wins와 효과 분리 위해 batch 2로.
 
-**verification 문서 운영**: 다음 fresh 세션이 batch 1 + 1.3-A + 1.4 = 5건을 한 번에 측정·verdict. 그 결과 보고 batch 2 (남은 항목 = 1.1-B / 1.1-C / 1.2-B / 1.3-B / Tier 2 / 1.5 등) 진행 여부 결정.
+**verification 문서 운영**: main에 5건 머지 후 fresh 세션 1회로 일괄 측정·verdict. 결과 보고 batch 2 (남은 항목 = 1.1-B / 1.1-C / 1.2-B / 1.3-B / Tier 2 / 1.5 등) 진행 여부 결정.
 
-### 3단계 — batch 1 main 머지 후
+### 3단계 — 5건 main 머지 후
 
-- main `claude-progress.txt`에 batch 1 적용 사실 1블록 추가 (이 브랜치 progress 파일과 별개)
-- PR #177 (이 브랜치) 본 plan + verification 추적 용도로 계속 OPEN 유지
-- 다음 fresh 세션이 본 파일과 verification 문서를 동시에 업데이트
+- main `claude-progress.txt`에 5건 적용 사실 1블록 추가 (이 브랜치 progress 파일과 별개)
+- 본 브랜치는 plan + verification 추적용으로 계속 유지 (PR #177 OPEN)
+- 다음 fresh 세션이 본 파일 + verification 문서 동시 업데이트
 
 ---
 
