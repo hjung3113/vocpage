@@ -23,6 +23,8 @@ export interface VocAdvancedFiltersProps {
   onReset: () => void;
 }
 
+export const VOC_ADVANCED_FILTERS_PANEL_ID = 'voc-advanced-filters-panel';
+
 export interface VocAdvancedFiltersToggleProps {
   open: boolean;
   onToggle: () => void;
@@ -34,6 +36,7 @@ export function VocAdvancedFiltersToggle({ open, onToggle }: VocAdvancedFiltersT
       type="button"
       onClick={onToggle}
       aria-expanded={open}
+      aria-controls={VOC_ADVANCED_FILTERS_PANEL_ID}
       className="advanced-filters-toggle"
     >
       <SlidersHorizontal className="advanced-filters-toggle-icon" aria-hidden />
@@ -109,6 +112,7 @@ export function VocAdvancedFilters({
 }: VocAdvancedFiltersProps) {
   return (
     <div
+      id={VOC_ADVANCED_FILTERS_PANEL_ID}
       data-pcomp="voc-advanced-filters"
       className={open ? 'advanced-filters advanced-filters--open' : 'advanced-filters'}
       aria-hidden={!open}

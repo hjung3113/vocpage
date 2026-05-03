@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import { VocAdvancedFilters, VocAdvancedFiltersToggle } from '../VocAdvancedFilters';
+import {
+  VOC_ADVANCED_FILTERS_PANEL_ID,
+  VocAdvancedFilters,
+  VocAdvancedFiltersToggle,
+} from '../VocAdvancedFilters';
 import type {
   AssigneeListItem,
   TagListItem,
@@ -122,5 +126,18 @@ describe('VocAdvancedFiltersToggle (F-3)', () => {
       'aria-expanded',
       'true',
     );
+  });
+
+  it('toggle aria-controls matches the panel id (a11y wiring)', () => {
+    const { unmount } = render(<VocAdvancedFiltersToggle open={false} onToggle={vi.fn()} />);
+    const toggleBtn = screen.getByRole('button', { name: /필터 더보기/ });
+    const controlsId = toggleBtn.getAttribute('aria-controls');
+    expect(controlsId).toBe(VOC_ADVANCED_FILTERS_PANEL_ID);
+    unmount();
+
+    renderClosed();
+    const panel = document.getElementById(controlsId!);
+    expect(panel).not.toBeNull();
+    expect(panel).toHaveAttribute('data-pcomp', 'voc-advanced-filters');
   });
 });

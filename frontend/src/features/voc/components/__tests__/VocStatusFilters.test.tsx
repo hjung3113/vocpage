@@ -49,4 +49,24 @@ describe('VocStatusFilters', () => {
     // After removing '접수' from ['접수'], result should be empty array
     expect(onChange).toHaveBeenCalledWith([]);
   });
+
+  it('renders rightSlot ReactNode at the end of the row when provided', () => {
+    render(
+      <VocStatusFilters
+        value="all"
+        onChange={() => {}}
+        rightSlot={<button type="button">필터 더보기</button>}
+      />,
+    );
+    // 7 buttons total: 6 status pills + 1 rightSlot button
+    expect(screen.getAllByRole('button')).toHaveLength(7);
+    expect(screen.getByRole('button', { name: /필터 더보기/ })).toBeInTheDocument();
+  });
+
+  it('omits rightSlot wrapper when rightSlot is not provided', () => {
+    const { container } = render(<VocStatusFilters value="all" onChange={() => {}} />);
+    // Only the 6 pill buttons; no extra wrapper
+    expect(screen.getAllByRole('button')).toHaveLength(6);
+    expect(container.querySelectorAll('.ml-auto')).toHaveLength(0);
+  });
 });
