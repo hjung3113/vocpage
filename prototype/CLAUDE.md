@@ -45,3 +45,12 @@ Full reference: `docs/specs/requires/uidesign.md §10 CSS Reference`. Every colo
 ## graphify
 
 After modifying prototype HTML files, run `graphify update .` from the project root to keep the knowledge graph current.
+
+## Sub-tree map
+
+- `css/` — split modules (each ≤500 lines). Spec: `uidesign.md §10`. Tokens defined at top of the prototype CSS chain.
+  - `css/admin/` — admin-page-only styles (tag rules, system menu, VOC type, users, notices, FAQ admin). Cross-page → `components/` or `layout/`.
+  - `css/components/` — reusable component styles (cards, buttons, badges, drawers, modals, tables). Visual reference for an FE component being implemented.
+  - `css/layout/` — app shell, grid, structural layout (navbar, sidebar, page frame proportions).
+- `js/` — 16+ classic-script modules. Mock data (source of truth for prototype-driven UX) → `data.js`; data exposed on `window` via explicit aliases (classic-script gotcha — `const NOTICES` doesn't auto-attach). Stage A-2/A-4 split rationale → `docs/specs/plans/done/prototype-phase7-wave3-plan.md`.
+- `scripts/` — Playwright smoke verification + tooling helpers. Generated graph artifacts → `graphify-out/`.
