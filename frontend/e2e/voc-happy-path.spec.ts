@@ -45,10 +45,9 @@ test.describe('VOC happy path', () => {
       timeout: 8_000,
     });
 
-    // 8. Switch to history tab inside the drawer
-    await page.click('[role="tab"]:has-text("변경이력")');
-
-    // History list should render at least one entry (fixtures have 5 entries for VOC_FIXTURES[0])
+    // 8. History section is now flat-rendered (Wave 1.6 C-13 — Tabs replaced with sections).
+    //    History list should render at least one entry without any tab interaction.
+    //    (fixtures have 5 entries for VOC_FIXTURES[0])
     const historyPanel = page.locator('[data-testid="drawer-history"]');
     await expect(historyPanel).toBeVisible();
     await expect(historyPanel.locator('li').first()).toBeVisible({ timeout: 5_000 });

@@ -13,6 +13,7 @@ export type ComponentId =
   | 'voc-create-modal'
   | 'voc-notif-dropdown'
   | 'voc-review-drawer'
+  | 'voc-review-sections'
   | 'notification-bell'
   | 'pagination'
   | 'data-table'
@@ -87,6 +88,14 @@ export const SELECTOR_MAP: readonly SelectorEntry[] = [
     // openDrawer() shows #drawer; use it as the structural root
     proto: '#drawer',
     react: '[data-pcomp="voc-review-drawer"]',
+    isOverlay: true,
+  },
+  {
+    componentId: 'voc-review-sections',
+    // Wave 1.6 C-13: prototype has no tab UI — flat .d-section siblings.
+    // Structural root: #drawerBody (the section column inside the drawer).
+    proto: '#drawerBody',
+    react: '[data-pcomp="voc-review-sections"]',
     isOverlay: true,
   },
   {

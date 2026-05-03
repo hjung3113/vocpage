@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { TabsContent } from '../../../components/ui/tabs';
 import { Button } from '../../../components/ui/button';
 import { Textarea } from '../../../components/ui/textarea';
 import { LoadingState } from '../../../components/common/LoadingState';
@@ -29,30 +28,35 @@ export function VocCommentsPanel({
 }: CommentsPanelProps) {
   const [body, setBody] = useState('');
   return (
-    <TabsContent value="comments" data-testid="drawer-notes">
+    <section data-testid="drawer-notes" className="flex flex-col gap-2">
+      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+        코멘트
+      </h3>
       {notesLoading && <LoadingState />}
       {!notesLoading && notes && notes.length === 0 && (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           아직 작성된 코멘트가 없습니다.
         </p>
       )}
-      <ul className="flex flex-col gap-2">
-        {notes?.map((n) => (
-          <li
-            key={n.id}
-            className="rounded border p-2 text-sm"
-            style={{ borderColor: 'var(--border-standard)' }}
-          >
-            <div className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-              {n.created_at.slice(0, 16).replace('T', ' ')}
-            </div>
-            {n.body}
-          </li>
-        ))}
-      </ul>
+      {notes && notes.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {notes.map((n) => (
+            <li
+              key={n.id}
+              className="rounded border p-2 text-sm"
+              style={{ borderColor: 'var(--border-standard)' }}
+            >
+              <div className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+                {n.created_at.slice(0, 16).replace('T', ' ')}
+              </div>
+              {n.body}
+            </li>
+          ))}
+        </ul>
+      )}
       {canWrite && (
         <form
-          className="mt-3 flex flex-col gap-2"
+          className="mt-1 flex flex-col gap-2"
           onSubmit={(e) => {
             e.preventDefault();
             if (body.trim()) {
@@ -72,7 +76,7 @@ export function VocCommentsPanel({
           </Button>
         </form>
       )}
-    </TabsContent>
+    </section>
   );
 }
 
@@ -83,7 +87,10 @@ interface AttachmentsPanelProps {
 
 export function VocAttachmentsPanel({ items, canUpload }: AttachmentsPanelProps) {
   return (
-    <TabsContent value="attachments" data-testid="drawer-attachments">
+    <section data-testid="drawer-attachments" className="flex flex-col gap-2">
+      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+        첨부
+      </h3>
       {items.length === 0 ? (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           첨부 파일이 없습니다.
@@ -113,11 +120,17 @@ export function VocAttachmentsPanel({ items, canUpload }: AttachmentsPanelProps)
         </ul>
       )}
       {canUpload && (
-        <Button type="button" size="sm" className="mt-3" disabled aria-label="첨부 업로드">
+        <Button
+          type="button"
+          size="sm"
+          className="mt-1 self-start"
+          disabled
+          aria-label="첨부 업로드"
+        >
           파일 업로드
         </Button>
       )}
-    </TabsContent>
+    </section>
   );
 }
 
@@ -136,29 +149,34 @@ const FIELD_LABEL: Record<string, string> = {
 
 export function VocHistoryPanel({ entries, loading }: HistoryPanelProps) {
   return (
-    <TabsContent value="history" data-testid="drawer-history">
+    <section data-testid="drawer-history" className="flex flex-col gap-2">
+      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+        변경이력
+      </h3>
       {loading && <LoadingState />}
       {!loading && entries && entries.length === 0 && (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           변경 이력이 없습니다.
         </p>
       )}
-      <ol className="flex flex-col gap-2">
-        {entries?.map((h) => (
-          <li
-            key={h.id}
-            className="rounded border p-2 text-xs"
-            style={{ borderColor: 'var(--border-standard)' }}
-          >
-            <div style={{ color: 'var(--text-secondary)' }}>
-              {h.changed_at.slice(0, 16).replace('T', ' ')}
-            </div>
-            <div style={{ color: 'var(--text-primary)' }}>
-              {FIELD_LABEL[h.field] ?? h.field}: {h.old_value ?? '∅'} → {h.new_value ?? '∅'}
-            </div>
-          </li>
-        ))}
-      </ol>
-    </TabsContent>
+      {entries && entries.length > 0 && (
+        <ol className="flex flex-col gap-2">
+          {entries.map((h) => (
+            <li
+              key={h.id}
+              className="rounded border p-2 text-xs"
+              style={{ borderColor: 'var(--border-standard)' }}
+            >
+              <div style={{ color: 'var(--text-secondary)' }}>
+                {h.changed_at.slice(0, 16).replace('T', ' ')}
+              </div>
+              <div style={{ color: 'var(--text-primary)' }}>
+                {FIELD_LABEL[h.field] ?? h.field}: {h.old_value ?? '∅'} → {h.new_value ?? '∅'}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
   );
 }
