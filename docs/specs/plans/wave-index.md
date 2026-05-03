@@ -5,17 +5,17 @@
 
 ## Wave 계보
 
-| Wave    | 범위 (한 줄)                                                                          | 상태                   | 정본 plan                                                                                      |
-| ------- | ------------------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------- |
-| 0       | Foundation (shared, shadcn, TanStack Query, MSW, AppShell, Zod, ESLint, CI)           | ✅ PR #102             | [`phase-8.md`](./phase-8.md)                                                                   |
-| 1       | 기준 화면 — VOC 리스트 + 검토 드로어 vertical slice + RTL 보강                        | ✅ PR #110~#114        | [`phase-8.md §Wave 1`](./phase-8.md)                                                           |
-| **1.5** | Wave 1 보강 — `/voc` 시각 동등화 + Playwright e2e (token-only)                        | ✅ PR #125             | (archive: `wave1.5-followup-a-*`)                                                              |
-| **1.6** | `/voc` prototype 100% 일치화 — Phase A 분해 / B 토큰 / C 컴포넌트 rebuild 19 / D 검증 | 🟡 진행 중 (Phase C δ) | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) + [룰북](./wave-1-6-phase-c-precedent.md) |
-| **1.7** | VOC 등록 모달 정합화 — A spec → B BE → C FE → D visual                                | 🟡 Phase A 머지        | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md)                               |
-| 2       | Dashboard + 위젯 8종                                                                  | ⛔ Wave 1.6 종료 후    | (예정)                                                                                         |
-| 3       | Admin 4 화면 (Tag Master / Trash / External Masters / Users)                          | 대기                   | (예정)                                                                                         |
-| 4       | 공지/FAQ + Notice popup                                                               | 대기                   | (예정)                                                                                         |
-| 5       | 알림 + 셸 마감 + 시각 회귀 12 화면                                                    | close gate             | (예정)                                                                                         |
+| Wave    | 범위 (한 줄)                                                                                                  | 상태                     | 정본 plan                                                                                      |
+| ------- | ------------------------------------------------------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------- |
+| 0       | Foundation (shared, shadcn, TanStack Query, MSW, AppShell, Zod, ESLint, CI)                                   | ✅ PR #102               | [`phase-8.md`](./phase-8.md)                                                                   |
+| 1       | 기준 화면 — VOC 리스트 + 검토 드로어 vertical slice + RTL 보강                                                | ✅ PR #110~#114          | [`phase-8.md §Wave 1`](./phase-8.md)                                                           |
+| **1.5** | Wave 1 보강 — `/voc` 시각 동등화 + Playwright e2e (token-only)                                                | ✅ PR #125               | (archive: `wave1.5-followup-a-*`)                                                              |
+| **1.6** | `/voc` prototype 100% 일치화 — Phase A 분해 / B 토큰 / C 컴포넌트 rebuild 19 + η 4 (2026-05-04 추가) / D 검증 | 🟡 진행 중 (Phase C δ→η) | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) + [룰북](./wave-1-6-phase-c-precedent.md) |
+| **1.7** | VOC 등록 모달 정합화 — A spec → B BE → C FE → D visual                                                        | 🟡 Phase A 머지          | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md)                               |
+| 2       | Dashboard + 위젯 8종                                                                                          | ⛔ Wave 1.6 종료 후      | (예정)                                                                                         |
+| 3       | Admin 4 화면 (Tag Master / Trash / External Masters / Users)                                                  | 대기                     | (예정)                                                                                         |
+| 4       | 공지/FAQ + Notice popup                                                                                       | 대기                     | (예정)                                                                                         |
+| 5       | 알림 + 셸 마감 + 시각 회귀 12 화면                                                                            | close gate               | (예정)                                                                                         |
 
 > **Decimal Wave 주의**: 1.5/1.6/1.7은 grandfather. 본 인덱스 규칙(R1) 적용 이후 추가되는 wave는 정수 (Wave 6, 7…) 로 진행.
 

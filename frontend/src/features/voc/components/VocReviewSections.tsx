@@ -28,16 +28,8 @@ export function VocCommentsPanel({
 }: CommentsPanelProps) {
   const [body, setBody] = useState('');
   return (
-    <section
-      data-testid="drawer-notes"
-      aria-labelledby="voc-section-comments"
-      className="flex flex-col gap-2"
-    >
-      <h3
-        id="voc-section-comments"
-        className="text-xs font-medium"
-        style={{ color: 'var(--text-secondary)' }}
-      >
+    <section data-testid="drawer-notes" className="flex flex-col gap-2">
+      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
         코멘트
       </h3>
       {notesLoading && <LoadingState />}
@@ -95,16 +87,8 @@ interface AttachmentsPanelProps {
 
 export function VocAttachmentsPanel({ items, canUpload }: AttachmentsPanelProps) {
   return (
-    <section
-      data-testid="drawer-attachments"
-      aria-labelledby="voc-section-attachments"
-      className="flex flex-col gap-2"
-    >
-      <h3
-        id="voc-section-attachments"
-        className="text-xs font-medium"
-        style={{ color: 'var(--text-secondary)' }}
-      >
+    <section data-testid="drawer-attachments" className="flex flex-col gap-2">
+      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
         첨부
       </h3>
       {items.length === 0 ? (
@@ -165,16 +149,8 @@ const FIELD_LABEL: Record<string, string> = {
 
 export function VocHistoryPanel({ entries, loading }: HistoryPanelProps) {
   return (
-    <section
-      data-testid="drawer-history"
-      aria-labelledby="voc-section-history"
-      className="flex flex-col gap-2"
-    >
-      <h3
-        id="voc-section-history"
-        className="text-xs font-medium"
-        style={{ color: 'var(--text-secondary)' }}
-      >
+    <section data-testid="drawer-history" className="flex flex-col gap-2">
+      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
         변경이력
       </h3>
       {loading && <LoadingState />}
