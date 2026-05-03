@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react'; // within: 변경이력 섹션 listitem scoping
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VocReviewDrawer } from '../VocReviewDrawer';
@@ -68,19 +67,21 @@ function renderDrawer(
   );
 }
 
-describe('VocReviewDrawer — Wave D D1', () => {
+describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
 
-  it('렌더링 후 tablist + 3 tabs (코멘트/첨부/변경이력) 노출', async () => {
+  it('탭 UI 없이 3개 섹션(코멘트/첨부/변경이력) 동시 노출', async () => {
     renderDrawer('manager', target.id);
-    await waitFor(() => expect(screen.getByRole('tablist')).toBeInTheDocument());
-    expect(screen.getByRole('tab', { name: '코멘트' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '첨부' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '변경이력' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('drawer-notes')).toBeInTheDocument());
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    expect(screen.queryAllByRole('tab')).toHaveLength(0);
+    expect(screen.getByTestId('drawer-notes')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-attachments')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-history')).toBeInTheDocument();
   });
 
   it('role=user → 코멘트 작성 form 미노출 + 첨부 업로드 button 미노출', async () => {
@@ -90,15 +91,12 @@ describe('VocReviewDrawer — Wave D D1', () => {
     expect(screen.queryByLabelText('첨부 업로드')).not.toBeInTheDocument();
   });
 
-  it('role=manager → 3 영역 모두 가시 + 작성 form 노출', async () => {
+  it('role=manager → 3 섹션 모두 가시 + 작성 form 노출', async () => {
     renderDrawer('manager', target.id);
     await waitFor(() => expect(screen.getByLabelText('new note')).toBeInTheDocument());
-    // 첨부 패널 / 이력 패널은 Tabs 내부 mount 기본 활성 시 hidden 상태일 수 있어
-    // testid 기준 존재 자체만 확인 (Radix Tabs는 다른 패널을 unmount 하지 않음).
     expect(screen.getByTestId('drawer-notes')).toBeInTheDocument();
-    // 다른 탭 컨텐츠는 활성 탭 변경 시 표시되므로 트리거 존재로 대체.
-    expect(screen.getByRole('tab', { name: '첨부' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '변경이력' })).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-attachments')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-history')).toBeInTheDocument();
   });
 
   it('deleted_at !== null + role !== admin → VocPermissionGate(reason="deleted") 렌더', async () => {
@@ -109,12 +107,13 @@ describe('VocReviewDrawer — Wave D D1', () => {
     expect(screen.queryByTestId('drawer-notes')).not.toBeInTheDocument();
   });
 
-  it('변경이력 탭 클릭 시 timeline listitem 노출', async () => {
+  it('변경이력 섹션에 timeline listitem 즉시 노출 (탭 클릭 불필요)', async () => {
     renderDrawer('manager', target.id);
-    await waitFor(() => expect(screen.getByTestId('drawer-notes')).toBeInTheDocument());
-    const historyTab = screen.getByRole('tab', { name: '변경이력' });
-    await userEvent.click(historyTab);
-    await waitFor(() => expect(screen.getAllByRole('listitem').length).toBeGreaterThanOrEqual(1));
+    await waitFor(() => expect(screen.getByTestId('drawer-history')).toBeInTheDocument());
+    await waitFor(() => {
+      const history = screen.getByTestId('drawer-history');
+      expect(within(history).getAllByRole('listitem').length).toBeGreaterThanOrEqual(1);
+    });
   });
 
   it('403 에러 시 VocPermissionGate 표시', async () => {

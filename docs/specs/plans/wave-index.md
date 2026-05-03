@@ -23,14 +23,15 @@
 
 > Wave 1.6 Phase C는 19 rebuild를 6 batch + addendum + audit으로 묶음. **batch 라벨은 plan doc 표 안의 grouping 메타데이터일 뿐 ID 아님** (R3).
 
-| Batch | 의미                                                  | 컴포넌트 (leaf)                                                                |
-| ----- | ----------------------------------------------------- | ------------------------------------------------------------------------------ |
-| α     | Badge primitive + leaf 컴포넌트 (의존성 가장 적음)    | C-2.6 / C-3 / C-4 / C-5 / C-6 / C-7 (+ pre-α: C-2.5 audit / B-add-2 chip 토큰) |
-| β     | Sort / Filter / Notification (서로 독립, 3 슬롯 병렬) | C-8 / C-9 / C-10                                                               |
-| γ     | Modal + atom 동봉                                     | C-11                                                                           |
-| **δ** | **Drawer shell + tabs (sequential)**                  | **C-12** ✅ / **C-13** ⏳                                                      |
-| ε     | Drawer 본문 컴포넌트 (3 슬롯 병렬)                    | C-14 / C-15 / C-16                                                             |
-| ζ     | Sidebar / Topbar (sequential — popover 의존)          | C-17 / C-18 / C-19                                                             |
+| Batch | 의미                                                  | 컴포넌트 (leaf)                                                                                       |
+| ----- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| α     | Badge primitive + leaf 컴포넌트 (의존성 가장 적음)    | C-2.6 / C-3 / C-4 / C-5 / C-6 / C-7 (+ pre-α: C-2.5 audit / B-add-2 chip 토큰)                        |
+| β     | Sort / Filter / Notification (서로 독립, 3 슬롯 병렬) | C-8 / C-9 / C-10                                                                                      |
+| γ     | Modal + atom 동봉                                     | C-11                                                                                                  |
+| **δ** | **Drawer shell + flat-section refactor (sequential)** | **C-12** ✅ / **C-13** ⏳ (rename: VocReviewTabs → VocReviewSections, 탭 폐기)                        |
+| ε     | Drawer 본문 컴포넌트 (3 슬롯 병렬)                    | C-14 / C-15 / C-16                                                                                    |
+| ζ     | Sidebar / Topbar (sequential — popover 의존)          | C-17 / C-18 / C-19                                                                                    |
+| η     | Drawer 추가 섹션 (4 슬롯 병렬, prototype 일치)        | C-20 VocTagPills / C-21 VocActivityTimeline / C-22 VocAttachmentUploadZone / C-23 VocErrorSimSelector |
 
 Phase D = 종합 검증 (visual-diff SKIP 0, E2E 그린, 토큰 lint, 사용자 최종 승인).
 

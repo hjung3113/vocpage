@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../../components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -31,7 +30,7 @@ import {
   VocAttachmentsPanel,
   VocHistoryPanel,
   type AttachmentItem,
-} from './VocReviewTabs';
+} from './VocReviewSections';
 import { VocReviewMetaPanel } from './VocReviewMetaPanel';
 
 const STATUS_LOCK_TITLE = '결과 검토가 승인되어 상태 변경이 잠겨 있습니다.';
@@ -179,12 +178,7 @@ export function VocReviewDrawer({
                 </Select>
               </label>
             </div>
-            <Tabs defaultValue="comments" className="flex flex-col gap-3">
-              <TabsList>
-                <TabsTrigger value="comments">코멘트</TabsTrigger>
-                <TabsTrigger value="attachments">첨부</TabsTrigger>
-                <TabsTrigger value="history">변경이력</TabsTrigger>
-              </TabsList>
+            <div className="flex flex-col gap-4" data-pcomp="voc-review-sections">
               <VocCommentsPanel
                 notes={notes}
                 notesLoading={notesLoading}
@@ -196,7 +190,7 @@ export function VocReviewDrawer({
               />
               <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
               <VocHistoryPanel entries={history.data} loading={history.isLoading} />
-            </Tabs>
+            </div>
           </div>
         )}
       </DialogContent>
