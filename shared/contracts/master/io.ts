@@ -47,6 +47,10 @@ export type VocTypeListItem = z.infer<typeof VocTypeListItem>;
 export const VocTypeListResponse = z.object({ rows: z.array(VocTypeListItem) });
 export type VocTypeListResponse = z.infer<typeof VocTypeListResponse>;
 
+// `is_archived`는 schema 레벨에서는 boolean 허용 (Admin 단독 endpoint
+// `GET /api/masters/menus?includeArchived=true`에서 true 행 포함). VOC 등록
+// 모달의 cascade 응답(`GET /api/masters/systems`)은 BE에서 archived 행을
+// 제외하고 반환 — feature-voc.md §9.11.6 + §8.8.
 export const MenuListItem = z.object({
   id: Uuid,
   system_id: Uuid,

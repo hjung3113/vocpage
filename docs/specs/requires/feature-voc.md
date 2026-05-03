@@ -215,6 +215,7 @@ function assertCanManageVoc(
 - 허용 형식: PNG, JPG, GIF, WebP (이미지만)
 - 최대 크기: 10MB / 파일
 - 최대 개수: 5개 / VOC (본문 기준. 댓글 이미지는 별도)
+- **합산 cap (Wave 1.7, 2026-05-03)**: VOC 등록 모달에서는 본문 inline 이미지 + 첨부 zone 이미지 **유니크 합집합 기준 5개 / 합산 10MB**로 cap 적용 (§9.11.2 dedup 룰: name+size+lastModified). 드로어 편집(`PATCH /api/vocs/:id` + `POST /api/attachments`)에서도 동일 합산 룰 적용. 댓글 첨부는 별도 cap (§8.13).
 - 업로드 검증: MIME 스니핑 + 확장자 일치 검증. 실행 파일 헤더 차단. SVG 명시적 차단 (XSS 위험).
 - 파일 서빙: `Content-Disposition: attachment` 강제 (인라인 렌더링 방지).
 - GIF 크기 검증: 원본 파일 바이트 기준 (디코딩 전 raw bytes).
@@ -482,6 +483,7 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 - "시스템 추가" / "메뉴 추가" 버튼 → 인라인 폼
 - 시스템 추가 시 "기타" 메뉴 자동 생성 (알림 표시)
 - 아카이브 처리 시 신규 VOC 등록에서 선택 불가, 기존 데이터는 유지
+- **Admin 페이지 master 조회 (Wave 1.7)**: 메뉴 단독 CRUD는 `GET /api/masters/menus?system_id=<uuid>&includeArchived=true` 호출. 기본값(`includeArchived=false`)은 활성 메뉴만 — 등록 모달 cascade와 동일 응답. Admin 테이블은 `includeArchived=true`로 아카이브 행 포함 표시 (상태 컬럼으로 구분).
 
 #### 9.4.3 유형 관리
 
@@ -755,6 +757,6 @@ prototype `prototype.html#modalBg` 시각 사양을 React 모달(`features/voc/c
 
 #### 9.11.6 master 데이터 의존
 
-- `GET /api/master/systems` 응답에 `menus: MenuListItem[]` nested 포함 — 모달은 단일 호출로 cascade 데이터 확보.
-- Admin 페이지의 메뉴 단독 CRUD에는 `GET /api/master/menus?system_id=` 별도 endpoint 사용 (§9.4.2).
+- `GET /api/masters/systems` 응답에 `menus: MenuListItem[]` nested 포함 — 모달은 단일 호출로 cascade 데이터 확보.
+- Admin 페이지의 메뉴 단독 CRUD에는 `GET /api/masters/menus?system_id=` 별도 endpoint 사용 (§9.4.2).
 - 스키마: `shared/contracts/master/io.ts` (Wave 1.7에서 신규 추가).

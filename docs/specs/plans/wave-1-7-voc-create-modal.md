@@ -34,7 +34,7 @@
 | D4  | 본문↔첨부 동기화   | 단방향 (본문→첨부 추가/제거), 첨부→본문 자동삽입 안 함. Dedup name+size+lastModified.                                                     |
 | D5  | 5개·10MB cap       | 본문+첨부 **합산** (§8.5:217 "본문 기준" 재해석)                                                                                          |
 | D6  | 우선순위 UI        | 항상 disabled, 라벨 `우선순위 (자동: Medium · 생성 후 조정)`, value 고정 `medium`                                                         |
-| D7  | master 응답 형태   | `GET /api/master/systems` nested(`menus[]` 포함) + `GET /api/master/menus?system_id=` 별도 endpoint 둘 다 제공. 모달은 nested 사용.       |
+| D7  | master 응답 형태   | `GET /api/masters/systems` nested(`menus[]` 포함) + `GET /api/masters/menus?system_id=` 별도 endpoint 둘 다 제공. 모달은 nested 사용.     |
 | D8  | 메뉴 활성 0건 표시 | 메뉴 select disabled + 안내 `"이 시스템에 등록된 메뉴가 없습니다"` (§8.8:261)                                                             |
 | D9  | PR 단위            | Phase A 1 PR (spec/contract) / Phase B 1 PR (BE master endpoints) / Phase C 1 PR (FE 모달 rebuild) / Phase D 1 PR (visual diff + cleanup) |
 | D10 | 게이트             | 각 Phase 종료 시 사용자 승인 없으면 다음 Phase 시작 금지                                                                                  |
@@ -48,10 +48,16 @@ Phase A — Spec & Contract  (코드 0줄, 이번 작업으로 진입)
   ├─ shared/contracts/master/io.ts: SystemListItem/MenuListItem ✅
   └─ 사용자 승인 게이트
 
-Phase B — BE Master Endpoints (TDD)
-  ├─ 실패 테스트: GET /api/master/systems (nested menus), GET /api/master/menus?system_id=
-  ├─ Express route + zod validation + DB 쿼리 (systems LEFT JOIN menus, is_archived 필터)
-  ├─ MSW v2 handler 동기화 (`frontend/src/mocks/handlers/master.ts`)
+Phase B — BE Master Endpoints + VOC Create Enforcement (TDD)
+  ├─ 실패 테스트:
+  │   - GET /api/masters/systems (nested menus, is_archived=false 응답에서 제외)
+  │   - GET /api/masters/menus?system_id=<uuid>&includeArchived=true|false (Admin 단독)
+  │   - POST /api/vocs: client priority='urgent' 보내도 DB에 'medium' 저장 (§8.4 강제)
+  │   - POST /api/vocs: due_date 미제공 시 created_at + 30d 자동 계산 저장 (§8.4.1)
+  ├─ Express route 추가 (mastersRouter에 systems/menus 핸들러)
+  ├─ DB 쿼리: systems + menus aggregation (1 query LEFT JOIN + JSON_AGG, 또는 2 query in-memory grouping — 기존 backend/src/repository 패턴 따름)
+  ├─ Service 변경: createVoc()에서 priority 무조건 'medium', due_date = NOW()::date + 30 자동 세팅 (§8.4·8.4.1)
+  ├─ MSW v2 handler 동기화 (`frontend/src/mocks/handlers/masters.ts`)
   └─ 통합 테스트 + 사용자 승인 게이트
 
 Phase C — FE Modal Rebuild (TDD)
@@ -64,14 +70,15 @@ Phase C — FE Modal Rebuild (TDD)
   │   - 본문 skeleton 초기값 검증
   │   - 본문 이미지 삽입 → 첨부 추가 (mock blob hook)
   │   - 본문 이미지 제거 → 첨부 제거
-  │   - 합산 5개 cap 검증
+  │   - 합산 5개 cap 검증 (본문+첨부 유니크 합집합)
+  │   - 합산 10MB cap 검증 (본문 이미지 + 첨부 zone 바이트 합산 초과 시 거부)
   │   - 자동 태그 추천 row 노출
   │   - 푸터 안내 문구 + send 아이콘
   ├─ 구현: master 응답 useQuery → cascade 처리, AttachmentZone 통합, ToastBodyEditor blob hook 노출
   └─ 사용자 승인 게이트
 
 Phase D — Visual Diff & Cleanup
-  ├─ benchmark/<wave-1-7>/voc-create-modal.png 추가
+  ├─ benchmark/09-voc-create-modal.png 재캡처 (flat-index 정책, INDEX.md §VOC 목록 페이지의 인터렉션 행에 이미 등록된 baseline 갱신)
   ├─ scripts/visual-diff.ts 통과
   ├─ 구버전 priority select·잘못된 그리드 코드 제거
   ├─ claude-progress.txt + next-session-tasks.md 업데이트
