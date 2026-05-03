@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -29,13 +29,18 @@ function makeAxiosError(status: number) {
   return err;
 }
 
+const ASSIGNEE_MAP: Record<string, string> = {};
+
 function renderDrawer(
   role: Role,
   vocId: string,
-  opts: { deleted?: boolean; errorStatus?: number } = {},
+  opts: { deleted?: boolean; errorStatus?: number; reviewStatus?: string } = {},
 ) {
   const target = VOC_FIXTURES.find((r) => r.id === vocId)!;
-  const detail = opts.deleted ? { ...target, deleted_at: new Date().toISOString() } : target;
+  let detail = opts.deleted ? { ...target, deleted_at: new Date().toISOString() } : target;
+  if (opts.reviewStatus !== undefined) {
+    detail = { ...detail, review_status: opts.reviewStatus as typeof detail.review_status };
+  }
   if (opts.errorStatus !== undefined) {
     vi.mocked(vocApi.get).mockRejectedValue(makeAxiosError(opts.errorStatus));
   } else {
@@ -52,6 +57,7 @@ function renderDrawer(
             notes={[]}
             notesLoading={false}
             pending={false}
+            assigneeMap={ASSIGNEE_MAP}
             onClose={() => {}}
             onPatch={vi.fn().mockResolvedValue(undefined)}
             onAddNote={vi.fn().mockResolvedValue(undefined)}
@@ -121,5 +127,92 @@ describe('VocReviewDrawer — Wave D D1', () => {
     renderDrawer('manager', target.id, { errorStatus: 500 });
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
     expect(screen.queryByTestId('voc-permission-gate')).not.toBeInTheDocument();
+  });
+
+  it('review_status === approved → drawer-status SelectTrigger에 data-disabled 속성 존재', async () => {
+    renderDrawer('manager', target.id, { reviewStatus: 'approved' });
+    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
+    const trigger = screen.getByTestId('drawer-status');
+    expect(trigger).toHaveAttribute('data-disabled');
+  });
+
+  it('review_status === unverified → drawer-status SelectTrigger에 data-disabled 속성 없음', async () => {
+    renderDrawer('manager', target.id, { reviewStatus: 'unverified' });
+    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
+    const trigger = screen.getByTestId('drawer-status');
+    expect(trigger).not.toHaveAttribute('data-disabled');
+  });
+
+  it('review_status === null → drawer-status SelectTrigger에 data-disabled 속성 없음', async () => {
+    renderDrawer('manager', target.id, { reviewStatus: null as unknown as string });
+    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
+    const trigger = screen.getByTestId('drawer-status');
+    expect(trigger).not.toHaveAttribute('data-disabled');
+  });
+
+  it('review_status key 없음(undefined) → drawer-status SelectTrigger에 data-disabled 속성 없음', async () => {
+    const targetFixture = VOC_FIXTURES.find((r) => r.id === target.id)!;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { review_status: _, ...withoutReviewStatus } = targetFixture;
+    vi.mocked(vocApi.get).mockResolvedValue(withoutReviewStatus as typeof targetFixture);
+    vi.mocked(vocApi.history).mockResolvedValue([...VOC_HISTORY_FIXTURES]);
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <RoleContext.Provider value={{ role: 'manager', setRole: () => {} }}>
+          <QueryClientProvider client={qc}>
+            <VocReviewDrawer
+              vocId={target.id}
+              notes={[]}
+              notesLoading={false}
+              pending={false}
+              assigneeMap={ASSIGNEE_MAP}
+              onClose={() => {}}
+              onPatch={vi.fn().mockResolvedValue(undefined)}
+              onAddNote={vi.fn().mockResolvedValue(undefined)}
+            />
+          </QueryClientProvider>
+        </RoleContext.Provider>
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(getByTestId('drawer-status')).toBeInTheDocument());
+    expect(getByTestId('drawer-status')).not.toHaveAttribute('data-disabled');
+  });
+
+  it('approved → onPatch가 호출되지 않음 (Select disabled로 onValueChange 차단)', async () => {
+    const onPatchMock = vi.fn().mockResolvedValue(undefined);
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const targetFixture = VOC_FIXTURES.find((r) => r.id === target.id)!;
+    vi.mocked(vocApi.get).mockResolvedValue({
+      ...targetFixture,
+      review_status: 'approved' as typeof targetFixture.review_status,
+    });
+    vi.mocked(vocApi.history).mockResolvedValue([...VOC_HISTORY_FIXTURES]);
+    render(
+      <MemoryRouter>
+        <RoleContext.Provider value={{ role: 'manager', setRole: () => {} }}>
+          <QueryClientProvider client={qc}>
+            <VocReviewDrawer
+              vocId={target.id}
+              notes={[]}
+              notesLoading={false}
+              pending={false}
+              assigneeMap={ASSIGNEE_MAP}
+              onClose={() => {}}
+              onPatch={onPatchMock}
+              onAddNote={vi.fn().mockResolvedValue(undefined)}
+            />
+          </QueryClientProvider>
+        </RoleContext.Provider>
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('drawer-status'));
+    expect(onPatchMock).not.toHaveBeenCalled();
+  });
+
+  it('drawer에 VocReviewMetaPanel 마운트 — data-testid="voc-meta-panel" 존재', async () => {
+    renderDrawer('manager', target.id);
+    await waitFor(() => expect(screen.getByTestId('voc-meta-panel')).toBeInTheDocument());
   });
 });

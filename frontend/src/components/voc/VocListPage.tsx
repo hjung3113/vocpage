@@ -15,9 +15,18 @@ import { ErrorState } from '../common/ErrorState';
 import { LoadingState } from '../common/LoadingState';
 
 const SYSTEMS_PLACEHOLDER = [
-  { id: '11111111-1111-4111-8111-111111111111', label: '시스템 미지정' },
+  { id: '11111111-1111-4111-8111-111111111111', label: '데이터 분석' },
+  { id: '22222222-2222-4222-8222-222222222222', label: '리포트' },
+  { id: '33333333-3333-4333-8333-333333333333', label: '포털' },
 ];
-const MENUS_PLACEHOLDER = [{ id: '22222222-2222-4222-8222-222222222222', label: '메뉴 미지정' }];
+const MENUS_PLACEHOLDER = [{ id: '44444444-4444-4444-8444-444444444444', label: '기본 메뉴' }];
+
+const SYSTEMS_MAP: Record<string, string> = Object.fromEntries(
+  SYSTEMS_PLACEHOLDER.map((s) => [s.id, s.label]),
+);
+const MENUS_MAP: Record<string, string> = Object.fromEntries(
+  MENUS_PLACEHOLDER.map((m) => [m.id, m.label]),
+);
 
 export function VocListPage() {
   const ctrl = useVocPageController();
@@ -97,6 +106,10 @@ export function VocListPage() {
         notes={ctrl.notes.data}
         notesLoading={ctrl.notes.isLoading}
         pending={ctrl.pending}
+        assigneeMap={ctrl.masters.assigneeMap}
+        vocTypeMap={vocTypeMap}
+        systemMap={SYSTEMS_MAP}
+        menuMap={MENUS_MAP}
         onClose={ctrl.drawer.close}
         onPatch={ctrl.actions.patch}
         onAddNote={ctrl.actions.addNote}

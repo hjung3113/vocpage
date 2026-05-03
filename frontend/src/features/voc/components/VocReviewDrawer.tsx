@@ -1,5 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../../../components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs';
 import {
   Select,
@@ -26,6 +32,7 @@ import {
   VocHistoryPanel,
   type AttachmentItem,
 } from './VocReviewTabs';
+import { VocReviewMetaPanel } from './VocReviewMetaPanel';
 
 interface Props {
   vocId: string | null;
@@ -33,6 +40,10 @@ interface Props {
   notesLoading: boolean;
   pending: boolean;
   attachments?: AttachmentItem[];
+  assigneeMap: Record<string, string>;
+  vocTypeMap?: Record<string, { slug: string; name: string }>;
+  systemMap?: Record<string, string>;
+  menuMap?: Record<string, string>;
   onClose: () => void;
   onPatch: (id: string, patch: VocUpdate) => Promise<unknown>;
   onAddNote: (id: string, body: string) => Promise<unknown>;
@@ -62,6 +73,10 @@ export function VocReviewDrawer({
   notesLoading,
   pending,
   attachments = [],
+  assigneeMap,
+  vocTypeMap,
+  systemMap,
+  menuMap,
   onClose,
   onPatch,
   onAddNote,
@@ -75,6 +90,7 @@ export function VocReviewDrawer({
   const canUpload = role === 'manager' || role === 'admin';
   const isDeleted = !!voc?.deleted_at;
   const blockedDeleted = isDeleted && role !== 'admin';
+  const approvedLock = voc?.review_status === 'approved';
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -86,6 +102,7 @@ export function VocReviewDrawer({
       >
         <DialogHeader>
           <DialogTitle>{voc ? voc.title : 'VOC'}</DialogTitle>
+          <DialogDescription className="sr-only">VOC 상세 검토 패널</DialogDescription>
         </DialogHeader>
         {detail.isLoading && <LoadingState />}
         {detail.isError &&
@@ -105,16 +122,32 @@ export function VocReviewDrawer({
             >
               {voc.issue_code} · 등록 {voc.created_at.slice(0, 10)}
             </div>
+            <VocReviewMetaPanel
+              voc={voc}
+              assigneeMap={assigneeMap}
+              vocTypeMap={vocTypeMap}
+              systemMap={systemMap}
+              menuMap={menuMap}
+            />
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1 text-xs">
                 Status
                 <Select
+                  disabled={approvedLock}
                   value={voc.status}
                   onValueChange={(v) =>
                     onPatch(voc.id, { status: v as (typeof VocStatus.options)[number] })
                   }
                 >
-                  <SelectTrigger data-testid="drawer-status">
+                  <SelectTrigger
+                    data-testid="drawer-status"
+                    title={
+                      approvedLock ? '결과 검토가 승인되어 상태 변경이 잠겨 있습니다.' : undefined
+                    }
+                    aria-label={
+                      approvedLock ? '상태 변경 잠김: 결과 검토가 승인되었습니다.' : '상태 변경'
+                    }
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
