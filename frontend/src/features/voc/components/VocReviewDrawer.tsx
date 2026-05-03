@@ -34,6 +34,9 @@ import {
 } from './VocReviewTabs';
 import { VocReviewMetaPanel } from './VocReviewMetaPanel';
 
+const STATUS_LOCK_TITLE = '결과 검토가 승인되어 상태 변경이 잠겨 있습니다.';
+const STATUS_LOCK_LABEL = '상태 변경 잠김: 결과 검토가 승인되었습니다.';
+
 interface Props {
   vocId: string | null;
   notes: InternalNote[] | undefined;
@@ -141,12 +144,8 @@ export function VocReviewDrawer({
                 >
                   <SelectTrigger
                     data-testid="drawer-status"
-                    title={
-                      approvedLock ? '결과 검토가 승인되어 상태 변경이 잠겨 있습니다.' : undefined
-                    }
-                    aria-label={
-                      approvedLock ? '상태 변경 잠김: 결과 검토가 승인되었습니다.' : '상태 변경'
-                    }
+                    title={approvedLock ? STATUS_LOCK_TITLE : undefined}
+                    aria-label={approvedLock ? STATUS_LOCK_LABEL : '상태 변경'}
                   >
                     <SelectValue />
                   </SelectTrigger>
