@@ -60,7 +60,7 @@ Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Arc
   - Known small range or tight cluster needing imports+body together → **`Read`** with `offset`/`limit` (or `sed -n 'A,Bp'`)
   - Architecture map / dependency graph / UI→API→DB flow / "what connects to X" → **Graphify** — required at least once before a wide refactor or first entry into an unfamiliar feature; details below
   - **Never** `cat <file>` to dump source, **never** `Read` a whole TS/TSX file you could `find_symbol` instead, **never** re-read a file already in context. Exception: config/JSON under ~1KB.
-- **Parallel tool calls** — independent tool calls go in one message, not sequential
+- **Parallel tool calls** — independent tool calls go in one message, not sequential (bash·Read chains 포함; sequential chain 식별 시 즉시 batch 전환 — reviewer audit 대상)
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe through `| tail -20`; never print full traces
 - **No Read before delete** — files being deleted must never be Read first; just `rm`
@@ -104,6 +104,7 @@ Skip the frame for trivial one-liners (rename, obvious typo, single-file change 
 - **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite
 - **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused
 - **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified
+- **Pre-commit lint dry-run** — 첫 `git commit` 전에 `npm run lint -w frontend` 단일 호출로 검증. 실패 시 수정 후 commit — husky 실패-재commit cycle 방지. (backend lint script 미정의 — 추후 추가 시 동일 패턴)
 
 ## Refactoring
 
