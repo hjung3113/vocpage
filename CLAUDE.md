@@ -50,7 +50,7 @@ Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Arc
   - Known small range or tight cluster needing imports+body together → **`Read`** with `offset`/`limit` (or `sed -n 'A,Bp'`)
   - Architecture map / dependency graph / UI→API→DB flow / "what connects to X" → **Graphify** — required at least once before a wide refactor or first entry into an unfamiliar feature; details below
   - **Never** `cat <file>` to dump source, **never** `Read` a whole TS/TSX file you could `find_symbol` instead, **never** re-read a file already in context. Exception: config/JSON under ~1KB.
-- **Parallel tool calls** — independent tool calls go in one message, not sequential
+- **Parallel tool calls** — independent tool calls go in one message, not sequential (bash·Read chains 포함; sequential chain 식별 시 즉시 batch 전환 — reviewer audit 대상)
 - **No re-read** — never re-read a file already in session context (exception: modified files)
 - **Tail test output** — pipe through `| tail -20`; never print full traces
 - **No Read before delete** — files being deleted must never be Read first; just `rm`
@@ -94,6 +94,7 @@ Skip the frame for trivial one-liners (rename, obvious typo, single-file change 
 - **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite
 - **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused
 - **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified
+- **Pre-commit lint dry-run** — 첫 `git commit` 전에 `npm run lint -w frontend` 단일 호출로 검증. 실패 시 수정 후 commit — husky 실패-재commit cycle 방지. (backend lint script 미정의 — 추후 추가 시 동일 패턴)
 
 ## Refactoring
 
@@ -107,3 +108,14 @@ A refactor changes structure without changing observable behavior. Refactor and 
 ## Graphify
 
 Knowledge graph at `graphify-out/`. Triggered by the routing rule above (architecture / dependency / cross-domain flow questions only). Prefer `graphify-out/wiki/index.md` over raw files; specific queries via `/graphify query|path|explain`. After modifying code files, run `graphify update .` to keep the graph current.
+
+## Top-level directories
+
+- `benchmark/` — visual ground-truth PNGs (`01-…`–`22-…`) compared by `scripts/visual-diff.ts`. Index: `INDEX.md`. New screen = baseline + INDEX row.
+- `graphify-out/` — auto-generated knowledge-graph output. Do not hand-edit. Architecture/community Q → `GRAPH_REPORT.md` or `wiki/index.md`. Refresh: `graphify update .`.
+- `scripts/` — repo utilities. Fixture↔seed parity: `check-fixture-seed-parity.ts`. Shadcn token rewrite: `shadcn-token-rewrite.ts`. Visual diff: `visual-diff.ts` + `visual-diff/` (helpers + `__tests__/`).
+- `shared/` — types/zod-schemas/fixtures used by **both** FE+BE.
+  - `shared/types/` — TS domain entities/enums/response shapes. Single-side types stay in that side.
+  - `shared/contracts/` — zod schemas (FE forms + BE route input, single source). Sub-trees: `voc/`, `notification/`, `master/` (source data in `backend/config/masters/`).
+  - `shared/fixtures/` — FE MSW + BE seed shared data; parity enforced by `scripts/check-fixture-seed-parity.ts`.
+  - REST contract reference → `shared/openapi.yaml`.

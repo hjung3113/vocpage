@@ -67,3 +67,10 @@ Full schema DDL and column-level spec: `docs/specs/requires/requirements.md` (da
 ## Business Rules (cross-reference)
 
 Behavioral contracts (what auto-tagging does, what the AD session middleware rejects, sub-task propagation rules) live in `docs/specs/requires/requirements.md`. **Do not duplicate behavioral rules into code comments** — link to the spec section.
+
+## Sub-tree map
+
+- `config/` — static config loaded at boot. `config/masters/` = master data JSON/CSV (VOC types/statuses/departments). Schema: `shared/contracts/master/`. Spec: `external-masters.md`. Adding/changing master = file here + matching `shared/fixtures/`.
+- `migrations/` — sequential SQL (`NNN_description.sql`). Current = latest numbered (013 = dev role + voc origin metadata). pgvector `CREATE EXTENSION` runs first before any DDL.
+- `seeds/` — DB seed for dev/test, mirrors `shared/fixtures/`. Parity check: `scripts/check-fixture-seed-parity.ts`.
+- `src/` — see `src/CLAUDE.md`.
