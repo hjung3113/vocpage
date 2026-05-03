@@ -84,19 +84,19 @@ PR #175(220 LOC, mixed-layer) cost 3.39M vs C-11(350 LOC, FE-only) cost 2.73M. *
 
 ## §3 Tier 개요
 
-| Tier         | 영역                                                                                    | 추정 절감                                                                     | ROI 등급                                                 | 위험                                |
-| ------------ | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------- |
-| **1.1-A**    | Hook env entry (`OMC_SKIP_DELEGATION_NOTICES=1`)                                        | -2K direct                                                                    | `[marginal, cheap]`                                      | 낮음                                |
-| **1.1-B**    | Hook dispatcher dedup patch (`pre-tool-use.mjs` 직접 편집)                              | -50-720K (task-shape dep, D3 follow)                                          | `[task-conditional, mid-cost]`                           | 낮음 (백업-and-restore 롤백)        |
-| **1.1-C**    | PostToolUse Serena echo 제거                                                            | per-Serena-call ~수십 토큰 (Serena 호출 0인 task엔 noise)                     | `[task-conditional]`                                     | 낮음                                |
-| **1.2-A**    | Sub-CLAUDE.md 통합 (69개 → 8개 keep + 61개 삭제, no stub) + Tier 2 결합                 | -200-400K (single-session ±50% band, Tier 2 결합 시 TS/TSX 도메인 inject ≈ 0) | **`[high-value, mid-cost, depends on Tier 2 + raid 1]`** | 중간 (leaf 본문 ancestor 흡수 필요) |
-| **1.2-B**    | Path-scoped 자동 주입 (CC platform fix 또는 OMC hook)                                   | -100-200K (1.2-A 후속, 비-TS/TSX 도메인 잔존 inject 대상)                     | `[high-value, blocked-on-trace]`                         | 중간 (선결: 발신자 trace)           |
-| **1.3-A**    | Serena 이중 등록 정리 — `mcp__serena__*` 유지, plugin namespace 제거                    | ~3K direct (등록 시점)                                                        | `[cheap, low-saving]`                                    | 중간 (실 등록 경로 trace 선결)      |
-| **1.3-B**    | SessionStart Serena schema pre-load                                                     | per-fire 200-500K × ToolSearch fire 횟수 (ToolSearch heavy task에서만 active) | **`[required on ToolSearch-heavy tasks]`**               | 중간 (paired test 권장)             |
-| **1.4**      | opt-prompt SKILL.md `references/` lazy-load (또는 옵션 D 우회)                          | -2.5~25K direct + dual-fire 25-35K cache_creation (B3 PR#182)                 | `[marginal, cheap]`                                      | 낮음                                |
-| **2**        | CLAUDE.md tool-routing + project memory `name_path_pattern` trap                        | 행동 교정 → D6 차단                                                           | `[behavior-fixable, retain]`                             | 중간                                |
-| **2.5**      | Quick Wins (4 룰: parallel batch / lint dry-run / opt-prompt gating / tsc+vitest batch) | -200-400K (overlap with D3 미해소, single-session estimates)                  | `[high-ROI, low-cost]`                                   | 낮음 — protocol-level               |
-| **3** (hold) | Commit hygiene (single-commit + fixup)                                                  | ?? — N=4에서 commit 수와 cost 무상관                                          | `[hold pending R5 5분 실측]`                             | hold                                |
+| Tier         | 영역                                                                                         | 추정 절감                                                                     | ROI 등급                                                 | 위험                                   |
+| ------------ | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------- |
+| **1.1-A**    | Hook env entry (`OMC_SKIP_DELEGATION_NOTICES=1`)                                             | -2K direct                                                                    | `[marginal, cheap]`                                      | 낮음                                   |
+| **1.1-B**    | Hook dispatcher dedup patch (`pre-tool-use.mjs` 직접 편집)                                   | -50-720K (task-shape dep, D3 follow)                                          | `[task-conditional, mid-cost]`                           | 낮음 (백업-and-restore 롤백)           |
+| **1.1-C**    | PostToolUse Serena echo 제거                                                                 | per-Serena-call ~수십 토큰 (Serena 호출 0인 task엔 noise)                     | `[task-conditional]`                                     | 낮음                                   |
+| **1.2-A**    | Sub-CLAUDE.md 통합 (69개 → 8개 keep + 61개 삭제, no stub) + Tier 2 결합                      | -200-400K (single-session ±50% band, Tier 2 결합 시 TS/TSX 도메인 inject ≈ 0) | **`[high-value, mid-cost, depends on Tier 2 + raid 1]`** | 중간 (leaf 본문 ancestor 흡수 필요)    |
+| **1.2-B**    | Path-scoped 자동 주입 (CC platform fix 또는 OMC hook)                                        | -100-200K (1.2-A 후속, 비-TS/TSX 도메인 잔존 inject 대상)                     | `[high-value, blocked-on-trace]`                         | 중간 (선결: 발신자 trace)              |
+| **1.3-A**    | Serena 이중 등록 정리 — `mcp__serena__*` 유지, plugin namespace 제거                         | ~3K direct (등록 시점)                                                        | `[cheap, low-saving]`                                    | 중간 (실 등록 경로 trace 선결)         |
+| **1.3-B**    | SessionStart Serena schema pre-load                                                          | per-fire 200-500K × ToolSearch fire 횟수 (ToolSearch heavy task에서만 active) | **`[required on ToolSearch-heavy tasks]`**               | 중간 (paired test 권장)                |
+| **1.4**      | opt-prompt SKILL.md 2-skill split (옵션 E: `opt-prompt` normalize / `opt-prompt-eval` retro) | -25-35K dual-fire (B3 구조적 제거) + 매 turn ~4K (eval 섹션 사전 로드 제거)   | `[high-ROI, structural]`                                 | 낮음 (cross-ref grep + retro 1회 검증) |
+| **2**        | CLAUDE.md tool-routing + project memory `name_path_pattern` trap                             | 행동 교정 → D6 차단                                                           | `[behavior-fixable, retain]`                             | 중간                                   |
+| **2.5**      | Quick Wins (4 룰: parallel batch / lint dry-run / opt-prompt gating / tsc+vitest batch)      | -200-400K (overlap with D3 미해소, single-session estimates)                  | `[high-ROI, low-cost]`                                   | 낮음 — protocol-level                  |
+| **3** (hold) | Commit hygiene (single-commit + fixup)                                                       | ?? — N=4에서 commit 수와 cost 무상관                                          | `[hold pending R5 5분 실측]`                             | hold                                   |
 
 **v4 정정 요약** (vs v3):
 
@@ -170,16 +170,50 @@ A2 (PR#182): 유일 "high-value" 등급 patch.
 - **A. 이중 등록 정리**: `mcp__serena__*` 유지, `mcp__plugin_serena_serena__*` (plugin namespace) 제거. 실행 전 Serena 실 등록 경로 사전 trace 필수 (§11 rollback 참조).
 - **B. SessionStart Serena schema pre-load**: ToolSearch 의존 제거. ToolSearch heavy task에서 paired test 후 적용.
 
-### §4.4 Tier 1.4 — opt-prompt SKILL.md Lazy-load
+### §4.4 Tier 1.4 — opt-prompt SKILL.md 2-skill Split (옵션 E)
 
-**진단**: `.claude/skills/opt-prompt/SKILL.md` (실측 452줄 ≈ ~10K 토큰). `/opt-prompt` 1회 + `/opt-prompt --eval` 1회 = 세션당 ~20K 로드. B3 (PR#182) 직접 관측: `/opt-prompt --eval` 호출 시 SKILL.md 본문이 system-reminder로 다시 인라인 (중복 ~600 lines). cache hit 여부와 무관하게 suffix breakpoint 무효화 비용 발생. ~25-35K cache_creation 절감 가능 (B3 추정).
+**진단**: `.claude/skills/opt-prompt/SKILL.md` (실측 452줄 ≈ ~10K). 단일 SKILL.md에 호출 시점·빈도가 다른 두 모드가 묶여 있음:
+
+| 라인 범위 | 모드                | 분량 | 호출 시점                        |
+| --------- | ------------------- | ---- | -------------------------------- |
+| 1–277     | Normalize/Sizing    | ~6K  | `/opt-prompt` (매 prompt)        |
+| 278–406   | Eval / retro JSONL  | ~3K  | `/opt-prompt --eval` (세션 종료) |
+| 407–452   | Anti-patterns + Ex5 | ~1K  | 공용 (분리 시 normalize 측 잔류) |
+
+B3 (PR#182) 직접 관측: `/opt-prompt --eval` 호출 시 SKILL.md 본문이 system-reminder로 재인라인 → suffix breakpoint 무효화 25-35K cache_creation. 매 normalize invoke마다 eval 섹션 ~4K 사전 로드도 동반.
 
 **근거**: B3 dual-fire 직접 관측 + B1 ~60-80K final turn 누적 컨텍스트. C-11 retro가 helper 직접 호출(`append.sh retro`)로 완료 — opt-prompt-log.jsonl row 존재로 우회 검증.
 
-**변경**:
+**변경 — 옵션 E (선택)**: SKILL을 두 개로 split.
 
-- **A. references/ split**: SKILL.md frontmatter + 본문 분리. `references/` 서브디렉토리 신설 (현재 미존재 — split 작업 필요).
-- **D. Helper 직접 호출 우회**: `/opt-prompt --eval` invoke 대신 `.claude/skills/opt-prompt/append.sh retro <id> @<file>` 직접 호출. 본 세션 C-11 retro에서 검증된 패턴.
+```
+.claude/skills/
+├── opt-prompt/         # normalize only (~277줄, eval 섹션 절단)
+│   └── SKILL.md
+└── opt-prompt-eval/    # retro logging + pattern analysis (eval/review/anti-patterns)
+    ├── SKILL.md
+    └── append.sh       (이동 — eval 전용 helper)
+```
+
+**효과**:
+
+- `/opt-prompt` invoke → ~6K만 로드 (이전 10K → -4K, 매 turn)
+- `/opt-prompt-eval` invoke → 별도 skill 로드, normalize 본문 재인라인 0
+- B3 dual-fire 25-35K 구조적 제거 (사람 룰 의존 없음)
+- C-11 retro의 helper 직접 호출 패턴은 옵션 E 후에도 유효한 fallback
+
+**드랍된 대안**:
+
+- ~~A. references/ split~~ → 본문이 여전히 inline. 옵션 E로 흡수.
+- ~~D. helper 직접 호출 우회~~ → 룰 의존 (강제력 약함). 옵션 E의 fallback으로만 유지.
+
+**작업 범위**:
+
+1. SKILL.md 1–277 / 278–406 / 407–452 절단점 확정
+2. `opt-prompt-eval/` 디렉토리 + SKILL.md frontmatter 신설 (description: retro logging mode)
+3. append.sh `opt-prompt-eval/`로 이동
+4. cross-reference grep — `append.sh`, `--eval`, `opt-prompt-log.jsonl` 호출하는 root CLAUDE.md / `.claude/CLAUDE.md` / 다른 skills / hooks 갱신
+5. dummy retro 1회 (C-11 패턴 재현) — append.sh 정상 동작 + JSONL 정합 확인
 
 ---
 
@@ -222,7 +256,9 @@ Parallel tool calls — independent tool calls go in one message, not sequential
   (실 명령은 다음 세션에서 package.json scripts 확인 후 확정. placeholder: `npm run lint`)
 ```
 
-### §6.3 [B3] opt-prompt SKILL.md re-injection gating
+### §6.3 [B3] opt-prompt SKILL.md re-injection gating (Tier 1.4 옵션 E의 fallback)
+
+> **Note**: Tier 1.4 옵션 E (§4.4) 적용 후에는 본 절 제약이 자동 해소됨. 옵션 E 적용 전 임시 절감 또는 옵션 E rollback 시 fallback으로만 유지.
 
 **근거**: B3 + B1 — `/opt-prompt --eval` SKILL.md 본문 재인라인 직접 관측. 본 세션 C-11 retro가 helper 직접 호출 패턴으로 검증.
 
@@ -266,20 +302,25 @@ Parallel tool calls — independent tool calls go in one message, not sequential
 
 ## §8 실행 순서
 
+**v4.1 순서 변경**: Tier 1.3-A + Tier 1.4 (옵션 E)를 우선 처리. 사용자 우선순위 — 두 항목이 사용자가 직접 인지한 문제. 나머지는 그 다음.
+
 ```
 0. 본 plan v4 머지
-1. Tier 2.5 Quick Wins (4 룰) 즉시 적용 — 다음 세션 첫 task부터 enforcement
-2. Tier 1.1-A (env entry) — cheapest
-3. Tier 1.3-A (Serena 이중 등록 정리) — 사전 trace + plugin namespace 제거
-4. Tier 2.1~2.3 (CLAUDE.md routing 룰 + project memory)
-4.5. **Raid 1 - Tier 2 적용 후 가설 검증**: TS/TSX 도메인 inject 0 가설 직접 측정. Serena routing 강제 + 동일 spec task 1회 → CLAUDE.md inject 카운트 + 토큰량 기록. 비-TS/TSX 도메인 잔존 inject share 산출. → Tier 1.2-A 진행 여부 결정 (≥-100K 잔존 share면 진행, 미달이면 frontend/src·backend/src 본문 정리만 축소 적용)
-5. Tier 1.2-A (69→8 keep + 61 삭제) — raid 1 결과 보고 진행
-6. Tier 1.1-C (PostToolUse Serena echo 제거)
-7. Tier 1.4 (옵션 D 우회 또는 SKILL.md split)
+1. Tier 1.3-A (Serena 이중 등록 정리) — 사전 trace + plugin namespace 제거
+   - 사전 trace 0건이면 즉시 stop, 사용자 인계
+2. Tier 1.4 옵션 E (opt-prompt SKILL 2-skill split)
+   - opt-prompt/ (normalize) + opt-prompt-eval/ (retro + append.sh) 분리
+   - cross-ref grep 갱신 + dummy retro 검증
+3. Tier 2.5 Quick Wins (4 룰)
+4. Tier 1.1-A (env entry) — cheapest
+5. Tier 2.1~2.3 (CLAUDE.md routing 룰 + project memory)
+5.5. **Raid 1 - Tier 2 적용 후 가설 검증**: TS/TSX 도메인 inject 0 가설 직접 측정. → Tier 1.2-A 진행 여부 결정
+6. Tier 1.2-A (69→8 keep + 61 삭제) — raid 1 결과 보고 진행
+7. Tier 1.1-C (PostToolUse Serena echo 제거)
 8. **측정 raid 1**: 동일 spec task 1회 → cost\* 기록 + independent variable 사전 등록
 9. Tier 3 5분 실측 → Tier 1.5 살림/폐기 결정
 10. **측정 raid 2**: 동일 spec task 1회 → §10 paired comparison
-11. Tier 1.1-B + Tier 1.2-B + Tier 1.3-B (Serena pre-load — ToolSearch fire ≥3회 task로 paired test 검증 후 적용) — 선결 trace 후
+11. Tier 1.1-B + Tier 1.2-B + Tier 1.3-B (ToolSearch fire ≥3회 task로 paired test 검증 후 적용) — 선결 trace 후
 ```
 
 ---
@@ -362,7 +403,7 @@ cost* = input + cache_creation + 0.1 × cache_read
 | Tier 1.2-B platform path-scoped 주입           | hook 또는 settings 롤백                                                                                                                                                                                                                                  |
 | **Tier 1.3-A Serena 이중 등록 정리 (v4 정정)** | 사전 trace로 실 등록 파일 확인: `cat ~/.claude/claude_desktop_config.json 2>/dev/null; ls ~/.claude/mcp*.json 2>/dev/null`. 편집 전 해당 파일 백업. 롤백 = 백업 복원. (v3 `settings.json mcpServers` 경로는 path-error — 해당 키 자체가 없음.)           |
 | Tier 1.3-B SessionStart pre-load               | hook 또는 settings 롤백                                                                                                                                                                                                                                  |
-| Tier 1.4 opt-prompt SKILL.md 분리              | `git revert`                                                                                                                                                                                                                                             |
+| Tier 1.4 옵션 E (opt-prompt 2-skill split)     | `git revert` 또는 `opt-prompt-eval/` 디렉토리 삭제 + `opt-prompt/SKILL.md` 원본 복원 + `append.sh` 원위치 + cross-ref grep 재역적용. dummy retro 1회로 회귀 확인 (JSONL row append 정상). §6.3 옵션 D fallback 룰만 일시 활용 가능                       |
 | Tier 2 룰 변경                                 | `git revert`                                                                                                                                                                                                                                             |
 | Tier 2.5 Quick Wins (CLAUDE.md 룰)             | `git revert` — 룰 텍스트 4건 (root CLAUDE.md 강화 + .claude/CLAUDE.md 추가)                                                                                                                                                                              |
 
@@ -388,27 +429,29 @@ cost* = input + cache_creation + 0.1 × cache_read
 
 ## §13 v1 → v2 → v3 → v4 통합 audit 표
 
-| 항목                                   | v1                             | v2                                            | v3                                            | v4 (`[v4]`)                                                                                                            |
-| -------------------------------------- | ------------------------------ | --------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| §0 baseline N                          | N=1                            | N=3                                           | N=4                                           | N=4 유지 (cost\* column 정정)                                                                                          |
-| Cost metric                            | implicit                       | `input + cache_creation`                      | `+ 0.1×cache_read`                            | cost\* 유지 + §10.4 sensitivity 표 신설 + power 재계산 (§10.3)                                                         |
-| §1 D2 (sub-CLAUDE.md)                  | 미인식                         | -200-400K 간접                                | -300-400K + "blind 3/3 합의 단일 최대 driver" | **±50% band, "single-transcript reviewed by 3" 표기 정정 (N=1, not N=3)**                                              |
-| §1 D3 (hook firehose)                  | -360-720K 간접                 | -360-720K 간접                                | -50-150K 간접 (`[v3-reweight]`)               | **per-Bash formula로 표기, per-session 50-720K (task-shape dep). 절대 범위 표기 폐기**                                 |
-| §1 D4 (ToolSearch invalidation)        | -1.2M 간접                     | -1.2M 간접                                    | -200-400K (`[v3-reweight]`, drop 후보)        | **per-fire 200-500K × fire 횟수. C-11 0 fire는 inadmissible evidence — v3 강등 무효화**                                |
-| §1 D7 (task shape)                     | (없음)                         | (없음)                                        | +200-400K weight `[v3-신규]`                  | **driver 표에서 폐기 (residual = circular reasoning). §2 Unattributed variance로 이전**                                |
-| §2 Tier 1.3-B (Serena pre-load)        | (없음)                         | R10 필수                                      | drop 후보 (`[v3-강등]`)                       | **`[required on ToolSearch-heavy tasks]` 복원**                                                                        |
-| §6 Tier 2.5 Quick Wins                 | (없음)                         | (없음)                                        | 5 룰 신설 (`[v3-신규]`)                       | **4 룰 (§2.5.5 TSX Serena routing은 pure-duplicate라 drop). aggregate -200-400K (overlap caveat)**                     |
-| §4.2 Tier 1.2-A 형태                   | (없음)                         | sub-CLAUDE.md 통합 추정                       | 68→6 keep + 62 stub (1줄 포인터)              | **69→8 keep + 61 삭제 (no stub). Tier 2 결합으로 TS/TSX 도메인 inject ≈ 0 가설. §8 step 4.5 raid 1 검증 후 진행 결정** |
-| §6 Tier 2.5.4 PNG screenshot           | (없음)                         | (없음)                                        | -200K 절감 (base64 byte 기반)                 | **수치 폐기. image token 모델 기반 추정 (~5-30K)도 단일 점, raid 측정에서 결정**                                       |
-| §10 paired replay                      | N≥1 baseline                   | 12 sessions, n=3                              | 40 sessions, n=10                             | n=10 유지 + cost\* power 재계산 단계 신설                                                                              |
-| §10 cost\* sensitivity                 | (없음)                         | (없음)                                        | (없음)                                        | **§10.4 신설 — 0.05/0.10/0.15 가중치 ROI 순위 robustness 검증**                                                        |
-| §11 Tier 1.1-B rollback                | (없음)                         | `git -C ~/.claude/plugins/.../<ver> checkout` | 동일                                          | **`pre-tool-use.mjs` backup-and-restore (path-error 정정)**                                                            |
-| §11 Tier 1.3-A rollback                | (없음)                         | `settings.json mcpServers` 복원               | 동일                                          | **사전 trace + 실 등록 파일 백업 복원 (path-error 정정 — settings.json엔 mcpServers 키 없음)**                         |
-| §10.2 paired-replay design             | (없음)                         | 12 sessions                                   | 40 sessions, "task shape 매칭" 요구           | **task shape 매칭 폐기. independent variable 사전 등록 (screenshot/subagent/inject/ToolSearch fire 수)**               |
-| §3 (Tier 1.1) reminder fire 카운트     | (없음)                         | "Bash 1회당 ~4개 발사"                        | 동일                                          | **"1-4개 (현재 hook 구성 1-2개)" — 실측 정정**                                                                         |
-| §4 (Tier 1.4) opt-prompt SKILL.md 경로 | `~/.claude/skills/opt-prompt/` | 동일                                          | 동일                                          | **`.claude/skills/opt-prompt/SKILL.md` (실측 452줄)**                                                                  |
-| review v2 별도 파일                    | —                              | (별도)                                        | plan §15-§19로 통합 폐기                      | 동일 (appendix 보존)                                                                                                   |
-| 문서 구조                              | flat                           | flat                                          | flat                                          | **5 part 분리 + Tier 번호와 절 번호 일치 (Tier 1.1 = §4.1)**                                                           |
+| 항목                                   | v1                             | v2                                            | v3                                            | v4 (`[v4]`)                                                                                                                                        |
+| -------------------------------------- | ------------------------------ | --------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §0 baseline N                          | N=1                            | N=3                                           | N=4                                           | N=4 유지 (cost\* column 정정)                                                                                                                      |
+| Cost metric                            | implicit                       | `input + cache_creation`                      | `+ 0.1×cache_read`                            | cost\* 유지 + §10.4 sensitivity 표 신설 + power 재계산 (§10.3)                                                                                     |
+| §1 D2 (sub-CLAUDE.md)                  | 미인식                         | -200-400K 간접                                | -300-400K + "blind 3/3 합의 단일 최대 driver" | **±50% band, "single-transcript reviewed by 3" 표기 정정 (N=1, not N=3)**                                                                          |
+| §1 D3 (hook firehose)                  | -360-720K 간접                 | -360-720K 간접                                | -50-150K 간접 (`[v3-reweight]`)               | **per-Bash formula로 표기, per-session 50-720K (task-shape dep). 절대 범위 표기 폐기**                                                             |
+| §1 D4 (ToolSearch invalidation)        | -1.2M 간접                     | -1.2M 간접                                    | -200-400K (`[v3-reweight]`, drop 후보)        | **per-fire 200-500K × fire 횟수. C-11 0 fire는 inadmissible evidence — v3 강등 무효화**                                                            |
+| §1 D7 (task shape)                     | (없음)                         | (없음)                                        | +200-400K weight `[v3-신규]`                  | **driver 표에서 폐기 (residual = circular reasoning). §2 Unattributed variance로 이전**                                                            |
+| §2 Tier 1.3-B (Serena pre-load)        | (없음)                         | R10 필수                                      | drop 후보 (`[v3-강등]`)                       | **`[required on ToolSearch-heavy tasks]` 복원**                                                                                                    |
+| §6 Tier 2.5 Quick Wins                 | (없음)                         | (없음)                                        | 5 룰 신설 (`[v3-신규]`)                       | **4 룰 (§2.5.5 TSX Serena routing은 pure-duplicate라 drop). aggregate -200-400K (overlap caveat)**                                                 |
+| §4.2 Tier 1.2-A 형태                   | (없음)                         | sub-CLAUDE.md 통합 추정                       | 68→6 keep + 62 stub (1줄 포인터)              | **69→8 keep + 61 삭제 (no stub). Tier 2 결합으로 TS/TSX 도메인 inject ≈ 0 가설. §8 step 4.5 raid 1 검증 후 진행 결정**                             |
+| §6 Tier 2.5.4 PNG screenshot           | (없음)                         | (없음)                                        | -200K 절감 (base64 byte 기반)                 | **수치 폐기. image token 모델 기반 추정 (~5-30K)도 단일 점, raid 측정에서 결정**                                                                   |
+| §10 paired replay                      | N≥1 baseline                   | 12 sessions, n=3                              | 40 sessions, n=10                             | n=10 유지 + cost\* power 재계산 단계 신설                                                                                                          |
+| §10 cost\* sensitivity                 | (없음)                         | (없음)                                        | (없음)                                        | **§10.4 신설 — 0.05/0.10/0.15 가중치 ROI 순위 robustness 검증**                                                                                    |
+| §11 Tier 1.1-B rollback                | (없음)                         | `git -C ~/.claude/plugins/.../<ver> checkout` | 동일                                          | **`pre-tool-use.mjs` backup-and-restore (path-error 정정)**                                                                                        |
+| §11 Tier 1.3-A rollback                | (없음)                         | `settings.json mcpServers` 복원               | 동일                                          | **사전 trace + 실 등록 파일 백업 복원 (path-error 정정 — settings.json엔 mcpServers 키 없음)**                                                     |
+| §10.2 paired-replay design             | (없음)                         | 12 sessions                                   | 40 sessions, "task shape 매칭" 요구           | **task shape 매칭 폐기. independent variable 사전 등록 (screenshot/subagent/inject/ToolSearch fire 수)**                                           |
+| §3 (Tier 1.1) reminder fire 카운트     | (없음)                         | "Bash 1회당 ~4개 발사"                        | 동일                                          | **"1-4개 (현재 hook 구성 1-2개)" — 실측 정정**                                                                                                     |
+| §4 (Tier 1.4) opt-prompt SKILL.md 경로 | `~/.claude/skills/opt-prompt/` | 동일                                          | 동일                                          | **`.claude/skills/opt-prompt/SKILL.md` (실측 452줄)**                                                                                              |
+| review v2 별도 파일                    | —                              | (별도)                                        | plan §15-§19로 통합 폐기                      | 동일 (appendix 보존)                                                                                                                               |
+| 문서 구조                              | flat                           | flat                                          | flat                                          | **5 part 분리 + Tier 번호와 절 번호 일치 (Tier 1.1 = §4.1)**                                                                                       |
+| §4.4 Tier 1.4 형태 (`[v4.1]`)          | (없음)                         | references/ split (옵션 A)                    | 옵션 D 우회 추가                              | **옵션 E (2-skill split: opt-prompt normalize + opt-prompt-eval retro)로 통합 — A는 흡수, D는 fallback. ROI 등급 `[high-ROI, structural]`로 격상** |
+| §8 실행 순서 (`[v4.1]`)                | —                              | —                                             | Tier 1.4 = step 7                             | **Tier 1.3-A = step 1, Tier 1.4(옵션 E) = step 2 — 사용자 우선순위 반영**                                                                          |
 
 ---
 

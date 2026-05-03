@@ -55,42 +55,46 @@
 
 본 브랜치 PR #177은 **머지하지 않음** (blind test 환경 보존). 다음 세션이 본 브랜치 위에서 plan §8 실행.
 
-### 2단계 — plan §8 실행 순서
+### 2단계 — plan §8 실행 순서 (v4.1: 1.3-A + 1.4 옵션 E 우선)
 
 ```
-1. Tier 2.5 Quick Wins (4 룰) 즉시 적용 — root CLAUDE.md / .claude/CLAUDE.md
-   - §6.1 parallel batch (기존 룰 강화)
-   - §6.2 pre-commit lint dry-run (package.json scripts 확인 후 명령 확정)
-   - §6.3 opt-prompt re-injection gating (옵션 A + SKILL.md guard)
-   - §6.4 tsc+vitest batch (.claude/CLAUDE.md Token-Saving Protocol 섹션)
+1. Tier 1.3-A — Serena 이중 등록 정리 (우선)
+   - 사전 trace: cat ~/.claude/claude_desktop_config.json 2>/dev/null;
+     ls -la ~/.claude/mcp*.json 2>/dev/null;
+     ls -la ~/.claude/plugins/**/serena* 2>/dev/null;
+     grep -rn "plugin_serena_serena\|mcp__serena__" ~/.claude/*.json 2>/dev/null | head -20
+   - 0건이면 즉시 stop, 사용자 인계
+   - 백업(.bak.YYYYMMDD) → plugin namespace entry 제거 → JSON validate
 
-2. Tier 1.1-A — `OMC_SKIP_DELEGATION_NOTICES=1` env entry
+2. Tier 1.4 옵션 E — opt-prompt SKILL을 2 skill로 split (우선)
+   - .claude/skills/opt-prompt/ → normalize 모드만 (1–277 + 407–452 잔류)
+   - .claude/skills/opt-prompt-eval/ 신설 → eval/review/anti-patterns + append.sh 이동
+   - cross-ref grep: append.sh / --eval / opt-prompt-log.jsonl 호출 root CLAUDE.md, .claude/CLAUDE.md, 다른 skills, hooks
+   - dummy retro 1회로 검증 (C-11 패턴 재현, JSONL row append 정상)
 
-3. Tier 1.3-A — Serena 이중 등록 정리
-   - 사전 trace: cat ~/.claude/claude_desktop_config.json; ls ~/.claude/mcp*.json
-   - mcp__serena__* 유지, mcp__plugin_serena_serena__* 제거
+3. Tier 2.5 Quick Wins (4 룰)
+   - §6.1 parallel batch / §6.2 pre-commit lint dry-run / §6.3 (Tier 1.4 옵션 E의 fallback) / §6.4 tsc+vitest batch
+   - §6.2 lint 명령은 package.json scripts 확인 후 확정
 
-4. Tier 2 — root CLAUDE.md tool-routing 강화 + project memory narrowing
+4. Tier 1.1-A — `OMC_SKIP_DELEGATION_NOTICES=1` env entry
 
-4.5. **Raid 1 — Tier 2 적용 후 가설 검증** (신규)
+5. Tier 2 — root CLAUDE.md tool-routing 강화 + project memory narrowing
+
+5.5. **Raid 1 — Tier 2 적용 후 가설 검증**
    - TS/TSX 도메인 inject ≈ 0 가설 직접 측정
-   - Serena routing 강제 + 동일 spec task 1회
-   - CLAUDE.md inject 카운트 + 토큰량 기록
    - → Tier 1.2-A 진행 여부 결정 (≥-100K 잔존 share면 진행)
 
-5. Tier 1.2-A — 69→8 keep + 61 삭제 (raid 1 결과 보고 진행)
+6. Tier 1.2-A — 69→8 keep + 61 삭제
 
-6. Tier 1.1-C — PostToolUse Serena echo 제거
+7. Tier 1.1-C — PostToolUse Serena echo 제거
 
-7. Tier 1.4 — 옵션 D (helper 직접 호출) 또는 SKILL.md split
-
-8. 측정 raid 1 — cost* 기록 + independent variable (screenshot/subagent/inject/ToolSearch fire) 사전 등록
+8. 측정 raid 1 — cost* + independent variable 사전 등록
 
 9. Tier 3 5분 실측 → Tier 1.5 살림/폐기 결정
 
 10. 측정 raid 2 — paired comparison (§10)
 
-11. Tier 1.1-B + Tier 1.2-B + Tier 1.3-B (ToolSearch fire ≥3회 task로 paired test 후) — 선결 trace 후
+11. Tier 1.1-B + Tier 1.2-B + Tier 1.3-B (ToolSearch fire ≥3회 task로 paired test 후)
 ```
 
 ### 3단계 — Post-flight + 머지
@@ -117,7 +121,7 @@
 - **§6.2 lint 명령**: `package.json` scripts 확인 후 `npm run lint` placeholder를 실 명령어로 교체
 - **§10.4 sensitivity 표**: raid 1 후 0.05 / 0.10 / 0.15 가중치로 4 세션 cost\* 재계산. Tier ROI 순위가 3 가중치 모두에서 동일하면 robust
 - **§10.3 power 재계산**: cost\* 분산 σ/μ 산출 후 n=10/cell 검증. underpowered면 표본 추가
-- **Tier 1.4 SKILL.md split 분기**: §6.3 옵션 A (helper 직접 호출)만으로 충분한지, references/ split까지 필요한지 raid 1 결과 후 결정
+- ~~**Tier 1.4 SKILL.md split 분기**~~ — **결정 완료 (v4.1, 2026-05-03)**: 옵션 E (2-skill split: `opt-prompt` normalize + `opt-prompt-eval` retro)로 확정. 옵션 A(references/) 흡수, 옵션 D(helper 직접 호출)는 §6.3 fallback으로만 유지
 
 ---
 
