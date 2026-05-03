@@ -22,6 +22,15 @@
 - v3 consolidation (commit `89f26e4`) — review v2 단일 plan fold-in
 - v4 pre-flight 정정 (commit `2002921`) — PR #177 3 reviewer (critic·debugger·document-specialist) BLOCK 7건 + NIT 6건 정정 + 5 part 재구조화
 
+### Tier 1.4 검증 체크리스트 (다음 fresh 세션, normalize/eval 양쪽 sanity)
+
+1. fresh 세션 deferred-skills 목록에 **`opt-prompt`** + **`opt-prompt-eval`** 둘 다 등장. 두 description이 서로 retro/normalize를 명확히 분리해야 함.
+2. `/opt-prompt <짧은 prompt>` 실행 → SKILL.md 306줄만 로드 (이전 452 → -32%). Step 1 helper 호출 → Step 2 block emit → 마지막에 `// reminder: invoke /opt-prompt-eval <decision_id>` 한 줄 자동 emit 확인.
+3. 동일 세션에서 `/opt-prompt-eval <위 decision_id>` 실행 → opt-prompt-eval 스킬 단독 로드 (181줄), 8 questions 진행, `append.sh retro` 호출, retro row append 성공.
+4. `--review` 분기: `/opt-prompt-eval --review` → 로그 join + 제안만 출력, normalize SKILL.md 자동 편집 0.
+5. legacy 호환: `/opt-prompt --eval` 호출 시 normalize 스킬이 anti-pattern으로 감지, "redirect to /opt-prompt-eval" 응답.
+6. B3 dual-fire 측정 (선택): C-11 패턴 재현 task 1회 + retro 1회로 cache_creation 25-35K 절감 직접 관측. 미달 시 description keyword 충돌 의심 → 두 스킬 description의 trigger 단어 분리 정확도 재검토.
+
 ### v4 핵심 변화 (vs v3)
 
 1. **D4 ToolSearch weight 강등 무효화** — C-11 0 fire는 도메인 밖 inadmissible. `[required on ToolSearch-heavy tasks]` 복원
@@ -44,6 +53,17 @@
 - `prototype/CLAUDE.md`
 
 나머지 61개 leaf CLAUDE.md → ancestor 8개 본문에 흡수 후 삭제 (no stub).
+
+---
+
+## 검증 추적 문서
+
+**[docs/specs/reviews/token-discipline-verification.md](docs/specs/reviews/token-discipline-verification.md)** — 각 Tier patch 적용 후 fresh 세션에서 절감 측정 결과를 박제. 적용 직후엔 정적 측정만 채워두고, 다른 세션이 fresh 환경에서 체크리스트 통과 + 측정 결과 칸을 직접 채움. PASS / FAIL / NEEDS-REVIEW verdict.
+
+현재 row:
+
+- Tier 1.3-A (Serena 이중 등록 정리) — 본 세션 정적 측정 PASS, fresh 세션 측정 미완
+- Tier 1.4 옵션 E (opt-prompt 2-skill split) — 본 세션 정적 측정 PASS, fresh 세션 측정 미완
 
 ---
 
@@ -79,11 +99,15 @@
 1. Tier 1.3-A — Serena 이중 등록 정리 (우선)  ✅ 적용 완료 (2026-05-03), 검증 미완
    - 검증: 위 체크리스트 4항 통과 후 다음 단계로
 
-2. Tier 1.4 옵션 E — opt-prompt SKILL을 2 skill로 split (우선)
-   - .claude/skills/opt-prompt/ → normalize 모드만 (1–277 + 407–452 잔류)
-   - .claude/skills/opt-prompt-eval/ 신설 → eval/review/anti-patterns + append.sh 이동
-   - cross-ref grep: append.sh / --eval / opt-prompt-log.jsonl 호출 root CLAUDE.md, .claude/CLAUDE.md, 다른 skills, hooks
-   - dummy retro 1회로 검증 (C-11 패턴 재현, JSONL row append 정상)
+2. Tier 1.4 옵션 E — opt-prompt SKILL을 2 skill로 split (우선)  ✅ **적용 완료 (2026-05-03 세션)**
+   - `.claude/skills/opt-prompt/SKILL.md` 306줄 (was 452, -32%) — normalize/sizing/markers/examples 잔류 + 신설 "Closing reminder" 섹션 (Step 2 출력 끝에 `// reminder: invoke /opt-prompt-eval <decision_id>` 1줄 자동 emit)
+   - `.claude/skills/opt-prompt-eval/SKILL.md` 181줄 (신규) — retro questions, helper invocations, JSONL schema, analysis join, token-delta methodology, verdict, --review pattern analysis, eval anti-patterns
+   - `append.sh`는 `opt-prompt/`에 유지 (Q1 결정-A) — eval 스킬은 `../opt-prompt/append.sh` 호출. plan §4.4 line 214 "이동" 가설 기각, 동일 폴더가 path/의미 모두 명확.
+   - 트리거 분리 (Q2 결정-A): `/opt-prompt` → normalize, **`/opt-prompt-eval <decision_id>` → retro (신규 명령어)**, `/opt-prompt-eval --review` → 패턴 분석. legacy `/opt-prompt --eval` 호출은 normalize 스킬의 anti-pattern로 감지, eval 스킬로 redirect.
+   - 워크플로우 변경: 이전엔 normalize SKILL.md 452줄에 eval 섹션이 포함되어 ambient 컨텍스트로 retro 흐름이 모델에 항상 노출. 이후엔 normalize가 호출될 때마다 Step 2 출력 끝에 `// reminder: invoke /opt-prompt-eval <decision_id>` 한 줄을 명시적으로 emit하여 retro 단계가 silently 누락되지 않도록 보강.
+   - cross-ref audit: `~/.claude/settings.json`, `vocpage/.claude/settings*.json`, `~/.claude/hooks/`, `~/.claude/CLAUDE.md`, hookify rules — 모두 opt-prompt 참조 **0건**. split이 외부 시스템과 완전 격리되어 어떤 hook/setting/script도 깨뜨리지 않음.
+   - smoke test (격리 로그 `OPT_PROMPT_LOG=/tmp/opt-prompt-smoke.jsonl`): `decided` + `retro` 2 row append 모두 exit 0, decision_id stdout emit 정상, 2-row 결과 파일 검증 후 정리.
+   - 백업: `.claude/skills/opt-prompt/SKILL.md.bak.20260503` (원본 452줄)
 
 3. Tier 2.5 Quick Wins (4 룰)
    - §6.1 parallel batch / §6.2 pre-commit lint dry-run / §6.3 (Tier 1.4 옵션 E의 fallback) / §6.4 tsc+vitest batch
