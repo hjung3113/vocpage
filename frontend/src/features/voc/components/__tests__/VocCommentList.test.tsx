@@ -81,6 +81,80 @@ describe('VocCommentList', () => {
     expect(screen.queryByLabelText('new comment')).not.toBeInTheDocument();
   });
 
+  it('편집 → 취소 → 원본 보존 (수정 안됨)', () => {
+    const onEdit = vi.fn();
+    render(
+      <VocCommentList
+        comments={[mkComment({ id: 'mine', author_id: ME, body: '원본 텍스트' })]}
+        currentUserId={ME}
+        canWrite
+        pending={false}
+        onAdd={vi.fn()}
+        onEdit={onEdit}
+        onDelete={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('comment-edit-mine'));
+    const ta = screen.getByLabelText('댓글 수정') as HTMLTextAreaElement;
+    fireEvent.change(ta, { target: { value: '바뀐 텍스트' } });
+    fireEvent.click(screen.getByRole('button', { name: '취소' }));
+    expect(onEdit).not.toHaveBeenCalled();
+    expect(screen.getByText('원본 텍스트')).toBeInTheDocument();
+    expect(screen.queryByLabelText('댓글 수정')).not.toBeInTheDocument();
+  });
+
+  it('공백만 입력 → 저장 disabled, onAdd 미호출', () => {
+    const onAdd = vi.fn();
+    render(
+      <VocCommentList
+        comments={[]}
+        currentUserId={ME}
+        canWrite
+        pending={false}
+        onAdd={onAdd}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('new comment'), { target: { value: '   ' } });
+    expect(screen.getByRole('button', { name: '저장' })).toBeDisabled();
+  });
+
+  it('pending=true → 저장 버튼 disabled', () => {
+    render(
+      <VocCommentList
+        comments={[]}
+        currentUserId={ME}
+        canWrite
+        pending={true}
+        onAdd={vi.fn()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('new comment'), { target: { value: '본문' } });
+    expect(screen.getByRole('button', { name: '저장' })).toBeDisabled();
+  });
+
+  it('Ctrl+Enter → onAdd 호출', () => {
+    const onAdd = vi.fn();
+    render(
+      <VocCommentList
+        comments={[]}
+        currentUserId={ME}
+        canWrite
+        pending={false}
+        onAdd={onAdd}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    const ta = screen.getByLabelText('new comment');
+    fireEvent.change(ta, { target: { value: '단축키' } });
+    fireEvent.keyDown(ta, { key: 'Enter', ctrlKey: true });
+    expect(onAdd).toHaveBeenCalledWith('단축키');
+  });
+
   it('저장 클릭 → onAdd 호출 + textarea 비움', () => {
     const onAdd = vi.fn();
     render(

@@ -35,7 +35,11 @@ export function VocCommentList({
   const [editBody, setEditBody] = useState('');
 
   return (
-    <section data-testid="drawer-comments" className="flex flex-col gap-2">
+    <section
+      data-testid="drawer-comments"
+      className="flex flex-col gap-2"
+      aria-labelledby="voc-comments-heading"
+    >
       <h3
         id="voc-comments-heading"
         className="text-xs font-medium"
@@ -48,7 +52,7 @@ export function VocCommentList({
           아직 작성된 댓글이 없습니다.
         </p>
       ) : (
-        <ul className="flex flex-col gap-2" aria-labelledby="voc-comments-heading">
+        <ul className="flex flex-col gap-2">
           {comments.map((c) => {
             const isOwn = c.author_id === currentUserId;
             const isEditing = editingId === c.id;
@@ -113,7 +117,7 @@ export function VocCommentList({
                     <Textarea
                       value={editBody}
                       onChange={(e) => setEditBody(e.target.value)}
-                      aria-label={`edit comment ${c.id}`}
+                      aria-label="댓글 수정"
                     />
                     <div className="flex gap-2">
                       <Button type="submit" size="sm" disabled={pending || !editBody.trim()}>
@@ -152,7 +156,17 @@ export function VocCommentList({
           <Textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="댓글을 입력하세요"
+            onKeyDown={(e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const next = draft.trim();
+                if (next) {
+                  onAdd(next);
+                  setDraft('');
+                }
+              }
+            }}
+            placeholder="댓글을 입력하세요 (Ctrl+Enter로 등록)"
             aria-label="new comment"
           />
           <Button type="submit" size="sm" disabled={pending || !draft.trim()}>

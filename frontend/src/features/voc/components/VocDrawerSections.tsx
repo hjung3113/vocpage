@@ -34,6 +34,7 @@ export function VocDrawerSections({
 }: Props) {
   return (
     <div className="flex flex-col gap-4" data-pcomp="voc-review-sections">
+      {/* TODO(FU): wire api/comments + react-query mutations. C-14 ships UI only. */}
       <VocCommentList
         comments={[]}
         currentUserId={currentUserId}
