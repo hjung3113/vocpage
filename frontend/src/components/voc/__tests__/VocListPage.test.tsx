@@ -87,8 +87,9 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.notes).mockResolvedValue([]);
     renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'user' });
     await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
-    await waitFor(() => expect(screen.getByTestId('drawer-notes')).toBeInTheDocument());
-    expect(screen.queryByLabelText('new note')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('drawer-comments')).toBeInTheDocument());
+    expect(screen.queryByLabelText('new comment')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('drawer-internal-notes')).not.toBeInTheDocument();
   });
 
   it('F-T4b manager role contrast: 같은 vocId에서 note form은 노출 (gate 조건이 user 전용임을 증명)', async () => {
@@ -103,7 +104,7 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.notes).mockResolvedValue([]);
     renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
     await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
-    await waitFor(() => expect(screen.getByLabelText('new note')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
   });
 
   it('F-T5 drawer Escape 닫힘: URL ?id 제거 — 다음 list query에 stale id 유출 없음', async () => {
