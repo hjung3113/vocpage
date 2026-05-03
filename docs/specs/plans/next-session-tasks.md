@@ -30,9 +30,16 @@
 > **진행 방식 (D10 번복)**: Phase 진행 중 autopilot/ralph 자동화 사용 허용. **머지·완료 선언은 사용자 검수 후에만**. Phase 게이트 미승인 시 다음 Phase 시작 금지.
 > **금지**: Wave 2 (Dashboard) 및 Follow-up C-2 (seed UUID v4) 진입은 본 Wave 종료 전까지 **hard-block**.
 
+### Wave 1.7 — VOC 등록 모달 정합화 (신규, 2026-05-03)
+
+> **트리거**: 사용자 검토 — 현 등록 모달이 prototype 시각·spec(`feature-voc.md §8.4` medium 강제, §8.5 합산 cap, §8.8 cascade)과 어긋남.
+> **정본 plan**: [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md). 사양: `feature-voc.md §9.11`.
+> **Phase**: A(spec/contract, 본 PR 진행) → B(BE master endpoints) → C(FE 모달 rebuild) → D(visual diff/cleanup). 각 Phase 사용자 승인 게이트.
+> **Phase A 산출**: `feature-voc.md §9.11` 신설 + `requirements.md §6.1` master endpoints 추가 + `shared/contracts/master/io.ts` SystemListItem/MenuListItem 신규.
+
 ### Wave 2 진입 hard-block
 
-위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + **Wave 1.6 (`/voc` prototype 일치화)** + follow-up C-2 (seed UUID fix) 종결 전까지 **Wave 2 implementation 금지**. follow-up C-1은 본 PR로 종결. 진행 순서: Wave 1.6 → Follow-up C-2 → Wave 2.
+위 Wave 1 보강 PR 머지 + follow-up A (Playwright) + **Wave 1.6 (`/voc` prototype 일치화)** + **Wave 1.7 (VOC 등록 모달 정합화)** + follow-up C-2 (seed UUID fix) 종결 전까지 **Wave 2 implementation 금지**. follow-up C-1은 본 PR로 종결. 진행 순서: Wave 1.6 → Wave 1.7 → Follow-up C-2 → Wave 2.
 
 ---
 

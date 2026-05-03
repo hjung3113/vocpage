@@ -679,3 +679,82 @@ FE 가드: window.currentUser.role ∈ {manager, admin}일 때만 승인/반려 
 - @멘션 댓글
 - CSV/Excel 내보내기
 - 중복 VOC 감지
+
+### 9.11 VOC 등록 모달 상세 (Wave 1.7, 2026-05-03)
+
+prototype `prototype.html#modalBg` 시각 사양을 React 모달(`features/voc/components/VocCreateModal.tsx`)에 반영. §8 데이터 모델·권한 룰을 UI에서 깨지 않도록 정합성 명시.
+
+#### 9.11.1 필드 구성 (위→아래)
+
+1. **제목** (필수, `*` 표시)
+   - placeholder: `"문제를 간결하게 설명해 주세요 (최대 200자)"`
+   - `maxLength=200` (§8.10 일치)
+   - 우하단 글자수 카운터 `현재/200`. 200 도달 시 강조색 `var(--status-danger)`.
+2. **드롭다운 2×2 그리드**
+   - row1: **시스템** `*` · **메뉴** `*`
+     - 시스템 미선택 시 메뉴 select `disabled`, placeholder `"시스템 먼저 선택..."`
+     - 시스템 변경 시 메뉴 옵션 재로드 + 선택값 reset
+     - 활성 메뉴 0건 시 메뉴 select `disabled` + 안내 `"이 시스템에 등록된 메뉴가 없습니다"` (§8.8:261)
+   - row2: **유형** `*` · **우선순위**
+     - 우선순위는 **항상 `disabled`**, value 고정 `medium`
+     - 라벨: `우선순위 (자동: Medium · 생성 후 조정)`
+     - 근거: §8.4 — "생성 시 서버에서 medium으로 강제 설정 (클라이언트 값 무시)". 권한자(Manager/Admin/담당 Dev)는 생성 후 드로어에서 변경.
+3. **본문** (필수, `*` 표시) — Toast UI Editor
+   - **빈 본문일 때 초기값으로 마크다운 skeleton 자동 삽입** (placeholder 아닌 실제 값):
+
+     ```md
+     ## 문제 상황
+
+     ## 재현 방법
+
+     1.
+
+     ## 발생 환경
+
+     - 시스템:
+     - 브라우저:
+
+     ## 기대 동작
+     ```
+
+   - skeleton의 H2 헤더 구조는 추후 자동 정규화/structured_payload 추출 파이프라인의 파싱 기준이 됨 (NextGen 연계).
+   - 사용자가 skeleton 위에 작성을 시작하면 그대로 유지 — 빈 헤더만 남으면 BE가 무시(저장 시 본문 전체 64KB 제한, §8.10).
+
+4. **자동 태그 추천 row**
+   - 본문 아래, 첨부 위에 표시.
+   - 본문/제목 입력 후 500ms debounce → `tag_rules` 매칭 (§8.8 자동 태깅 정책 기준, prototype `autotagRow` 동작).
+5. **첨부파일 zone** (선택)
+   - 라벨 보조 텍스트 `(선택 · 이미지만 · 최대 5개)`
+   - 드래그앤드롭 + 선택 버튼
+   - 5개·10MB **본문 이미지 + 첨부 합산** cap (§8.5:217 "본문 기준" 명시 재인용).
+   - 우측 카운트 배지 `0/5`.
+
+#### 9.11.2 본문 ↔ 첨부 단방향 동기화
+
+- **본문 → 첨부 (자동 추가)**: 사용자가 Toast Editor에 이미지를 삽입 (드래그·붙여넣기·이미지 버튼)하면 동일 File이 첨부 zone에도 추가된다.
+- **본문 → 첨부 (자동 제거)**: 사용자가 본문에서 이미지 마크다운/노드를 삭제하면 첨부 zone에서도 동일 항목 제거.
+- **첨부 → 본문**: 자동 삽입 **하지 않음**. 첨부 zone에서 직접 추가한 이미지는 본문 흐름과 무관 (캡처/별첨용).
+- **dedup**: 동일 File(name+size+lastModified hash) 중복 방지 — 본문에 이미 있는 이미지를 첨부에 별도로 올려도 1개로만 카운트.
+- **합산 cap 검증**: 본문 + 첨부의 유니크 이미지 합계가 `5개 / 10MB`를 초과하면 새 추가를 거부 (토스트 안내).
+
+#### 9.11.3 Due Date 처리
+
+- **생성 모달에 Due Date 필드 미노출**.
+- BE는 priority=`medium` 강제 룰에 따라 항상 `due_date = created_at + 30일`로 자동 계산 후 저장 (§8.4.1 표 그대로).
+- 권한자는 생성 후 드로어에서 priority 변경 시 자동 재계산되며, 수동 수정도 §8.4.2 룰로 가능.
+
+#### 9.11.4 푸터
+
+- 좌측: `(info icon) 등록 후 이슈 ID가 자동 부여됩니다` — `var(--text-quaternary)`, 12px.
+- 우측: `취소` (ghost) / `[send icon] VOC 등록` (primary).
+
+#### 9.11.5 라벨 표기 토큰
+
+- 필수 마커 `*`: `var(--status-danger)` (또는 신규 `--form-required` 토큰 추가 시 그쪽). 별도 레이블 토큰 추가는 본 wave 범위 외 — 기존 토큰 재사용.
+- 라벨 보조 텍스트 (예: `(선택 · 이미지만 · 최대 5개)`): `text-xs` + `var(--text-quaternary)`.
+
+#### 9.11.6 master 데이터 의존
+
+- `GET /api/master/systems` 응답에 `menus: MenuListItem[]` nested 포함 — 모달은 단일 호출로 cascade 데이터 확보.
+- Admin 페이지의 메뉴 단독 CRUD에는 `GET /api/master/menus?system_id=` 별도 endpoint 사용 (§9.4.2).
+- 스키마: `shared/contracts/master/io.ts` (Wave 1.7에서 신규 추가).
