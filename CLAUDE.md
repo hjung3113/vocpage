@@ -34,6 +34,16 @@ Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Arc
 - Typography: Pretendard Variable (UI), D2Coding (code/issue IDs).
 - 8px spacing grid, max-width ~1200px, elevation via background opacity not shadow darkness.
 
+<!-- BRANCH-NOTE: token-discipline-plan — REMOVE ON MERGE TO MAIN -->
+
+> **이 브랜치 (`docs/token-discipline-plan`) 전용 안내 — main 머지 시 본 블록 + `claude-progress-token-discipline.md` 함께 제거**
+>
+> 본 브랜치는 토큰 절감 plan **blind test** 환경. main의 `claude-progress.txt`는 본 브랜치 작업과 무관하게 main 상태 유지.
+>
+> **세션 시작 시**: `claude-progress.txt` 대신 **`claude-progress-token-discipline.md`** 를 읽어라. 다음 진입점·Tier 실행 순서·미해결 결정 모두 그쪽에 있음.
+
+<!-- /BRANCH-NOTE -->
+
 ## Start Every Session
 
 1. Read `claude-progress.txt` (first 30 lines only)

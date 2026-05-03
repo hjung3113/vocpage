@@ -1,0 +1,130 @@
+# Token-Discipline Branch Progress
+
+> **이 파일은 `docs/token-discipline-plan` 브랜치 전용 진행 추적 파일이다.**
+> Main의 `claude-progress.txt`는 본 브랜치 작업과 무관하게 main 상태 유지.
+> 본 브랜치는 토큰 절감 plan **blind test** 환경 — 다른 세션이 fresh 시작해 측정 정합성을 확보하기 위함.
+> **머지 시점에 이 파일은 삭제** (root `CLAUDE.md`의 BRANCH-NOTE 블록도 함께 제거).
+
+---
+
+## 브랜치 목적
+
+- PR #177 (`docs(plan): token-discipline Tier 1/1.5/2 implementation plan (next session)`) — OPEN
+- 단일 plan 문서 finalize: `docs/specs/plans/token-discipline-plan.md` (v4, 560줄)
+- **다음 세션은 본 plan §8 실행 순서 따라 patches 적용** — 본 브랜치에서 진행, main 영향 없음
+
+---
+
+## 현재 상태 (2026-05-03)
+
+### 완료
+
+- v3 consolidation (commit `89f26e4`) — review v2 단일 plan fold-in
+- v4 pre-flight 정정 (commit `2002921`) — PR #177 3 reviewer (critic·debugger·document-specialist) BLOCK 7건 + NIT 6건 정정 + 5 part 재구조화
+
+### v4 핵심 변화 (vs v3)
+
+1. **D4 ToolSearch weight 강등 무효화** — C-11 0 fire는 도메인 밖 inadmissible. `[required on ToolSearch-heavy tasks]` 복원
+2. **D7 task shape driver 폐기** — residual-as-driver = circular. §2 Unattributed variance로 이전
+3. **Quick Wins 5룰 → 4룰** — §2.5.5 (TSX Serena routing)는 root CLAUDE.md L48-52 pure-duplicate + hookify 제안이 `feedback_serena_first.md` contradiction이라 drop
+4. **PNG 절감 수치 폐기** — base64 byte vs image token 혼동 ~10× 오류. raid 측정에서 결정
+5. **Tier 1.1-B / Tier 1.3-A rollback 경로 정정** — debugger path-error 발견 (`pre-tool-use.mjs` backup-and-restore + Serena 등록 사전 trace)
+6. **Tier 1.2-A 재정의** — 68→6 (stub) → 69→8 keep + 61 삭제 (no stub) + Tier 2 결합 가설 (TS/TSX 도메인 inject ≈ 0)
+7. **§10.4 cost\* 가중치 sensitivity 표 신설** + power 재계산 단계 (§10.3)
+
+### 8 keep 디렉토리 (Tier 1.2-A 재정의)
+
+- `root/CLAUDE.md`
+- `.claude/CLAUDE.md`
+- `frontend/CLAUDE.md`
+- `backend/CLAUDE.md`
+- `frontend/src/CLAUDE.md` (50-80줄 디렉토리 맵)
+- `backend/src/CLAUDE.md` (50-80줄 디렉토리 맵)
+- `docs/CLAUDE.md`
+- `prototype/CLAUDE.md`
+
+나머지 61개 leaf CLAUDE.md → ancestor 8개 본문에 흡수 후 삭제 (no stub).
+
+---
+
+## 다음 세션 진입점 (blind test)
+
+**중요**: 다음 세션은 **본 브랜치에서 새로 시작** — main `claude-progress.txt`는 보지 말고 본 파일과 plan §8을 따라.
+
+### 1단계 — 본 plan v4 머지 결정
+
+본 브랜치 PR #177은 **머지하지 않음** (blind test 환경 보존). 다음 세션이 본 브랜치 위에서 plan §8 실행.
+
+### 2단계 — plan §8 실행 순서
+
+```
+1. Tier 2.5 Quick Wins (4 룰) 즉시 적용 — root CLAUDE.md / .claude/CLAUDE.md
+   - §6.1 parallel batch (기존 룰 강화)
+   - §6.2 pre-commit lint dry-run (package.json scripts 확인 후 명령 확정)
+   - §6.3 opt-prompt re-injection gating (옵션 A + SKILL.md guard)
+   - §6.4 tsc+vitest batch (.claude/CLAUDE.md Token-Saving Protocol 섹션)
+
+2. Tier 1.1-A — `OMC_SKIP_DELEGATION_NOTICES=1` env entry
+
+3. Tier 1.3-A — Serena 이중 등록 정리
+   - 사전 trace: cat ~/.claude/claude_desktop_config.json; ls ~/.claude/mcp*.json
+   - mcp__serena__* 유지, mcp__plugin_serena_serena__* 제거
+
+4. Tier 2 — root CLAUDE.md tool-routing 강화 + project memory narrowing
+
+4.5. **Raid 1 — Tier 2 적용 후 가설 검증** (신규)
+   - TS/TSX 도메인 inject ≈ 0 가설 직접 측정
+   - Serena routing 강제 + 동일 spec task 1회
+   - CLAUDE.md inject 카운트 + 토큰량 기록
+   - → Tier 1.2-A 진행 여부 결정 (≥-100K 잔존 share면 진행)
+
+5. Tier 1.2-A — 69→8 keep + 61 삭제 (raid 1 결과 보고 진행)
+
+6. Tier 1.1-C — PostToolUse Serena echo 제거
+
+7. Tier 1.4 — 옵션 D (helper 직접 호출) 또는 SKILL.md split
+
+8. 측정 raid 1 — cost* 기록 + independent variable (screenshot/subagent/inject/ToolSearch fire) 사전 등록
+
+9. Tier 3 5분 실측 → Tier 1.5 살림/폐기 결정
+
+10. 측정 raid 2 — paired comparison (§10)
+
+11. Tier 1.1-B + Tier 1.2-B + Tier 1.3-B (ToolSearch fire ≥3회 task로 paired test 후) — 선결 trace 후
+```
+
+### 3단계 — Post-flight + 머지
+
+§9.2 post-flight 3 reviewer all PASS 후 본 브랜치 main 머지.
+
+---
+
+## Baseline 측정 보존 (paired raid 비교 기준)
+
+| Session                                | LOC | cache_creation | cache_read | cost   | cost\* (+0.1×cache_read) |
+| -------------------------------------- | --- | -------------- | ---------- | ------ | ------------------------ |
+| PR #175 (F-1/2/3 bundle)               | 220 | 3.39M          | 54.34M     | 3.39M  | 8.82M                    |
+| PR #178 (F-bundle minor)               | 56  | 1.16M          | 14.77M     | 1.16M  | 2.64M                    |
+| PR #180 (C-10 NotifButton+NotifPanel)  | 324 | 2.40M          | n/a        | ~2.40M | n/a                      |
+| **PR #182 (C-11 VocCreateModal+Atom)** | 350 | 2.73M          | 54.97M     | 2.73M  | 8.23M                    |
+
+근거: `~/.claude/opt-prompt/opt-prompt-log.jsonl` 4 retro rows.
+
+---
+
+## 미해결 결정 (다음 세션 인계)
+
+- **§6.2 lint 명령**: `package.json` scripts 확인 후 `npm run lint` placeholder를 실 명령어로 교체
+- **§10.4 sensitivity 표**: raid 1 후 0.05 / 0.10 / 0.15 가중치로 4 세션 cost\* 재계산. Tier ROI 순위가 3 가중치 모두에서 동일하면 robust
+- **§10.3 power 재계산**: cost\* 분산 σ/μ 산출 후 n=10/cell 검증. underpowered면 표본 추가
+- **Tier 1.4 SKILL.md split 분기**: §6.3 옵션 A (helper 직접 호출)만으로 충분한지, references/ split까지 필요한지 raid 1 결과 후 결정
+
+---
+
+## 머지 시 정리
+
+본 브랜치 main 머지 시:
+
+1. `claude-progress-token-discipline.md` 삭제 (이 파일)
+2. root `CLAUDE.md` 의 `<!-- BRANCH-NOTE: token-discipline-plan -->` 블록 제거
+3. `claude-progress.txt`에 token-discipline plan 적용 결과 + 다음 작업 (δ-batch C-12) 한 블록 추가
