@@ -104,31 +104,52 @@
 
 검증 칸은 `docs/specs/reviews/token-discipline-verification.md`로 분리되어 있음. 다음 fresh 세션이 그 문서의 row를 직접 채움.
 
-### 2단계 — 다음 세션 작업: 본 브랜치에 batch 1 적용
+### 2단계 — 다음 세션 작업: 본 브랜치 1.2-A 적용 (batch 1 잔여)
 
-**전략 (2026-05-03 사용자 확정, 명확히)**:
+**현황 (2026-05-03 본 세션 결과)**:
 
-1. **다음 세션은 본 브랜치 (`docs/token-discipline-plan`) 위에서 그대로 진행** — 신규 브랜치 만들지 말 것.
-2. 본 브랜치에 batch 1 (1.2-A + 1.1-A + 2.5 Quick Wins, 3건) 3 commit 적용.
-3. **그 이후 별도 브랜치를 main에서 분기 → 1.3-A + 1.4 + batch 1 = 총 5건을 한 묶음으로 main에 머지** (5 commit cherry-pick 또는 squash).
-4. 검증 (verification 문서 row 채움)은 main 머지된 5건을 fresh 세션이 한 번에 처리.
+- ✅ Tier 1.1-A 적용 (commit `817c9be`) — `OMC_SKIP_DELEGATION_NOTICES=1`
+- ✅ Tier 2.5 Quick Wins (3 룰) 적용 (commit `3fedfa4`) — root CLAUDE.md §6.1·§6.2 + .claude/CLAUDE.md §6.4
+- ⏳ **Tier 1.2-A 잔여** — 다음 세션이 본 브랜치(`docs/token-discipline-plan`)에서 직접 진행
 
-**batch 1 — 부작용 거의 없는 + 거의 확실한 3개 (최종 확정)**:
+**전략**:
 
-| #   | Tier                                          | 변경                                                                                                                                                                                                                               | 백업/롤백               | 위험도                                                          | 추정 절감                        |
-| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------- | -------------------------------- |
-| 1   | **1.2-A** (사용자 명시 요청)                  | sub-CLAUDE.md 69 → 8 keep + 61 삭제 (no stub). leaf 본문 ancestor 8개에 흡수. **유지 8개**: root, `.claude`, `frontend`, `backend`, `frontend/src` (50-80줄 디렉토리 맵), `backend/src` (50-80줄 디렉토리 맵), `docs`, `prototype` | `git revert`            | 중간 (~2-3시간 흡수 작업, 흡수 누락 시 leaf 도메인 가이드 손실) | -200-400K (단일 최대 절감 patch) |
-| 2   | **1.1-A**                                     | `~/.claude/settings.json` env에 `OMC_SKIP_DELEGATION_NOTICES=1` 1줄 추가                                                                                                                                                           | `.bak.<ts>` 백업 → `mv` | 최저 (1줄 편집, hook script 코드 변경 0)                        | -2K direct                       |
-| 3   | **2.5 Quick Wins (룰 텍스트 4건 → 실질 3건)** | root `CLAUDE.md` parallel batch 강화 (§6.1) + lint dry-run 신규 (§6.2) + tsc+vitest batch 신규 (§6.4). `.claude/CLAUDE.md` Token-Saving Protocol에 §6.4 위치. **§6.3은 Tier 1.4 옵션 E 적용으로 자동 해소됨, skip**                | `git revert`            | 최저 (룰 텍스트만, 코드 영향 0)                                 | -200-400K (overlap caveat)       |
+1. 다음 세션은 본 브랜치 위에서 1.2-A 그대로 적용 — 신규 브랜치 X.
+2. 1.2-A 완료 후 별도 브랜치를 main에서 분기 → 1.3-A + 1.4 + 1.1-A + 2.5 + 1.2-A = 총 5건을 한 묶음으로 main 머지.
+3. 검증 (verification 문서 row 채움)은 main 머지된 5건을 fresh 세션이 한 번에 처리.
 
-**선결 작업 (batch 1 실행 시 첫 단계)**:
+**1.2-A 작업 (다음 세션 진입점)**:
 
-- §6.2 lint 명령: `package.json scripts` 직접 확인 → `npm run lint` placeholder 실 명령어로 교체
-- 1.2-A leaf 흡수: 61개 leaf CLAUDE.md 사전 검토 후 의미 있는 가이드라인만 ancestor 8개에 추가, stub 안 남김. 50-80줄 cap 위반 시 frontend/src·backend/src 본문 cap 80-100줄까지 양보 허용
+| 항목      | 내용                                                                                                                                                                                                |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 변경      | sub-CLAUDE.md 69 → 8 keep + 61 삭제 (no stub). leaf 본문 ancestor 8개에 흡수.                                                                                                                       |
+| 8 keep    | root, `.claude`, `frontend`, `backend`, `frontend/src` (50-80줄 디렉토리 맵), `backend/src` (50-80줄 디렉토리 맵), `docs`, `prototype`. 50-80줄 cap 위반 시 frontend/src·backend/src는 80-100 양보. |
+| 작업 시간 | ~2-3시간 (leaf 본문 분류 + 흡수 + 삭제 + hookify 패치)                                                                                                                                              |
+| 위험도    | 중간 — 흡수 누락 시 leaf 도메인 가이드 손실                                                                                                                                                         |
+| 롤백      | `git revert` (4 commit 모두 git tracked)                                                                                                                                                            |
+| 추정 절감 | -200-400K (단일 최대 절감 patch)                                                                                                                                                                    |
 
-**커밋 분리** (PR 1건 안에): 4개 별도 commit (1.2-A leaf 흡수 + 1.2-A 삭제 / 1.1-A / 2.5 Quick Wins) — 부분 revert 대비.
+**커밋 분리** (4 commit, 부분 revert 대비):
 
-**제외한 후보 + 사유**:
+1. leaf 본문 ancestor 흡수 (8 keep CLAUDE.md 갱신)
+2. 61 leaf CLAUDE.md 삭제
+3. **hookify 패치** — `vocpage/.claude/hookify.warn-doc-cleanup-before-pr.local.md` L18-23 (현재 step 7 "Refresh CLAUDE.md ..." 5 sub-bullet) 통째 교체:
+
+   ```
+   7. **CLAUDE.md 8-keep set** — only `root`, `.claude`, `frontend`, `backend`, `frontend/src`, `backend/src`, `docs`, `prototype`. Update one of these only if its `## Role` / `## When to look where` changed in this PR.
+      - No new leaf CLAUDE.md outside the 8-keep set — fold any directory guidance into the nearest ancestor.
+      - No stub on delete — `→ ancestor.md` one-liners are auto-loaded noise.
+   ```
+
+   사유: 기존 L18-23은 PR마다 leaf 추가/삭제 판단을 요구 — 1.2-A baseline 후 의사결정 트리가 "8 keep 중 변경됐나?" 하나로 축약되어 기존 5 sub-bullet 자체가 obsolete.
+
+4. progress 문서 (본 파일) 업데이트 + verification 문서 row 추가
+
+**사용자 추가 확인 사항** (다음 세션 진입 직후 사용자에게 먼저 질의):
+
+- 1.2-A 적용 전 추가로 확인하고 싶은 부분이 있다고 함 (2026-05-03 본 세션 종료 시점). 진입 직후 사용자에게 먼저 묻고 시작.
+
+**제외한 후보 + 사유** (참고용 보존):
 
 - **1.1-B** (hook dispatcher dedup): hook script 직접 편집, 부작용 위험. batch 2 후보.
 - **1.1-C** (PostToolUse Serena echo matcher 삭제): 안전도 높지만 Serena 관련 추가 변경은 batch 1.3-A 검증 후로 미룸 (사용자 결정 2026-05-03).
