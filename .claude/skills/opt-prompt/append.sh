@@ -18,6 +18,12 @@ mkdir -p "$(dirname "$LOG")"
 LOCK_DIR="$LOG.lock.d"
 TRANSCRIPT_DIR="$HOME/.claude/projects/-Users-hyojung-Desktop-2026-vocpage"
 LOCK_TIMEOUT=10  # seconds
+# Session-stats binary (read-only consumer; we never modify it).
+# Override path for tests via OPT_PROMPT_STATS_BIN.
+STATS_BIN="${OPT_PROMPT_STATS_BIN:-$SCRIPT_DIR/../../../utils/session-stats.sh}"
+# Sidecar snapshots: full session-stats JSON per phase per decision.
+SNAPSHOT_DIR="${OPT_PROMPT_SNAPSHOTS_DIR:-$HOME/.claude/opt-prompt/snapshots}"
+mkdir -p "$SNAPSHOT_DIR"
 
 now_iso()      { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
 now_compact()  { date -u +"%Y%m%dT%H%M%SZ"; }
@@ -37,7 +43,10 @@ acquire_lock() {
   trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT INT TERM
 }
 
-# Read fields-json from arg, @file, or stdin. Validate as JSON object.
+# Reserved keys helper-controlled by append.sh — user $fields must not collide.
+RESERVED_KEYS='ts task decision_id phase status session_id session_summary tokens_at_decision tokens_at_retro tokens_delta void_reason'
+
+# Read fields-json from arg, @file, or stdin. Validate as JSON object and reject reserved keys.
 read_fields() {
   local raw
   case "$1" in
@@ -49,22 +58,84 @@ read_fields() {
     echo "ERROR: fields must be a JSON object (got: $(printf '%s' "$raw" | head -c 80))" >&2
     exit 7
   fi
+  local violations
+  violations=$(printf '%s' "$raw" | jq -r --arg r "$RESERVED_KEYS" \
+    '($r|split(" ")) as $reserved | [keys[] | select(. as $k | $reserved | any(. == $k))] | join(",")' 2>/dev/null)
+  if [[ -n "$violations" ]]; then
+    echo "ERROR: <fields> must not contain helper-controlled keys: $violations" >&2
+    exit 7
+  fi
   printf '%s' "$raw"
 }
 
-capture_tokens() {
+current_session_id() {
   local latest
   latest=$(ls -t "$TRANSCRIPT_DIR"/*.jsonl 2>/dev/null | head -1 || true)
-  if [[ -z "${latest:-}" || ! -f "$latest" ]]; then echo 'null'; return; fi
-  jq -s '
-    [.[] | .. | objects | select(.input_tokens? != null and .output_tokens? != null)] as $u
-    | if ($u | length) == 0 then null else
-      { input:          ($u | map(.input_tokens // 0) | add),
-        output:         ($u | map(.output_tokens // 0) | add),
-        cache_read:     ($u | map(.cache_read_input_tokens // 0) | add),
-        cache_creation: ($u | map(.cache_creation_input_tokens // 0) | add) }
-      end
-  ' "$latest" 2>/dev/null || echo 'null'
+  if [[ -z "${latest:-}" || ! -f "$latest" ]]; then return 0; fi
+  basename "$latest" .jsonl
+}
+
+# Run session-stats <sid> and save full JSON snapshot to <out>.
+# Fail-soft: write '{}' on any failure (missing bin, bad sid, transcript moved).
+# Stays silent on stdout (snapshot path is the contract).
+write_snapshot() {
+  local sid="$1" out="$2"
+  if [[ -z "$sid" ]]; then
+    echo "WARNING: no session_id resolved; snapshot will be empty (telemetry skipped)" >&2
+    echo '{}' > "$out"; return
+  fi
+  if [[ ! -x "$STATS_BIN" ]]; then
+    echo "WARNING: session-stats binary not found at '$STATS_BIN'; snapshot will be empty" >&2
+    echo '{}' > "$out"; return
+  fi
+  if ! "$STATS_BIN" "$sid" > "$out" 2>/dev/null; then
+    echo "WARNING: session-stats failed for sid=$sid (transcript missing/corrupt); snapshot will be empty" >&2
+    echo '{}' > "$out"
+  fi
+  if ! jq -e 'type == "object"' "$out" >/dev/null 2>&1; then echo '{}' > "$out"; fi
+}
+
+# Build the slim session_summary object from a snapshot file.
+# Mirrors fields agreed in skill design (D-2.B): tokens + 7 metrics.
+# Returns 'null' if snapshot is empty/invalid (fail-soft).
+summary_from_snapshot() {
+  local snap="$1"
+  [[ -f "$snap" ]] || { echo 'null'; return; }
+  jq -c '
+    if (.tokens // null) == null then null else
+    {
+      api_calls: (.api_calls // 0),
+      tokens: {
+        input_uncached: (.tokens.input_uncached // 0),
+        cache_create:   (.tokens.cache_create   // 0),
+        cache_read:     (.tokens.cache_read     // 0),
+        output:         (.tokens.output         // 0),
+        grand_total:    (.tokens.grand_total    // 0)
+      },
+      cache_invalidation_events: (.cache_invalidation.events // 0),
+      bash_failures:             (.bash_failures.count       // 0),
+      subagent_calls:            (.subagents.total_calls     // 0),
+      top3_tools: ((.by_tool // {}) | to_entries | sort_by(-.value) | .[0:3] | from_entries),
+      claudemd_reads:            (.tool_use_details.read.claudemd_count // 0),
+      p90_pause_min: ((.pause_distribution.p90_ms // 0) / 60000 | (. * 100 | round) / 100)
+    } end
+  ' "$snap" 2>/dev/null || echo 'null'
+}
+
+# tokens_delta from two summaries (objects, not snapshots).
+# null if either side has no tokens, OR session ids differ (caller passes 'null' then).
+tokens_delta_from_summaries() {
+  local s_decided="$1" s_retro="$2"
+  jq -nc --argjson a "$s_decided" --argjson b "$s_retro" '
+    if $a == null or $b == null or ($a.tokens // null) == null or ($b.tokens // null) == null
+    then null
+    else {
+      input_uncached: ($b.tokens.input_uncached - $a.tokens.input_uncached),
+      cache_create:   ($b.tokens.cache_create   - $a.tokens.cache_create),
+      cache_read:     ($b.tokens.cache_read     - $a.tokens.cache_read),
+      output:         ($b.tokens.output         - $a.tokens.output),
+      grand_total:    ($b.tokens.grand_total    - $a.tokens.grand_total)
+    } end'
 }
 
 # Exact jq match — avoids substring false-positives of grep.
@@ -73,16 +144,23 @@ id_exists() {
   jq -e --arg id "$1" 'select(.decision_id == $id)' "$LOG" >/dev/null 2>&1
 }
 
+# "Active" = LATEST row at (id|task, phase) AND its status is "active". A later void row at the
+# same (id, phase) supersedes the earlier active one, matching the analysis-join semantics in
+# the eval skill SKILL.md. Pre-filter-then-tail would mis-return the earlier active row.
 active_decided_for_task() {
   [[ -f "$LOG" ]] || return 0
-  jq -c --arg t "$1" \
-    'select(.task==$t and .phase=="decided" and (.status//"active")=="active")' "$LOG" 2>/dev/null
+  local latest
+  latest=$(jq -c --arg t "$1" 'select(.task==$t and .phase=="decided")' "$LOG" 2>/dev/null | tail -1)
+  [[ -n "$latest" ]] || return 0
+  [[ "$(jq -r '.status // "active"' <<<"$latest")" == "active" ]] && printf '%s' "$latest"
 }
 
 active_decided_by_id() {
   [[ -f "$LOG" ]] || return 0
-  jq -c --arg id "$1" \
-    'select(.decision_id==$id and .phase=="decided" and (.status//"active")=="active")' "$LOG" 2>/dev/null
+  local latest
+  latest=$(jq -c --arg id "$1" 'select(.decision_id==$id and .phase=="decided")' "$LOG" 2>/dev/null | tail -1)
+  [[ -n "$latest" ]] || return 0
+  [[ "$(jq -r '.status // "active"' <<<"$latest")" == "active" ]] && printf '%s' "$latest"
 }
 
 cmd="${1:-}"; shift || true
@@ -98,18 +176,37 @@ case "$cmd" in
     if id_exists "$id"; then
       echo "ERROR: decision_id '$id' already exists (clock collision?)" >&2; exit 2
     fi
-    tokens=$(capture_tokens)
+    sid=$(current_session_id || true)
+    snap="$SNAPSHOT_DIR/$id.decided.json"
+    write_snapshot "$sid" "$snap"
+    summary=$(summary_from_snapshot "$snap")
+    [[ -n "$summary" ]] || summary='null'
     # $fields first, helper-controlled fields second → helper wins on key conflicts (no injection).
     row=$(jq -nc \
-      --arg ts "$(now_iso)" --arg task "$task" --arg id "$id" \
-      --argjson fields "$fields" --argjson tokens "$tokens" \
+      --arg ts "$(now_iso)" --arg task "$task" --arg id "$id" --arg sid "$sid" \
+      --argjson fields "$fields" --argjson summary "$summary" \
       '$fields + {ts:$ts, task:$task, decision_id:$id, phase:"decided", status:"active",
-        tokens_at_decision:$tokens}')
+        session_id:$sid, session_summary:$summary}')
     printf '%s\n' "$row" >> "$LOG"
     printf '%s\n' "$id"
     ;;
   retro)
     id="${1:?decision_id required}"; raw_fields="${2:?fields required (JSON | @file | -)}"
+    shift 2 || true
+    # Optional flag: --exec-sid <sid> (B) — explicit task-execution session for stats.
+    # If absent, auto-fallback (C): use decided.session_id when its transcript still exists,
+    # else fall back to current latest session.
+    exec_sid=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --exec-sid)
+          if [[ -z "${2:-}" ]]; then
+            echo "ERROR: --exec-sid requires non-empty <session_id>" >&2; exit 1
+          fi
+          exec_sid="$2"; shift 2 ;;
+        *) echo "ERROR: unknown retro arg '$1'" >&2; exit 1 ;;
+      esac
+    done
     fields=$(read_fields "$raw_fields")
     acquire_lock
     decided=$(active_decided_by_id "$id" || true)
@@ -117,20 +214,34 @@ case "$cmd" in
       echo "ERROR: no active 'decided' row for decision_id '$id'" >&2; exit 4
     fi
     task=$(jq -r '.task' <<<"$decided")
-    decided_tokens=$(jq -c '.tokens_at_decision // null' <<<"$decided")
-    tokens=$(capture_tokens)
-    delta=$(jq -nc --argjson a "$decided_tokens" --argjson b "$tokens" '
-      if $a == null or $b == null then null else
-      { input:          ($b.input          - $a.input),
-        output:         ($b.output         - $a.output),
-        cache_read:     ($b.cache_read     - $a.cache_read),
-        cache_creation: ($b.cache_creation - $a.cache_creation) }
-      end')
+    sid_decided=$(jq -r '.session_id // ""' <<<"$decided")
+    decided_summary=$(jq -c '.session_summary // null' <<<"$decided")
+    # Resolve sid for snapshot: B (explicit) > C (decided sid if transcript present) > current.
+    if [[ -n "$exec_sid" ]]; then
+      sid="$exec_sid"
+    elif [[ -n "$sid_decided" && -f "$TRANSCRIPT_DIR/$sid_decided.jsonl" ]]; then
+      sid="$sid_decided"
+    else
+      sid=$(current_session_id || true)
+    fi
+    snap="$SNAPSHOT_DIR/$id.retro.json"
+    write_snapshot "$sid" "$snap"
+    summary=$(summary_from_snapshot "$snap")
+    [[ -n "$summary" ]] || summary='null'
+    # tokens_delta meaningful only when retro snapshot reflects the same session as decided.
+    if [[ -n "$sid" && -n "$sid_decided" && "$sid" == "$sid_decided" ]]; then
+      delta=$(tokens_delta_from_summaries "$decided_summary" "$summary")
+    else
+      delta='null'
+    fi
+    # Embed delta inside session_summary (alongside tokens) so review reads from one place.
+    summary_with_delta=$(jq -nc --argjson s "$summary" --argjson d "$delta" \
+      'if $s == null then null else $s + {tokens_delta:$d} end')
     row=$(jq -nc \
-      --arg ts "$(now_iso)" --arg task "$task" --arg id "$id" \
-      --argjson fields "$fields" --argjson tokens "$tokens" --argjson delta "$delta" \
+      --arg ts "$(now_iso)" --arg task "$task" --arg id "$id" --arg sid "$sid" \
+      --argjson fields "$fields" --argjson summary "$summary_with_delta" \
       '$fields + {ts:$ts, task:$task, decision_id:$id, phase:"retro", status:"active",
-        tokens_at_retro:$tokens, tokens_delta:$delta}')
+        session_id:$sid, session_summary:$summary}')
     printf '%s\n' "$row" >> "$LOG"
     printf '%s\n' "$id"
     ;;
