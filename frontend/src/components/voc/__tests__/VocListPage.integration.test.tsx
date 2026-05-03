@@ -178,4 +178,18 @@ describe('VocListPage — Wave D D5 integration', () => {
     expect(screen.queryByTestId('voc-loading')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /다시 시도/ })).not.toBeInTheDocument();
   });
+
+  it('vocTypeMap threads VocListPage → VocTable → VocRow → VocTypeBadge (renders type icon for each row)', async () => {
+    renderPage();
+    await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
+
+    // All fixture rows reference TYPE_PRIMARY ("기능 요청", slug=feature) — see master.fixtures.ts
+    const renderedRows = screen.getAllByTestId('voc-row');
+    expect(renderedRows.length).toBeGreaterThan(0);
+
+    // Each rendered row's title cell should contain a VocTypeBadge with aria-label "유형 기능 요청"
+    // (proves vocTypeMap was threaded VocListPage → VocTable → VocRow → VocTypeBadge).
+    const badges = await screen.findAllByLabelText('유형 기능 요청');
+    expect(badges.length).toBe(renderedRows.length);
+  });
 });
