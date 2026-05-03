@@ -304,12 +304,47 @@
    으로 시작했으나 discovery 후 medium 으로 확대 — 기존 NotificationBell 골격이 misleading 했음). rework rounds 0.
    토큰 사용량은 retro JSONL 자동 기록.
 
-→ **다음 세션 첫 작업** = **γ-batch C-11 VocCreateModal + AttachmentZone 진입**.
-   §7.2 batch 순서: ~~α (C-2~C-7)~~ → ~~β (C-8~C-10)~~ → **γ** → δ → ε → ζ → Phase D.
-   - C-11 scope: VocCreateModal (atom 동봉 1 PR). 200줄 초과 시 §7.1 분할 정책. AttachmentZone 은
-     모달 내부 컴포넌트로 동반 신설.
-   - 진입 게이트: 본 PR (#180 C-10) 머지 + 사용자 검수 통과 — **충족**.
-   참고: ζ batch C-19 Topbar 는 NotifButton 머지 의존이었으므로 이제 unblock. ε 와 병렬 가능 시점 확인 필요.
+→ **Wave 1.6 C-11 VocCreateModal + AttachmentZone MERGED** (PR #182, merge `3e62bc7`, 2026-05-03 16:13 KST) —
+   FE-only, 6 files, +350/-10. γ-batch 1/1 완료, δ batch C-12 VocReviewDrawer prerequisite 해제.
+   - **New atom**: `frontend/src/shared/ui/AttachmentZone/AttachmentZone.tsx` (193 LOC) — image-only
+     (png/jpeg/gif/webp), 최대 5개, 파일당 10MB, drag&drop + click-to-pick, "0/5" count badge,
+     per-file remove. 검증 실패 시 `role=status aria-live=polite` 영역에 한국어 에러 노출. 상수 모듈 export
+     (`ATTACHMENT_MAX_FILES / _MAX_SIZE_MB / _ACCEPT`) — 후속 backend 인입 시 props 주입으로 1줄 swap.
+   - **Modal slot**: `VocCreateModal` 본문 에디터 아래 `<AttachmentZone files onChange disabled />` 슬롯
+     1줄 주입. `File[]` state owned by modal, `open` toggle 시 reset. `onSubmit` 시그니처 `(payload, files)`
+     로 확장 (호환성 깨는 변경, 단일 caller `useVocPageController.create.onSubmit` 동기 마이그레이션 +
+     TODO 주석으로 추후 BE upload endpoint wiring 표시 — 본 PR 은 FE-only γ batch 정책 답습).
+   - **A11y wiring**: dropzone `role=group aria-labelledby aria-describedby`, 단일 `<label htmlFor>` (이전
+     초안의 `<span><label></span>` 중첩 무효 HTML 수정), file remove `aria-label="<filename> 제거"`,
+     count badge `aria-label`. role=alert (assertive) → role=status (polite) — input validation 적정 패턴.
+   - **Token discipline**: 에러 색상 `--status-drop` (orange "Drop" status badge token, 의미 불일치) →
+     `--danger`. 신규 hex/oklch 0건. 기존 modal 의 title-error 같은 misuse 는 surgical-changes 룰로 본 PR
+     scope 외 — F-bundle 후속 따로 정리 가능.
+   - **Layout 후속 fix (commit `d257274`)**: 사용자 검수에서 1920px viewport 모달이 자식 overflow 발견 —
+     DialogContent 의 `grid` 트랙이 자식 min-content (Toast UI Editor `previewStyle=vertical` + 3-col
+     grid) 초과 시 강제 확장하는 CSS grid 거동. fix: DialogContent `w-[min(92vw,42rem)]` + `overflow-x-
+     hidden` + `max-h-[90vh]` + `overflow-y-auto`, form/grid columns/본문 wrapper 모두 `min-w-0`. Pre-
+     existing bug 였으나 같은 모달이라 동봉. vitest modal 7/7 GREEN 유지.
+   - **Tests**: AttachmentZone 9 (constants / count badge / add via input / size reject / type reject
+     (fireEvent bypass jsdom accept filter) / count exceed / remove / error clears on remove / label
+     associations) + VocCreateModal 7 (기존 4 + slot rendered + empty files in onSubmit + files forwarded).
+     full vitest 341/341 GREEN, tsc clean.
+   - **Review**: 2× parallel adversarial (사용자 simplification 4→2). Reviewer 1 `code-reviewer` SHIP
+     (NIT only). Reviewer 2 `general-purpose` (a11y/token/UX) BLOCK×3 (invalid HTML / missing aria /
+     wrong token) → 모두 fix commit `f368fde` 반영. NIT 부분 채택 (key collision via WeakMap, error-
+     clear-on-remove, min-w-0 truncation). 미채택: partial-batch acceptance, modal reopen reset test
+     — 본 PR 는 atomic-batch 의도 + reset 로직은 useEffect 단순체.
+   - **Verification**: 341/341 vitest, tsc clean, ESLint clean, token grep 0 hits, 1920×1200 Playwright
+     screenshot `docs/screenshots/wave-1-6/c-11-voc-create-modal.png` (modal 완전 contained, AttachmentZone
+     dropzone + 0/5 badge + "이미지 드래그 또는 선택" + "파일당 최대 10MB" 가시).
+   /opt-prompt decision id `opt-20260503T063921Z-c-11-voc-create-modal`. Outcome: as-planned (NIT loop 1
+   round). Layout fix 는 scope-creep 아님 — 동일 modal 시각 검수 결과.
+
+→ **다음 세션 첫 작업** = **δ-batch C-12 VocReviewDrawer 진입**.
+   §7.2 batch 순서: ~~α (C-2~C-7)~~ → ~~β (C-8~C-10)~~ → ~~γ (C-11)~~ → **δ (C-12 → C-13)** → ε → ζ → Phase D.
+   - C-12 scope: VocReviewDrawer rebuild (drawer shell). C-13 VocReviewTabs sequential dependent.
+   - 진입 게이트: 본 PR (#182 C-11) 머지 + 사용자 검수 통과 — **충족**.
+   참고: ζ batch C-19 Topbar 는 NotifButton 머지 (C-10) 이후 unblock 상태. ε 와 병렬 가능 시점 확인 필요.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
      22px expand-btn + 6 cell). VocTable.tsx 재합성 — `<DataTable>` → `<VocListHeader> + <VocRow[]>`.
      parent에 `role="grid"` 부여하여 C-6의 a11y contract 충족 (column/row chain 완성).
@@ -339,7 +374,7 @@
 **Wave 1.6 전체 흐름** (정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`)
 - ✅ Phase A — 분해 산출물 (PR #126)
 - ✅ Phase B — 토큰 갭 채우기 (PR #128) + violet 보강 (PR #132)
-- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 부분 진행: **C-8 ✅ + C-9 ✅ + F-1/F-2/F-3 bundle ✅ + F-bundle minor cleanup ✅ + #155/#156/#162/#166 follow-up ✅** / C-10 미착수 / γ δ ε ζ 미착수: C-11~C-19 10 PR)
+- 🟡 Phase C — 컴포넌트 rebuild (α 완료: C-1~C-7 + C-2.5/2.6/B-add-2 ✅ / β 완료: C-8 ✅ + C-9 ✅ + C-10 ✅ + F-1/F-2/F-3 bundle ✅ + F-bundle minor cleanup ✅ + #155/#156/#162/#166 follow-up ✅ / γ 완료: **C-11 ✅** / δ ε ζ 미착수: C-12~C-19 8 PR)
 - ⛔ Phase D — 종합 검증 (Phase C 전체 batch 머지 후에만 진입 가능 — 현재 차단)
 - 금지: Wave 2 + Follow-up C-2 hard-block (Wave 1.6 종료 전)
 
