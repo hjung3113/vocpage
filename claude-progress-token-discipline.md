@@ -93,50 +93,53 @@
 3. `vocpage/.claude/settings.json`의 `serena-hooks` 훅이 정상 fire하는지 (PreToolUse / SessionStart / Stop) — 세션 로그에 hook output 확인
 4. 어느 항목 하나라도 실패하면 즉시 rollback: `mv .bak.20260503 원본` (두 파일)
 
-### 2단계 — plan §8 실행 순서 (v4.1: 1.3-A + 1.4 옵션 E 우선)
+### 적용 완료 (이번 세션, 2026-05-03)
 
-```
-1. Tier 1.3-A — Serena 이중 등록 정리 (우선)  ✅ 적용 완료 (2026-05-03), 검증 미완
-   - 검증: 위 체크리스트 4항 통과 후 다음 단계로
+| Tier       | 변경 요지                                                                                                                                                                     | 백업 / 적용 위치                                                                                               | 검증                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 1.3-A      | Serena 이중 등록 정리 (`mcp__plugin_serena_serena__*` 제거)                                                                                                                   | `vocpage/.claude/settings.local.json.bak.20260503` + `~/.claude/settings.json.bak.20260503` (commit `7583240`) | 본 세션 정적 측정 PASS, fresh 세션 측정 미완                                    |
+| 1.4 옵션 E | `opt-prompt` SKILL 2-skill split (normalize 306줄 + eval 181줄, append.sh `opt-prompt/`에 유지, `/opt-prompt-eval` 신규 트리거, normalize Step 2 끝에 reminder 1줄 자동 emit) | `.claude/skills/opt-prompt/SKILL.md.bak.20260503` (원본 452줄, commit `a5c16a6`)                               | 본 세션 정적 측정 PASS (cross-ref 0건, smoke test exit 0), fresh 세션 측정 미완 |
 
-2. Tier 1.4 옵션 E — opt-prompt SKILL을 2 skill로 split (우선)  ✅ **적용 완료 (2026-05-03 세션)**
-   - `.claude/skills/opt-prompt/SKILL.md` 306줄 (was 452, -32%) — normalize/sizing/markers/examples 잔류 + 신설 "Closing reminder" 섹션 (Step 2 출력 끝에 `// reminder: invoke /opt-prompt-eval <decision_id>` 1줄 자동 emit)
-   - `.claude/skills/opt-prompt-eval/SKILL.md` 181줄 (신규) — retro questions, helper invocations, JSONL schema, analysis join, token-delta methodology, verdict, --review pattern analysis, eval anti-patterns
-   - `append.sh`는 `opt-prompt/`에 유지 (Q1 결정-A) — eval 스킬은 `../opt-prompt/append.sh` 호출. plan §4.4 line 214 "이동" 가설 기각, 동일 폴더가 path/의미 모두 명확.
-   - 트리거 분리 (Q2 결정-A): `/opt-prompt` → normalize, **`/opt-prompt-eval <decision_id>` → retro (신규 명령어)**, `/opt-prompt-eval --review` → 패턴 분석. legacy `/opt-prompt --eval` 호출은 normalize 스킬의 anti-pattern로 감지, eval 스킬로 redirect.
-   - 워크플로우 변경: 이전엔 normalize SKILL.md 452줄에 eval 섹션이 포함되어 ambient 컨텍스트로 retro 흐름이 모델에 항상 노출. 이후엔 normalize가 호출될 때마다 Step 2 출력 끝에 `// reminder: invoke /opt-prompt-eval <decision_id>` 한 줄을 명시적으로 emit하여 retro 단계가 silently 누락되지 않도록 보강.
-   - cross-ref audit: `~/.claude/settings.json`, `vocpage/.claude/settings*.json`, `~/.claude/hooks/`, `~/.claude/CLAUDE.md`, hookify rules — 모두 opt-prompt 참조 **0건**. split이 외부 시스템과 완전 격리되어 어떤 hook/setting/script도 깨뜨리지 않음.
-   - smoke test (격리 로그 `OPT_PROMPT_LOG=/tmp/opt-prompt-smoke.jsonl`): `decided` + `retro` 2 row append 모두 exit 0, decision_id stdout emit 정상, 2-row 결과 파일 검증 후 정리.
-   - 백업: `.claude/skills/opt-prompt/SKILL.md.bak.20260503` (원본 452줄)
+검증 칸은 `docs/specs/reviews/token-discipline-verification.md`로 분리되어 있음. 다음 fresh 세션이 그 문서의 row를 직접 채움.
 
-3. Tier 2.5 Quick Wins (4 룰)
-   - §6.1 parallel batch / §6.2 pre-commit lint dry-run / §6.3 (Tier 1.4 옵션 E의 fallback) / §6.4 tsc+vitest batch
-   - §6.2 lint 명령은 package.json scripts 확인 후 확정
+### 2단계 — 다음 세션 작업: batch 1 적용 + main 머지 (검증은 그 다음 세션)
 
-4. Tier 1.1-A — `OMC_SKIP_DELEGATION_NOTICES=1` env entry
+**전략 결정 (2026-05-03 사용자 확정)**:
 
-5. Tier 2 — root CLAUDE.md tool-routing 강화 + project memory narrowing
+- 검증은 **나중에 한꺼번에**. 이번 batch 1 + 이미 적용된 1.3-A + 1.4 까지 합쳐서 fresh 세션 1회로 verification 문서 일괄 채움.
+- 본 `docs/token-discipline-plan` 브랜치는 plan + verification 본문용으로 **계속 유지** (PR #177 머지 보류).
+- batch 1은 별도 신규 브랜치 `feat/token-discipline-batch1` (또는 동등 이름)을 main에서 분기 → 3 commit → PR → main 머지.
 
-5.5. **Raid 1 — Tier 2 적용 후 가설 검증**
-   - TS/TSX 도메인 inject ≈ 0 가설 직접 측정
-   - → Tier 1.2-A 진행 여부 결정 (≥-100K 잔존 share면 진행)
+**batch 1 — 부작용 거의 없는 + 거의 확실한 3개 (최종 확정)**:
 
-6. Tier 1.2-A — 69→8 keep + 61 삭제
+| #   | Tier                                          | 변경                                                                                                                                                                                                                               | 백업/롤백               | 위험도                                                          | 추정 절감                        |
+| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------- | -------------------------------- |
+| 1   | **1.2-A** (사용자 명시 요청)                  | sub-CLAUDE.md 69 → 8 keep + 61 삭제 (no stub). leaf 본문 ancestor 8개에 흡수. **유지 8개**: root, `.claude`, `frontend`, `backend`, `frontend/src` (50-80줄 디렉토리 맵), `backend/src` (50-80줄 디렉토리 맵), `docs`, `prototype` | `git revert`            | 중간 (~2-3시간 흡수 작업, 흡수 누락 시 leaf 도메인 가이드 손실) | -200-400K (단일 최대 절감 patch) |
+| 2   | **1.1-A**                                     | `~/.claude/settings.json` env에 `OMC_SKIP_DELEGATION_NOTICES=1` 1줄 추가                                                                                                                                                           | `.bak.<ts>` 백업 → `mv` | 최저 (1줄 편집, hook script 코드 변경 0)                        | -2K direct                       |
+| 3   | **2.5 Quick Wins (룰 텍스트 4건 → 실질 3건)** | root `CLAUDE.md` parallel batch 강화 (§6.1) + lint dry-run 신규 (§6.2) + tsc+vitest batch 신규 (§6.4). `.claude/CLAUDE.md` Token-Saving Protocol에 §6.4 위치. **§6.3은 Tier 1.4 옵션 E 적용으로 자동 해소됨, skip**                | `git revert`            | 최저 (룰 텍스트만, 코드 영향 0)                                 | -200-400K (overlap caveat)       |
 
-7. Tier 1.1-C — PostToolUse Serena echo 제거
+**선결 작업 (batch 1 실행 시 첫 단계)**:
 
-8. 측정 raid 1 — cost* + independent variable 사전 등록
+- §6.2 lint 명령: `package.json scripts` 직접 확인 → `npm run lint` placeholder 실 명령어로 교체
+- 1.2-A leaf 흡수: 61개 leaf CLAUDE.md 사전 검토 후 의미 있는 가이드라인만 ancestor 8개에 추가, stub 안 남김. 50-80줄 cap 위반 시 frontend/src·backend/src 본문 cap 80-100줄까지 양보 허용
 
-9. Tier 3 5분 실측 → Tier 1.5 살림/폐기 결정
+**커밋 분리** (PR 1건 안에): 4개 별도 commit (1.2-A leaf 흡수 + 1.2-A 삭제 / 1.1-A / 2.5 Quick Wins) — 부분 revert 대비.
 
-10. 측정 raid 2 — paired comparison (§10)
+**제외한 후보 + 사유**:
 
-11. Tier 1.1-B + Tier 1.2-B + Tier 1.3-B (ToolSearch fire ≥3회 task로 paired test 후)
-```
+- **1.1-B** (hook dispatcher dedup): hook script 직접 편집, 부작용 위험. batch 2 후보.
+- **1.1-C** (PostToolUse Serena echo matcher 삭제): 안전도 높지만 Serena 관련 추가 변경은 batch 1.3-A 검증 후로 미룸 (사용자 결정 2026-05-03).
+- **1.2-B** (path-scoped 자동 주입): 선결 trace 필요, 1.2-A 후속.
+- **1.3-B** (SessionStart Serena schema pre-load): paired test 권장.
+- **Tier 2** (CLAUDE.md routing 룰 강화): 행동 교정 측면 — Quick Wins와 효과 분리 위해 batch 2로.
 
-### 3단계 — Post-flight + 머지
+**verification 문서 운영**: 다음 fresh 세션이 batch 1 + 1.3-A + 1.4 = 5건을 한 번에 측정·verdict. 그 결과 보고 batch 2 (남은 항목 = 1.1-B / 1.1-C / 1.2-B / 1.3-B / Tier 2 / 1.5 등) 진행 여부 결정.
 
-§9.2 post-flight 3 reviewer all PASS 후 본 브랜치 main 머지.
+### 3단계 — batch 1 main 머지 후
+
+- main `claude-progress.txt`에 batch 1 적용 사실 1블록 추가 (이 브랜치 progress 파일과 별개)
+- PR #177 (이 브랜치) 본 plan + verification 추적 용도로 계속 OPEN 유지
+- 다음 fresh 세션이 본 파일과 verification 문서를 동시에 업데이트
 
 ---
 
