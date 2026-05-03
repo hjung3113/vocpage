@@ -123,10 +123,10 @@ describe('VocListPage — Wave D D5 integration', () => {
     await waitFor(() => expect(screen.getByText(`${expected}개`)).toBeInTheDocument());
   });
 
-  it('sort chip "우선순위" 클릭 → 첫 row priority="urgent"', async () => {
+  it('header "우선순위" 클릭 → 첫 row priority="urgent" (sort chips removed; header is now the only sort affordance)', async () => {
     renderPage();
     await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
-    await userEvent.click(screen.getByRole('radio', { name: /우선순위/ }));
+    await userEvent.click(screen.getByTestId('voc-list-header-cell-priority'));
     await waitFor(() => {
       const lastCall = vi.mocked(vocApi.list).mock.calls.at(-1);
       expect(lastCall?.[0]?.sort_by).toBe('priority');

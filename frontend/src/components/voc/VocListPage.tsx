@@ -6,7 +6,6 @@ import {
   VocAdvancedFilters,
   VocAdvancedFiltersToggle,
 } from '../../features/voc/components/VocAdvancedFilters';
-import { VocSortChips } from '../../features/voc/components/VocSortChips';
 import { VocTable } from '../../features/voc/components/VocTable';
 import { VocPaginationBar } from '../../features/voc/components/VocPaginationBar';
 import { VocReviewDrawer } from '../../features/voc/components/VocReviewDrawer';
@@ -67,7 +66,6 @@ export function VocListPage() {
         onChange={ctrl.advanced.onChange}
         onReset={ctrl.advanced.onReset}
       />
-      <VocSortChips sortBy={ctrl.sortBy} sortDir={ctrl.sortDir} onChange={ctrl.setSort} />
       <div className="px-6 text-sm">
         {list.isLoading && <LoadingState data-testid="voc-loading" />}
         {list.isError && <ErrorState onRetry={() => list.refetch()} />}
