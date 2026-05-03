@@ -4,13 +4,13 @@ Static HTML prototypes for visual exploration. Read root `CLAUDE.md` first for c
 
 ## Purpose
 
-This directory is a **visual sandbox** for design reviews — dashboard mockups, widget experiments, layout studies. Outputs feed into `docs/specs/requires/uidesign.md` (정본) — 활성 리뷰는 `docs/specs/reviews/`, 완료된 것은 `docs/specs/reviews/done/`.
+This directory is a **visual sandbox** for design reviews — dashboard mockups, widget experiments, layout studies. Outputs feed into `docs/specs/requires/uidesign.md` (정본) — 활성 리뷰는 `docs/specs/reviews/`, 완료된 것은 `docs/specs/archive/reviews/`.
 
 ## Throwaway Scope
 
 - Prototype HTML is **not** production code. Do not wire it to backend APIs.
 - When a prototype graduates to implementation, the real version goes into `frontend/` — the prototype stays as a reference snapshot.
-- No bundler / no transpile. The prototype loads as static HTML with `<link>` to split CSS files under `css/` and classic `<script>` tags loading modules under `js/` (Stage A-2 / A-4 split, see `docs/specs/plans/done/prototype-phase7-wave3-plan.md`).
+- No bundler / no transpile. The prototype loads as static HTML with `<link>` to split CSS files under `css/` and classic `<script>` tags loading modules under `js/` (Stage A-2 / A-4 split, see `docs/specs/archive/plans/prototype-phase7-wave3-plan.md`).
 - `package.json` exists only for Playwright-driven smoke verification (`scripts/`); no app-level build step.
 
 ## Layout
@@ -52,5 +52,5 @@ After modifying prototype HTML files, run `graphify update .` from the project r
   - `css/admin/` — admin-page-only styles (tag rules, system menu, VOC type, users, notices, FAQ admin). Cross-page → `components/` or `layout/`.
   - `css/components/` — reusable component styles (cards, buttons, badges, drawers, modals, tables). Visual reference for an FE component being implemented.
   - `css/layout/` — app shell, grid, structural layout (navbar, sidebar, page frame proportions).
-- `js/` — 16+ classic-script modules. Mock data (source of truth for prototype-driven UX) → `data.js`; data exposed on `window` via explicit aliases (classic-script gotcha — `const NOTICES` doesn't auto-attach). Stage A-2/A-4 split rationale → `docs/specs/plans/done/prototype-phase7-wave3-plan.md`.
+- `js/` — 16+ classic-script modules. Mock data (source of truth for prototype-driven UX) → `data.js`; data exposed on `window` via explicit aliases (classic-script gotcha — `const NOTICES` doesn't auto-attach). Stage A-2/A-4 split rationale → `docs/specs/archive/plans/prototype-phase7-wave3-plan.md`.
 - `scripts/` — Playwright smoke verification + tooling helpers. Generated graph artifacts → `graphify-out/`.

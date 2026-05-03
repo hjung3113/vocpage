@@ -3,8 +3,71 @@
 > **Note:** §13.x references in this archive predate the 2026-05-02 (C-2.5 audit) rename — `uidesign.md §13` was renumbered to §14. Current equivalents: §13.1→§14.1 ... §13.12→§14.12. New §13 is "Badge System".
 
 > `claude-progress.txt`에서 분리된 완료 이력. 최신 진행은 `claude-progress.txt`만 보면 된다.
-> 분리 기준: Wave 2 종료(2026-05-01)까지의 누적 이력 전체.
+> 분리 기준: Wave 1.6 진행 중까지의 누적 이력 (활성 항목 제외).
 > 검색용 — 신규 진입 시 읽지 말고, 특정 결정/PR 컨텍스트 추적 시에만 grep.
+
+---
+
+## Wave 1.6 — `/voc` prototype parity (2026-05-02 ~ 진행 중)
+
+정본 plan: `wave-1-6-voc-parity.md`. 룰북: `wave-1-6-phase-c-precedent.md`. Audit: `wave-1-6-voc-badge-audit.md`.
+
+### Phase A · B (분해 + 토큰 갭)
+
+- **Phase A** ✅ PR #126 (2026-05-02) — `voc-prototype-decomposition.md` ~700줄 + plan `wave-1-6-voc-parity.md`.
+- **Phase B** ✅ PR #128 (2026-05-02) — 토큰 갭 채우기.
+- **Phase C precedent doc** ✅ PR #131 — per-leaf 체크리스트 7항목 (TDD failing-first / §7.3 lint scoped / 4 reviewer + codex / visual-diff SKIP 0 / 사용자 시각 검수 / 구버전 동시 삭제 / FE-only slug 격리).
+- **Phase B violet 보강** ✅ PR #132 (merge `395bf0f`) — `--status-processing-{bg,fg,border}` hue 152→290°(light)/288°(dark), WCAG AA 7.72:1.
+- **Phase C batch plan** ✅ PR #134 — 19 rebuild 잔여를 6 batch (α~ζ) + 1 addendum.
+
+### Phase C — α batch (C-1~C-7 + C-2.5/2.6/B-add-2)
+
+- **C-1 VocStatusBadge** ✅ PR #129 (merge `9b615ef`) — 처리중·완료 hue 충돌 사용자 검수에서 발견 → violet 이동(B 보강).
+- **C-2 VocPriorityBadge** ✅ PR #136 (merge `c0a7518`) — text-only 디자인 (Urgent/High/Medium/Low 영문). 토큰 `--status-orange` 1개만 도입.
+- **C-2.5 badge audit + 3-archetype lock** ✅ PR #138 (merge `a8e3507`) — `wave-1-6-voc-badge-audit.md` ~457줄 + `uidesign.md §13 Badge System` 신설 (TextMark/OutlineChip/SolidChip + VocTypeBadge/VocTagPill/VocStatusBadge·VocPriorityBadge wrapper).
+- **B-add-2** ✅ — 7 chip 토큰 SSOT(`tokens.ts` ↔ `index.css` 미러) + raw `9999px` 마이그.
+- **C-2.6 / C-3 / C-4 / C-5 / C-6 / C-7** ✅ — TextMark/OutlineChip/SolidChip 신설, VocTagPill/VocSubRow/VocRow rebuild. Issue #156 (VocRow tag-row 통합) PR #159, Issue #155 (VocSortColumn enum align — `title`/`assignee` 추가, `updated_at`/`due_date` 제거) PR #161.
+
+### Phase C — β batch (C-8~C-10 + F-bundle + sticky 토큰화)
+
+- **C-8 VocSortChips** ✅ PR #153 (merge `57b56e8`) — Tailwind+inline → prototype 클래스. Codex HIGH 1건 (정렬 컬럼셋 drift) → Issue #155 분리.
+- **C-9 VocAdvancedFilters** ✅ PR #172 (merge `8b6c195`) — `.advanced-filters*` semantic class block. uidesign §9 grid-rows 0fr→1fr 애니메이션. 169→156 LOC.
+- **opt-prompt skill** ✅ PR #163 (merge `dd6a947`) — `/opt-prompt` 자동조종 right-sizer.
+- **Issue #162** ✅ PR #165 (merge `eba12c8`) — sticky 헤더 갭 fix (`top: calc(0px - var(--sp-5))`).
+- **Issue #166** ✅ PR #169 (merge `e2c2cd6`) — `--app-main-pad` 시맨틱 토큰 SSOT, AppShell↔VocListHeader 결합 정리.
+- **C-10 NotifButton + NotifPanel** ✅ PR #180 (merge `a8b533b`, 2026-05-03) — Popover 분리 (50+131 LOC), `NOTIF_PANEL_ID` a11y wiring, type chip 5개 (전체 + 4 enum) `NotificationType.options` derive. 4→12 tests.
+- **F-1/F-2/F-3 bundle** ✅ PR #175 (2026-05-03) — F-1 VocSortChips 전면 제거(헤더가 유일 정렬 affordance) / F-2 VocRow VocTypeBadge 통합 / F-3 VocAdvancedFiltersToggle 분리 + status chips 우측 정렬 + topbar placeholder.
+- **F-bundle deferred minor** ✅ PR #178 (2026-05-03) — `aria-controls` panel id 매칭 + VocListPage→VocTable→VocRow 통합 테스트 + VocStatusFilters `rightSlot` 단위 테스트. 326/326 green.
+
+### Phase C — γ batch
+
+- **C-11 VocCreateModal + AttachmentZone** ✅ PR #182 (merge `3e62bc7`, 2026-05-03 16:13 KST) — image-only/5 files/10MB AttachmentZone atom 신설(193 LOC). DialogContent `w-[min(92vw,42rem)]` overflow fix(`d257274`). `onSubmit(payload, files)` 확장. 2× parallel adversarial → 3 BLOCK fix(invalid HTML / aria / token). 341/341 green.
+
+### Phase C — δ batch (진행 중)
+
+- **C-12 VocReviewDrawer** ✅ PR #187 (merge `cec67f0`, 2026-05-03) — drawer shell parity. I-2 approved-lock(`review_status==='approved'` → status select disabled + a11y title/aria-label 사유 노출, prototype drawer-advanced.js:33 인용). 신규 `VocReviewMetaPanel.tsx` (91 LOC, 7-field grid). DialogDescription sr-only. fixtures parity 회복(SYSTEMS/MENUS placeholder ID → 실제 UUID 매핑). 4-reviewer 적대적 패널 7 fix-required(P0 3 / P1 4) + 5건 defer(C-13 후속). FE 350/350 green.
+
+### Tooling / governance (Wave 1.6 기간 중)
+
+- **PR #184 token-discipline batch1** (merge `4b549d5`) — 8-keep set policy + 60 leaf CLAUDE.md 정리.
+- **PR #186 Tier 2.5 quick wins** (merge `596fafa`) — root §"Parallel tool calls" + §"Pre-commit lint dry-run" + .claude §"Test batch".
+- **PR #188** (merge `7c4adcf`) — FE test batch `-- --run` 추가.
+- **PR #189** (merge `a33ce22`) — `scripts/session-stats.ts` Claude transcript analyzer.
+
+---
+
+## Wave 1.7 Phase A — VOC 등록 모달 정합 spec (2026-05-03)
+
+- ✅ PR #185 (merge `1353219`) — `feature-voc.md §9.11` 신설 (필드 구성·skeleton·본문↔첨부 단방향 동기화·합산 cap·Due Date 모달 미노출), `requirements.md §6.1` master endpoints (`GET /api/masters/systems` nested + `GET /api/masters/menus`), `shared/contracts/master/io.ts`에 `SystemListItem`/`MenuListItem` 추가, plan `wave-1-7-voc-create-modal.md` (Phase A→D, 결정 D1~D10).
+- Codex 적대적 리뷰 9건 → 7 반영 / 2 스킵: BLOCKER namespace `/api/master`→`/api/masters`, HIGH priority 강제·due_date 자동계산 BE 미구현 → Phase B 확장, §8.5 합산 cap amendment, benchmark flat-index 정정, §9.4.2 `?includeArchived` 명시. 스킵: prototype 카운터 (false positive).
+
+---
+
+## Wave 1.5 Follow-up A → PR #125 (2026-05-02) — 시각 동등화 + Playwright e2e
+
+- ✅ MERGED 2026-05-02 — Stage 1: `scripts/visual-diff/` Playwright 듀얼-렌더 harness + 12 components data-pcomp markers + MSW `/api/auth/*` durable handlers. Stage 2: 13 token-only fixes — visual-diff HIGH 26→9 (잔여 9건은 SKIP — table a11y / Radix 내부 / 의도된 layout). Stage 3: 24 PNG + `voc-visual-screenshots.md` index. Stage 4: `frontend/e2e/voc-happy-path.spec.ts` (1.8s, login→list→create→drawer→history). 189 vitest + 1 e2e pass / lint:tokens / typecheck clean. 5-reviewer 병렬, self-review 없음.
+- 부수 발견 + 수정: MSW POST /api/vocs `sequence_no` 누락 + auth handlers 부재.
+- token-only 한계로 9 SKIP 잔존 → Wave 1.6 신설 트리거.
 
 ---
 
@@ -30,7 +93,7 @@
 
 **Wave 2 모든 PR 머지 완료** ✅ 2026-05-01 — PR #79 docs Wave 2 / #80 B-4a R2 / #81 B-4b / #82 B-13 / #83 B-15 / #84 B-16 / #85 B-17 / #86 B-9 verification (8건 머지). b-13/b-15/b-17은 prototype.html `<head>` CSS 링크 + `<script>` 섹션에서 main 재머지 후 충돌 해결.
 
-**Wave 3 plan 작성** ✅ 2026-05-01 — 브랜치 `docs/prototype-phase7-wave3-plan` commit 490921d. `docs/specs/plans/done/prototype-phase7-wave3-plan.md`. B- 기준 = Critical 4 + Major 1 + FE-mock Minor 4 + 보강 2. 3 sub-wave: W3-A VOC 본체 / W3-B Admin 공통 / W3-C Dashboard 잔여. R-4 (tsx watch) Wave 3 종료 후 단독 PR. 의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰.
+**Wave 3 plan 작성** ✅ 2026-05-01 — 브랜치 `docs/prototype-phase7-wave3-plan` commit 490921d. `docs/specs/archive/plans/prototype-phase7-wave3-plan.md`. B- 기준 = Critical 4 + Major 1 + FE-mock Minor 4 + 보강 2. 3 sub-wave: W3-A VOC 본체 / W3-B Admin 공통 / W3-C Dashboard 잔여. R-4 (tsx watch) Wave 3 종료 후 단독 PR. 의도적 제외: N-03 폴링, 풀 역할×상태 매트릭스, 신규 토큰.
 
 ---
 

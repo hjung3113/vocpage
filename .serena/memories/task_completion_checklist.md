@@ -18,5 +18,5 @@ TDD discipline: red → green → refactor. No "tests later" PRs.
 
 ## Doc hygiene at phase close
 
-Run `docs/specs/README.md §5` 7-step cleanup. Move merged reviews → `reviews/done/`,
-completed plans → `plans/done/`. Archive must not be cited as canonical.
+Run `docs/specs/README.md §5` 7-step cleanup. Move merged reviews → `archive/reviews/`,
+completed plans → `archive/plans/`. Archive must not be cited as canonical.
