@@ -1,14 +1,14 @@
 import { Search, Plus } from 'lucide-react';
 import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
-import { NotificationBell } from '../../../components/common/NotificationBell';
-import type { NotificationBellProps } from '../../../components/common/NotificationBell';
+import { VocNotificationsDropdown } from './VocNotificationsDropdown';
+import type { VocNotificationsDropdownProps } from './VocNotificationsDropdown';
 
 export interface VocTopbarProps {
   totalCount: number;
   query: string;
   onQueryChange: (q: string) => void;
-  notifications: NotificationBellProps;
+  notifications: VocNotificationsDropdownProps;
   onCreate: () => void;
 }
 
@@ -63,7 +63,7 @@ export function VocTopbar({
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <NotificationBell {...notifications} />
+        <VocNotificationsDropdown {...notifications} />
         <Button
           type="button"
           onClick={onCreate}
