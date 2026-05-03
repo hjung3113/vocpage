@@ -3,8 +3,11 @@ import type { Role } from '../../../../../shared/contracts/common';
 import { VocAttachmentsPanel, VocHistoryPanel, type AttachmentItem } from './VocReviewSections';
 import { VocCommentList } from './VocCommentList';
 import { VocInternalNotes } from './VocInternalNotes';
+import { VocSubTaskList } from './VocSubTaskList';
 
 interface Props {
+  vocId: string;
+  parentIsSubtask: boolean;
   currentUserId: string;
   role: Role;
   isOwner: boolean;
@@ -20,6 +23,8 @@ interface Props {
 }
 
 export function VocDrawerSections({
+  vocId,
+  parentIsSubtask,
   currentUserId,
   role,
   isOwner,
@@ -35,6 +40,25 @@ export function VocDrawerSections({
 }: Props) {
   return (
     <div className="flex flex-col gap-4" data-pcomp="voc-review-sections">
+      <VocHistoryPanel entries={historyEntries} loading={historyLoading} />
+      {/* TODO(FU): wire subtask CRUD + onOpen navigation. C-16 ships UI only. */}
+      <VocSubTaskList
+        parentId={vocId}
+        parentIsSubtask={parentIsSubtask}
+        subs={[]}
+        canAdd={canWrite}
+        onOpen={() => {}}
+        onAdd={() => {}}
+      />
+      <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
+      <VocInternalNotes
+        notes={notes}
+        notesLoading={notesLoading}
+        pending={pending}
+        role={role}
+        isOwner={isOwner}
+        onAdd={onAddNote}
+      />
       {/* TODO(FU): wire api/comments + react-query mutations. C-14 ships UI only. */}
       <VocCommentList
         comments={[]}
@@ -45,16 +69,6 @@ export function VocDrawerSections({
         onEdit={() => {}}
         onDelete={() => {}}
       />
-      <VocInternalNotes
-        notes={notes}
-        notesLoading={notesLoading}
-        pending={pending}
-        role={role}
-        isOwner={isOwner}
-        onAdd={onAddNote}
-      />
-      <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
-      <VocHistoryPanel entries={historyEntries} loading={historyLoading} />
     </div>
   );
 }
