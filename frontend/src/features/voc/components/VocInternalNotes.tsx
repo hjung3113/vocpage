@@ -6,7 +6,6 @@ import type { InternalNote } from '../../../../../shared/contracts/voc';
 import type { Role } from '../../../../../shared/contracts/common';
 
 interface Props {
-  vocId: string;
   notes: InternalNote[] | undefined;
   notesLoading: boolean;
   pending: boolean;
@@ -34,28 +33,21 @@ export function VocInternalNotes({ notes, notesLoading, pending, role, isOwner, 
       className="flex flex-col gap-2 rounded border p-2"
       style={{
         borderColor: 'var(--border-standard)',
-        background: 'var(--status-amber-bg, var(--bg-elevated))',
+        background: 'var(--status-amber-bg)',
       }}
     >
-      <div className="flex items-center gap-2">
-        <h3
-          id="voc-internal-notes-heading"
-          className="text-xs font-medium"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          내부 메모 (Internal Notes)
-        </h3>
-        <span
-          data-testid="internal-notes-count"
-          className="rounded-full px-2 text-[11px]"
-          style={{
-            background: 'var(--bg-surface)',
-            color: 'var(--text-secondary)',
-          }}
-        >
-          {count}
-        </span>
-      </div>
+      <h3
+        id="voc-internal-notes-heading"
+        className="text-xs font-medium"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        내부 메모
+        {count > 0 && (
+          <span data-testid="internal-notes-count" className="ml-1">
+            {count}개
+          </span>
+        )}
+      </h3>
       {notesLoading && <LoadingState />}
       {!notesLoading && count === 0 && (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>

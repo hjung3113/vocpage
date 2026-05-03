@@ -15,7 +15,6 @@ const note = (over: Partial<InternalNote> = {}): InternalNote => ({
 });
 
 const baseProps = {
-  vocId: 'v-1',
   notes: [] as InternalNote[],
   notesLoading: false,
   pending: false,
@@ -63,14 +62,28 @@ describe('VocInternalNotes — content', () => {
         isOwner={false}
       />,
     );
-    expect(screen.getByTestId('internal-notes-count')).toHaveTextContent('2');
+    expect(screen.getByTestId('internal-notes-count')).toHaveTextContent('2개');
     expect(screen.getByText('내부 검토 결과 정상')).toBeInTheDocument();
     expect(screen.getByText('두번째 메모')).toBeInTheDocument();
   });
 
-  it('빈 상태 메시지', () => {
+  it('빈 상태 메시지 + 카운트 배지 미노출 (count===0)', () => {
     render(<VocInternalNotes {...baseProps} notes={[]} role={'admin' as Role} isOwner={false} />);
     expect(screen.getByText('등록된 내부 메모가 없습니다.')).toBeInTheDocument();
+    expect(screen.queryByTestId('internal-notes-count')).not.toBeInTheDocument();
+  });
+
+  it('notesLoading=true → LoadingState 노출 + 빈 메시지 미노출', () => {
+    render(
+      <VocInternalNotes
+        {...baseProps}
+        notes={undefined}
+        notesLoading={true}
+        role={'admin' as Role}
+        isOwner={false}
+      />,
+    );
+    expect(screen.queryByText('등록된 내부 메모가 없습니다.')).not.toBeInTheDocument();
   });
 
   it('저장 → onAdd 호출 + textarea 비움', () => {

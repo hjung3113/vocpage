@@ -5,7 +5,6 @@ import { VocCommentList } from './VocCommentList';
 import { VocInternalNotes } from './VocInternalNotes';
 
 interface Props {
-  vocId: string;
   currentUserId: string;
   role: Role;
   isOwner: boolean;
@@ -21,7 +20,6 @@ interface Props {
 }
 
 export function VocDrawerSections({
-  vocId,
   currentUserId,
   role,
   isOwner,
@@ -48,7 +46,6 @@ export function VocDrawerSections({
         onDelete={() => {}}
       />
       <VocInternalNotes
-        vocId={vocId}
         notes={notes}
         notesLoading={notesLoading}
         pending={pending}
