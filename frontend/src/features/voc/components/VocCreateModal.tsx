@@ -17,6 +17,7 @@ import {
 import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
 import type { VocTypeListItem } from '../../../../../shared/contracts/master/io';
 import { NativeSelect } from './NativeSelect';
+import { AttachmentZone } from '../../../shared/ui/AttachmentZone/AttachmentZone';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));
 
@@ -31,7 +32,7 @@ export interface VocCreateModalProps {
   vocTypes: VocTypeListItem[];
   systems: IdLabel[];
   menus: IdLabel[];
-  onSubmit: (payload: VocCreateInput) => Promise<void>;
+  onSubmit: (payload: VocCreateInput, files: File[]) => Promise<void>;
   submitting: boolean;
 }
 
@@ -68,11 +69,13 @@ export function VocCreateModal({
 }: VocCreateModalProps) {
   const [form, setForm] = useState<FormState>(() => makeInitial(vocTypes, systems, menus));
   const [titleErr, setTitleErr] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     if (open) {
       setForm(makeInitial(vocTypes, systems, menus));
       setTitleErr('');
+      setFiles([]);
     }
   }, [open, vocTypes, systems, menus]);
 
@@ -97,7 +100,7 @@ export function VocCreateModal({
       setTitleErr('입력값이 올바르지 않습니다');
       return;
     }
-    await onSubmit(parsed.data);
+    await onSubmit(parsed.data, files);
   };
 
   return (
@@ -173,6 +176,7 @@ export function VocCreateModal({
               <ToastBodyEditor value={form.body} onChange={(md) => set('body', md)} />
             </Suspense>
           </div>
+          <AttachmentZone files={files} onChange={setFiles} disabled={submitting} />
           <DialogFooter>
             <Button
               type="button"
