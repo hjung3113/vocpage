@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.command // empty' | grep -q 'gh pr merge' && graphify update . || true"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/remind-rename-read.sh"
           }
         ]
       }
@@ -22,11 +26,28 @@
         ]
       },
       {
+        "matcher": "Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/block-blind-edit.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Read",
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path // empty'); lim=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.limit // empty'); [ -n \"$f\" ] && [ -f \"$f\" ] && [ -z \"$lim\" ] && lines=$(wc -l < \"$f\" 2>/dev/null || echo 0) && [ \"$lines\" -gt 200 ] && echo \"Large file ($lines lines): use offset+limit\""
+            "command": ".claude/hooks/check-read.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/block-reread.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/block-read-after-edit.sh"
           }
         ]
       },
@@ -78,7 +99,7 @@
   },
   "enabledPlugins": {
     "dev-browser@dev-browser-marketplace": false,
-    "claude-mem@thedotmack": true,
+    "claude-mem@thedotmack": false,
     "superpowers@superpowers-marketplace": true,
     "ralph-loop@claude-plugins-official": false,
     "hookify@claude-plugins-official": true,
