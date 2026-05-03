@@ -38,15 +38,22 @@ describe('VocSubTaskList', () => {
     expect(screen.getByText(/최대 1레벨/)).toBeInTheDocument();
   });
 
+  it('parentIsSubtask=true + canAdd=true → parentIsSubtask 가 우선 (추가 버튼 미노출)', () => {
+    render(<VocSubTaskList {...baseProps} parentIsSubtask canAdd />);
+    expect(screen.queryByRole('button', { name: '서브태스크 추가' })).not.toBeInTheDocument();
+    expect(screen.getByText(/최대 1레벨/)).toBeInTheDocument();
+  });
+
   it('canAdd=false → 추가 버튼 미노출', () => {
     render(<VocSubTaskList {...baseProps} canAdd={false} />);
     expect(screen.queryByRole('button', { name: '서브태스크 추가' })).not.toBeInTheDocument();
   });
 
-  it('서브태스크 행 클릭 → onOpen(id)', () => {
+  it('서브태스크 행 클릭 → onOpen(id), 버튼 accessible name = "{status} {title}"', () => {
     const onOpen = vi.fn();
     render(<VocSubTaskList {...baseProps} subs={[item()]} onOpen={onOpen} />);
-    fireEvent.click(screen.getByText('하위 작업 1'));
+    const btn = screen.getByRole('button', { name: '접수 하위 작업 1' });
+    fireEvent.click(btn);
     expect(onOpen).toHaveBeenCalledWith('s-1');
   });
 

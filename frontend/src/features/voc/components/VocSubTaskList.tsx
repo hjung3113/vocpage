@@ -18,13 +18,18 @@ interface Props {
   onAdd: (title: string) => void;
 }
 
-export function VocSubTaskList({ parentIsSubtask, subs, canAdd, onOpen, onAdd }: Props) {
+export function VocSubTaskList({ parentId, parentIsSubtask, subs, canAdd, onOpen, onAdd }: Props) {
   const [formOpen, setFormOpen] = useState(false);
   const [title, setTitle] = useState('');
   const showAddButton = canAdd && !parentIsSubtask && !formOpen;
 
   return (
-    <section data-testid="drawer-subtasks" className="flex flex-col gap-2">
+    <section
+      data-testid="drawer-subtasks"
+      data-parent-id={parentId}
+      className="flex flex-col gap-2"
+      aria-labelledby="voc-subtasks-heading"
+    >
       <h3
         id="voc-subtasks-heading"
         className="text-xs font-medium"
@@ -41,38 +46,37 @@ export function VocSubTaskList({ parentIsSubtask, subs, canAdd, onOpen, onAdd }:
           {subs.map((s) => (
             <li
               key={s.id}
-              className="flex items-center gap-2 rounded border p-2 text-sm"
+              className="rounded border text-sm"
               style={{
                 borderColor: 'var(--border-standard)',
                 background: 'var(--bg-elevated)',
               }}
             >
-              <span
-                className="rounded px-2 py-0.5 text-[11px]"
-                style={{
-                  background: 'var(--bg-surface)',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                {s.status}
-              </span>
               <button
                 type="button"
-                className="flex-1 text-left"
+                className="flex w-full items-center gap-2 p-2 text-left"
                 style={{ color: 'var(--text-primary)' }}
+                aria-label={`${s.status} ${s.title}`}
                 onClick={() => onOpen(s.id)}
               >
-                {s.title}
+                <span
+                  aria-hidden="true"
+                  className="rounded px-2 py-0.5 text-[11px]"
+                  style={{
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  {s.status}
+                </span>
+                <span className="flex-1">{s.title}</span>
               </button>
             </li>
           ))}
         </ul>
       )}
       {parentIsSubtask && (
-        <p
-          className="text-[11px]"
-          style={{ color: 'var(--text-quaternary, var(--text-secondary))' }}
-        >
+        <p className="text-[11px]" style={{ color: 'var(--text-quaternary)' }}>
           서브태스크 추가 불가 (최대 1레벨)
         </p>
       )}
