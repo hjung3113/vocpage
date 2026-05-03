@@ -279,9 +279,37 @@
    미첨부 (변경이 ARIA attribute + 테스트 추가뿐, 가시 변화 0).
    토큰 사용량 (cost metric `input + cache_creation`): **1.16M** (PR #175 baseline 3.39M 의 ~34%).
 
-→ **다음 세션 첫 작업** = **β-batch 잔여 C-10 진입** (NotifButton + NotifPanel — ζ batch C-19 Topbar prerequisite).
-   그다음 γ → δ → ε → ζ → Phase D.
-   §7.2 batch 순서: ~~α (C-2~C-7)~~ → **β** → γ → δ → ε → ζ → Phase D.
+→ **Wave 1.6 C-10 NotifButton + NotifPanel MERGED** (PR #180, merge `a8b533b`, 2026-05-03 14:46 KST) —
+   FE-only, 9 files, +324/-207. β-batch 종료, ζ batch C-19 Topbar prerequisite 해제.
+   - **Split**: 기존 monolithic `NotificationBell` (DropdownMenu 기반) → `NotifButton` (Popover trigger, 50 LOC) +
+     `NotifPanel` (Popover content + chip filter row + item list, 131 LOC). `VocNotificationsDropdown` 은
+     `Popover` + 두 자식 합성 wrapper로 재작성. orphaned `NotificationBell.tsx` + 테스트 동시 삭제 (단일
+     caller `VocTopbar` 마이그레이션 완료, no back-compat shim).
+   - **A11y wiring (F-3 precedent 답습)**: `NOTIF_PANEL_ID = 'notif-panel'` 상수 export → `NotifButton`
+     `aria-haspopup="dialog"` + `aria-controls={NOTIF_PANEL_ID}`, `NotifPanel` `role="dialog"` + `id={NOTIF_PANEL_ID}`.
+     Escape close + focus return verified. chip toggle group `role="group"` + `aria-pressed` 단일선택.
+   - **Type filter chips**: prototype 7개 VOC-카테고리 칩 (문의/환불/장애/요청/배송/FAQ) **미사용** —
+     실제 `NotificationType` enum (`mention | assigned | status_change | comment`) 4종과 불일치. prototype-as-reference
+     룰 적용: UX 패턴 보존, content 는 실제 contract 에 적응. **No contract change.** 칩 5개 (전체 + 4 enum) 는
+     `NotificationType.options` 로부터 derive (compile-time drift safety — schema 추가 시 TS 에러).
+   - **Tests**: 4 → 12 (a11y wiring, badge "99+" cap, Escape close, 5 chip render, "전체" default active,
+     filter behavior, empty state, item click, "모두 읽음" hidden when unreadCount=0, `data-unread` attr).
+   - **Review**: 1× code-reviewer subagent adversarial 3-hat (a11y / React / token-discipline) — verdict **SHIP**.
+     2 NIT 적용 후 commit: (1) `aria-haspopup="dialog"` on NotifButton, (2) `TYPE_CHIPS` derive from enum.
+     No BLOCKers. 4-reviewer panel 은 사용자 simplification 권한 ("복잡하지 않다면 워크플로우 간소화 가능") 으로
+     1× 로 축소. Watchdog 미사용 (main session 동기 orchestrator).
+   - **Verification**: 329/329 vitest green, tsc clean. 스크린샷 `docs/screenshots/wave-1-6/c-10-notif-panel.png`
+     (panel open + 5 chips + "전체" active + unread accent dots + "모두 읽음" link visible).
+   /opt-prompt decision id `opt-20260503T053143Z-c10-notif-button-panel`. retro = `expanded` (사이즈는 small
+   으로 시작했으나 discovery 후 medium 으로 확대 — 기존 NotificationBell 골격이 misleading 했음). rework rounds 0.
+   토큰 사용량은 retro JSONL 자동 기록.
+
+→ **다음 세션 첫 작업** = **γ-batch C-11 VocCreateModal + AttachmentZone 진입**.
+   §7.2 batch 순서: ~~α (C-2~C-7)~~ → ~~β (C-8~C-10)~~ → **γ** → δ → ε → ζ → Phase D.
+   - C-11 scope: VocCreateModal (atom 동봉 1 PR). 200줄 초과 시 §7.1 분할 정책. AttachmentZone 은
+     모달 내부 컴포넌트로 동반 신설.
+   - 진입 게이트: 본 PR (#180 C-10) 머지 + 사용자 검수 통과 — **충족**.
+   참고: ζ batch C-19 Topbar 는 NotifButton 머지 의존이었으므로 이제 unblock. ε 와 병렬 가능 시점 확인 필요.
    - C-7 scope: `VocRow.tsx` 신설 (52px height, prototype `.voc-row` 포팅, hover/selected 상태,
      22px expand-btn + 6 cell). VocTable.tsx 재합성 — `<DataTable>` → `<VocListHeader> + <VocRow[]>`.
      parent에 `role="grid"` 부여하여 C-6의 a11y contract 충족 (column/row chain 완성).
