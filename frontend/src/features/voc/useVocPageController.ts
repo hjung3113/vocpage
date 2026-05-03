@@ -143,6 +143,7 @@ export function useVocPageController() {
       open: createOpen,
       setOpen: setCreateOpen,
       onSubmit: async (payload: VocCreate) => {
+        // TODO(wave-1.6 BE): VocCreateModal now passes File[] as 2nd arg; wire upload endpoint here
         await createVoc.mutateAsync(payload);
         setCreateOpen(false);
       },

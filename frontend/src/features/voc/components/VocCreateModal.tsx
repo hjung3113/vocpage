@@ -17,6 +17,7 @@ import {
 import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
 import type { VocTypeListItem } from '../../../../../shared/contracts/master/io';
 import { NativeSelect } from './NativeSelect';
+import { AttachmentZone } from '../../../shared/ui/AttachmentZone/AttachmentZone';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));
 
@@ -31,7 +32,7 @@ export interface VocCreateModalProps {
   vocTypes: VocTypeListItem[];
   systems: IdLabel[];
   menus: IdLabel[];
-  onSubmit: (payload: VocCreateInput) => Promise<void>;
+  onSubmit: (payload: VocCreateInput, files: File[]) => Promise<void>;
   submitting: boolean;
 }
 
@@ -68,11 +69,13 @@ export function VocCreateModal({
 }: VocCreateModalProps) {
   const [form, setForm] = useState<FormState>(() => makeInitial(vocTypes, systems, menus));
   const [titleErr, setTitleErr] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     if (open) {
       setForm(makeInitial(vocTypes, systems, menus));
       setTitleErr('');
+      setFiles([]);
     }
   }, [open, vocTypes, systems, menus]);
 
@@ -97,7 +100,7 @@ export function VocCreateModal({
       setTitleErr('입력값이 올바르지 않습니다');
       return;
     }
-    await onSubmit(parsed.data);
+    await onSubmit(parsed.data, files);
   };
 
   return (
@@ -105,12 +108,12 @@ export function VocCreateModal({
       <DialogContent
         data-pcomp="voc-create-modal"
         aria-label="새 VOC 등록"
-        className="max-w-2xl bg-[color:var(--bg-surface)] text-[color:var(--text-primary)]"
+        className="max-h-[90vh] w-[min(92vw,42rem)] max-w-none overflow-y-auto overflow-x-hidden bg-[color:var(--bg-surface)] text-[color:var(--text-primary)]"
       >
         <DialogHeader>
           <DialogTitle>새 VOC 등록</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-col gap-1">
             <Label htmlFor="voc-title">제목</Label>
             <Input
@@ -124,7 +127,7 @@ export function VocCreateModal({
             )}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="voc-type">유형</Label>
               <NativeSelect
                 id="voc-type"
@@ -133,7 +136,7 @@ export function VocCreateModal({
                 options={vocTypes.map((t) => ({ id: t.id, label: t.name }))}
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="voc-system">시스템</Label>
               <NativeSelect
                 id="voc-system"
@@ -142,7 +145,7 @@ export function VocCreateModal({
                 options={systems}
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="voc-menu">메뉴</Label>
               <NativeSelect
                 id="voc-menu"
@@ -167,12 +170,13 @@ export function VocCreateModal({
               ))}
             </select>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex min-w-0 flex-col gap-1 overflow-hidden">
             <Label>본문</Label>
             <Suspense fallback={<LoadingState label="에디터 로딩" />}>
               <ToastBodyEditor value={form.body} onChange={(md) => set('body', md)} />
             </Suspense>
           </div>
+          <AttachmentZone files={files} onChange={setFiles} disabled={submitting} />
           <DialogFooter>
             <Button
               type="button"

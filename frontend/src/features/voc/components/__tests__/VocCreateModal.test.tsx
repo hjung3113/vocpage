@@ -68,19 +68,40 @@ describe('VocCreateModal', () => {
     expect(await screen.findByTestId('voc-body-editor')).toBeInTheDocument();
   });
 
-  it('calls onSubmit once with VocCreate-shaped payload when valid', async () => {
+  it('calls onSubmit once with VocCreate-shaped payload and empty files when valid', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     renderModal({ onSubmit });
     await user.type(screen.getByLabelText(/제목/), '버그 발견');
     await user.click(screen.getByRole('button', { name: /등록/ }));
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
-    const payload = onSubmit.mock.calls[0]![0];
+    const [payload, files] = onSubmit.mock.calls[0]!;
     expect(payload).toMatchObject({
       title: '버그 발견',
       voc_type_id: vocTypes[0]!.id,
       system_id: systems[0]!.id,
       menu_id: menus[0]!.id,
     });
+    expect(files).toEqual([]);
+  });
+
+  it('renders AttachmentZone slot inside the dialog', () => {
+    renderModal();
+    expect(screen.getByTestId('attachment-zone-count')).toBeInTheDocument();
+  });
+
+  it('forwards selected files to onSubmit as second arg', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    renderModal({ onSubmit });
+    const blob = new Blob([new Uint8Array(1024)], { type: 'image/png' });
+    const file = new File([blob], 'shot.png', { type: 'image/png' });
+    await user.type(screen.getByLabelText(/제목/), '버그 발견');
+    await user.upload(screen.getByTestId('attachment-zone-input') as HTMLInputElement, [file]);
+    await user.click(screen.getByRole('button', { name: /등록/ }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    const files = onSubmit.mock.calls[0]![1] as File[];
+    expect(files).toHaveLength(1);
+    expect(files[0]!.name).toBe('shot.png');
   });
 });
