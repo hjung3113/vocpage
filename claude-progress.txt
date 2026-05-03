@@ -2,6 +2,20 @@
 
 ## 다음 세션 시작점
 
+→ **Wave 1.7 Phase A MERGED** (PR #185, merge `1353219`, 2026-05-03) — VOC 등록 모달
+   parity spec + master contracts. `feature-voc.md §9.11` 신설 (필드 구성·skeleton·
+   본문↔첨부 단방향 동기화·합산 cap·Due Date 모달 미노출), `requirements.md §6.1`
+   master endpoints (`GET /api/masters/systems` nested + `GET /api/masters/menus`),
+   `shared/contracts/master/io.ts`에 `SystemListItem`/`MenuListItem` 추가,
+   plan `wave-1-7-voc-create-modal.md` (Phase A→D, 결정 D1~D10).
+   **Codex 적대적 리뷰 9건 → 7 반영 / 2 스킵**: BLOCKER namespace `/api/master`→
+   `/api/masters`, HIGH priority 강제·due_date 자동계산 BE 미구현 → Phase B 확장,
+   §8.5 합산 cap amendment, benchmark flat-index 정정, §9.4.2 `?includeArchived`
+   명시. 스킵: prototype 카운터 (false positive).
+   **다음**: Wave 1.7 Phase B (BE master endpoints + voc create enforcement, TDD).
+   사용자 승인 게이트 통과 후 시작. 진행 순서: Wave 1.6 잔여 → 1.7 B/C/D →
+   Follow-up C-2 → Wave 2.
+
 → **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물.
    `voc-prototype-decomposition.md` ~700줄 + plan `wave-1-6-voc-parity.md`.
 → **Wave 1.6 Phase B MERGED** (PR #128, 2026-05-02) — 토큰 갭 채우기.
