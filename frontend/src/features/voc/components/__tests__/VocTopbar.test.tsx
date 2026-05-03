@@ -42,7 +42,7 @@ describe('VocTopbar', () => {
     expect(onQueryChange).toHaveBeenCalled();
   });
 
-  it('renders NotificationBell button', () => {
+  it('renders notification trigger button', () => {
     render(
       <VocTopbar
         totalCount={0}
