@@ -251,6 +251,10 @@
 
 - **헬스체크**: `GET /api/health` → `{ "status": "ok", "db": "ok" }` (DB 연결 포함 확인). 인증 불필요.
 - **공통 쿼리 파라미터**: 대시보드 API는 `?systemId=&menuId=&assigneeId=&from=&to=` 공통 필터 지원 (§11.7 참조).
+- **Master 데이터 (Wave 1.7, 2026-05-03)**:
+  - `GET /api/masters/systems` → `{ rows: SystemListItem[] }`. 각 항목은 `menus: MenuListItem[]` nested 포함 (VOC 등록 모달 cascade용 단일 호출). `is_archived=true` 시스템·메뉴는 응답 제외 (신규 VOC 선택 불가, feature-voc.md §8.8).
+  - `GET /api/masters/menus?system_id=<uuid>` → `{ rows: MenuListItem[] }`. Admin 페이지 메뉴 CRUD 단독 조회용. `is_archived` 포함 여부는 `?includeArchived=true` 토글.
+  - 스키마 SSOT: `shared/contracts/master/io.ts`.
 
 ### 6.2 Frontend (React)
 
