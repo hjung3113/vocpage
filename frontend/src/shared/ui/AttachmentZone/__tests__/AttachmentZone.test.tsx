@@ -59,7 +59,7 @@ describe('AttachmentZone', () => {
     const input = screen.getByTestId('attachment-zone-input') as HTMLInputElement;
     await user.upload(input, [makeFile('big.png', 11)]);
     expect(onChange).not.toHaveBeenCalled();
-    expect(await screen.findByRole('alert')).toHaveTextContent(/10MB/);
+    expect(await screen.findByRole('status')).toHaveTextContent(/10MB/);
   });
 
   it('rejects unsupported mime type', async () => {
@@ -69,7 +69,7 @@ describe('AttachmentZone', () => {
     // bypass user-event accept filter — we need the handler to run, not the picker filter
     fireEvent.change(input, { target: { files: [pdf] } });
     expect(onChange).not.toHaveBeenCalled();
-    expect(await screen.findByRole('alert')).toHaveTextContent(/이미지/);
+    expect(await screen.findByRole('status')).toHaveTextContent(/이미지/);
   });
 
   it('rejects when adding would exceed max file count', async () => {
@@ -79,7 +79,7 @@ describe('AttachmentZone', () => {
     const input = screen.getByTestId('attachment-zone-input') as HTMLInputElement;
     await user.upload(input, [makeFile('extra.png', 1)]);
     expect(onChange).not.toHaveBeenCalled();
-    expect(await screen.findByRole('alert')).toHaveTextContent(/5개/);
+    expect(await screen.findByRole('status')).toHaveTextContent(/5개/);
   });
 
   it('removes a file when its remove button is clicked', async () => {
@@ -94,8 +94,28 @@ describe('AttachmentZone', () => {
     expect(next[0]!.name).toBe('b.png');
   });
 
-  it('exposes label region with file-input association', () => {
+  it('clears error message when a file is removed', async () => {
+    const user = userEvent.setup();
+    const f1 = makeFile('a.png', 1);
+    let current: File[] = [f1];
+    const onChange = vi.fn((next: File[]) => {
+      current = next;
+    });
+    const { rerender } = render(<AttachmentZone files={current} onChange={onChange} />);
+    // trigger an error by adding a bad file
+    fireEvent.change(screen.getByTestId('attachment-zone-input') as HTMLInputElement, {
+      target: { files: [makeFile('big.png', 11)] },
+    });
+    expect(await screen.findByRole('status')).toBeInTheDocument();
+    // remove the existing file → error should clear
+    await user.click(screen.getByRole('button', { name: /a\.png 제거/ }));
+    rerender(<AttachmentZone files={current} onChange={onChange} />);
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('exposes label association for input and dropzone group', () => {
     renderZone();
-    expect(screen.getByLabelText(/첨부파일/)).toBeInTheDocument();
+    // input is labeled via <label htmlFor>; dropzone via aria-labelledby — both should resolve
+    expect(screen.getAllByLabelText(/첨부파일/).length).toBeGreaterThanOrEqual(2);
   });
 });

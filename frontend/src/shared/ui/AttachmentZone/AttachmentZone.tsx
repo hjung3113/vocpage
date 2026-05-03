@@ -41,13 +41,25 @@ function errorMessage(err: ValidationError): string {
 
 export function AttachmentZone({ files, onChange, disabled = false }: AttachmentZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileKeys = useRef<WeakMap<File, string>>(new WeakMap());
   const labelId = useId();
   const inputId = useId();
+  const errorId = useId();
+  const hintId = useId();
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
+  const keyFor = (f: File) => {
+    let k = fileKeys.current.get(f);
+    if (!k) {
+      k = `${f.name}-${f.size}-${Math.random().toString(36).slice(2, 9)}`;
+      fileKeys.current.set(f, k);
+    }
+    return k;
+  };
+
   const acceptIncoming = (incoming: File[]) => {
-    if (incoming.length === 0) return;
+    if (disabled || incoming.length === 0) return;
     const err = validateAddition(files, incoming);
     if (err) {
       setError(errorMessage(err));
@@ -64,10 +76,9 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
   };
 
   const handleRemove = (idx: number) => {
+    setError(null);
     onChange(files.filter((_, i) => i !== idx));
   };
-
-  const openPicker = () => inputRef.current?.click();
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -79,22 +90,28 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span id={labelId} className="text-sm font-medium text-[color:var(--text-primary)]">
-          <label htmlFor={inputId} className="cursor-pointer">
-            첨부파일
-          </label>
+        <label
+          id={labelId}
+          htmlFor={inputId}
+          className="text-sm font-medium text-[color:var(--text-primary)]"
+        >
+          첨부파일
           <span className="ml-1 text-[10px] text-[color:var(--text-quaternary)]">
             (선택 · 이미지만 · 최대 {ATTACHMENT_MAX_FILES}개)
           </span>
-        </span>
+        </label>
         <span
           data-testid="attachment-zone-count"
+          aria-label={`첨부 ${files.length}개, 최대 ${ATTACHMENT_MAX_FILES}개`}
           className="rounded-full border border-[color:var(--border-standard)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]"
         >
           {files.length}/{ATTACHMENT_MAX_FILES}
         </span>
       </div>
       <div
+        role="group"
+        aria-labelledby={labelId}
+        aria-describedby={`${hintId}${error ? ` ${errorId}` : ''}`}
         onDragEnter={(e) => {
           e.preventDefault();
           if (!disabled) setDragOver(true);
@@ -106,7 +123,7 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
           dragOver
             ? 'border-[color:var(--brand)] bg-[color:var(--bg-elevated)]'
             : 'border-[color:var(--border-standard)] bg-[color:var(--bg-app)]'
-        } ${disabled ? 'opacity-60' : ''}`}
+        } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
       >
         <input
           ref={inputRef}
@@ -123,19 +140,24 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
           이미지 드래그 또는{' '}
           <button
             type="button"
-            onClick={openPicker}
+            onClick={() => inputRef.current?.click()}
             disabled={disabled}
-            className="font-medium text-[color:var(--brand)] underline-offset-2 hover:underline"
+            className="font-medium text-[color:var(--brand)] underline-offset-2 hover:underline disabled:cursor-not-allowed"
           >
             선택
           </button>
         </span>
-        <span className="text-[11px] text-[color:var(--text-quaternary)]">
+        <span id={hintId} className="text-[11px] text-[color:var(--text-quaternary)]">
           파일당 최대 {ATTACHMENT_MAX_SIZE_MB}MB
         </span>
       </div>
       {error && (
-        <div role="alert" className="text-xs text-[color:var(--status-drop)]">
+        <div
+          id={errorId}
+          role="status"
+          aria-live="polite"
+          className="text-xs text-[color:var(--danger)]"
+        >
           {error}
         </div>
       )}
@@ -143,17 +165,20 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
         <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
           {files.map((f, i) => (
             <li
-              key={`${f.name}-${i}`}
+              key={keyFor(f)}
               className="flex items-center justify-between gap-2 rounded border border-[color:var(--border-standard)] bg-[color:var(--bg-surface)] px-2 py-1 text-xs"
             >
-              <span className="truncate text-[color:var(--text-primary)]" title={f.name}>
+              <span
+                className="min-w-0 flex-1 truncate text-[color:var(--text-primary)]"
+                title={f.name}
+              >
                 {f.name}
               </span>
               <button
                 type="button"
                 aria-label={`${f.name} 제거`}
                 onClick={() => handleRemove(i)}
-                className="text-[color:var(--text-tertiary)] hover:text-[color:var(--text-primary)]"
+                className="shrink-0 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-primary)]"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
