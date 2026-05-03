@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import { VocAdvancedFilters } from '../VocAdvancedFilters';
+import { VocAdvancedFilters, VocAdvancedFiltersToggle } from '../VocAdvancedFilters';
 import type {
   AssigneeListItem,
   TagListItem,
@@ -31,7 +31,6 @@ const vocTypes: VocTypeListItem[] = [
 function renderClosed(overrides: Partial<React.ComponentProps<typeof VocAdvancedFilters>> = {}) {
   const props: React.ComponentProps<typeof VocAdvancedFilters> = {
     open: false,
-    onToggle: vi.fn(),
     assignees,
     tags,
     vocTypes,
@@ -44,19 +43,13 @@ function renderClosed(overrides: Partial<React.ComponentProps<typeof VocAdvanced
 }
 
 describe('VocAdvancedFilters', () => {
-  it('shows only "필터 더보기" button when closed', () => {
+  it('F-3: panel does not render its own toggle button (toggle now lives outside the panel)', () => {
     renderClosed();
-    expect(screen.getByRole('button', { name: /필터 더보기/ })).toBeInTheDocument();
-    expect(screen.queryByRole('group', { name: /담당자/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /필터 더보기/ })).not.toBeInTheDocument();
   });
 
-  it('calls onToggle on toggle click; renders 4 groups when open', async () => {
-    const user = userEvent.setup();
-    const { props, rerender } = renderClosed();
-    await user.click(screen.getByRole('button', { name: /필터 더보기/ }));
-    expect(props.onToggle).toHaveBeenCalledTimes(1);
-
-    rerender(<VocAdvancedFilters {...props} open />);
+  it('renders 4 chip groups when open', () => {
+    renderClosed({ open: true });
     expect(screen.getByRole('group', { name: /담당자/ })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /우선순위/ })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /유형/ })).toBeInTheDocument();
@@ -85,6 +78,13 @@ describe('VocAdvancedFilters', () => {
     expect(onReset).toHaveBeenCalledTimes(1);
   });
 
+  it('codex-fix: no chip buttons in DOM when closed (no aria-hidden focus trap)', () => {
+    renderClosed();
+    expect(screen.queryByRole('button', { name: /김관리/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /긴급/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /초기화/ })).not.toBeInTheDocument();
+  });
+
   it('flips aria-hidden on the panel when open toggles', () => {
     const { rerender } = renderClosed();
     const panel = document.querySelector('[data-pcomp="voc-advanced-filters"]');
@@ -92,7 +92,6 @@ describe('VocAdvancedFilters', () => {
     rerender(
       <VocAdvancedFilters
         open={true}
-        onToggle={vi.fn()}
         assignees={assignees}
         tags={tags}
         vocTypes={vocTypes}
@@ -102,5 +101,26 @@ describe('VocAdvancedFilters', () => {
       />,
     );
     expect(panel).toHaveAttribute('aria-hidden', 'false');
+  });
+});
+
+describe('VocAdvancedFiltersToggle (F-3)', () => {
+  it('renders 필터 더보기 button and calls onToggle on click', async () => {
+    const user = userEvent.setup();
+    const onToggle = vi.fn();
+    render(<VocAdvancedFiltersToggle open={false} onToggle={onToggle} />);
+    const btn = screen.getByRole('button', { name: /필터 더보기/ });
+    expect(btn).toBeInTheDocument();
+    expect(btn).toHaveAttribute('aria-expanded', 'false');
+    await user.click(btn);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it('reflects open state via aria-expanded=true', () => {
+    render(<VocAdvancedFiltersToggle open={true} onToggle={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /필터 더보기/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
   });
 });

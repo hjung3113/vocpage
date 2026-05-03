@@ -21,29 +21,33 @@ describe('VocListHeader', () => {
     expect(expand).toHaveAttribute('role', 'presentation');
   });
 
-  it('sortable cells render as buttons; non-sortable as divs', () => {
+  it('all 6 columnheader cells render as sortable buttons (F-1: title/assignee now sortable)', () => {
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
     expect(screen.getByTestId('voc-list-header-cell-issue_code').tagName).toBe('BUTTON');
+    expect(screen.getByTestId('voc-list-header-cell-title').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-status').tagName).toBe('BUTTON');
+    expect(screen.getByTestId('voc-list-header-cell-assignee').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-priority').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-created_at').tagName).toBe('BUTTON');
     expect(screen.getByTestId('voc-list-header-cell-expand').tagName).toBe('DIV');
-    expect(screen.getByTestId('voc-list-header-cell-title').tagName).toBe('DIV');
-    expect(screen.getByTestId('voc-list-header-cell-assignee').tagName).toBe('DIV');
   });
 
-  it('clicking sortable cell calls onSort with the correct key', () => {
+  it('clicking sortable cell calls onSort with the correct key (F-1: includes title and assignee)', () => {
     const onSort = vi.fn();
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={onSort} />);
     fireEvent.click(screen.getByTestId('voc-list-header-cell-issue_code'));
     expect(onSort).toHaveBeenCalledWith('issue_code');
+    fireEvent.click(screen.getByTestId('voc-list-header-cell-title'));
+    expect(onSort).toHaveBeenCalledWith('title');
     fireEvent.click(screen.getByTestId('voc-list-header-cell-status'));
     expect(onSort).toHaveBeenCalledWith('status');
+    fireEvent.click(screen.getByTestId('voc-list-header-cell-assignee'));
+    expect(onSort).toHaveBeenCalledWith('assignee');
     fireEvent.click(screen.getByTestId('voc-list-header-cell-priority'));
     expect(onSort).toHaveBeenCalledWith('priority');
     fireEvent.click(screen.getByTestId('voc-list-header-cell-created_at'));
     expect(onSort).toHaveBeenCalledWith('created_at');
-    expect(onSort).toHaveBeenCalledTimes(4);
+    expect(onSort).toHaveBeenCalledTimes(6);
   });
 
   it('active cell has sort-active class and aria-sort=ascending when sortDir=asc', () => {

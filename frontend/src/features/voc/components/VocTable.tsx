@@ -1,5 +1,5 @@
 import { VocListHeader } from '../../../components/voc/VocListHeader';
-import { VocRow } from '../../../components/voc/VocRow';
+import { VocRow, type VocTypeMapEntry } from '../../../components/voc/VocRow';
 import type { VocListResponse, VocSortColumn, SortDir } from '../../../../../shared/contracts/voc';
 
 interface VocTableProps {
@@ -9,6 +9,7 @@ interface VocTableProps {
   onSort: (key: VocSortColumn) => void;
   onRowClick: (id: string) => void;
   assigneeMap: Record<string, string>;
+  vocTypeMap?: Record<string, VocTypeMapEntry>;
 }
 
 export function VocTable({
@@ -18,6 +19,7 @@ export function VocTable({
   onSort,
   onRowClick,
   assigneeMap,
+  vocTypeMap,
 }: VocTableProps) {
   return (
     <div data-pcomp="voc-table" data-testid="voc-table" className="voc-table-wrapper">
@@ -29,6 +31,7 @@ export function VocTable({
               key={row.id}
               row={row}
               assigneeMap={assigneeMap}
+              vocTypeMap={vocTypeMap}
               onClick={() => onRowClick(row.id)}
             />
           ))}

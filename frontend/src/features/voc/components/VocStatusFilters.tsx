@@ -1,5 +1,6 @@
 import { Layers, Circle, Search, Zap, PauseCircle, CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import type { VocStatus as VocStatusType } from '../../../../../shared/contracts/voc';
 
 const STATUS_TOKEN: Record<VocStatusType, string> = {
@@ -28,9 +29,10 @@ const PILLS: PillConfig[] = [
 export interface VocStatusFiltersProps {
   value: VocStatusType[] | 'all';
   onChange: (next: VocStatusType[] | 'all') => void;
+  rightSlot?: ReactNode;
 }
 
-export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
+export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFiltersProps) {
   const isAll = value === 'all';
 
   function handleClick(pill: VocStatusType | 'all') {
@@ -93,6 +95,7 @@ export function VocStatusFilters({ value, onChange }: VocStatusFiltersProps) {
           </button>
         );
       })}
+      {rightSlot && <div className="ml-auto flex items-center">{rightSlot}</div>}
     </div>
   );
 }

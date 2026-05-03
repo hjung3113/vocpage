@@ -37,6 +37,7 @@ describe('VocTopbar', () => {
     );
     const input = screen.getByRole('searchbox', { name: /검색/ });
     expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute('placeholder', '제목, 본문 검색...');
     await user.type(input, 'hello');
     expect(onQueryChange).toHaveBeenCalled();
   });

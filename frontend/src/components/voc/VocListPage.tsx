@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
 import { useVocPageController } from '../../features/voc/useVocPageController';
 import { VocTopbar } from '../../features/voc/components/VocTopbar';
 import { VocStatusFilters } from '../../features/voc/components/VocStatusFilters';
-import { VocAdvancedFilters } from '../../features/voc/components/VocAdvancedFilters';
-import { VocSortChips } from '../../features/voc/components/VocSortChips';
+import {
+  VocAdvancedFilters,
+  VocAdvancedFiltersToggle,
+} from '../../features/voc/components/VocAdvancedFilters';
 import { VocTable } from '../../features/voc/components/VocTable';
 import { VocPaginationBar } from '../../features/voc/components/VocPaginationBar';
 import { VocReviewDrawer } from '../../features/voc/components/VocReviewDrawer';
@@ -22,6 +25,11 @@ export function VocListPage() {
   const rows = list.data?.rows ?? [];
   const total = list.data?.total ?? 0;
   const statusValue = ctrl.filter.status ?? 'all';
+  const vocTypeMap = useMemo(
+    () =>
+      Object.fromEntries(ctrl.masters.vocTypes.map((t) => [t.id, { slug: t.slug, name: t.name }])),
+    [ctrl.masters.vocTypes],
+  );
 
   return (
     <div className="flex flex-col">
@@ -37,25 +45,27 @@ export function VocListPage() {
         }}
         onCreate={() => ctrl.create.setOpen(true)}
       />
-      <VocStatusFilters value={statusValue} onChange={ctrl.onStatusChange} />
-      <div>
-        <VocAdvancedFilters
-          open={ctrl.advanced.open}
-          onToggle={ctrl.advanced.onToggle}
-          assignees={ctrl.masters.assignees}
-          tags={ctrl.masters.tags}
-          vocTypes={ctrl.masters.vocTypes}
-          value={{
-            assignees: ctrl.filter.assignees,
-            priorities: ctrl.filter.priorities,
-            voc_type_ids: ctrl.filter.voc_type_ids,
-            tag_ids: ctrl.filter.tag_ids,
-          }}
-          onChange={ctrl.advanced.onChange}
-          onReset={ctrl.advanced.onReset}
-        />
-      </div>
-      <VocSortChips sortBy={ctrl.sortBy} sortDir={ctrl.sortDir} onChange={ctrl.setSort} />
+      <VocStatusFilters
+        value={statusValue}
+        onChange={ctrl.onStatusChange}
+        rightSlot={
+          <VocAdvancedFiltersToggle open={ctrl.advanced.open} onToggle={ctrl.advanced.onToggle} />
+        }
+      />
+      <VocAdvancedFilters
+        open={ctrl.advanced.open}
+        assignees={ctrl.masters.assignees}
+        tags={ctrl.masters.tags}
+        vocTypes={ctrl.masters.vocTypes}
+        value={{
+          assignees: ctrl.filter.assignees,
+          priorities: ctrl.filter.priorities,
+          voc_type_ids: ctrl.filter.voc_type_ids,
+          tag_ids: ctrl.filter.tag_ids,
+        }}
+        onChange={ctrl.advanced.onChange}
+        onReset={ctrl.advanced.onReset}
+      />
       <div className="px-6 text-sm">
         {list.isLoading && <LoadingState data-testid="voc-loading" />}
         {list.isError && <ErrorState onRetry={() => list.refetch()} />}
@@ -72,6 +82,7 @@ export function VocListPage() {
             }
             onRowClick={ctrl.drawer.open}
             assigneeMap={ctrl.masters.assigneeMap}
+            vocTypeMap={vocTypeMap}
           />
         )}
       </div>
