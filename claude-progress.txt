@@ -2,6 +2,36 @@
 
 ## 다음 세션 시작점
 
+→ **Wave 1.6 C-12 VocReviewDrawer PR opened** (2026-05-03) — drawer shell parity.
+   I-2 approved-lock(`review_status==='approved'` → status select disabled +
+   a11y title/aria-label 사유 노출, prototype drawer-advanced.js:33 인용),
+   신규 `VocReviewMetaPanel.tsx` (91 LOC, 7-field grid: status/priority/type/
+   assignee/due_date/system/menu) + DialogDescription sr-only, fixtures parity
+   회복(SYSTEMS/MENUS placeholder ID를 voc.fixtures.ts의 실제 UUID와 매핑).
+   4-reviewer 적대적 패널(designer/code-reviewer/test-engineer/architect, 각
+   3관점) → 7건 fix-required 반영 (P0 3 / P1 4) + 5건 defer(C-13 후속).
+   본문/서브태스크/첨부 dropzone/Toast Editor/댓글리스트 재설계는 후속 C-13~16.
+   FE 테스트 350/350 green, typecheck/lint clean. 변경 LOC: drawer 175→198,
+   meta-panel 신규 97, list-page 115→128. 200줄 룰 준수.
+   **다음**: 사용자 검수 → merge → C-13 VocReviewTabs (δ 종료) → ε batch 진입.
+
+→ **Wave 1.7 Phase A MERGED** (PR #185, merge `1353219`, 2026-05-03) — VOC 등록 모달
+   parity spec + master contracts. `feature-voc.md §9.11` 신설 (필드 구성·skeleton·
+   본문↔첨부 단방향 동기화·합산 cap·Due Date 모달 미노출), `requirements.md §6.1`
+   master endpoints (`GET /api/masters/systems` nested + `GET /api/masters/menus`),
+   `shared/contracts/master/io.ts`에 `SystemListItem`/`MenuListItem` 추가,
+   plan `wave-1-7-voc-create-modal.md` (Phase A→D, 결정 D1~D10).
+   **Codex 적대적 리뷰 9건 → 7 반영 / 2 스킵**: BLOCKER namespace `/api/master`→
+   `/api/masters`, HIGH priority 강제·due_date 자동계산 BE 미구현 → Phase B 확장,
+   §8.5 합산 cap amendment, benchmark flat-index 정정, §9.4.2 `?includeArchived`
+   명시. 스킵: prototype 카운터 (false positive).
+   **다음**: Wave 1.6 δ batch **C-12 VocReviewDrawer 진입 승인** (2026-05-03).
+   진입 게이트(γ C-11 PR #182 머지 + 사용자 검수) 충족 — 바로 착수.
+   진행 순서: Wave 1.6 잔여 (C-12 → C-13 →
+   ε C-14∥C-15∥C-16 → ζ C-17 → C-18∥C-19 → Phase D) → 1.7 B/C/D →
+   Follow-up C-2 → Wave 2. Wave 1.7 Phase A는 spec/contract만 선행 머지된
+   상태이며, B(BE FE 코드) 이후는 1.6 종료 후 진입.
+
 → **Wave 1.6 Phase A MERGED** (PR #126, 2026-05-02) — `/voc` prototype 분해 산출물.
    `voc-prototype-decomposition.md` ~700줄 + plan `wave-1-6-voc-parity.md`.
 → **Wave 1.6 Phase B MERGED** (PR #128, 2026-05-02) — 토큰 갭 채우기.
