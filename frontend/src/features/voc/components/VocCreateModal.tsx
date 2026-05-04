@@ -1,11 +1,13 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '../../../components/ui/dialog';
+import { X } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
@@ -110,8 +112,12 @@ export function VocCreateModal({
         aria-label="새 VOC 등록"
         className="max-h-[90vh] w-[min(92vw,42rem)] max-w-none overflow-y-auto overflow-x-hidden bg-[color:var(--bg-surface)] text-[color:var(--text-primary)]"
       >
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>새 VOC 등록</DialogTitle>
+          <DialogClose className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[color:var(--brand)]">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-col gap-1">
