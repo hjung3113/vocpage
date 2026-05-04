@@ -15,7 +15,9 @@ import {
 } from '../../../components/ui/select';
 import { vocApi } from '../../../api/voc';
 import { queryKeys } from '../../../api/queryKeys';
+import { useContext } from 'react';
 import { useRole } from '../../../hooks/useRole';
+import { AuthContext } from '../../../contexts/AuthContext';
 import {
   VocStatus,
   VocPriority,
@@ -25,12 +27,8 @@ import {
 import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
-import {
-  VocCommentsPanel,
-  VocAttachmentsPanel,
-  VocHistoryPanel,
-  type AttachmentItem,
-} from './VocReviewSections';
+import { type AttachmentItem } from './VocReviewSections';
+import { VocDrawerSections } from './VocDrawerSections';
 import { VocReviewMetaPanel } from './VocReviewMetaPanel';
 
 const STATUS_LOCK_TITLE = '결과 검토가 승인되어 상태 변경이 잠겨 있습니다.';
@@ -86,6 +84,7 @@ export function VocReviewDrawer({
   const detail = useVocDetail(vocId);
   const history = useVocHistory(vocId);
   const { role } = useRole();
+  const auth = useContext(AuthContext);
   const open = !!vocId;
   const voc = detail.data;
   const canWrite = role !== 'user';
@@ -178,19 +177,18 @@ export function VocReviewDrawer({
                 </Select>
               </label>
             </div>
-            <div className="flex flex-col gap-4" data-pcomp="voc-review-sections">
-              <VocCommentsPanel
-                notes={notes}
-                notesLoading={notesLoading}
-                canWrite={canWrite}
-                pending={pending}
-                onAdd={(body) => {
-                  void onAddNote(voc.id, body);
-                }}
-              />
-              <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
-              <VocHistoryPanel entries={history.data} loading={history.isLoading} />
-            </div>
+            <VocDrawerSections
+              currentUserId={auth?.user?.id ?? ''}
+              canWrite={canWrite}
+              canUpload={canUpload}
+              pending={pending}
+              notes={notes}
+              notesLoading={notesLoading}
+              attachments={attachments}
+              historyEntries={history.data}
+              historyLoading={history.isLoading}
+              onAddNote={(body) => void onAddNote(voc.id, body)}
+            />
           </div>
         )}
       </DialogContent>
