@@ -135,7 +135,7 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(screen.queryByTestId('voc-permission-gate')).not.toBeInTheDocument();
   });
 
-  it('drawer에 VocReviewMetaPanel 마운트', async () => {
+  it('drawer에 VocMetaSection 마운트', async () => {
     renderDrawer('manager', target.id);
     await waitFor(() => expect(screen.getByTestId('voc-meta-panel')).toBeInTheDocument());
   });

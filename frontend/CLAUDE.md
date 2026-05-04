@@ -41,6 +41,7 @@ Flow: analyze prototype → map components → define types → build with dummy
 - **Key hooks:** `useVOCFilter`, `useAutoTag`, `useDrawer`.
 - **State:** React Context or Redux for global filter/selection.
 - **Base components:** Radix UI primitives — ghost buttons, translucent cards, border-focused inputs.
+- **Component naming:** suffix rules (`*Drawer`, `*Section`, `*Panel`, `*Card`, `*Item`) → `docs/specs/requires/component-naming.md`.
 
 ## Styling Architecture
 

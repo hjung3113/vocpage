@@ -1,7 +1,7 @@
 import type { InternalNote, VocHistoryEntry } from '../../../../../shared/contracts/voc';
 import type { Role } from '../../../../../shared/contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/ui/tabs';
-import { VocHistoryPanel } from './VocReviewSections';
+import { VocHistorySection } from './VocReviewSections';
 import { VocCommentList } from './VocCommentList';
 import { VocInternalNotes } from './VocInternalNotes';
 import { VocSubTaskList } from './VocSubTaskList';
@@ -21,7 +21,7 @@ interface Props {
   onAddNote: (body: string) => void;
 }
 
-export function VocDrawerSections({
+export function VocActionSection({
   vocId,
   parentIsSubtask,
   currentUserId,
@@ -69,7 +69,7 @@ export function VocDrawerSections({
       </TabsContent>
 
       <TabsContent value="history">
-        <VocHistoryPanel entries={historyEntries} loading={historyLoading} />
+        <VocHistorySection entries={historyEntries} loading={historyLoading} />
       </TabsContent>
 
       <TabsContent value="subtask">

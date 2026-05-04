@@ -16,11 +16,11 @@ import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
 import { type AttachmentItem } from './VocReviewSections';
-import { VocDrawerSections } from './VocDrawerSections';
-import { VocReviewMetaPanel } from './VocReviewMetaPanel';
+import { VocActionSection } from './VocActionSection';
+import { VocMetaSection } from './VocMetaSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
 import { VocBodySection } from './VocBodySection';
-import { VocAttachmentsPanel } from './VocReviewSections';
+import { VocAttachmentSection } from './VocReviewSections';
 
 const ISSUE_CODE_STYLE: React.CSSProperties = {
   color: 'var(--accent)',
@@ -151,7 +151,7 @@ export function VocReviewDrawer({
           {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
           {voc && !blockedDeleted && (
             <div className="flex flex-col gap-4">
-              <VocReviewMetaPanel
+              <VocMetaSection
                 voc={voc}
                 assigneeMap={assigneeMap}
                 vocTypeMap={vocTypeMap}
@@ -159,8 +159,8 @@ export function VocReviewDrawer({
                 menuMap={menuMap}
               />
               <VocBodySection body={voc.body} />
-              <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
-              <VocDrawerSections
+              <VocAttachmentSection items={attachments} canUpload={canUpload} />
+              <VocActionSection
                 vocId={voc.id}
                 parentIsSubtask={voc.parent_id !== null}
                 currentUserId={auth?.user?.id ?? ''}
