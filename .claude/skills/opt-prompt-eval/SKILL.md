@@ -228,4 +228,4 @@ Evaluated in order; first match wins:
 - Don't size, normalize, or rewrite a fresh prompt here — that is the `/opt-prompt` skill's job. Refuse and redirect.
 - Don't auto-trigger on `eval` / `retro` / `review` keywords; only on explicit `/opt-prompt-eval`.
 - **`/clear` between task and eval gives bogus retro stats** — if you `/clear`'d and the new session can't reach the original task transcript, retro `session_summary` will reflect only the eval session (tiny `api_calls`, near-zero deltas), `tokens_delta` will be `null`, and the row's `session_id` won't match the decided `session_id`. Recovery: `append.sh void <id> retro 'wrong session captured'` then `/opt-prompt-eval <id> --exec-sid <original-task-sid>`. Find the original sid via `ls -t ~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/*.jsonl`. Confirm by comparing the row's `session_id` against decided's.
-- Don't redirect to `--review` — pattern analysis and skill improvement belong to `/opt-prompt-improve`.
+- Don't tell users to use the legacy `--review` flag — it no longer exists. Direct them to `/opt-prompt-improve` as a separate command.

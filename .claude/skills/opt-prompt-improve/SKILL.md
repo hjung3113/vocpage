@@ -19,13 +19,22 @@ Count active `decided` rows with no matching active `retro`:
 
 ```bash
 python3 - <<'EOF'
-import json, collections
-log = open(f"{__import__('os').path.expanduser('~')}/.claude/opt-prompt/opt-prompt-log.jsonl").readlines()
-rows = [json.loads(l) for l in log if l.strip()]
+import json, os
+log_path = os.path.expanduser("~/.claude/opt-prompt/opt-prompt-log.jsonl")
+if not os.path.exists(log_path):
+    print("INFO: opt-prompt-log.jsonl not found — no retro data yet. Skipping Tier 1-3.")
+    exit(0)
 latest = {}
-for r in rows:
-    key = (r["decision_id"], r["phase"])
-    latest[key] = r
+for i, line in enumerate(open(log_path), 1):
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        r = json.loads(line)
+        key = (r.get("decision_id", ""), r.get("phase", ""))
+        latest[key] = r
+    except json.JSONDecodeError:
+        print(f"[warn] skipped malformed line {i} in opt-prompt-log.jsonl")
 decided = {did for (did, ph), r in latest.items() if ph == "decided" and r.get("status") == "active"}
 retrod  = {did for (did, ph), r in latest.items() if ph == "retro"   and r.get("status") == "active"}
 inflight = decided - retrod
@@ -35,7 +44,7 @@ if inflight:
 EOF
 ```
 
-Print the warning if any in-flight tasks exist, then proceed with the rest of the analysis using only fully-closed decisions.
+If the log file does not exist, emit `INFO: opt-prompt-log.jsonl not found` and skip Tier 1–3 (Tier 0 still runs from `feedback.jsonl`). Print in-flight warnings if any tasks are unretro'd, then proceed with only fully-closed decisions.
 
 ## Workflow
 
@@ -122,11 +131,12 @@ After the proposal list, ask exactly:
 
 > 적용할 제안 번호? (전체 / 1,3 / none)
 
-Wait for the user's response. Map:
+Wait for the user's response. Parse:
 
 - `전체` or `all` → apply all proposals
-- `1,3` (comma-separated numbers) → apply only those
-- `none` or empty → STOP without editing
+- Digits / commas / spaces → extract all integers with `re.findall(r'\d+', response)`, deduplicate, sort
+  - If any extracted number exceeds the proposal count, ask once: "다음 번호는 무효합니다: [X]. 다시 입력해주세요."
+- `none`, `취소`, `x`, or empty response → STOP without editing
 
 ### Step 7 — Apply
 
@@ -136,7 +146,8 @@ For each approved proposal, edit the target SKILL.md using the `Edit` tool. Rule
 - **Surgical changes only** — change only the exact lines the proposal targets; do not reformat surrounding text.
 - **Never delete the `## Anti-patterns` section** of any skill.
 - If the edit would conflict with another approved proposal (overlapping lines), apply in numbered order and re-read the file between edits.
-- If the target location is ambiguous (e.g., section no longer exists as described), pause and ask the user: "제안 #N의 대상 위치를 찾지 못했습니다. 수동 편집하시겠어요?"
+- **"Ambiguous"** means: (a) the proposal describes only intent without enough text to form a unique `old_string` for the `Edit` tool, or (b) the `Edit` tool returns a mismatch/not-found error. In either case, pause and ask: "제안 #N의 대상 위치를 찾지 못했습니다. 수동 편집하시겠어요?" Do NOT mark the proposal as applied.
+- **"Applied"** means the `Edit` tool returned success with no error. Skipped (ambiguous) proposals are NOT applied regardless of user approval.
 
 After all edits, show a summary:
 
@@ -145,12 +156,27 @@ After all edits, show a summary:
 ─────────
 #1 → opt-prompt/SKILL.md 수정됨
 #2 → opt-prompt/SKILL.md 수정됨
-건너뜀: #3 (위치 모호)
+건너뜀: #3 (위치 모호 — 수동 편집 필요)
 ```
 
 ### Step 8 — Resolve Feedback
 
-For each **applied** Tier 0 proposal (linked to a `fb-*` id), append a resolve tombstone by running the `/opt-prompt-feedback --resolve <id>` skill inline (do NOT hand-roll the tombstone).
+For each **applied** (Edit tool success) Tier 0 proposal linked to a `fb-*` id, append a resolve tombstone using the python3 block below. Run once per id — do NOT hand-roll JSON.
+
+```bash
+FEEDBACK_ID="<fb-id>" python3 << 'PYEOF'
+import json, datetime, os
+fb_id = os.environ["FEEDBACK_ID"]
+ts = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+tombstone = {"id": fb_id, "ts": ts, "resolved": True, "resolved_ts": ts}
+log_path = os.path.expanduser("~/.claude/opt-prompt/feedback.jsonl")
+with open(log_path, "a", encoding="utf-8") as f:
+    f.write(json.dumps(tombstone, ensure_ascii=False) + "\n")
+print(f"Resolved: {fb_id}")
+PYEOF
+```
+
+**Skipped proposals are never resolved** — if Step 7 marked a proposal as skipped (ambiguous), do not run the resolve block for its `fb-*` id. It remains unresolved and will reappear in the next `/opt-prompt-improve` run.
 
 Do NOT resolve feedback entries for Tier 1/2/3 proposals — those are derived from log analysis, not user-submitted feedback.
 
