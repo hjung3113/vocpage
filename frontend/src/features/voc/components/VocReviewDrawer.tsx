@@ -178,6 +178,8 @@ export function VocReviewDrawer({
               </label>
             </div>
             <VocDrawerSections
+              vocId={voc.id}
+              parentIsSubtask={voc.parent_id !== null}
               currentUserId={auth?.user?.id ?? ''}
               role={role}
               isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
