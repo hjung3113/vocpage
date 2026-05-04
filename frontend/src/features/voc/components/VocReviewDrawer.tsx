@@ -179,6 +179,8 @@ export function VocReviewDrawer({
             </div>
             <VocDrawerSections
               currentUserId={auth?.user?.id ?? ''}
+              role={role}
+              isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
               canWrite={canWrite}
               canUpload={canUpload}
               pending={pending}

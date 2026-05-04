@@ -74,27 +74,31 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
 
   const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
 
-  it('탭 UI 없이 3개 섹션(코멘트/첨부/변경이력) 동시 노출', async () => {
+  it('탭 UI 없이 4개 섹션(댓글/내부메모/첨부/변경이력) 동시 노출 (manager)', async () => {
     renderDrawer('manager', target.id);
-    await waitFor(() => expect(screen.getByTestId('drawer-notes')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('drawer-comments')).toBeInTheDocument());
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     expect(screen.queryAllByRole('tab')).toHaveLength(0);
-    expect(screen.getByTestId('drawer-notes')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-internal-notes')).toBeInTheDocument();
     expect(screen.getByTestId('drawer-attachments')).toBeInTheDocument();
     expect(screen.getByTestId('drawer-history')).toBeInTheDocument();
   });
 
-  it('role=user → 코멘트 작성 form 미노출 + 첨부 업로드 button 미노출', async () => {
+  it('role=user → 댓글 작성 form 미노출 + 내부메모 섹션 미노출 + 첨부 업로드 button 미노출', async () => {
     renderDrawer('user', target.id);
-    await waitFor(() => expect(screen.getByTestId('drawer-notes')).toBeInTheDocument());
-    expect(screen.queryByLabelText('new note')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('drawer-comments')).toBeInTheDocument());
+    expect(screen.queryByLabelText('new comment')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('drawer-internal-notes')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('첨부 업로드')).not.toBeInTheDocument();
   });
 
-  it('role=manager → 3 섹션 모두 가시 + 작성 form 노출', async () => {
+  it('role=manager → 4 섹션 모두 가시 + 작성 form 노출', async () => {
     renderDrawer('manager', target.id);
-    await waitFor(() => expect(screen.getByLabelText('new note')).toBeInTheDocument());
-    expect(screen.getByTestId('drawer-notes')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText('new comment')).toBeInTheDocument());
+    expect(screen.getByLabelText('new internal note')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-internal-notes')).toBeInTheDocument();
     expect(screen.getByTestId('drawer-attachments')).toBeInTheDocument();
     expect(screen.getByTestId('drawer-history')).toBeInTheDocument();
   });
@@ -103,8 +107,7 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     renderDrawer('manager', target.id, { deleted: true });
     await waitFor(() => expect(screen.getByTestId('voc-permission-gate')).toBeInTheDocument());
     expect(screen.getByText(/삭제된 항목/)).toBeInTheDocument();
-    // 게이트가 본문 자체를 막아야 한다.
-    expect(screen.queryByTestId('drawer-notes')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('drawer-comments')).not.toBeInTheDocument();
   });
 
   it('변경이력 섹션에 timeline listitem 즉시 노출 (탭 클릭 불필요)', async () => {

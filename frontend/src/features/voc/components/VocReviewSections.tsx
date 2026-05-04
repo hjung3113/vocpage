@@ -1,83 +1,12 @@
-import { useState } from 'react';
 import { Button } from '../../../components/ui/button';
-import { Textarea } from '../../../components/ui/textarea';
 import { LoadingState } from '../../../components/common/LoadingState';
-import type { InternalNote, VocHistoryEntry } from '../../../../../shared/contracts/voc';
+import type { VocHistoryEntry } from '../../../../../shared/contracts/voc';
 
 export interface AttachmentItem {
   id: string;
   name: string;
   size: number;
   href: string;
-}
-
-interface CommentsPanelProps {
-  notes: InternalNote[] | undefined;
-  notesLoading: boolean;
-  canWrite: boolean;
-  pending: boolean;
-  onAdd: (body: string) => void;
-}
-
-export function VocCommentsPanel({
-  notes,
-  notesLoading,
-  canWrite,
-  pending,
-  onAdd,
-}: CommentsPanelProps) {
-  const [body, setBody] = useState('');
-  return (
-    <section data-testid="drawer-notes" className="flex flex-col gap-2">
-      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-        코멘트
-      </h3>
-      {notesLoading && <LoadingState />}
-      {!notesLoading && notes && notes.length === 0 && (
-        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-          아직 작성된 코멘트가 없습니다.
-        </p>
-      )}
-      {notes && notes.length > 0 && (
-        <ul className="flex flex-col gap-2">
-          {notes.map((n) => (
-            <li
-              key={n.id}
-              className="rounded border p-2 text-sm"
-              style={{ borderColor: 'var(--border-standard)' }}
-            >
-              <div className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-                {n.created_at.slice(0, 16).replace('T', ' ')}
-              </div>
-              {n.body}
-            </li>
-          ))}
-        </ul>
-      )}
-      {canWrite && (
-        <form
-          className="mt-1 flex flex-col gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (body.trim()) {
-              onAdd(body.trim());
-              setBody('');
-            }
-          }}
-        >
-          <Textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="코멘트를 입력하세요"
-            aria-label="new note"
-          />
-          <Button type="submit" disabled={pending || !body.trim()} size="sm">
-            저장
-          </Button>
-        </form>
-      )}
-    </section>
-  );
 }
 
 interface AttachmentsPanelProps {

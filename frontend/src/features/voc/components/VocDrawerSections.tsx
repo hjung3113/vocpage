@@ -1,14 +1,13 @@
 import type { InternalNote, VocHistoryEntry } from '../../../../../shared/contracts/voc';
-import {
-  VocCommentsPanel,
-  VocAttachmentsPanel,
-  VocHistoryPanel,
-  type AttachmentItem,
-} from './VocReviewSections';
+import type { Role } from '../../../../../shared/contracts/common';
+import { VocAttachmentsPanel, VocHistoryPanel, type AttachmentItem } from './VocReviewSections';
 import { VocCommentList } from './VocCommentList';
+import { VocInternalNotes } from './VocInternalNotes';
 
 interface Props {
   currentUserId: string;
+  role: Role;
+  isOwner: boolean;
   canWrite: boolean;
   canUpload: boolean;
   pending: boolean;
@@ -22,6 +21,8 @@ interface Props {
 
 export function VocDrawerSections({
   currentUserId,
+  role,
+  isOwner,
   canWrite,
   canUpload,
   pending,
@@ -44,11 +45,12 @@ export function VocDrawerSections({
         onEdit={() => {}}
         onDelete={() => {}}
       />
-      <VocCommentsPanel
+      <VocInternalNotes
         notes={notes}
         notesLoading={notesLoading}
-        canWrite={canWrite}
         pending={pending}
+        role={role}
+        isOwner={isOwner}
         onAdd={onAddNote}
       />
       <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
