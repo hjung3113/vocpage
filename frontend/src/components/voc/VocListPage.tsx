@@ -111,7 +111,6 @@ export function VocListPage() {
         systemMap={SYSTEMS_MAP}
         menuMap={MENUS_MAP}
         onClose={ctrl.drawer.close}
-        onPatch={ctrl.actions.patch}
         onAddNote={ctrl.actions.addNote}
       />
       <VocCreateModal

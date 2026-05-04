@@ -104,6 +104,8 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.notes).mockResolvedValue([]);
     renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
     await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('tab', { name: '내부노트' })).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('tab', { name: '내부노트' }));
     await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
   });
 

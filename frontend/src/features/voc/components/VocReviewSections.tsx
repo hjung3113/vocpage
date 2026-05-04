@@ -1,6 +1,7 @@
 import { Button } from '../../../components/ui/button';
 import { LoadingState } from '../../../components/common/LoadingState';
 import type { VocHistoryEntry } from '../../../../../shared/contracts/voc';
+import { VocSection } from './VocSection';
 
 export interface AttachmentItem {
   id: string;
@@ -9,17 +10,14 @@ export interface AttachmentItem {
   href: string;
 }
 
-interface AttachmentsPanelProps {
+interface AttachmentSectionProps {
   items: AttachmentItem[];
   canUpload: boolean;
 }
 
-export function VocAttachmentsPanel({ items, canUpload }: AttachmentsPanelProps) {
+export function VocAttachmentSection({ items, canUpload }: AttachmentSectionProps) {
   return (
-    <section data-testid="drawer-attachments" className="flex flex-col gap-2">
-      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-        첨부
-      </h3>
+    <VocSection title="첨부" testId="drawer-attachments">
       {items.length === 0 ? (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           첨부 파일이 없습니다.
@@ -59,11 +57,11 @@ export function VocAttachmentsPanel({ items, canUpload }: AttachmentsPanelProps)
           파일 업로드
         </Button>
       )}
-    </section>
+    </VocSection>
   );
 }
 
-interface HistoryPanelProps {
+interface HistorySectionProps {
   entries: VocHistoryEntry[] | undefined;
   loading: boolean;
 }
@@ -76,12 +74,9 @@ const FIELD_LABEL: Record<string, string> = {
   title: '제목',
 };
 
-export function VocHistoryPanel({ entries, loading }: HistoryPanelProps) {
+export function VocHistorySection({ entries, loading }: HistorySectionProps) {
   return (
-    <section data-testid="drawer-history" className="flex flex-col gap-2">
-      <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-        변경이력
-      </h3>
+    <VocSection title="변경이력" testId="drawer-history">
       {loading && <LoadingState />}
       {!loading && entries && entries.length === 0 && (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
@@ -106,6 +101,6 @@ export function VocHistoryPanel({ entries, loading }: HistoryPanelProps) {
           ))}
         </ol>
       )}
-    </section>
+    </VocSection>
   );
 }

@@ -4,7 +4,7 @@ import { VocPriorityBadge } from '../../../components/voc/VocPriorityBadge';
 import { VocTypeBadge } from '../../../components/voc/VocTypeBadge';
 import { VocAssignee } from '../../../components/voc/VocAssignee';
 
-export interface VocReviewMetaPanelProps {
+export interface VocMetaSectionProps {
   voc: Voc;
   assigneeMap: Record<string, string>;
   vocTypeMap?: Record<string, { slug: string; name: string }>;
@@ -46,13 +46,13 @@ function formatDate(iso: string | null | undefined): string {
   return iso.slice(0, 10);
 }
 
-export function VocReviewMetaPanel({
+export function VocMetaSection({
   voc,
   assigneeMap,
   vocTypeMap,
   systemMap,
   menuMap,
-}: VocReviewMetaPanelProps) {
+}: VocMetaSectionProps) {
   const vocType = vocTypeMap?.[voc.voc_type_id];
   const assigneeName = voc.assignee_id ? (assigneeMap[voc.assignee_id] ?? null) : null;
   const systemLabel = systemMap?.[voc.system_id] ?? '—';
@@ -61,10 +61,14 @@ export function VocReviewMetaPanel({
   return (
     <div
       data-testid="voc-meta-panel"
-      data-pcomp="VocReviewMetaPanel"
+      data-pcomp="VocMetaSection"
       className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
       style={{ background: 'var(--bg-surface)' }}
     >
+      <MetaField label="등록일" testId="meta-created_at">
+        <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
+      </MetaField>
+
       <MetaField label="상태" testId="meta-status">
         <VocStatusBadge status={voc.status} />
       </MetaField>
@@ -100,4 +104,4 @@ export function VocReviewMetaPanel({
   );
 }
 
-export default VocReviewMetaPanel;
+export default VocMetaSection;
