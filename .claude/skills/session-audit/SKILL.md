@@ -65,9 +65,19 @@ Build `turns_summary` (in-memory; not persisted) and inject identically to all 4
 
 Match `touched_paths` against the "work_type labels" rules in `checklist.md`. Multi-label allowed (top-2). Tie or empty → label `mixed`.
 
-### Step 5 — Dispatch 4 experts in parallel
+### Step 5 — Dispatch experts in parallel (size-gated)
 
-Single-message parallel `Agent` calls. `subagent_type=general-purpose`, `model=sonnet` (cost expert uses `opus`).
+**Session-size gate** (decide expert set from Step 2 stats):
+
+- `tokens.grand_total < 50_000` OR `events.by_type.user < 5` → **2-expert mode**: dispatch only `cost` + `rule`. Skip `design` + `pattern` (lowest-yield on small sessions). Note `expert_set: "small"` in session.json `meta`.
+- otherwise → **4-expert mode** (full set). `expert_set: "full"`.
+
+Single-message parallel `Agent` calls. `subagent_type=general-purpose`. Per-expert model selection (cost-tuned):
+
+- `cost`: `model=sonnet` — input is already pre-aggregated by `session-stats.sh`; deep reasoning unnecessary
+- `rule`: `model=sonnet` — free-discovery across rule categories needs judgment
+- `design`: `model=sonnet` — batching/timing assessment retains sonnet pending recall measurement
+- `pattern`: `model=haiku` — surface keyword detection (apology, narration, guessing)
 
 **Mission text — never reference R1~R10/C1~C7/P1~P7 IDs and never attach CLAUDE.md content** (Round 1+2 fix):
 
@@ -76,42 +86,20 @@ Single-message parallel `Agent` calls. `subagent_type=general-purpose`, `model=s
 - `design`: "Session prompt batching, decision timing, workflow appropriateness. EXCLUDE prompt sizing — that belongs to opt-prompt-eval."
 - `pattern`: "Expression and habit — apologies, narration, guessing, unrequested work, deferring decisions, deferred batches."
 
-Common contract for every expert:
+**Common contract**: do NOT inline. Each dispatch sends a pointer instead — `Read .claude/audit/expert-contract.md for the output schema, rules, and JSON discipline. Mission: <line above>. Inputs: turns_summary (inline), raw jsonl path <abs>.` This avoids sending the ~40-line contract 2–4× per audit. The contract file is the single source of truth.
 
-```
-You are a blind expert in session-audit.
-
-Mission: <one of the 4 above>
-Inputs: turns_summary (masking applied), raw jsonl path <abs>
-
-Rules:
-- Never read any file under .claude/audit/.
-- When reading the raw jsonl, use jq slices only (never dump the whole file). Each result must be <50KB.
-- Output a single JSON block only — no prose, no markdown.
-- Omit findings you are not confident about.
-
-Schema:
-{
-  "expert": "cost|rule|design|pattern",
-  "findings": [
-    {
-      "proposed_title": "<short one-liner>",
-      "occurred": true,
-      "count": <int>,
-      "impact_ordinal": 0|1|2|3,
-      "impact_tokens_est": <int|null>,
-      "evidence": [{"turn": <int>, "snippet": "<<=80 chars>"}]
-    }
-  ]
-}
-Max 3 evidence entries per finding.
-```
-
-### Step 6 — Mapper expert (separate dispatch)
+### Step 6 — Mapper expert (separate dispatch, conditional)
 
 Mapping is performed by a dedicated mapper expert, not main, to block confirmation bias (Round 2 fix).
 
-`Agent` dispatch, `model=sonnet`. Mapper receives the 4 expert findings + a registry view limited to `(id, title, category, allowed_fix_types)` (no detection text, no status, no history).
+**Skip-mapper preconditions** (main evaluates before dispatch):
+
+- All experts returned `findings: []` (zero work) → write empty mapper block (`mapped:[], new_candidates:[], ambiguous:[]`) and skip dispatch.
+- Every `proposed_title` across experts is unique AND each appears in exactly one expert's findings (no cross-expert collisions, no within-expert duplicates) → main performs trivial 1:1 lookup against the registry view (normalize + exact/Levenshtein only, no semantic tiebreak needed) and skips dispatch. Record `mapper_skipped: "trivial"` in session.json.
+
+Otherwise → dispatch mapper.
+
+`Agent` dispatch, `model=sonnet` (Step 6 rule 2 requires semantic judgment for tied candidates — haiku rolled back after adversarial review flagged ambiguity-overflow risk; revisit after 5 sessions of golden-sample data). Mapper receives the expert findings + a registry view limited to `(id, title, category, allowed_fix_types)` (no detection text, no status, no history).
 
 ```
 You are the session-audit mapper. Map 4-expert findings to registry items.
