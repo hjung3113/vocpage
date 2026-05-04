@@ -1,6 +1,6 @@
 # opt-prompt-feedback
 
-Sister skill to `opt-prompt` and `opt-prompt-eval`. Captures free-form human feedback about opt-prompt skill behavior for incorporation during `/opt-prompt-eval --review`.
+Sister skill to `opt-prompt`, `opt-prompt-eval`, and `opt-prompt-improve`. Captures free-form human feedback about opt-prompt skill behavior for incorporation during `/opt-prompt-improve`.
 
 ## When to use
 
@@ -81,13 +81,13 @@ PYEOF
 ### List mode — `/opt-prompt-feedback --list`
 
 Print all unresolved entries (latest per id, `resolved: false`) as a numbered table.
-If no unresolved entries exist (or the file is missing/empty), print: `"No unresolved feedback entries. Run /opt-prompt-eval --review to see resolved history."`
+If no unresolved entries exist (or the file is missing/empty), print: `"No unresolved feedback entries. Run /opt-prompt-improve to see full analysis."`
 
 ```
 1. [directive-parsing] fb-20260504T184423-ee41a7 — 사용자가 프롬프트 뒤에 **필수사항...
 2. [output-format]     fb-20260504T184423-5c7fa6 — large scope + planning 동사...
 
-Run /opt-prompt-eval --review to see these as Tier 0 proposals.
+Run /opt-prompt-improve to see these as Tier 0 proposals.
 ```
 
 ## Writing the entry
@@ -123,11 +123,11 @@ print(entry["id"])
 PYEOF
 ```
 
-## Integration with --review
+## Integration with /opt-prompt-improve
 
-`/opt-prompt-eval --review` reads `feedback.jsonl`, groups by `id`, takes the latest entry per id, and surfaces all with `resolved: false` as **Tier 0 — User-Mandated Proposals** before Tier 1 cohort analysis.
+`/opt-prompt-improve` reads `feedback.jsonl`, groups by `id`, takes the latest entry per id, and surfaces all with `resolved: false` as **Tier 0 — User-Mandated Proposals** before Tier 1 cohort analysis.
 
-To see your recorded feedback surface as proposals, run: **`/opt-prompt-eval --review`**
+To see your recorded feedback surface as proposals, run: **`/opt-prompt-improve`**
 
 After a Tier 0 proposal is accepted and the skill is updated, mark it resolved:
 

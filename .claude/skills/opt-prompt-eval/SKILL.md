@@ -1,18 +1,20 @@
 ---
 name: opt-prompt-eval
-description: Internal helper invoked ONLY when the user types the literal command /opt-prompt-eval (optionally with --review). Records a one-line retro JSONL row for a previously normalized /opt-prompt task, or runs pattern analysis across the log. Do NOT auto-load on keywords like "eval", "retro", "review" — only on the explicit /opt-prompt-eval command. Normalization/sizing belongs to the separate /opt-prompt skill; never run sizing here.
+description: Internal helper invoked ONLY when the user types the literal command /opt-prompt-eval. Records a retro JSONL row for a previously normalized /opt-prompt task. Do NOT auto-load on keywords like "eval", "retro", "review" — only on the explicit /opt-prompt-eval command. Normalization/sizing belongs to /opt-prompt; skill improvement analysis belongs to /opt-prompt-improve.
 ---
 
 # opt-prompt-eval
 
-Sister skill to `opt-prompt` (normalize). This skill handles the **post-task retro** flow: writing a `phase:"retro"` JSONL row keyed to the `decision_id` minted by `/opt-prompt`, and (with `--review`) running pattern analysis across the log.
+Sister skill to `opt-prompt` (normalize) and `opt-prompt-improve` (skill analysis). This skill handles the **post-task retro** flow: writing a `phase:"retro"` JSONL row keyed to the `decision_id` minted by `/opt-prompt`.
+
+> **스킬 개선 분석은 `/opt-prompt-improve`를 사용하세요.** 이 스킬은 retro 로그 기록만 담당합니다.
 
 ## When to use
 
 - User explicitly invokes `/opt-prompt-eval <decision_id>` after a normalized task closed (PR merged or abandoned).
-- User invokes `/opt-prompt-eval --review` for pattern analysis across the log.
 - Do **not** auto-trigger on `eval` / `retro` / `review` keywords.
 - Do **not** size or normalize here — that is the `/opt-prompt` skill's job. If user passes a fresh prompt, refuse and redirect to `/opt-prompt`.
+- Do **not** run pattern analysis or generate proposals here — that is the `/opt-prompt-improve` skill's job. If user passes `--review`, redirect to `/opt-prompt-improve`.
 
 ## Hard rule (read before anything else)
 
@@ -32,51 +34,6 @@ Sister skill to `opt-prompt` (normalize). This skill handles the **post-task ret
 6. On success, surface the appended row's `decision_id` and `verdict` to the user. STOP — do not analyze.
 
 **When does `--exec-sid` matter?** If you ran `/opt-prompt`, then did the work, then `/clear`'d, then opened a fresh session for eval — the helper's auto-fallback (C) only works if the original transcript file still exists at `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/<sid>.jsonl`. It usually does (Claude Code keeps transcripts), so most of the time you can omit `--exec-sid` and trust auto-fallback. Pass it explicitly when (a) you want to be unambiguous about which session reflects the task, (b) the task ran in a different session from `/opt-prompt` (rare — e.g., decision in session A, but actual implementation in session B because you context-switched).
-
-### Review mode — `/opt-prompt-eval --review`
-
-Read the log, join `decided` ↔ `retro` rows by `decision_id`, exclude `status:"void"`. Then report:
-
-**Tier 0 — User-Mandated Proposals (always first):**
-
-Read `~/.claude/opt-prompt/feedback.jsonl`. Group all entries by `id`; for each `id`, take the **latest entry** (by line order, last wins). Entries with `resolved: true` in their latest row are excluded. Surface all remaining (`resolved: false`) as Tier 0, regardless of sample size thresholds.
-
-- If the file does not exist or has no unresolved entries after deduplication, skip Tier 0 silently.
-- If a line fails JSON parsing, skip that line with a warning (`[warn] skipped malformed line N in feedback.jsonl`) and continue — never abort the review.
-- List each unresolved entry as: `[<category>] <id> — <feedback>`
-- After the list, remind the user: "Run `/opt-prompt-feedback --resolve <id>` after each proposal is accepted and the skill is updated."
-
-Tier 0 proposals are **user-mandated** — they appear before any cohort analysis and are never suppressed by sample size gates.
-
-**Tier 1 — qualitative cohorts (always):**
-
-- **Global**: hit rate (`correct` / non-void total). Require ≥5 non-void entries before any proposal is emitted.
-- **Per scope**: hit rate per `scope_decided`. Require ≥5 entries **for that scope** before flagging it. Scopes below threshold → counts only, no proposal.
-- **Per-scope flag**: scope with ≥5 entries AND wrong-rate ≥40% → "needs revision"; propose specific signal/threshold changes referencing the dominant verdict (e.g., recurring `undersized` → add a signal; recurring `oversized` → remove a gate).
-- **Top 3 recurring `missed_gates`** (across all entries) → candidate additions to the normalize skill's Expand list.
-- **Top 3 recurring `unnecessary_gates`** → candidate removals from the rubric.
-- **Mis-routed cluster**: if `mis-routed` ≥3 entries, separate diagnosis — the rubric is fine, the tool selection logic isn't.
-
-**Tier 2 — quantitative cohorts from `session_summary` (when ≥5 retros have non-null `session_summary`):**
-
-Compare median values per verdict cohort. Require N≥5 in the cohort before reporting. Read directly from the JSONL row's `session_summary` — no sidecar load needed for these.
-
-- `tokens.grand_total` — `oversized` should not exceed `correct`; if it does, gates being added are paying for themselves in surprises elsewhere (or rubric is mis-classifying).
-- `cache_invalidation_events` — `undersized` cohort should be elevated (scope creep ⇒ context churn).
-- `subagent_calls` — same: elevated `subagent_calls` in `undersized`/`mis-routed` cohorts is a signal that the rubric under-allocated the workflow tier.
-- `bash_failures` — elevated in any cohort = pre-flight check candidate (e.g., `npm run lint` before commit).
-- `top3_tools` — recurring tool across cohorts (e.g., `Read` dominating across all `oversized` cases) suggests a routing rule violation worth surfacing.
-- `claudemd_reads` — high count across many tasks → CLAUDE.md slimming candidate (cache invalidation magnifier).
-
-**Tier 3 — sidecar deep-dive (only when Tier 2 flags a cohort):**
-
-When a Tier 2 metric flags a cohort, read the per-row `~/.claude/opt-prompt/snapshots/<id>.{decided,retro}.json` for the affected ids and look at fields not in `session_summary`: `by_prompt[]` for which user prompts dominated tokens, `tool_use_details.read.top_files` for which files were over-read, `subagents.agents[]` for which subagent type/prompt drove cost, `pause_distribution` for human-in-the-loop gaps. Use these to make the proposal **specific** ("rubric should down-weight tasks where top read file is `frontend/CLAUDE.md` ×N").
-
-**Cross-session caveat**: when `session_id_decided != session_id_retro`, `tokens_delta` is `null` and Tier-2 token comparisons are invalid for that row. Other Tier-2 metrics (counts, tool patterns) still reflect the retro session and are usable, but flag the cohort as cross-session-mixed in the report.
-
-**Backwards-compat for legacy rows**: rows written before this scheme have no `session_summary` — fall back to top-level `tokens_at_decision`/`tokens_at_retro`/`tokens_delta` if present, else exclude from Tier-2.
-
-Output is **proposals only**. Never edit the normalize SKILL.md automatically. The user reviews and accepts changes manually.
 
 ## Eval questions (ask in order, one line each)
 
@@ -271,4 +228,4 @@ Evaluated in order; first match wins:
 - Don't size, normalize, or rewrite a fresh prompt here — that is the `/opt-prompt` skill's job. Refuse and redirect.
 - Don't auto-trigger on `eval` / `retro` / `review` keywords; only on explicit `/opt-prompt-eval`.
 - **`/clear` between task and eval gives bogus retro stats** — if you `/clear`'d and the new session can't reach the original task transcript, retro `session_summary` will reflect only the eval session (tiny `api_calls`, near-zero deltas), `tokens_delta` will be `null`, and the row's `session_id` won't match the decided `session_id`. Recovery: `append.sh void <id> retro 'wrong session captured'` then `/opt-prompt-eval <id> --exec-sid <original-task-sid>`. Find the original sid via `ls -t ~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/*.jsonl`. Confirm by comparing the row's `session_id` against decided's.
-- **Don't run `/opt-prompt-eval --review` while tasks are mid-flight** — before analysis, count active `decided` rows with no matching active `retro`. If >0, print `WARNING: N tasks in-flight (no retro yet) — excluded from cohort analysis` and list their `decision_id`s, then proceed with the rest. Mid-flight rows are not voided, just excluded from this run's cohort math.
+- Don't tell users to use the legacy `--review` flag — it no longer exists. Direct them to `/opt-prompt-improve` as a separate command.
