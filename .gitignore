@@ -41,3 +41,9 @@ admin-*.png
 # Uploads (multer)
 uploads/
 .claude/scheduled_tasks.lock
+
+# session-audit local data (registry/checklist는 commit, 세션 raw·통계는 로컬)
+.claude/audit/sessions/*
+!.claude/audit/sessions/.gitkeep
+.claude/audit/stats.json
+.claude/audit/*.bak
