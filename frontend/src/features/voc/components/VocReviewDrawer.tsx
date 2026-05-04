@@ -11,7 +11,7 @@ import { vocApi } from '../../../api/voc';
 import { queryKeys } from '../../../api/queryKeys';
 import { useRole } from '../../../hooks/useRole';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { type InternalNote, type VocUpdate } from '../../../../../shared/contracts/voc';
+import { type InternalNote } from '../../../../../shared/contracts/voc';
 import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
@@ -19,7 +19,8 @@ import { type AttachmentItem } from './VocReviewSections';
 import { VocDrawerSections } from './VocDrawerSections';
 import { VocReviewMetaPanel } from './VocReviewMetaPanel';
 import { DrawerActionButtons } from './DrawerActionButtons';
-import { VocStatusPriorityGrid } from './VocStatusPriorityGrid';
+import { VocBodySection } from './VocBodySection';
+import { VocAttachmentsPanel } from './VocReviewSections';
 
 const ISSUE_CODE_STYLE: React.CSSProperties = {
   color: 'var(--accent)',
@@ -41,7 +42,6 @@ interface Props {
   systemMap?: Record<string, string>;
   menuMap?: Record<string, string>;
   onClose: () => void;
-  onPatch: (id: string, patch: VocUpdate) => Promise<unknown>;
   onAddNote: (id: string, body: string) => Promise<unknown>;
 }
 
@@ -74,7 +74,6 @@ export function VocReviewDrawer({
   systemMap,
   menuMap,
   onClose,
-  onPatch,
   onAddNote,
 }: Props) {
   const detail = useVocDetail(vocId);
@@ -87,7 +86,6 @@ export function VocReviewDrawer({
   const canUpload = role === 'manager' || role === 'admin';
   const isDeleted = !!voc?.deleted_at;
   const blockedDeleted = isDeleted && role !== 'admin';
-  const approvedLock = voc?.review_status === 'approved';
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -160,7 +158,8 @@ export function VocReviewDrawer({
                 systemMap={systemMap}
                 menuMap={menuMap}
               />
-              <VocStatusPriorityGrid voc={voc} approvedLock={approvedLock} onPatch={onPatch} />
+              <VocBodySection body={voc.body} />
+              <VocAttachmentsPanel items={attachments} canUpload={canUpload} />
               <VocDrawerSections
                 vocId={voc.id}
                 parentIsSubtask={voc.parent_id !== null}
@@ -168,11 +167,9 @@ export function VocReviewDrawer({
                 role={role}
                 isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
                 canWrite={canWrite}
-                canUpload={canUpload}
                 pending={pending}
                 notes={notes}
                 notesLoading={notesLoading}
-                attachments={attachments}
                 historyEntries={history.data}
                 historyLoading={history.isLoading}
                 onAddNote={(body) => void onAddNote(voc.id, body)}

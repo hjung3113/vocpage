@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VocReviewDrawer } from '../VocReviewDrawer';
@@ -67,7 +68,6 @@ function renderDrawer(role: Role, vocId: string, opts: RenderOpts = {}) {
             pending={false}
             assigneeMap={ASSIGNEE_MAP}
             onClose={() => {}}
-            onPatch={onPatch}
             onAddNote={vi.fn().mockResolvedValue(undefined)}
           />
         </QueryClientProvider>
@@ -84,16 +84,17 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
 
   const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
 
-  it('role=manager → tablist 없음 + 4섹션 동시 노출 + 작성 form 노출', async () => {
+  it('role=manager → 탭 4개 노출 + 기본(댓글) 탭 활성 + comment form 노출', async () => {
+    const user = userEvent.setup();
     renderDrawer('manager', target.id);
     await waitFor(() => expect(screen.getByTestId('drawer-comments')).toBeInTheDocument());
-    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
-    expect(screen.queryAllByRole('tab')).toHaveLength(0);
-    ['drawer-comments', 'drawer-internal-notes', 'drawer-attachments', 'drawer-history'].forEach(
-      (id) => expect(screen.getByTestId(id)).toBeInTheDocument(),
-    );
+    expect(screen.getByRole('tablist')).toBeInTheDocument();
+    expect(screen.getAllByRole('tab')).toHaveLength(4);
+    expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
     expect(screen.getByLabelText('new comment')).toBeInTheDocument();
-    expect(screen.getByLabelText('new internal note')).toBeInTheDocument();
+    // 내부노트는 탭 전환 후 노출
+    await user.click(screen.getByRole('tab', { name: '내부노트' }));
+    await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
   });
 
   it('role=user → 댓글 form 미노출 + 내부메모 섹션 미노출 + 첨부 업로드 미노출', async () => {
@@ -111,8 +112,11 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(screen.queryByTestId('drawer-comments')).not.toBeInTheDocument();
   });
 
-  it('변경이력 섹션에 timeline listitem 즉시 노출 (탭 클릭 불필요)', async () => {
+  it('변경이력 탭 클릭 → timeline listitem 노출', async () => {
+    const user = userEvent.setup();
     renderDrawer('manager', target.id);
+    await waitFor(() => expect(screen.getByRole('tablist')).toBeInTheDocument());
+    await user.click(screen.getByRole('tab', { name: '변경이력' }));
     await waitFor(() => {
       const history = screen.getByTestId('drawer-history');
       expect(within(history).getAllByRole('listitem').length).toBeGreaterThanOrEqual(1);
@@ -129,37 +133,6 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     renderDrawer('manager', target.id, { errorStatus: 500 });
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
     expect(screen.queryByTestId('voc-permission-gate')).not.toBeInTheDocument();
-  });
-
-  it('review_status === approved → drawer-status data-disabled 존재', async () => {
-    renderDrawer('manager', target.id, { reviewStatus: 'approved' });
-    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
-    expect(screen.getByTestId('drawer-status')).toHaveAttribute('data-disabled');
-  });
-
-  it('review_status === unverified → drawer-status data-disabled 없음', async () => {
-    renderDrawer('manager', target.id, { reviewStatus: 'unverified' });
-    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
-    expect(screen.getByTestId('drawer-status')).not.toHaveAttribute('data-disabled');
-  });
-
-  it('review_status === null → drawer-status data-disabled 없음', async () => {
-    renderDrawer('manager', target.id, { reviewStatus: null });
-    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
-    expect(screen.getByTestId('drawer-status')).not.toHaveAttribute('data-disabled');
-  });
-
-  it('review_status key 없음(undefined) → drawer-status data-disabled 없음', async () => {
-    renderDrawer('manager', target.id, { removeReviewStatus: true });
-    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
-    expect(screen.getByTestId('drawer-status')).not.toHaveAttribute('data-disabled');
-  });
-
-  it('approved → onPatch가 호출되지 않음 (Select disabled로 onValueChange 차단)', async () => {
-    const { onPatch } = renderDrawer('manager', target.id, { reviewStatus: 'approved' });
-    await waitFor(() => expect(screen.getByTestId('drawer-status')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('drawer-status'));
-    expect(onPatch).not.toHaveBeenCalled();
   });
 
   it('drawer에 VocReviewMetaPanel 마운트', async () => {
