@@ -65,6 +65,10 @@ export function VocReviewMetaPanel({
       className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
       style={{ background: 'var(--bg-surface)' }}
     >
+      <MetaField label="등록일" testId="meta-created_at">
+        <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
+      </MetaField>
+
       <MetaField label="상태" testId="meta-status">
         <VocStatusBadge status={voc.status} />
       </MetaField>

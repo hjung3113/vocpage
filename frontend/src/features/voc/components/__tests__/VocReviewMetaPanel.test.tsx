@@ -15,9 +15,10 @@ const vocTypeMap: Record<string, { slug: string; name: string }> = {
 };
 
 describe('VocReviewMetaPanel', () => {
-  it('기본 렌더링 — 7개 메타 필드(status/priority/type/assignee/due_date/system/menu) 모두 표시', () => {
+  it('기본 렌더링 — 8개 메타 필드(created_at/status/priority/type/assignee/due_date/system/menu) 모두 표시', () => {
     render(<VocReviewMetaPanel voc={baseVoc} assigneeMap={assigneeMap} vocTypeMap={vocTypeMap} />);
     expect(screen.getByTestId('voc-meta-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('meta-created_at')).toBeInTheDocument();
     expect(screen.getByTestId('meta-status')).toBeInTheDocument();
     expect(screen.getByTestId('meta-priority')).toBeInTheDocument();
     expect(screen.getByTestId('meta-type')).toBeInTheDocument();
@@ -25,6 +26,13 @@ describe('VocReviewMetaPanel', () => {
     expect(screen.getByTestId('meta-due_date')).toBeInTheDocument();
     expect(screen.getByTestId('meta-system')).toBeInTheDocument();
     expect(screen.getByTestId('meta-menu')).toBeInTheDocument();
+  });
+
+  it('등록일 필드가 created_at 날짜(YYYY-MM-DD)로 표시됨', () => {
+    render(<VocReviewMetaPanel voc={baseVoc} assigneeMap={assigneeMap} />);
+    expect(screen.getByTestId('meta-created_at')).toHaveTextContent(
+      baseVoc.created_at.slice(0, 10),
+    );
   });
 
   it('due_date === null → "—" 표시', () => {
