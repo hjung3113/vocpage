@@ -2,11 +2,15 @@
 
 ## 다음 세션 시작점
 
-→ **다음: PR #201 머지 → VocReview 피드백 계속** (body 4섹션 재구성 완료 — 메타데이터/본문/첨부파일/활동탭, VocStatusPriorityGrid 제거).
-   그 후 Wave 1.6 ζ-batch C-17 SidebarUserSwitcher 진입.
-   **[다음 세션 선행 작업]** `features/voc/components/` 폴더 구조 정리 — shared/drawer/table/modal/notifications 5개 하위 폴더로 분리 + VocReviewSections.tsx를 VocAttachmentSection.tsx·VocHistorySection.tsx로 분리. 상세 구조: 이전 대화 참고.
+→ **다음: 폴더 구조 + 네이밍룰 + 코딩컨벤션 정리 (Wave 1.6 ζ 진입 전 선행 필수)**
+   PR #202 머지 완료 (feat/voc-drawer-header-fix — body 4섹션 재구성 + rename consistency).
+   **[세션 시작 시 첫 번째 작업]** 아래 3가지를 문서화 + 리팩토링으로 정리:
+   1. `features/voc/components/` 폴더 분류 — drawer/table/modal/shared/notifications 하위 폴더로 분리
+   2. 컴포넌트 네이밍룰 확정 — `Voc` prefix 정책, Section suffix 기준 등
+   3. 코딩컨벤션 문서화 — props 타입 위치, export 방식, 컴포넌트 구성 순서
+   정리 완료 후 → Wave 1.6 ζ-batch C-17 SidebarUserSwitcher 진입.
    §7.2 batch 순서: ~~α(C-2~C-7)~~ → ~~β(C-8~C-10 + F-bundle)~~ → ~~γ(C-11)~~ →
-   ~~δ(C-12, C-13)~~ → ~~ε(C-14∥C-15∥C-16)~~ → **[VocReview 피드백]** → ζ(C-17 → C-18∥C-19) → η(C-20∥C-21∥C-22∥C-23) → Phase D.
+   ~~δ(C-12, C-13)~~ → ~~ε(C-14∥C-15∥C-16)~~ → ~~[VocReview 피드백 + PR #202]~~ → **[폴더/네이밍/컨벤션 정리]** → ζ(C-17 → C-18∥C-19) → η(C-20∥C-21∥C-22∥C-23) → Phase D.
    룰북: `docs/specs/plans/wave-1-6-phase-c-precedent.md`.
    정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`.
 
