@@ -37,6 +37,17 @@ Sister skill to `opt-prompt` (normalize). This skill handles the **post-task ret
 
 Read the log, join `decided` ↔ `retro` rows by `decision_id`, exclude `status:"void"`. Then report:
 
+**Tier 0 — User-Mandated Proposals (always first):**
+
+Read `~/.claude/opt-prompt/feedback.jsonl`. Group all entries by `id`; for each `id`, take the **latest entry** (by line order, last wins). Entries with `resolved: true` in their latest row are excluded. Surface all remaining (`resolved: false`) as Tier 0, regardless of sample size thresholds.
+
+- If the file does not exist or has no unresolved entries after deduplication, skip Tier 0 silently.
+- If a line fails JSON parsing, skip that line with a warning (`[warn] skipped malformed line N in feedback.jsonl`) and continue — never abort the review.
+- List each unresolved entry as: `[<category>] <id> — <feedback>`
+- After the list, remind the user: "Run `/opt-prompt-feedback --resolve <id>` after each proposal is accepted and the skill is updated."
+
+Tier 0 proposals are **user-mandated** — they appear before any cohort analysis and are never suppressed by sample size gates.
+
 **Tier 1 — qualitative cohorts (always):**
 
 - **Global**: hit rate (`correct` / non-void total). Require ≥5 non-void entries before any proposal is emitted.
