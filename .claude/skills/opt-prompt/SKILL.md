@@ -11,7 +11,7 @@ Heavy orchestration skills (autopilot, ralph, team, ultrawork) impose multi-phas
 
 ## When to use
 
-- User explicitly invokes `/opt-prompt <original prompt>`.
+- User explicitly invokes `/opt-prompt <original prompt>` or `/opt-prompt --guide "<constraint>" <original prompt>`.
 - Do **not** auto-trigger on `autopilot` / `ralph` / `team` keywords.
 - The wrapped prompt may itself contain heavy-skill invocations — that is fine; this skill decides whether to keep, swap, or strip them.
 - Post-task retro is handled by the **separate** `/opt-prompt-eval <decision_id>` skill — do not handle retro / `--review` invocations here.
@@ -31,6 +31,7 @@ If the input already starts with a `[scope] ... [normalized prompt]` block, trea
 ## Precedence (highest wins)
 
 1. **User-mandated protections** — verbatim phrases ("must have security review", "no direct push") OR `@opt-keep` markers. **Additive only, never override risk-bumped gates.** Markers force inclusion (`type=step|gate`) or refuse insertion (`type=skip`); they never weaken safety.
+   - `--guide` flags share tier 1. When `--guide` and `@opt-keep` express conflicting intent (e.g., `--guide "skip screenshot"` vs `@opt-keep[type=gate] screenshot`), **`@opt-keep` wins** — it is a persistent source annotation; `--guide` is ephemeral runtime input.
 2. **Risk override** (see below) — bumps scope by one tier minimum. Cannot be cancelled by `type=skip`.
 3. **LOC / file-count rubric**.
 4. **User's chosen workflow keyword** (`/autopilot`, `/ralph`, `/team`) — lowest priority. Size the underlying change, not the verb.
@@ -61,6 +62,16 @@ Single namespaced marker, three semantic types via `type=` slot. One marker per 
 - `type=step` / `type=gate`: keep verbatim in the normalized prompt body even if Trim list / sizing would strip. If skill judges it wasteful, surface as `[skipped] proposed-skip:<item> (blocked by @opt-keep)` rather than removing.
 - `type=skip`: blocks the named gate from Expand list **only**. Risk-override gates (DB / auth / public API / money / destructive) ignore `type=skip` — log as `[warning] skip-overridden-by-risk:<gate>`.
 - All recognized markers echo verbatim into the `[preserved]` output line AND survive inside `<<< ... >>>` for round-trip on re-run.
+
+## `--guide` flag (runtime constraints)
+
+`/opt-prompt --guide "<constraint text>" <original prompt>`
+
+- Multiple `--guide` flags allowed: `/opt-prompt --guide "TDD required" --guide "no direct push" <prompt>`.
+- Each `--guide` value is a **runtime constraint**: it influences sizing/gate decisions AND is injected into the `**Constraints:**` block inside `<<<...>>>` (same as CLAUDE.md-derived constraints) so the executor cannot silently skip it.
+- Injected constraints are also listed on a `[directives]` output line for traceability — **only emit this line when at least one `--guide` flag is present**.
+- Treat `--guide` constraints with the same precedence as user-mandated protections (Precedence tier 1 — see tie-break rule above for collisions with `@opt-keep`): they cannot be overridden by Trim list or LOC-based sizing.
+- If `--guide` value is empty, < 3 chars, or matches universal quantifier (`모든|전부|all|everything|*`): emit `[skipped] invalid-guide:<raw>` on the `[directives]` line and ignore.
 
 ## Risk override (evaluated before LOC sizing)
 
@@ -112,6 +123,7 @@ This ordering guarantees the row exists even if the turn is interrupted (user ca
 [preserved]  <recognized @opt-keep markers verbatim, or "none">
 [skipped]    <heavy items removed, with reason; OR proposed-skip:<x> (blocked by @opt-keep); OR unparsed-marker:<raw>>
 [added]      <gates inserted, with reason>
+[directives] <--guide constraints verbatim, comma-separated>   ← omit this line entirely when no --guide flags
 [normalized prompt]
 <<<
 <rewritten prompt verbatim, ready to execute — markers preserved in body>
@@ -119,6 +131,8 @@ This ordering guarantees the row exists even if the turn is interrupted (user ca
 ```
 
 The `<<<` / `>>>` delimiters terminate the prompt body so downstream agents can parse unambiguously. Exploration tool selection lives inline in `[tool]` (no separate line) — see Tool routing below.
+
+> **Phase content rule (large scope only):** when the normalized prompt includes Phase steps, each Phase must describe _exploration order, questions to answer, and entry conditions for the next Phase_ — **not** design deliverables (folder trees, convention lists, output documents). Wrong: "Phase 1: 폴더 구조 설계 + 컨벤션 목록 작성". Right: "Phase 1: 현재 import 패턴 탐색 (`rg -n`) → 불일치 패턴 목록 확인 → 수정 범위 ≥ 50파일이면 Phase 2 진입".
 
 The JSONL row was already appended in Step 1 (see above) so a later `/opt-prompt-eval` can join against ground truth instead of relying on user recall. After the block is emitted, proceed with the normalized prompt.
 
@@ -134,6 +148,25 @@ After sizing, pick the exploration tool by **objective signals from the prompt i
 | ≥3 named layers (FE+BE+DB) OR cross-domain flow verbs ("trace UI→DB")   | Graphify (recommend) |
 
 Emit chosen tool inside `<<< ... >>>` as a verb (`"via Serena (find_symbol VocSortColumn)"`, `"consult graphify-out/wiki/<feature>.md first"`). opt-prompt **never executes** Graphify itself — only injects the recommendation. If `graphify-out/wiki/<feature>.md` is unknown, emit `"consult graphify-out/wiki/index.md and pick the relevant page"`. Tool routing is duplicate of the root `CLAUDE.md` rule; if that rule changes, this table follows.
+
+## Normalized prompt body rules
+
+### Project constraints injection (#4)
+
+When writing `<<<...>>>`, inline the project's hard constraints so the executor cannot silently skip them. Pull from the active `CLAUDE.md` (root + sub-dir).
+
+> **Sync note:** the table below mirrors root `CLAUDE.md` §Design System / §Working Style / §Git workflow. If they diverge, root wins — update the table to match.
+
+Apply only to **small/medium/large** scope; omit for **trivial** ("no frame, no review"). `--guide` values are also included in the same block.
+
+| Change type         | Constraint to inject                                    |
+| ------------------- | ------------------------------------------------------- |
+| FE/CSS change       | CSS custom properties only — no hex, no raw OKLCH       |
+| FE/BE code change   | TDD: write failing test first, confirm red, then green  |
+| FE component change | Pretendard Variable (UI), D2Coding (code/IDs), 8px grid |
+| Any commit/PR step  | feature branch only — never commit or push to main      |
+
+Write as a `Constraints:` block at the top of the normalized prompt body. If none apply (e.g., docs-only or trivial), omit the block.
 
 ## Sizing rubric
 
@@ -175,7 +208,7 @@ Dispatch Explore / Agent **only** when one of:
 
 - DB schema change without migration check → add migration verification gate.
 - Public API change without contract test → add contract test gate.
-- UI change without visual verify → add screenshot gate.
+- UI change without visual verify → add screenshot gate **when** the diff touches JSX/TSX render output, CSS custom property values, Tailwind class lists, or animation/transition logic. Pure type-only changes, dead-code removal, and rename-only refactors of non-exported symbols do NOT trigger.
 - Bug fix without TDD → add failing-regression-test gate.
 
 ## Examples
@@ -300,6 +333,7 @@ Fix off-by-one in /api/admin/users pagination at backend/src/routes/admin.ts:142
 - Don't extract `@opt-keep` markers from inside fenced code blocks (` ``` `) — the SKILL.md examples themselves contain quoted markers and would false-trigger.
 - Don't silently drop malformed markers — surface every unparsed/invalid marker in `[skipped]` so the user sees their intent didn't land.
 - Don't run `/opt-prompt --eval` or `--review` here — those routes belong to the separate `/opt-prompt-eval` skill. If the user passes `--eval` / `--review`, redirect them to `/opt-prompt-eval`.
+- Don't emit `[directives]` when no `--guide` flags were passed — the line is conditional, not a constant output slot.
 
 ## Closing reminder (emit at end of normalize output)
 
