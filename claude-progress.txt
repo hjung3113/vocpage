@@ -2,7 +2,7 @@
 
 ## 다음 세션 시작점
 
-→ **다음: PR #201 머지 → VocReview 피드백 2차** (drawer 상단 4개 이슈 fix 완료 — 추가 피드백 대기).
+→ **다음: PR #201 머지 → VocReview 피드백 계속** (body 4섹션 재구성 완료 — 메타데이터/본문/첨부파일/활동탭, VocStatusPriorityGrid 제거).
    그 후 Wave 1.6 ζ-batch C-17 SidebarUserSwitcher 진입.
    §7.2 batch 순서: ~~α(C-2~C-7)~~ → ~~β(C-8~C-10 + F-bundle)~~ → ~~γ(C-11)~~ →
    ~~δ(C-12, C-13)~~ → ~~ε(C-14∥C-15∥C-16)~~ → **[VocReview 피드백]** → ζ(C-17 → C-18∥C-19) → η(C-20∥C-21∥C-22∥C-23) → Phase D.
