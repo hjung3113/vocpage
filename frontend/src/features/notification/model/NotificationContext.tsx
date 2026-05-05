@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useMemo, useState } from 'react';
-import { useAuth } from '@features/auth/model/useAuth';
+import { useAuth } from '@features/auth';
 
 export interface AppNotification {
   id: string;

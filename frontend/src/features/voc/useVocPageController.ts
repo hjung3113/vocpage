@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVocList } from './useVocList';
 import { useVocFilters } from './useVocFilters';
 import { useUpdateVoc, useAddNote, useNotes } from './useVocMutation';
-import { useRole } from '@features/auth/model/useRole';
+import { useRole } from '@entities/user/model/useRole';
 import { useCreateVoc } from '@features/voc-create/model/useCreateVoc';
 import { mastersApi } from '../../api/masters';
 import { notificationsApi } from '../../api/notifications';

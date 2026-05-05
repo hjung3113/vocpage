@@ -1,2 +1,2 @@
-// Moved to features/auth/model/RoleContext (Step 4)
-export { RoleProvider, RoleContext } from '@features/auth/model/RoleContext';
+// Moved to entities/user/model/RoleContext (W3)
+export { RoleProvider, RoleContext } from '@entities/user/model/RoleContext';
