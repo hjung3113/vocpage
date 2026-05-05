@@ -7,7 +7,7 @@ description: Internal helper invoked ONLY when the user types the literal comman
 
 Sister skill to `opt-prompt` (normalize) and `opt-prompt-improve` (skill analysis). This skill handles the **post-task retro** flow: writing a `phase:"retro"` JSONL row keyed to the `decision_id` minted by `/opt-prompt`.
 
-> **스킬 개선 분석은 `/opt-prompt-improve`를 사용하세요.** 이 스킬은 retro 로그 기록만 담당합니다.
+> **For skill improvement analysis, use `/opt-prompt-improve`.** This skill only handles retro log recording.
 
 ## When to use
 
@@ -26,11 +26,11 @@ Sister skill to `opt-prompt` (normalize) and `opt-prompt-improve` (skill analysi
 
 ### Retro mode — `/opt-prompt-eval <decision_id> [--exec-sid <sid>]`
 
-> **`/tmp/retro.json` anti-pattern**: If `/tmp/retro.json` already exists in the environment (e.g., loaded via system-reminder from a previous session), **IGNORE it entirely.** It is stale from a prior task. Always ask the 8 questions fresh — never silently reuse a temp file. The task slug in the old file will not match the current `decision_id`.
+> **`/tmp/retro.json` anti-pattern**: If `/tmp/retro.json` already exists in the environment (e.g., loaded via system-reminder from a previous session), **IGNORE it entirely.** It is stale from a prior task. Always re-derive retro fields from current task context — never silently reuse a temp file. The task slug in the old file will not match the current `decision_id`.
 
 1. Confirm `<decision_id>` is provided. If missing, ask the user once: "Which decision_id? (format `opt-{compactISO}-{task-slug}`)". Never guess.
 2. Parse optional `--exec-sid <session_id>` from the user's prompt. Pass it through to the helper unchanged. If the user typed it inside the literal command line (e.g., `/opt-prompt-eval opt-...-foo --exec-sid abc-123`), forward verbatim. Don't fabricate a sid if the user didn't supply one.
-3. Ask the **8 retro questions below**, one line each, in order. **Do not skip this step even if a `/tmp/retro.json` or any pre-existing JSON blob is in context.**
+3. **Auto-collect** the 8 retro fields from available context — `git log`, PR description, commit diff stats, and conversation history — and draft a JSON response. Do not ask the user each question individually. For fields that cannot be determined from context, use `"?"` as the placeholder value. Present the drafted JSON in a single block and ask: "Review the draft below and reply with a corrected JSON block, or 'ok' to confirm." Apply any corrections, then proceed to step 4. **Do not re-derive from a stale `/tmp/retro.json` or pre-existing JSON blob** — always re-derive from current task context.
 4. Build a JSON `<fields>` object from the answers.
 5. Write the fields to `/tmp/retro-<decision_id>.json` (decision_id-scoped filename avoids cross-task collision), then invoke `.claude/skills/opt-prompt/append.sh retro <decision_id> @/tmp/retro-<decision_id>.json [--exec-sid <sid>]` (use `@/tmp/file.json` or stdin `-` for fields containing single quotes / Korean / multiline). The helper resolves the snapshot session by precedence: **(B) explicit `--exec-sid`** > **(C) `decided.session_id`** if its transcript still exists > **current latest session**. Then runs `utils/session-stats.sh <resolved_sid>` to write `~/.claude/opt-prompt/snapshots/<decision_id>.retro.json`, and embeds the slim `session_summary` (tokens + 7 metrics) + `tokens_delta` (only when resolved sid matches decided sid; `null` otherwise) into the row.
 6. On success, surface the appended row's `decision_id` and `verdict` to the user. STOP — do not analyze.

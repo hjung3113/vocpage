@@ -334,6 +334,7 @@ Fix off-by-one in /api/admin/users pagination at backend/src/routes/admin.ts:142
 - Don't silently drop malformed markers — surface every unparsed/invalid marker in `[skipped]` so the user sees their intent didn't land.
 - Don't run `/opt-prompt --eval` or `--review` here — those routes belong to the separate `/opt-prompt-eval` skill. If the user passes `--eval` / `--review`, redirect them to `/opt-prompt-eval`.
 - Don't emit `[directives]` when no `--guide` flags were passed — the line is conditional, not a constant output slot.
+- Don't proceed to execution after emitting the `>>>` block — opt-prompt's role ends when the normalized prompt is output. STOP and wait for explicit user confirmation; do not start execution, design, or codebase exploration.
 
 ## Closing reminder (emit at end of normalize output)
 
@@ -346,3 +347,5 @@ After the `>>>` block, append a **2-line reminder** showing both eval forms — 
 ```
 
 Substitute the actual `decision_id` from Step 1. The `--exec-sid` form is for when the task ran in a session that's no longer the latest (e.g., `/clear`'d between task and eval) — pass the original task-execution sid so retro stats reflect the actual work, not the eval-only session. If unsure, omit `--exec-sid` and the helper auto-falls-back to `decided.session_id` when its transcript still exists, else the current session.
+
+> **STOP after `>>>`**: opt-prompt's job ends when the normalized prompt block is emitted. Do not proceed to execution, design, or codebase exploration until the user explicitly confirms the normalized prompt. Refine the prompt in response to follow-up questions; never start executing. **Explicit confirmation** = a user message containing `go`, `start`, `proceed`, `yes`, or equivalent with no further refinement questions.
