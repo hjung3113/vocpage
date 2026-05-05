@@ -128,3 +128,17 @@ Knowledge graph at `graphify-out/`. Triggered by the routing rule above (archite
   - `shared/contracts/` — zod schemas (FE forms + BE route input, single source). Sub-trees: `voc/`, `notification/`, `master/` (source data in `backend/config/masters/`).
   - `shared/fixtures/` — FE MSW + BE seed shared data; parity enforced by `scripts/check-fixture-seed-parity.ts`.
   - REST contract reference → `shared/openapi.yaml`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default label vocabulary (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — one `CONTEXT.md` at the repo root + `docs/adr/`. See `docs/agents/domain.md`.
