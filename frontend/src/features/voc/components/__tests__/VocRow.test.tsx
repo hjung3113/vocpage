@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { VocRow } from '../VocRow';
-import type { VocListResponse } from '../../../../../shared/contracts/voc';
+import type { VocListResponse } from '@contracts/voc';
 
 type VocRowData = VocListResponse['rows'][number];
 
@@ -121,7 +121,7 @@ describe('VocRow', () => {
 
   it('C-7 CSS block (between START/END markers) has no hex or raw oklch', () => {
     const css = readFileSync(
-      resolve(__dirname, '..', '..', '..', 'shared', 'styles', 'globals.css'),
+      resolve(__dirname, '..', '..', '..', '..', 'shared', 'styles', 'globals.css'),
       'utf-8',
     );
     const start = css.indexOf('=== C-7 VocRow styles START ===');

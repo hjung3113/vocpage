@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VocReviewDrawer } from '../VocReviewDrawer';
-import { RoleContext } from '../../../../contexts/RoleContext';
+import { RoleContext } from '@entities/user';
 import { VOC_FIXTURES, VOC_HISTORY_FIXTURES } from '../../../../../../shared/fixtures/voc.fixtures';
 import type { Role } from '../../../../../../shared/contracts/common';
 
-vi.mock('../../../../api/voc', () => ({
+vi.mock('@entities/voc/api/vocApi', () => ({
   vocApi: {
     list: vi.fn(),
     get: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('../../../../api/voc', () => ({
   },
 }));
 
-import { vocApi } from '../../../../api/voc';
+import { vocApi } from '@entities/voc/api/vocApi';
 
 function makeAxiosError(status: number) {
   return Object.assign(new Error(`Request failed with status code ${status}`), {

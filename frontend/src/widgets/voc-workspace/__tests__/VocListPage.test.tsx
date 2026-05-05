@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VocListPage } from '../VocListPage';
-import { RoleProvider, RoleContext } from '../../../contexts/RoleContext';
+import { RoleProvider, RoleContext } from '@entities/user';
 import { VOC_FIXTURES } from '../../../../../shared/fixtures/voc.fixtures';
 import type { Role } from '../../../../../shared/contracts/common';
 
-vi.mock('../../../api/voc', () => {
+vi.mock('@entities/voc/api/vocApi', () => {
   return {
     vocApi: {
       list: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock('../../../api/voc', () => {
   };
 });
 
-import { vocApi } from '../../../api/voc';
+import { vocApi } from '@entities/voc/api/vocApi';
 
 function renderPage(opts: { initialUrl?: string; role?: Role } = {}) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });

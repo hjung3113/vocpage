@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { VocStatusBadge } from '../VocStatusBadge';
-import type { VocStatus } from '../../../../../shared/contracts/voc';
+import type { VocStatus } from '@contracts/voc';
 
 describe('VocStatusBadge', () => {
   const cases: VocStatus[] = ['접수', '검토중', '처리중', '완료', '드랍'];

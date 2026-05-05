@@ -1,12 +1,14 @@
 import { ChevronRight } from 'lucide-react';
 import type { CSSProperties, KeyboardEvent } from 'react';
-import type { VocListResponse } from '../../../../shared/contracts/voc';
-import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
-import { VocStatusBadge } from './VocStatusBadge';
-import { VocPriorityBadge } from './VocPriorityBadge';
-import { VocAssignee } from './VocAssignee';
-import { VocTagPill } from './VocTagPill';
-import { VocTypeBadge } from './VocTypeBadge';
+import type { VocListResponse } from '@contracts/voc';
+import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from '@features/voc-list-filter/ui/vocGridLayout';
+import {
+  VocStatusBadge,
+  VocPriorityBadge,
+  VocAssignee,
+  VocTagPill,
+  VocTypeBadge,
+} from '@entities/voc';
 
 type VocRowData = VocListResponse['rows'][number];
 

@@ -1,8 +1,5 @@
 import type { Voc } from '../../../../../shared/contracts/voc/entity';
-import { VocStatusBadge } from '../../../components/voc/VocStatusBadge';
-import { VocPriorityBadge } from '../../../components/voc/VocPriorityBadge';
-import { VocTypeBadge } from '../../../components/voc/VocTypeBadge';
-import { VocAssignee } from '../../../components/voc/VocAssignee';
+import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocAssignee } from '@entities/voc';
 
 export interface VocMetaSectionProps {
   voc: Voc;

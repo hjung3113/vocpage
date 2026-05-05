@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { vocApi } from '../../api/voc';
-import { queryKeys } from '../../api/queryKeys';
+import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
 import type { VocFilter, VocListQuery } from '../../../../shared/contracts/voc';
 
@@ -13,7 +12,7 @@ export function useVocList(
 ) {
   const { role } = useRole();
   return useQuery({
-    queryKey: queryKeys.voc.list(role, { ...filter, sort_by, sort_dir, page, per_page }),
+    queryKey: vocQueryKeys.list(role, { ...filter, sort_by, sort_dir, page, per_page }),
     queryFn: () => vocApi.list({ ...filter, sort_by, sort_dir, page, per_page }),
     staleTime: 30_000,
   });

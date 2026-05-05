@@ -1,6 +1,6 @@
 import React from 'react';
 import type { VocStatus } from '../../../../../shared/contracts/voc';
-import { VocStatusBadge } from '../../../components/voc/VocStatusBadge';
+import { VocStatusBadge } from '@entities/voc';
 
 export interface VocSubRowProps {
   status: VocStatus;

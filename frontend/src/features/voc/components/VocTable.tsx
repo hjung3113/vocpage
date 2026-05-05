@@ -1,5 +1,5 @@
-import { VocListHeader } from '../../../components/voc/VocListHeader';
-import { VocRow, type VocTypeMapEntry } from '../../../components/voc/VocRow';
+import { VocListHeader } from '@features/voc-list-filter';
+import { VocRow, type VocTypeMapEntry } from './VocRow';
 import type { VocListResponse, VocSortColumn, SortDir } from '../../../../../shared/contracts/voc';
 
 interface VocTableProps {

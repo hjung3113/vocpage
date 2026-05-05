@@ -9,3 +9,5 @@ export { VocTagPill } from './ui/VocTagPill';
 export type { VocTagPillProps } from './ui/VocTagPill';
 export { VocTypeBadge } from './ui/VocTypeBadge';
 export type { VocTypeBadgeProps } from './ui/VocTypeBadge';
+export { VocAssignee } from './ui/VocAssignee';
+export type { AvatarColorClass } from './ui/VocAssignee';
