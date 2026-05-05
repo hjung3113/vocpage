@@ -17,6 +17,7 @@ import { VocDateSection } from './VocDateSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
 import { VocBodySection } from './VocBodySection';
 import { VocAttachmentSection } from './VocReviewSections';
+import { CollapsibleSection } from './CollapsibleSection';
 
 const ISSUE_CODE_STYLE: React.CSSProperties = {
   color: 'var(--accent)',
@@ -149,16 +150,24 @@ export function VocReviewDrawer({
           {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
           {voc && !blockedDeleted && (
             <div className="flex flex-col gap-4">
-              <VocDetailSection
-                voc={voc}
-                vocTypeMap={vocTypeMap}
-                systemMap={systemMap}
-                menuMap={menuMap}
-                tags={tags}
-              />
-              <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
-              <VocDateSection voc={voc} />
-              <VocBodySection body={voc.body} />
+              <CollapsibleSection title="상세 정보">
+                <VocDetailSection
+                  voc={voc}
+                  vocTypeMap={vocTypeMap}
+                  systemMap={systemMap}
+                  menuMap={menuMap}
+                  tags={tags}
+                />
+              </CollapsibleSection>
+              <CollapsibleSection title="담당자">
+                <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
+              </CollapsibleSection>
+              <CollapsibleSection title="날짜">
+                <VocDateSection voc={voc} />
+              </CollapsibleSection>
+              <CollapsibleSection title="본문">
+                <VocBodySection body={voc.body} />
+              </CollapsibleSection>
               <VocAttachmentSection items={attachments} canUpload={canUpload} />
               <VocActionSection
                 vocId={voc.id}

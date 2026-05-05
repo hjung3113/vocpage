@@ -1,7 +1,7 @@
 import { Button } from '@shared/ui/button';
 import { LoadingState } from '@shared/ui/skeleton';
 import type { VocHistoryEntry } from '../../../../../../shared/contracts/voc';
-import { VocSection } from './VocSection';
+import { CollapsibleSection } from './CollapsibleSection';
 
 export interface AttachmentItem {
   id: string;
@@ -17,7 +17,7 @@ interface AttachmentSectionProps {
 
 export function VocAttachmentSection({ items, canUpload }: AttachmentSectionProps) {
   return (
-    <VocSection title="첨부" testId="drawer-attachments">
+    <CollapsibleSection title="첨부" testId="drawer-attachments">
       {items.length === 0 ? (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           첨부 파일이 없습니다.
@@ -57,7 +57,7 @@ export function VocAttachmentSection({ items, canUpload }: AttachmentSectionProp
           파일 업로드
         </Button>
       )}
-    </VocSection>
+    </CollapsibleSection>
   );
 }
 
@@ -76,7 +76,7 @@ const FIELD_LABEL: Record<string, string> = {
 
 export function VocHistorySection({ entries, loading }: HistorySectionProps) {
   return (
-    <VocSection title="변경이력" testId="drawer-history">
+    <CollapsibleSection title="변경이력" testId="drawer-history">
       {loading && <LoadingState />}
       {!loading && entries && entries.length === 0 && (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
@@ -101,6 +101,6 @@ export function VocHistorySection({ entries, loading }: HistorySectionProps) {
           ))}
         </ol>
       )}
-    </VocSection>
+    </CollapsibleSection>
   );
 }

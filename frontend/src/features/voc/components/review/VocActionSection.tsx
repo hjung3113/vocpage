@@ -1,5 +1,5 @@
 import type { InternalNote, VocHistoryEntry } from '../../../../../../shared/contracts/voc';
-import { VocSection } from './VocSection';
+import { CollapsibleSection } from './CollapsibleSection';
 import type { Role } from '../../../../../../shared/contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistorySection } from './VocReviewSections';
@@ -37,7 +37,7 @@ export function VocActionSection({
   onAddNote,
 }: Props) {
   return (
-    <VocSection title="활동" testId="drawer-actions">
+    <CollapsibleSection title="활동" testId="drawer-actions">
       <Tabs defaultValue="comment" data-pcomp="voc-review-sections">
         <TabsList className="w-full justify-start">
           <TabsTrigger value="comment">댓글</TabsTrigger>
@@ -86,6 +86,6 @@ export function VocActionSection({
           />
         </TabsContent>
       </Tabs>
-    </VocSection>
+    </CollapsibleSection>
   );
 }
