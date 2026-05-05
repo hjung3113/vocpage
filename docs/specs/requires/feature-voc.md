@@ -394,10 +394,22 @@ function assertCanManageVoc(
 
 - Avatar: 이니셜 원형, `var(--brand-bg)` 배경 / `var(--brand)` 텍스트.
 
+#### 댓글 에디터 (Toast UI)
+
+댓글 작성/수정 입력창은 **Toast UI Editor** (Markdown/WYSIWYG 겸용 rich text)로 구현한다. VOC 등록 모달 본문 에디터와 동일 컴포넌트(`ToastBodyEditor`)를 재사용.
+
+- `body` 필드는 HTML 문자열로 저장/전송. 최대 16KB.
+- 이미지 삽입: 에디터 내 이미지 업로드 → `POST /api/vocs/:id/comments/images` (multipart). 업로드 성공 시 응답 URL을 에디터가 inline으로 삽입.
+  - 저장 경로: `/uploads/comments/{comment_id}/`. `attachments` 행 별도 생성 없음.
+  - 파일당 5MB, 댓글당 최대 5개, 허용 형식: PNG/JPG/GIF/WebP.
+- 표·코드블록 등 Toast UI 지원 전체 허용.
+- **렌더링 (읽기 모드):** `body` HTML은 **DOMPurify** 적용 후 `dangerouslySetInnerHTML`로 노출. XSS 방지 필수.
+- FE 연결 시점: BE CRUD 구현 후 `VocComment.tsx`의 `<Textarea>`를 `<ToastBodyEditor>`로 교체.
+
 #### BE 구현 현황 (2026-05-06)
 
-- FE UI: ✅ 완료 (`VocComment.tsx` — 빈 배열 + 빈 핸들러로 연결)
-- BE CRUD: ⏳ 미구현 — `POST/GET/PATCH/DELETE /api/vocs/:id/comments` 라우트·컨트롤러·react-query 훅 모두 미작성. Wave 1.6 종료 후 별도 태스크로 진입.
+- FE UI: ✅ 완료 (`VocComment.tsx` — 빈 배열 + 빈 핸들러, Textarea 임시 사용)
+- BE CRUD: ⏳ 미구현 — `POST/GET/PATCH/DELETE /api/vocs/:id/comments` + `POST /api/vocs/:id/comments/images` 라우트·컨트롤러·react-query 훅 모두 미작성. Wave 1.6 종료 후 별도 태스크로 진입.
 
 ### 8.14 인앱 알림 폴링
 
@@ -498,6 +510,15 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 - **API 응답 의존**: `GET /api/vocs` 목록 응답의 부모 VOC 객체에 `subTasks: VocListItem[]` 필드 포함 (D4 확정 필드명). 자식 VOC는 별도 row로 다시 등장하지 않음.
 - **빈 상태**: 토글 클릭 후 자식 0건이면(예: 동시 삭제) 부모 행 직하단에 "서브태스크 없음" 안내 행 1줄 표시 후 자동 접힘 처리.
 - 부모 VOC가 이미 Sub-task인 경우 하단 폼 비활성화 (1레벨 제한, 안내 문구 표시).
+
+#### 9.2.3 드로어 내 서브태스크 패널 — 행 클릭 이동 (2026-05-06)
+
+드로어 활동 패널 `Subtask` 탭의 서브태스크 행을 클릭하면 **해당 서브태스크 VOC 드로어로 전환**한다.
+
+- **FE 동작**: `onOpen(id)` 호출 → 현재 드로어 `vocId` 를 클릭한 서브태스크 id로 교체. URL 파라미터(`?voc={id}`)도 동기화하여 새로고침·공유 시 유지.
+- **상태 표시**: 서브태스크 행의 status는 `VocStatusBadge` 컴포넌트 사용 (raw string 렌더 금지).
+- **BE 의존**: `GET /api/vocs/:id` — 서브태스크 id로 드로어 상세 조회. 기존 detail 엔드포인트 재사용. `parent_id` 필드 존재 시 드로어 상단에 "부모 VOC" 링크 표시 (§8.7 참조).
+- **현황 (2026-05-06)**: FE `onOpen` 핸들러는 `() => {}` 스텁. FE 라우터 연결 + URL 동기화는 Wave 1.6 종료 후 진입.
 
 ### 9.3 첨부파일 UI 명세
 

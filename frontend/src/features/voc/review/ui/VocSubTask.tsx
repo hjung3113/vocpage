@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
+import { VocStatusBadge } from '@entities/voc';
 import type { VocStatus } from '@contracts/voc';
 
 export interface SubTaskItem {
@@ -59,16 +60,7 @@ export function VocSubTask({ parentId, parentIsSubtask, subs, canAdd, onOpen, on
                 aria-label={`${s.status} ${s.title}`}
                 onClick={() => onOpen(s.id)}
               >
-                <span
-                  aria-hidden="true"
-                  className="rounded px-2 py-0.5 text-[11px]"
-                  style={{
-                    background: 'var(--bg-surface)',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  {s.status}
-                </span>
+                <VocStatusBadge status={s.status} />
                 <span className="flex-1">{s.title}</span>
               </button>
             </li>
