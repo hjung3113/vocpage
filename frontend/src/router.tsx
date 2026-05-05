@@ -1,12 +1,12 @@
 import { lazy, Suspense } from 'react';
+import { env } from '@shared/config/env';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
 import { EmptyState } from '@shared/ui/empty-state';
 import { LoadingState } from '@shared/ui/skeleton';
 import { PageTitle } from './components/layout/PageTitle';
 
-const MockLoginPage =
-  import.meta.env.VITE_AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
+const MockLoginPage = env.AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
 
 const VocPage = lazy(() => import('./pages/VocPage'));
 

@@ -19,7 +19,7 @@ import {
 import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
 import type { VocTypeListItem } from '../../../../../shared/contracts/master/io';
 import { NativeSelect } from './NativeSelect';
-import { AttachmentZone } from '@shared/ui/attachment-zone/AttachmentZone';
+import { AttachmentZone } from '@shared/ui/attachment-zone';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));
 

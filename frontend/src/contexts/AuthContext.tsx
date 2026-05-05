@@ -1,3 +1,4 @@
+import { env } from '@shared/config/env';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { mockLogin as apiMockLogin, logout as apiLogout, getMe } from '../api/auth';
 import type { AuthUser } from '../api/auth';
@@ -33,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const login = useCallback(async (role: AuthUser['role']) => {
-    if (import.meta.env.VITE_AUTH_MODE !== 'mock') {
+    if (env.AUTH_MODE !== 'mock') {
       throw new Error('login() is only available in mock auth mode');
     }
     const me = await apiMockLogin(role);

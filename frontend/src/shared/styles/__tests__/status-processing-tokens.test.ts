@@ -3,7 +3,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const cssPath = resolve(here, '..', '..', 'shared', 'styles', 'globals.css');
+const cssPath = resolve(here, '..', 'globals.css');
 const css = readFileSync(cssPath, 'utf8');
 
 const VIOLET_MIN = 285;
