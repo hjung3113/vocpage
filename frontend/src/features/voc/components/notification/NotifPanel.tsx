@@ -5,7 +5,7 @@ import {
   NotificationType,
   type NotificationItem,
   type NotificationType as NotificationTypeT,
-} from '../../../../../shared/contracts/notification/io';
+} from '../../../../../../shared/contracts/notification/io';
 
 export const NOTIF_PANEL_ID = 'notif-panel';
 

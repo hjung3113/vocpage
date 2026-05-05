@@ -5,8 +5,11 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VocReviewDrawer } from '../VocReviewDrawer';
 import { RoleContext } from '@entities/user';
-import { VOC_FIXTURES, VOC_HISTORY_FIXTURES } from '../../../../../../shared/fixtures/voc.fixtures';
-import type { Role } from '../../../../../../shared/contracts/common';
+import {
+  VOC_FIXTURES,
+  VOC_HISTORY_FIXTURES,
+} from '../../../../../../../shared/fixtures/voc.fixtures';
+import type { Role } from '../../../../../../../shared/contracts/common';
 
 vi.mock('@entities/voc/api/vocApi', () => ({
   vocApi: {
@@ -135,9 +138,9 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(screen.queryByTestId('voc-permission-gate')).not.toBeInTheDocument();
   });
 
-  it('drawer에 VocMetaSection 마운트', async () => {
+  it('drawer에 VocDetailSection 마운트', async () => {
     renderDrawer('manager', target.id);
-    await waitFor(() => expect(screen.getByTestId('voc-meta-panel')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('voc-detail-panel')).toBeInTheDocument());
   });
 
   it('헤더에 issue_code가 accent mono 스타일로 표시됨', async () => {
@@ -153,7 +156,7 @@ describe('VocReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
 
   it('delete 버튼은 미구현 — 어떤 role에서도 미노출', async () => {
     renderDrawer('admin', target.id);
-    await waitFor(() => expect(screen.getByTestId('voc-meta-panel')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('voc-detail-panel')).toBeInTheDocument());
     expect(screen.queryByTestId('drawer-btn-delete')).not.toBeInTheDocument();
   });
 

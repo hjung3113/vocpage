@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { VocInternalNotes } from '../VocInternalNotes';
-import type { InternalNote } from '../../../../../../shared/contracts/voc';
-import type { Role } from '../../../../../../shared/contracts/common';
+import type { InternalNote } from '../../../../../../../shared/contracts/voc';
+import type { Role } from '../../../../../../../shared/contracts/common';
 
 const note = (over: Partial<InternalNote> = {}): InternalNote => ({
   id: 'n-1',

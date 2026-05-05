@@ -15,10 +15,10 @@ import { LoadingState } from '@shared/ui/skeleton';
 import {
   VocCreate,
   type VocCreate as VocCreateInput,
-} from '../../../../../shared/contracts/voc/io';
-import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
-import type { VocTypeListItem } from '../../../../../shared/contracts/master/io';
-import { NativeSelect } from './NativeSelect';
+} from '../../../../../../shared/contracts/voc/io';
+import type { VocPriority } from '../../../../../../shared/contracts/voc/entity';
+import type { VocTypeListItem } from '../../../../../../shared/contracts/master/io';
+import { NativeSelect } from '../NativeSelect';
 import { AttachmentZone } from '@shared/ui/attachment-zone';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));

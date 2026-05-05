@@ -10,7 +10,7 @@ import type {
   AssigneeListItem,
   TagListItem,
   VocTypeListItem,
-} from '../../../../../../shared/contracts/master/io';
+} from '../../../../../../../shared/contracts/master/io';
 
 const assignees: AssigneeListItem[] = [
   { id: '11111111-1111-1111-1111-111111111111', ad_username: 'kim.admin', display_name: '김관리' },

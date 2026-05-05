@@ -1,6 +1,10 @@
 import { VocListHeader } from '@features/voc-list-filter';
 import { VocRow, type VocTypeMapEntry } from './VocRow';
-import type { VocListResponse, VocSortColumn, SortDir } from '../../../../../shared/contracts/voc';
+import type {
+  VocListResponse,
+  VocSortColumn,
+  SortDir,
+} from '../../../../../../shared/contracts/voc';
 
 interface VocTableProps {
   rows: VocListResponse['rows'];

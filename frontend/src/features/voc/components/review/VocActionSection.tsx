@@ -1,11 +1,11 @@
-import type { InternalNote, VocHistoryEntry } from '../../../../../shared/contracts/voc';
+import type { InternalNote, VocHistoryEntry } from '../../../../../../shared/contracts/voc';
 import { VocSection } from './VocSection';
-import type { Role } from '../../../../../shared/contracts/common';
+import type { Role } from '../../../../../../shared/contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistorySection } from './VocReviewSections';
 import { VocCommentList } from './VocCommentList';
 import { VocInternalNotes } from './VocInternalNotes';
-import { VocSubTaskList } from './VocSubTaskList';
+import { VocSubTaskList } from '../list/VocSubTaskList';
 
 interface Props {
   vocId: string;

@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { useVocPageController } from '@features/voc/useVocPageController';
-import { VocTopbar } from '@features/voc/components/VocTopbar';
-import { VocStatusFilters } from '@features/voc/components/VocStatusFilters';
+import { VocTopbar } from '@features/voc/components/list/VocTopbar';
+import { VocStatusFilters } from '@features/voc/components/list/VocStatusFilters';
 import {
   VocAdvancedFilters,
   VocAdvancedFiltersToggle,
-} from '@features/voc/components/VocAdvancedFilters';
-import { VocTable } from '@features/voc/components/VocTable';
-import { VocPaginationBar } from '@features/voc/components/VocPaginationBar';
-import { VocReviewDrawer } from '@features/voc/components/VocReviewDrawer';
-import { VocCreateModal } from '@features/voc/components/VocCreateModal';
+} from '@features/voc/components/list/VocAdvancedFilters';
+import { VocTable } from '@features/voc/components/list/VocTable';
+import { VocPaginationBar } from '@features/voc/components/list/VocPaginationBar';
+import { VocReviewDrawer } from '@features/voc/components/review/VocReviewDrawer';
+import { VocCreateModal } from '@features/voc/components/create/VocCreateModal';
 import { EmptyState } from '@shared/ui/empty-state';
 import { ErrorState } from '@shared/ui/error-state';
 import { LoadingState } from '@shared/ui/skeleton';
@@ -34,6 +34,7 @@ export function VocListPage() {
   const rows = list.data?.rows ?? [];
   const total = list.data?.total ?? 0;
   const statusValue = ctrl.filter.status ?? 'all';
+  const selectedRow = rows.find((r) => r.id === ctrl.drawer.vocId);
   const vocTypeMap = useMemo(
     () =>
       Object.fromEntries(ctrl.masters.vocTypes.map((t) => [t.id, { slug: t.slug, name: t.name }])),
@@ -103,6 +104,7 @@ export function VocListPage() {
       />
       <VocReviewDrawer
         vocId={ctrl.drawer.vocId}
+        tags={selectedRow?.tags}
         notes={ctrl.notes.data}
         notesLoading={ctrl.notes.isLoading}
         pending={ctrl.pending}

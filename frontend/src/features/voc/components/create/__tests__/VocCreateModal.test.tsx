@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { VocCreateModal } from '../VocCreateModal';
-import type { VocTypeListItem } from '../../../../../../shared/contracts/master/io';
+import type { VocTypeListItem } from '../../../../../../../shared/contracts/master/io';
 
 const vocTypes: VocTypeListItem[] = [
   {

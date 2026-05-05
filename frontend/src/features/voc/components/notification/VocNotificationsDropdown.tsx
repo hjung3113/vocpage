@@ -1,7 +1,7 @@
 import { Popover } from '@shared/ui/popover';
 import { NotifButton } from './NotifButton';
 import { NotifPanel } from './NotifPanel';
-import type { NotificationItem } from '../../../../../shared/contracts/notification/io';
+import type { NotificationItem } from '../../../../../../shared/contracts/notification/io';
 
 export interface VocNotificationsDropdownProps {
   items: NotificationItem[];
