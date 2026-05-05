@@ -6,6 +6,9 @@
  * `role` is the user's currently active role. Including it in every key means
  * switching role automatically yields a fresh cache key — no manual
  * invalidation required for role-scoped data.
+ *
+ * MIGRATION: FSD Step 3 seeded per-entity query-key files (entities/voc/api/vocQueryKeys etc).
+ * Step 4 will migrate callers. Do not add new domains here.
  */
 import type { Role } from '../../../shared/contracts/common';
 
