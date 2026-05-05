@@ -5,9 +5,8 @@ import { AppShell, PageTitle } from '@widgets/app-shell';
 import { EmptyState } from '@shared/ui/empty-state';
 import { LoadingState } from '@shared/ui/skeleton';
 
-const MockLoginPage = env.AUTH_MODE === 'mock' ? lazy(() => import('./pages/MockLoginPage')) : null;
-
-const VocPage = lazy(() => import('./pages/VocPage'));
+const MockLoginPage = env.AUTH_MODE === 'mock' ? lazy(() => import('@pages/mock-login')) : null;
+const VocPage = lazy(() => import('@pages/voc'));
 
 function VocRoute() {
   return (
