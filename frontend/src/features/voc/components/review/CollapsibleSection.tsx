@@ -22,19 +22,19 @@ export function CollapsibleSection({
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="flex w-full items-center justify-between text-left"
+        className="flex w-full items-center gap-1.5 text-left"
         aria-expanded={isOpen}
       >
-        <h3 className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-          {title}
-        </h3>
         <ChevronDown
           className={cn(
             'h-3.5 w-3.5 shrink-0 transition-transform duration-150',
-            !isOpen && '-rotate-90',
+            !isOpen && 'rotate-90',
           )}
           style={{ color: 'var(--text-secondary)' }}
         />
+        <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+          {title}
+        </span>
       </button>
       {isOpen && children}
     </section>
