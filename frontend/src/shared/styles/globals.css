@@ -39,6 +39,28 @@
   --color-brand-border: oklch(35% 0.06 260);
 }
 
+/* shadcn Tailwind v4 — maps compat CSS vars to Tailwind color utilities.
+   Uses @theme inline so bg-border/text-foreground etc. resolve via CSS variable chain. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
 :root {
   color-scheme: light dark;
 
@@ -172,6 +194,26 @@
   --danger: var(--status-red);
   --text-on-brand: oklch(100% 0 0);
   --border: var(--border-standard);
+
+  /* shadcn compatibility layer — maps shadcn CSS vars to project tokens.
+     --accent is intentionally omitted: conflicts with --accent brand color. */
+  --background: var(--bg-app);
+  --foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--brand);
+  --primary-foreground: var(--text-on-brand);
+  --secondary: var(--bg-panel);
+  --secondary-foreground: var(--text-secondary);
+  --muted: var(--bg-elevated);
+  --muted-foreground: var(--text-tertiary);
+  --destructive: var(--danger);
+  --destructive-foreground: var(--text-on-brand);
+  --input: var(--border-standard);
+  --ring: var(--brand);
+  --radius: 6px;
 
   /* Overlay (modal/dialog scrim) — light/dark mirror, ~60% opacity black */
   --bg-overlay: light-dark(oklch(0% 0 0 / 0.45), oklch(0% 0 0 / 0.6));
