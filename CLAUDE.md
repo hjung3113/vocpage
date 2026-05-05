@@ -103,6 +103,7 @@ Skip the frame for trivial one-liners (rename, obvious typo, single-file change 
 - **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused
 - **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified
 - **Pre-commit lint dry-run** — 첫 `git commit` 전에 `npm run lint -w frontend` 단일 호출로 검증. 실패 시 수정 후 commit — husky 실패-재commit cycle 방지. (backend lint script 미정의 — 추후 추가 시 동일 패턴)
+- **Progress docs before merge** — for any PR that closes a phase/wave/step, commit `claude-progress.txt` + the relevant plan doc status update on the same branch before running `gh pr merge`. No separate branch or PR. Skill-only or docs-only PRs are exempt.
 
 ## Refactoring
 
