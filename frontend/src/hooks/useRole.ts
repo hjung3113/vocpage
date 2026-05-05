@@ -1,2 +1,2 @@
-// Moved to features/auth/model/useRole (Step 4)
-export { useRole } from '@features/auth/model/useRole';
+// Moved to entities/user/model/useRole (W3)
+export { useRole } from '@entities/user/model/useRole';

@@ -6,7 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { router } from './router';
 import AppProviders from './contexts/AppProviders';
-import { RoleProvider } from '@features/auth/model/RoleContext';
+import { RoleProvider } from '@entities/user/model/RoleContext';
 import { queryClient } from '@shared/api/queryClient';
 import '@shared/styles/globals.css';
 

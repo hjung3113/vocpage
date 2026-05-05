@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { vocApi } from '../../api/voc';
 import { queryKeys } from '../../api/queryKeys';
-import { useRole } from '@features/auth/model/useRole';
+import { useRole } from '@entities/user/model/useRole';
 import type { VocUpdate } from '../../../../shared/contracts/voc';
 
 export function useUpdateVoc() {
