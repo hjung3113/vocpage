@@ -56,7 +56,6 @@ export function VocDetailSection({
       <div
         data-pcomp="VocDetailSection"
         className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-        style={{ background: 'var(--bg-surface)' }}
       >
         <MetaField label="시스템" testId="meta-system">
           <span style={VALUE_STYLE}>{systemLabel}</span>

@@ -39,7 +39,6 @@ export function VocPeopleSection({ voc, assigneeMap }: VocPeopleSectionProps) {
       <div
         data-pcomp="VocPeopleSection"
         className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-        style={{ background: 'var(--bg-surface)' }}
       >
         <MetaField label="담당자" testId="meta-assignee">
           <VocAssignee name={assigneeName} />
