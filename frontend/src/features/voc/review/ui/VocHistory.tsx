@@ -1,6 +1,6 @@
 import { LoadingState } from '@shared/ui/skeleton';
 import type { VocHistoryEntry } from '@contracts/voc';
-import { VOC_FIELD_LABELS } from '@features/voc/list/constants';
+import { VOC_FIELD_LABELS } from '@features/voc/constants';
 
 interface Props {
   entries: VocHistoryEntry[] | undefined;

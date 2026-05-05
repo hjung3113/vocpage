@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import type { VocSortColumn, SortDir } from '@contracts/voc';
 import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
-import { VOC_FIELD_LABELS } from '../constants';
+import { VOC_FIELD_LABELS } from '../../constants';
 
 export interface VocListHeaderProps {
   sortBy: VocSortColumn;
