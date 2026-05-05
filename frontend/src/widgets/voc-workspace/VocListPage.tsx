@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
-import { useVocPageController } from '../../features/voc/useVocPageController';
-import { VocTopbar } from '../../features/voc/components/VocTopbar';
-import { VocStatusFilters } from '../../features/voc/components/VocStatusFilters';
+import { useVocPageController } from '@features/voc/useVocPageController';
+import { VocTopbar } from '@features/voc/components/VocTopbar';
+import { VocStatusFilters } from '@features/voc/components/VocStatusFilters';
 import {
   VocAdvancedFilters,
   VocAdvancedFiltersToggle,
-} from '../../features/voc/components/VocAdvancedFilters';
-import { VocTable } from '../../features/voc/components/VocTable';
-import { VocPaginationBar } from '../../features/voc/components/VocPaginationBar';
-import { VocReviewDrawer } from '../../features/voc/components/VocReviewDrawer';
-import { VocCreateModal } from '../../features/voc/components/VocCreateModal';
+} from '@features/voc/components/VocAdvancedFilters';
+import { VocTable } from '@features/voc/components/VocTable';
+import { VocPaginationBar } from '@features/voc/components/VocPaginationBar';
+import { VocReviewDrawer } from '@features/voc/components/VocReviewDrawer';
+import { VocCreateModal } from '@features/voc/components/VocCreateModal';
 import { EmptyState } from '@shared/ui/empty-state';
 import { ErrorState } from '@shared/ui/error-state';
 import { LoadingState } from '@shared/ui/skeleton';

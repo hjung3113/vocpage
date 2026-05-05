@@ -1,0 +1,1 @@
+export { VocListPage } from './VocListPage';
