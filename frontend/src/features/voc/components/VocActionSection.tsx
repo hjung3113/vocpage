@@ -1,6 +1,6 @@
 import type { InternalNote, VocHistoryEntry } from '../../../../../shared/contracts/voc';
 import type { Role } from '../../../../../shared/contracts/common';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistorySection } from './VocReviewSections';
 import { VocCommentList } from './VocCommentList';
 import { VocInternalNotes } from './VocInternalNotes';

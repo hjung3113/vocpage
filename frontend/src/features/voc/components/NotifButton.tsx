@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Bell } from 'lucide-react';
-import { PopoverTrigger } from '../../../components/ui/popover';
-import { cn } from '../../../lib/utils';
+import { PopoverTrigger } from '@shared/ui/popover';
+import { cn } from '@shared/lib/cn';
 import { NOTIF_PANEL_ID } from './NotifPanel';
 
 export interface NotifButtonProps {

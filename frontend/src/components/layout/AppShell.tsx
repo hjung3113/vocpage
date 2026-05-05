@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
-import { ErrorBoundary } from '../common/ErrorBoundary';
-import { Toaster } from '../ui/toast';
+import { ErrorBoundary } from '@shared/ui/error-state';
+import { Toaster } from '@shared/ui/toast';
 
 const ROUTE_TITLES: Record<string, string> = {
   '/voc': 'VOC',

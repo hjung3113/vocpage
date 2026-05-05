@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@shared/ui/alert';
 
 const REASONS: Record<string, { title: string; description: string }> = {
   role: { title: '권한이 없습니다', description: '담당자 또는 관리자만 접근할 수 있습니다.' },

@@ -1,5 +1,5 @@
-import { Button } from '../../../components/ui/button';
-import { LoadingState } from '../../../components/common/LoadingState';
+import { Button } from '@shared/ui/button';
+import { LoadingState } from '@shared/ui/skeleton';
 import type { VocHistoryEntry } from '../../../../../shared/contracts/voc';
 import { VocSection } from './VocSection';
 

@@ -1,4 +1,4 @@
-import { Popover } from '../../../components/ui/popover';
+import { Popover } from '@shared/ui/popover';
 import { NotifButton } from './NotifButton';
 import { NotifPanel } from './NotifPanel';
 import type { NotificationItem } from '../../../../../shared/contracts/notification/io';

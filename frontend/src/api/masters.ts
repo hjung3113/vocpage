@@ -3,7 +3,7 @@
  * call returns the validated rows array. Used by VOC advanced filters and
  * create modal selects.
  */
-import { apiGet } from './client';
+import { apiGet } from '@shared/api/client';
 import {
   AssigneeListItem,
   AssigneeListResponse,

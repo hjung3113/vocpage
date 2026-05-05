@@ -1,4 +1,4 @@
-import { Pagination } from '../../../components/common/Pagination';
+import { Pagination } from '@shared/ui/pagination';
 
 export interface VocPaginationBarProps {
   page: number;

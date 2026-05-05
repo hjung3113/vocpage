@@ -47,3 +47,4 @@ uploads/
 !.claude/audit/sessions/.gitkeep
 .claude/audit/stats.json
 .claude/audit/*.bak
+utils/wc

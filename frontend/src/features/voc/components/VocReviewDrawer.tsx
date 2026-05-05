@@ -1,20 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useContext } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '../../../components/ui/dialog';
-import { cn } from '../../../lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog';
+import { cn } from '@shared/lib/cn';
 import { vocApi } from '../../../api/voc';
 import { queryKeys } from '../../../api/queryKeys';
 import { useRole } from '../../../hooks/useRole';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { type InternalNote } from '../../../../../shared/contracts/voc';
 import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
-import { LoadingState } from '../../../components/common/LoadingState';
-import { ErrorState } from '../../../components/common/ErrorState';
+import { LoadingState } from '@shared/ui/skeleton';
+import { ErrorState } from '@shared/ui/error-state';
 import { type AttachmentItem } from './VocReviewSections';
 import { VocActionSection } from './VocActionSection';
 import { VocMetaSection } from './VocMetaSection';

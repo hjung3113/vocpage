@@ -6,12 +6,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../../../components/ui/dialog';
+} from '@shared/ui/dialog';
 import { X } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
-import { LoadingState } from '../../../components/common/LoadingState';
+import { Button } from '@shared/ui/button';
+import { Input } from '@shared/ui/input';
+import { Label } from '@shared/ui/label';
+import { LoadingState } from '@shared/ui/skeleton';
 import {
   VocCreate,
   type VocCreate as VocCreateInput,
@@ -19,7 +19,7 @@ import {
 import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
 import type { VocTypeListItem } from '../../../../../shared/contracts/master/io';
 import { NativeSelect } from './NativeSelect';
-import { AttachmentZone } from '../../../shared/ui/AttachmentZone/AttachmentZone';
+import { AttachmentZone } from '@shared/ui/attachment-zone';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));
 
