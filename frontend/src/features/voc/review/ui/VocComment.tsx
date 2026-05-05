@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Textarea } from '@shared/ui/textarea';
+import type { Comment } from '@contracts/voc';
 
-export interface Comment {
-  id: string;
-  voc_id: string;
-  author_id: string;
-  body: string;
-  created_at: string;
-  updated_at: string;
-}
+export type { Comment };
 
 interface Props {
   comments: Comment[];

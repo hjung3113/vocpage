@@ -8,4 +8,6 @@ export const vocQueryKeys = {
   detail: (role: Role, id: string) => ['voc', role, 'detail', id] as const,
   notes: (role: Role, id: string) => ['voc', role, 'notes', id] as const,
   history: (role: Role, id: string) => ['voc', role, 'history', id] as const,
+  comments: (role: Role, id: string) => ['voc', role, 'comments', id] as const,
+  subtasks: (role: Role, id: string) => ['voc', role, 'subtasks', id] as const,
 } as const;
