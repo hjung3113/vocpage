@@ -6,22 +6,20 @@
 
 ## 0. 잔여 작업 (이 plan 의 활성 항목)
 
-> 머지된 PR 들(C-1~C-12, F-1/F-2/F-3, F-bundle minor, Issue #155/#156/#162/#166)의 상세는 `progress-archive.md` 로 이동. 본 절은 **다음 작업** 만.
+> 머지된 PR들(C-1~C-16, F-1/F-2/F-3, F-bundle minor, Issue #155/#156/#162/#166)의 상세는 `progress-archive.md`로 이동. 본 절은 **다음 작업**만.
+> ε batch (C-14 VocCommentList / C-15 VocInternalNotes / C-16 VocSubTaskList) 완료 ✅.
+> **실행 순서 조정 (2026-05-05)**: VOC 리뷰 페이지 고도화 우선 — η batch(C-20~C-23) 먼저 진행 후 ζ batch(C-17~C-19).
 
-| 순서 | Batch | leaf                         | 의존                            | 비고                                                                                    |
-| ---- | ----- | ---------------------------- | ------------------------------- | --------------------------------------------------------------------------------------- |
-| 1    | δ     | **C-13** VocReviewSections   | C-12 머지 ✅                    | δ shell 의존 — 탭 폐기, 평평 섹션 골격 추출 (rename: VocReviewTabs → VocReviewSections) |
-| 2    | ε     | C-14 VocCommentList          | δ 종료 (C-13 머지)              | 3 슬롯 병렬                                                                             |
-| 3    | ε     | C-15 VocInternalNotes        | δ 종료                          | 3 슬롯 병렬                                                                             |
-| 4    | ε     | C-16 VocSubTaskList          | δ 종료                          | 3 슬롯 병렬                                                                             |
-| 5    | ζ     | C-17 SidebarUserSwitcher     | ε 종료                          | popover 컨테이너                                                                        |
-| 6    | ζ     | C-18 Sidebar                 | C-17 머지                       | popover 의존                                                                            |
-| 7    | ζ     | C-19 Topbar                  | C-17 머지 (NotifButton C-10 ✅) | 2 슬롯 병렬 (C-18과)                                                                    |
-| 8    | η     | C-20 VocTagPills             | ε 종료                          | 태그 뱃지 묶음 (#메모 #차트 #데이터 #오류) — 설계는 진입 시 prototype 재확인            |
-| 9    | η     | C-21 VocActivityTimeline     | ε 종료                          | 작업 이력 타임라인 (현 VocHistoryPanel과 별개의 시각적 timeline) — 설계 진입 시 결정    |
-| 10   | η     | C-22 VocAttachmentUploadZone | ε 종료                          | drag-drop 업로드 영역 + 썸네일 그리드 (현 VocAttachmentsPanel stub 강화)                |
-| 11   | η     | C-23 VocErrorSimSelector     | ε 종료                          | 에러 시뮬레이션 selector (역할 게이트 포함, 진입 시 spec 확정)                          |
-| 12   | D     | Phase D 종합 검증            | η 종료 (C-19 + C-20~C-23 머지)  | visual-diff SKIP 0 / E2E / lint / 사용자 승인                                           |
+| 순서 | Batch | leaf                         | 의존                             | 비고                                                                                 |
+| ---- | ----- | ---------------------------- | -------------------------------- | ------------------------------------------------------------------------------------ |
+| 1    | η     | C-20 VocTagPills             | ε 종료 ✅                        | 태그 뱃지 묶음 (#메모 #차트 #데이터 #오류) — 설계는 진입 시 prototype 재확인         |
+| 2    | η     | C-21 VocActivityTimeline     | ε 종료 ✅                        | 작업 이력 타임라인 (현 VocHistoryPanel과 별개의 시각적 timeline) — 설계 진입 시 결정 |
+| 3    | η     | C-22 VocAttachmentUploadZone | ε 종료 ✅                        | drag-drop 업로드 영역 + 썸네일 그리드 (현 VocAttachmentsPanel stub 강화)             |
+| 4    | η     | C-23 VocErrorSimSelector     | ε 종료 ✅                        | 에러 시뮬레이션 selector (역할 게이트 포함, 진입 시 spec 확정)                       |
+| 5    | ζ     | C-17 SidebarUserSwitcher     | ε 종료 ✅                        | popover 컨테이너                                                                     |
+| 6    | ζ     | C-18 Sidebar                 | C-17 머지                        | popover 의존                                                                         |
+| 7    | ζ     | C-19 Topbar                  | C-17 머지 (NotifButton C-10 ✅)  | 2 슬롯 병렬 (C-18과)                                                                 |
+| 8    | D     | Phase D 종합 검증            | η+ζ 종료 (C-19 + C-20~C-23 머지) | visual-diff SKIP 0 / E2E / lint / 사용자 승인                                        |
 
 **진입 게이트**: 직전 batch 마지막 PR 머지 + 사용자 검수 통과 (§7.3).
 **룰북**: [`wave-1-6-phase-c-precedent.md`](./wave-1-6-phase-c-precedent.md) per-leaf 7항목 체크.

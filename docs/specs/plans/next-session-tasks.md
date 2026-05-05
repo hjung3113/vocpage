@@ -1,18 +1,18 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-04
-> 현재 위치: **Phase 8 Wave 1.6 진행 중** (Phase C δ-batch C-13 PR 작성 — VocReviewSections rename + 탭 폐기)
+> 최종 업데이트: 2026-05-05
+> 현재 위치: **Phase 8 Wave 1.6 진행 중** (η-batch 진입 — VOC 리뷰 페이지 고도화 C-20~C-23)
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → 활성 plan
 
 ---
 
 ## 활성 작업
 
-| Wave    | 정본 plan                                                                                      | 상태                                                                                                                                                        |
-| ------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **FSD** | [`fsd-migration.md`](./fsd-migration.md) · 상세: `.omc/plans/fsd-migration-plan.md`            | 🟡 Step 0(Convention 문서 10종) ✅ / Step 1~7 미착수 — 다음 세션: Step 1 `refactor/fsd-path-alias`                                                          |
-| **1.6** | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) + [룰북](./wave-1-6-phase-c-precedent.md) | 🟡 Phase C — α/β/γ/**δ C-12** 완료 / **C-13 PR 진행 중 / ε ζ η 미착수 (총 10 PR 잔여 — 2026-05-04 η batch C-20~C-23 신규 등록)** / Phase D는 C 전체 머지 후 |
-| **1.7** | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md)                               | ✅ Phase A spec/contract 머지 (PR #185) / ⏳ Phase B(BE) → C(FE) → D(visual) — Wave 1.6 종료 후 진입                                                        |
+| Wave    | 정본 plan                                                                                                 | 상태                                                                                                                        |
+| ------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **FSD** | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md` | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                                        |
+| **1.6** | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) + [룰북](./wave-1-6-phase-c-precedent.md)            | 🟡 Phase C — α/β/γ/δ/ε 완료 (C-2~C-16) / **다음: η(C-20~C-23) VOC 리뷰 고도화 → ζ(C-17~C-19)** / Phase D는 η+ζ 전부 머지 후 |
+| **1.7** | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md)                                          | ✅ Phase A spec/contract 머지 (PR #185) / ⏳ Phase B(BE) → C(FE) → D(visual) — Wave 1.6 종료 후 진입                        |
 
 ### Hard-blocks
 
@@ -21,7 +21,7 @@
 
 ### 진행 순서
 
-**FSD Migration** (Step 1→7) → Wave 1.6 잔여 (ζ C-17 → C-18∥C-19 → η C-20∥C-21∥C-22∥C-23 → Phase D) → Wave 1.7 B/C/D → Follow-up C-2 → Wave 2.
+~~FSD Migration (완료)~~ → Wave 1.6 잔여 (**η C-20∥C-21∥C-22∥C-23** → ζ C-17 → C-18∥C-19 → Phase D) → Wave 1.7 B/C/D → Follow-up C-2 → Wave 2.
 
 ---
 
