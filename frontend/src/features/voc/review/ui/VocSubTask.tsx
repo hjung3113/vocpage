@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { VocStatusBadge } from '@entities/voc';
-import type { VocStatus } from '@contracts/voc';
-
-export interface SubTaskItem {
-  id: string;
-  title: string;
-  status: VocStatus;
-}
+import type { SubTaskItem } from '@contracts/voc';
 
 interface Props {
   parentId: string;

@@ -5,7 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistory } from './VocHistory';
 import { VocComment } from './VocComment';
 import { VocInternalNotes } from './VocInternalNotes';
-import { VocSubTask, type SubTaskItem } from './VocSubTask';
+import { VocSubTask } from './VocSubTask';
+import type { SubTaskItem } from '@contracts/voc';
 
 interface Props {
   vocId: string;

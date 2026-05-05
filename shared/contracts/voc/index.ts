@@ -5,3 +5,4 @@
 export * from './entity';
 export * from './io';
 export * from './note';
+export * from './subtask';
