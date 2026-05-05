@@ -40,10 +40,10 @@ export function VocActionSection({
     <CollapsibleSection title="활동" testId="drawer-actions">
       <Tabs defaultValue="comment" data-pcomp="voc-review-sections">
         <TabsList className="w-full justify-start">
-          <TabsTrigger value="comment">댓글</TabsTrigger>
-          <TabsTrigger value="internal">내부노트</TabsTrigger>
-          <TabsTrigger value="history">변경이력</TabsTrigger>
-          <TabsTrigger value="subtask">서브태스크</TabsTrigger>
+          <TabsTrigger value="comment">Comment</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
+          <TabsTrigger value="subtask">Subtask</TabsTrigger>
+          <TabsTrigger value="internal">InternalNote</TabsTrigger>
         </TabsList>
 
         <TabsContent value="comment">
@@ -56,17 +56,6 @@ export function VocActionSection({
             onAdd={() => {}}
             onEdit={() => {}}
             onDelete={() => {}}
-          />
-        </TabsContent>
-
-        <TabsContent value="internal">
-          <VocInternalNotes
-            notes={notes}
-            notesLoading={notesLoading}
-            pending={pending}
-            role={role}
-            isOwner={isOwner}
-            onAdd={onAddNote}
           />
         </TabsContent>
 
@@ -83,6 +72,17 @@ export function VocActionSection({
             canAdd={canWrite}
             onOpen={() => {}}
             onAdd={() => {}}
+          />
+        </TabsContent>
+
+        <TabsContent value="internal">
+          <VocInternalNotes
+            notes={notes}
+            notesLoading={notesLoading}
+            pending={pending}
+            role={role}
+            isOwner={isOwner}
+            onAdd={onAddNote}
           />
         </TabsContent>
       </Tabs>
