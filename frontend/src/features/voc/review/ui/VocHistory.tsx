@@ -1,27 +1,11 @@
 import { LoadingState } from '@shared/ui/skeleton';
 import type { VocHistoryEntry } from '@contracts/voc';
 import { VOC_FIELD_LABELS } from '@features/voc/constants';
+import { ActivityAvatar, formatActivityTime } from './ActivityAvatar';
 
 interface Props {
   entries: VocHistoryEntry[] | undefined;
   loading: boolean;
-}
-
-function ActivityAvatar({ userId }: { userId: string }) {
-  const initial = userId[0]?.toUpperCase() ?? '?';
-  return (
-    <span
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-      style={{ background: 'var(--brand-bg)', color: 'var(--brand)' }}
-      aria-hidden
-    >
-      {initial}
-    </span>
-  );
-}
-
-function formatTime(iso: string) {
-  return iso.slice(0, 16).replace('T', ' ');
 }
 
 export function VocHistory({ entries, loading }: Props) {
@@ -51,7 +35,9 @@ export function VocHistory({ entries, loading }: Props) {
                 <span style={{ color: 'var(--text-tertiary)' }}>·</span>
                 <span style={{ color: 'var(--text-secondary)' }}>{fieldLabel} 변경</span>
                 <span style={{ color: 'var(--text-tertiary)' }}>·</span>
-                <span style={{ color: 'var(--text-tertiary)' }}>{formatTime(h.changed_at)}</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>
+                  {formatActivityTime(h.changed_at)}
+                </span>
               </div>
               <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                 <span style={{ color: 'var(--text-tertiary)' }}>{h.old_value ?? '∅'}</span>
