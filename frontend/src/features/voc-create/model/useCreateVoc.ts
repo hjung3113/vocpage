@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { vocApi } from '@entities/voc/api/vocApi';
 import { queryKeys } from '../../../api/queryKeys';
-import { useRole } from '@features/auth/model/useRole';
+import { useRole } from '@entities/user/model/useRole';
 import type { VocCreate, VocDetail } from '@contracts/voc';
 
 export function useCreateVoc() {
