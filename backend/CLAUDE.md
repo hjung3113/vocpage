@@ -68,6 +68,10 @@ Full schema DDL and column-level spec: `docs/specs/requires/requirements.md` (da
 
 Behavioral contracts (what auto-tagging does, what the AD session middleware rejects, sub-task propagation rules) live in `docs/specs/requires/requirements.md`. **Do not duplicate behavioral rules into code comments** — link to the spec section.
 
+## Conventions
+
+Before coding an endpoint, check `docs/specs/README.md §0.2`. Backend-relevant convention files in `docs/specs/requires/`: `api-conventions.md` (response envelope target, auth split boundary) · `routing-conventions.md §10.1` (route list) · `test-conventions.md §17.2` (shared/fixtures parity rules).
+
 ## Sub-tree map
 
 - `config/` — static config loaded at boot. `config/masters/` = master data JSON/CSV (VOC types/statuses/departments). Schema: `shared/contracts/master/`. Spec: `external-masters.md`. Adding/changing master = file here + matching `shared/fixtures/`.
