@@ -57,7 +57,7 @@ Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Arc
 - **Broad git history first pass** — use `--all` and wide keywords on first `git log --grep`; never retry with a narrower pattern
 - **Minimum context for decisions** — for judgment tasks, use only the single most relevant file; open supporting files only if the first is insufficient
 - **Before editing** — summarize selected files/symbols and why they are in scope
-- **Git workflow** — feature branch only (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`); never commit or push to main directly. PRs are opened by the user. Merge with `gh pr merge <n> --merge --delete-branch` (`--squash` and `--rebase` forbidden). After merge: `git branch -D <branch>`. Enforced by hookify rules in `.claude/hookify.block-*.local.md`.
+- **Git workflow** — Create the feature branch (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`) **before** making any changes; never work on main then move commits after. Never commit or push to main directly. PRs are opened by the user. Merge with `gh pr merge <n> --merge --delete-branch` (`--squash` and `--rebase` forbidden). After merge: `git branch -D <branch>`. Enforced by hookify rules in `.claude/hookify.block-*.local.md`.
 - Run tests before committing; follow existing code style (read 2–3 nearby files first)
 - No features beyond what the task requires (YAGNI)
 - CLAUDE.md stays under 200 lines
