@@ -2,7 +2,7 @@ import type { InternalNote, VocHistoryEntry } from '../../../../../../shared/con
 import { CollapsibleSection } from './CollapsibleSection';
 import type { Role } from '../../../../../../shared/contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
-import { VocHistorySection } from './VocReviewSections';
+import { VocHistoryTab } from './VocHistoryTab';
 import { VocCommentList } from './VocCommentList';
 import { VocInternalNotes } from './VocInternalNotes';
 import { VocSubTaskList } from '../list/VocSubTaskList';
@@ -71,7 +71,7 @@ export function VocActionSection({
         </TabsContent>
 
         <TabsContent value="history">
-          <VocHistorySection entries={historyEntries} loading={historyLoading} />
+          <VocHistoryTab entries={historyEntries} loading={historyLoading} />
         </TabsContent>
 
         <TabsContent value="subtask">

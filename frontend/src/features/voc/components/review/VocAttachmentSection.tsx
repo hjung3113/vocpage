@@ -1,6 +1,4 @@
 import { Button } from '@shared/ui/button';
-import { LoadingState } from '@shared/ui/skeleton';
-import type { VocHistoryEntry } from '../../../../../../shared/contracts/voc';
 import { CollapsibleSection } from './CollapsibleSection';
 
 export interface AttachmentItem {
@@ -56,50 +54,6 @@ export function VocAttachmentSection({ items, canUpload }: AttachmentSectionProp
         >
           파일 업로드
         </Button>
-      )}
-    </CollapsibleSection>
-  );
-}
-
-interface HistorySectionProps {
-  entries: VocHistoryEntry[] | undefined;
-  loading: boolean;
-}
-
-const FIELD_LABEL: Record<string, string> = {
-  status: '상태',
-  priority: '우선순위',
-  assignee_id: '담당자',
-  due_date: '마감일',
-  title: '제목',
-};
-
-export function VocHistorySection({ entries, loading }: HistorySectionProps) {
-  return (
-    <CollapsibleSection title="변경이력" testId="drawer-history">
-      {loading && <LoadingState />}
-      {!loading && entries && entries.length === 0 && (
-        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-          변경 이력이 없습니다.
-        </p>
-      )}
-      {entries && entries.length > 0 && (
-        <ol className="flex flex-col gap-2">
-          {entries.map((h) => (
-            <li
-              key={h.id}
-              className="rounded border p-2 text-xs"
-              style={{ borderColor: 'var(--border-standard)' }}
-            >
-              <div style={{ color: 'var(--text-secondary)' }}>
-                {h.changed_at.slice(0, 16).replace('T', ' ')}
-              </div>
-              <div style={{ color: 'var(--text-primary)' }}>
-                {FIELD_LABEL[h.field] ?? h.field}: {h.old_value ?? '∅'} → {h.new_value ?? '∅'}
-              </div>
-            </li>
-          ))}
-        </ol>
       )}
     </CollapsibleSection>
   );

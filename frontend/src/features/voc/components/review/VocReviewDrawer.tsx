@@ -9,14 +9,14 @@ import { type InternalNote } from '../../../../../../shared/contracts/voc';
 import { VocPermissionGate } from './VocPermissionGate';
 import { LoadingState } from '@shared/ui/skeleton';
 import { ErrorState } from '@shared/ui/error-state';
-import { type AttachmentItem } from './VocReviewSections';
+import { type AttachmentItem } from './VocAttachmentSection';
 import { VocActionSection } from './VocActionSection';
 import { VocDetailSection } from './VocDetailSection';
 import { VocPeopleSection } from './VocPeopleSection';
 import { VocDateSection } from './VocDateSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
 import { VocBodySection } from './VocBodySection';
-import { VocAttachmentSection } from './VocReviewSections';
+import { VocAttachmentSection } from './VocAttachmentSection';
 import { CollapsibleSection } from './CollapsibleSection';
 
 const ISSUE_CODE_STYLE: React.CSSProperties = {
