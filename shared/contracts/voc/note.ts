@@ -45,3 +45,16 @@ export const VocHistoryListResponse = z.object({
   rows: z.array(VocHistoryEntry),
 });
 export type VocHistoryListResponse = z.infer<typeof VocHistoryListResponse>;
+
+export const Comment = z.object({
+  id: Uuid,
+  voc_id: Uuid,
+  author_id: Uuid,
+  body: z.string().min(1).max(16_384),
+  created_at: Iso,
+  updated_at: Iso,
+});
+export type Comment = z.infer<typeof Comment>;
+
+export const CommentListResponse = z.object({ rows: z.array(Comment) });
+export type CommentListResponse = z.infer<typeof CommentListResponse>;

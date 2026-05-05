@@ -1,9 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState, useContext } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog';
 import { cn } from '@shared/lib/cn';
-import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
+import {
+  useVocDetail,
+  useVocHistory,
+  useVocComments,
+  useVocSubtasks,
+} from '../model/useDrawerQueries';
 import { useVocPermissions } from '../model/useVocPermissions';
 import { AuthContext } from '@features/auth/model/AuthContext';
 import { type InternalNote } from '@contracts/voc';
@@ -44,24 +48,6 @@ interface Props {
   onAddNote: (id: string, body: string) => Promise<unknown>;
 }
 
-function useVocDetail(id: string | null) {
-  const { role } = useRole();
-  return useQuery({
-    queryKey: id ? vocQueryKeys.detail(role, id) : ['voc', role, 'detail', 'none'],
-    queryFn: () => vocApi.get(id!),
-    enabled: !!id,
-  });
-}
-
-function useVocHistory(id: string | null) {
-  const { role } = useRole();
-  return useQuery({
-    queryKey: id ? vocQueryKeys.history(role, id) : ['voc', role, 'history', 'none'],
-    queryFn: () => vocApi.history(id!),
-    enabled: !!id,
-  });
-}
-
 export function VocReviewDrawer({
   vocId,
   notes,
@@ -78,6 +64,8 @@ export function VocReviewDrawer({
 }: Props) {
   const detail = useVocDetail(vocId);
   const history = useVocHistory(vocId);
+  const comments = useVocComments(vocId);
+  const subtasks = useVocSubtasks(vocId);
   const { canWrite, canUpload, canSeeInternal } = useVocPermissions();
   const { role } = useRole();
   const auth = useContext(AuthContext);
@@ -178,10 +166,14 @@ export function VocReviewDrawer({
                 canWrite={canWrite}
                 canSeeInternal={canSeeInternal}
                 pending={pending}
+                comments={comments.data}
+                commentsLoading={comments.isLoading}
                 notes={notes}
                 notesLoading={notesLoading}
                 historyEntries={history.data}
                 historyLoading={history.isLoading}
+                subtasks={subtasks.data}
+                subtasksLoading={subtasks.isLoading}
                 onAddNote={(body) => void onAddNote(voc.id, body)}
               />
             </div>

@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiPatch } from '@shared/api/client';
+import { z } from 'zod';
 import {
   VocListResponse,
   VocDetail,
@@ -10,7 +11,14 @@ import {
   InternalNoteCreate,
   VocHistoryListResponse,
   type VocHistoryEntry,
+  CommentListResponse,
+  type Comment,
+  VocStatus,
 } from '@contracts/voc';
+
+const SubTaskListResponse = z.object({
+  rows: z.array(z.object({ id: z.string(), title: z.string(), status: VocStatus })),
+});
 
 function toQs(query: Partial<VocListQuery>): string {
   const params = new URLSearchParams();
@@ -51,5 +59,11 @@ export const vocApi = {
   },
   history(id: string): Promise<VocHistoryEntry[]> {
     return apiGet(`/api/vocs/${id}/history`, VocHistoryListResponse).then((r) => r.rows);
+  },
+  comments(id: string): Promise<Comment[]> {
+    return apiGet(`/api/vocs/${id}/comments`, CommentListResponse).then((r) => r.rows);
+  },
+  subtasks(id: string): Promise<z.infer<typeof SubTaskListResponse>['rows']> {
+    return apiGet(`/api/vocs/${id}/subtasks`, SubTaskListResponse).then((r) => r.rows);
   },
 };

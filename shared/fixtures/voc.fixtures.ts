@@ -17,6 +17,8 @@ import {
   type InternalNote as InternalNoteT,
   VocHistoryEntry,
   type VocHistoryEntry as VocHistoryEntryT,
+  Comment,
+  type Comment as CommentT,
 } from '../contracts/voc/note';
 import { FIXTURE_USERS } from '../contracts/voc/users';
 
@@ -102,7 +104,7 @@ const SPECS: ReadonlyArray<RowSpec> = (() => {
     priority: 'high',
     assigneeId: FIXTURE_USERS.devSelf,
     authorId: FIXTURE_USERS.user,
-    parentId: 'aaaaaaaa-0000-4000-8000-100000000001',
+    parentId: 'aaaaaaaa-0000-4000-8000-000000000001',
   });
   return out.slice(0, 50);
 })();
@@ -212,5 +214,32 @@ export const VOC_HISTORY_FIXTURES: ReadonlyArray<VocHistoryEntryT> = [
     new_value: '완료',
     changed_by: FIXTURE_USERS.manager,
     changed_at: baseDate(4),
+  }),
+];
+
+export const VOC_COMMENT_FIXTURES: ReadonlyArray<CommentT> = [
+  Comment.parse({
+    id: 'dddddddd-0000-4000-8000-000000000001',
+    voc_id: VOC_FIXTURES[0]!.id,
+    author_id: FIXTURE_USERS.manager,
+    body: '초기 분류 완료했습니다. 우선순위를 high로 올렸으니 확인 부탁드립니다.',
+    created_at: baseDate(1),
+    updated_at: baseDate(1),
+  }),
+  Comment.parse({
+    id: 'dddddddd-0000-4000-8000-000000000002',
+    voc_id: VOC_FIXTURES[0]!.id,
+    author_id: FIXTURE_USERS.devSelf,
+    body: '확인했습니다. 재현 환경 세팅 후 원인 분석 시작하겠습니다.',
+    created_at: baseDate(2),
+    updated_at: baseDate(2),
+  }),
+  Comment.parse({
+    id: 'dddddddd-0000-4000-8000-000000000003',
+    voc_id: VOC_FIXTURES[0]!.id,
+    author_id: FIXTURE_USERS.devSelf,
+    body: '원인 파악 완료 — DB 인덱스 누락으로 인한 타임아웃이었습니다. 핫픽스 배포 예정입니다.',
+    created_at: baseDate(3),
+    updated_at: baseDate(4),
   }),
 ];

@@ -1,11 +1,11 @@
-import type { InternalNote, VocHistoryEntry } from '@contracts/voc';
+import type { InternalNote, VocHistoryEntry, Comment } from '@contracts/voc';
 import { CollapsibleSection } from './CollapsibleSection';
 import type { Role } from '@contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistory } from './VocHistory';
 import { VocComment } from './VocComment';
 import { VocInternalNotes } from './VocInternalNotes';
-import { VocSubTask } from './VocSubTask';
+import { VocSubTask, type SubTaskItem } from './VocSubTask';
 
 interface Props {
   vocId: string;
@@ -16,10 +16,14 @@ interface Props {
   canWrite: boolean;
   canSeeInternal: boolean;
   pending: boolean;
+  comments: Comment[] | undefined;
+  commentsLoading: boolean;
   notes: InternalNote[] | undefined;
   notesLoading: boolean;
   historyEntries: VocHistoryEntry[] | undefined;
   historyLoading: boolean;
+  subtasks: SubTaskItem[] | undefined;
+  subtasksLoading: boolean;
   onAddNote: (body: string) => void;
 }
 
@@ -32,10 +36,12 @@ export function VocActionSection({
   canWrite,
   canSeeInternal,
   pending,
+  comments,
   notes,
   notesLoading,
   historyEntries,
   historyLoading,
+  subtasks,
   onAddNote,
 }: Props) {
   return (
@@ -59,9 +65,8 @@ export function VocActionSection({
         </TabsList>
 
         <TabsContent value="comment">
-          {/* TODO(FU): wire api/comments + react-query mutations. C-14 ships UI only. */}
           <VocComment
-            comments={[]}
+            comments={comments ?? []}
             currentUserId={currentUserId}
             canWrite={canWrite}
             pending={pending}
@@ -76,11 +81,10 @@ export function VocActionSection({
         </TabsContent>
 
         <TabsContent value="subtask">
-          {/* TODO(FU): wire subtask CRUD + onOpen navigation. C-16 ships UI only. */}
           <VocSubTask
             parentId={vocId}
             parentIsSubtask={parentIsSubtask}
-            subs={[]}
+            subs={subtasks ?? []}
             canAdd={canWrite}
             onOpen={() => {}}
             onAdd={() => {}}

@@ -12,6 +12,7 @@ import {
   VOC_FIXTURES,
   VOC_NOTES_FIXTURES,
   VOC_HISTORY_FIXTURES,
+  VOC_COMMENT_FIXTURES,
   VOC_TAG_RELATIONS,
   FIXTURE_USERS,
 } from '../../../../../shared/fixtures/voc.fixtures';
@@ -262,6 +263,20 @@ export const vocHandlers = [
 
   http.get('/api/vocs/:id/history', ({ params }) => {
     const rows = VOC_HISTORY_FIXTURES.filter((h) => h.voc_id === params.id);
+    return HttpResponse.json({ rows });
+  }),
+
+  http.get('/api/vocs/:id/comments', ({ params }) => {
+    const rows = VOC_COMMENT_FIXTURES.filter((c) => c.voc_id === params.id);
+    return HttpResponse.json({ rows });
+  }),
+
+  http.get('/api/vocs/:id/subtasks', ({ params }) => {
+    const rows = VOC_FIXTURES.filter((v) => v.parent_id === params.id).map((v) => ({
+      id: v.id,
+      title: v.title,
+      status: v.status,
+    }));
     return HttpResponse.json({ rows });
   }),
 ];
