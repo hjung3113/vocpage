@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import type { CSSProperties, KeyboardEvent } from 'react';
 import type { VocListResponse } from '@contracts/voc';
-import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from '@features/voc-list-filter/ui/vocGridLayout';
+import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from '@features/voc-list-filter';
 import {
   VocStatusBadge,
   VocPriorityBadge,

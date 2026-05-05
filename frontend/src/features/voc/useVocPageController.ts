@@ -7,7 +7,6 @@ import { useRole } from '@entities/user/model/useRole';
 import { useCreateVoc } from '@features/voc-create/model/useCreateVoc';
 import { mastersApi, masterQueryKeys } from '@entities/master';
 import { notificationsApi, notificationQueryKeys } from '@entities/notification';
-import { userQueryKeys } from '@entities/user';
 import type { VocFilter, VocSortColumn, SortDir, VocCreate, VocStatus } from '@contracts/voc';
 import type { NotificationItem } from '@contracts/notification';
 
@@ -23,7 +22,7 @@ export function useVocPageController() {
   const notes = useNotes(vocId);
 
   const assigneesQ = useQuery({
-    queryKey: userQueryKeys.list(role.role, { kind: 'assignees' }),
+    queryKey: masterQueryKeys.assignees.list(role.role),
     queryFn: () => mastersApi.assignees(),
     staleTime: 5 * 60_000,
   });
@@ -33,7 +32,7 @@ export function useVocPageController() {
     staleTime: 5 * 60_000,
   });
   const vocTypesQ = useQuery({
-    queryKey: ['masters', role.role, 'voc-types'] as const,
+    queryKey: masterQueryKeys.vocTypes.list(role.role),
     queryFn: () => mastersApi.vocTypes(),
     staleTime: 5 * 60_000,
   });
