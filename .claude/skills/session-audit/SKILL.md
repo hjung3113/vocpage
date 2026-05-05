@@ -35,7 +35,7 @@ Analyze a session jsonl with 4 blind experts to accumulate behavior, cost, and r
 ### Step 2 — Stats collection (one-shot)
 
 ```bash
-bash utils/session-stats.sh <sessionId>
+bash .claude/utils/session-stats.sh <sessionId>
 ```
 
 **Whitelist for what experts see**: `span`, `tokens.{grand_total,cache_hit_rate,output,cache_create}`, `tokens.cache_invalidation`, `by_tool`, `by_prompt[*].{ts,calls,tokens,out}`, `events.by_type.{attachment,user,assistant}`. Everything else stays with main.
