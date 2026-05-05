@@ -8,7 +8,7 @@ import { useCreateVoc } from '@features/voc-create/model/useCreateVoc';
 import { mastersApi } from '../../api/masters';
 import { notificationsApi } from '../../api/notifications';
 import { queryKeys } from '../../api/queryKeys';
-import type { VocFilter, VocSortColumn, SortDir, VocCreate } from '@contracts/voc';
+import type { VocFilter, VocSortColumn, SortDir, VocCreate, VocStatus } from '@contracts/voc';
 import type { NotificationItem } from '@contracts/notification';
 
 /** Single composition root for the VOC page — keeps `VocListPage` thin. */
@@ -60,7 +60,7 @@ export function useVocPageController() {
   }, [assigneesQ.data]);
 
   const onStatusChange = useCallback(
-    (next: import('../../../../shared/contracts/voc').VocStatus[] | 'all') => {
+    (next: VocStatus[] | 'all') => {
       const status = next === 'all' ? undefined : next;
       setFilter({ ...filter, status });
     },
