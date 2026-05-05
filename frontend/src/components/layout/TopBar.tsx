@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react';
-import { useRole } from '../../hooks/useRole';
+import { useRole } from '@features/auth/model/useRole';
 
 interface TopBarProps {
   title: string;

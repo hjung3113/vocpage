@@ -2,7 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { AuthProvider, AuthContext, AuthContextValue } from '../AuthContext';
-import * as authApi from '../../api/auth';
+import * as userApi from '../../entities/user/api/userApi';
+import * as authApi from '../../features/auth/api/authApi';
 import { useContext } from 'react';
 
 function TestConsumer() {
@@ -31,7 +32,7 @@ beforeEach(() => {
 });
 
 test('미인증 초기 상태: getMe 실패 시 user=null, isLoading=false', async () => {
-  vi.spyOn(authApi, 'getMe').mockResolvedValue(null);
+  vi.spyOn(userApi, 'getMe').mockResolvedValue(null);
   renderWithProvider();
 
   await waitFor(() => {
@@ -41,7 +42,7 @@ test('미인증 초기 상태: getMe 실패 시 user=null, isLoading=false', asy
 });
 
 test('세션 복구: getMe 성공 시 user 설정', async () => {
-  vi.spyOn(authApi, 'getMe').mockResolvedValue({
+  vi.spyOn(userApi, 'getMe').mockResolvedValue({
     id: '1',
     email: 'admin@test.com',
     name: 'Admin',
@@ -55,7 +56,7 @@ test('세션 복구: getMe 성공 시 user 설정', async () => {
 });
 
 test('logout 후 user=null', async () => {
-  vi.spyOn(authApi, 'getMe').mockResolvedValue({
+  vi.spyOn(userApi, 'getMe').mockResolvedValue({
     id: '1',
     email: 'admin@test.com',
     name: 'Admin',
@@ -78,7 +79,7 @@ test('logout 후 user=null', async () => {
 });
 
 test('getMe가 네트워크 에러 throw 시 user=null, isLoading=false', async () => {
-  vi.spyOn(authApi, 'getMe').mockRejectedValue(new Error('network error'));
+  vi.spyOn(userApi, 'getMe').mockRejectedValue(new Error('network error'));
   renderWithProvider();
 
   await waitFor(() => {
@@ -88,7 +89,7 @@ test('getMe가 네트워크 에러 throw 시 user=null, isLoading=false', async 
 });
 
 test('mock 모드 아닐 때 login 호출 시 에러', async () => {
-  vi.spyOn(authApi, 'getMe').mockResolvedValue(null);
+  vi.spyOn(userApi, 'getMe').mockResolvedValue(null);
 
   let capturedCtx: AuthContextValue | null = null;
 

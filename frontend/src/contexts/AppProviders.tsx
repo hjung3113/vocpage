@@ -1,8 +1,8 @@
 import React from 'react';
-import { AuthProvider } from './AuthContext';
-import { NotificationProvider } from './NotificationContext';
-import { MasterCacheProvider } from './MasterCacheContext';
-import { VOCFilterProvider } from './VOCFilterContext';
+import { AuthProvider } from '@features/auth/model/AuthContext';
+import { NotificationProvider } from '@features/notification/model/NotificationContext';
+import { MasterCacheProvider } from '@features/master-cache/model/MasterCacheContext';
+import { VOCFilterProvider } from '@features/voc-list-filter/model/VocFilterContext';
 import { VOCDrawerProvider } from './VOCDrawerContext';
 
 const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {

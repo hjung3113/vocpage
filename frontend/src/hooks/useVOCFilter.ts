@@ -1,8 +1,2 @@
-import { useContext } from 'react';
-import { VOCFilterContext, VOCFilterContextValue } from '../contexts/VOCFilterContext';
-
-export function useVOCFilter(): VOCFilterContextValue {
-  const ctx = useContext(VOCFilterContext);
-  if (!ctx) throw new Error('useVOCFilter must be used within VOCFilterProvider');
-  return ctx;
-}
+// Moved to features/voc-list-filter/model/useVocFilter (Step 4)
+export { useVocFilter as useVOCFilter } from '@features/voc-list-filter/model/useVocFilter';
