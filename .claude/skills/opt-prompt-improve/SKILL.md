@@ -105,38 +105,42 @@ Use these to make proposals **specific** (e.g., "rubric should down-weight tasks
 
 ### Step 5 — Numbered Proposal List
 
+> **Proposal scope rule**: Prefer rubric/workflow-level proposals (e.g., adjusting a tier threshold, restructuring a phase, changing a gate trigger condition) over micro-fixes (single gate add/remove). Emit micro-fix proposals only when the same gate pattern recurs N≥5 times across closed decisions. _Example — micro-fix: "add `contract-test` to Expand list"; rubric-level: "raise small scope LOC ceiling from 100 to 150 LOC"._
+
+> **Dedup check before numbering**: For each candidate proposal, read the target SKILL.md to verify it does not already reflect the fix (e.g., gate already in Trim list, threshold already matches the suggestion). If already reflected, exclude from the numbered list — append as `(already applied — verify effectiveness)` without a number, below the main list.
+
 After all tiers, emit a consolidated numbered list:
 
 ```
 Proposals
 ─────────
 [T0] #1  [output-format] fb-20260504T184423-5c7fa6
-         Phase 필드가 '설계 결과물'이 아닌 '탐색 순서'여야 함.
-         → opt-prompt/SKILL.md §Phase output format 수정
+         Phase fields should describe exploration order, not design deliverables.
+         → opt-prompt/SKILL.md §Phase output format: revise rule
 
 [T1] #2  scope=medium wrong-rate 60% (3/5), dominant: undersized
-         → opt-prompt/SKILL.md Expand list에 `contract-test` gate 추가
+         → opt-prompt/SKILL.md Expand list: add `contract-test` gate
 
 [T2] #3  oversized cohort median tokens > correct cohort (+40%)
-         → opt-prompt/SKILL.md Trim list에서 `post-PR codex review` 조건 완화
+         → opt-prompt/SKILL.md Trim list: relax `post-PR codex review` condition
 
-none     샘플 부족으로 Tier-2 추가 제안 없음 (N<5)
+none     Insufficient sample for additional Tier-2 proposals (N<5)
 ```
 
-If no proposals exist at any tier, emit: `제안 없음 — 현재 로그/피드백으로는 충분한 패턴이 없습니다.` and STOP.
+If no proposals exist at any tier, emit: `No proposals — insufficient pattern data in current log/feedback.` and STOP.
 
 ### Step 6 — User Approval Gate
 
 After the proposal list, ask exactly:
 
-> 적용할 제안 번호? (전체 / 1,3 / none)
+> Which proposals to apply? (all / 1,3 / none)
 
 Wait for the user's response. Parse:
 
-- `전체` or `all` → apply all proposals
+- `all` → apply all proposals
 - Digits / commas / spaces → extract all integers with `re.findall(r'\d+', response)`, deduplicate, sort
-  - If any extracted number exceeds the proposal count, ask once: "다음 번호는 무효합니다: [X]. 다시 입력해주세요."
-- `none`, `취소`, `x`, or empty response → STOP without editing
+  - If any extracted number exceeds the proposal count, ask once: "The following numbers are invalid: [X]. Please re-enter."
+- `none`, `cancel`, `x`, or empty response → STOP without editing
 
 ### Step 7 — Apply
 
@@ -146,17 +150,17 @@ For each approved proposal, edit the target SKILL.md using the `Edit` tool. Rule
 - **Surgical changes only** — change only the exact lines the proposal targets; do not reformat surrounding text.
 - **Never delete the `## Anti-patterns` section** of any skill.
 - If the edit would conflict with another approved proposal (overlapping lines), apply in numbered order and re-read the file between edits.
-- **"Ambiguous"** means: (a) the proposal describes only intent without enough text to form a unique `old_string` for the `Edit` tool, or (b) the `Edit` tool returns a mismatch/not-found error. In either case, pause and ask: "제안 #N의 대상 위치를 찾지 못했습니다. 수동 편집하시겠어요?" Do NOT mark the proposal as applied.
+- **"Ambiguous"** means: (a) the proposal describes only intent without enough text to form a unique `old_string` for the `Edit` tool, or (b) the `Edit` tool returns a mismatch/not-found error. In either case, pause and ask: "Could not locate the target for proposal #N. Edit manually?" Do NOT mark the proposal as applied.
 - **"Applied"** means the `Edit` tool returned success with no error. Skipped (ambiguous) proposals are NOT applied regardless of user approval.
 
 After all edits, show a summary:
 
 ```
-적용 완료
-─────────
-#1 → opt-prompt/SKILL.md 수정됨
-#2 → opt-prompt/SKILL.md 수정됨
-건너뜀: #3 (위치 모호 — 수동 편집 필요)
+Applied
+───────
+#1 → opt-prompt/SKILL.md updated
+#2 → opt-prompt/SKILL.md updated
+Skipped: #3 (target location ambiguous — manual edit required)
 ```
 
 ### Step 8 — Resolve Feedback
