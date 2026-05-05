@@ -1,14 +1,11 @@
-export interface AuthUser {
-  id: string;
-  email?: string;
-  name: string;
-  role: 'admin' | 'manager' | 'dev' | 'user';
-  department?: string;
-}
+// AuthUser/AuthRole/getMe moved to entities/user/api/userApi (Step 3)
+// mockLogin/logout will move to features/auth/api/authApi (Step 4)
+export type { AuthUser, AuthRole } from '@entities/user/api/userApi';
+export { getMe } from '@entities/user/api/userApi';
 
-export type AuthRole = AuthUser['role'];
+import type { AuthUser } from '@entities/user/api/userApi';
 
-export async function mockLogin(role: AuthRole): Promise<AuthUser> {
+export async function mockLogin(role: AuthUser['role']): Promise<AuthUser> {
   const res = await fetch('/api/auth/mock-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -22,10 +19,4 @@ export async function mockLogin(role: AuthRole): Promise<AuthUser> {
 
 export async function logout(): Promise<void> {
   await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-}
-
-export async function getMe(): Promise<AuthUser | null> {
-  const res = await fetch('/api/auth/me', { credentials: 'include' });
-  if (!res.ok) return null;
-  return res.json() as Promise<AuthUser>;
 }
