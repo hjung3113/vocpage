@@ -1,7 +1,7 @@
 {
   "version": 2,
   "registry_version": 2,
-  "updated": "2026-05-04",
+  "updated": "2026-05-05T05:02:29.448521+00:00",
   "fix_type_strength": ["hookify", "claude_md", "spec", "manual"],
   "rule_taxonomy": [
     "tool_routing",
@@ -99,11 +99,13 @@
       "detection": "Read tool_use에 같은 path 2회+ (수정 사이 제외)",
       "hookify_feasible": true,
       "allowed_fix_types": ["hookify", "claude_md", "spec", "manual"],
-      "status": "candidate",
+      "status": "promoted",
       "fix_history": [],
       "regression_count": 0,
       "reactivation_count": 0,
-      "baseline_hooked": false
+      "baseline_hooked": false,
+      "promoted_at": "2026-05-05T04:54:19.386247+00:00",
+      "promotion_note": "occ=6/7, 4 work_types, raw_conf≈0.57, 3-expert agreement in latest session"
     },
     {
       "id": "R2",
@@ -112,16 +114,29 @@
       "detection": "연속 assistant 턴 각 tool 1개·의존 없음",
       "hookify_feasible": false,
       "allowed_fix_types": ["claude_md", "spec", "manual"],
-      "status": "claude_md_added",
+      "status": "spec_added",
       "fix_history": [
         {
           "fix_type": "claude_md",
           "reference": "file:CLAUDE.md",
           "applied_at": "2026-05-04T17:22:23.397758+00:00",
           "note": "Strengthened parallel tool call rule with explicit violation patterns and examples"
+        },
+        {
+          "fix_type": "transition",
+          "reference": "session:0221f5ca-909d-4d03-af8f-78a34396a839",
+          "applied_at": "2026-05-05T04:54:19.386247+00:00",
+          "note": "claude_md_added → under_remediation → regressed: R2 recurred in docs_conventions session (7 instances, 4-expert agreement) the day after CLAUDE.md fix was applied"
+        },
+        {
+          "fix_type": "spec",
+          "reference": "file:.claude/specs/parallel-dispatch.md",
+          "queued_at": "2026-05-05T04:57:33.106185+00:00",
+          "note": "Escalated spec after CLAUDE.md regression. Covers B1-B4 + M1-M3 from adversarial review: argument-writability gate, \"read A first\" trap, same-file Edit tightened, closed exception list, CLAUDE.md pointer added, 10-item rationalization table.",
+          "applied_at": "2026-05-05T05:02:29.448521+00:00"
         }
       ],
-      "regression_count": 0,
+      "regression_count": 1,
       "reactivation_count": 0,
       "baseline_hooked": false
     },
@@ -475,6 +490,36 @@
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": false
+    },
+    {
+      "id": "R16",
+      "category": "rule_violation",
+      "title": "Skill 도구를 CLI 내장 명령에 사용",
+      "detection": "Skill tool_use에 compact/clear 등 내장 CLI 커맨드",
+      "hookify_feasible": false,
+      "allowed_fix_types": ["claude_md", "spec", "manual"],
+      "status": "candidate",
+      "fix_history": [],
+      "regression_count": 0,
+      "reactivation_count": 0,
+      "baseline_hooked": false,
+      "added_from_session": "0221f5ca-909d-4d03-af8f-78a34396a839",
+      "added_at": "2026-05-05T04:54:19.386247+00:00"
+    },
+    {
+      "id": "R17",
+      "category": "rule_violation",
+      "title": "Doc 파일 Read limit 미지정",
+      "detection": "Read tool_use on .md file without limit param (claude-progress.txt 제외)",
+      "hookify_feasible": false,
+      "allowed_fix_types": ["claude_md", "spec", "manual"],
+      "status": "candidate",
+      "fix_history": [],
+      "regression_count": 0,
+      "reactivation_count": 0,
+      "baseline_hooked": false,
+      "added_from_session": "0221f5ca-909d-4d03-af8f-78a34396a839",
+      "added_at": "2026-05-05T04:54:19.386247+00:00"
     }
   ]
 }
