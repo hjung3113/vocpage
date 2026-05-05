@@ -1,7 +1,8 @@
 import { LoadingState } from '@shared/ui/skeleton';
 import type { VocHistoryEntry } from '@contracts/voc';
 import { VOC_FIELD_LABELS } from '@features/voc/constants';
-import { ActivityAvatar, formatActivityTime } from './ActivityAvatar';
+import { ActivityAvatar } from './ActivityAvatar';
+import { formatActivityTime } from '../lib/formatActivityTime';
 
 interface Props {
   entries: VocHistoryEntry[] | undefined;

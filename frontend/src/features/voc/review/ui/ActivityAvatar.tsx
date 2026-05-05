@@ -1,5 +1,3 @@
-export { formatActivityTime } from '../lib/formatActivityTime';
-
 interface Props {
   userId: string;
 }

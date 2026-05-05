@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Textarea } from '@shared/ui/textarea';
 import type { Comment } from '@contracts/voc';
-import { ActivityAvatar, formatActivityTime } from './ActivityAvatar';
+import { ActivityAvatar } from './ActivityAvatar';
+import { formatActivityTime } from '../lib/formatActivityTime';
 
 export type { Comment };
 

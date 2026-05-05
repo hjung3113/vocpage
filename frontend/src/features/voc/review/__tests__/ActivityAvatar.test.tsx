@@ -8,7 +8,8 @@ describe('formatActivityTime', () => {
     expect(formatActivityTime('2026-05-06T10:30:00')).toBe('2026-05-06 10:30');
   });
 
-  it('Z suffix가 있어도 앞 16자를 슬라이스한다', () => {
+  it('Z suffix가 있어도 로컬 타임존 변환 없이 슬라이스 — 추후 서버측 localtime 반환 시 정상', () => {
+    // TODO: 서버가 UTC ISO를 반환할 경우 localtime 변환 필요
     expect(formatActivityTime('2026-01-01T00:00:00Z')).toBe('2026-01-01 00:00');
   });
 });
