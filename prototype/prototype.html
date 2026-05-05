@@ -1,1080 +1,1303 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VOCpage — Prototype</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout/sidebar.css">
-<link rel="stylesheet" href="css/layout/topbar.css">
-<link rel="stylesheet" href="css/layout/filter.css">
-<link rel="stylesheet" href="css/layout/list.css">
-<link rel="stylesheet" href="css/components/drawer.css">
-<link rel="stylesheet" href="css/components/drawer-readonly.css">
-<link rel="stylesheet" href="css/components/modal.css">
-<link rel="stylesheet" href="css/components/notification-panel.css">
-<link rel="stylesheet" href="css/components/misc.css">
-<link rel="stylesheet" href="css/components/badges.css">
-<link rel="stylesheet" href="css/components/admin-states.css">
-<link rel="stylesheet" href="css/components/notice-popup.css">
-<link rel="stylesheet" href="css/admin/dashboard-overview.css">
-<link rel="stylesheet" href="css/admin/dashboard-widgets.css">
-<link rel="stylesheet" href="css/admin/dashboard-charts.css">
-<link rel="stylesheet" href="css/admin/dashboard-settings.css">
-<link rel="stylesheet" href="css/admin/dashboard-edit.css">
-<link rel="stylesheet" href="css/admin/admin-shared.css">
-<link rel="stylesheet" href="css/admin/result-review.css">
-<link rel="stylesheet" href="css/admin/internal-notes.css">
-<link rel="stylesheet" href="css/admin/attachment-errors.css">
-<link rel="stylesheet" href="css/admin/tag-master.css">
-<link rel="stylesheet" href="css/admin/trash.css">
-<link rel="stylesheet" href="css/admin/external-masters.css">
-<link rel="stylesheet" href="css/admin/notifications.css">
-<link rel="stylesheet" href="css/admin/mode-toggle.css">
-<link rel="stylesheet" href="css/admin/dashboard-settings-panel.css">
-<link rel="stylesheet" href="css/admin/admin-users.css">
-<link rel="stylesheet" href="css/admin/drawer-advanced.css">
-<link rel="stylesheet" href="css/admin/notice-faq-admin.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOCpage — Prototype</title>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout/sidebar.css">
+  <link rel="stylesheet" href="css/layout/topbar.css">
+  <link rel="stylesheet" href="css/layout/filter.css">
+  <link rel="stylesheet" href="css/layout/list.css">
+  <link rel="stylesheet" href="css/components/drawer.css">
+  <link rel="stylesheet" href="css/components/drawer-readonly.css">
+  <link rel="stylesheet" href="css/components/modal.css">
+  <link rel="stylesheet" href="css/components/notification-panel.css">
+  <link rel="stylesheet" href="css/components/misc.css">
+  <link rel="stylesheet" href="css/components/badges.css">
+  <link rel="stylesheet" href="css/components/admin-states.css">
+  <link rel="stylesheet" href="css/components/notice-popup.css">
+  <link rel="stylesheet" href="css/admin/dashboard-overview.css">
+  <link rel="stylesheet" href="css/admin/dashboard-widgets.css">
+  <link rel="stylesheet" href="css/admin/dashboard-charts.css">
+  <link rel="stylesheet" href="css/admin/dashboard-settings.css">
+  <link rel="stylesheet" href="css/admin/dashboard-edit.css">
+  <link rel="stylesheet" href="css/admin/admin-shared.css">
+  <link rel="stylesheet" href="css/admin/result-review.css">
+  <link rel="stylesheet" href="css/admin/internal-notes.css">
+  <link rel="stylesheet" href="css/admin/attachment-errors.css">
+  <link rel="stylesheet" href="css/admin/tag-master.css">
+  <link rel="stylesheet" href="css/admin/trash.css">
+  <link rel="stylesheet" href="css/admin/external-masters.css">
+  <link rel="stylesheet" href="css/admin/notifications.css">
+  <link rel="stylesheet" href="css/admin/mode-toggle.css">
+  <link rel="stylesheet" href="css/admin/dashboard-settings-panel.css">
+  <link rel="stylesheet" href="css/admin/admin-users.css">
+  <link rel="stylesheet" href="css/admin/drawer-advanced.css">
+  <link rel="stylesheet" href="css/admin/notice-faq-admin.css">
 </head>
 
 <body>
-<div class="app">
+  <div class="app">
 
-<!-- ── Sidebar ─── -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark"><i data-lucide="message-square-dot"></i></div>
-    <span class="logo-text">VOCpage</span>
-    <span class="logo-badge">BETA</span>
-  </div>
-  <div class="sidebar-section">
-    <div class="section-label">보기</div>
-    <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span class="nav-badge accent" id="allBadge">0</span></div>
-    <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC <span class="nav-badge muted" id="mineBadge"></span></div>
-    <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-view="assigned"><i data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
-    <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-page="dashboard"><i data-lucide="bar-chart-2"></i> 대시보드</div>
-  </div>
-  <div class="sidebar-nav">
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="section-label">시스템</div>
-    <div id="sidebarSystems"></div>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="section-label">정보</div>
-    <div class="nav-item" onclick="setNav(this)" data-view="notices"><i data-lucide="bell"></i> 공지사항 <span class="nav-badge" id="noticeBadge" style="display:none"></span></div>
-    <div class="nav-item" onclick="setNav(this)" data-view="faq"><i data-lucide="help-circle"></i> FAQ</div>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section" data-role-section="admin">
-    <div class="section-label">관리자</div>
-    <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="tag-rules"><i data-lucide="tag"></i> 태그 규칙 관리</div>
-    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="system-menu"><i data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
-    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="voc-type"><i data-lucide="layers"></i> 유형 관리</div>
-    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="users"><i data-lucide="users"></i> 사용자 관리</div>
-    <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-page="result-review"><i data-lucide="check-square"></i> 결과 검토 <span class="nav-badge accent" id="reviewBadge"></span></div>
-    <!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
-    <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="tag-master"><i data-lucide="hash"></i> 태그 마스터</div>
-    <!-- END P-7 Tag Master -->
-    <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
-    <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="trash"><i data-lucide="trash-2"></i> 휴지통</div>
-    <!-- END P-8 Trash -->
-    <!-- BEGIN P-10 External Masters (Stage B-12) -->
-    <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="external-masters"><i data-lucide="plug"></i> 외부 마스터</div>
-    <!-- END P-10 External Masters -->
-  </div>
-  </div>
-  <div class="sidebar-user" data-tip="역할 전환 (데모)" aria-expanded="false">
-    <div class="user-avatar">홍</div>
-    <div style="flex:1;min-width:0"><div class="user-name">홍길동</div><div class="user-role">Admin</div></div>
-    <i data-lucide="chevrons-up-down"></i>
-  </div>
-</aside>
-
-<!-- ── Main ─── -->
-<main class="main">
-
-<div id="page-voc">
-  <!-- Topbar -->
-  <div class="topbar">
-    <span class="topbar-title" id="topbarTitle">전체 VOC</span>
-    <span class="topbar-count" id="topbarCount">12개</span>
-    <div class="spacer"></div>
-    <div class="search-wrap">
-      <i data-lucide="search"></i>
-      <input type="text" id="searchInput" placeholder="제목, 본문 검색..." oninput="onSearch(this.value)" />
-    </div>
-    <div class="icon-btn" id="notifBtn" data-tip="알림" onclick="toggleNotif()">
-      <i data-lucide="bell"></i><span class="notif-dot"></span>
-    </div>
-    <button class="btn-primary" onclick="openModal()"><i data-lucide="plus"></i> 새 VOC 등록</button>
-  </div>
-
-  <!-- Filter bar -->
-  <div class="filterbar">
-    <span class="filter-label">필터</span>
-    <div class="pill active" onclick="togglePill(this,'전체')"><i data-lucide="layers"></i> 전체</div>
-    <div class="pill" onclick="togglePill(this,'접수')"><i data-lucide="circle"></i> 접수</div>
-    <div class="pill" onclick="togglePill(this,'검토중')"><i data-lucide="search"></i> 검토중</div>
-    <div class="pill" onclick="togglePill(this,'처리중')"><i data-lucide="zap"></i> 처리중</div>
-    <div class="pill" onclick="togglePill(this,'드랍')"><i data-lucide="pause-circle"></i> 드랍</div>
-    <div class="pill" onclick="togglePill(this,'완료')"><i data-lucide="check-circle-2"></i> 완료</div>
-    <div class="spacer"></div>
-    <button class="btn-ghost" id="filterMoreBtn" onclick="toggleAdvFilter()">
-      <i data-lucide="sliders-horizontal"></i> 필터 더보기
-    </button>
-  </div>
-
-  <!-- Advanced Filter Panel -->
-  <div class="adv-filter-wrap" id="advFilterWrap">
-    <div class="adv-filter-inner">
-      <div class="af-group">
-        <div class="af-label">담당자</div>
-        <div class="af-opts">
-          <div class="af-chip" onclick="toggleAfChip('assignee','김관리',this)">김관리</div>
-          <div class="af-chip" onclick="toggleAfChip('assignee','박개발',this)">박개발</div>
-          <div class="af-chip" onclick="toggleAfChip('assignee','이분석',this)">이분석</div>
-          <div class="af-chip" onclick="toggleAfChip('assignee','',this)">미배정</div>
+    <!-- ── Sidebar ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark"><i data-lucide="message-square-dot"></i></div>
+        <span class="logo-text">VOCpage</span>
+        <span class="logo-badge">BETA</span>
+      </div>
+      <div class="sidebar-section">
+        <div class="section-label">보기</div>
+        <div class="nav-item active" onclick="setNav(this)" data-view="all"><i data-lucide="inbox"></i> 전체 VOC <span
+            class="nav-badge accent" id="allBadge">0</span></div>
+        <div class="nav-item" onclick="setNav(this)" data-view="mine"><i data-lucide="user"></i> 내 VOC <span
+            class="nav-badge muted" id="mineBadge"></span></div>
+        <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-view="assigned"><i
+            data-lucide="user-check"></i> 담당 VOC <span class="nav-badge muted" id="assignedBadge"></span></div>
+        <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-page="dashboard"><i
+            data-lucide="bar-chart-2"></i> 대시보드</div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="section-label">시스템</div>
+          <div id="sidebarSystems"></div>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="section-label">정보</div>
+          <div class="nav-item" onclick="setNav(this)" data-view="notices"><i data-lucide="bell"></i> 공지사항 <span
+              class="nav-badge" id="noticeBadge" style="display:none"></span></div>
+          <div class="nav-item" onclick="setNav(this)" data-view="faq"><i data-lucide="help-circle"></i> FAQ</div>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section" data-role-section="admin">
+          <div class="section-label">관리자</div>
+          <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="tag-rules"><i
+              data-lucide="tag"></i> 태그 규칙 관리</div>
+          <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="system-menu"><i
+              data-lucide="folder-open"></i> 시스템/메뉴 관리</div>
+          <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="voc-type"><i
+              data-lucide="layers"></i> 유형 관리</div>
+          <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="users"><i
+              data-lucide="users"></i> 사용자 관리</div>
+          <div class="nav-item" data-role-allow="admin manager dev" onclick="setNav(this)" data-page="result-review"><i
+              data-lucide="check-square"></i> 결과 검토 <span class="nav-badge accent" id="reviewBadge"></span></div>
+          <!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
+          <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="tag-master"><i
+              data-lucide="hash"></i> 태그 마스터</div>
+          <!-- END P-7 Tag Master -->
+          <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
+          <div class="nav-item" data-role-allow="admin" onclick="setNav(this)" data-page="trash"><i
+              data-lucide="trash-2"></i> 휴지통</div>
+          <!-- END P-8 Trash -->
+          <!-- BEGIN P-10 External Masters (Stage B-12) -->
+          <div class="nav-item" data-role-allow="admin manager" onclick="setNav(this)" data-page="external-masters"><i
+              data-lucide="plug"></i> 외부 마스터</div>
+          <!-- END P-10 External Masters -->
         </div>
       </div>
-      <div class="af-group">
-        <div class="af-label">우선순위</div>
-        <div class="af-opts">
-          <div class="af-chip" onclick="toggleAfChip('priority','urgent',this)">Urgent</div>
-          <div class="af-chip" onclick="toggleAfChip('priority','high',this)">High</div>
-          <div class="af-chip" onclick="toggleAfChip('priority','medium',this)">Medium</div>
-          <div class="af-chip" onclick="toggleAfChip('priority','low',this)">Low</div>
+      <div class="sidebar-user" data-tip="역할 전환 (데모)" aria-expanded="false">
+        <div class="user-avatar">홍</div>
+        <div style="flex:1;min-width:0">
+          <div class="user-name">홍길동</div>
+          <div class="user-role">Admin</div>
         </div>
+        <i data-lucide="chevrons-up-down"></i>
       </div>
-      <div class="af-group">
-        <div class="af-label">유형</div>
-        <div class="af-chips" id="typeChips"></div>
-      </div>
-      <div class="af-group">
-        <div class="af-label">태그</div>
-        <div class="af-chips" id="tagChips"></div>
-      </div>
-      <div class="af-actions">
-        <button class="btn-ghost" style="padding:5px 10px;font-size:12px" onclick="clearAdvFilter()">초기화</button>
-      </div>
-    </div>
-  </div>
+    </aside>
 
-  <!-- List -->
-  <div class="list-area">
-    <!-- N-06: Sort chips toolbar -->
-    <div class="list-toolbar">
-      <span class="sort-label">정렬</span>
-      <div class="sort-chips" id="sortChips" role="radiogroup" aria-label="정렬 기준">
-        <button class="sort-chip" data-sort-key="date" onclick="sortByChip('date')" aria-pressed="false">등록일</button>
-        <button class="sort-chip" data-sort-key="id" onclick="sortByChip('id')" aria-pressed="false">이슈 ID</button>
-        <button class="sort-chip" data-sort-key="title" onclick="sortByChip('title')" aria-pressed="false">제목</button>
-        <button class="sort-chip" data-sort-key="status" onclick="sortByChip('status')" aria-pressed="false">상태</button>
-        <button class="sort-chip" data-sort-key="priority" onclick="sortByChip('priority')" aria-pressed="false">우선순위</button>
-        <button class="sort-chip" data-sort-key="assignee" onclick="sortByChip('assignee')" aria-pressed="false">담당자</button>
-      </div>
-    </div>
-    <div class="list-header">
-      <div></div>
-      <div class="hcell" data-sort-key="id" onclick="toggleSort('id')">이슈 ID <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
-      <div class="hcell" data-sort-key="title" onclick="toggleSort('title')">제목 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
-      <div class="hcell" data-sort-key="status" onclick="toggleSort('status')">상태 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
-      <div class="hcell" data-sort-key="assignee" onclick="toggleSort('assignee')">담당자 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
-      <div class="hcell" data-sort-key="priority" onclick="toggleSort('priority')">우선순위 <i data-lucide="chevrons-up-down" class="sort-icon"></i></div>
-      <div class="hcell sort-active" data-sort-key="date" onclick="toggleSort('date')">등록일 <i data-lucide="chevron-down" class="sort-icon"></i></div>
-    </div>
-    <div id="listArea"></div>
-    <div id="paginationRow"></div>
-  </div>
-</div><!-- /page-voc -->
+    <!-- ── Main ─── -->
+    <main class="main">
 
-<!-- ── 공지사항 ── -->
-<div id="page-notices" class="info-page admin-page"></div>
+      <div id="page-voc">
+        <!-- Topbar -->
+        <div class="topbar">
+          <span class="topbar-title" id="topbarTitle">전체 VOC</span>
+          <span class="topbar-count" id="topbarCount">12개</span>
+          <div class="spacer"></div>
+          <div class="search-wrap">
+            <i data-lucide="search"></i>
+            <input type="text" id="searchInput" placeholder="제목, 본문 검색..." oninput="onSearch(this.value)" />
+          </div>
+          <div class="icon-btn" id="notifBtn" data-tip="알림" onclick="toggleNotif()">
+            <i data-lucide="bell"></i><span class="notif-dot"></span>
+          </div>
+          <button class="btn-primary" onclick="openModal()"><i data-lucide="plus"></i> 새 VOC 등록</button>
+        </div>
 
-<!-- ── FAQ ── -->
-<div id="page-faq" class="info-page admin-page"></div>
+        <!-- Filter bar -->
+        <div class="filterbar">
+          <span class="filter-label">필터</span>
+          <div class="pill active" onclick="togglePill(this,'전체')"><i data-lucide="layers"></i> 전체</div>
+          <div class="pill" onclick="togglePill(this,'접수')"><i data-lucide="circle"></i> 접수</div>
+          <div class="pill" onclick="togglePill(this,'검토중')"><i data-lucide="search"></i> 검토중</div>
+          <div class="pill" onclick="togglePill(this,'처리중')"><i data-lucide="zap"></i> 처리중</div>
+          <div class="pill" onclick="togglePill(this,'드랍')"><i data-lucide="pause-circle"></i> 드랍</div>
+          <div class="pill" onclick="togglePill(this,'완료')"><i data-lucide="check-circle-2"></i> 완료</div>
+          <div class="spacer"></div>
+          <button class="btn-ghost" id="filterMoreBtn" onclick="toggleAdvFilter()">
+            <i data-lucide="sliders-horizontal"></i> 필터 더보기
+          </button>
+        </div>
 
-<!--
+        <!-- Advanced Filter Panel -->
+        <div class="adv-filter-wrap" id="advFilterWrap">
+          <div class="adv-filter-inner">
+            <div class="af-group">
+              <div class="af-label">담당자</div>
+              <div class="af-opts">
+                <div class="af-chip" onclick="toggleAfChip('assignee','김관리',this)">김관리</div>
+                <div class="af-chip" onclick="toggleAfChip('assignee','박개발',this)">박개발</div>
+                <div class="af-chip" onclick="toggleAfChip('assignee','이분석',this)">이분석</div>
+                <div class="af-chip" onclick="toggleAfChip('assignee','',this)">미배정</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <div class="af-label">우선순위</div>
+              <div class="af-opts">
+                <div class="af-chip" onclick="toggleAfChip('priority','urgent',this)">Urgent</div>
+                <div class="af-chip" onclick="toggleAfChip('priority','high',this)">High</div>
+                <div class="af-chip" onclick="toggleAfChip('priority','medium',this)">Medium</div>
+                <div class="af-chip" onclick="toggleAfChip('priority','low',this)">Low</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <div class="af-label">유형</div>
+              <div class="af-chips" id="typeChips"></div>
+            </div>
+            <div class="af-group">
+              <div class="af-label">태그</div>
+              <div class="af-chips" id="tagChips"></div>
+            </div>
+            <div class="af-actions">
+              <button class="btn-ghost" style="padding:5px 10px;font-size:12px" onclick="clearAdvFilter()">초기화</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- List -->
+        <div class="list-area">
+          <!-- N-06: Sort chips toolbar -->
+          <div class="list-toolbar">
+            <span class="sort-label">정렬</span>
+            <div class="sort-chips" id="sortChips" role="radiogroup" aria-label="정렬 기준">
+              <button class="sort-chip" data-sort-key="date" onclick="sortByChip('date')"
+                aria-pressed="false">등록일</button>
+              <button class="sort-chip" data-sort-key="id" onclick="sortByChip('id')" aria-pressed="false">이슈
+                ID</button>
+              <button class="sort-chip" data-sort-key="title" onclick="sortByChip('title')"
+                aria-pressed="false">제목</button>
+              <button class="sort-chip" data-sort-key="status" onclick="sortByChip('status')"
+                aria-pressed="false">상태</button>
+              <button class="sort-chip" data-sort-key="priority" onclick="sortByChip('priority')"
+                aria-pressed="false">우선순위</button>
+              <button class="sort-chip" data-sort-key="assignee" onclick="sortByChip('assignee')"
+                aria-pressed="false">담당자</button>
+            </div>
+          </div>
+          <div class="list-header">
+            <div></div>
+            <div class="hcell" data-sort-key="id" onclick="toggleSort('id')">이슈 ID <i data-lucide="chevrons-up-down"
+                class="sort-icon"></i></div>
+            <div class="hcell" data-sort-key="title" onclick="toggleSort('title')">제목 <i data-lucide="chevrons-up-down"
+                class="sort-icon"></i></div>
+            <div class="hcell" data-sort-key="status" onclick="toggleSort('status')">상태 <i
+                data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+            <div class="hcell" data-sort-key="assignee" onclick="toggleSort('assignee')">담당자 <i
+                data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+            <div class="hcell" data-sort-key="priority" onclick="toggleSort('priority')">우선순위 <i
+                data-lucide="chevrons-up-down" class="sort-icon"></i></div>
+            <div class="hcell sort-active" data-sort-key="date" onclick="toggleSort('date')">등록일 <i
+                data-lucide="chevron-down" class="sort-icon"></i></div>
+          </div>
+          <div id="listArea"></div>
+          <div id="paginationRow"></div>
+        </div>
+      </div><!-- /page-voc -->
+
+      <!-- ── 공지사항 ── -->
+      <div id="page-notices" class="info-page admin-page"></div>
+
+      <!-- ── FAQ ── -->
+      <div id="page-faq" class="info-page admin-page"></div>
+
+      <!--
   공지/FAQ 관리(Admin) 전용 페이지는 D19에 따라 제거.
   진입점 = 공지/FAQ 페이지 우측 상단 버튼 + `?mode=admin` URL 쿼리 (P-9에서 시연 추가 예정).
 -->
 
-<!-- ── 대시보드 ── -->
-<div id="page-dashboard" class="admin-page">
-  <div class="dash-header">
-    <div class="dash-title">대시보드</div>
-    <div class="dash-controls">
-      <div class="menu-selector-wrap" id="menuSelectorWrap">
-        <span class="separator">›</span>
-        <select class="filter-select" id="menuSelect" onchange="dashSelectMenu(this.value)">
-          <option value="">메뉴: 전체</option>
-        </select>
-      </div>
-      <select class="filter-select" id="assigneeSelect" onchange="dashSelectAssignee(this.value)">
-        <option value="">담당자: 전체</option>
-        <option>김지훈</option><option>이수연</option><option>박민준</option><option>최유진</option><option>정해원</option>
-      </select>
-      <div class="date-btn-group">
-        <button class="date-btn active">1달</button>
-        <button class="date-btn">3달</button>
-        <button class="date-btn">1년</button>
-        <button class="date-btn">전체</button>
-        <button class="date-btn">커스텀</button>
-      </div>
-      <button class="dash-btn">📅 2025.05.01–05.30 ▾</button>
-      <button class="dash-btn" id="dashEditBtn" onclick="dashToggleEdit()" style="gap:5px;"><i data-lucide="layout-panel-left" style="width:13px;height:13px"></i> 레이아웃 편집</button>
-      <!-- B-17 Dashboard 설정 슬라이드 패널 -->
-      <button class="dash-btn dash-settings-btn" id="dashSettingsBtn" onclick="DashboardSettingsPanel.open()" aria-label="대시보드 설정"><i data-lucide="settings" style="width:13px;height:13px"></i></button>
-    </div>
-  </div>
-
-  <div class="filter-context-banner" id="filterContext">
-    <span id="filterContextText"></span>
-    <span style="font-size:11px;color:var(--brand);opacity:.7">기준</span>
-  </div>
-
-  <div class="global-tabs" id="globalTabs">
-    <button class="global-tab active" onclick="switchGlobalTab('all',this)">전체</button>
-    <button class="global-tab" onclick="switchGlobalTab('A',this)">채널 A</button>
-    <button class="global-tab" onclick="switchGlobalTab('B',this)">채널 B</button>
-    <button class="global-tab" onclick="switchGlobalTab('C',this)">채널 C</button>
-    <button class="global-tab" onclick="switchGlobalTab('D',this)">채널 D</button>
-    <button class="global-tab" onclick="switchGlobalTab('E',this)">채널 E</button>
-  </div>
-
-  <div class="dash-body">
-
-    <!-- KPI VOLUME -->
-    <div data-dash-widget="kpi-volume">
-      <div class="section-label">Volume</div>
-      <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-label">총 VOC</div><div class="kpi-value">1,204</div><div class="kpi-delta delta-pos">▲ 12% vs 전주</div></div>
-        <div class="kpi-card"><div class="kpi-label">미해결</div><div class="kpi-value">87</div><div class="kpi-delta delta-neg">▲ 5% vs 전주</div></div>
-        <div class="kpi-card"><div class="kpi-label">이번주 신규</div><div class="kpi-value">+23</div><div class="kpi-sublabel">3일차</div><div class="kpi-delta delta-pos">▲ 8% vs 전주</div></div>
-        <div class="kpi-card"><div class="kpi-label">이번주 완료</div><div class="kpi-value">+18</div><div class="kpi-sublabel">3일차</div><div class="kpi-delta delta-pos">▲ 20% vs 전주</div></div>
-      </div>
-    </div>
-
-    <!-- KPI QUALITY -->
-    <div data-dash-widget="kpi-quality">
-      <div class="section-label">Quality</div>
-      <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-label">평균 처리시간</div><div class="kpi-value">4.2<span style="font-size:14px;font-weight:400;">일</span></div><div class="kpi-delta delta-pos">▼ 0.3일 vs 전주</div></div>
-        <div class="kpi-card"><div class="kpi-label">해결율</div><div class="kpi-value">78<span style="font-size:14px;font-weight:400;">%</span></div><div class="kpi-delta delta-pos">▲ 4%p vs 전주</div></div>
-        <div class="kpi-card alert-red"><div class="kpi-label">Urgent·High 미해결</div><div class="kpi-value" style="color:oklch(58% .22 25)">12</div><div class="kpi-delta delta-neg">▲ 3건 vs 전주</div></div>
-        <div class="kpi-card alert-amber"><div class="kpi-label">14일+ 미처리</div><div class="kpi-value" style="color:oklch(70% .16 72)">8</div><div class="kpi-delta delta-amb">▲ 2건 vs 전주</div></div>
-      </div>
-    </div>
-
-    <!-- 분포 + 매트릭스 -->
-    <div class="two-col" data-dash-widget="dist-matrix">
-      <div class="widget" data-dash-widget="dist">
-        <div class="widget-header">
-          <div class="widget-title">분포</div>
-          <div class="dim-selector" id="distDimSel">
-            <button class="dim-btn active" onclick="dashSwitchDim('distDimSel',this)">전체</button>
-            <button class="dim-btn" onclick="dashSwitchDim('distDimSel',this)" id="distDimSys">시스템별</button>
-            <button class="dim-btn" onclick="dashSwitchDim('distDimSel',this)" id="distDimMenu">메뉴별</button>
+      <!-- ── 대시보드 ── -->
+      <div id="page-dashboard" class="admin-page">
+        <div class="dash-header">
+          <div class="dash-title">대시보드</div>
+          <div class="dash-controls">
+            <div class="menu-selector-wrap" id="menuSelectorWrap">
+              <span class="separator">›</span>
+              <select class="filter-select" id="menuSelect" onchange="dashSelectMenu(this.value)">
+                <option value="">메뉴: 전체</option>
+              </select>
+            </div>
+            <select class="filter-select" id="assigneeSelect" onchange="dashSelectAssignee(this.value)">
+              <option value="">담당자: 전체</option>
+              <option>김지훈</option>
+              <option>이수연</option>
+              <option>박민준</option>
+              <option>최유진</option>
+              <option>정해원</option>
+            </select>
+            <div class="date-btn-group">
+              <button class="date-btn active">1달</button>
+              <button class="date-btn">3달</button>
+              <button class="date-btn">1년</button>
+              <button class="date-btn">전체</button>
+              <button class="date-btn">커스텀</button>
+            </div>
+            <button class="dash-btn">📅 2025.05.01–05.30 ▾</button>
+            <button class="dash-btn" id="dashEditBtn" onclick="dashToggleEdit()" style="gap:5px;"><i
+                data-lucide="layout-panel-left" style="width:13px;height:13px"></i> 레이아웃 편집</button>
+            <!-- B-17 Dashboard 설정 슬라이드 패널 -->
+            <button class="dash-btn dash-settings-btn" id="dashSettingsBtn" onclick="DashboardSettingsPanel.open()"
+              aria-label="대시보드 설정"><i data-lucide="settings" style="width:13px;height:13px"></i></button>
           </div>
         </div>
-        <div class="d-tabs" id="distTabs">
-          <div class="d-tab active" onclick="dashSwitchDistTab(this,'status')">상태</div>
-          <div class="d-tab" onclick="dashSwitchDistTab(this,'priority')">우선순위</div>
-          <div class="d-tab" onclick="dashSwitchDistTab(this,'type')">유형</div>
-          <div class="d-tab" onclick="dashSwitchDistTab(this,'tag')">태그</div>
-        </div>
-        <div id="distContent"></div>
-      </div>
 
-      <div class="widget" data-dash-widget="matrix">
-        <div class="widget-header">
-          <div class="widget-title">우선순위 × 상태 매트릭스</div>
-          <div class="dim-selector" id="matDimSel">
-            <button class="dim-btn active" onclick="dashSwitchDim('matDimSel',this)">전체</button>
-            <button class="dim-btn" onclick="dashSwitchDim('matDimSel',this)" id="matDimSys">시스템별</button>
-            <button class="dim-btn" onclick="dashSwitchDim('matDimSel',this)" id="matDimMenu">메뉴별</button>
+        <div class="filter-context-banner" id="filterContext">
+          <span id="filterContextText"></span>
+          <span style="font-size:11px;color:var(--brand);opacity:.7">기준</span>
+        </div>
+
+        <div class="global-tabs" id="globalTabs">
+          <button class="global-tab active" onclick="switchGlobalTab('all',this)">전체</button>
+          <button class="global-tab" onclick="switchGlobalTab('A',this)">채널 A</button>
+          <button class="global-tab" onclick="switchGlobalTab('B',this)">채널 B</button>
+          <button class="global-tab" onclick="switchGlobalTab('C',this)">채널 C</button>
+          <button class="global-tab" onclick="switchGlobalTab('D',this)">채널 D</button>
+          <button class="global-tab" onclick="switchGlobalTab('E',this)">채널 E</button>
+        </div>
+
+        <div class="dash-body">
+
+          <!-- KPI VOLUME -->
+          <div data-dash-widget="kpi-volume">
+            <div class="section-label">Volume</div>
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">총 VOC</div>
+                <div class="kpi-value">1,204</div>
+                <div class="kpi-delta delta-pos">▲ 12% vs 전주</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">미해결</div>
+                <div class="kpi-value">87</div>
+                <div class="kpi-delta delta-neg">▲ 5% vs 전주</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">이번주 신규</div>
+                <div class="kpi-value">+23</div>
+                <div class="kpi-sublabel">3일차</div>
+                <div class="kpi-delta delta-pos">▲ 8% vs 전주</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">이번주 완료</div>
+                <div class="kpi-value">+18</div>
+                <div class="kpi-sublabel">3일차</div>
+                <div class="kpi-delta delta-pos">▲ 20% vs 전주</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI QUALITY -->
+          <div data-dash-widget="kpi-quality">
+            <div class="section-label">Quality</div>
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">평균 처리시간</div>
+                <div class="kpi-value">4.2<span style="font-size:14px;font-weight:400;">일</span></div>
+                <div class="kpi-delta delta-pos">▼ 0.3일 vs 전주</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">해결율</div>
+                <div class="kpi-value">78<span style="font-size:14px;font-weight:400;">%</span></div>
+                <div class="kpi-delta delta-pos">▲ 4%p vs 전주</div>
+              </div>
+              <div class="kpi-card alert-red">
+                <div class="kpi-label">Urgent·High 미해결</div>
+                <div class="kpi-value" style="color:oklch(58% .22 25)">12</div>
+                <div class="kpi-delta delta-neg">▲ 3건 vs 전주</div>
+              </div>
+              <div class="kpi-card alert-amber">
+                <div class="kpi-label">14일+ 미처리</div>
+                <div class="kpi-value" style="color:oklch(70% .16 72)">8</div>
+                <div class="kpi-delta delta-amb">▲ 2건 vs 전주</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 분포 + 매트릭스 -->
+          <div class="two-col" data-dash-widget="dist-matrix">
+            <div class="widget" data-dash-widget="dist">
+              <div class="widget-header">
+                <div class="widget-title">분포</div>
+                <div class="dim-selector" id="distDimSel">
+                  <button class="dim-btn active" onclick="dashSwitchDim('distDimSel',this)">전체</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('distDimSel',this)" id="distDimSys">시스템별</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('distDimSel',this)" id="distDimMenu">메뉴별</button>
+                </div>
+              </div>
+              <div class="d-tabs" id="distTabs">
+                <div class="d-tab active" onclick="dashSwitchDistTab(this,'status')">상태</div>
+                <div class="d-tab" onclick="dashSwitchDistTab(this,'priority')">우선순위</div>
+                <div class="d-tab" onclick="dashSwitchDistTab(this,'type')">유형</div>
+                <div class="d-tab" onclick="dashSwitchDistTab(this,'tag')">태그</div>
+              </div>
+              <div id="distContent"></div>
+            </div>
+
+            <div class="widget" data-dash-widget="matrix">
+              <div class="widget-header">
+                <div class="widget-title">우선순위 × 상태 매트릭스</div>
+                <div class="dim-selector" id="matDimSel">
+                  <button class="dim-btn active" onclick="dashSwitchDim('matDimSel',this)">전체</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('matDimSel',this)" id="matDimSys">시스템별</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('matDimSel',this)" id="matDimMenu">메뉴별</button>
+                </div>
+              </div>
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th class="rh"></th>
+                    <th>접수</th>
+                    <th>검토중</th>
+                    <th>처리중</th>
+                    <th>완료</th>
+                    <th>드랍</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="rh" style="color:oklch(58% .22 25)">Urgent</td>
+                    <td style="background:oklch(63% .19 258 / .50)">8</td>
+                    <td style="background:oklch(63% .19 258 / .65)">15</td>
+                    <td style="background:oklch(63% .19 258 / .40)">6</td>
+                    <td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">2</td>
+                    <td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">1</td>
+                  </tr>
+                  <tr>
+                    <td class="rh" style="color:oklch(60% .18 45)">High</td>
+                    <td style="background:oklch(63% .19 258 / .28)">22</td>
+                    <td style="background:oklch(63% .19 258 / .55)">48</td>
+                    <td style="background:oklch(63% .19 258 / .60)">61</td>
+                    <td style="background:oklch(63% .19 258 / .15);color:var(--text-tertiary)">9</td>
+                    <td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">4</td>
+                  </tr>
+                  <tr>
+                    <td class="rh" style="color:var(--text-tertiary)">Medium</td>
+                    <td style="background:oklch(63% .19 258 / .18)">55</td>
+                    <td style="background:oklch(63% .19 258 / .42)">112</td>
+                    <td style="background:oklch(63% .19 258 / .65)">189</td>
+                    <td style="background:oklch(63% .19 258 / .22)">67</td>
+                    <td style="background:oklch(63% .19 258 / .14)">28</td>
+                  </tr>
+                  <tr>
+                    <td class="rh" style="color:var(--text-quaternary)">Low</td>
+                    <td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">95</td>
+                    <td style="background:oklch(63% .19 258 / .18)">165</td>
+                    <td style="background:oklch(63% .19 258 / .28)">264</td>
+                    <td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">26</td>
+                    <td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">27</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">셀 클릭 → 해당 필터로 VOC 목록 이동</div>
+            </div>
+          </div>
+
+          <!-- 히트맵 -->
+          <div class="widget" data-dash-widget="heatmap">
+            <div class="heatmap-top">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div class="widget-title">드릴다운 히트맵</div>
+                <div class="breadcrumb" id="hmBreadcrumb"></div>
+              </div>
+              <div class="dash-btn-group" id="hmXAxisBtns">
+                <button class="dash-btn active" onclick="dashSwitchHmAxis('status',this)">진행 현황</button>
+                <button class="dash-btn" onclick="dashSwitchHmAxis('priority',this)">우선순위별</button>
+                <button class="dash-btn" onclick="dashSwitchHmAxis('tag',this)">태그별</button>
+              </div>
+            </div>
+            <div id="hmTable"></div>
+          </div>
+
+          <!-- 주간 트렌드 + 태그 바 -->
+          <div class="two-col" data-dash-widget="trend-tags">
+            <div class="widget" data-dash-widget="trend">
+              <div class="widget-header">
+                <div class="widget-title">주간 트렌드 (최근 12주)</div>
+                <div class="dim-selector" id="lineDimSel">
+                  <button class="dim-btn active" onclick="dashSwitchDim('lineDimSel',this)">전체</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('lineDimSel',this)" id="lineDimSys">시스템별</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('lineDimSel',this)" id="lineDimMenu">메뉴별</button>
+                </div>
+              </div>
+              <div class="chart-legend">
+                <div class="cleg-item">
+                  <div class="cleg-line" style="background:var(--chart-blue)"></div>신규(접수)
+                </div>
+                <div class="cleg-item">
+                  <div class="cleg-line" style="background:var(--chart-sky)"></div>진행중(검토+처리)
+                </div>
+                <div class="cleg-item">
+                  <div class="cleg-line" style="background:var(--chart-emerald)"></div>완료(완료+드랍)
+                </div>
+              </div>
+              <div class="chart-area">
+                <svg viewBox="0 0 460 110" width="100%" height="100%" preserveAspectRatio="none">
+                  <line x1="0" y1="20" x2="460" y2="20" stroke="var(--border-subtle)" stroke-width=".5" />
+                  <line x1="0" y1="50" x2="460" y2="50" stroke="var(--border-subtle)" stroke-width=".5" />
+                  <line x1="0" y1="80" x2="460" y2="80" stroke="var(--border-subtle)" stroke-width=".5" />
+                  <line x1="0" y1="105" x2="460" y2="105" stroke="var(--border-subtle)" stroke-width=".5" />
+                  <polyline fill="none" stroke="var(--chart-blue)" stroke-width="2" stroke-linejoin="round"
+                    points="20,78 58,64 96,68 134,54 172,58 210,44 248,48 286,38 324,52 362,40 400,34 438,36" />
+                  <polyline fill="none" stroke="var(--chart-sky)" stroke-width="2" stroke-linejoin="round"
+                    points="20,55 58,48 96,52 134,42 172,46 210,36 248,40 286,32 324,44 362,34 400,28 438,30" />
+                  <polyline fill="none" stroke="var(--chart-emerald)" stroke-width="2" stroke-linejoin="round"
+                    points="20,92 58,82 96,86 134,74 172,78 210,64 248,66 286,58 324,70 362,56 400,50 438,53" />
+                </svg>
+              </div>
+              <div
+                style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-quaternary);margin-top:3px;padding:0 2px;">
+                <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span><span>W9</span><span>W10</span><span>W11</span><span>W12</span>
+              </div>
+            </div>
+
+            <div class="widget" data-dash-widget="tags">
+              <div class="widget-header">
+                <div class="widget-title">태그별 분포 (Top 10)</div>
+                <div class="dim-selector" id="tagDimSel">
+                  <button class="dim-btn active" onclick="dashSwitchDim('tagDimSel',this)">전체</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('tagDimSel',this)" id="tagDimSys">시스템별</button>
+                  <button class="dim-btn" onclick="dashSwitchDim('tagDimSel',this)" id="tagDimMenu">메뉴별</button>
+                </div>
+              </div>
+              <div class="bar-list">
+                <div class="bar-item"><span class="bar-label">UI/UX</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:100%"></div>
+                  </div><span class="bar-val">287</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">성능</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:82%"></div>
+                  </div><span class="bar-val">235</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">오류/버그</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:71%"></div>
+                  </div><span class="bar-val">204</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">결제</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:58%"></div>
+                  </div><span class="bar-val">167</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">로그인</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:47%"></div>
+                  </div><span class="bar-val">135</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">알림</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:39%"></div>
+                  </div><span class="bar-val">112</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">데이터</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:33%"></div>
+                  </div><span class="bar-val">95</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">API</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:27%"></div>
+                  </div><span class="bar-val">78</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">보안</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:21%"></div>
+                  </div><span class="bar-val">61</span>
+                </div>
+                <div class="bar-item"><span class="bar-label">기타</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:16%"></div>
+                  </div><span class="bar-val">46</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 현황 카드 (W7) — 가로 스크롤, N-05 -->
+          <div class="widget" id="w7-status-widget" data-dash-widget="status-cards">
+            <div class="widget-header">
+              <div class="widget-title">현황</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button class="w7-scroll-btn" id="w7ScrollLeft" aria-label="왼쪽으로 스크롤" onclick="w7Scroll(-1)"
+                  style="display:none">
+                  <i data-lucide="chevron-left" style="width:14px;height:14px"></i>
+                </button>
+                <button class="w7-scroll-btn" id="w7ScrollRight" aria-label="오른쪽으로 스크롤" onclick="w7Scroll(1)"
+                  style="display:none">
+                  <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+                </button>
+              </div>
+            </div>
+            <div class="w7-scroll-wrap" id="w7ScrollWrap">
+              <div class="w7-cards" id="w7Cards"></div>
+              <div class="w7-scroll-fade-right" id="w7FadeRight"></div>
+            </div>
+          </div>
+
+          <!-- 처리속도 & 에이징 — 2개 카드 좌우 배치 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" data-dash-widget="throughput-aging">
+            <div class="widget" data-dash-widget="throughput">
+              <div class="widget-header">
+                <div class="widget-title">처리속도</div>
+              </div>
+              <div id="slaCardWrap"></div>
+            </div>
+            <div class="widget" data-dash-widget="aging">
+              <div class="widget-header">
+                <div class="widget-title">에이징</div>
+              </div>
+              <div id="agingCardWrap"></div>
+            </div>
+          </div>
+
+          <!-- 담당자별 처리 현황 -->
+          <div class="widget" data-dash-widget="assignee">
+            <div class="widget-header">
+              <div class="widget-title">담당자별 처리 현황</div>
+              <div class="dash-btn-group" id="assignXAxisBtns">
+                <button class="dash-btn active" onclick="dashSwitchAssignAxis('status',this)">진행 현황</button>
+                <button class="dash-btn" onclick="dashSwitchAssignAxis('priority',this)">우선순위별</button>
+                <button class="dash-btn" onclick="dashSwitchAssignAxis('tag',this)">태그별</button>
+              </div>
+            </div>
+            <div id="assignTable"></div>
+          </div>
+
+          <!-- 장기 미처리 -->
+          <div class="widget" data-dash-widget="long-pending" style="margin-bottom:24px;">
+            <div class="widget-header">
+              <div class="widget-title">장기 미처리 VOC Top 10</div>
+              <div class="dim-selector" id="agingDimSel">
+                <button class="dim-btn active" onclick="dashSwitchDim('agingDimSel',this)">전체</button>
+                <button class="dim-btn" onclick="dashSwitchDim('agingDimSel',this)" id="agingDimSys">시스템별</button>
+              </div>
+            </div>
+            <div id="agingTableWrap"></div>
+          </div>
+
+        </div><!-- /.dash-body -->
+
+        <!-- 편집 모드 우측 패널 -->
+        <div class="dash-edit-panel" id="dashEditPanel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <span style="font-size:13px;font-weight:700;color:var(--accent)">✏️ 레이아웃 편집</span>
+            <button onclick="dashToggleEdit()"
+              style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;font-size:18px;line-height:1">×</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px;">위젯을 드래그하여 순서 변경, 눈 아이콘으로 숨기기</div>
+
+          <div
+            style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">
+            저장 대상</div>
+          <div class="ds-save-target-group" id="dashSaveTarget">
+            <button class="ds-save-target active" data-target="personal">내 설정</button>
+            <button class="ds-save-target" data-target="admin">기본값 (Admin)</button>
+          </div>
+
+          <div
+            style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;">
+            기본 설정</div>
+          <div class="ds-setting-group">
+            <label class="ds-setting-label">기본 기간</label>
+            <select class="ds-setting-select">
+              <option>최근 30일</option>
+              <option>최근 7일</option>
+              <option>최근 90일</option>
+              <option>올해</option>
+            </select>
+          </div>
+          <div class="ds-setting-group">
+            <label class="ds-setting-label">히트맵 기본 X축</label>
+            <select class="ds-setting-select">
+              <option>시스템</option>
+              <option>담당자</option>
+              <option>유형</option>
+            </select>
+          </div>
+
+          <div style="flex:1"></div>
+          <div
+            style="border-top:1px solid var(--border-subtle);padding-top:14px;display:flex;flex-direction:column;gap:8px;">
+            <button class="ds-save-btn" onclick="dashSaveLayout()">설정 저장</button>
+            <button class="ds-reset-btn" onclick="dashToggleEdit()">취소</button>
           </div>
         </div>
-        <table class="matrix-table">
-          <thead><tr><th class="rh"></th><th>접수</th><th>검토중</th><th>처리중</th><th>완료</th><th>드랍</th></tr></thead>
-          <tbody>
-            <tr><td class="rh" style="color:oklch(58% .22 25)">Urgent</td><td style="background:oklch(63% .19 258 / .50)">8</td><td style="background:oklch(63% .19 258 / .65)">15</td><td style="background:oklch(63% .19 258 / .40)">6</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">2</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">1</td></tr>
-            <tr><td class="rh" style="color:oklch(60% .18 45)">High</td><td style="background:oklch(63% .19 258 / .28)">22</td><td style="background:oklch(63% .19 258 / .55)">48</td><td style="background:oklch(63% .19 258 / .60)">61</td><td style="background:oklch(63% .19 258 / .15);color:var(--text-tertiary)">9</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">4</td></tr>
-            <tr><td class="rh" style="color:var(--text-tertiary)">Medium</td><td style="background:oklch(63% .19 258 / .18)">55</td><td style="background:oklch(63% .19 258 / .42)">112</td><td style="background:oklch(63% .19 258 / .65)">189</td><td style="background:oklch(63% .19 258 / .22)">67</td><td style="background:oklch(63% .19 258 / .14)">28</td></tr>
-            <tr><td class="rh" style="color:var(--text-quaternary)">Low</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">95</td><td style="background:oklch(63% .19 258 / .18)">165</td><td style="background:oklch(63% .19 258 / .28)">264</td><td style="background:oklch(63% .19 258 / .10);color:var(--text-tertiary)">26</td><td style="background:oklch(63% .19 258 / .08);color:var(--text-tertiary)">27</td></tr>
-          </tbody>
+      </div><!-- /#page-dashboard -->
+
+      <!-- ── Admin: 태그 규칙 관리 ── -->
+      <div id="page-tag-rules" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">태그 규칙 관리</span>
+          <span class="section-count-badge" id="tagRuleCount">0개</span>
+          <div class="spacer"></div>
+          <button class="btn-ghost" onclick="toggleAddRuleForm()"><i data-lucide="plus"></i> 규칙 추가</button>
+        </div>
+        <div class="admin-body">
+          <div class="admin-add-form" id="addRuleForm">
+            <div class="aform-field">
+              <label>키워드 (Enter로 추가)</label>
+              <div class="kw-input-wrap" id="kwInputWrap" onclick="document.getElementById('kwRawInput').focus()">
+                <input type="text" id="kwRawInput" placeholder="키워드 입력 후 Enter…" onkeydown="handleKwInput(event)" />
+              </div>
+            </div>
+            <div class="aform-field">
+              <label>연결 태그</label>
+              <input type="text" id="newRuleTag" placeholder="예: 인증" style="min-width:120px" />
+            </div>
+            <div class="aform-field">
+              <label>유형</label>
+              <select id="newRuleType">
+                <option value="keyword">키워드</option>
+                <option value="regex">정규식</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:6px;align-self:flex-end">
+              <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addRule()">추가</button>
+              <button class="btn-ghost" style="padding:6px 14px;font-size:13px"
+                onclick="toggleAddRuleForm()">취소</button>
+            </div>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>키워드 패턴</th>
+                <th style="width:120px">연결 태그</th>
+                <th style="width:90px">유형</th>
+                <th style="width:90px">상태</th>
+                <th style="width:70px"></th>
+              </tr>
+            </thead>
+            <tbody id="tagRulesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Admin: 시스템/메뉴 관리 ── -->
+      <div id="page-system-menu" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">시스템 / 메뉴 관리</span>
+          <span class="section-count-badge" id="sysMenuCount">0개</span>
+          <div class="spacer"></div>
+          <button class="btn-ghost" onclick="toggleAddSystemForm()"><i data-lucide="folder-plus"></i> 시스템 추가</button>
+          <button class="btn-ghost" onclick="toggleAddMenuForm()"><i data-lucide="plus"></i> 메뉴 추가</button>
+        </div>
+        <div class="admin-body">
+          <div class="admin-add-form" id="addSystemForm">
+            <div class="aform-field">
+              <label>시스템명</label>
+              <input type="text" id="newSystemName" placeholder="예: 결제" style="min-width:160px" />
+            </div>
+            <div class="aform-field">
+              <label>슬러그 (URL-safe)</label>
+              <input type="text" id="newSystemSlug" placeholder="예: 결제" style="min-width:140px" />
+            </div>
+            <div style="display:flex;gap:6px;align-self:flex-end">
+              <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addSystem()">추가</button>
+              <button class="btn-ghost" style="padding:6px 14px;font-size:13px"
+                onclick="toggleAddSystemForm()">취소</button>
+            </div>
+            <div style="font-size:11px;color:var(--text-quaternary);margin-left:auto;align-self:center">시스템 추가 시
+              &quot;기타&quot; 메뉴가 자동 생성됩니다.</div>
+          </div>
+          <div class="admin-add-form" id="addMenuForm">
+            <div class="aform-field">
+              <label>대상 시스템</label>
+              <select id="newMenuSystem" style="min-width:160px"></select>
+            </div>
+            <div class="aform-field">
+              <label>메뉴명</label>
+              <input type="text" id="newMenuName" placeholder="예: 차트/그래프" style="min-width:160px" />
+            </div>
+            <div style="display:flex;gap:6px;align-self:flex-end">
+              <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addMenu()">추가</button>
+              <button class="btn-ghost" style="padding:6px 14px;font-size:13px"
+                onclick="toggleAddMenuForm()">취소</button>
+            </div>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>시스템 / 메뉴</th>
+                <th style="width:100px">슬러그</th>
+                <th style="width:60px;text-align:right">VOC</th>
+                <th style="width:90px">상태</th>
+                <th style="width:70px"></th>
+              </tr>
+            </thead>
+            <tbody id="adminSystemMenuContent"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="page-voc-type" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">유형 관리</span>
+          <span class="section-count-badge" id="vocTypeCount">0개</span>
+          <div class="spacer"></div>
+          <button class="btn-ghost" onclick="toggleAddTypeForm()"><i data-lucide="plus"></i> 유형 추가</button>
+        </div>
+        <div class="admin-body">
+          <div class="admin-add-form" id="addTypeForm">
+            <div class="aform-field">
+              <label>유형명</label>
+              <input type="text" id="newTypeName" placeholder="예: 장애" style="min-width:140px" />
+            </div>
+            <div class="aform-field">
+              <label>슬러그</label>
+              <input type="text" id="newTypeSlug" placeholder="예: incident" style="min-width:140px" />
+            </div>
+            <div class="aform-field">
+              <label>색상</label>
+              <input type="color" id="newTypeColor" value="var(--brand)"
+                style="min-width:56px;padding:2px;height:34px" />
+            </div>
+            <div style="display:flex;gap:6px;align-self:flex-end">
+              <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addType()">추가</button>
+              <button class="btn-ghost" style="padding:6px 14px;font-size:13px"
+                onclick="toggleAddTypeForm()">취소</button>
+            </div>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>유형</th>
+                <th style="width:120px">슬러그</th>
+                <th style="width:110px">분류</th>
+                <th style="width:60px;text-align:right">VOC</th>
+                <th style="width:90px">상태</th>
+                <th style="width:70px"></th>
+              </tr>
+            </thead>
+            <tbody id="adminVocTypeContent"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Admin: 사용자 관리 ── -->
+      <div id="page-users" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">사용자 관리</span>
+          <span class="section-count-badge" id="userCount">0명</span>
+          <div class="spacer"></div>
+          <button class="btn-ghost" onclick="toggleAddUserForm()"><i data-lucide="user-plus"></i> 사용자 초대</button>
+        </div>
+        <div class="admin-body">
+          <div class="admin-add-form" id="addUserForm">
+            <div class="aform-field">
+              <label>이름</label>
+              <input type="text" id="newUserName" placeholder="홍길동" style="min-width:110px" />
+            </div>
+            <div class="aform-field">
+              <label>이메일</label>
+              <input type="text" id="newUserEmail" placeholder="user@company.com" style="min-width:200px" />
+            </div>
+            <div class="aform-field">
+              <label>역할</label>
+              <select id="newUserRole">
+                <option value="admin">Admin</option>
+                <option value="manager" selected>Manager</option>
+                <option value="user">User</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:6px;align-self:flex-end">
+              <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="inviteUser()">초대 전송</button>
+              <button class="btn-ghost" style="padding:6px 14px;font-size:13px"
+                onclick="toggleAddUserForm()">취소</button>
+            </div>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>사용자</th>
+                <th>이메일</th>
+                <th style="width:100px">역할</th>
+                <th style="width:80px">상태</th>
+                <th style="width:110px">마지막 접속</th>
+                <th style="width:120px"></th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Result Review (Stage B-1 P-1.C1) ─── -->
+      <div id="page-result-review" class="admin-page"></div>
+
+      <!-- ============================================================ -->
+      <!-- BEGIN P-7 Tag Master (Stage B-6 D22)                          -->
+      <!-- ============================================================ -->
+      <div id="page-tag-master" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">태그 마스터</span>
+          <span class="section-count-badge" id="tmCount">0건</span>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <input id="tmSearch" class="tm-search" placeholder="이름/슬러그 검색" oninput="syncTmFilter()" />
+            <div class="tm-seg" role="tablist">
+              <button type="button" class="tm-seg-btn active" data-filter="all"
+                onclick="syncTmFilter('all')">전체</button>
+              <button type="button" class="tm-seg-btn" data-filter="general"
+                onclick="syncTmFilter('general')">general</button>
+              <button type="button" class="tm-seg-btn" data-filter="menu" onclick="syncTmFilter('menu')">menu</button>
+              <button type="button" class="tm-seg-btn" data-filter="external"
+                onclick="syncTmFilter('external')">외부</button>
+              <button type="button" class="tm-seg-btn" data-filter="merged"
+                onclick="syncTmFilter('merged')">병합됨</button>
+            </div>
+            <button type="button" class="a-btn primary" onclick="openTmAddModal()"><i data-lucide="plus"></i> 태그
+              추가</button>
+          </div>
+        </div>
+        <!-- 운영 갭 콜아웃: tag_rules 일시중지 데모 -->
+        <div class="tm-callout" id="tmRuleCallout">
+          <i data-lucide="alert-circle"></i>
+          <span>tag_rules 운영 일시중지 (Admin) — </span>
+          <button type="button" class="a-btn" onclick="suspendRule()">24시간 일시중지</button>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>태그명</th>
+              <th>슬러그</th>
+              <th>kind</th>
+              <th style="text-align:right">사용 VOC</th>
+              <th>마지막 사용</th>
+              <th>상태</th>
+              <th style="text-align:right">작업</th>
+            </tr>
+          </thead>
+          <tbody id="tmBody"></tbody>
         </table>
-        <div style="margin-top:7px;font-size:10px;color:var(--text-quaternary)">셀 클릭 → 해당 필터로 VOC 목록 이동</div>
       </div>
-    </div>
+      <!-- END P-7 Tag Master -->
 
-    <!-- 히트맵 -->
-    <div class="widget" data-dash-widget="heatmap">
-      <div class="heatmap-top">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="widget-title">드릴다운 히트맵</div>
-          <div class="breadcrumb" id="hmBreadcrumb"></div>
+      <!-- ============================================================ -->
+      <!-- BEGIN P-8 Trash (Stage B-7 D23)                              -->
+      <!-- ============================================================ -->
+      <section id="page-trash" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">휴지통</span>
+          <span class="section-count-badge" id="trCount">0건</span>
+          <div class="spacer"></div>
+          <button type="button" class="tr-persona-btn" id="trPersonaBtn" onclick="trTogglePersona()">👤 Admin
+            모드</button>
         </div>
-        <div class="dash-btn-group" id="hmXAxisBtns">
-          <button class="dash-btn active" onclick="dashSwitchHmAxis('status',this)">진행 현황</button>
-          <button class="dash-btn" onclick="dashSwitchHmAxis('priority',this)">우선순위별</button>
-          <button class="dash-btn" onclick="dashSwitchHmAxis('tag',this)">태그별</button>
-        </div>
-      </div>
-      <div id="hmTable"></div>
-    </div>
 
-    <!-- 주간 트렌드 + 태그 바 -->
-    <div class="two-col" data-dash-widget="trend-tags">
-      <div class="widget" data-dash-widget="trend">
-        <div class="widget-header">
-          <div class="widget-title">주간 트렌드 (최근 12주)</div>
-          <div class="dim-selector" id="lineDimSel">
-            <button class="dim-btn active" onclick="dashSwitchDim('lineDimSel',this)">전체</button>
-            <button class="dim-btn" onclick="dashSwitchDim('lineDimSel',this)" id="lineDimSys">시스템별</button>
-            <button class="dim-btn" onclick="dashSwitchDim('lineDimSel',this)" id="lineDimMenu">메뉴별</button>
+        <div class="admin-body" style="padding:16px 20px">
+          <div class="tr-info-callout" role="note" id="trInfoCallout">
+            <i data-lucide="info"></i>
+            <span>삭제 후 30일이 지나면 자동으로 영구 삭제됩니다. 복원 시 태그 규칙이 재실행됩니다.<br><small>(시연 한정 — 실제 BE는 §9.4.7에 따라 영구삭제
+                비활성)</small></span>
           </div>
-        </div>
-        <div class="chart-legend">
-          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-blue)"></div>신규(접수)</div>
-          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-sky)"></div>진행중(검토+처리)</div>
-          <div class="cleg-item"><div class="cleg-line" style="background:var(--chart-emerald)"></div>완료(완료+드랍)</div>
-        </div>
-        <div class="chart-area">
-          <svg viewBox="0 0 460 110" width="100%" height="100%" preserveAspectRatio="none">
-            <line x1="0" y1="20" x2="460" y2="20" stroke="var(--border-subtle)" stroke-width=".5"/>
-            <line x1="0" y1="50" x2="460" y2="50" stroke="var(--border-subtle)" stroke-width=".5"/>
-            <line x1="0" y1="80" x2="460" y2="80" stroke="var(--border-subtle)" stroke-width=".5"/>
-            <line x1="0" y1="105" x2="460" y2="105" stroke="var(--border-subtle)" stroke-width=".5"/>
-            <polyline fill="none" stroke="var(--chart-blue)" stroke-width="2" stroke-linejoin="round" points="20,78 58,64 96,68 134,54 172,58 210,44 248,48 286,38 324,52 362,40 400,34 438,36"/>
-            <polyline fill="none" stroke="var(--chart-sky)" stroke-width="2" stroke-linejoin="round" points="20,55 58,48 96,52 134,42 172,46 210,36 248,40 286,32 324,44 362,34 400,28 438,30"/>
-            <polyline fill="none" stroke="var(--chart-emerald)" stroke-width="2" stroke-linejoin="round" points="20,92 58,82 96,86 134,74 172,78 210,64 248,66 286,58 324,70 362,56 400,50 438,53"/>
-          </svg>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-quaternary);margin-top:3px;padding:0 2px;">
-          <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span><span>W9</span><span>W10</span><span>W11</span><span>W12</span>
-        </div>
-      </div>
 
-      <div class="widget" data-dash-widget="tags">
-        <div class="widget-header">
-          <div class="widget-title">태그별 분포 (Top 10)</div>
-          <div class="dim-selector" id="tagDimSel">
-            <button class="dim-btn active" onclick="dashSwitchDim('tagDimSel',this)">전체</button>
-            <button class="dim-btn" onclick="dashSwitchDim('tagDimSel',this)" id="tagDimSys">시스템별</button>
-            <button class="dim-btn" onclick="dashSwitchDim('tagDimSel',this)" id="tagDimMenu">메뉴별</button>
+          <div class="tr-toolbar">
+            <input id="trSearch" class="form-input tr-search" placeholder="제목 또는 이슈 ID 검색" oninput="syncTrFilter()" />
+            <select id="trRange" class="form-select" onchange="syncTrFilter()">
+              <option value="all">전체 기간</option>
+              <option value="today">오늘</option>
+              <option value="7d">최근 7일</option>
+              <option value="30d">최근 30일</option>
+              <option value="overdue">30일 초과 (만료 대상)</option>
+            </select>
+            <select id="trSystem" class="form-select" onchange="syncTrFilter()">
+              <option value="all">전체 시스템</option>
+            </select>
           </div>
-        </div>
-        <div class="bar-list">
-          <div class="bar-item"><span class="bar-label">UI/UX</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">287</span></div>
-          <div class="bar-item"><span class="bar-label">성능</span><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><span class="bar-val">235</span></div>
-          <div class="bar-item"><span class="bar-label">오류/버그</span><div class="bar-track"><div class="bar-fill" style="width:71%"></div></div><span class="bar-val">204</span></div>
-          <div class="bar-item"><span class="bar-label">결제</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div><span class="bar-val">167</span></div>
-          <div class="bar-item"><span class="bar-label">로그인</span><div class="bar-track"><div class="bar-fill" style="width:47%"></div></div><span class="bar-val">135</span></div>
-          <div class="bar-item"><span class="bar-label">알림</span><div class="bar-track"><div class="bar-fill" style="width:39%"></div></div><span class="bar-val">112</span></div>
-          <div class="bar-item"><span class="bar-label">데이터</span><div class="bar-track"><div class="bar-fill" style="width:33%"></div></div><span class="bar-val">95</span></div>
-          <div class="bar-item"><span class="bar-label">API</span><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div><span class="bar-val">78</span></div>
-          <div class="bar-item"><span class="bar-label">보안</span><div class="bar-track"><div class="bar-fill" style="width:21%"></div></div><span class="bar-val">61</span></div>
-          <div class="bar-item"><span class="bar-label">기타</span><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><span class="bar-val">46</span></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 현황 카드 (W7) — 가로 스크롤, N-05 -->
-    <div class="widget" id="w7-status-widget" data-dash-widget="status-cards">
-      <div class="widget-header">
-        <div class="widget-title">현황</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <button class="w7-scroll-btn" id="w7ScrollLeft" aria-label="왼쪽으로 스크롤" onclick="w7Scroll(-1)" style="display:none">
-            <i data-lucide="chevron-left" style="width:14px;height:14px"></i>
+          <div id="trBulkBar" class="tr-bulk-bar" hidden>
+            <span class="tr-bulk-count"><span id="trSelectedCount">0</span>건 선택</span>
+            <button type="button" class="a-btn primary" onclick="restoreSelected()">선택 복원</button>
+            <button type="button" class="a-btn danger" onclick="purgeSelected()">선택 영구삭제</button>
+            <button type="button" class="a-btn" onclick="clearTrSelection()">선택 해제</button>
+          </div>
+
+          <div id="trDenied" class="tr-denied" hidden>
+            <i data-lucide="lock"></i>
+            <span>Admin 권한이 필요합니다.</span>
+          </div>
+
+          <table class="tr-table" id="trTable">
+            <thead>
+              <tr>
+                <th class="tr-th-check"><input type="checkbox" id="trSelectAll" onchange="toggleSelectAll(this)"
+                    aria-label="전체 선택" /></th>
+                <th>이슈 ID</th>
+                <th>제목</th>
+                <th>상태</th>
+                <th>시스템/메뉴</th>
+                <th>삭제자</th>
+                <th>원담당자</th>
+                <th>삭제일</th>
+                <th>잔여일</th>
+                <th class="tr-th-actions">작업</th>
+              </tr>
+            </thead>
+            <tbody id="trBody"></tbody>
+          </table>
+
+          <details class="tr-audit" id="trAuditWrap" open>
+            <summary>최근 복원/영구삭제 이력 (voc_restore_log)</summary>
+            <div id="trAuditList"></div>
+          </details>
+        </div>
+      </section>
+      <!-- END P-8 Trash -->
+
+      <!-- ============================================================ -->
+      <!-- BEGIN P-10 External Masters (Stage B-12)                     -->
+      <!-- ============================================================ -->
+      <section id="page-external-masters" class="admin-page">
+        <div class="admin-topbar">
+          <span class="admin-title">외부 마스터</span>
+          <div class="spacer"></div>
+          <!-- H4: scope label — program master excluded (server-restart only) -->
+          <button type="button" class="admin-btn" onclick="emRefreshAll()"
+            title="MSSQL 소스(설비·DB 마스터)만 새로고침 — 프로그램 마스터는 서버 재시작으로만 갱신">
+            <i data-lucide="refresh-cw" style="width:13px;height:13px;vertical-align:-2px"></i>
+            전체 새로고침
+            <span class="em-bulk-sublabel">(MSSQL 2종만)</span>
           </button>
-          <button class="w7-scroll-btn" id="w7ScrollRight" aria-label="오른쪽으로 스크롤" onclick="w7Scroll(1)" style="display:none">
-            <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+        </div>
+        <div class="admin-body" style="padding:16px 20px">
+          <!-- M-05 필드 매핑 섹션 — 읽기 전용, VOC 필드 ↔ 외부 마스터 source key 표 -->
+          <div class="em-field-map-section">
+            <div class="em-field-map-header">
+              <i data-lucide="table-2"
+                style="width:14px;height:14px;vertical-align:-2px;color:var(--text-tertiary)"></i>
+              <span class="em-field-map-title">필드 매핑</span>
+              <span class="em-field-map-desc">VOC 필드가 참조하는 외부 마스터 소스 (읽기 전용)</span>
+            </div>
+            <table class="admin-table em-field-map-table">
+              <thead>
+                <tr>
+                  <th>VOC structured_payload 필드</th>
+                  <th>외부 마스터</th>
+                  <th style="width:90px;text-align:center">검증 여부</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code
+                      style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">equipment</code>
+                  </td>
+                  <td><span style="font-size:13px">설비 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">maker</code>
+                  </td>
+                  <td><span style="font-size:13px">설비 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">model</code>
+                  </td>
+                  <td><span style="font-size:13px">설비 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code
+                      style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">process</code>
+                  </td>
+                  <td><span style="font-size:13px">설비 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code
+                      style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_programs</code>
+                  </td>
+                  <td><span style="font-size:13px">프로그램 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code
+                      style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_db_tables</code>
+                  </td>
+                  <td><span style="font-size:13px">DB 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code
+                      style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_jobs</code>
+                  </td>
+                  <td><span style="font-size:13px">DB 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+                <tr>
+                  <td><code
+                      style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_sps</code>
+                  </td>
+                  <td><span style="font-size:13px">DB 마스터</span></td>
+                  <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- H2: Cold-start system-wide banner — shown/hidden by JS -->
+          <div id="emColdStartBanner" class="em-coldstart-banner">
+            <i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0"></i>
+            <span class="em-coldstart-banner-text">
+              콜드스타트 모드 (스냅샷 파일 미존재 — 전 필드 unverified)
+            </span>
+            <button type="button" class="admin-btn em-coldstart-banner-btn"
+              onclick="window.emMockColdStart=false;window.AdminExternalMasters&&AdminExternalMasters.render()">
+              boot 완료 시뮬레이션
+            </button>
+          </div>
+          <!-- H1: Q5 source-independence note -->
+          <div class="em-atomic-note">
+            <i data-lucide="git-fork" style="width:12px;height:12px"></i>
+            각 소스별 독립 atomic swap — 실패 시 해당 소스만 영향 (Q5 소스 독립 정책)
+          </div>
+          <div id="emGrid" class="em-grid"></div>
+        </div>
+      </section>
+      <!-- END P-10 External Masters -->
+
+    </main>
+
+    <!-- ── Drawer ─── -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="drawer">
+      <div class="drawer-header">
+        <div class="drawer-header-left">
+          <div class="d-code" id="dCode"></div>
+          <div class="d-title" id="dTitle"></div>
+        </div>
+        <div class="drawer-actions">
+          <div class="icon-btn" id="expandBtn" data-tip="큰 화면으로 보기" onclick="toggleFullscreen()"><i
+              data-lucide="maximize-2"></i></div>
+          <div class="icon-btn" data-tip="링크 복사"><i data-lucide="link-2"></i></div>
+          <div class="icon-btn" data-tip="삭제 (Admin)"><i data-lucide="trash-2"></i></div>
+          <div class="icon-btn" onclick="closeDrawer()" data-tip="닫기"><i data-lucide="x"></i></div>
+        </div>
+      </div>
+      <div class="drawer-body" id="drawerBody">
+        <!-- Filled dynamically by openDrawer() -->
+      </div>
+    </div>
+
+    <!-- ── Trash Confirm Modal (P-8 — separate from #modalBg) ─── -->
+    <div id="trConfirmBg" class="modal-bg" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="trConfirmTitle">
+        <div class="modal-header">
+          <div class="modal-title" id="trConfirmTitle"></div>
+          <button class="icon-btn" type="button" onclick="closeTrConfirm()" aria-label="닫기">
+            <i data-lucide="x"></i>
           </button>
         </div>
-      </div>
-      <div class="w7-scroll-wrap" id="w7ScrollWrap">
-        <div class="w7-cards" id="w7Cards"></div>
-        <div class="w7-scroll-fade-right" id="w7FadeRight"></div>
+        <div class="modal-body" id="trConfirmBody"></div>
+        <div class="modal-footer" id="trConfirmFooter"></div>
       </div>
     </div>
 
-    <!-- 처리속도 & 에이징 — 2개 카드 좌우 배치 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" data-dash-widget="throughput-aging">
-      <div class="widget" data-dash-widget="throughput">
-        <div class="widget-header">
-          <div class="widget-title">처리속도</div>
+    <!-- ── Create Modal ─── -->
+    <div class="modal-bg" id="modalBg" onclick="handleBgClick(event)">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">새 VOC 등록</span>
+          <div class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></div>
         </div>
-        <div id="slaCardWrap"></div>
-      </div>
-      <div class="widget" data-dash-widget="aging">
-        <div class="widget-header">
-          <div class="widget-title">에이징</div>
-        </div>
-        <div id="agingCardWrap"></div>
-      </div>
-    </div>
-
-    <!-- 담당자별 처리 현황 -->
-    <div class="widget" data-dash-widget="assignee">
-      <div class="widget-header">
-        <div class="widget-title">담당자별 처리 현황</div>
-        <div class="dash-btn-group" id="assignXAxisBtns">
-          <button class="dash-btn active" onclick="dashSwitchAssignAxis('status',this)">진행 현황</button>
-          <button class="dash-btn" onclick="dashSwitchAssignAxis('priority',this)">우선순위별</button>
-          <button class="dash-btn" onclick="dashSwitchAssignAxis('tag',this)">태그별</button>
-        </div>
-      </div>
-      <div id="assignTable"></div>
-    </div>
-
-    <!-- 장기 미처리 -->
-    <div class="widget" data-dash-widget="long-pending" style="margin-bottom:24px;">
-      <div class="widget-header">
-        <div class="widget-title">장기 미처리 VOC Top 10</div>
-        <div class="dim-selector" id="agingDimSel">
-          <button class="dim-btn active" onclick="dashSwitchDim('agingDimSel',this)">전체</button>
-          <button class="dim-btn" onclick="dashSwitchDim('agingDimSel',this)" id="agingDimSys">시스템별</button>
-        </div>
-      </div>
-      <div id="agingTableWrap"></div>
-    </div>
-
-  </div><!-- /.dash-body -->
-
-  <!-- 편집 모드 우측 패널 -->
-  <div class="dash-edit-panel" id="dashEditPanel">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <span style="font-size:13px;font-weight:700;color:var(--accent)">✏️ 레이아웃 편집</span>
-      <button onclick="dashToggleEdit()" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;font-size:18px;line-height:1">×</button>
-    </div>
-    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px;">위젯을 드래그하여 순서 변경, 눈 아이콘으로 숨기기</div>
-
-    <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">저장 대상</div>
-    <div class="ds-save-target-group" id="dashSaveTarget">
-      <button class="ds-save-target active" data-target="personal">내 설정</button>
-      <button class="ds-save-target" data-target="admin">기본값 (Admin)</button>
-    </div>
-
-    <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;">기본 설정</div>
-    <div class="ds-setting-group">
-      <label class="ds-setting-label">기본 기간</label>
-      <select class="ds-setting-select">
-        <option>최근 30일</option><option>최근 7일</option><option>최근 90일</option><option>올해</option>
-      </select>
-    </div>
-    <div class="ds-setting-group">
-      <label class="ds-setting-label">히트맵 기본 X축</label>
-      <select class="ds-setting-select">
-        <option>시스템</option><option>담당자</option><option>유형</option>
-      </select>
-    </div>
-
-    <div style="flex:1"></div>
-    <div style="border-top:1px solid var(--border-subtle);padding-top:14px;display:flex;flex-direction:column;gap:8px;">
-      <button class="ds-save-btn" onclick="dashSaveLayout()">설정 저장</button>
-      <button class="ds-reset-btn" onclick="dashToggleEdit()">취소</button>
-    </div>
-  </div>
-</div><!-- /#page-dashboard -->
-
-<!-- ── Admin: 태그 규칙 관리 ── -->
-<div id="page-tag-rules" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">태그 규칙 관리</span>
-    <span class="section-count-badge" id="tagRuleCount">0개</span>
-    <div class="spacer"></div>
-    <button class="btn-ghost" onclick="toggleAddRuleForm()"><i data-lucide="plus"></i> 규칙 추가</button>
-  </div>
-  <div class="admin-body">
-      <div class="admin-add-form" id="addRuleForm">
-        <div class="aform-field">
-          <label>키워드 (Enter로 추가)</label>
-          <div class="kw-input-wrap" id="kwInputWrap" onclick="document.getElementById('kwRawInput').focus()">
-            <input type="text" id="kwRawInput" placeholder="키워드 입력 후 Enter…" onkeydown="handleKwInput(event)" />
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">제목 <span class="form-req">*</span></label>
+            <input class="form-input" type="text" id="titleInput" placeholder="문제를 간결하게 설명해 주세요 (최대 200자)"
+              maxlength="200" oninput="onTitleInput(this)" />
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">시스템 <span class="form-req">*</span></label>
+              <select class="form-select" id="modalSysSelect" onchange="onModalSysChange()">
+                <option value="">시스템 선택...</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">메뉴 <span class="form-req">*</span></label>
+              <select class="form-select" id="modalMenuSelect" disabled>
+                <option value="">시스템 먼저 선택...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:var(--sp-3)">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">유형 <span class="form-req">*</span></label>
+              <select class="form-select" id="modalTypeSelect">
+                <option value="">유형 선택...</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">우선순위 <span style="color:var(--text-quaternary);font-size:10px">(Admin
+                  설정)</span></label>
+              <select class="form-select" id="modalPrioritySelect" onchange="onModalPriorityChange(this.value)"
+                disabled>
+                <option value="medium">Medium (기본값)</option>
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          <!-- C-02: Due Date row -->
+          <div class="form-row" style="margin-top:var(--sp-3)">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">마감일 <span style="color:var(--text-quaternary);font-size:10px">(자동
+                  계산)</span></label>
+              <input type="date" class="form-input" id="modalDueDate" style="font-size:13px" />
+            </div>
+            <div class="form-group" style="margin-bottom:0"></div>
+          </div>
+          <div class="form-group" style="margin-top:var(--sp-4)">
+            <label class="form-label">본문 <span class="form-req">*</span></label>
+            <div class="editor-wrap">
+              <div class="editor-toolbar">
+                <button class="e-btn"><b>B</b></button><button class="e-btn"><i style="font-style:italic">I</i></button>
+                <button class="e-btn"><s>S</s></button><button class="e-btn">H1</button>
+                <button class="e-btn">H2</button><button class="e-btn">—</button>
+                <button class="e-btn">• 목록</button><button class="e-btn">1. 목록</button>
+                <button class="e-btn">&lt;/&gt; 코드</button><button class="e-btn">⊞ 표</button>
+                <button class="e-btn">🖼 이미지</button>
+              </div>
+              <textarea class="editor-area" id="bodyInput"
+                placeholder="문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요.&#10;이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개)&#10;&#10;※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다."
+                oninput="onBodyInput(this)"></textarea>
+            </div>
+            <div class="autotag-row" id="autotagRow">
+              <span class="at-label">자동 태그 추천:</span>
+              <span style="font-size:11.5px;color:var(--text-quaternary)">제목·본문 입력 시 자동으로 추천됩니다</span>
+            </div>
+          </div>
+          <!-- N-07: Attachment att-zone (modal) -->
+          <div class="form-group" style="margin-top:var(--sp-4);margin-bottom:0">
+            <label class="form-label">첨부파일 <span style="color:var(--text-quaternary);font-size:10px">(선택 · 이미지만 · 최대
+                5개)</span></label>
+            <div class="att-zone" id="modal-att-zone">
+              <input type="file" id="modal-file-input" multiple accept="image/png,image/jpeg,image/gif,image/webp"
+                style="display:none" onchange="modalFileSelected(event)" />
+              <div class="att-drop" id="modal-att-drop" ondragenter="modalAttDragEnter(event)"
+                ondragover="modalAttDragOver(event)" ondragleave="modalAttDragLeave(event)"
+                ondrop="modalAttDrop(event)">
+                이미지 드래그 또는
+                <button class="att-select-btn" type="button" onclick="modalAddAttach(event)">선택</button>
+                · 10MB까지 · <span class="att-count-badge" id="modal-att-count">0/5</span>
+              </div>
+              <div class="att-grid" id="modal-att-grid"></div>
+            </div>
           </div>
         </div>
-        <div class="aform-field">
-          <label>연결 태그</label>
-          <input type="text" id="newRuleTag" placeholder="예: 인증" style="min-width:120px" />
-        </div>
-        <div class="aform-field">
-          <label>유형</label>
-          <select id="newRuleType">
-            <option value="keyword">키워드</option>
-            <option value="regex">정규식</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:6px;align-self:flex-end">
-          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addRule()">추가</button>
-          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddRuleForm()">취소</button>
-        </div>
-      </div>
-      <table class="admin-table">
-        <thead><tr>
-          <th style="width:36px">#</th>
-          <th>키워드 패턴</th>
-          <th style="width:120px">연결 태그</th>
-          <th style="width:90px">유형</th>
-          <th style="width:90px">상태</th>
-          <th style="width:70px"></th>
-        </tr></thead>
-        <tbody id="tagRulesBody"></tbody>
-      </table>
-  </div>
-</div>
-
-<!-- ── Admin: 시스템/메뉴 관리 ── -->
-<div id="page-system-menu" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">시스템 / 메뉴 관리</span>
-    <span class="section-count-badge" id="sysMenuCount">0개</span>
-    <div class="spacer"></div>
-    <button class="btn-ghost" onclick="toggleAddSystemForm()"><i data-lucide="folder-plus"></i> 시스템 추가</button>
-    <button class="btn-ghost" onclick="toggleAddMenuForm()"><i data-lucide="plus"></i> 메뉴 추가</button>
-  </div>
-  <div class="admin-body">
-      <div class="admin-add-form" id="addSystemForm">
-        <div class="aform-field">
-          <label>시스템명</label>
-          <input type="text" id="newSystemName" placeholder="예: 결제" style="min-width:160px" />
-        </div>
-        <div class="aform-field">
-          <label>슬러그 (URL-safe)</label>
-          <input type="text" id="newSystemSlug" placeholder="예: 결제" style="min-width:140px" />
-        </div>
-        <div style="display:flex;gap:6px;align-self:flex-end">
-          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addSystem()">추가</button>
-          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddSystemForm()">취소</button>
-        </div>
-        <div style="font-size:11px;color:var(--text-quaternary);margin-left:auto;align-self:center">시스템 추가 시 &quot;기타&quot; 메뉴가 자동 생성됩니다.</div>
-      </div>
-      <div class="admin-add-form" id="addMenuForm">
-        <div class="aform-field">
-          <label>대상 시스템</label>
-          <select id="newMenuSystem" style="min-width:160px"></select>
-        </div>
-        <div class="aform-field">
-          <label>메뉴명</label>
-          <input type="text" id="newMenuName" placeholder="예: 차트/그래프" style="min-width:160px" />
-        </div>
-        <div style="display:flex;gap:6px;align-self:flex-end">
-          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addMenu()">추가</button>
-          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddMenuForm()">취소</button>
-        </div>
-      </div>
-      <table class="admin-table">
-        <thead><tr>
-          <th>시스템 / 메뉴</th>
-          <th style="width:100px">슬러그</th>
-          <th style="width:60px;text-align:right">VOC</th>
-          <th style="width:90px">상태</th>
-          <th style="width:70px"></th>
-        </tr></thead>
-        <tbody id="adminSystemMenuContent"></tbody>
-      </table>
-  </div>
-</div>
-
-<div id="page-voc-type" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">유형 관리</span>
-    <span class="section-count-badge" id="vocTypeCount">0개</span>
-    <div class="spacer"></div>
-    <button class="btn-ghost" onclick="toggleAddTypeForm()"><i data-lucide="plus"></i> 유형 추가</button>
-  </div>
-  <div class="admin-body">
-      <div class="admin-add-form" id="addTypeForm">
-        <div class="aform-field">
-          <label>유형명</label>
-          <input type="text" id="newTypeName" placeholder="예: 장애" style="min-width:140px" />
-        </div>
-        <div class="aform-field">
-          <label>슬러그</label>
-          <input type="text" id="newTypeSlug" placeholder="예: incident" style="min-width:140px" />
-        </div>
-        <div class="aform-field">
-          <label>색상</label>
-          <input type="color" id="newTypeColor" value="var(--brand)" style="min-width:56px;padding:2px;height:34px" />
-        </div>
-        <div style="display:flex;gap:6px;align-self:flex-end">
-          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="addType()">추가</button>
-          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddTypeForm()">취소</button>
-        </div>
-      </div>
-      <table class="admin-table">
-        <thead><tr>
-          <th>유형</th>
-          <th style="width:120px">슬러그</th>
-          <th style="width:110px">분류</th>
-          <th style="width:60px;text-align:right">VOC</th>
-          <th style="width:90px">상태</th>
-          <th style="width:70px"></th>
-        </tr></thead>
-        <tbody id="adminVocTypeContent"></tbody>
-      </table>
-  </div>
-</div>
-
-<!-- ── Admin: 사용자 관리 ── -->
-<div id="page-users" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">사용자 관리</span>
-    <span class="section-count-badge" id="userCount">0명</span>
-    <div class="spacer"></div>
-    <button class="btn-ghost" onclick="toggleAddUserForm()"><i data-lucide="user-plus"></i> 사용자 초대</button>
-  </div>
-  <div class="admin-body">
-      <div class="admin-add-form" id="addUserForm">
-        <div class="aform-field">
-          <label>이름</label>
-          <input type="text" id="newUserName" placeholder="홍길동" style="min-width:110px" />
-        </div>
-        <div class="aform-field">
-          <label>이메일</label>
-          <input type="text" id="newUserEmail" placeholder="user@company.com" style="min-width:200px" />
-        </div>
-        <div class="aform-field">
-          <label>역할</label>
-          <select id="newUserRole">
-            <option value="admin">Admin</option>
-            <option value="manager" selected>Manager</option>
-            <option value="user">User</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:6px;align-self:flex-end">
-          <button class="btn-primary" style="padding:6px 14px;font-size:13px" onclick="inviteUser()">초대 전송</button>
-          <button class="btn-ghost"   style="padding:6px 14px;font-size:13px" onclick="toggleAddUserForm()">취소</button>
-        </div>
-      </div>
-      <table class="admin-table">
-        <thead><tr>
-          <th>사용자</th>
-          <th>이메일</th>
-          <th style="width:100px">역할</th>
-          <th style="width:80px">상태</th>
-          <th style="width:110px">마지막 접속</th>
-          <th style="width:120px"></th>
-        </tr></thead>
-        <tbody id="usersBody"></tbody>
-      </table>
-  </div>
-</div>
-
-<!-- ── Result Review (Stage B-1 P-1.C1) ─── -->
-<div id="page-result-review" class="admin-page"></div>
-
-<!-- ============================================================ -->
-<!-- BEGIN P-7 Tag Master (Stage B-6 D22)                          -->
-<!-- ============================================================ -->
-<div id="page-tag-master" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">태그 마스터</span>
-    <span class="section-count-badge" id="tmCount">0건</span>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <input id="tmSearch" class="tm-search" placeholder="이름/슬러그 검색" oninput="syncTmFilter()" />
-      <div class="tm-seg" role="tablist">
-        <button type="button" class="tm-seg-btn active" data-filter="all"      onclick="syncTmFilter('all')">전체</button>
-        <button type="button" class="tm-seg-btn"        data-filter="general"  onclick="syncTmFilter('general')">general</button>
-        <button type="button" class="tm-seg-btn"        data-filter="menu"     onclick="syncTmFilter('menu')">menu</button>
-        <button type="button" class="tm-seg-btn"        data-filter="external" onclick="syncTmFilter('external')">외부</button>
-        <button type="button" class="tm-seg-btn"        data-filter="merged"   onclick="syncTmFilter('merged')">병합됨</button>
-      </div>
-      <button type="button" class="a-btn primary" onclick="openTmAddModal()"><i data-lucide="plus"></i> 태그 추가</button>
-    </div>
-  </div>
-  <!-- 운영 갭 콜아웃: tag_rules 일시중지 데모 -->
-  <div class="tm-callout" id="tmRuleCallout">
-    <i data-lucide="alert-circle"></i>
-    <span>tag_rules 운영 일시중지 (Admin) — </span>
-    <button type="button" class="a-btn" onclick="suspendRule()">24시간 일시중지</button>
-  </div>
-  <table class="admin-table">
-    <thead><tr>
-      <th>태그명</th><th>슬러그</th><th>kind</th><th style="text-align:right">사용 VOC</th>
-      <th>마지막 사용</th><th>상태</th><th style="text-align:right">작업</th>
-    </tr></thead>
-    <tbody id="tmBody"></tbody>
-  </table>
-</div>
-<!-- END P-7 Tag Master -->
-
-<!-- ============================================================ -->
-<!-- BEGIN P-8 Trash (Stage B-7 D23)                              -->
-<!-- ============================================================ -->
-<section id="page-trash" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">휴지통</span>
-    <span class="section-count-badge" id="trCount">0건</span>
-    <div class="spacer"></div>
-    <button type="button" class="tr-persona-btn" id="trPersonaBtn" onclick="trTogglePersona()">👤 Admin 모드</button>
-  </div>
-
-  <div class="admin-body" style="padding:16px 20px">
-    <div class="tr-info-callout" role="note" id="trInfoCallout">
-      <i data-lucide="info"></i>
-      <span>삭제 후 30일이 지나면 자동으로 영구 삭제됩니다. 복원 시 태그 규칙이 재실행됩니다.<br><small>(시연 한정 — 실제 BE는 §9.4.7에 따라 영구삭제 비활성)</small></span>
-    </div>
-
-    <div class="tr-toolbar">
-      <input id="trSearch" class="form-input tr-search" placeholder="제목 또는 이슈 ID 검색" oninput="syncTrFilter()" />
-      <select id="trRange" class="form-select" onchange="syncTrFilter()">
-        <option value="all">전체 기간</option>
-        <option value="today">오늘</option>
-        <option value="7d">최근 7일</option>
-        <option value="30d">최근 30일</option>
-        <option value="overdue">30일 초과 (만료 대상)</option>
-      </select>
-      <select id="trSystem" class="form-select" onchange="syncTrFilter()">
-        <option value="all">전체 시스템</option>
-      </select>
-    </div>
-
-    <div id="trBulkBar" class="tr-bulk-bar" hidden>
-      <span class="tr-bulk-count"><span id="trSelectedCount">0</span>건 선택</span>
-      <button type="button" class="a-btn primary" onclick="restoreSelected()">선택 복원</button>
-      <button type="button" class="a-btn danger" onclick="purgeSelected()">선택 영구삭제</button>
-      <button type="button" class="a-btn" onclick="clearTrSelection()">선택 해제</button>
-    </div>
-
-    <div id="trDenied" class="tr-denied" hidden>
-      <i data-lucide="lock"></i>
-      <span>Admin 권한이 필요합니다.</span>
-    </div>
-
-    <table class="tr-table" id="trTable">
-      <thead>
-        <tr>
-          <th class="tr-th-check"><input type="checkbox" id="trSelectAll" onchange="toggleSelectAll(this)" aria-label="전체 선택" /></th>
-          <th>이슈 ID</th>
-          <th>제목</th>
-          <th>상태</th>
-          <th>시스템/메뉴</th>
-          <th>삭제자</th>
-          <th>원담당자</th>
-          <th>삭제일</th>
-          <th>잔여일</th>
-          <th class="tr-th-actions">작업</th>
-        </tr>
-      </thead>
-      <tbody id="trBody"></tbody>
-    </table>
-
-    <details class="tr-audit" id="trAuditWrap" open>
-      <summary>최근 복원/영구삭제 이력 (voc_restore_log)</summary>
-      <div id="trAuditList"></div>
-    </details>
-  </div>
-</section>
-<!-- END P-8 Trash -->
-
-<!-- ============================================================ -->
-<!-- BEGIN P-10 External Masters (Stage B-12)                     -->
-<!-- ============================================================ -->
-<section id="page-external-masters" class="admin-page">
-  <div class="admin-topbar">
-    <span class="admin-title">외부 마스터</span>
-    <div class="spacer"></div>
-    <!-- H4: scope label — program master excluded (server-restart only) -->
-    <button type="button" class="admin-btn" onclick="emRefreshAll()"
-      title="MSSQL 소스(설비·DB 마스터)만 새로고침 — 프로그램 마스터는 서버 재시작으로만 갱신">
-      <i data-lucide="refresh-cw" style="width:13px;height:13px;vertical-align:-2px"></i>
-      전체 새로고침
-      <span class="em-bulk-sublabel">(MSSQL 2종만)</span>
-    </button>
-  </div>
-  <div class="admin-body" style="padding:16px 20px">
-    <!-- M-05 필드 매핑 섹션 — 읽기 전용, VOC 필드 ↔ 외부 마스터 source key 표 -->
-    <div class="em-field-map-section">
-      <div class="em-field-map-header">
-        <i data-lucide="table-2" style="width:14px;height:14px;vertical-align:-2px;color:var(--text-tertiary)"></i>
-        <span class="em-field-map-title">필드 매핑</span>
-        <span class="em-field-map-desc">VOC 필드가 참조하는 외부 마스터 소스 (읽기 전용)</span>
-      </div>
-      <table class="admin-table em-field-map-table">
-        <thead>
-          <tr>
-            <th>VOC structured_payload 필드</th>
-            <th>외부 마스터</th>
-            <th style="width:90px;text-align:center">검증 여부</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">equipment</code></td>
-            <td><span style="font-size:13px">설비 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">maker</code></td>
-            <td><span style="font-size:13px">설비 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">model</code></td>
-            <td><span style="font-size:13px">설비 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">process</code></td>
-            <td><span style="font-size:13px">설비 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_programs</code></td>
-            <td><span style="font-size:13px">프로그램 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_db_tables</code></td>
-            <td><span style="font-size:13px">DB 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_jobs</code></td>
-            <td><span style="font-size:13px">DB 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-          <tr>
-            <td><code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">related_sps</code></td>
-            <td><span style="font-size:13px">DB 마스터</span></td>
-            <td style="text-align:center;font-size:12px;color:var(--status-green)">O</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- H2: Cold-start system-wide banner — shown/hidden by JS -->
-    <div id="emColdStartBanner" class="em-coldstart-banner">
-      <i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0"></i>
-      <span class="em-coldstart-banner-text">
-        콜드스타트 모드 (스냅샷 파일 미존재 — 전 필드 unverified)
-      </span>
-      <button type="button" class="admin-btn em-coldstart-banner-btn"
-        onclick="window.emMockColdStart=false;window.AdminExternalMasters&&AdminExternalMasters.render()">
-        boot 완료 시뮬레이션
-      </button>
-    </div>
-    <!-- H1: Q5 source-independence note -->
-    <div class="em-atomic-note">
-      <i data-lucide="git-fork" style="width:12px;height:12px"></i>
-      각 소스별 독립 atomic swap — 실패 시 해당 소스만 영향 (Q5 소스 독립 정책)
-    </div>
-    <div id="emGrid" class="em-grid"></div>
-  </div>
-</section>
-<!-- END P-10 External Masters -->
-
-</main>
-
-<!-- ── Drawer ─── -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer">
-  <div class="drawer-header">
-    <div class="drawer-header-left">
-      <div class="d-code" id="dCode"></div>
-      <div class="d-title" id="dTitle"></div>
-    </div>
-    <div class="drawer-actions">
-      <div class="icon-btn" id="expandBtn" data-tip="큰 화면으로 보기" onclick="toggleFullscreen()"><i data-lucide="maximize-2"></i></div>
-      <div class="icon-btn" data-tip="링크 복사"><i data-lucide="link-2"></i></div>
-      <div class="icon-btn" data-tip="삭제 (Admin)"><i data-lucide="trash-2"></i></div>
-      <div class="icon-btn" onclick="closeDrawer()" data-tip="닫기"><i data-lucide="x"></i></div>
-    </div>
-  </div>
-  <div class="drawer-body" id="drawerBody">
-    <!-- Filled dynamically by openDrawer() -->
-  </div>
-</div>
-
-<!-- ── Trash Confirm Modal (P-8 — separate from #modalBg) ─── -->
-<div id="trConfirmBg" class="modal-bg" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="trConfirmTitle">
-    <div class="modal-header">
-      <div class="modal-title" id="trConfirmTitle"></div>
-      <button class="icon-btn" type="button" onclick="closeTrConfirm()" aria-label="닫기">
-        <i data-lucide="x"></i>
-      </button>
-    </div>
-    <div class="modal-body" id="trConfirmBody"></div>
-    <div class="modal-footer" id="trConfirmFooter"></div>
-  </div>
-</div>
-
-<!-- ── Create Modal ─── -->
-<div class="modal-bg" id="modalBg" onclick="handleBgClick(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">새 VOC 등록</span>
-      <div class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></div>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">제목 <span class="form-req">*</span></label>
-        <input class="form-input" type="text" id="titleInput"
-          placeholder="문제를 간결하게 설명해 주세요 (최대 200자)"
-          maxlength="200" oninput="onTitleInput(this)" />
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">시스템 <span class="form-req">*</span></label>
-          <select class="form-select" id="modalSysSelect" onchange="onModalSysChange()">
-            <option value="">시스템 선택...</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">메뉴 <span class="form-req">*</span></label>
-          <select class="form-select" id="modalMenuSelect" disabled>
-            <option value="">시스템 먼저 선택...</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row" style="margin-top:var(--sp-3)">
-        <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">유형 <span class="form-req">*</span></label>
-          <select class="form-select" id="modalTypeSelect">
-            <option value="">유형 선택...</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">우선순위 <span style="color:var(--text-quaternary);font-size:10px">(Admin 설정)</span></label>
-          <select class="form-select" id="modalPrioritySelect" onchange="onModalPriorityChange(this.value)" disabled><option value="medium">Medium (기본값)</option><option value="urgent">Urgent</option><option value="high">High</option><option value="low">Low</option></select>
-        </div>
-      </div>
-      <!-- C-02: Due Date row -->
-      <div class="form-row" style="margin-top:var(--sp-3)">
-        <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">마감일 <span style="color:var(--text-quaternary);font-size:10px">(자동 계산)</span></label>
-          <input type="date" class="form-input" id="modalDueDate" style="font-size:13px" />
-        </div>
-        <div class="form-group" style="margin-bottom:0"></div>
-      </div>
-      <div class="form-group" style="margin-top:var(--sp-4)">
-        <label class="form-label">본문 <span class="form-req">*</span></label>
-        <div class="editor-wrap">
-          <div class="editor-toolbar">
-            <button class="e-btn"><b>B</b></button><button class="e-btn"><i style="font-style:italic">I</i></button>
-            <button class="e-btn"><s>S</s></button><button class="e-btn">H1</button>
-            <button class="e-btn">H2</button><button class="e-btn">—</button>
-            <button class="e-btn">• 목록</button><button class="e-btn">1. 목록</button>
-            <button class="e-btn">&lt;/&gt; 코드</button><button class="e-btn">⊞ 표</button>
-            <button class="e-btn">🖼 이미지</button>
+        <div class="modal-footer">
+          <div class="footer-note"><i data-lucide="info"></i> 등록 후 이슈 ID가 자동 부여됩니다</div>
+          <div class="footer-actions">
+            <button class="btn-ghost" onclick="closeModal()">취소</button>
+            <button class="btn-primary" id="registerVocBtn"><i data-lucide="send"></i> VOC 등록</button>
           </div>
-          <textarea class="editor-area" id="bodyInput"
-            placeholder="문제 상황, 재현 방법, 발생 환경을 상세히 기술해 주세요.&#10;이미지 드래그 앤 드롭 지원 (PNG · JPG · GIF · WebP / 최대 10 MB · 5개)&#10;&#10;※ 실제 구현 시 Toast UI Editor가 이 위치에 마운트됩니다."
-            oninput="onBodyInput(this)"></textarea>
-        </div>
-        <div class="autotag-row" id="autotagRow">
-          <span class="at-label">자동 태그 추천:</span>
-          <span style="font-size:11.5px;color:var(--text-quaternary)">제목·본문 입력 시 자동으로 추천됩니다</span>
-        </div>
-      </div>
-      <!-- N-07: Attachment att-zone (modal) -->
-      <div class="form-group" style="margin-top:var(--sp-4);margin-bottom:0">
-        <label class="form-label">첨부파일 <span style="color:var(--text-quaternary);font-size:10px">(선택 · 이미지만 · 최대 5개)</span></label>
-        <div class="att-zone" id="modal-att-zone">
-          <input type="file" id="modal-file-input" multiple
-            accept="image/png,image/jpeg,image/gif,image/webp"
-            style="display:none" onchange="modalFileSelected(event)" />
-          <div class="att-drop" id="modal-att-drop"
-            ondragenter="modalAttDragEnter(event)"
-            ondragover="modalAttDragOver(event)"
-            ondragleave="modalAttDragLeave(event)"
-            ondrop="modalAttDrop(event)">
-            이미지 드래그 또는
-            <button class="att-select-btn" type="button" onclick="modalAddAttach(event)">선택</button>
-            · 10MB까지 · <span class="att-count-badge" id="modal-att-count">0/5</span>
-          </div>
-          <div class="att-grid" id="modal-att-grid"></div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <div class="footer-note"><i data-lucide="info"></i> 등록 후 이슈 ID가 자동 부여됩니다</div>
-      <div class="footer-actions">
-        <button class="btn-ghost" onclick="closeModal()">취소</button>
-        <button class="btn-primary" id="registerVocBtn"><i data-lucide="send"></i> VOC 등록</button>
+
+    <!-- ── Notification Panel ─── -->
+    <!-- P-12: extended with type filter chips, dynamic list, urgent badge -->
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-header">
+        <span class="notif-title">알림<span id="nfUnreadLabel"></span></span>
+        <span class="notif-mark" onclick="markAllRead()">모두 읽음 처리</span>
       </div>
+      <!-- P-12: type filter chips -->
+      <div class="nf-chips" role="toolbar" aria-label="알림 유형 필터">
+        <button type="button" class="nf-chip nf-chip--active" data-filter="all"
+          onclick="filterByType('all')">전체</button>
+        <button type="button" class="nf-chip" data-filter="comment" onclick="filterByType('comment')">댓글</button>
+        <button type="button" class="nf-chip" data-filter="status" onclick="filterByType('status')">상태</button>
+        <button type="button" class="nf-chip" data-filter="assignee" onclick="filterByType('assignee')">담당자</button>
+        <button type="button" class="nf-chip" data-filter="urgent" onclick="filterByType('urgent')">Urgent</button>
+        <button type="button" class="nf-chip" data-filter="notice" onclick="filterByType('notice')">공지</button>
+        <button type="button" class="nf-chip" data-filter="faq" onclick="filterByType('faq')">FAQ</button>
+      </div>
+      <!-- P-12: dynamic list rendered by notif.js renderNotifPanel() -->
+      <div id="nfList"></div>
     </div>
-  </div>
-</div>
 
-<!-- ── Notification Panel ─── -->
-<!-- P-12: extended with type filter chips, dynamic list, urgent badge -->
-<div class="notif-panel" id="notifPanel">
-  <div class="notif-header">
-    <span class="notif-title">알림<span id="nfUnreadLabel"></span></span>
-    <span class="notif-mark" onclick="markAllRead()">모두 읽음 처리</span>
-  </div>
-  <!-- P-12: type filter chips -->
-  <div class="nf-chips" role="toolbar" aria-label="알림 유형 필터">
-    <button type="button" class="nf-chip nf-chip--active" data-filter="all"      onclick="filterByType('all')">전체</button>
-    <button type="button" class="nf-chip"                 data-filter="comment"  onclick="filterByType('comment')">댓글</button>
-    <button type="button" class="nf-chip"                 data-filter="status"   onclick="filterByType('status')">상태</button>
-    <button type="button" class="nf-chip"                 data-filter="assignee" onclick="filterByType('assignee')">담당자</button>
-    <button type="button" class="nf-chip"                 data-filter="urgent"   onclick="filterByType('urgent')">Urgent</button>
-    <button type="button" class="nf-chip"                 data-filter="notice"   onclick="filterByType('notice')">공지</button>
-    <button type="button" class="nf-chip"                 data-filter="faq"      onclick="filterByType('faq')">FAQ</button>
-  </div>
-  <!-- P-12: dynamic list rendered by notif.js renderNotifPanel() -->
-  <div id="nfList"></div>
-</div>
-
-<!-- Load order matters: dom-utils → helpers → data → consumers → init.js (init MUST stay last) -->
-<script src="js/dom-utils.js"></script>
-<script src="js/helpers.js"></script>
-<script src="js/data.js"></script>
-<script src="js/voc-list.js"></script>
-<script src="js/sidebar.js"></script>
-<script src="js/filters.js"></script>
-<script src="js/drawer-core.js"></script>
-<script src="js/internal-notes.js"></script>
-<script src="js/drawer.js"></script>
-<script src="js/drawer-comments.js"></script>
-<script src="js/drawer-advanced.js"></script>
-<script src="js/attachment-errors.js"></script>
-<script src="js/modal.js"></script>
-<script src="js/notif.js"></script>
-<script src="js/notice-faq.js"></script>
-<script src="js/admin-master.js"></script>
-<!-- B-17 Dashboard 설정 슬라이드 패널 -->
-<script src="js/dashboard-settings-panel.js"></script>
-<script src="js/admin-users.js"></script>
-<!-- B-15 User 관리 가드 토스트 (D14/D15/D16) — must load after admin-users.js -->
-<script src="js/admin-users-guards.js"></script>
-<script src="js/result-review-data.js"></script>
-<script src="js/result-review.js"></script>
-<!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
-<script src="js/admin-tag-master-data.js"></script>
-<script src="js/admin-tag-master.js"></script>
-<script src="js/admin-tag-master-modals.js"></script>
-<!-- END P-7 Tag Master -->
-<script src="js/diff-helpers.js"></script>
-<script src="js/result-review-detail.js"></script>
-<script src="js/dashboard-data.js"></script>
-<script src="js/dashboard-render.js"></script>
-<script src="js/dashboard-actions.js"></script>
-<!-- BEGIN P-8 Trash (Stage B-7 D23) -->
-<script src="js/admin-trash-data.js"></script>
-<script src="js/admin-trash.js"></script>
-<script src="js/admin-trash-modals.js"></script>
-<!-- END P-8 Trash -->
-<!-- BEGIN P-10 External Masters (Stage B-12) -->
-<script src="js/admin-external-masters-data.js"></script>
-<script src="js/admin-external-masters.js"></script>
-<!-- END P-10 External Masters -->
-<script src="js/role-state.js"></script>
-<script src="js/notice-popup.js"></script>
-<script src="js/admin-mode.js"></script>
-<!-- B-4b Notice/FAQ Admin UI — additive, loads after admin-mode.js -->
-<script src="js/notice-admin.js"></script>
-<script src="js/faq-admin.js"></script>
-<script src="js/faq-admin-modals.js"></script>
-<script src="js/admin-states-demo.js"></script>
-<script src="js/dashboard-states-demo.js"></script>
-<script src="js/init.js"></script>
+    <!-- Load order matters: dom-utils → helpers → data → consumers → init.js (init MUST stay last) -->
+    <script src="js/dom-utils.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/list.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/drawer-core.js"></script>
+    <script src="js/internal-notes.js"></script>
+    <script src="js/drawer.js"></script>
+    <script src="js/drawer-comments.js"></script>
+    <script src="js/drawer-advanced.js"></script>
+    <script src="js/attachment-errors.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/notif.js"></script>
+    <script src="js/notice-faq.js"></script>
+    <script src="js/admin-master.js"></script>
+    <!-- B-17 Dashboard 설정 슬라이드 패널 -->
+    <script src="js/dashboard-settings-panel.js"></script>
+    <script src="js/admin-users.js"></script>
+    <!-- B-15 User 관리 가드 토스트 (D14/D15/D16) — must load after admin-users.js -->
+    <script src="js/admin-users-guards.js"></script>
+    <script src="js/result-review-data.js"></script>
+    <script src="js/result-review.js"></script>
+    <!-- BEGIN P-7 Tag Master (Stage B-6 D22) -->
+    <script src="js/admin-tag-master-data.js"></script>
+    <script src="js/admin-tag-master.js"></script>
+    <script src="js/admin-tag-master-modals.js"></script>
+    <!-- END P-7 Tag Master -->
+    <script src="js/diff-helpers.js"></script>
+    <script src="js/result-review-detail.js"></script>
+    <script src="js/dashboard-data.js"></script>
+    <script src="js/dashboard-render.js"></script>
+    <script src="js/dashboard-actions.js"></script>
+    <!-- BEGIN P-8 Trash (Stage B-7 D23) -->
+    <script src="js/admin-trash-data.js"></script>
+    <script src="js/admin-trash.js"></script>
+    <script src="js/admin-trash-modals.js"></script>
+    <!-- END P-8 Trash -->
+    <!-- BEGIN P-10 External Masters (Stage B-12) -->
+    <script src="js/admin-external-masters-data.js"></script>
+    <script src="js/admin-external-masters.js"></script>
+    <!-- END P-10 External Masters -->
+    <script src="js/role-state.js"></script>
+    <script src="js/notice-popup.js"></script>
+    <script src="js/admin-mode.js"></script>
+    <!-- B-4b Notice/FAQ Admin UI — additive, loads after admin-mode.js -->
+    <script src="js/notice-admin.js"></script>
+    <script src="js/faq-admin.js"></script>
+    <script src="js/faq-admin-modals.js"></script>
+    <script src="js/admin-states-demo.js"></script>
+    <script src="js/dashboard-states-demo.js"></script>
+    <script src="js/init.js"></script>
 </body>
+
 </html>
