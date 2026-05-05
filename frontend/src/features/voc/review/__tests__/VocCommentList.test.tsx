@@ -16,7 +16,7 @@ const mkComment = (over: Partial<Comment> = {}): Comment => ({
 });
 
 describe('VocCommentList', () => {
-  it('빈 상태 — "댓글 0개" 헤더 + 푸터 textarea 노출', () => {
+  it('빈 상태 — 빈 메시지 + 푸터 textarea 노출', () => {
     render(
       <VocComment
         comments={[]}
@@ -28,11 +28,11 @@ describe('VocCommentList', () => {
         onDelete={vi.fn()}
       />,
     );
-    expect(screen.getByRole('heading', { name: /댓글 0개/ })).toBeInTheDocument();
+    expect(screen.getByText('아직 작성된 댓글이 없습니다.')).toBeInTheDocument();
     expect(screen.getByLabelText('new comment')).toBeInTheDocument();
   });
 
-  it('댓글 목록 렌더링 + 카운트', () => {
+  it('댓글 목록 렌더링', () => {
     render(
       <VocComment
         comments={[mkComment(), mkComment({ id: 'c-2', body: '확인했습니다' })]}
@@ -44,7 +44,6 @@ describe('VocCommentList', () => {
         onDelete={vi.fn()}
       />,
     );
-    expect(screen.getByRole('heading', { name: /댓글 2개/ })).toBeInTheDocument();
     expect(screen.getByText('리뷰 부탁드립니다')).toBeInTheDocument();
     expect(screen.getByText('확인했습니다')).toBeInTheDocument();
   });

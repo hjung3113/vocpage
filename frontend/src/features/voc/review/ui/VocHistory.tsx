@@ -7,6 +7,23 @@ interface Props {
   loading: boolean;
 }
 
+function ActivityAvatar({ userId }: { userId: string }) {
+  const initial = userId[0]?.toUpperCase() ?? '?';
+  return (
+    <span
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+      style={{ background: 'var(--brand-bg)', color: 'var(--brand)' }}
+      aria-hidden
+    >
+      {initial}
+    </span>
+  );
+}
+
+function formatTime(iso: string) {
+  return iso.slice(0, 16).replace('T', ' ');
+}
+
 export function VocHistory({ entries, loading }: Props) {
   if (loading) return <LoadingState />;
 
@@ -19,22 +36,32 @@ export function VocHistory({ entries, loading }: Props) {
   }
 
   return (
-    <ol className="flex flex-col gap-2">
-      {entries.map((h) => (
-        <li
-          key={h.id}
-          className="rounded border p-2 text-xs"
-          style={{ borderColor: 'var(--border-standard)' }}
-        >
-          <div style={{ color: 'var(--text-secondary)' }}>
-            {h.changed_at.slice(0, 16).replace('T', ' ')}
-          </div>
-          <div style={{ color: 'var(--text-primary)' }}>
-            {(VOC_FIELD_LABELS as Record<string, string>)[h.field] ?? h.field}: {h.old_value ?? '∅'}{' '}
-            → {h.new_value ?? '∅'}
-          </div>
-        </li>
-      ))}
+    <ol className="flex flex-col gap-4 py-1">
+      {entries.map((h) => {
+        const fieldLabel = (VOC_FIELD_LABELS as Record<string, string>)[h.field] ?? h.field;
+        const shortUser = h.changed_by.slice(0, 8);
+        return (
+          <li key={h.id} className="flex gap-3">
+            <ActivityAvatar userId={h.changed_by} />
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <div className="flex flex-wrap items-center gap-x-1 text-xs">
+                <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {shortUser}
+                </span>
+                <span style={{ color: 'var(--text-tertiary)' }}>·</span>
+                <span style={{ color: 'var(--text-secondary)' }}>{fieldLabel} 변경</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>·</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>{formatTime(h.changed_at)}</span>
+              </div>
+              <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <span style={{ color: 'var(--text-tertiary)' }}>{h.old_value ?? '∅'}</span>
+                {' → '}
+                <span style={{ color: 'var(--text-primary)' }}>{h.new_value ?? '∅'}</span>
+              </div>
+            </div>
+          </li>
+        );
+      })}
     </ol>
   );
 }

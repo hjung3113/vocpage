@@ -9,6 +9,8 @@
 > 머지된 PR들(C-1~C-16, F-1/F-2/F-3, F-bundle minor, Issue #155/#156/#162/#166)의 상세는 `progress-archive.md`로 이동. 본 절은 **다음 작업**만.
 > ε batch (C-14 VocCommentList / C-15 VocInternalNotes / C-16 VocSubTaskList) 완료 ✅.
 > **실행 순서 조정 (2026-05-05)**: VOC 리뷰 페이지 고도화 우선 — η batch(C-20~C-23) 먼저 진행 후 ζ batch(C-17~C-19).
+>
+> **C-14 BE 미연결 (2026-05-06)**: Comment CRUD(`POST/GET/PATCH/DELETE /api/vocs/:id/comments`) BE 라우트·컨트롤러·react-query 훅 미작성. FE UI(`VocComment.tsx`)는 빈 배열 + 빈 핸들러로 stub 상태. spec: `feature-voc.md §8.13`. Wave 1.6 종료 후 별도 태스크로 진입.
 
 | 순서 | Batch | leaf                         | 의존                             | 비고                                                                                 |
 | ---- | ----- | ---------------------------- | -------------------------------- | ------------------------------------------------------------------------------------ |

@@ -354,12 +354,50 @@ function assertCanManageVoc(
 - 정적 파일 서빙: Express `static` 미들웨어 또는 별도 `/files/:id` 엔드포인트로 인증 후 제공.
 - 운영 환경에서는 volume을 호스트 경로에 마운트하여 백업 대상 포함.
 
-### 8.13 댓글 수정/삭제 정책
+### 8.13 댓글 (공개 Comment)
+
+#### API
+
+| 메서드   | 경로                                | 권한               | 요청 body          | 응답                   | 에러                   |
+| -------- | ----------------------------------- | ------------------ | ------------------ | ---------------------- | ---------------------- |
+| `GET`    | `/api/vocs/:id/comments`            | 조회 권한자 전체   | —                  | `{ rows: Comment[] }`  | 404 VOC_NOT_FOUND      |
+| `POST`   | `/api/vocs/:id/comments`            | canWrite           | `{ body: string }` | `{ comment: Comment }` | 403, 422 BODY_REQUIRED |
+| `PATCH`  | `/api/vocs/:id/comments/:commentId` | 작성자 본인, Admin | `{ body: string }` | `{ comment: Comment }` | 403, 404               |
+| `DELETE` | `/api/vocs/:id/comments/:commentId` | 작성자 본인, Admin | —                  | `{ ok: true }`         | 403, 404               |
+
+`Comment` shape: `{ id, voc_id, author_id, body, created_at, updated_at }`.
+
+- internal note를 **절대 혼입하지 않음** (§8.16 참조).
+- `GET` 응답은 `created_at ASC` 정렬. 페이지네이션 없음 (MVP: 최대 200건).
+
+#### 수정/삭제 정책
 
 - **수정:** 본인이 작성한 댓글만 수정 가능. 수정 시 `updated_at` 갱신 및 UI에 "(수정됨)" 표시.
 - **삭제:** 본인이 작성한 댓글 삭제 가능(Hard Delete). Admin은 모든 댓글 삭제 가능.
   - 댓글은 의도적 Hard Delete — 댓글은 감사 로그 대상이 아니며, VOC 본문·상태·담당자·Priority 변경만 `voc_history`로 추적.
 - VOC 작성자 본인의 댓글에는 수정/삭제 버튼 노출, 타인 댓글에는 미노출.
+
+#### UI 레이아웃 (2026-05-06 확정)
+
+활동 패널 탭(`Comment` / `History` / `Subtask` / `InternalNote`)은 **underline variant** 사용:
+
+- 탭 목록: 배경·박스 없음, 하단 구분선만 (`var(--bg-elevated)` 1px).
+- 활성 탭: 하단 2px 라인 `var(--brand)`, 텍스트 bold + `var(--text-primary)`.
+- 비활성 탭: `var(--text-secondary)`.
+
+댓글 아이템 레이아웃 (박스 없음, `gap-4` 여백):
+
+```
+[Avatar]  author_id (앞 8자) · 시간  [수정 삭제 - 본인만]
+          본문
+```
+
+- Avatar: 이니셜 원형, `var(--brand-bg)` 배경 / `var(--brand)` 텍스트.
+
+#### BE 구현 현황 (2026-05-06)
+
+- FE UI: ✅ 완료 (`VocComment.tsx` — 빈 배열 + 빈 핸들러로 연결)
+- BE CRUD: ⏳ 미구현 — `POST/GET/PATCH/DELETE /api/vocs/:id/comments` 라우트·컨트롤러·react-query 훅 모두 미작성. Wave 1.6 종료 후 별도 태스크로 진입.
 
 ### 8.14 인앱 알림 폴링
 
