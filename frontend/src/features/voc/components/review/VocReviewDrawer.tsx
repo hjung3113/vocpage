@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/u
 import { cn } from '@shared/lib/cn';
 import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
+import { useVocPermissions } from '../../useVocPermissions';
 import { AuthContext } from '@features/auth/model/AuthContext';
 import { type InternalNote } from '../../../../../../shared/contracts/voc';
 import { VocPermissionGate } from './VocPermissionGate';
@@ -77,12 +78,11 @@ export function VocReviewDrawer({
 }: Props) {
   const detail = useVocDetail(vocId);
   const history = useVocHistory(vocId);
+  const { canWrite, canUpload, canSeeInternal } = useVocPermissions();
   const { role } = useRole();
   const auth = useContext(AuthContext);
   const open = !!vocId;
   const voc = detail.data;
-  const canWrite = role !== 'user';
-  const canUpload = role === 'manager' || role === 'admin';
   const isDeleted = !!voc?.deleted_at;
   const blockedDeleted = isDeleted && role !== 'admin';
 
@@ -176,6 +176,7 @@ export function VocReviewDrawer({
                 role={role}
                 isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
                 canWrite={canWrite}
+                canSeeInternal={canSeeInternal}
                 pending={pending}
                 notes={notes}
                 notesLoading={notesLoading}

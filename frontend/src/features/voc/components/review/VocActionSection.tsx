@@ -14,6 +14,7 @@ interface Props {
   role: Role;
   isOwner: boolean;
   canWrite: boolean;
+  canSeeInternal: boolean;
   pending: boolean;
   notes: InternalNote[] | undefined;
   notesLoading: boolean;
@@ -29,6 +30,7 @@ export function VocActionSection({
   role,
   isOwner,
   canWrite,
+  canSeeInternal,
   pending,
   notes,
   notesLoading,
@@ -43,7 +45,7 @@ export function VocActionSection({
           <TabsTrigger value="comment">Comment</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="subtask">Subtask</TabsTrigger>
-          <TabsTrigger value="internal">InternalNote</TabsTrigger>
+          {canSeeInternal && <TabsTrigger value="internal">InternalNote</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="comment">
@@ -75,16 +77,18 @@ export function VocActionSection({
           />
         </TabsContent>
 
-        <TabsContent value="internal">
-          <VocInternalNotes
-            notes={notes}
-            notesLoading={notesLoading}
-            pending={pending}
-            role={role}
-            isOwner={isOwner}
-            onAdd={onAddNote}
-          />
-        </TabsContent>
+        {canSeeInternal && (
+          <TabsContent value="internal">
+            <VocInternalNotes
+              notes={notes}
+              notesLoading={notesLoading}
+              pending={pending}
+              role={role}
+              isOwner={isOwner}
+              onAdd={onAddNote}
+            />
+          </TabsContent>
+        )}
       </Tabs>
     </CollapsibleSection>
   );
