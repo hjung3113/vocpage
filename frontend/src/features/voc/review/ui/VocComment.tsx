@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Textarea } from '@shared/ui/textarea';
 import type { Comment } from '@contracts/voc';
+import { ActivityAvatar, formatActivityTime } from './ActivityAvatar';
 
 export type { Comment };
 
@@ -13,23 +14,6 @@ interface Props {
   onAdd: (body: string) => void;
   onEdit: (id: string, body: string) => void;
   onDelete: (id: string) => void;
-}
-
-function ActivityAvatar({ userId }: { userId: string }) {
-  const initial = userId[0]?.toUpperCase() ?? '?';
-  return (
-    <span
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-      style={{ background: 'var(--brand-bg)', color: 'var(--brand)' }}
-      aria-hidden
-    >
-      {initial}
-    </span>
-  );
-}
-
-function formatTime(iso: string) {
-  return iso.slice(0, 16).replace('T', ' ');
 }
 
 export function VocComment({
@@ -81,7 +65,7 @@ export function VocComment({
                       </span>
                       <span style={{ color: 'var(--text-tertiary)' }}>·</span>
                       <span style={{ color: 'var(--text-tertiary)' }}>
-                        {formatTime(c.created_at)}
+                        {formatActivityTime(c.created_at)}
                         {edited && <span className="ml-1">(수정됨)</span>}
                       </span>
                     </div>
