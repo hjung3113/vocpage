@@ -3,8 +3,8 @@
 ## 다음 세션 시작점
 
 → **현재: FSD 리팩토링 진행 중** (진행 문서: `docs/specs/plans/fsd-migration.md`)
-   Step 0 ✅ / Step 1 ✅ (PR #207) / Step 2 ✅ (PR #208) / Step 3 ✅ (PR #211) / Step 4 🟡 (branch: `refactor/fsd-features-layer`, commit 3e108ce — PR 대기)
-   **[세션 시작 시]** Step 4 PR 머지 확인 → Step 5 (`refactor/fsd-widgets-layer`) 착수.
+   Step 0 ✅ / Step 1 ✅ (PR #207) / Step 2 ✅ (PR #208) / Step 3 ✅ (PR #211) / Step 4 ✅ (PR #213 + W3 #215 머지 완료)
+   **[세션 시작 시]** Step 5 (`refactor/fsd-widgets-layer`) 착수.
    완료 후 → Wave 1.6 ζ-batch C-17 진입.
    §7.2 batch 순서: ~~α(C-2~C-7)~~ → ~~β(C-8~C-10 + F-bundle)~~ → ~~γ(C-11)~~ →
    ~~δ(C-12, C-13)~~ → ~~ε(C-14∥C-15∥C-16)~~ → ~~[VocReview 피드백 + PR #202]~~ → **[폴더/네이밍/컨벤션 정리]** → ζ(C-17 → C-18∥C-19) → η(C-20∥C-21∥C-22∥C-23) → Phase D.
