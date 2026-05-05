@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { VocTable } from '../VocTable';
-import type { VocListResponse, VocSortColumn } from '../../../../../../shared/contracts/voc';
+import type { VocListResponse, VocSortColumn } from '../../../../../../../shared/contracts/voc';
 
 const COMMON_FIELDS = {
   voc_type_id: 'vtype-001',

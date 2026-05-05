@@ -1,13 +1,13 @@
-import type { Voc } from '../../../../../shared/contracts/voc/entity';
+import type { Voc } from '../../../../../../shared/contracts/voc/entity';
 import { VocSection } from './VocSection';
-import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocAssignee } from '@entities/voc';
+import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocTagPill } from '@entities/voc';
 
-export interface VocMetaSectionProps {
+export interface VocDetailSectionProps {
   voc: Voc;
-  assigneeMap: Record<string, string>;
   vocTypeMap?: Record<string, { slug: string; name: string }>;
   systemMap?: Record<string, string>;
   menuMap?: Record<string, string>;
+  tags?: string[];
 }
 
 const LABEL_STYLE: React.CSSProperties = {
@@ -39,40 +39,39 @@ function MetaField({
   );
 }
 
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  return iso.slice(0, 10);
-}
-
-export function VocMetaSection({
+export function VocDetailSection({
   voc,
-  assigneeMap,
   vocTypeMap,
   systemMap,
   menuMap,
-}: VocMetaSectionProps) {
+  tags,
+}: VocDetailSectionProps) {
   const vocType = vocTypeMap?.[voc.voc_type_id];
-  const assigneeName = voc.assignee_id ? (assigneeMap[voc.assignee_id] ?? null) : null;
   const systemLabel = systemMap?.[voc.system_id] ?? '—';
   const menuLabel = menuMap?.[voc.menu_id] ?? '—';
+  const tagList = tags ?? [];
 
   return (
-    <VocSection title="정보" testId="voc-meta-panel">
+    <VocSection title="정보" testId="voc-detail-panel">
       <div
-        data-pcomp="VocMetaSection"
+        data-pcomp="VocDetailSection"
         className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
         style={{ background: 'var(--bg-surface)' }}
       >
-        <MetaField label="등록일" testId="meta-created_at">
-          <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
+        <MetaField label="시스템" testId="meta-system">
+          <span style={VALUE_STYLE}>{systemLabel}</span>
         </MetaField>
 
-        <MetaField label="상태" testId="meta-status">
-          <VocStatusBadge status={voc.status} />
+        <MetaField label="메뉴" testId="meta-menu">
+          <span style={VALUE_STYLE}>{menuLabel}</span>
         </MetaField>
 
         <MetaField label="우선순위" testId="meta-priority">
           <VocPriorityBadge priority={voc.priority} />
+        </MetaField>
+
+        <MetaField label="상태" testId="meta-status">
+          <VocStatusBadge status={voc.status} />
         </MetaField>
 
         <MetaField label="유형" testId="meta-type">
@@ -83,24 +82,20 @@ export function VocMetaSection({
           )}
         </MetaField>
 
-        <MetaField label="담당자" testId="meta-assignee">
-          <VocAssignee name={assigneeName} />
-        </MetaField>
-
-        <MetaField label="마감일" testId="meta-due_date">
-          <span style={VALUE_STYLE}>{formatDate(voc.due_date)}</span>
-        </MetaField>
-
-        <MetaField label="시스템" testId="meta-system">
-          <span style={VALUE_STYLE}>{systemLabel}</span>
-        </MetaField>
-
-        <MetaField label="메뉴" testId="meta-menu">
-          <span style={VALUE_STYLE}>{menuLabel}</span>
+        <MetaField label="태그" testId="meta-tags">
+          {tagList.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {tagList.map((tag) => (
+                <VocTagPill key={tag} name={tag} />
+              ))}
+            </div>
+          ) : (
+            <span style={VALUE_STYLE}>—</span>
+          )}
         </MetaField>
       </div>
     </VocSection>
   );
 }
 
-export default VocMetaSection;
+export default VocDetailSection;

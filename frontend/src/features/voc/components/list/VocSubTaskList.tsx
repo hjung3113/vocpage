@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
-import type { VocStatus } from '../../../../../shared/contracts/voc';
+import type { VocStatus } from '../../../../../../shared/contracts/voc';
 
 export interface SubTaskItem {
   id: string;

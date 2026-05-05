@@ -3,8 +3,8 @@ import type {
   AssigneeListItem,
   TagListItem,
   VocTypeListItem,
-} from '../../../../../shared/contracts/master/io';
-import type { VocPriority } from '../../../../../shared/contracts/voc/entity';
+} from '../../../../../../shared/contracts/master/io';
+import type { VocPriority } from '../../../../../../shared/contracts/voc/entity';
 
 export interface VocAdvancedFiltersValue {
   assignees?: string[];

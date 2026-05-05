@@ -1,7 +1,7 @@
 import { Layers, Circle, Search, Zap, PauseCircle, CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
-import type { VocStatus as VocStatusType } from '../../../../../shared/contracts/voc';
+import type { VocStatus as VocStatusType } from '../../../../../../shared/contracts/voc';
 
 const STATUS_TOKEN: Record<VocStatusType, string> = {
   접수: 'var(--status-pending, var(--bg-info-subtle))',

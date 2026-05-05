@@ -1,8 +1,8 @@
 import { Search, Plus } from 'lucide-react';
 import { Input } from '@shared/ui/input';
 import { Button } from '@shared/ui/button';
-import { VocNotificationsDropdown } from './VocNotificationsDropdown';
-import type { VocNotificationsDropdownProps } from './VocNotificationsDropdown';
+import { VocNotificationsDropdown } from '../notification/VocNotificationsDropdown';
+import type { VocNotificationsDropdownProps } from '../notification/VocNotificationsDropdown';
 
 export interface VocTopbarProps {
   totalCount: number;

@@ -5,13 +5,15 @@ import { cn } from '@shared/lib/cn';
 import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
 import { AuthContext } from '@features/auth/model/AuthContext';
-import { type InternalNote } from '../../../../../shared/contracts/voc';
+import { type InternalNote } from '../../../../../../shared/contracts/voc';
 import { VocPermissionGate } from './VocPermissionGate';
 import { LoadingState } from '@shared/ui/skeleton';
 import { ErrorState } from '@shared/ui/error-state';
 import { type AttachmentItem } from './VocReviewSections';
 import { VocActionSection } from './VocActionSection';
-import { VocMetaSection } from './VocMetaSection';
+import { VocDetailSection } from './VocDetailSection';
+import { VocPeopleSection } from './VocPeopleSection';
+import { VocDateSection } from './VocDateSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
 import { VocBodySection } from './VocBodySection';
 import { VocAttachmentSection } from './VocReviewSections';
@@ -35,6 +37,7 @@ interface Props {
   vocTypeMap?: Record<string, { slug: string; name: string }>;
   systemMap?: Record<string, string>;
   menuMap?: Record<string, string>;
+  tags?: string[];
   onClose: () => void;
   onAddNote: (id: string, body: string) => Promise<unknown>;
 }
@@ -67,6 +70,7 @@ export function VocReviewDrawer({
   vocTypeMap,
   systemMap,
   menuMap,
+  tags,
   onClose,
   onAddNote,
 }: Props) {
@@ -145,13 +149,15 @@ export function VocReviewDrawer({
           {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
           {voc && !blockedDeleted && (
             <div className="flex flex-col gap-4">
-              <VocMetaSection
+              <VocDetailSection
                 voc={voc}
-                assigneeMap={assigneeMap}
                 vocTypeMap={vocTypeMap}
                 systemMap={systemMap}
                 menuMap={menuMap}
+                tags={tags}
               />
+              <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
+              <VocDateSection voc={voc} />
               <VocBodySection body={voc.body} />
               <VocAttachmentSection items={attachments} canUpload={canUpload} />
               <VocActionSection

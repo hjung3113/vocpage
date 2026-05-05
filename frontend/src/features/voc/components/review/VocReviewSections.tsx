@@ -1,6 +1,6 @@
 import { Button } from '@shared/ui/button';
 import { LoadingState } from '@shared/ui/skeleton';
-import type { VocHistoryEntry } from '../../../../../shared/contracts/voc';
+import type { VocHistoryEntry } from '../../../../../../shared/contracts/voc';
 import { VocSection } from './VocSection';
 
 export interface AttachmentItem {

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Textarea } from '@shared/ui/textarea';
 import { LoadingState } from '@shared/ui/skeleton';
-import type { InternalNote } from '../../../../../shared/contracts/voc';
-import type { Role } from '../../../../../shared/contracts/common';
+import type { InternalNote } from '../../../../../../shared/contracts/voc';
+import type { Role } from '../../../../../../shared/contracts/common';
 
 interface Props {
   notes: InternalNote[] | undefined;

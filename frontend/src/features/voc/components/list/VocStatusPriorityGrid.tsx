@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select';
-import { VocStatus, VocPriority, type VocUpdate } from '../../../../../shared/contracts/voc';
-import type { Voc } from '../../../../../shared/contracts/voc/entity';
+import { VocStatus, VocPriority, type VocUpdate } from '../../../../../../shared/contracts/voc';
+import type { Voc } from '../../../../../../shared/contracts/voc/entity';
 
 const STATUS_LOCK_TITLE = '결과 검토가 승인되어 상태 변경이 잠겨 있습니다.';
 const STATUS_LOCK_LABEL = '상태 변경 잠김: 결과 검토가 승인되었습니다.';
