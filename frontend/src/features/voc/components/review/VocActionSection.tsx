@@ -2,10 +2,10 @@ import type { InternalNote, VocHistoryEntry } from '../../../../../../shared/con
 import { CollapsibleSection } from './CollapsibleSection';
 import type { Role } from '../../../../../../shared/contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
-import { VocHistoryTab } from './VocHistoryTab';
-import { VocCommentList } from './VocCommentList';
+import { VocHistory } from './VocHistory';
+import { VocComment } from './VocComment';
 import { VocInternalNotes } from './VocInternalNotes';
-import { VocSubTaskList } from '../list/VocSubTaskList';
+import { VocSubTask } from './VocSubTask';
 
 interface Props {
   vocId: string;
@@ -48,7 +48,7 @@ export function VocActionSection({
 
         <TabsContent value="comment">
           {/* TODO(FU): wire api/comments + react-query mutations. C-14 ships UI only. */}
-          <VocCommentList
+          <VocComment
             comments={[]}
             currentUserId={currentUserId}
             canWrite={canWrite}
@@ -60,12 +60,12 @@ export function VocActionSection({
         </TabsContent>
 
         <TabsContent value="history">
-          <VocHistoryTab entries={historyEntries} loading={historyLoading} />
+          <VocHistory entries={historyEntries} loading={historyLoading} />
         </TabsContent>
 
         <TabsContent value="subtask">
           {/* TODO(FU): wire subtask CRUD + onOpen navigation. C-16 ships UI only. */}
-          <VocSubTaskList
+          <VocSubTask
             parentId={vocId}
             parentIsSubtask={parentIsSubtask}
             subs={[]}
