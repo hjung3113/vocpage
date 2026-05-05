@@ -1,3 +1,5 @@
+export { formatActivityTime } from '../lib/formatActivityTime';
+
 interface Props {
   userId: string;
 }
@@ -13,8 +15,4 @@ export function ActivityAvatar({ userId }: Props) {
       {initial}
     </span>
   );
-}
-
-export function formatActivityTime(iso: string) {
-  return iso.slice(0, 16).replace('T', ' ');
 }
