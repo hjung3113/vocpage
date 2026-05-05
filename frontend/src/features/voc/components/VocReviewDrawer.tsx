@@ -2,12 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useContext } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog';
 import { cn } from '@shared/lib/cn';
-import { vocApi } from '../../../api/voc';
-import { queryKeys } from '../../../api/queryKeys';
+import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
 import { AuthContext } from '@features/auth/model/AuthContext';
 import { type InternalNote } from '../../../../../shared/contracts/voc';
-import { VocPermissionGate } from '../../../components/voc/VocPermissionGate';
+import { VocPermissionGate } from './VocPermissionGate';
 import { LoadingState } from '@shared/ui/skeleton';
 import { ErrorState } from '@shared/ui/error-state';
 import { type AttachmentItem } from './VocReviewSections';
@@ -43,7 +42,7 @@ interface Props {
 function useVocDetail(id: string | null) {
   const { role } = useRole();
   return useQuery({
-    queryKey: id ? queryKeys.voc.detail(role, id) : ['voc', role, 'detail', 'none'],
+    queryKey: id ? vocQueryKeys.detail(role, id) : ['voc', role, 'detail', 'none'],
     queryFn: () => vocApi.get(id!),
     enabled: !!id,
   });
@@ -52,7 +51,7 @@ function useVocDetail(id: string | null) {
 function useVocHistory(id: string | null) {
   const { role } = useRole();
   return useQuery({
-    queryKey: id ? queryKeys.voc.history(role, id) : ['voc', role, 'history', 'none'],
+    queryKey: id ? vocQueryKeys.history(role, id) : ['voc', role, 'history', 'none'],
     queryFn: () => vocApi.history(id!),
     enabled: !!id,
   });

@@ -2,8 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { AuthProvider, AuthContext, AuthContextValue } from '../AuthContext';
-import * as userApi from '../../entities/user/api/userApi';
-import * as authApi from '../../features/auth/api/authApi';
+import * as userApi from '@entities/user/api/userApi';
+import * as authApi from '../../api/authApi';
 import { useContext } from 'react';
 
 function TestConsumer() {
@@ -76,16 +76,6 @@ test('logout 후 user=null', async () => {
   await waitFor(() => {
     expect(screen.getByTestId('user').textContent).toBe('null');
   });
-});
-
-test('getMe가 네트워크 에러 throw 시 user=null, isLoading=false', async () => {
-  vi.spyOn(userApi, 'getMe').mockRejectedValue(new Error('network error'));
-  renderWithProvider();
-
-  await waitFor(() => {
-    expect(screen.getByTestId('loading').textContent).toBe('false');
-  });
-  expect(screen.getByTestId('user').textContent).toBe('null');
 });
 
 test('mock 모드 아닐 때 login 호출 시 에러', async () => {

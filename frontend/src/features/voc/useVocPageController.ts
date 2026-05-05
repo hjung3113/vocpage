@@ -5,9 +5,8 @@ import { useVocFilters } from './useVocFilters';
 import { useUpdateVoc, useAddNote, useNotes } from './useVocMutation';
 import { useRole } from '@entities/user/model/useRole';
 import { useCreateVoc } from '@features/voc-create/model/useCreateVoc';
-import { mastersApi } from '../../api/masters';
-import { notificationsApi } from '../../api/notifications';
-import { queryKeys } from '../../api/queryKeys';
+import { mastersApi, masterQueryKeys } from '@entities/master';
+import { notificationsApi, notificationQueryKeys } from '@entities/notification';
 import type { VocFilter, VocSortColumn, SortDir, VocCreate, VocStatus } from '@contracts/voc';
 import type { NotificationItem } from '@contracts/notification';
 
@@ -23,29 +22,29 @@ export function useVocPageController() {
   const notes = useNotes(vocId);
 
   const assigneesQ = useQuery({
-    queryKey: queryKeys.users.list(role.role, { kind: 'assignees' }),
+    queryKey: masterQueryKeys.assignees.list(role.role),
     queryFn: () => mastersApi.assignees(),
     staleTime: 5 * 60_000,
   });
   const tagsQ = useQuery({
-    queryKey: queryKeys.tags.list(role.role),
+    queryKey: masterQueryKeys.tags.list(role.role),
     queryFn: () => mastersApi.tags(),
     staleTime: 5 * 60_000,
   });
   const vocTypesQ = useQuery({
-    queryKey: ['masters', role.role, 'voc-types'] as const,
+    queryKey: masterQueryKeys.vocTypes.list(role.role),
     queryFn: () => mastersApi.vocTypes(),
     staleTime: 5 * 60_000,
   });
   const notificationsQ = useQuery({
-    queryKey: queryKeys.notifications.list(role.role),
+    queryKey: notificationQueryKeys.list(role.role),
     queryFn: () => notificationsApi.list(),
     staleTime: 30_000,
   });
 
   const markAllRead = useMutation({
     mutationFn: () => notificationsApi.markAllRead(),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.notifications.all(role.role) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: notificationQueryKeys.all(role.role) }),
   });
 
   const createVoc = useCreateVoc();

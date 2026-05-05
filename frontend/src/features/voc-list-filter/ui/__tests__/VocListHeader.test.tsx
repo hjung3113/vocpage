@@ -83,7 +83,7 @@ describe('VocListHeader', () => {
   // light-dark wrapped color-space literals in CSS for prototype-fidelity shadows).
   it('C-6 CSS block (between START/END markers) contains no hex or raw OKLCH', () => {
     const css = readFileSync(
-      resolve(__dirname, '..', '..', '..', 'shared', 'styles', 'globals.css'),
+      resolve(__dirname, '..', '..', '..', '..', 'shared', 'styles', 'globals.css'),
       'utf-8',
     );
     const start = css.indexOf('=== C-6 VocListHeader styles START ===');

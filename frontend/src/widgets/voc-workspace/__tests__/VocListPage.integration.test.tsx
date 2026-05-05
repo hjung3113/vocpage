@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VocListPage } from '../VocListPage';
-import { RoleContext } from '../../../contexts/RoleContext';
+import { RoleContext } from '@entities/user';
 import { VOC_FIXTURES } from '../../../../../shared/fixtures/voc.fixtures';
 import {
   ASSIGNEE_FIXTURES,
@@ -15,7 +15,7 @@ import { NOTIFICATION_FIXTURES } from '../../../../../shared/fixtures/notificati
 import type { Role } from '../../../../../shared/contracts/common';
 import type { VocStatus } from '../../../../../shared/contracts/voc';
 
-vi.mock('../../../api/voc', () => ({
+vi.mock('@entities/voc/api/vocApi', () => ({
   vocApi: {
     list: vi.fn(),
     get: vi.fn(),
@@ -26,23 +26,23 @@ vi.mock('../../../api/voc', () => ({
     history: vi.fn(),
   },
 }));
-vi.mock('../../../api/masters', () => ({
+vi.mock('@entities/master/api/masterApi', () => ({
   mastersApi: {
     assignees: vi.fn(),
     tags: vi.fn(),
     vocTypes: vi.fn(),
   },
 }));
-vi.mock('../../../api/notifications', () => ({
+vi.mock('@entities/notification/api/notificationApi', () => ({
   notificationsApi: {
     list: vi.fn(),
     markAllRead: vi.fn(),
   },
 }));
 
-import { vocApi } from '../../../api/voc';
-import { mastersApi } from '../../../api/masters';
-import { notificationsApi } from '../../../api/notifications';
+import { vocApi } from '@entities/voc/api/vocApi';
+import { mastersApi } from '@entities/master/api/masterApi';
+import { notificationsApi } from '@entities/notification/api/notificationApi';
 
 const live = VOC_FIXTURES.filter((r) => r.deleted_at === null).map((r) => ({
   ...r,

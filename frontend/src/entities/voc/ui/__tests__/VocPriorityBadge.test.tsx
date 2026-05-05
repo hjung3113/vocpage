@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { VocPriorityBadge } from '../VocPriorityBadge';
-import type { VocPriority } from '../../../../../shared/contracts/voc';
+import type { VocPriority } from '@contracts/voc';
 
 describe('VocPriorityBadge', () => {
   type Case = [VocPriority, string, string, number];
