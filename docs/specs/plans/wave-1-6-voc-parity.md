@@ -13,6 +13,8 @@
 > **C-14 BE 미연결 (2026-05-06)**: Comment CRUD(`POST/GET/PATCH/DELETE /api/vocs/:id/comments`) + 이미지 업로드(`POST /api/vocs/:id/comments/images`) BE 라우트·컨트롤러·react-query 훅 미작성. FE UI(`VocComment.tsx`)는 빈 배열 + 빈 핸들러로 stub 상태, 에디터는 `<Textarea>` 임시 사용 (BE 연결 시 `<ToastBodyEditor>`로 교체). spec: `feature-voc.md §8.13`. Wave 1.6 종료 후 별도 태스크로 진입.
 >
 > **C-16 서브태스크 onOpen 스텁 (2026-05-06)**: `VocSubTask.tsx`의 `onOpen` 핸들러가 `() => {}` 스텁. 클릭 시 해당 서브태스크 드로어 전환 + URL `?voc={id}` 동기화 필요 (FE 라우터 연결). spec: `feature-voc.md §9.2.3`. Wave 1.6 종료 후 별도 태스크로 진입.
+>
+> **코드리뷰 FU (2026-05-06)**: PR #232-236 리뷰 피드백 — formatActivityTime lib 분리 + 단위테스트, SubTaskListResponse shared/contracts 이동, dead props 4개 제거, comments/subtasks/history 쿼리 VocActionSection co-location, 적대적 리뷰 1회. PR #237.
 
 | 순서 | Batch | leaf                         | 의존                             | 비고                                                                                 |
 | ---- | ----- | ---------------------------- | -------------------------------- | ------------------------------------------------------------------------------------ |
