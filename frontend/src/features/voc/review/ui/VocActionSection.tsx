@@ -61,7 +61,7 @@ export function VocActionSection({
           />
         </TabsContent>
 
-        <TabsContent value="history">
+        <TabsContent value="history" data-testid="drawer-history">
           <VocHistory entries={historyEntries} loading={historyLoading} />
         </TabsContent>
 

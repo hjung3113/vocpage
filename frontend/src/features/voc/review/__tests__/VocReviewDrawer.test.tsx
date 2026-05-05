@@ -93,7 +93,7 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
     expect(screen.getByLabelText('new comment')).toBeInTheDocument();
     // 내부노트는 탭 전환 후 노출
-    await user.click(screen.getByRole('tab', { name: '내부노트' }));
+    await user.click(screen.getByRole('tab', { name: 'InternalNote' }));
     await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
   });
 
@@ -116,7 +116,7 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     const user = userEvent.setup();
     renderDrawer('manager', target.id);
     await waitFor(() => expect(screen.getByRole('tablist')).toBeInTheDocument());
-    await user.click(screen.getByRole('tab', { name: '변경이력' }));
+    await user.click(screen.getByRole('tab', { name: 'History' }));
     await waitFor(() => {
       const history = screen.getByTestId('drawer-history');
       expect(within(history).getAllByRole('listitem').length).toBeGreaterThanOrEqual(1);

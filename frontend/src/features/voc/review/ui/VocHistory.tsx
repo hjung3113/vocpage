@@ -1,18 +1,11 @@
 import { LoadingState } from '@shared/ui/skeleton';
 import type { VocHistoryEntry } from '@contracts/voc';
+import { VOC_FIELD_LABELS } from '@features/voc/list/constants';
 
 interface Props {
   entries: VocHistoryEntry[] | undefined;
   loading: boolean;
 }
-
-const FIELD_LABEL: Record<string, string> = {
-  status: '상태',
-  priority: '우선순위',
-  assignee_id: '담당자',
-  due_date: '마감일',
-  title: '제목',
-};
 
 export function VocHistory({ entries, loading }: Props) {
   if (loading) return <LoadingState />;
@@ -37,7 +30,8 @@ export function VocHistory({ entries, loading }: Props) {
             {h.changed_at.slice(0, 16).replace('T', ' ')}
           </div>
           <div style={{ color: 'var(--text-primary)' }}>
-            {FIELD_LABEL[h.field] ?? h.field}: {h.old_value ?? '∅'} → {h.new_value ?? '∅'}
+            {(VOC_FIELD_LABELS as Record<string, string>)[h.field] ?? h.field}: {h.old_value ?? '∅'}{' '}
+            → {h.new_value ?? '∅'}
           </div>
         </li>
       ))}

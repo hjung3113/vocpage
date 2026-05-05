@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import type { VocSortColumn, SortDir } from '@contracts/voc';
 import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
+import { VOC_FIELD_LABELS } from '../constants';
 
 export interface VocListHeaderProps {
   sortBy: VocSortColumn;
@@ -26,12 +27,12 @@ interface CellDef {
 
 const CELLS: CellDef[] = [
   { key: 'expand', label: '' },
-  { key: 'issue_code', label: '이슈 ID', sortKey: 'issue_code' },
-  { key: 'title', label: '제목', sortKey: 'title' },
-  { key: 'status', label: '상태', sortKey: 'status' },
-  { key: 'assignee', label: '담당자', sortKey: 'assignee' },
-  { key: 'priority', label: '우선순위', sortKey: 'priority' },
-  { key: 'created_at', label: '등록일', sortKey: 'created_at' },
+  { key: 'issue_code', label: VOC_FIELD_LABELS['issue_code'], sortKey: 'issue_code' },
+  { key: 'title', label: VOC_FIELD_LABELS['title'], sortKey: 'title' },
+  { key: 'status', label: VOC_FIELD_LABELS['status'], sortKey: 'status' },
+  { key: 'assignee', label: VOC_FIELD_LABELS['assignee'], sortKey: 'assignee' },
+  { key: 'priority', label: VOC_FIELD_LABELS['priority'], sortKey: 'priority' },
+  { key: 'created_at', label: VOC_FIELD_LABELS['created_at'], sortKey: 'created_at' },
 ];
 
 const CONTAINER_STYLE: CSSProperties = {
