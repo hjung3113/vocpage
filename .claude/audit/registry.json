@@ -181,8 +181,23 @@
       "detection": "Bash command가 cat <소스파일>",
       "hookify_feasible": true,
       "allowed_fix_types": ["hookify", "claude_md", "spec", "manual"],
-      "status": "promoted",
-      "fix_history": [],
+      "status": "under_remediation",
+      "fix_history": [
+        {
+          "fix_type": "hookify",
+          "queued_at": "2026-05-05T12:30:00.000Z",
+          "note": "promoted→hookify_queued. Debated in 2-expert review before queuing.",
+          "target_file": ".claude/hookify.block-cat-fullfile.local.md"
+        },
+        {
+          "fix_type": "hookify",
+          "reference": "hookify:.claude/hookify.block-cat-fullfile.local.md",
+          "applied_at": "2026-05-05T12:45:00.000Z",
+          "note": "hookify_queued→hookified→under_remediation. Rule written in warn mode. Pattern: (^|[;&|]\\s*)cat(\\s+-[a-zA-Z]+)*\\s+[^<\\s][^\\s]*\\.(ts|tsx|js|jsx|py|go|sql)\\b. 15 regression cases passed. 3-reviewer debate (regex + ops). Flip to block- after 1 warn-mode session with 0 FP.",
+          "warn_mode": true,
+          "flip_to_block_after_sessions": 1
+        }
+      ],
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": false,
@@ -192,7 +207,10 @@
       "promoted_at": "2026-05-05T10:46:16.671392+00:00",
       "promotion_note": "occ=8/10, disp_conf=0.72, 4 work_types. defer_reason 만료 (Promote when occ reaches 8 + next_session_redetect fired in session 87fe1b75).",
       "defer_expired_at": "2026-05-05T10:46:16.671392+00:00",
-      "defer_expired_reason": "occ=8 reached, next_session_redetect fired in session 87fe1b75"
+      "defer_expired_reason": "occ=8 reached, next_session_redetect fired in session 87fe1b75",
+      "hookify_queued_at": "2026-05-05T12:30:00.000Z",
+      "hookified_at": "2026-05-05T12:45:00.000Z",
+      "under_remediation_at": "2026-05-05T12:45:00.000Z"
     },
     {
       "id": "R5",
@@ -319,7 +337,8 @@
       "fix_history": [],
       "regression_count": 0,
       "reactivation_count": 0,
-      "baseline_hooked": true
+      "baseline_hooked": true,
+      "baseline_hooked_note": "Hook pre-existing since day 1 (block-push-to-main.local.md). No pre-hook baseline exists — remediation lifecycle is not applicable because attempt rate cannot be compared against an unhooked baseline. 7/12 occ are all hook-blocked attempts (0 bypasses confirmed). Attempt rate is tracked by hook log itself; no formal registry transition needed. Re-evaluate only if hook is found to be bypassable."
     },
     {
       "id": "R14",
@@ -578,6 +597,38 @@
       "baseline_hooked": false,
       "added_from_session": "0221f5ca-909d-4d03-af8f-78a34396a839",
       "added_at": "2026-05-05T04:54:19.386247+00:00"
+    },
+    {
+      "id": "R18",
+      "category": "rule_violation",
+      "title": "Unscoped expansion after terse approval",
+      "detection": "All three conditions: (1) prior assistant turn ends with '?' (was a question awaiting decision); (2) user response is ≤3 tokens; (3) subsequent assistant execution spans >20 tool calls across ≥3 distinct file/domain roots without scope restatement. Rationale: guards against false-positives from mid-task acks ('ok, continue') and deep single-feature tasks that legitimately exceed 20 calls.",
+      "hookify_feasible": false,
+      "allowed_fix_types": ["claude_md", "spec", "manual"],
+      "status": "candidate",
+      "fix_history": [],
+      "regression_count": 0,
+      "reactivation_count": 0,
+      "baseline_hooked": false,
+      "added_from_session": "90dc6009-8a14-4d84-89eb-264cf7a2f6fa",
+      "added_at": "2026-05-05T12:30:00.000Z",
+      "new_candidate_rationale": "Session 90dc6009: 'ok' (single-word) triggered 60 tool calls without scope restatement. Adversarial review confirmed this is distinct from R9 (uncertainty gate) — it is a scope-discipline failure, not an epistemic one. Root: CLAUDE.md 'Input Interpretation' frame."
+    },
+    {
+      "id": "C8",
+      "category": "cost_anomaly",
+      "title": "Untruncated subagent return absorption",
+      "detection": "Agent tool_result ≥10000 chars absorbed verbatim into main context without summarization; AND next assistant turn does not contain a explicit summary of the return content. Threshold rationale: typical agent returns are 3-8KB; 10000-char floor targets the anomalous absorption (13742-char trigger case) while avoiding noise from normal explore/planner outputs.",
+      "hookify_feasible": false,
+      "allowed_fix_types": ["claude_md", "spec", "manual"],
+      "status": "candidate",
+      "fix_history": [],
+      "regression_count": 0,
+      "reactivation_count": 0,
+      "baseline_hooked": false,
+      "added_from_session": "90dc6009-8a14-4d84-89eb-264cf7a2f6fa",
+      "added_at": "2026-05-05T12:30:00.000Z",
+      "new_candidate_rationale": "Session 90dc6009: adversarial review (13742 chars) returned verbatim into main context, causing cache_create spike (peak 128036). Distinct from C2 (agent output spike) — this is input-context inflation from subagent returns. Fix target: summarize/truncate Agent results before absorbing, not reduce agent output."
     }
   ]
 }
