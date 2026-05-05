@@ -15,7 +15,7 @@ test.describe('VOC happy path', () => {
 
     // 3. Open create modal
     await page.click('button:has-text("새 VOC 등록")');
-    await expect(page.locator('[data-pcomp="voc-create-modal"]')).toBeVisible();
+    await expect(page.locator('[data-pcomp="create-modal"]')).toBeVisible();
 
     // 4. Fill the form
     await page.fill('#voc-title', 'E2E happy path test VOC');
@@ -25,10 +25,10 @@ test.describe('VOC happy path', () => {
     await expect(page.locator('#voc-type')).toHaveValue(/.+/, { timeout: 5_000 });
 
     // Submit
-    await page.click('[data-pcomp="voc-create-modal"] button[type="submit"]');
+    await page.click('[data-pcomp="create-modal"] button[type="submit"]');
 
     // 5. Modal closes after successful submit
-    await expect(page.locator('[data-pcomp="voc-create-modal"]')).not.toBeVisible({
+    await expect(page.locator('[data-pcomp="create-modal"]')).not.toBeVisible({
       timeout: 8_000,
     });
 
@@ -41,7 +41,7 @@ test.describe('VOC happy path', () => {
     // 7. Click a VOC by stable fixture issue_code (ANALYSIS-2026-0001 has 5 history entries).
     //    Avoids fragile sort-order assumptions.
     await rows.filter({ hasText: 'ANALYSIS-2026-0001' }).first().click();
-    await expect(page.locator('[data-pcomp="voc-review-drawer"]')).toBeVisible({
+    await expect(page.locator('[data-pcomp="review-drawer"]')).toBeVisible({
       timeout: 8_000,
     });
 

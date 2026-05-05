@@ -1,0 +1,1191 @@
+{
+  "version": 2,
+  "registry_version": 2,
+  "updated": "2026-05-05T10:39:57.161740+00:00",
+  "sessions_total": 10,
+  "audit_revisions_per_session": {
+    "9cf1cdcb-f893-4526-afc7-1e94a60a3fa0": 1,
+    "1475424b-201c-4ee0-b013-57e41aae871a": 1,
+    "26f0bd46-b7e1-4456-b1a1-2211fa89a12c": 1,
+    "118adc67-334f-4eb5-8d78-7ab3ce18be35": 1,
+    "247db5a5-4b57-4a83-8fb2-b1b99a300e82": 2,
+    "850ac399-3081-4f53-ab6a-362fb1819802": 1,
+    "0221f5ca-909d-4d03-af8f-78a34396a839": 1,
+    "337d1911-bf8d-47ee-8c91-0aa8e1100d1b": 1,
+    "43ef1450-37e0-4637-9d23-cb98bee852c2": 1,
+    "87fe1b75-2315-42d0-926f-fef7752b3573": 1
+  },
+  "audit_cost_cumulative": 1901705,
+  "detected_waste_cumulative": 13448628,
+  "items": {
+    "C2": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 18,
+        "count_sum_sq": 74,
+        "tokens_est_sum": 34920,
+        "tokens_est_count": 5,
+        "ordinal_sum": 11,
+        "ordinal_count": 5,
+        "agreement_sum": 2.5,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 4,
+          "count_sum": 15,
+          "count_sum_sq": 40,
+          "tokens_est_sum": 14972,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 8,
+          "count_sum_sq": 40,
+          "tokens_est_sum": 14972,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 3,
+          "count_sum_sq": 9,
+          "tokens_est_sum": 3071,
+          "tokens_est_count": 1,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 4
+        }
+      },
+      "verdicts": {
+        "unknown": 4,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "C4": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 22,
+        "count_sum_sq": 154,
+        "tokens_est_sum": 572000,
+        "tokens_est_count": 4,
+        "ordinal_sum": 10,
+        "ordinal_count": 5,
+        "agreement_sum": 9.75,
+        "agreement_count": 5
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 22,
+          "count_sum_sq": 154,
+          "tokens_est_sum": 566000,
+          "tokens_est_count": 3,
+          "ordinal_sum": 8,
+          "ordinal_count": 4,
+          "agreement_sum": 5.75,
+          "agreement_count": 4
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 7,
+          "count_sum_sq": 25,
+          "tokens_est_sum": 4000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 2,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 2,
+          "count_sum_sq": 4,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 2,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "C7": {
+      "lifetime": {
+        "sessions_occurred_count": 2,
+        "count_sum": 4,
+        "count_sum_sq": 8,
+        "tokens_est_sum": 14000,
+        "tokens_est_count": 2,
+        "ordinal_sum": 4,
+        "ordinal_count": 2,
+        "agreement_sum": 2.5,
+        "agreement_count": 2
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 2,
+          "count_sum": 4,
+          "count_sum_sq": 8,
+          "tokens_est_sum": 14000,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 2.5,
+          "agreement_count": 2
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 1,
+          "count_sum": 2,
+          "count_sum_sq": 4,
+          "tokens_est_sum": 8000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 2,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 2,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "R1": {
+      "lifetime": {
+        "sessions_occurred_count": 9,
+        "count_sum": 48,
+        "count_sum_sq": 350,
+        "tokens_est_sum": 251900,
+        "tokens_est_count": 9,
+        "ordinal_sum": 19,
+        "ordinal_count": 9,
+        "agreement_sum": 15.0,
+        "agreement_count": 8
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 7,
+          "count_sum": 38,
+          "count_sum_sq": 132,
+          "tokens_est_sum": 192900,
+          "tokens_est_count": 4,
+          "ordinal_sum": 9,
+          "ordinal_count": 4,
+          "agreement_sum": 5.0,
+          "agreement_count": 4
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 3,
+          "count_sum": 8,
+          "count_sum_sq": 26,
+          "tokens_est_sum": 7400,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 1.5,
+          "agreement_count": 2
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 800,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 1.0,
+          "agreement_count": 1
+        },
+        "docs_conventions": {
+          "sessions_occurred_count": 1,
+          "count_sum": 9
+        },
+        "refactor": {
+          "sessions_occurred_count": 2,
+          "count_sum": 15,
+          "count_sum_sq": 25,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 3,
+          "agreement_count": 1,
+          "tokens_est_sum": 5500,
+          "tokens_est_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 8,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "R2": {
+      "lifetime": {
+        "sessions_occurred_count": 9,
+        "count_sum": 52,
+        "count_sum_sq": 440,
+        "tokens_est_sum": 662488,
+        "tokens_est_count": 9,
+        "ordinal_sum": 20,
+        "ordinal_count": 9,
+        "agreement_sum": 16.75,
+        "agreement_count": 8
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 7,
+          "count_sum": 41,
+          "count_sum_sq": 103,
+          "tokens_est_sum": 36800,
+          "tokens_est_count": 4,
+          "ordinal_sum": 8,
+          "ordinal_count": 4,
+          "agreement_sum": 4.75,
+          "agreement_count": 4
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 3,
+          "count_sum": 12,
+          "count_sum_sq": 62,
+          "tokens_est_sum": 18800,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 2.25,
+          "agreement_count": 2
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 4,
+          "count_sum_sq": 16,
+          "tokens_est_sum": 6488,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 1.0,
+          "agreement_count": 1
+        },
+        "docs_conventions": {
+          "sessions_occurred_count": 1,
+          "count_sum": 7
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 4
+        }
+      },
+      "verdicts": {
+        "unknown": 8,
+        "true_positive": 1,
+        "false_positive": 0
+      },
+      "post_fix": {
+        "sessions_total": 1,
+        "work_type_matches": 0
+      }
+    },
+    "R3": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 24,
+        "count_sum_sq": 146,
+        "tokens_est_sum": 53200,
+        "tokens_est_count": 5,
+        "ordinal_sum": 9,
+        "ordinal_count": 5,
+        "agreement_sum": 6.25,
+        "agreement_count": 5
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 24,
+          "count_sum_sq": 97,
+          "tokens_est_sum": 23200,
+          "tokens_est_count": 3,
+          "ordinal_sum": 5,
+          "ordinal_count": 3,
+          "agreement_sum": 3.25,
+          "agreement_count": 3
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 10,
+          "count_sum_sq": 68,
+          "tokens_est_sum": 2400,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "R10": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 6,
+        "count_sum_sq": 8,
+        "tokens_est_sum": 0,
+        "tokens_est_count": 0,
+        "ordinal_sum": 11,
+        "ordinal_count": 5,
+        "agreement_sum": 3.75,
+        "agreement_count": 5
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 4,
+          "count_sum": 5,
+          "count_sum_sq": 6,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 7,
+          "ordinal_count": 3,
+          "agreement_sum": 2.25,
+          "agreement_count": 3
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 3,
+          "count_sum_sq": 5,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 5,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 0.5,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "C5": {
+      "lifetime": {
+        "sessions_occurred_count": 6,
+        "count_sum": 98,
+        "count_sum_sq": 8294,
+        "tokens_est_sum": 12466712,
+        "tokens_est_count": 6,
+        "ordinal_sum": 16,
+        "ordinal_count": 6,
+        "agreement_sum": 3.0,
+        "agreement_count": 5
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 97,
+          "count_sum_sq": 12,
+          "tokens_est_sum": 8824969,
+          "tokens_est_count": 3,
+          "ordinal_sum": 8,
+          "ordinal_count": 3,
+          "agreement_sum": 1.75,
+          "agreement_count": 3
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 3,
+          "count_sum": 5,
+          "count_sum_sq": 11,
+          "tokens_est_sum": 2322671,
+          "tokens_est_count": 2,
+          "ordinal_sum": 5,
+          "ordinal_count": 2,
+          "agreement_sum": 1.5,
+          "agreement_count": 2
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 2570001,
+          "tokens_est_count": 1,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 91
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "P6": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 11,
+        "count_sum_sq": 31,
+        "tokens_est_sum": 8900,
+        "tokens_est_count": 4,
+        "ordinal_sum": 9,
+        "ordinal_count": 5,
+        "agreement_sum": 3.75,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 11,
+          "count_sum_sq": 14,
+          "tokens_est_sum": 8600,
+          "tokens_est_count": 3,
+          "ordinal_sum": 6,
+          "ordinal_count": 3,
+          "agreement_sum": 1.75,
+          "agreement_count": 3
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 4,
+          "count_sum_sq": 10,
+          "tokens_est_sum": 3600,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 1.5,
+          "agreement_count": 2
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "P7": {
+      "lifetime": {
+        "sessions_occurred_count": 4,
+        "count_sum": 10,
+        "count_sum_sq": 42,
+        "tokens_est_sum": 72000,
+        "tokens_est_count": 3,
+        "ordinal_sum": 10,
+        "ordinal_count": 4,
+        "agreement_sum": 4.25,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 4,
+          "count_sum": 10,
+          "count_sum_sq": 6,
+          "tokens_est_sum": 60000,
+          "tokens_est_count": 2,
+          "ordinal_sum": 6,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 3,
+          "count_sum_sq": 5,
+          "tokens_est_sum": 18000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 4,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "P2": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 44,
+        "count_sum_sq": 718,
+        "tokens_est_sum": 980,
+        "tokens_est_count": 4,
+        "ordinal_sum": 7,
+        "ordinal_count": 5,
+        "agreement_sum": 3.25,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 44,
+          "count_sum_sq": 198,
+          "tokens_est_sum": 780,
+          "tokens_est_count": 3,
+          "ordinal_sum": 4,
+          "ordinal_count": 3,
+          "agreement_sum": 2.25,
+          "agreement_count": 3
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 15,
+          "count_sum_sq": 197,
+          "tokens_est_sum": 500,
+          "tokens_est_count": 2,
+          "ordinal_sum": 3,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 6
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "P4": {
+      "lifetime": {
+        "sessions_occurred_count": 6,
+        "count_sum": 12,
+        "count_sum_sq": 30,
+        "tokens_est_sum": 48800,
+        "tokens_est_count": 3,
+        "ordinal_sum": 11,
+        "ordinal_count": 6,
+        "agreement_sum": 3.5,
+        "agreement_count": 5
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 9,
+          "count_sum_sq": 20,
+          "tokens_est_sum": 36800,
+          "tokens_est_count": 2,
+          "ordinal_sum": 9,
+          "ordinal_count": 4,
+          "agreement_sum": 2.5,
+          "agreement_count": 4
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 4,
+          "count_sum_sq": 10,
+          "tokens_est_sum": 1800,
+          "tokens_est_count": 1,
+          "ordinal_sum": 5,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "docs_conventions": {
+          "sessions_occurred_count": 1,
+          "count_sum": 3
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "R4": {
+      "lifetime": {
+        "sessions_occurred_count": 8,
+        "count_sum": 60,
+        "count_sum_sq": 944,
+        "tokens_est_sum": 38800,
+        "tokens_est_count": 7,
+        "ordinal_sum": 14,
+        "ordinal_count": 8,
+        "agreement_sum": 9.25,
+        "agreement_count": 7
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 7,
+          "count_sum": 58,
+          "count_sum_sq": 615,
+          "tokens_est_sum": 26400,
+          "tokens_est_count": 4,
+          "ordinal_sum": 8,
+          "ordinal_count": 4,
+          "agreement_sum": 4.75,
+          "agreement_count": 4
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 10,
+          "count_sum_sq": 68,
+          "tokens_est_sum": 2000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 0.5,
+          "agreement_count": 1
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 2,
+          "count_sum_sq": 4,
+          "tokens_est_sum": 400,
+          "tokens_est_count": 1,
+          "ordinal_sum": 1,
+          "ordinal_count": 1,
+          "agreement_sum": 0.5,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 2,
+          "count_sum": 41,
+          "count_sum_sq": 529,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 3,
+          "agreement_count": 1,
+          "tokens_est_sum": 18000,
+          "tokens_est_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 7,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "R12": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 31,
+        "count_sum_sq": 363,
+        "tokens_est_sum": 64500,
+        "tokens_est_count": 2,
+        "ordinal_sum": 13,
+        "ordinal_count": 5,
+        "agreement_sum": 4.5,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 5,
+          "count_sum": 31,
+          "count_sum_sq": 73,
+          "tokens_est_sum": 64500,
+          "tokens_est_count": 2,
+          "ordinal_sum": 7,
+          "ordinal_count": 3,
+          "agreement_sum": 3.5,
+          "agreement_count": 3
+        },
+        "refactor": {
+          "sessions_occurred_count": 2,
+          "count_sum": 23,
+          "count_sum_sq": 36,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "R13": {
+      "lifetime": {
+        "sessions_occurred_count": 5,
+        "count_sum": 8,
+        "count_sum_sq": 16,
+        "tokens_est_sum": 200,
+        "tokens_est_count": 1,
+        "ordinal_sum": 12,
+        "ordinal_count": 5,
+        "agreement_sum": 4.25,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 4,
+          "count_sum": 6,
+          "count_sum_sq": 11,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 6,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "docs_conventions": {
+          "sessions_occurred_count": 1,
+          "count_sum": 2
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 1,
+          "count_sum": 3,
+          "count_sum_sq": 9
+        },
+        "refactor": {
+          "sessions_occurred_count": 2,
+          "count_sum": 2,
+          "count_sum_sq": 1,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 5,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "C6": {
+      "lifetime": {
+        "sessions_occurred_count": 4,
+        "count_sum": 18,
+        "count_sum_sq": 110,
+        "tokens_est_sum": 93000,
+        "tokens_est_count": 4,
+        "ordinal_sum": 8,
+        "ordinal_count": 4,
+        "agreement_sum": 3.75,
+        "agreement_count": 4
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 4,
+          "count_sum": 18,
+          "count_sum_sq": 110,
+          "tokens_est_sum": 93000,
+          "tokens_est_count": 4,
+          "ordinal_sum": 8,
+          "ordinal_count": 4,
+          "agreement_sum": 3.75,
+          "agreement_count": 4
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 1,
+          "count_sum": 8,
+          "count_sum_sq": 64,
+          "tokens_est_sum": 12000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1,
+          "tokens_est_sum": 5000,
+          "tokens_est_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 4,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "C1": {
+      "lifetime": {
+        "sessions_occurred_count": 7,
+        "count_sum": 18,
+        "count_sum_sq": 60,
+        "tokens_est_sum": 1501951,
+        "tokens_est_count": 7,
+        "ordinal_sum": 18,
+        "ordinal_count": 7,
+        "agreement_sum": 5.25,
+        "agreement_count": 6
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 6,
+          "count_sum": 14,
+          "count_sum_sq": 18,
+          "tokens_est_sum": 557608,
+          "tokens_est_count": 3,
+          "ordinal_sum": 8,
+          "ordinal_count": 3,
+          "agreement_sum": 2.25,
+          "agreement_count": 3
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 2,
+          "count_sum": 3,
+          "count_sum_sq": 5,
+          "tokens_est_sum": 85000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "docs_conventions": {
+          "sessions_occurred_count": 1,
+          "count_sum": 4
+        },
+        "refactor": {
+          "sessions_occurred_count": 2,
+          "count_sum": 4,
+          "count_sum_sq": 9,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1,
+          "tokens_est_sum": 220000,
+          "tokens_est_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 6,
+        "confirmed": 0,
+        "false_positive": 0,
+        "true_positive": 1
+      },
+      "post_fix": {
+        "sessions_total": 0,
+        "work_type_matches": 0
+      }
+    },
+    "P3": {
+      "lifetime": {
+        "sessions_occurred_count": 1,
+        "count_sum": 1,
+        "count_sum_sq": 1,
+        "tokens_est_sum": 0,
+        "tokens_est_count": 0,
+        "ordinal_sum": 1,
+        "ordinal_count": 1,
+        "agreement_sum": 1,
+        "agreement_count": 1
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 1,
+        "confirmed": 0,
+        "false_positive": 0
+      },
+      "post_fix": {
+        "sessions_total": 0,
+        "work_type_matches": 0
+      }
+    },
+    "C3": {
+      "lifetime": {
+        "sessions_occurred_count": 4,
+        "count_sum": 1653,
+        "count_sum_sq": 1363323,
+        "tokens_est_sum": 145000,
+        "tokens_est_count": 3,
+        "ordinal_sum": 7,
+        "ordinal_count": 4,
+        "agreement_sum": 3,
+        "agreement_count": 3
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 3,
+          "count_sum": 842,
+          "count_sum_sq": 2,
+          "tokens_est_sum": 125000,
+          "tokens_est_count": 2,
+          "ordinal_sum": 4,
+          "ordinal_count": 2,
+          "agreement_sum": 2,
+          "agreement_count": 2
+        },
+        "docs_conventions": {
+          "sessions_occurred_count": 1,
+          "count_sum": 811
+        },
+        "refactor": {
+          "sessions_occurred_count": 2,
+          "count_sum": 841,
+          "count_sum_sq": 1,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1,
+          "tokens_est_sum": 40000,
+          "tokens_est_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 4,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "R9": {
+      "lifetime": {
+        "sessions_occurred_count": 1,
+        "count_sum": 2,
+        "count_sum_sq": 4,
+        "tokens_est_sum": 25000,
+        "tokens_est_count": 1,
+        "ordinal_sum": 3,
+        "ordinal_count": 1,
+        "agreement_sum": 2,
+        "agreement_count": 1
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 1,
+          "count_sum": 2,
+          "count_sum_sq": 4,
+          "tokens_est_sum": 25000,
+          "tokens_est_count": 1,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 2,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 0,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "R8": {
+      "lifetime": {
+        "sessions_occurred_count": 2,
+        "count_sum": 2,
+        "count_sum_sq": 2,
+        "tokens_est_sum": 21173,
+        "tokens_est_count": 1,
+        "ordinal_sum": 6,
+        "ordinal_count": 2,
+        "agreement_sum": 1.25,
+        "agreement_count": 2
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 21173,
+          "tokens_est_count": 1,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        },
+        "infra": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 3,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 1,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "R14": {
+      "lifetime": {
+        "sessions_occurred_count": 2,
+        "count_sum": 2,
+        "count_sum_sq": 2,
+        "tokens_est_sum": 0,
+        "tokens_est_count": 0,
+        "ordinal_sum": 3,
+        "ordinal_count": 2,
+        "agreement_sum": 1.25,
+        "agreement_count": 2
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 2,
+          "count_sum": 2,
+          "count_sum_sq": 2,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 3,
+          "ordinal_count": 2,
+          "agreement_sum": 1.25,
+          "agreement_count": 2
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 2,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "ordinal_sum": 1,
+          "ordinal_count": 1,
+          "agreement_sum": 1,
+          "agreement_count": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 1,
+        "true_positive": 1,
+        "false_positive": 0
+      }
+    },
+    "R15": {
+      "lifetime": {
+        "sessions_occurred_count": 2,
+        "count_sum": 2,
+        "count_sum_sq": 2,
+        "tokens_est_sum": 0,
+        "tokens_est_count": 0,
+        "ordinal_sum": 3,
+        "ordinal_count": 2,
+        "agreement_sum": 0.25,
+        "agreement_count": 1
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 2,
+          "count_sum": 2,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 1,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "docs_sync": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1,
+          "count_sum_sq": 1,
+          "tokens_est_sum": 0,
+          "tokens_est_count": 0,
+          "ordinal_sum": 1,
+          "ordinal_count": 1,
+          "agreement_sum": 0.25,
+          "agreement_count": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 2,
+        "true_positive": 0,
+        "false_positive": 0
+      }
+    },
+    "R7": {
+      "lifetime": {
+        "sessions_occurred_count": 1,
+        "count_sum": 1,
+        "count_sum_sq": 1,
+        "tokens_est_sum": 2500,
+        "tokens_est_count": 1,
+        "ordinal_sum": 3,
+        "ordinal_count": 1,
+        "agreement_sum": 0,
+        "agreement_count": 0
+      },
+      "by_work_type": {
+        "fe_componentization": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1
+        },
+        "refactor": {
+          "sessions_occurred_count": 1,
+          "count_sum": 1
+        }
+      },
+      "verdicts": {
+        "unknown": 1,
+        "tp": 0,
+        "fp": 0
+      },
+      "post_fix": {}
+    }
+  }
+}
