@@ -1,26 +1,3 @@
-import { TextMark } from '../../shared/ui/badge';
-import { getVocTypeIconConfig } from '../../lib/voc-type-icon';
-
-export interface VocTypeBadgeProps {
-  slug: string;
-  name: string;
-  color?: string;
-}
-
-export function VocTypeBadge({ slug, name }: VocTypeBadgeProps) {
-  const { Icon, color, weight, isUnknown } = getVocTypeIconConfig(slug);
-  const variant = isUnknown ? 'unknown' : slug;
-
-  return (
-    <TextMark
-      variant={variant}
-      iconMode="icon-only"
-      icon={Icon}
-      label={name}
-      color={color}
-      weight={weight}
-      extraTestId={isUnknown ? 'text-mark-unknown' : `voc-type-badge-${slug}`}
-      ariaLabelOverride={`유형 ${name}`}
-    />
-  );
-}
+// re-export stub — real implementation moved to entities/voc/ui/VocTypeBadge (Step 3)
+export { VocTypeBadge } from '@entities/voc/ui/VocTypeBadge';
+export type { VocTypeBadgeProps } from '@entities/voc/ui/VocTypeBadge';
