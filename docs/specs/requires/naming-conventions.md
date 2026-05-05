@@ -79,8 +79,7 @@ suffix가 없는 경우: 가장 서술적인 명사를 직접 사용한다.
 
 ### Section 패턴
 
-`VocSection`은 Drawer 내부 `title + body` 구조의 공용 래퍼.  
-레이아웃이 크게 다를 경우 (`VocMetaSection` 그리드, `VocActionSection` 탭) 자체 루트 요소를 사용하고 `VocSection`을 쓰지 않는다.
+`VocSection`은 Drawer 내부 모든 섹션의 공용 래퍼 — 레이아웃(그리드·탭 등)에 관계없이 항상 사용한다.
 
 ```tsx
 <VocSection title="첨부" testId="drawer-attachments">

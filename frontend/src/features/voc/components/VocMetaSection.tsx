@@ -1,4 +1,5 @@
 import type { Voc } from '../../../../../shared/contracts/voc/entity';
+import { VocSection } from './VocSection';
 import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocAssignee } from '@entities/voc';
 
 export interface VocMetaSectionProps {
@@ -56,48 +57,49 @@ export function VocMetaSection({
   const menuLabel = menuMap?.[voc.menu_id] ?? '—';
 
   return (
-    <div
-      data-testid="voc-meta-panel"
-      data-pcomp="VocMetaSection"
-      className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-      style={{ background: 'var(--bg-surface)' }}
-    >
-      <MetaField label="등록일" testId="meta-created_at">
-        <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
-      </MetaField>
+    <VocSection title="정보" testId="voc-meta-panel">
+      <div
+        data-pcomp="VocMetaSection"
+        className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
+        style={{ background: 'var(--bg-surface)' }}
+      >
+        <MetaField label="등록일" testId="meta-created_at">
+          <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
+        </MetaField>
 
-      <MetaField label="상태" testId="meta-status">
-        <VocStatusBadge status={voc.status} />
-      </MetaField>
+        <MetaField label="상태" testId="meta-status">
+          <VocStatusBadge status={voc.status} />
+        </MetaField>
 
-      <MetaField label="우선순위" testId="meta-priority">
-        <VocPriorityBadge priority={voc.priority} />
-      </MetaField>
+        <MetaField label="우선순위" testId="meta-priority">
+          <VocPriorityBadge priority={voc.priority} />
+        </MetaField>
 
-      <MetaField label="유형" testId="meta-type">
-        {vocType ? (
-          <VocTypeBadge slug={vocType.slug} name={vocType.name} />
-        ) : (
-          <span style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>—</span>
-        )}
-      </MetaField>
+        <MetaField label="유형" testId="meta-type">
+          {vocType ? (
+            <VocTypeBadge slug={vocType.slug} name={vocType.name} />
+          ) : (
+            <span style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>—</span>
+          )}
+        </MetaField>
 
-      <MetaField label="담당자" testId="meta-assignee">
-        <VocAssignee name={assigneeName} />
-      </MetaField>
+        <MetaField label="담당자" testId="meta-assignee">
+          <VocAssignee name={assigneeName} />
+        </MetaField>
 
-      <MetaField label="마감일" testId="meta-due_date">
-        <span style={VALUE_STYLE}>{formatDate(voc.due_date)}</span>
-      </MetaField>
+        <MetaField label="마감일" testId="meta-due_date">
+          <span style={VALUE_STYLE}>{formatDate(voc.due_date)}</span>
+        </MetaField>
 
-      <MetaField label="시스템" testId="meta-system">
-        <span style={VALUE_STYLE}>{systemLabel}</span>
-      </MetaField>
+        <MetaField label="시스템" testId="meta-system">
+          <span style={VALUE_STYLE}>{systemLabel}</span>
+        </MetaField>
 
-      <MetaField label="메뉴" testId="meta-menu">
-        <span style={VALUE_STYLE}>{menuLabel}</span>
-      </MetaField>
-    </div>
+        <MetaField label="메뉴" testId="meta-menu">
+          <span style={VALUE_STYLE}>{menuLabel}</span>
+        </MetaField>
+      </div>
+    </VocSection>
   );
 }
 

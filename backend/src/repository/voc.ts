@@ -38,7 +38,7 @@ export interface ListVocsParams {
   includeDeleted?: boolean;
 }
 
-export type ListVocsRow = Voc & { tags: string[] };
+export type ListVocsRow = Voc & { tags: string[]; has_children: boolean; notes_count: number };
 
 export interface ListVocsResult {
   rows: ListVocsRow[];
@@ -100,13 +100,18 @@ export async function listVocs(params: ListVocsParams): Promise<ListVocsResult> 
   const sortDir = params.sort_dir === 'asc' ? 'ASC' : 'DESC';
   const rows = (
     await pool.query(
-      `SELECT vocs.*, COALESCE(
-         (SELECT array_agg(t.name ORDER BY t.name)
-            FROM voc_tags vt
-            JOIN tags t ON t.id = vt.tag_id
-           WHERE vt.voc_id = vocs.id),
-         ARRAY[]::text[]
-       ) AS tags
+      `SELECT vocs.*,
+         COALESCE(
+           (SELECT array_agg(t.name ORDER BY t.name)
+              FROM voc_tags vt
+              JOIN tags t ON t.id = vt.tag_id
+             WHERE vt.voc_id = vocs.id),
+           ARRAY[]::text[]
+         ) AS tags,
+         EXISTS (
+           SELECT 1 FROM vocs c WHERE c.parent_id = vocs.id AND c.deleted_at IS NULL
+         ) AS has_children,
+         (SELECT COUNT(*)::int FROM voc_internal_notes n WHERE n.voc_id = vocs.id) AS notes_count
        FROM vocs ${where} ORDER BY ${sortColumn} ${sortDir} LIMIT $${i++} OFFSET $${i++}`,
       [...values, params.per_page, offset],
     )
