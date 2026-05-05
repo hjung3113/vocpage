@@ -3,10 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVocList } from './useVocList';
 import { useVocFilters } from './useVocFilters';
 import { useUpdateVoc, useAddNote, useNotes } from './useVocMutation';
-import { useRole } from '../../hooks/useRole';
+import { useRole } from '@features/auth/model/useRole';
+import { useCreateVoc } from '@features/voc-create/model/useCreateVoc';
 import { mastersApi } from '../../api/masters';
 import { notificationsApi } from '../../api/notifications';
-import { vocApi } from '../../api/voc';
 import { queryKeys } from '../../api/queryKeys';
 import type {
   VocFilter,
@@ -53,10 +53,7 @@ export function useVocPageController() {
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.notifications.all(role.role) }),
   });
 
-  const createVoc = useMutation({
-    mutationFn: (payload: VocCreate) => vocApi.create(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.voc.all(role.role) }),
-  });
+  const createVoc = useCreateVoc();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);

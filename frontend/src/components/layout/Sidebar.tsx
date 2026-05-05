@@ -10,7 +10,7 @@ import {
   Code2,
 } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
-import { useRole } from '../../hooks/useRole';
+import { useRole } from '@features/auth/model/useRole';
 
 interface NavItem {
   to: string;
