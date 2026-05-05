@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import MockLoginPage from '../MockLoginPage';
-import { AuthContext, type AuthContextValue } from '../../contexts/AuthContext';
-import * as authApi from '../../api/auth';
+import { AuthContext, type AuthContextValue } from '@features/auth/model/AuthContext';
+import * as authApi from '@features/auth/api/authApi';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {

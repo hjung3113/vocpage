@@ -3,16 +3,13 @@ import { AuthProvider } from '@features/auth/model/AuthContext';
 import { NotificationProvider } from '@features/notification/model/NotificationContext';
 import { MasterCacheProvider } from '@features/master-cache/model/MasterCacheContext';
 import { VOCFilterProvider } from '@features/voc-list-filter/model/VocFilterContext';
-import { VOCDrawerProvider } from './VOCDrawerContext';
 
 const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <AuthProvider>
       <NotificationProvider>
         <MasterCacheProvider>
-          <VOCFilterProvider>
-            <VOCDrawerProvider>{children}</VOCDrawerProvider>
-          </VOCFilterProvider>
+          <VOCFilterProvider>{children}</VOCFilterProvider>
         </MasterCacheProvider>
       </NotificationProvider>
     </AuthProvider>
