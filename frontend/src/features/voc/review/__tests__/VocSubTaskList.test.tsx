@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { VocSubTask, type SubTaskItem } from '../ui/VocSubTask';
+import { VocSubTask } from '../ui/VocSubTask';
+import type { SubTaskItem } from '@contracts/voc';
 
 const item = (over: Partial<SubTaskItem> = {}): SubTaskItem => ({
   id: 's-1',

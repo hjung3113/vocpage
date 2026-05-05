@@ -14,7 +14,3 @@ export function ActivityAvatar({ userId }: Props) {
     </span>
   );
 }
-
-export function formatActivityTime(iso: string) {
-  return iso.slice(0, 16).replace('T', ' ');
-}

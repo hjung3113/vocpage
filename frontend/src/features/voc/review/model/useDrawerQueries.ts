@@ -20,20 +20,20 @@ export function useVocHistory(id: string | null) {
   });
 }
 
-export function useVocComments(id: string | null) {
+export function useVocComments(id: string) {
   const { role } = useRole();
   return useQuery({
-    queryKey: id ? vocQueryKeys.comments(role, id) : ['voc', role, 'comments', 'none'],
-    queryFn: () => vocApi.comments(id!),
+    queryKey: vocQueryKeys.comments(role, id),
+    queryFn: () => vocApi.comments(id),
     enabled: !!id,
   });
 }
 
-export function useVocSubtasks(id: string | null) {
+export function useVocSubtasks(id: string) {
   const { role } = useRole();
   return useQuery({
-    queryKey: id ? vocQueryKeys.subtasks(role, id) : ['voc', role, 'subtasks', 'none'],
-    queryFn: () => vocApi.subtasks(id!),
+    queryKey: vocQueryKeys.subtasks(role, id),
+    queryFn: () => vocApi.subtasks(id),
     enabled: !!id,
   });
 }
