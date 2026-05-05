@@ -112,7 +112,7 @@ export function VocReviewDrawer({
 
         {/* Custom header */}
         <div
-          className="flex items-start gap-3 px-4 py-3 shrink-0"
+          className="flex items-start gap-3 px-4 py-5 shrink-0"
           style={{ borderBottom: '1px solid var(--border-standard)' }}
         >
           <div className="flex-1 min-w-0">
@@ -138,7 +138,7 @@ export function VocReviewDrawer({
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
           {detail.isLoading && <LoadingState />}
           {detail.isError &&
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
