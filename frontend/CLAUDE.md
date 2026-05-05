@@ -41,7 +41,6 @@ Flow: analyze prototype → map components → define types → build with dummy
 - **Key hooks:** `useVOCFilter`, `useAutoTag`, `useDrawer`.
 - **State:** React Context or Redux for global filter/selection.
 - **Base components:** Radix UI primitives — ghost buttons, translucent cards, border-focused inputs.
-- **Component naming:** suffix rules (`*Drawer`, `*Section`, `*Panel`, `*Card`, `*Item`) → `docs/specs/requires/component-naming.md`.
 
 ## Styling Architecture
 
@@ -64,6 +63,12 @@ Full token reference: `docs/specs/requires/uidesign.md §10 CSS Reference` and `
 - Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)
 
 Key tokens: `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--brand)` / `var(--accent)` / `var(--text-primary)` / `var(--text-secondary)`
+
+## Conventions
+
+Before writing FE code, look up the task in `docs/specs/README.md §0.2` (task → file + section routing table). Read any convention file with `limit=2` first — line 2 is `When to read` — then read in full only if relevant.
+
+All files in `docs/specs/requires/`: `naming-conventions.md` · `state-management-conventions.md` · `api-conventions.md` · `routing-conventions.md` · `error-loading-conventions.md` · `form-conventions.md` · `table-filter-conventions.md` · `datetime-conventions.md` · `test-conventions.md` · `env-conventions.md`.
 
 ## Sub-tree map (non-src)
 
