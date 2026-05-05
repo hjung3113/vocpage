@@ -249,6 +249,35 @@ box-shadow: 0 0 0 1px var(--brand-border); /* double-ring: intentional active si
 - Filterbar height: `44px` — deliberately secondary to topbar's `56px`
 - Filter tab row: `height: 44px; padding: 0 var(--sp-5)` — distinct zone between topbar and list header
 
+### Underline Tab (Activity Panel)
+
+Used in the VOC review drawer activity section (`Comment / History / Subtask / InternalNote`). Implemented as `variant="underline"` on `TabsList` / `TabsTrigger` (`shared/ui/tabs`).
+
+```css
+/* TabsList */
+background: transparent;
+border-radius: 0;
+padding: 0;
+border-bottom: 1px solid var(--bg-elevated);
+
+/* TabsTrigger — base */
+background: transparent;
+border-radius: 0;
+border-bottom: 2px solid transparent;
+padding: 4px 12px 8px;
+color: var(--text-secondary);
+font-size: 14px;
+
+/* TabsTrigger — active */
+border-bottom-color: var(--brand);
+color: var(--text-primary);
+font-weight: 600;
+```
+
+- No background, no box shadow, no rounded corners — flat underline only.
+- Active indicator: `var(--brand)` 2px bottom border (auto light/dark via token).
+- Avatar used in activity item rows: `var(--brand-bg)` fill, `var(--brand)` text, 28px circle.
+
 ### Status Badge
 
 Full pill style — background + border + text color, all semantic. Not dot-only.

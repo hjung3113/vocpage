@@ -41,11 +41,21 @@ export function VocActionSection({
   return (
     <CollapsibleSection title="활동" testId="drawer-actions">
       <Tabs defaultValue="comment" data-pcomp="review-sections">
-        <TabsList className="w-full justify-start">
-          <TabsTrigger value="comment">Comment</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="subtask">Subtask</TabsTrigger>
-          {canSeeInternal && <TabsTrigger value="internal">InternalNote</TabsTrigger>}
+        <TabsList variant="underline">
+          <TabsTrigger variant="underline" value="comment">
+            Comment
+          </TabsTrigger>
+          <TabsTrigger variant="underline" value="history">
+            History
+          </TabsTrigger>
+          <TabsTrigger variant="underline" value="subtask">
+            Subtask
+          </TabsTrigger>
+          {canSeeInternal && (
+            <TabsTrigger variant="underline" value="internal">
+              InternalNote
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="comment">
