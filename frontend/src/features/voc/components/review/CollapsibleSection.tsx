@@ -28,7 +28,7 @@ export function CollapsibleSection({
         <ChevronDown
           className={cn(
             'h-3.5 w-3.5 shrink-0 transition-transform duration-150',
-            !isOpen && 'rotate-90',
+            !isOpen && '-rotate-90',
           )}
           style={{ color: 'var(--text-secondary)' }}
         />

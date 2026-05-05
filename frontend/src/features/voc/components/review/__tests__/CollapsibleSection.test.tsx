@@ -88,16 +88,16 @@ describe('CollapsibleSection', () => {
       </CollapsibleSection>,
     );
     const chevron = document.querySelector('svg');
-    expect(chevron).not.toHaveClass('rotate-90');
+    expect(chevron).not.toHaveClass('-rotate-90');
   });
 
-  it('chevron이 접힌 상태에서 오른쪽을 향한다(rotate-90 또는 -rotate-90 없음)', () => {
+  it('chevron이 접힌 상태에서 오른쪽을 향한다(-rotate-90)', () => {
     render(
       <CollapsibleSection title="Details" defaultOpen={false}>
         <p>c</p>
       </CollapsibleSection>,
     );
     const chevron = document.querySelector('svg');
-    expect(chevron).toHaveClass('rotate-90');
+    expect(chevron).toHaveClass('-rotate-90');
   });
 });
