@@ -1,0 +1,45 @@
+# ── Build / dependency artifacts ──────────────────────────────────
+node_modules/
+dist/
+build/
+*.js.map
+*.d.ts
+*.tsbuildinfo
+
+# ── Lock files (no signal for the graph) ──────────────────────────
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ── Auto-generated / tool state ───────────────────────────────────
+graphify-out/
+.git/
+.claude/
+.omc/
+.external_brainstorming/
+utils/
+
+# ── Test artifacts ────────────────────────────────────────────────
+frontend/test-results/
+frontend/playwright-report/
+coverage/
+
+# ── Font / static binary assets ───────────────────────────────────
+frontend/public/fonts/
+*.woff
+*.woff2
+*.ttf
+*.otf
+
+# ── Prototype HTML (large single-file, too noisy) ─────────────────
+# prototype/prototype.html
+
+# ── Archive plans are superseded — include only if doing history work
+# docs/specs/archive/
+
+# ── Config files with no architectural signal ─────────────────────
+*.env
+*.env.*
+.eslintrc*
+.prettierrc*
+tsconfig.base.json
