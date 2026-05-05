@@ -1,7 +1,7 @@
 {
   "version": 2,
   "registry_version": 2,
-  "updated": "2026-05-05T05:02:29.448521+00:00",
+  "updated": "2026-05-05T10:46:16.671392+00:00",
   "fix_type_strength": ["hookify", "claude_md", "spec", "manual"],
   "rule_taxonomy": [
     "tool_routing",
@@ -181,14 +181,18 @@
       "detection": "Bash command가 cat <소스파일>",
       "hookify_feasible": true,
       "allowed_fix_types": ["hookify", "claude_md", "spec", "manual"],
-      "status": "candidate",
+      "status": "promoted",
       "fix_history": [],
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": false,
       "defer_reason": "Defer until R1 hookify rule is written — same category, learn from that first. Promote when occ reaches 8.",
       "defer_recorded_at": "2026-05-05T07:35:00.000Z",
-      "defer_review_trigger": "next_session_redetect"
+      "defer_review_trigger": "next_session_redetect",
+      "promoted_at": "2026-05-05T10:46:16.671392+00:00",
+      "promotion_note": "occ=8/10, disp_conf=0.72, 4 work_types. defer_reason 만료 (Promote when occ reaches 8 + next_session_redetect fired in session 87fe1b75).",
+      "defer_expired_at": "2026-05-05T10:46:16.671392+00:00",
+      "defer_expired_reason": "occ=8 reached, next_session_redetect fired in session 87fe1b75"
     },
     {
       "id": "R5",
@@ -288,13 +292,21 @@
       "detection": "test 미수정 commit에 src/ 신규/수정",
       "hookify_feasible": true,
       "allowed_fix_types": ["hookify", "claude_md", "spec", "manual"],
-      "status": "candidate",
-      "fix_history": [],
+      "status": "hookify_queued",
+      "fix_history": [
+        {
+          "fix_type": "hookify",
+          "queued_at": "2026-05-05T10:46:16.671392+00:00",
+          "note": "fast_track promote+queue. PostToolUse on Edit/Write to frontend/src/**/*.tsx — verify corresponding test file exists."
+        }
+      ],
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": false,
       "fast_track": true,
-      "fast_track_reason": "Core CLAUDE.md violation (TDD-only rule). occ=4/9. At occ=5: immediately promote + queue hookify (PostToolUse on Edit/Write to frontend/src/**/*.tsx — verify corresponding test file exists)."
+      "fast_track_reason": "Core CLAUDE.md violation (TDD-only rule). occ=4/9. At occ=5: immediately promote + queue hookify (PostToolUse on Edit/Write to frontend/src/**/*.tsx — verify corresponding test file exists).",
+      "promoted_at": "2026-05-05T10:46:16.671392+00:00",
+      "promotion_note": "occ=5/10, disp_conf=0.45, 2 work_types, fast_track trigger fired at occ=5. Direct candidate→hookify_queued per fast_track_reason."
     },
     {
       "id": "R13",
