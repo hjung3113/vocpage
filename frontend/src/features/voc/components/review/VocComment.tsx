@@ -21,7 +21,7 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-export function VocCommentList({
+export function VocComment({
   comments,
   currentUserId,
   canWrite,

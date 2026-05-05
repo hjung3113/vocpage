@@ -14,7 +14,7 @@ const FIELD_LABEL: Record<string, string> = {
   title: '제목',
 };
 
-export function VocHistoryTab({ entries, loading }: Props) {
+export function VocHistory({ entries, loading }: Props) {
   if (loading) return <LoadingState />;
 
   if (!entries || entries.length === 0) {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { VocCommentList, type Comment } from '../VocCommentList';
+import { VocComment, type Comment } from '../VocComment';
 
 const ME = '11111111-1111-4111-8111-111111111111';
 const OTHER = '22222222-2222-4222-8222-222222222222';
@@ -18,7 +18,7 @@ const mkComment = (over: Partial<Comment> = {}): Comment => ({
 describe('VocCommentList', () => {
   it('빈 상태 — "댓글 0개" 헤더 + 푸터 textarea 노출', () => {
     render(
-      <VocCommentList
+      <VocComment
         comments={[]}
         currentUserId={ME}
         canWrite
@@ -34,7 +34,7 @@ describe('VocCommentList', () => {
 
   it('댓글 목록 렌더링 + 카운트', () => {
     render(
-      <VocCommentList
+      <VocComment
         comments={[mkComment(), mkComment({ id: 'c-2', body: '확인했습니다' })]}
         currentUserId={ME}
         canWrite
@@ -51,7 +51,7 @@ describe('VocCommentList', () => {
 
   it('편집/삭제 버튼은 본인 댓글에만 노출', () => {
     render(
-      <VocCommentList
+      <VocComment
         comments={[mkComment({ id: 'mine', author_id: ME }), mkComment({ id: 'theirs' })]}
         currentUserId={ME}
         canWrite
@@ -68,7 +68,7 @@ describe('VocCommentList', () => {
 
   it('canWrite=false → 푸터 숨김', () => {
     render(
-      <VocCommentList
+      <VocComment
         comments={[mkComment()]}
         currentUserId={ME}
         canWrite={false}
@@ -84,7 +84,7 @@ describe('VocCommentList', () => {
   it('편집 → 취소 → 원본 보존 (수정 안됨)', () => {
     const onEdit = vi.fn();
     render(
-      <VocCommentList
+      <VocComment
         comments={[mkComment({ id: 'mine', author_id: ME, body: '원본 텍스트' })]}
         currentUserId={ME}
         canWrite
@@ -106,7 +106,7 @@ describe('VocCommentList', () => {
   it('공백만 입력 → 저장 disabled, onAdd 미호출', () => {
     const onAdd = vi.fn();
     render(
-      <VocCommentList
+      <VocComment
         comments={[]}
         currentUserId={ME}
         canWrite
@@ -122,7 +122,7 @@ describe('VocCommentList', () => {
 
   it('pending=true → 저장 버튼 disabled', () => {
     render(
-      <VocCommentList
+      <VocComment
         comments={[]}
         currentUserId={ME}
         canWrite
@@ -139,7 +139,7 @@ describe('VocCommentList', () => {
   it('Ctrl+Enter → onAdd 호출', () => {
     const onAdd = vi.fn();
     render(
-      <VocCommentList
+      <VocComment
         comments={[]}
         currentUserId={ME}
         canWrite
@@ -158,7 +158,7 @@ describe('VocCommentList', () => {
   it('저장 클릭 → onAdd 호출 + textarea 비움', () => {
     const onAdd = vi.fn();
     render(
-      <VocCommentList
+      <VocComment
         comments={[]}
         currentUserId={ME}
         canWrite
