@@ -12,8 +12,8 @@ import { http, HttpResponse } from 'msw';
 import {
   NotificationListResponse,
   MarkAllReadResponse,
-} from '../../../../shared/contracts/notification';
-import { NOTIFICATION_FIXTURES } from '../../../../shared/fixtures/notification.fixtures';
+} from '../../../../../shared/contracts/notification';
+import { NOTIFICATION_FIXTURES } from '../../../../../shared/fixtures/notification.fixtures';
 
 type NotificationItem = (typeof NOTIFICATION_FIXTURES)[number];
 

@@ -6,13 +6,13 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { router } from './router';
 import AppProviders from './contexts/AppProviders';
 import { RoleProvider } from './contexts/RoleContext';
-import { queryClient } from './api/queryClient';
-import './styles/index.css';
+import { queryClient } from '@shared/api/queryClient';
+import '@shared/styles/globals.css';
 
 async function enableMocking() {
   if (!import.meta.env.DEV) return;
   if (import.meta.env.VITE_USE_MSW === 'false') return;
-  const { worker } = await import('./mocks/browser');
+  const { worker } = await import('./test/mocks/browser');
   await worker.start({ onUnhandledRequest: 'bypass' });
 }
 

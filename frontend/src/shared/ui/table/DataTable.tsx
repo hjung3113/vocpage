@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@shared/lib/cn';
 
 export interface DataTableColumn<T> {
   key: string;

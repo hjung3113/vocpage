@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
+import { Button } from '@shared/ui/button';
+import { Input } from '@shared/ui/input';
 import type { VocStatus } from '../../../../../shared/contracts/voc';
 
 export interface SubTaskItem {

@@ -9,7 +9,7 @@ import {
   AssigneeListResponse,
   TagListResponse,
   VocTypeListResponse,
-} from '../../../../../shared/contracts/master';
+} from '../../../../../../shared/contracts/master';
 
 const server = setupServer(...mastersHandlers);
 

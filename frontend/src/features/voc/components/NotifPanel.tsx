@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { PopoverContent } from '../../../components/ui/popover';
-import { cn } from '../../../lib/utils';
+import { PopoverContent } from '@shared/ui/popover';
+import { cn } from '@shared/lib/cn';
 import {
   NotificationType,
   type NotificationItem,

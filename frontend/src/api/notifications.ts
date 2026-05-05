@@ -2,7 +2,7 @@
  * Notifications API client — FE-only consumer in Wave 1.5 PR-β. BE는
  * 후속 PR. MSW가 `/api/notifications` 와 mark-all-read 핸들러 제공.
  */
-import { apiGet, apiPost } from './client';
+import { apiGet, apiPost } from '@shared/api/client';
 import {
   NotificationListResponse,
   MarkAllReadResponse,

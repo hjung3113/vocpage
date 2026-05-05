@@ -13,7 +13,7 @@ import {
   VOC_TAG_RELATIONS,
   FIXTURE_TAGS,
   FIXTURE_USERS,
-} from '../../../../../shared/fixtures/voc.fixtures';
+} from '../../../../../../shared/fixtures/voc.fixtures';
 
 const server = setupServer(...vocHandlers);
 

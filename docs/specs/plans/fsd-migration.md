@@ -59,8 +59,8 @@ app → pages → widgets → features → entities → shared
 | Step | Branch                         | 내용                                          | 상태          |
 | ---- | ------------------------------ | --------------------------------------------- | ------------- |
 | 0    | —                              | Convention 문서 작성 (사전 작업)              | ✅ 2026-05-05 |
-| 1    | `refactor/fsd-path-alias`      | tsconfig + vite alias 설정                    | 🟡 진행 중    |
-| 2    | `refactor/fsd-shared-layer`    | shared/ui, api, lib, hooks, styles, config    | ⬜ 미착수     |
+| 1    | `refactor/fsd-path-alias`      | tsconfig + vite alias 설정                    | ✅ 2026-05-05 |
+| 2    | `refactor/fsd-shared-layer`    | shared/ui, api, lib, hooks, styles, config    | 🟡 진행 중    |
 | 3    | `refactor/fsd-entities-layer`  | entities/voc, user, notification, master      | ⬜ 미착수     |
 | 4    | `refactor/fsd-features-layer`  | features/auth, voc-list-filter, voc-create 등 | ⬜ 미착수     |
 | 5    | `refactor/fsd-widgets-layer`   | widgets/app-shell, voc-workspace              | ⬜ 미착수     |

@@ -1,5 +1,5 @@
 import { Maximize2, Minimize2, Link2, Trash2, X } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Button } from '@shared/ui/button';
 
 const LABEL_FULLSCREEN_OPEN = '큰 화면으로 보기';
 const LABEL_FULLSCREEN_CLOSE = '이전 크기로';

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { AuthUser, AuthRole } from '../../api/auth';
+import type { AuthUser, AuthRole } from '../../../api/auth';
 
 let currentUser: AuthUser | null = null;
 

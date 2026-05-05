@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
-import { EmptyState } from './components/common/EmptyState';
-import { LoadingState } from './components/common/LoadingState';
+import { EmptyState } from '@shared/ui/empty-state';
+import { LoadingState } from '@shared/ui/skeleton';
 import { PageTitle } from './components/layout/PageTitle';
 
 const MockLoginPage =

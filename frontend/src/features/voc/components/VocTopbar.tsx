@@ -1,6 +1,6 @@
 import { Search, Plus } from 'lucide-react';
-import { Input } from '../../../components/ui/input';
-import { Button } from '../../../components/ui/button';
+import { Input } from '@shared/ui/input';
+import { Button } from '@shared/ui/button';
 import { VocNotificationsDropdown } from './VocNotificationsDropdown';
 import type { VocNotificationsDropdownProps } from './VocNotificationsDropdown';
 

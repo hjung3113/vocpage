@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest';
 import { setupServer } from 'msw/node';
 import { vocHandlers, __resetVocMocks } from '../voc';
-import { VOC_FIXTURES, FIXTURE_USERS } from '../../../../../shared/fixtures/voc.fixtures';
+import { VOC_FIXTURES, FIXTURE_USERS } from '../../../../../../shared/fixtures/voc.fixtures';
 
 const server = setupServer(...vocHandlers);
 

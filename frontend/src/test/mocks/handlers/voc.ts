@@ -14,9 +14,9 @@ import {
   VOC_HISTORY_FIXTURES,
   VOC_TAG_RELATIONS,
   FIXTURE_USERS,
-} from '../../../../shared/fixtures/voc.fixtures';
-import { TAG_FIXTURES } from '../../../../shared/fixtures/master.fixtures';
-import { VocListQuery } from '../../../../shared/contracts/voc';
+} from '../../../../../shared/fixtures/voc.fixtures';
+import { TAG_FIXTURES } from '../../../../../shared/fixtures/master.fixtures';
+import { VocListQuery } from '../../../../../shared/contracts/voc';
 
 const TAG_NAME_BY_ID = new Map(TAG_FIXTURES.map((t) => [t.id, t.name] as const));
 function tagsForVoc(vocId: string): string[] {

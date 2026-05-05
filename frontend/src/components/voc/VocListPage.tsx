@@ -10,9 +10,9 @@ import { VocTable } from '../../features/voc/components/VocTable';
 import { VocPaginationBar } from '../../features/voc/components/VocPaginationBar';
 import { VocReviewDrawer } from '../../features/voc/components/VocReviewDrawer';
 import { VocCreateModal } from '../../features/voc/components/VocCreateModal';
-import { EmptyState } from '../common/EmptyState';
-import { ErrorState } from '../common/ErrorState';
-import { LoadingState } from '../common/LoadingState';
+import { EmptyState } from '@shared/ui/empty-state';
+import { ErrorState } from '@shared/ui/error-state';
+import { LoadingState } from '@shared/ui/skeleton';
 
 const SYSTEMS_PLACEHOLDER = [
   { id: '11111111-1111-4111-8111-111111111111', label: '데이터 분석' },

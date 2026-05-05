@@ -3,7 +3,7 @@
  * surface. MSW vs real BE switch happens once in `main.tsx`; this module is
  * environment-agnostic.
  */
-import { apiGet, apiPost, apiPatch } from './client';
+import { apiGet, apiPost, apiPatch } from '@shared/api/client';
 import {
   VocListResponse,
   VocDetail,

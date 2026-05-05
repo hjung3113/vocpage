@@ -7,7 +7,7 @@ import { notificationsHandlers, __resetNotificationMocks } from '../notification
 import {
   NotificationListResponse,
   MarkAllReadResponse,
-} from '../../../../../shared/contracts/notification';
+} from '../../../../../../shared/contracts/notification';
 
 const server = setupServer(...notificationsHandlers);
 

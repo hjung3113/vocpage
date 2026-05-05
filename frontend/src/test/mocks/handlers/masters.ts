@@ -10,12 +10,12 @@ import {
   AssigneeListResponse,
   TagListResponse,
   VocTypeListResponse,
-} from '../../../../shared/contracts/master';
+} from '../../../../../shared/contracts/master';
 import {
   ASSIGNEE_FIXTURES,
   TAG_FIXTURES,
   VOC_TYPE_FIXTURES,
-} from '../../../../shared/fixtures/master.fixtures';
+} from '../../../../../shared/fixtures/master.fixtures';
 
 export const mastersHandlers = [
   http.get('/api/masters/assignees', () => {
