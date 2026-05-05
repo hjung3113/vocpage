@@ -1,4 +1,4 @@
-import type { InternalNote, VocHistoryEntry, Comment } from '@contracts/voc';
+import type { InternalNote, VocHistoryEntry } from '@contracts/voc';
 import { CollapsibleSection } from './CollapsibleSection';
 import type { Role } from '@contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
@@ -6,7 +6,8 @@ import { VocHistory } from './VocHistory';
 import { VocComment } from './VocComment';
 import { VocInternalNotes } from './VocInternalNotes';
 import { VocSubTask } from './VocSubTask';
-import type { SubTaskItem } from '@contracts/voc';
+import { LoadingState } from '@shared/ui/skeleton';
+import { useVocComments, useVocSubtasks } from '../model/useDrawerQueries';
 
 interface Props {
   vocId: string;
@@ -17,14 +18,10 @@ interface Props {
   canWrite: boolean;
   canSeeInternal: boolean;
   pending: boolean;
-  comments: Comment[] | undefined;
-  commentsLoading: boolean;
   notes: InternalNote[] | undefined;
   notesLoading: boolean;
   historyEntries: VocHistoryEntry[] | undefined;
   historyLoading: boolean;
-  subtasks: SubTaskItem[] | undefined;
-  subtasksLoading: boolean;
   onAddNote: (body: string) => void;
 }
 
@@ -37,14 +34,14 @@ export function VocActionSection({
   canWrite,
   canSeeInternal,
   pending,
-  comments,
   notes,
   notesLoading,
   historyEntries,
   historyLoading,
-  subtasks,
   onAddNote,
 }: Props) {
+  const comments = useVocComments(vocId);
+  const subtasks = useVocSubtasks(vocId);
   return (
     <CollapsibleSection title="활동" testId="drawer-actions">
       <Tabs defaultValue="comment" data-pcomp="review-sections">
@@ -66,15 +63,19 @@ export function VocActionSection({
         </TabsList>
 
         <TabsContent value="comment">
-          <VocComment
-            comments={comments ?? []}
-            currentUserId={currentUserId}
-            canWrite={canWrite}
-            pending={pending}
-            onAdd={() => {}}
-            onEdit={() => {}}
-            onDelete={() => {}}
-          />
+          {comments.isLoading ? (
+            <LoadingState />
+          ) : (
+            <VocComment
+              comments={comments.data ?? []}
+              currentUserId={currentUserId}
+              canWrite={canWrite}
+              pending={pending}
+              onAdd={() => {}}
+              onEdit={() => {}}
+              onDelete={() => {}}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="history" data-testid="drawer-history">
@@ -82,14 +83,18 @@ export function VocActionSection({
         </TabsContent>
 
         <TabsContent value="subtask">
-          <VocSubTask
-            parentId={vocId}
-            parentIsSubtask={parentIsSubtask}
-            subs={subtasks ?? []}
-            canAdd={canWrite}
-            onOpen={() => {}}
-            onAdd={() => {}}
-          />
+          {subtasks.isLoading ? (
+            <LoadingState />
+          ) : (
+            <VocSubTask
+              parentId={vocId}
+              parentIsSubtask={parentIsSubtask}
+              subs={subtasks.data ?? []}
+              canAdd={canWrite}
+              onOpen={() => {}}
+              onAdd={() => {}}
+            />
+          )}
         </TabsContent>
 
         {canSeeInternal && (
