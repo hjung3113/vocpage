@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/u
 import { cn } from '@shared/lib/cn';
 import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
-import { useVocPermissions } from '@features/voc/model/useVocPermissions';
+import { useVocPermissions } from '../model/useVocPermissions';
 import { AuthContext } from '@features/auth/model/AuthContext';
 import { type InternalNote } from '@contracts/voc';
 import { VocPermissionGate } from './VocPermissionGate';
