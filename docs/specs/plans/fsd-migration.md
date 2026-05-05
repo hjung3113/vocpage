@@ -65,7 +65,7 @@ app → pages → widgets → features → entities → shared
 | 4    | `refactor/fsd-features-layer`  | features/auth, voc-list-filter, voc-create 등 | ✅ 2026-05-05 (PR #213 + #215) |
 | 5    | `refactor/fsd-widgets-layer`   | widgets/app-shell, voc-workspace              | ✅ 2026-05-05 (PR #216)        |
 | 6    | `refactor/fsd-app-pages-layer` | app/providers, pages 정리                     | ✅ 2026-05-05 (PR #219)        |
-| 7    | `refactor/fsd-cleanup`         | 구 디렉토리 삭제 + 검증                       | 🟡 PR 검토 중 (2026-05-05)     |
+| 7    | `refactor/fsd-cleanup`         | 구 디렉토리 삭제 + 검증                       | ✅ 2026-05-05 (PR #220)        |
 
 범례: ✅ 완료 / 🟡 진행 중 / ⬜ 미착수
 
