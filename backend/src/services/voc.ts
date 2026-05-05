@@ -12,6 +12,7 @@
 import { HttpError } from '../middleware/httpError';
 import { assertCanManageVoc, type VocAction } from './permissions/assertCanManageVoc';
 import * as repo from '../repository/voc';
+import type { ListVocsRow } from '../repository/voc';
 import type { AuthUser } from '../auth/types';
 import type {
   Voc,
@@ -23,7 +24,7 @@ import type {
   VocHistoryEntry,
 } from '../../../shared/contracts/voc';
 
-function toListItem(v: Voc & { tags: string[] }) {
+function toListItem(v: ListVocsRow) {
   return {
     id: v.id,
     issue_code: v.issue_code,
@@ -40,8 +41,8 @@ function toListItem(v: Voc & { tags: string[] }) {
     due_date: v.due_date ?? null,
     created_at: v.created_at,
     updated_at: v.updated_at,
-    has_children: false,
-    notes_count: 0,
+    has_children: v.has_children,
+    notes_count: v.notes_count,
     tags: v.tags,
   };
 }

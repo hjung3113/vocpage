@@ -79,7 +79,7 @@ jest.mock('../repository/voc', () => {
         return {
           rows: filtered
             .slice(start, start + per_page)
-            .map((r) => ({ ...r, tags: [] as string[] })),
+            .map((r) => ({ ...r, tags: [] as string[], has_children: false, notes_count: 0 })),
           total,
         };
       },
@@ -234,6 +234,8 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
         .map((r) => ({
           ...r,
           tags: r.id === targetId ? ['버그', '긴급'] : [],
+          has_children: false,
+          notes_count: 0,
         })),
       total: 3,
     });
@@ -248,7 +250,26 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
     }
   });
 
-  test('B-T3 dev PATCH on someone else’s VOC returns 403 FORBIDDEN action=changeStatus', async () => {
+  test('B-T2.6 GET /api/vocs surfaces has_children and notes_count from repo (ADR-0002)', async () => {
+    const base = VOC_FIXTURES.filter((r) => r.deleted_at === null).slice(0, 2);
+    repoMock.listVocs.mockResolvedValueOnce({
+      rows: [
+        { ...base[0]!, tags: [], has_children: true, notes_count: 3 },
+        { ...base[1]!, tags: [], has_children: false, notes_count: 0 },
+      ],
+      total: 2,
+    });
+    const agent = await loginAs('manager');
+    const res = await agent.get('/api/vocs?per_page=20');
+    expect(res.status).toBe(200);
+    const parsed = VocListResponse.parse(res.body);
+    expect(parsed.rows[0]?.has_children).toBe(true);
+    expect(parsed.rows[0]?.notes_count).toBe(3);
+    expect(parsed.rows[1]?.has_children).toBe(false);
+    expect(parsed.rows[1]?.notes_count).toBe(0);
+  });
+
+  test(`B-T3 dev PATCH on someone else's VOC returns 403 FORBIDDEN action=changeStatus`, async () => {
     const agent = await loginAs('dev');
     const res = await agent.patch(`/api/vocs/${otherDevVoc.id}`).send({ status: '검토중' });
     expect(res.status).toBe(403);
