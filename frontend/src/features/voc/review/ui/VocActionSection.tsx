@@ -45,17 +45,17 @@ export function VocActionSection({
       <Tabs defaultValue="comment" data-pcomp="review-sections">
         <TabsList variant="underline">
           <TabsTrigger variant="underline" value="comment">
-            Comment
+            댓글
           </TabsTrigger>
           <TabsTrigger variant="underline" value="history">
-            History
+            이력
           </TabsTrigger>
           <TabsTrigger variant="underline" value="subtask">
-            Subtask
+            하위작업
           </TabsTrigger>
           {canSeeInternal && (
             <TabsTrigger variant="underline" value="internal">
-              InternalNote
+              내부메모
             </TabsTrigger>
           )}
         </TabsList>

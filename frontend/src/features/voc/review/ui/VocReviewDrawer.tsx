@@ -12,6 +12,7 @@ import { ErrorState } from '@shared/ui/error-state';
 import { type AttachmentItem } from './VocAttachmentSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
 import { VocDrawerBody } from './VocDrawerBody';
+import { VocStatusBadge, VocPriorityBadge } from '@entities/voc';
 
 interface Props {
   vocId: string | null;
@@ -104,6 +105,12 @@ export function VocReviewDrawer({
           >
             {voc ? voc.title : 'VOC'}
           </div>
+          {voc && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <VocStatusBadge status={voc.status} />
+              <VocPriorityBadge priority={voc.priority} />
+            </div>
+          )}
         </div>
 
         <div

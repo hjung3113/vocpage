@@ -66,6 +66,14 @@ export function VocDrawerBody({
     onAddNote,
   };
 
+  const metaSection = (
+    <CollapsibleSection title="정보" noBorder>
+      <VocDetailSection {...detailProps} />
+      <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
+      <VocDateSection voc={voc} />
+    </CollapsibleSection>
+  );
+
   if (isFullscreen) {
     return (
       <>
@@ -78,15 +86,7 @@ export function VocDrawerBody({
           className="w-64 shrink-0 overflow-y-auto pt-6 pb-6 px-5 flex flex-col gap-4"
           style={{ borderLeft: '1px solid var(--border-subtle)' }}
         >
-          <CollapsibleSection title="상세 정보" noBorder>
-            <VocDetailSection {...detailProps} />
-          </CollapsibleSection>
-          <CollapsibleSection title="담당자" noBorder>
-            <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
-          </CollapsibleSection>
-          <CollapsibleSection title="날짜" noBorder>
-            <VocDateSection voc={voc} />
-          </CollapsibleSection>
+          {metaSection}
         </div>
       </>
     );
@@ -94,15 +94,7 @@ export function VocDrawerBody({
 
   return (
     <div className="flex flex-col gap-4">
-      <CollapsibleSection title="상세 정보" noBorder>
-        <VocDetailSection {...detailProps} />
-      </CollapsibleSection>
-      <CollapsibleSection title="담당자" noBorder>
-        <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
-      </CollapsibleSection>
-      <CollapsibleSection title="날짜" noBorder>
-        <VocDateSection voc={voc} />
-      </CollapsibleSection>
+      {metaSection}
       <VocBodySection body={voc.body} />
       <VocAttachmentSection items={attachments} canUpload={canUpload} noBorder />
       <VocActionSection {...actionProps} />
