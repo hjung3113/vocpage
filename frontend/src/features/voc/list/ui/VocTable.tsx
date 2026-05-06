@@ -10,6 +10,7 @@ interface VocTableProps {
   onRowClick: (id: string) => void;
   assigneeMap: Record<string, string>;
   vocTypeMap?: Record<string, VocTypeMapEntry>;
+  selectedId?: string | null;
 }
 
 export function VocTable({
@@ -20,6 +21,7 @@ export function VocTable({
   onRowClick,
   assigneeMap,
   vocTypeMap,
+  selectedId,
 }: VocTableProps) {
   return (
     <div data-pcomp="voc-table" data-testid="voc-table" className="voc-table-wrapper">
@@ -32,6 +34,7 @@ export function VocTable({
               row={row}
               assigneeMap={assigneeMap}
               vocTypeMap={vocTypeMap}
+              selected={row.id === selectedId}
               onClick={() => onRowClick(row.id)}
             />
           ))}

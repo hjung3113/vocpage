@@ -1,5 +1,5 @@
 import type { Voc } from '@contracts/voc/entity';
-import type { InternalNote } from '@contracts/voc';
+import type { InternalNote, VocUpdate } from '@contracts/voc';
 import type { Role } from '@contracts/common';
 import type { AttachmentItem } from './VocAttachmentSection';
 import { VocActionSection } from './VocActionSection';
@@ -29,6 +29,7 @@ export interface VocDrawerBodyProps {
   notes: InternalNote[] | undefined;
   notesLoading: boolean;
   onAddNote: (body: string) => void;
+  onPatch?: (patch: VocUpdate) => void;
 }
 
 export function VocDrawerBody({
@@ -50,8 +51,9 @@ export function VocDrawerBody({
   notes,
   notesLoading,
   onAddNote,
+  onPatch,
 }: VocDrawerBodyProps) {
-  const detailProps = { voc, vocTypeMap, systemMap, menuMap, tags };
+  const detailProps = { voc, vocTypeMap, systemMap, menuMap, tags, editable: canWrite, onPatch };
   const actionProps = {
     vocId: voc.id,
     parentIsSubtask: voc.parent_id !== null,
@@ -69,8 +71,8 @@ export function VocDrawerBody({
   const metaSection = (
     <CollapsibleSection title="정보" noBorder>
       <VocDetailSection {...detailProps} />
-      <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
-      <VocDateSection voc={voc} />
+      <VocPeopleSection voc={voc} assigneeMap={assigneeMap} editable={canWrite} onPatch={onPatch} />
+      <VocDateSection voc={voc} editable={canWrite} onPatch={onPatch} />
     </CollapsibleSection>
   );
 

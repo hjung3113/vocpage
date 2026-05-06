@@ -44,6 +44,9 @@ export const vocApi = {
   get(id: string): Promise<VocDetail> {
     return apiGet(`/api/vocs/${id}`, VocDetail);
   },
+  getByCode(issueCode: string): Promise<VocDetail> {
+    return apiGet(`/api/vocs/by-code/${encodeURIComponent(issueCode)}`, VocDetail);
+  },
   update(id: string, patch: VocUpdate): Promise<VocDetail> {
     return apiPatch(`/api/vocs/${id}`, patch, VocDetail);
   },

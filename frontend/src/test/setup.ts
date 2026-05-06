@@ -10,6 +10,15 @@ window.HTMLElement.prototype.setPointerCapture = vi.fn();
 window.HTMLElement.prototype.releasePointerCapture = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
+// cmdk uses ResizeObserver which jsdom doesn't implement.
+if (typeof global.ResizeObserver === 'undefined') {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 // Toast UI editor — jsdom incompatible. Mock as a textarea.
 interface MockEditorProps {
   initialValue?: string;

@@ -20,7 +20,7 @@ describe('VocTopbar', () => {
       />,
     );
     expect(screen.getByRole('heading', { name: /전체 VOC/ })).toBeInTheDocument();
-    expect(screen.getByText(/^42개$/)).toBeInTheDocument();
+    expect(screen.getByText(/^42$/)).toBeInTheDocument();
   });
 
   it('renders searchbox and calls onQueryChange on input', async () => {

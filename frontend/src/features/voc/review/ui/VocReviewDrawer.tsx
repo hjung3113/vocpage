@@ -4,6 +4,7 @@ import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
 import { useVocDetail } from '../model/useDrawerQueries';
 import { useVocPermissions } from '../model/useVocPermissions';
+import { useUpdateVoc } from '@features/voc/model/useVocMutation';
 import { AuthContext } from '@features/auth/model/AuthContext';
 import { type InternalNote } from '@contracts/voc';
 import { VocPermissionGate } from './VocPermissionGate';
@@ -47,6 +48,7 @@ export function VocReviewDrawer({
   const { canWrite, canUpload, canSeeInternal } = useVocPermissions();
   const { role } = useRole();
   const auth = useContext(AuthContext);
+  const updateVoc = useUpdateVoc();
   const open = !!vocId;
   const voc = detail.data;
   const isDeleted = !!voc?.deleted_at;
@@ -54,7 +56,8 @@ export function VocReviewDrawer({
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?voc=${vocId}`;
+    const code = voc?.issue_code ?? vocId;
+    const url = `${window.location.origin}${window.location.pathname}?id=${code}`;
     void navigator.clipboard.writeText(url);
   };
 
@@ -143,6 +146,7 @@ export function VocReviewDrawer({
               notes={notes}
               notesLoading={notesLoading}
               onAddNote={(body) => void onAddNote(voc.id, body)}
+              onPatch={(patch) => void updateVoc.mutate({ id: voc.id, patch })}
             />
           )}
         </div>

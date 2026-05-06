@@ -55,7 +55,7 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
   return (
     <div
       data-pcomp="voc-status-filters"
-      className="flex items-center gap-2 flex-nowrap overflow-x-auto px-6 h-11 scrollbar-none"
+      className="flex items-center gap-1.5 flex-nowrap overflow-x-auto px-5 h-9 scrollbar-none"
       style={{
         background: 'var(--bg-app)',
         borderBottom: '1px solid var(--border-subtle)',
@@ -65,7 +65,7 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
         type="multiple"
         value={toggleValue}
         onValueChange={handleValueChange}
-        className="flex items-center gap-2"
+        className="flex items-center gap-1"
       >
         {PILLS.map(({ label, value: pillValue, icon: Icon }) => {
           const pressed =
@@ -80,18 +80,19 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
               key={pillValue}
               value={pillValue}
               data-testid={`status-chip-${pillValue}`}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors border"
+              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors border hover:bg-[color:var(--voc-row-hover-bg)] hover:text-[color:var(--text-primary)]"
               style={{
+                height: '24px',
                 background: pressed
                   ? pillValue === 'all'
-                    ? 'var(--brand-bg, var(--brand))'
-                    : (statusBg ?? 'var(--brand-bg, var(--brand))')
-                  : 'var(--bg-elevated)',
-                color: pressed ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-                borderColor: 'var(--border-subtle)',
+                    ? 'color-mix(in oklch, var(--brand) 10%, var(--bg-app))'
+                    : (statusBg ?? 'color-mix(in oklch, var(--brand) 10%, var(--bg-app))')
+                  : 'transparent',
+                color: pressed ? 'var(--text-primary)' : 'var(--text-secondary)',
+                borderColor: 'transparent',
               }}
             >
-              <Icon size={13} aria-hidden />
+              <Icon size={12} aria-hidden />
               {label}
             </ToggleGroupItem>
           );

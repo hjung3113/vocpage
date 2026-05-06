@@ -7,11 +7,20 @@ import { LoadingState } from '@shared/ui/skeleton';
 
 const MockLoginPage = env.AUTH_MODE === 'mock' ? lazy(() => import('@pages/mock-login')) : null;
 const VocPage = lazy(() => import('@pages/voc'));
+const VocReviewPage = lazy(() => import('@pages/voc-review'));
 
 function VocRoute() {
   return (
     <Suspense fallback={<LoadingState />}>
       <VocPage />
+    </Suspense>
+  );
+}
+
+function VocReviewRoute() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <VocReviewPage />
     </Suspense>
   );
 }
@@ -53,6 +62,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/voc" replace /> },
       { path: 'voc', element: <VocRoute /> },
+      { path: 'voc/:id', element: <VocReviewRoute /> },
       { path: 'dashboard', element: <StubPage title="Dashboard" /> },
       { path: 'notice', element: <StubPage title="공지" /> },
       { path: 'faq', element: <StubPage title="FAQ" /> },
