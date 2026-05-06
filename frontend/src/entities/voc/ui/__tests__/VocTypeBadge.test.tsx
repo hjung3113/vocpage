@@ -40,6 +40,18 @@ describe('VocTypeBadge', () => {
     expect(svg?.getAttribute('class') ?? '').toContain('lucide-tag');
   });
 
+  it('iconOnly: renders icon without text label', () => {
+    render(<VocTypeBadge slug="bug" name="버그" iconOnly />);
+    const el = screen.getByTestId('voc-type-badge-bug');
+    expect(el).toBeInTheDocument();
+    // aria-label preserved for a11y
+    expect(el).toHaveAttribute('aria-label', '유형 버그');
+    // text label is not rendered as visible text content (icon-only mode)
+    expect(el.textContent ?? '').not.toContain('버그');
+    // svg still present
+    expect(el.querySelector('svg')).not.toBeNull();
+  });
+
   it('color prop ignored — rendering is same with or without it', () => {
     const { rerender } = render(<VocTypeBadge slug="bug" name="버그" />);
     const without = screen.getByTestId('voc-type-badge-bug').getAttribute('style');

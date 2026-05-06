@@ -64,7 +64,7 @@ export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick
       </div>
 
       <div role="gridcell" className="voc-row-title">
-        {vocType && <VocTypeBadge slug={vocType.slug} name={vocType.name} />}
+        {vocType && <VocTypeBadge slug={vocType.slug} name={vocType.name} iconOnly />}
         <span className="voc-title-text">{row.title}</span>
         {row.tags.length > 0 && (
           <div className="tag-row">
@@ -76,7 +76,7 @@ export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick
       </div>
 
       <div role="gridcell">
-        <VocStatusBadge status={row.status} />
+        <VocStatusBadge status={row.status} iconOnly />
       </div>
 
       <div role="gridcell">
@@ -84,7 +84,7 @@ export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick
       </div>
 
       <div role="gridcell">
-        <VocPriorityBadge priority={row.priority} />
+        <VocPriorityBadge priority={row.priority} iconOnly />
       </div>
 
       <div role="gridcell" className="voc-row-created-at">
