@@ -10,14 +10,8 @@ import { VocPermissionGate } from './VocPermissionGate';
 import { LoadingState } from '@shared/ui/skeleton';
 import { ErrorState } from '@shared/ui/error-state';
 import { type AttachmentItem } from './VocAttachmentSection';
-import { VocActionSection } from './VocActionSection';
-import { VocDetailSection } from './VocDetailSection';
-import { VocPeopleSection } from './VocPeopleSection';
-import { VocDateSection } from './VocDateSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
-import { VocBodySection } from './VocBodySection';
-import { VocAttachmentSection } from './VocAttachmentSection';
-import { CollapsibleSection } from './CollapsibleSection';
+import { VocDrawerBody } from './VocDrawerBody';
 
 interface Props {
   vocId: string | null;
@@ -56,15 +50,12 @@ export function VocReviewDrawer({
   const voc = detail.data;
   const isDeleted = !!voc?.deleted_at;
   const blockedDeleted = isDeleted && role !== 'admin';
-
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleCopyLink = () => {
     const url = `${window.location.origin}${window.location.pathname}?voc=${vocId}`;
     void navigator.clipboard.writeText(url);
   };
-
-  const handleToggleFullscreen = () => setIsFullscreen((v) => !v);
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -77,11 +68,9 @@ export function VocReviewDrawer({
         data-testid="voc-drawer"
         style={{ background: 'var(--bg-panel)' }}
       >
-        {/* Visually hidden a11y title/description */}
         <DialogTitle className="sr-only">{voc ? voc.title : 'VOC'}</DialogTitle>
         <DialogDescription className="sr-only">VOC 상세 검토 패널</DialogDescription>
 
-        {/* Custom header */}
         <div
           className="px-4 pt-4 pb-3 shrink-0"
           style={{ borderBottom: '1px solid var(--border-subtle)' }}
@@ -104,7 +93,7 @@ export function VocReviewDrawer({
             )}
             <DrawerActionButtons
               isFullscreen={isFullscreen}
-              onToggleFullscreen={handleToggleFullscreen}
+              onToggleFullscreen={() => setIsFullscreen((v) => !v)}
               onCopyLink={handleCopyLink}
               onClose={onClose}
             />
@@ -117,8 +106,11 @@ export function VocReviewDrawer({
           </div>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 pt-4 pb-4">
+        <div
+          className={
+            isFullscreen ? 'flex-1 flex overflow-hidden' : 'flex-1 overflow-y-auto px-4 pt-4 pb-4'
+          }
+        >
           {detail.isLoading && <LoadingState />}
           {detail.isError &&
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -129,40 +121,26 @@ export function VocReviewDrawer({
             ))}
           {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
           {voc && !blockedDeleted && (
-            <div className="flex flex-col gap-4">
-              <CollapsibleSection title="상세 정보">
-                <VocDetailSection
-                  voc={voc}
-                  vocTypeMap={vocTypeMap}
-                  systemMap={systemMap}
-                  menuMap={menuMap}
-                  tags={tags}
-                />
-              </CollapsibleSection>
-              <CollapsibleSection title="담당자">
-                <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
-              </CollapsibleSection>
-              <CollapsibleSection title="날짜">
-                <VocDateSection voc={voc} />
-              </CollapsibleSection>
-              <CollapsibleSection title="본문">
-                <VocBodySection body={voc.body} />
-              </CollapsibleSection>
-              <VocAttachmentSection items={attachments} canUpload={canUpload} />
-              <VocActionSection
-                vocId={voc.id}
-                parentIsSubtask={voc.parent_id !== null}
-                currentUserId={auth?.user?.id ?? ''}
-                role={role}
-                isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
-                canWrite={canWrite}
-                canSeeInternal={canSeeInternal}
-                pending={pending}
-                notes={notes}
-                notesLoading={notesLoading}
-                onAddNote={(body) => void onAddNote(voc.id, body)}
-              />
-            </div>
+            <VocDrawerBody
+              voc={voc}
+              isFullscreen={isFullscreen}
+              attachments={attachments}
+              assigneeMap={assigneeMap}
+              vocTypeMap={vocTypeMap}
+              systemMap={systemMap}
+              menuMap={menuMap}
+              tags={tags}
+              currentUserId={auth?.user?.id ?? ''}
+              role={role}
+              isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
+              canWrite={canWrite}
+              canUpload={canUpload}
+              canSeeInternal={canSeeInternal}
+              pending={pending}
+              notes={notes}
+              notesLoading={notesLoading}
+              onAddNote={(body) => void onAddNote(voc.id, body)}
+            />
           )}
         </div>
       </DialogContent>

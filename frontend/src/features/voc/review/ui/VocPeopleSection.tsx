@@ -37,7 +37,7 @@ export function VocPeopleSection({ voc, assigneeMap }: VocPeopleSectionProps) {
 
   return (
     <VocSection title="인원" testId="voc-people-panel">
-      <div data-pcomp="VocPeopleSection" className="grid grid-cols-2 gap-x-6">
+      <div data-pcomp="VocPeopleSection" className="grid grid-cols-1 @sm:grid-cols-2 gap-x-6">
         <PropRow label="담당자" testId="meta-assignee">
           <VocAssignee name={assigneeName} />
         </PropRow>
