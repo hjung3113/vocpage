@@ -12,12 +12,18 @@ const PRIORITY_CONFIG: Record<
   low: { label: 'Low', Icon: ChevronDown, color: 'var(--text-quaternary)', weight: 400 },
 };
 
-export function VocPriorityBadge({ priority }: { priority: VocPriority }) {
+export function VocPriorityBadge({
+  priority,
+  iconOnly = false,
+}: {
+  priority: VocPriority;
+  iconOnly?: boolean;
+}) {
   const { label, Icon, color, weight } = PRIORITY_CONFIG[priority];
   return (
     <TextMark
       variant={priority}
-      iconMode="icon+text"
+      iconMode={iconOnly ? 'icon-only' : 'icon+text'}
       icon={Icon}
       label={label}
       color={color}

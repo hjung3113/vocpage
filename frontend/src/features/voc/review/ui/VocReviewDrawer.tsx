@@ -92,7 +92,7 @@ export function VocReviewDrawer({
                 </span>
               ) : null}
               {voc && <VocStatusBadge status={voc.status} />}
-              {voc && <VocPriorityBadge priority={voc.priority} />}
+              {voc && <VocPriorityBadge priority={voc.priority} iconOnly />}
             </div>
             <DrawerActionButtons
               isFullscreen={isFullscreen}
