@@ -49,7 +49,7 @@ export function CollapsibleSection({
           style={{ color: open ? 'var(--text-quaternary)' : 'var(--text-secondary)' }}
         />
       </CollapsibleTrigger>
-      <CollapsibleContent className="pb-1">{children}</CollapsibleContent>
+      <CollapsibleContent className="flex flex-col gap-3 pb-1">{children}</CollapsibleContent>
     </Collapsible>
   );
 }
