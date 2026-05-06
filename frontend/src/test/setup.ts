@@ -2,6 +2,14 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { vi } from 'vitest';
 
+// Radix UI uses Pointer Events API and scrollIntoView which jsdom doesn't implement.
+// Polyfill the minimum surface so Radix Select/Dialog/etc. work in tests.
+window.PointerEvent = class PointerEvent extends MouseEvent {} as typeof PointerEvent;
+window.HTMLElement.prototype.hasPointerCapture = vi.fn();
+window.HTMLElement.prototype.setPointerCapture = vi.fn();
+window.HTMLElement.prototype.releasePointerCapture = vi.fn();
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
 // Toast UI editor — jsdom incompatible. Mock as a textarea.
 interface MockEditorProps {
   initialValue?: string;

@@ -58,9 +58,13 @@ describe('VocCreateModal', () => {
   it('reflects voc_type select change in form state', async () => {
     const user = userEvent.setup();
     renderModal();
-    const select = screen.getByLabelText(/유형/) as HTMLSelectElement;
-    await user.selectOptions(select, '55555555-5555-5555-5555-555555555555');
-    expect(select.value).toBe('55555555-5555-5555-5555-555555555555');
+    // shadcn Select trigger has id="voc-type" linked to the label
+    const trigger = document.getElementById('voc-type')!;
+    await user.click(trigger);
+    // Click the option rendered in Radix portal
+    const option = await screen.findByRole('option', { name: '개선' });
+    await user.click(option);
+    expect(trigger).toHaveTextContent('개선');
   });
 
   it('mounts lazy Toast UI editor (mocked) via testid', async () => {

@@ -1,5 +1,6 @@
 import { Maximize2, Minimize2, Link2, Trash2, X } from 'lucide-react';
 import { Button } from '@shared/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@shared/ui/tooltip';
 
 const LABEL_FULLSCREEN_OPEN = '큰 화면으로 보기';
 const LABEL_FULLSCREEN_CLOSE = '이전 크기로';
@@ -27,19 +28,23 @@ function IconBtn({
   'data-testid'?: string;
 }) {
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      className="h-7 w-7"
-      style={{ color: 'var(--text-secondary)' }}
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      data-testid={testId}
-    >
-      {children}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          style={{ color: 'var(--text-secondary)' }}
+          onClick={onClick}
+          aria-label={label}
+          data-testid={testId}
+        >
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   );
 }
 

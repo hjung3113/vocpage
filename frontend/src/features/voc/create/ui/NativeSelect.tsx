@@ -1,5 +1,4 @@
-const SEL =
-  'h-10 w-full rounded-md border border-[color:var(--border-standard)] bg-[color:var(--bg-app)] px-3 text-sm text-[color:var(--text-primary)]';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select';
 
 export function NativeSelect({
   id,
@@ -15,17 +14,17 @@ export function NativeSelect({
   className?: string;
 }) {
   return (
-    <select
-      id={id}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={className ?? SEL}
-    >
-      {options.map((o) => (
-        <option key={o.id} value={o.id}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger id={id} className={className}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((o) => (
+          <SelectItem key={o.id} value={o.id}>
+            {o.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

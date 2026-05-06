@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TooltipProvider } from '@shared/ui/tooltip';
 import { VocListPage } from '../VocListPage';
 import { RoleProvider, RoleContext } from '@entities/user';
 import { VOC_FIXTURES } from '../../../../../shared/fixtures/voc.fixtures';
@@ -27,9 +28,11 @@ function renderPage(opts: { initialUrl?: string; role?: Role } = {}) {
   const initialUrl = opts.initialUrl ?? '/voc';
   const role = opts.role;
   const tree = (
-    <QueryClientProvider client={qc}>
-      <VocListPage />
-    </QueryClientProvider>
+    <TooltipProvider>
+      <QueryClientProvider client={qc}>
+        <VocListPage />
+      </QueryClientProvider>
+    </TooltipProvider>
   );
   return render(
     <MemoryRouter initialEntries={[initialUrl]}>
@@ -127,6 +130,10 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.notes).mockResolvedValue([]);
     renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
     await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
+    // Blur any focused tooltip trigger so Radix Tooltip's DismissableLayer is not
+    // active — otherwise Tooltip intercepts the first Escape (to cancel its delay
+    // timer) and the Dialog never receives it.
+    (document.activeElement as HTMLElement | null)?.blur();
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByTestId('voc-drawer')).not.toBeInTheDocument());
     // Drawer disappearance from the DOM is the externally-visible proof that
