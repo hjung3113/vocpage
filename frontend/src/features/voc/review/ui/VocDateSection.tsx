@@ -41,7 +41,7 @@ function formatDate(iso: string | null | undefined): string {
 export function VocDateSection({ voc }: VocDateSectionProps) {
   return (
     <VocSection title="일정" testId="voc-date-panel">
-      <div data-pcomp="VocDateSection" className="flex flex-col">
+      <div data-pcomp="VocDateSection" className="grid grid-cols-2 gap-x-6">
         <MetaField label="등록일" testId="meta-created_at">
           {formatDate(voc.created_at)}
         </MetaField>

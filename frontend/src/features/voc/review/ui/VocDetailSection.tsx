@@ -52,7 +52,7 @@ export function VocDetailSection({
 
   return (
     <VocSection title="정보" testId="voc-detail-panel">
-      <div data-pcomp="VocDetailSection" className="flex flex-col">
+      <div data-pcomp="VocDetailSection" className="grid grid-cols-2 gap-x-6">
         <PropRow label="시스템" testId="meta-system">
           {systemLabel}
         </PropRow>
