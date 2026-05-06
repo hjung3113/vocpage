@@ -120,7 +120,9 @@ describe('VocListPage — Wave D D5 integration', () => {
       expect(lastCall?.[0]?.status).toEqual(['검토중']);
     });
     const expected = rowsByStatus('검토중').length;
-    await waitFor(() => expect(screen.getByText(`${expected}`)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('voc-topbar-total-count')).toHaveTextContent(`${expected}`),
+    );
   });
 
   it('header "우선순위" 클릭 → 첫 row priority="urgent" (sort chips removed; header is now the only sort affordance)', async () => {

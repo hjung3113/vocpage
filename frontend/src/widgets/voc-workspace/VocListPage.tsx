@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import type { VocStatus } from '@contracts/voc';
+import { useLocalStorageState } from '@shared/hooks/useLocalStorageState';
 import { useVocPageController } from '@features/voc/model/useVocPageController';
 import { VocTopbar } from '@features/voc/list/ui/VocTopbar';
 import { VocStatusFilters } from '@features/voc/list/ui/VocStatusFilters';
@@ -36,6 +38,21 @@ export function VocListPage() {
   const statusValue = ctrl.filter.status ?? 'all';
   const selectedRow = rows.find((r) => r.id === ctrl.drawer.vocId);
   const [isPanelFullscreen, setIsPanelFullscreen] = useState(false);
+
+  // Phase 5: status별 collapsible 그루핑. localStorage 영속.
+  const [collapsedList, setCollapsedList] = useLocalStorageState<VocStatus[]>(
+    'voc-list-group-collapsed',
+    [],
+  );
+  const collapsedStatuses = useMemo(() => new Set<VocStatus>(collapsedList), [collapsedList]);
+  const toggleStatus = useCallback(
+    (status: VocStatus) => {
+      setCollapsedList((prev) =>
+        prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status],
+      );
+    },
+    [setCollapsedList],
+  );
 
   const vocTypeMap = useMemo(
     () =>
@@ -132,6 +149,9 @@ export function VocListPage() {
                   selectedId={ctrl.drawer.vocId}
                   assigneeMap={ctrl.masters.assigneeMap}
                   vocTypeMap={vocTypeMap}
+                  groupByStatus
+                  collapsedStatuses={collapsedStatuses}
+                  onToggleStatus={toggleStatus}
                 />
               )}
             </div>

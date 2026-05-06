@@ -43,6 +43,7 @@ export function VocTopbar({
           전체 VOC
         </h1>
         <span
+          data-testid="voc-topbar-total-count"
           style={{
             color: 'var(--text-tertiary)',
             fontSize: '13px',
