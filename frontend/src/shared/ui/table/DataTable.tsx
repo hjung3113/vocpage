@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table';
 
 export interface DataTableColumn<T> {
   key: string;
@@ -44,17 +45,17 @@ export function DataTable<T>({
   }
 
   return (
-    <table className="w-full border-collapse text-sm text-[color:var(--text-primary)]">
-      <thead
+    <Table className="border-collapse text-[color:var(--text-primary)]">
+      <TableHeader
         data-pcomp="data-table"
         style={{ background: 'var(--bg-panel)', borderBottom: '2px solid var(--border-subtle)' }}
       >
-        <tr>
+        <TableRow>
           {columns.map((col) => {
             const active = sortKey === col.key;
             const sortable = col.sortable && onSort;
             return (
-              <th
+              <TableHead
                 key={col.key}
                 scope="col"
                 aria-sort={ariaSortFor(active, sortDir)}
@@ -77,14 +78,14 @@ export function DataTable<T>({
                       <ChevronsUpDown size={12} aria-hidden className="opacity-50" />
                     ))}
                 </span>
-              </th>
+              </TableHead>
             );
           })}
-        </tr>
-      </thead>
-      <tbody>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {rows.map((row) => (
-          <tr
+          <TableRow
             key={rowKey(row)}
             onClick={onRowClick ? () => onRowClick(row) : undefined}
             className={cn(
@@ -93,17 +94,17 @@ export function DataTable<T>({
             )}
           >
             {columns.map((col) => (
-              <td
+              <TableCell
                 key={col.key}
                 className={cn('px-6 py-2 text-[color:var(--text-primary)]', col.cellClassName)}
               >
                 {col.render ? col.render(row) : (row as Record<string, ReactNode>)[col.key]}
-              </td>
+              </TableCell>
             ))}
-          </tr>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }
 

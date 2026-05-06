@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TooltipProvider } from '@shared/ui/tooltip';
 import { VocReviewDrawer } from '../ui/VocReviewDrawer';
 import { RoleContext } from '@entities/user';
 import { VOC_FIXTURES, VOC_HISTORY_FIXTURES } from '../../../../../../shared/fixtures/voc.fixtures';
@@ -58,21 +59,23 @@ function renderDrawer(role: Role, vocId: string, opts: RenderOpts = {}) {
   const onPatch = opts.onPatch ?? vi.fn().mockResolvedValue(undefined);
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const utils = render(
-    <MemoryRouter>
-      <RoleContext.Provider value={{ role, setRole: () => {} }}>
-        <QueryClientProvider client={qc}>
-          <VocReviewDrawer
-            vocId={vocId}
-            notes={[]}
-            notesLoading={false}
-            pending={false}
-            assigneeMap={ASSIGNEE_MAP}
-            onClose={() => {}}
-            onAddNote={vi.fn().mockResolvedValue(undefined)}
-          />
-        </QueryClientProvider>
-      </RoleContext.Provider>
-    </MemoryRouter>,
+    <TooltipProvider>
+      <MemoryRouter>
+        <RoleContext.Provider value={{ role, setRole: () => {} }}>
+          <QueryClientProvider client={qc}>
+            <VocReviewDrawer
+              vocId={vocId}
+              notes={[]}
+              notesLoading={false}
+              pending={false}
+              assigneeMap={ASSIGNEE_MAP}
+              onClose={() => {}}
+              onAddNote={vi.fn().mockResolvedValue(undefined)}
+            />
+          </QueryClientProvider>
+        </RoleContext.Provider>
+      </MemoryRouter>
+    </TooltipProvider>,
   );
   return { ...utils, onPatch };
 }

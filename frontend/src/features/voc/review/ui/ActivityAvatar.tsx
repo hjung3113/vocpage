@@ -1,3 +1,5 @@
+import { Avatar, AvatarFallback } from '@shared/ui/avatar';
+
 interface Props {
   userId: string;
 }
@@ -5,12 +7,10 @@ interface Props {
 export function ActivityAvatar({ userId }: Props) {
   const initial = userId[0]?.toUpperCase() ?? '?';
   return (
-    <span
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-      style={{ background: 'var(--brand-bg)', color: 'var(--brand)' }}
-      aria-hidden
-    >
-      {initial}
-    </span>
+    <Avatar className="h-7 w-7 shrink-0 text-xs font-semibold">
+      <AvatarFallback style={{ background: 'var(--brand-bg)', color: 'var(--brand)' }}>
+        {initial}
+      </AvatarFallback>
+    </Avatar>
   );
 }

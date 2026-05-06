@@ -2,6 +2,7 @@ import { Layers, Circle, Search, Zap, PauseCircle, CheckCircle2 } from 'lucide-r
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { VocStatus as VocStatusType } from '@contracts/voc';
+import { ToggleGroup, ToggleGroupItem } from '@shared/ui/toggle-group';
 
 const STATUS_TOKEN: Record<VocStatusType, string> = {
   접수: 'var(--status-pending, var(--bg-info-subtle))',
@@ -35,26 +36,20 @@ export interface VocStatusFiltersProps {
 export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFiltersProps) {
   const isAll = value === 'all';
 
-  function handleClick(pill: VocStatusType | 'all') {
-    if (pill === 'all') {
+  // Convert external value to ToggleGroup string[] format
+  // 'all' → ['all'], specific statuses → [...statuses]
+  const toggleValue: string[] = isAll ? ['all'] : (value as VocStatusType[]);
+
+  function handleValueChange(vals: string[]) {
+    // "all" toggled on → call onChange('all')
+    if (vals.includes('all') && !toggleValue.includes('all')) {
       onChange('all');
       return;
     }
-    // current selected statuses
-    const current: VocStatusType[] = isAll ? [] : (value as VocStatusType[]);
-    const isSelected = current.includes(pill);
-    if (isSelected) {
-      // deselect
-      onChange(current.filter((s) => s !== pill));
-    } else {
-      onChange([...current, pill]);
-    }
-  }
-
-  function isPressed(pill: VocStatusType | 'all'): boolean {
-    if (pill === 'all') return isAll;
-    if (isAll) return false;
-    return (value as VocStatusType[]).includes(pill);
+    // "all" was previously selected and user clicked a status item →
+    // remove 'all' from the set, keep only the newly-selected status items
+    const filtered = vals.filter((v) => v !== 'all');
+    onChange(filtered as VocStatusType[]);
   }
 
   return (
@@ -66,35 +61,42 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
         borderBottom: '1px solid var(--border-subtle)',
       }}
     >
-      {PILLS.map(({ label, value: pillValue, icon: Icon }) => {
-        const pressed = isPressed(pillValue);
-        const statusBg =
-          pillValue !== 'all' && pressed ? STATUS_TOKEN[pillValue as VocStatusType] : undefined;
+      <ToggleGroup
+        type="multiple"
+        value={toggleValue}
+        onValueChange={handleValueChange}
+        className="flex items-center gap-2"
+      >
+        {PILLS.map(({ label, value: pillValue, icon: Icon }) => {
+          const pressed =
+            pillValue === 'all'
+              ? isAll
+              : !isAll && (value as VocStatusType[]).includes(pillValue as VocStatusType);
+          const statusBg =
+            pillValue !== 'all' && pressed ? STATUS_TOKEN[pillValue as VocStatusType] : undefined;
 
-        return (
-          <button
-            key={pillValue}
-            type="button"
-            role="button"
-            data-testid={`status-chip-${pillValue}`}
-            aria-pressed={pressed}
-            onClick={() => handleClick(pillValue)}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors"
-            style={{
-              background: pressed
-                ? pillValue === 'all'
-                  ? 'var(--brand-bg, var(--brand))'
-                  : (statusBg ?? 'var(--brand-bg, var(--brand))')
-                : 'var(--bg-elevated)',
-              color: pressed ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-              border: '1px solid var(--border-subtle)',
-            }}
-          >
-            <Icon size={13} aria-hidden />
-            {label}
-          </button>
-        );
-      })}
+          return (
+            <ToggleGroupItem
+              key={pillValue}
+              value={pillValue}
+              data-testid={`status-chip-${pillValue}`}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors border"
+              style={{
+                background: pressed
+                  ? pillValue === 'all'
+                    ? 'var(--brand-bg, var(--brand))'
+                    : (statusBg ?? 'var(--brand-bg, var(--brand))')
+                  : 'var(--bg-elevated)',
+                color: pressed ? 'var(--text-on-brand)' : 'var(--text-secondary)',
+                borderColor: 'var(--border-subtle)',
+              }}
+            >
+              <Icon size={13} aria-hidden />
+              {label}
+            </ToggleGroupItem>
+          );
+        })}
+      </ToggleGroup>
       {rightSlot && <div className="ml-auto flex items-center">{rightSlot}</div>}
     </div>
   );

@@ -1,5 +1,6 @@
 import { Button } from '@shared/ui/button';
 import { cn } from '@shared/lib/cn';
+import { PaginationRoot, PaginationContent, PaginationItem } from './PaginationPrimitives';
 
 export interface PaginationProps {
   page: number;
@@ -37,55 +38,65 @@ export function Pagination({ page, totalPages, onChange, siblingCount = 1 }: Pag
   const isFirst = page <= 1;
   const isLast = page >= totalPages;
 
-  const navBtn = (label: string, target: number, disabled: boolean) => (
-    <Button
-      variant="outline"
-      size="sm"
-      aria-disabled={disabled || undefined}
-      disabled={disabled}
-      onClick={() => !disabled && onChange(target)}
-      className="border-[color:var(--border-standard)] text-[color:var(--text-secondary)]"
-    >
-      {label}
-    </Button>
-  );
-
   return (
-    <nav
+    <PaginationRoot
       data-pcomp="pagination"
       aria-label="페이지"
       className="flex items-center justify-center gap-1"
     >
-      {navBtn('이전', page - 1, isFirst)}
-      {pages.map((p, idx) =>
-        p === ELLIPSIS ? (
-          <span
-            key={`e-${idx}`}
-            aria-hidden
-            className="px-2 text-sm text-[color:var(--text-secondary)]"
-          >
-            {ELLIPSIS}
-          </span>
-        ) : (
+      <PaginationContent>
+        <PaginationItem>
           <Button
-            key={p}
-            variant={p === page ? 'default' : 'outline'}
+            variant="outline"
             size="sm"
-            onClick={() => onChange(p)}
-            aria-current={p === page ? 'page' : undefined}
-            className={cn(
-              'min-w-9',
-              p === page
-                ? 'bg-[color:var(--brand)] text-[color:var(--text-on-brand)]'
-                : 'border-[color:var(--border-standard)] text-[color:var(--text-primary)]',
-            )}
+            aria-disabled={isFirst || undefined}
+            disabled={isFirst}
+            onClick={() => !isFirst && onChange(page - 1)}
+            className="border-[color:var(--border-standard)] text-[color:var(--text-secondary)]"
           >
-            {p}
+            이전
           </Button>
-        ),
-      )}
-      {navBtn('다음', page + 1, isLast)}
-    </nav>
+        </PaginationItem>
+        {pages.map((p, idx) =>
+          p === ELLIPSIS ? (
+            <PaginationItem key={`e-${idx}`}>
+              <span aria-hidden className="px-2 text-sm text-[color:var(--text-secondary)]">
+                {ELLIPSIS}
+              </span>
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={p}>
+              <Button
+                variant={p === page ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onChange(p)}
+                aria-current={p === page ? 'page' : undefined}
+                className={cn(
+                  'min-w-9',
+                  p === page
+                    ? 'bg-[color:var(--brand)] text-[color:var(--text-on-brand)]'
+                    : 'border-[color:var(--border-standard)] text-[color:var(--text-primary)]',
+                )}
+              >
+                {p}
+              </Button>
+            </PaginationItem>
+          ),
+        )}
+        <PaginationItem>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-disabled={isLast || undefined}
+            disabled={isLast}
+            onClick={() => !isLast && onChange(page + 1)}
+            className="border-[color:var(--border-standard)] text-[color:var(--text-secondary)]"
+          >
+            다음
+          </Button>
+        </PaginationItem>
+      </PaginationContent>
+    </PaginationRoot>
   );
 }
 

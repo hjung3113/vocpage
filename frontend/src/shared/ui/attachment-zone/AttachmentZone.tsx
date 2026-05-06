@@ -1,5 +1,8 @@
 import { useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import { Label } from '@shared/ui/label';
+import { Input } from '@shared/ui/input';
+import { Button } from '@shared/ui/button';
 
 export const ATTACHMENT_MAX_FILES = 5;
 export const ATTACHMENT_MAX_SIZE_MB = 10;
@@ -90,7 +93,7 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <label
+        <Label
           id={labelId}
           htmlFor={inputId}
           className="text-sm font-medium text-[color:var(--text-primary)]"
@@ -99,7 +102,7 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
           <span className="ml-1 text-[10px] text-[color:var(--text-quaternary)]">
             (선택 · 이미지만 · 최대 {ATTACHMENT_MAX_FILES}개)
           </span>
-        </label>
+        </Label>
         <span
           data-testid="attachment-zone-count"
           aria-label={`첨부 ${files.length}개, 최대 ${ATTACHMENT_MAX_FILES}개`}
@@ -125,7 +128,7 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
             : 'border-[color:var(--border-standard)] bg-[color:var(--bg-app)]'
         } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
       >
-        <input
+        <Input
           ref={inputRef}
           id={inputId}
           data-testid="attachment-zone-input"
@@ -138,14 +141,16 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
         />
         <span className="text-[color:var(--text-secondary)]">
           이미지 드래그 또는{' '}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => inputRef.current?.click()}
             disabled={disabled}
-            className="font-medium text-[color:var(--brand)] underline-offset-2 hover:underline disabled:cursor-not-allowed"
+            className="h-auto p-0 font-medium text-[color:var(--brand)] underline-offset-2 hover:underline hover:bg-transparent disabled:cursor-not-allowed"
           >
             선택
-          </button>
+          </Button>
         </span>
         <span id={hintId} className="text-[11px] text-[color:var(--text-quaternary)]">
           파일당 최대 {ATTACHMENT_MAX_SIZE_MB}MB
@@ -174,14 +179,16 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
               >
                 {f.name}
               </span>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 aria-label={`${f.name} 제거`}
                 onClick={() => handleRemove(i)}
-                className="shrink-0 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-primary)]"
+                className="h-auto w-auto shrink-0 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-primary)] hover:bg-transparent p-0"
               >
                 <X className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

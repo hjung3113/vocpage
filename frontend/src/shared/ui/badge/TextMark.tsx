@@ -1,4 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
+import { cn } from '@shared/lib/cn';
+import { badgeVariants } from './Badge';
 
 export interface TextMarkProps {
   variant: string;
@@ -31,7 +33,6 @@ export function TextMark({
     color,
     fontWeight: weight,
     fontSize: isXs ? 'var(--chip-font-size-xs)' : 'var(--chip-font-size-sm)',
-    gap: 'var(--chip-gap)',
   };
   // xs intentionally omits fixed height — flows at natural line height in compact rows
   if (!isXs) styleBase.height = 'var(--chip-height-sm)';
@@ -40,7 +41,7 @@ export function TextMark({
     <span
       data-testid={testId}
       aria-label={ariaLabel}
-      className="inline-flex items-center whitespace-nowrap"
+      className={cn(badgeVariants({ chipVariant: 'text' }), 'items-center')}
       style={styleBase}
     >
       {icon === '#' ? (

@@ -1,4 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
+import { cn } from '@shared/lib/cn';
+import { badgeVariants } from './Badge';
 
 export interface OutlineChipProps {
   label: string;
@@ -10,18 +12,10 @@ export function OutlineChip({ label, icon }: OutlineChipProps) {
   return (
     <span
       data-testid="outline-chip"
-      className="inline-flex items-center whitespace-nowrap"
-      style={{
-        background: 'var(--brand-bg)',
-        color: 'var(--accent)',
-        border: '1px solid var(--brand-border)',
-        borderRadius: 'var(--chip-radius-pill)',
-        padding: '2px var(--chip-padding-x-sm)',
-        height: 'var(--chip-height-sm)',
-        gap: 'var(--chip-gap)',
-        fontSize: 'var(--chip-font-size-sm)',
-        fontWeight: 600,
-      }}
+      className={cn(
+        badgeVariants({ chipVariant: 'outline' }),
+        'text-[length:var(--chip-font-size-sm)]',
+      )}
     >
       {icon === '#' ? (
         <span aria-hidden="true">#</span>

@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
-import { cn } from '@shared/lib/cn';
 import { Button } from '@shared/ui/button';
+import { StatusLayout } from '@shared/ui/status-layout';
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -12,9 +12,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div
-      className={cn('flex flex-col items-center justify-center gap-3 py-16 text-center', className)}
-    >
+    <StatusLayout className={className}>
       {Icon && (
         <Icon size={40} className="text-[color:var(--text-secondary)] opacity-50" aria-hidden />
       )}
@@ -27,6 +25,6 @@ export function EmptyState({ icon: Icon, title, description, action, className }
           {action.label}
         </Button>
       )}
-    </div>
+    </StatusLayout>
   );
 }

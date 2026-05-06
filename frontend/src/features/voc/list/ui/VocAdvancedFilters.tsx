@@ -1,6 +1,7 @@
 import { SlidersHorizontal, X } from 'lucide-react';
 import type { AssigneeListItem, TagListItem, VocTypeListItem } from '@contracts/master/io';
 import type { VocPriority } from '@contracts/voc/entity';
+import { ToggleGroup, ToggleGroupItem } from '@shared/ui/toggle-group';
 
 export interface VocAdvancedFiltersValue {
   assignees?: string[];
@@ -48,11 +49,6 @@ const PRIORITIES: ReadonlyArray<{ value: VocPriority; label: string }> = [
   { value: 'low', label: '낮음' },
 ];
 
-function toggleItem<T>(list: T[] | undefined, item: T): T[] {
-  const arr = list ?? [];
-  return arr.includes(item) ? arr.filter((v) => v !== item) : [...arr, item];
-}
-
 interface ChipGroupProps<T extends string> {
   groupId: string;
   label: string;
@@ -70,29 +66,31 @@ function ChipGroup<T extends string>({
 }: ChipGroupProps<T>) {
   const labelId = `${groupId}-label`;
   return (
-    <div role="group" aria-labelledby={labelId} className="advanced-filters-section">
+    <div className="advanced-filters-section">
       <span id={labelId} className="advanced-filters-section-label">
         {label}
       </span>
-      <div className="advanced-filters-chips">
-        {items.map((item) => {
-          const pressed = (selected ?? []).includes(item.value);
-          const chipClass = pressed
-            ? 'advanced-filters-chip advanced-filters-chip--active'
-            : 'advanced-filters-chip';
-          return (
-            <button
-              key={item.value}
-              type="button"
-              aria-pressed={pressed}
-              onClick={() => onToggleItem(toggleItem(selected, item.value))}
-              className={chipClass}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
+      <ToggleGroup
+        type="multiple"
+        aria-labelledby={labelId}
+        value={selected ?? []}
+        onValueChange={(vals) => onToggleItem(vals as T[])}
+        className="advanced-filters-chips"
+      >
+        {items.map((item) => (
+          <ToggleGroupItem
+            key={item.value}
+            value={item.value}
+            className={
+              (selected ?? []).includes(item.value)
+                ? 'advanced-filters-chip advanced-filters-chip--active'
+                : 'advanced-filters-chip'
+            }
+          >
+            {item.label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
     </div>
   );
 }
