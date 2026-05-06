@@ -1,33 +1,11 @@
 import type { Voc } from '@contracts/voc/entity';
 import { VocSection } from './VocSection';
 import { VocAssignee } from '@entities/voc';
+import { MetaField } from '@shared/ui/meta-field';
 
 export interface VocPeopleSectionProps {
   voc: Voc;
   assigneeMap: Record<string, string>;
-}
-
-const LABEL_STYLE: React.CSSProperties = {
-  fontSize: '11px',
-  color: 'var(--text-secondary)',
-  marginBottom: '2px',
-};
-
-function MetaField({
-  label,
-  testId,
-  children,
-}: {
-  label: string;
-  testId: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span style={LABEL_STYLE}>{label}</span>
-      <div data-testid={testId}>{children}</div>
-    </div>
-  );
 }
 
 export function VocPeopleSection({ voc, assigneeMap }: VocPeopleSectionProps) {

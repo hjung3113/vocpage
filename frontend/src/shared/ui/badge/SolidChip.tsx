@@ -1,3 +1,6 @@
+import { cn } from '@shared/lib/cn';
+import { badgeVariants } from './Badge';
+
 export type SolidChipVariant = 'received' | 'reviewing' | 'processing' | 'done' | 'drop';
 
 export interface SolidChipProps {
@@ -15,17 +18,14 @@ export function SolidChip({ variant, label, extraTestId, ariaLabelOverride }: So
     <span
       data-testid={testId}
       aria-label={ariaLabelOverride}
-      className="inline-flex items-center whitespace-nowrap"
+      className={cn(
+        badgeVariants({ chipVariant: 'status' }),
+        'text-[length:var(--chip-font-size-sm)]',
+      )}
       style={{
         background: `var(--status-${variant}-bg)`,
         color: `var(--status-${variant}-fg)`,
         border: `1px solid var(--status-${variant}-border)`,
-        borderRadius: 'var(--chip-radius-pill)',
-        padding: '2px var(--chip-padding-x-sm)',
-        height: 'var(--chip-height-sm)',
-        gap: 'var(--chip-gap)',
-        fontSize: 'var(--chip-font-size-sm)',
-        fontWeight: 600,
       }}
     >
       <span

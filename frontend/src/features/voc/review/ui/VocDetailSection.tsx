@@ -1,6 +1,7 @@
 import type { Voc } from '@contracts/voc/entity';
 import { VocSection } from './VocSection';
 import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocTagPill } from '@entities/voc';
+import { MetaField } from '@shared/ui/meta-field';
 
 export interface VocDetailSectionProps {
   voc: Voc;
@@ -10,34 +11,11 @@ export interface VocDetailSectionProps {
   tags?: string[];
 }
 
-const LABEL_STYLE: React.CSSProperties = {
-  fontSize: '11px',
-  color: 'var(--text-secondary)',
-  marginBottom: '2px',
-};
-
 const VALUE_STYLE: React.CSSProperties = {
   fontSize: '12px',
   color: 'var(--text-primary)',
   fontWeight: 500,
 };
-
-function MetaField({
-  label,
-  testId,
-  children,
-}: {
-  label: string;
-  testId: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span style={LABEL_STYLE}>{label}</span>
-      <div data-testid={testId}>{children}</div>
-    </div>
-  );
-}
 
 export function VocDetailSection({
   voc,

@@ -1,3 +1,5 @@
+export { Badge, badgeVariants } from './Badge';
+export type { BadgeVariantProps } from './Badge';
 export { TextMark } from './TextMark';
 export type { TextMarkProps } from './TextMark';
 export { OutlineChip } from './OutlineChip';
