@@ -22,13 +22,13 @@ const baseProps = {
 describe('VocSubTaskList', () => {
   it('빈 상태 — "서브태스크 0개" 헤더 + 추가 버튼', () => {
     render(<VocSubTask {...baseProps} />);
-    expect(screen.getByRole('heading', { name: /서브태스크 0개/ })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /서브태스크 0개/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '서브태스크 추가' })).toBeInTheDocument();
   });
 
   it('서브태스크 목록 렌더 + 카운트', () => {
     render(<VocSubTask {...baseProps} subs={[item(), item({ id: 's-2', title: '두번째' })]} />);
-    expect(screen.getByRole('heading', { name: /서브태스크 2개/ })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /서브태스크 2개/ })).toBeInTheDocument();
     expect(screen.getByText('하위 작업 1')).toBeInTheDocument();
     expect(screen.getByText('두번째')).toBeInTheDocument();
   });

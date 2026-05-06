@@ -4,6 +4,7 @@ import { Textarea } from '@shared/ui/textarea';
 import { LoadingState } from '@shared/ui/skeleton';
 import type { InternalNote } from '@contracts/voc';
 import type { Role } from '@contracts/common';
+import { formatActivityTime } from '../lib/formatActivityTime';
 
 interface Props {
   notes: InternalNote[] | undefined;
@@ -30,24 +31,15 @@ export function VocInternalNotes({ notes, notesLoading, pending, role, isOwner, 
   return (
     <section
       data-testid="drawer-internal-notes"
-      className="flex flex-col gap-2 rounded border p-2"
-      style={{
-        borderColor: 'var(--border-standard)',
-        background: 'var(--status-amber-bg)',
-      }}
+      className="flex flex-col gap-3 rounded-md px-3 py-3"
+      style={{ background: 'var(--status-amber-bg)' }}
     >
-      <h3
-        id="voc-internal-notes-heading"
-        className="text-xs font-medium"
+      <p
+        className="text-[11px] font-semibold uppercase tracking-[0.07em]"
         style={{ color: 'var(--text-secondary)' }}
       >
-        내부 메모
-        {count > 0 && (
-          <span data-testid="internal-notes-count" className="ml-1">
-            {count}개
-          </span>
-        )}
-      </h3>
+        내부 메모{count > 0 && ` (${count})`}
+      </p>
       {notesLoading && <LoadingState />}
       {!notesLoading && count === 0 && (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
@@ -55,26 +47,21 @@ export function VocInternalNotes({ notes, notesLoading, pending, role, isOwner, 
         </p>
       )}
       {notes && count > 0 && (
-        <ul className="flex flex-col gap-2" aria-labelledby="voc-internal-notes-heading">
+        <ul className="flex flex-col gap-3">
           {notes.map((n) => (
-            <li
-              key={n.id}
-              className="rounded border p-2 text-sm"
-              style={{
-                borderColor: 'var(--border-standard)',
-                background: 'var(--bg-surface)',
-              }}
-            >
-              <div className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-                {n.created_at.slice(0, 16).replace('T', ' ')}
-              </div>
-              <div style={{ color: 'var(--text-primary)' }}>{n.body}</div>
+            <li key={n.id} className="flex flex-col gap-0.5">
+              <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+                {formatActivityTime(n.created_at)}
+              </span>
+              <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                {n.body}
+              </p>
             </li>
           ))}
         </ul>
       )}
       <form
-        className="mt-1 flex flex-col gap-2"
+        className="flex flex-col gap-2"
         onSubmit={(e) => {
           e.preventDefault();
           const next = body.trim();
@@ -90,12 +77,14 @@ export function VocInternalNotes({ notes, notesLoading, pending, role, isOwner, 
           placeholder="내부 메모를 입력하세요 (담당자·관리자만 볼 수 있음)"
           aria-label="new internal note"
         />
-        <Button type="submit" size="sm" disabled={pending || !body.trim()}>
-          저장
-        </Button>
-        <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-          담당자·관리자에게만 공개. 공개 댓글과 별도 저장.
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+            담당자·관리자에게만 공개
+          </p>
+          <Button type="submit" size="sm" disabled={pending || !body.trim()}>
+            저장
+          </Button>
+        </div>
       </form>
     </section>
   );

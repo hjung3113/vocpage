@@ -1,5 +1,4 @@
 import type { InternalNote } from '@contracts/voc';
-import { CollapsibleSection } from './CollapsibleSection';
 import type { Role } from '@contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistory } from './VocHistory';
@@ -42,7 +41,7 @@ export function VocActionSection({
   // history is read-only; fetching is co-located here alongside comments/subtasks
   const history = useVocHistory(vocId);
   return (
-    <CollapsibleSection title="활동" testId="drawer-actions">
+    <div data-testid="drawer-actions">
       <Tabs defaultValue="comment" data-pcomp="review-sections">
         <TabsList variant="underline">
           <TabsTrigger variant="underline" value="comment">
@@ -109,6 +108,6 @@ export function VocActionSection({
           </TabsContent>
         )}
       </Tabs>
-    </CollapsibleSection>
+    </div>
   );
 }

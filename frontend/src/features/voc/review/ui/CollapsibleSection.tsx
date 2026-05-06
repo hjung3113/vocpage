@@ -7,6 +7,7 @@ interface CollapsibleSectionProps {
   title: string;
   testId?: string;
   defaultOpen?: boolean;
+  noBorder?: boolean;
   children: React.ReactNode;
 }
 
@@ -14,6 +15,7 @@ export function CollapsibleSection({
   title,
   testId,
   defaultOpen = true,
+  noBorder = false,
   children,
 }: CollapsibleSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
@@ -24,7 +26,7 @@ export function CollapsibleSection({
       onOpenChange={setOpen}
       data-testid={testId}
       className="flex flex-col"
-      style={{ borderTop: '1px solid var(--border-subtle)' }}
+      style={noBorder ? undefined : { borderTop: '1px solid var(--border-subtle)' }}
     >
       <CollapsibleTrigger
         className={cn(

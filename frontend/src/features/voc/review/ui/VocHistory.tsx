@@ -32,7 +32,7 @@ export function VocHistory({ entries, loading }: Props) {
               {i < entries.length - 1 && (
                 <div
                   className="mt-1.5 w-px flex-1"
-                  style={{ background: 'var(--border-standard)' }}
+                  style={{ background: 'var(--border-subtle)' }}
                 />
               )}
             </div>

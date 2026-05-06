@@ -38,17 +38,17 @@ describe('VocInternalNotes — role gate', () => {
 
   it('dev + isOwner=true → 렌더함', () => {
     render(<VocInternalNotes {...baseProps} role={'dev' as Role} isOwner={true} />);
-    expect(screen.getByRole('heading', { name: /내부 메모/ })).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-internal-notes')).toBeInTheDocument();
   });
 
   it('admin → 항상 렌더', () => {
     render(<VocInternalNotes {...baseProps} role={'admin' as Role} isOwner={false} />);
-    expect(screen.getByRole('heading', { name: /내부 메모/ })).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-internal-notes')).toBeInTheDocument();
   });
 
   it('manager → 항상 렌더', () => {
     render(<VocInternalNotes {...baseProps} role={'manager' as Role} isOwner={false} />);
-    expect(screen.getByRole('heading', { name: /내부 메모/ })).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-internal-notes')).toBeInTheDocument();
   });
 });
 
@@ -62,7 +62,7 @@ describe('VocInternalNotes — content', () => {
         isOwner={false}
       />,
     );
-    expect(screen.getByTestId('internal-notes-count')).toHaveTextContent('2개');
+    expect(screen.getByText(/내부 메모 \(2\)/)).toBeInTheDocument();
     expect(screen.getByText('내부 검토 결과 정상')).toBeInTheDocument();
     expect(screen.getByText('두번째 메모')).toBeInTheDocument();
   });

@@ -69,26 +69,24 @@ export function VocDrawerBody({
   if (isFullscreen) {
     return (
       <>
-        <div className="flex-1 overflow-y-auto px-8 pt-4 pb-4 flex flex-col gap-4">
-          <CollapsibleSection title="본문">
-            <VocBodySection body={voc.body} />
-          </CollapsibleSection>
+        <div className="flex-1 overflow-y-auto px-8 pt-6 pb-6 flex flex-col gap-6 min-w-0">
+          <VocBodySection body={voc.body} />
+          <VocAttachmentSection items={attachments} canUpload={canUpload} />
           <VocActionSection {...actionProps} />
         </div>
         <div
-          className="w-72 shrink-0 overflow-y-auto pt-4 pb-4 px-5 flex flex-col"
+          className="w-64 shrink-0 overflow-y-auto pt-6 pb-6 px-5 flex flex-col gap-4"
           style={{ borderLeft: '1px solid var(--border-subtle)' }}
         >
-          <CollapsibleSection title="상세 정보">
+          <CollapsibleSection title="상세 정보" noBorder>
             <VocDetailSection {...detailProps} />
           </CollapsibleSection>
-          <CollapsibleSection title="담당자">
+          <CollapsibleSection title="담당자" noBorder>
             <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
           </CollapsibleSection>
-          <CollapsibleSection title="날짜">
+          <CollapsibleSection title="날짜" noBorder>
             <VocDateSection voc={voc} />
           </CollapsibleSection>
-          <VocAttachmentSection items={attachments} canUpload={canUpload} />
         </div>
       </>
     );
@@ -96,20 +94,19 @@ export function VocDrawerBody({
 
   return (
     <div className="flex flex-col gap-4">
-      <CollapsibleSection title="상세 정보">
+      <CollapsibleSection title="상세 정보" noBorder>
         <VocDetailSection {...detailProps} />
       </CollapsibleSection>
-      <CollapsibleSection title="담당자">
+      <CollapsibleSection title="담당자" noBorder>
         <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
       </CollapsibleSection>
-      <CollapsibleSection title="날짜">
+      <CollapsibleSection title="날짜" noBorder>
         <VocDateSection voc={voc} />
       </CollapsibleSection>
-      <CollapsibleSection title="본문">
-        <VocBodySection body={voc.body} />
-      </CollapsibleSection>
-      <VocAttachmentSection items={attachments} canUpload={canUpload} />
+      <VocBodySection body={voc.body} />
+      <VocAttachmentSection items={attachments} canUpload={canUpload} noBorder />
       <VocActionSection {...actionProps} />
+      <div style={{ borderTop: '1px solid var(--border-subtle)' }} />
     </div>
   );
 }
