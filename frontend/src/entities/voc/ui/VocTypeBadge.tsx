@@ -14,7 +14,7 @@ export function VocTypeBadge({ slug, name }: VocTypeBadgeProps) {
   return (
     <TextMark
       variant={variant}
-      iconMode="icon-only"
+      iconMode="icon+text"
       icon={Icon}
       label={name}
       color={color}
