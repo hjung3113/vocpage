@@ -7,11 +7,18 @@ export interface SolidChipProps {
   variant: SolidChipVariant;
   label: string;
   size?: 'sm';
+  dotOnly?: boolean;
   extraTestId?: string;
   ariaLabelOverride?: string;
 }
 
-export function SolidChip({ variant, label, extraTestId, ariaLabelOverride }: SolidChipProps) {
+export function SolidChip({
+  variant,
+  label,
+  dotOnly,
+  extraTestId,
+  ariaLabelOverride,
+}: SolidChipProps) {
   const testId = extraTestId ?? `solid-chip-${variant}`;
 
   return (
@@ -38,7 +45,7 @@ export function SolidChip({ variant, label, extraTestId, ariaLabelOverride }: So
           flexShrink: 0,
         }}
       />
-      {label}
+      {!dotOnly && label}
     </span>
   );
 }

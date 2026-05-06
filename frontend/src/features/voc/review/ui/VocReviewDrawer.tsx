@@ -91,7 +91,7 @@ export function VocReviewDrawer({
                   {voc.issue_code}
                 </span>
               ) : null}
-              {voc && <VocStatusBadge status={voc.status} />}
+              {voc && <VocStatusBadge status={voc.status} iconOnly />}
               {voc && <VocPriorityBadge priority={voc.priority} iconOnly />}
             </div>
             <DrawerActionButtons
