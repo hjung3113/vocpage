@@ -19,15 +19,6 @@ import { VocBodySection } from './VocBodySection';
 import { VocAttachmentSection } from './VocAttachmentSection';
 import { CollapsibleSection } from './CollapsibleSection';
 
-const ISSUE_CODE_STYLE: React.CSSProperties = {
-  color: 'var(--accent)',
-  fontFamily: 'D2Coding, monospace',
-};
-
-const TITLE_STYLE: React.CSSProperties = {
-  color: 'var(--text-primary)',
-};
-
 interface Props {
   vocId: string | null;
   notes: InternalNote[] | undefined;
@@ -92,33 +83,42 @@ export function VocReviewDrawer({
 
         {/* Custom header */}
         <div
-          className="flex items-start gap-3 px-4 py-5 shrink-0"
-          style={{ borderBottom: '1px solid var(--border-standard)' }}
+          className="px-4 pt-4 pb-3 shrink-0"
+          style={{ borderBottom: '1px solid var(--border-subtle)' }}
         >
-          <div className="flex-1 min-w-0">
-            {voc && (
-              <div
-                className="text-xs font-semibold mb-1"
-                style={ISSUE_CODE_STYLE}
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            {voc ? (
+              <span
+                className="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold"
+                style={{
+                  fontFamily: 'D2Coding, monospace',
+                  background: 'var(--brand-bg)',
+                  color: 'var(--accent)',
+                }}
                 data-testid="drawer-issue-code"
               >
                 {voc.issue_code}
-              </div>
+              </span>
+            ) : (
+              <span />
             )}
-            <div className="text-base font-bold truncate" style={TITLE_STYLE}>
-              {voc ? voc.title : 'VOC'}
-            </div>
+            <DrawerActionButtons
+              isFullscreen={isFullscreen}
+              onToggleFullscreen={handleToggleFullscreen}
+              onCopyLink={handleCopyLink}
+              onClose={onClose}
+            />
           </div>
-          <DrawerActionButtons
-            isFullscreen={isFullscreen}
-            onToggleFullscreen={handleToggleFullscreen}
-            onCopyLink={handleCopyLink}
-            onClose={onClose}
-          />
+          <div
+            className="text-sm font-semibold leading-snug"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {voc ? voc.title : 'VOC'}
+          </div>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <div className="flex-1 overflow-y-auto px-4 pt-4 pb-4">
           {detail.isLoading && <LoadingState />}
           {detail.isError &&
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

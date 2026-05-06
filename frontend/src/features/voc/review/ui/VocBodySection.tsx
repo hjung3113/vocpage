@@ -7,7 +7,7 @@ interface Props {
 export function VocBodySection({ body }: Props) {
   return (
     <VocSection title="본문" testId="drawer-body">
-      <div data-pcomp="voc-body-section" className="rounded-md px-3 py-3 text-sm">
+      <div data-pcomp="voc-body-section" className="text-sm pb-1">
         {body ? (
           <div
             className="prose prose-sm max-w-none"

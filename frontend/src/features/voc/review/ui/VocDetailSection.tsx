@@ -1,7 +1,6 @@
 import type { Voc } from '@contracts/voc/entity';
 import { VocSection } from './VocSection';
 import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocTagPill } from '@entities/voc';
-import { MetaField } from '@shared/ui/meta-field';
 
 export interface VocDetailSectionProps {
   voc: Voc;
@@ -11,11 +10,33 @@ export interface VocDetailSectionProps {
   tags?: string[];
 }
 
-const VALUE_STYLE: React.CSSProperties = {
-  fontSize: '12px',
-  color: 'var(--text-primary)',
-  fontWeight: 500,
-};
+function PropRow({
+  label,
+  testId,
+  children,
+}: {
+  label: string;
+  testId: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="flex items-center gap-3 py-1.5 min-h-[26px]"
+      style={{ borderTop: '1px solid var(--border-subtle)' }}
+    >
+      <span className="w-16 shrink-0 text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+        {label}
+      </span>
+      <div
+        data-testid={testId}
+        className="flex-1 min-w-0 text-xs font-medium"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export function VocDetailSection({
   voc,
@@ -31,35 +52,27 @@ export function VocDetailSection({
 
   return (
     <VocSection title="정보" testId="voc-detail-panel">
-      <div
-        data-pcomp="VocDetailSection"
-        className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-      >
-        <MetaField label="시스템" testId="meta-system">
-          <span style={VALUE_STYLE}>{systemLabel}</span>
-        </MetaField>
-
-        <MetaField label="메뉴" testId="meta-menu">
-          <span style={VALUE_STYLE}>{menuLabel}</span>
-        </MetaField>
-
-        <MetaField label="우선순위" testId="meta-priority">
+      <div data-pcomp="VocDetailSection" className="flex flex-col">
+        <PropRow label="시스템" testId="meta-system">
+          {systemLabel}
+        </PropRow>
+        <PropRow label="메뉴" testId="meta-menu">
+          {menuLabel}
+        </PropRow>
+        <PropRow label="우선순위" testId="meta-priority">
           <VocPriorityBadge priority={voc.priority} />
-        </MetaField>
-
-        <MetaField label="상태" testId="meta-status">
+        </PropRow>
+        <PropRow label="상태" testId="meta-status">
           <VocStatusBadge status={voc.status} />
-        </MetaField>
-
-        <MetaField label="유형" testId="meta-type">
+        </PropRow>
+        <PropRow label="유형" testId="meta-type">
           {vocType ? (
             <VocTypeBadge slug={vocType.slug} name={vocType.name} />
           ) : (
-            <span style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>—</span>
+            <span style={{ color: 'var(--text-quaternary)' }}>—</span>
           )}
-        </MetaField>
-
-        <MetaField label="태그" testId="meta-tags">
+        </PropRow>
+        <PropRow label="태그" testId="meta-tags">
           {tagList.length > 0 ? (
             <div className="flex flex-wrap gap-1">
               {tagList.map((tag) => (
@@ -67,9 +80,9 @@ export function VocDetailSection({
               ))}
             </div>
           ) : (
-            <span style={VALUE_STYLE}>—</span>
+            <span style={{ color: 'var(--text-quaternary)' }}>—</span>
           )}
-        </MetaField>
+        </PropRow>
       </div>
     </VocSection>
   );

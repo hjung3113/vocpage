@@ -23,19 +23,23 @@ export function CollapsibleSection({
       open={open}
       onOpenChange={setOpen}
       data-testid={testId}
-      className="flex flex-col gap-2"
+      className="flex flex-col gap-1.5"
+      style={{ borderTop: '1px solid var(--border-subtle)' }}
     >
-      <CollapsibleTrigger className="flex w-full items-center gap-1.5 text-left">
-        <ChevronDown
-          className={cn(
-            'h-3.5 w-3.5 shrink-0 transition-transform duration-150',
-            !open && '-rotate-90',
-          )}
-          style={{ color: 'var(--text-secondary)' }}
-        />
-        <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+      <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-left py-2">
+        <span
+          className="text-[10px] font-semibold tracking-[0.1em] uppercase"
+          style={{ color: 'var(--text-quaternary)' }}
+        >
           {title}
         </span>
+        <ChevronDown
+          className={cn(
+            'h-3 w-3 shrink-0 transition-transform duration-200',
+            !open && '-rotate-90',
+          )}
+          style={{ color: 'var(--text-quaternary)' }}
+        />
       </CollapsibleTrigger>
       <CollapsibleContent>{children}</CollapsibleContent>
     </Collapsible>

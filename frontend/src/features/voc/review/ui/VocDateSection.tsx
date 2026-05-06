@@ -5,18 +5,6 @@ export interface VocDateSectionProps {
   voc: Voc;
 }
 
-const LABEL_STYLE: React.CSSProperties = {
-  fontSize: '11px',
-  color: 'var(--text-secondary)',
-  marginBottom: '2px',
-};
-
-const VALUE_STYLE: React.CSSProperties = {
-  fontSize: '12px',
-  color: 'var(--text-primary)',
-  fontWeight: 500,
-};
-
 function MetaField({
   label,
   testId,
@@ -27,9 +15,20 @@ function MetaField({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span style={LABEL_STYLE}>{label}</span>
-      <div data-testid={testId}>{children}</div>
+    <div
+      className="flex items-center gap-3 py-1.5 min-h-[26px]"
+      style={{ borderTop: '1px solid var(--border-subtle)' }}
+    >
+      <span className="w-16 shrink-0 text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+        {label}
+      </span>
+      <div
+        data-testid={testId}
+        className="text-xs font-medium"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -42,16 +41,12 @@ function formatDate(iso: string | null | undefined): string {
 export function VocDateSection({ voc }: VocDateSectionProps) {
   return (
     <VocSection title="일정" testId="voc-date-panel">
-      <div
-        data-pcomp="VocDateSection"
-        className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-      >
+      <div data-pcomp="VocDateSection" className="flex flex-col">
         <MetaField label="등록일" testId="meta-created_at">
-          <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
+          {formatDate(voc.created_at)}
         </MetaField>
-
         <MetaField label="마감일" testId="meta-due_date">
-          <span style={VALUE_STYLE}>{formatDate(voc.due_date)}</span>
+          {formatDate(voc.due_date)}
         </MetaField>
       </div>
     </VocSection>
