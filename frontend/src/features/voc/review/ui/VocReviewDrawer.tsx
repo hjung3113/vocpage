@@ -76,22 +76,24 @@ export function VocReviewDrawer({
           className="px-4 pt-4 pb-3 shrink-0"
           style={{ borderBottom: '1px solid var(--border-subtle)' }}
         >
-          <div className="flex items-center justify-between gap-2 mb-2.5">
-            {voc ? (
-              <span
-                className="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold"
-                style={{
-                  fontFamily: 'D2Coding, monospace',
-                  background: 'var(--brand-bg)',
-                  color: 'var(--accent)',
-                }}
-                data-testid="drawer-issue-code"
-              >
-                {voc.issue_code}
-              </span>
-            ) : (
-              <span />
-            )}
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              {voc ? (
+                <span
+                  className="inline-flex shrink-0 items-center rounded px-1.5 py-0.5 text-[11px] font-semibold"
+                  style={{
+                    fontFamily: 'D2Coding, monospace',
+                    background: 'var(--brand-bg)',
+                    color: 'var(--accent)',
+                  }}
+                  data-testid="drawer-issue-code"
+                >
+                  {voc.issue_code}
+                </span>
+              ) : null}
+              {voc && <VocStatusBadge status={voc.status} />}
+              {voc && <VocPriorityBadge priority={voc.priority} />}
+            </div>
             <DrawerActionButtons
               isFullscreen={isFullscreen}
               onToggleFullscreen={() => setIsFullscreen((v) => !v)}
@@ -105,12 +107,6 @@ export function VocReviewDrawer({
           >
             {voc ? voc.title : 'VOC'}
           </div>
-          {voc && (
-            <div className="flex items-center gap-1.5 mt-2">
-              <VocStatusBadge status={voc.status} />
-              <VocPriorityBadge priority={voc.priority} />
-            </div>
-          )}
         </div>
 
         <div
