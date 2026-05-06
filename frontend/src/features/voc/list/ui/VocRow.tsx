@@ -25,14 +25,22 @@ export interface VocRowProps {
   onClick: () => void;
 }
 
+// Phase 3 follow-up: align with benchmark Tasks.html `.irow`
+//   padding: 7px 24px; min-height: 36px; font-size: 13px; gap: 10px.
+// Vertical padding (7px) replaces fixed 52px height; min-height keeps a
+// stable row floor while letting tag chips relax growth.
 const CONTAINER_STYLE: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: VOC_GRID_COLUMNS,
-  padding: `0 ${VOC_GRID_PADDING_X}`,
-  height: '52px',
+  paddingTop: '7px',
+  paddingBottom: '7px',
+  paddingLeft: VOC_GRID_PADDING_X,
+  paddingRight: VOC_GRID_PADDING_X,
+  minHeight: '36px',
   alignItems: 'center',
   cursor: 'pointer',
   borderBottom: '1px solid var(--border-subtle)',
+  fontSize: '13px',
 };
 
 export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick }: VocRowProps) {

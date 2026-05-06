@@ -133,6 +133,17 @@ describe('VocRow', () => {
     expect(block).not.toMatch(/oklch\s*\(/i);
   });
 
+  it('Phase 3 follow-up: row container uses min-height 36px and padding 7px 24px (Tasks.html .irow parity)', () => {
+    render(<VocRow row={row} assigneeMap={assigneeMap} onClick={() => {}} />);
+    const el = screen.getByTestId('voc-row') as HTMLDivElement;
+    expect(el.style.minHeight).toBe('36px');
+    // Vertical padding = 7px, horizontal padding inherits VOC_GRID_PADDING_X token.
+    expect(el.style.paddingTop).toBe('7px');
+    expect(el.style.paddingBottom).toBe('7px');
+    // Hardcoded fixed height removed (was 52px).
+    expect(el.style.height).toBe('');
+  });
+
   it('keyboard Enter triggers onClick', () => {
     const onClick = vi.fn();
     render(<VocRow row={row} assigneeMap={assigneeMap} onClick={onClick} />);
