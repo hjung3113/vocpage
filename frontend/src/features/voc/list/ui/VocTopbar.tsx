@@ -22,17 +22,33 @@ export function VocTopbar({
   return (
     <div
       data-pcomp="voc-topbar"
-      className="flex items-center gap-3 px-5 h-10"
-      style={{ background: 'var(--bg-app)', borderBottom: '1px solid var(--border-subtle)' }}
+      className="flex items-center gap-3 px-6"
+      style={{
+        background: 'var(--bg-app)',
+        borderBottom: '1px solid var(--border-subtle)',
+        height: '56px',
+      }}
     >
       {/* Title + count */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        <h1 className="text-sm font-semibold leading-none" style={{ color: 'var(--text-primary)' }}>
+      <div className="flex items-baseline gap-1.5 shrink-0">
+        <h1
+          className="leading-none"
+          style={{
+            color: 'var(--text-primary)',
+            fontSize: '15px',
+            fontWeight: 700,
+            letterSpacing: '-0.2px',
+          }}
+        >
           전체 VOC
         </h1>
         <span
-          className="text-xs font-normal"
-          style={{ color: 'var(--text-muted, var(--text-quaternary))' }}
+          style={{
+            color: 'var(--text-tertiary)',
+            fontSize: '13px',
+            fontWeight: 400,
+            marginLeft: '6px',
+          }}
         >
           {totalCount}
         </span>

@@ -4,14 +4,6 @@ import type { ReactNode } from 'react';
 import type { VocStatus as VocStatusType } from '@contracts/voc';
 import { ToggleGroup, ToggleGroupItem } from '@shared/ui/toggle-group';
 
-const STATUS_TOKEN: Record<VocStatusType, string> = {
-  접수: 'var(--status-pending, var(--bg-info-subtle))',
-  검토중: 'var(--status-review, var(--bg-warning-subtle))',
-  처리중: 'var(--status-progress, var(--bg-info-subtle))',
-  완료: 'var(--status-done, var(--bg-success-subtle))',
-  드랍: 'var(--status-drop, var(--bg-muted))',
-};
-
 interface PillConfig {
   label: string;
   value: VocStatusType | 'all';
@@ -55,10 +47,11 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
   return (
     <div
       data-pcomp="voc-status-filters"
-      className="flex items-center gap-1.5 flex-nowrap overflow-x-auto px-5 h-9 scrollbar-none"
+      className="flex items-center gap-1.5 flex-nowrap overflow-x-auto px-6 scrollbar-none"
       style={{
         background: 'var(--bg-app)',
         borderBottom: '1px solid var(--border-subtle)',
+        height: '44px',
       }}
     >
       <ToggleGroup
@@ -72,24 +65,23 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
             pillValue === 'all'
               ? isAll
               : !isAll && (value as VocStatusType[]).includes(pillValue as VocStatusType);
-          const statusBg =
-            pillValue !== 'all' && pressed ? STATUS_TOKEN[pillValue as VocStatusType] : undefined;
 
           return (
             <ToggleGroupItem
               key={pillValue}
               value={pillValue}
               data-testid={`status-chip-${pillValue}`}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors border hover:bg-[color:var(--voc-row-hover-bg)] hover:text-[color:var(--text-primary)]"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-[color:var(--text-primary)]"
               style={{
-                height: '24px',
-                background: pressed
-                  ? pillValue === 'all'
-                    ? 'color-mix(in oklch, var(--brand) 10%, var(--bg-app))'
-                    : (statusBg ?? 'color-mix(in oklch, var(--brand) 10%, var(--bg-app))')
-                  : 'transparent',
-                color: pressed ? 'var(--text-primary)' : 'var(--text-secondary)',
-                borderColor: 'transparent',
+                height: '26px',
+                padding: '5px 12px',
+                borderRadius: '9999px',
+                border: '1px solid transparent',
+                fontSize: '13px',
+                fontWeight: pressed ? 600 : 500,
+                background: pressed ? 'var(--brand-bg)' : 'transparent',
+                color: pressed ? 'var(--accent)' : 'var(--text-secondary)',
+                borderColor: pressed ? 'var(--brand-border)' : 'transparent',
               }}
             >
               <Icon size={12} aria-hidden />

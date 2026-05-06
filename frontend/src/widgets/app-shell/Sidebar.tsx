@@ -55,8 +55,8 @@ export function Sidebar() {
 
   return (
     <nav
-      className="flex flex-col border-r border-[color:var(--border-standard)] bg-[color:var(--bg-elevated)]"
-      style={{ width: '220px', fontFamily: 'Pretendard Variable, Pretendard, sans-serif' }}
+      className="flex flex-col border-r border-[color:var(--border-standard)] bg-[color:var(--bg-panel)]"
+      style={{ width: '222px', fontFamily: 'Pretendard Variable, Pretendard, sans-serif' }}
     >
       {/* 워크스페이스 셀렉터 */}
       <div
@@ -111,14 +111,14 @@ export function Sidebar() {
               cn('flex items-center transition-colors', isActive ? 'font-medium' : '')
             }
             style={({ isActive }) => ({
-              height: '30px',
-              padding: '0 10px',
+              height: '34px',
+              padding: '9px 12px',
               gap: '10px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '13px',
-              color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--voc-row-hover-bg)' : undefined,
-              boxShadow: isActive ? 'inset 2px 0 0 var(--brand)' : undefined,
+              borderRadius: '6px',
+              fontSize: '13.5px',
+              fontWeight: isActive ? 600 : 500,
+              color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+              background: isActive ? 'var(--brand-bg)' : undefined,
             })}
           >
             <Icon
