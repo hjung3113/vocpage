@@ -31,7 +31,7 @@ export function VocInternalNotes({ notes, notesLoading, pending, role, isOwner, 
   return (
     <section
       data-testid="drawer-internal-notes"
-      className="flex flex-col gap-3 rounded-md px-3 py-3"
+      className="flex flex-col gap-3 py-1"
       style={{ background: 'var(--status-amber-bg)' }}
     >
       <p

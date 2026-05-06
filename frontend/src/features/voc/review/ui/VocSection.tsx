@@ -1,5 +1,5 @@
 export interface VocSectionProps {
-  title: string;
+  title?: string;
   testId: string;
   children: React.ReactNode;
 }

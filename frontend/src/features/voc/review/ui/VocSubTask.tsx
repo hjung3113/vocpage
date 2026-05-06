@@ -22,7 +22,7 @@ export function VocSubTask({ parentId, parentIsSubtask, subs, canAdd, onOpen, on
     <section
       data-testid="drawer-subtasks"
       data-parent-id={parentId}
-      className="flex flex-col gap-2"
+      className="flex flex-col gap-2 py-1"
       aria-label={`서브태스크 ${subs.length}개`}
     >
       {subs.length === 0 ? (
