@@ -4,6 +4,13 @@ import { VocSection } from './VocSection';
 import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocTagPill } from '@entities/voc';
 import { PropRow } from '@features/voc/shared/ui/PropRow';
 import { EditableSelect } from '@features/voc/shared/ui/EditableSelect';
+import {
+  STATUS_OPTIONS,
+  PRIORITY_OPTIONS,
+  REVIEW_STATUS_OPTIONS,
+  RESOLUTION_QUALITY_OPTIONS,
+  DROP_REASON_OPTIONS,
+} from './VocDetailOptions';
 
 export interface VocDetailSectionProps {
   voc: Partial<Voc>;
@@ -14,38 +21,6 @@ export interface VocDetailSectionProps {
   menuMap?: Record<string, string>;
   tags?: string[];
 }
-
-function opts(...pairs: [string, string][]): { id: string; label: string }[] {
-  return pairs.map(([id, label]) => ({ id, label }));
-}
-
-const STATUS_OPTIONS = opts(
-  ['접수', '접수'],
-  ['검토중', '검토중'],
-  ['처리중', '처리중'],
-  ['완료', '완료'],
-  ['드랍', '드랍'],
-);
-const PRIORITY_OPTIONS = opts(
-  ['urgent', '긴급'],
-  ['high', '높음'],
-  ['medium', '보통'],
-  ['low', '낮음'],
-);
-const REVIEW_STATUS_OPTIONS = opts(
-  ['unverified', '미검토'],
-  ['approved', '승인'],
-  ['rejected', '거부'],
-  ['pending_deletion', '삭제 대기'],
-);
-const RESOLUTION_QUALITY_OPTIONS = opts(['근본해결', '근본해결'], ['임시조치', '임시조치']);
-const DROP_REASON_OPTIONS = opts(
-  ['중복', '중복'],
-  ['정책거부', '정책거부'],
-  ['재현불가', '재현불가'],
-  ['범위외', '범위외'],
-  ['기타', '기타'],
-);
 
 export function VocDetailSection({
   voc,
