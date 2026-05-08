@@ -93,17 +93,45 @@ Skip the frame for trivial one-liners (rename, obvious typo, single-file change 
 
 ## Working Style
 
-- **TDD only** — every implementation (FE/BE) is test-first: write or update the test, confirm it fails for the right reason, write the minimal code to pass, then refactor. No "tests later" PRs. Bug fixes start with a failing regression test. Stack: Vitest (FE) / Jest+Supertest (BE) — see `requirements.md §3`.
-- **No completion claims** — never mark a task done until the user explicitly says so
-- **No implementation without approval** — never write BE/FE code until the user says to start
-- **Debate, don't defer** — raise counterarguments or missed cases before agreeing; no passive "yes"
-- **Think before coding** — state assumptions; if multiple interpretations exist, present them, don't pick silently
-- **90% certainty gate** — never proceed on any decision without ≥90% confidence. Ask the user (present both options + rationale) until resolved. No guessing, no default-filling, no "let's go with this for now".
-- **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite
-- **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused
-- **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified
-- **Pre-commit lint dry-run** — 첫 `git commit` 전에 `npm run lint -w frontend` 단일 호출로 검증. 실패 시 수정 후 commit — husky 실패-재commit cycle 방지. (backend lint script 미정의 — 추후 추가 시 동일 패턴)
-- **Progress docs before merge** — for any PR that closes a phase/wave/step, commit `claude-progress.txt` + the relevant plan doc status update on the same branch before running `gh pr merge`. No separate branch or PR. Skill-only or docs-only PRs are exempt.
+### Reversibility gate (apply before any pause)
+
+Classify the decision first; the gate level follows the class.
+
+- **Irreversible** — DB schema/migration, public API contract (`shared/openapi.yaml`, `shared/contracts/**`), merged commits, external comms (push, PR merge, issue/comment), file deletes, anything touching auth / billing / permissions / tenant boundary.
+- **Reversible** — code/style/test changes inside an unmerged feature branch, file moves within the working tree, naming choices, local refactors.
+
+Rules:
+
+- **Irreversible**: stop and ask. State both options + rationale. No proceeding under 90% confidence.
+- **Reversible**: state the assumption in one line, proceed, report what was done in the end-of-turn summary. Do not block on user response for reversible decisions.
+- **Visual-surface decisions** (anything affecting `/voc` parity, prototype-as-reference output) are treated as irreversible during a parity wave (currently Wave 1.6) — keep the gate.
+
+### Engineering rules
+
+- **TDD for irreversible surface** — auth, billing, permissions, contracts, migrations, BE routes: write the test first, confirm it fails, then implement. Bug fixes start with a failing regression test. Stack: Vitest (FE) / Jest+Supertest (BE) — see `requirements.md §3`.
+- **Smoke test for reversible UI** — components and styles only need a single happy-path render test plus the visual-diff baseline. Don't author exhaustive unit tests for trivial JSX.
+- **Debate, don't defer** — raise counterarguments or missed cases before agreeing; no passive "yes".
+- **Think before coding** — state assumptions; if multiple interpretations exist, present them, don't pick silently.
+- **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite.
+- **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused.
+- **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified.
+- **Pre-commit lint dry-run** — before the first `git commit`, run `npm run lint -w frontend` once. Fix and re-stage on failure to avoid a husky retry loop. (Backend lint script is undefined — same pattern applies once added.)
+- **Progress docs at phase/wave close only** — sync `claude-progress.txt` + the relevant plan doc on the same branch only when the PR closes a phase or wave. Intra-phase PRs are exempt; do not commit progress diffs for every leaf. The `warn-doc-cleanup-before-pr` hookify rule fires on every `gh pr` — apply its 8-step checklist only if this PR is a phase/wave-close PR.
+
+### Approval scope
+
+A user approval applies to its declared scope and everything reversible inside it:
+
+- **Plan approval** → all batches in that plan are approved; per-batch ack not required
+- **Batch approval** → all leaves in that batch are approved; per-leaf ack not required
+- **Spec-derived implementation** → no extra approval needed; the spec is the approval
+
+Re-ask only when (1) crossing into a new plan/batch, (2) hitting an irreversible decision not covered by the spec, or (3) the user contradicts the prior approval.
+
+Completion language:
+
+- For leaves and intra-batch work: report what landed in the end-of-turn summary, do not declare "done".
+- For phase / wave / PR-merge milestones: wait for explicit user confirmation before declaring closure.
 
 ## Refactoring
 
