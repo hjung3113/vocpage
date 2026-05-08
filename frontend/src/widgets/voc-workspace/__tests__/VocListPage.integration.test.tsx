@@ -120,7 +120,9 @@ describe('VocListPage — Wave D D5 integration', () => {
       expect(lastCall?.[0]?.status).toEqual(['검토중']);
     });
     const expected = rowsByStatus('검토중').length;
-    await waitFor(() => expect(screen.getByText(`${expected}개`)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('voc-topbar-total-count')).toHaveTextContent(`${expected}`),
+    );
   });
 
   it('header "우선순위" 클릭 → 첫 row priority="urgent" (sort chips removed; header is now the only sort affordance)', async () => {
@@ -168,7 +170,7 @@ describe('VocListPage — Wave D D5 integration', () => {
     renderPage();
     await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
     await userEvent.click(screen.getByRole('button', { name: /새 VOC 등록/ }));
-    expect(await screen.findByRole('dialog', { name: /새 VOC 등록/ })).toBeInTheDocument();
+    expect(await screen.findByTestId('voc-create-dialog')).toBeInTheDocument();
     expect(await screen.findByTestId('voc-body-editor')).toBeInTheDocument();
   });
 

@@ -39,25 +39,30 @@ export function VocComment({
   };
 
   return (
-    <section
-      data-testid="drawer-comments"
-      className="flex flex-col gap-4 py-1"
-      aria-labelledby="voc-comments-heading"
-    >
+    <section data-testid="drawer-comments" className="flex flex-col gap-4 py-1" aria-label="댓글">
       {comments.length === 0 ? (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           아직 작성된 댓글이 없습니다.
         </p>
       ) : (
-        <ul className="flex flex-col gap-4">
-          {comments.map((c) => {
+        <ul className="flex flex-col">
+          {comments.map((c, i) => {
+            const isLast = i === comments.length - 1;
             const isOwn = c.author_id === currentUserId;
             const isEditing = editingId === c.id;
             const edited = c.updated_at !== c.created_at;
             const shortUser = c.author_id.slice(0, 8);
             return (
-              <li key={c.id} className="flex gap-3">
-                <ActivityAvatar userId={c.author_id} />
+              <li key={c.id} className="flex gap-3 pb-4">
+                <div className="flex flex-col items-center">
+                  <ActivityAvatar userId={c.author_id} />
+                  {!isLast && (
+                    <div
+                      className="mt-1.5 w-px flex-1"
+                      style={{ background: 'var(--border-subtle)' }}
+                    />
+                  )}
+                </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <div className="flex items-center justify-between gap-x-1">
                     <div className="flex flex-wrap items-center gap-x-1 text-xs">
@@ -115,10 +120,7 @@ export function VocComment({
                         onChange={(e) => setEditBody(e.target.value)}
                         aria-label="댓글 수정"
                       />
-                      <div className="flex gap-2">
-                        <Button type="submit" size="sm" disabled={pending || !editBody.trim()}>
-                          저장
-                        </Button>
+                      <div className="flex justify-end gap-2">
                         <Button
                           type="button"
                           size="sm"
@@ -126,6 +128,9 @@ export function VocComment({
                           onClick={() => setEditingId(null)}
                         >
                           취소
+                        </Button>
+                        <Button type="submit" size="sm" disabled={pending || !editBody.trim()}>
+                          저장
                         </Button>
                       </div>
                     </form>
@@ -158,12 +163,14 @@ export function VocComment({
                 submitDraft();
               }
             }}
-            placeholder="댓글을 입력하세요 (Ctrl+Enter로 등록)"
+            placeholder="댓글을 입력하세요 (⌘+Enter로 등록)"
             aria-label="new comment"
           />
-          <Button type="submit" size="sm" disabled={pending || !draft.trim()}>
-            저장
-          </Button>
+          <div className="flex justify-end">
+            <Button type="submit" size="sm" disabled={pending || !draft.trim()}>
+              저장
+            </Button>
+          </div>
         </form>
       )}
     </section>

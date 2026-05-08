@@ -107,11 +107,33 @@ describe('VocListPage — Wave 1 RTL', () => {
     vi.mocked(vocApi.notes).mockResolvedValue([]);
     renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
     await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
-    await waitFor(() =>
-      expect(screen.getByRole('tab', { name: 'InternalNote' })).toBeInTheDocument(),
-    );
-    await userEvent.click(screen.getByRole('tab', { name: 'InternalNote' }));
+    await waitFor(() => expect(screen.getByRole('tab', { name: '내부메모' })).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('tab', { name: '내부메모' }));
     await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
+  });
+
+  it('F-T4c fullscreen 토글: 패널 fullscreen 시 리스트 영역 숨김', async () => {
+    const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
+    vi.mocked(vocApi.list).mockResolvedValue({
+      rows: [{ ...target, has_children: false, notes_count: 0, tags: [] }],
+      page: 1,
+      per_page: 50,
+      total: 1,
+    });
+    vi.mocked(vocApi.get).mockResolvedValue(target);
+    vi.mocked(vocApi.notes).mockResolvedValue([]);
+    renderPage({ initialUrl: `/voc?id=${target.id}`, role: 'manager' });
+    // Wait for both panel and table to render
+    await waitFor(() => expect(screen.getByTestId('voc-drawer')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
+    // Click fullscreen toggle button (inside the panel header)
+    const btn = screen.getByTestId('drawer-btn-fullscreen');
+    await userEvent.click(btn);
+    // After fullscreen: list column should be hidden
+    await waitFor(() => expect(screen.queryByTestId('voc-table')).not.toBeInTheDocument());
+    // Toggle back
+    await userEvent.click(btn);
+    await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
   });
 
   it('F-T5 drawer Escape 닫힘: URL ?id 제거 — 다음 list query에 stale id 유출 없음', async () => {

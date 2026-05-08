@@ -22,55 +22,74 @@ export function VocTopbar({
   return (
     <div
       data-pcomp="voc-topbar"
-      className="flex items-center gap-2 px-6 h-14"
-      style={{ background: 'var(--bg-app)', borderBottom: '1px solid var(--border-subtle)' }}
+      className="flex items-center gap-3 px-6"
+      style={{
+        background: 'var(--bg-app)',
+        borderBottom: '1px solid var(--border-subtle)',
+        height: '56px',
+      }}
     >
-      {/* Title + badge */}
-      <div className="flex items-center gap-2 shrink-0">
-        <h1 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+      {/* Title + count */}
+      <div className="flex items-baseline gap-1.5 shrink-0">
+        <h1
+          className="leading-none"
+          style={{
+            color: 'var(--text-primary)',
+            fontSize: '15px',
+            fontWeight: 700,
+            letterSpacing: '-0.2px',
+          }}
+        >
           전체 VOC
         </h1>
         <span
-          className="rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{ background: 'var(--brand)', color: 'var(--text-on-brand)' }}
+          data-testid="voc-topbar-total-count"
+          style={{
+            color: 'var(--text-tertiary)',
+            fontSize: '13px',
+            fontWeight: 400,
+            marginLeft: '6px',
+          }}
         >
-          {totalCount}개
+          {totalCount}
         </span>
       </div>
 
-      {/* Search */}
-      <div className="relative flex-1 max-w-sm">
-        <Search
-          size={15}
-          aria-hidden
-          className="absolute left-2.5 top-1/2 -translate-y-1/2"
-          style={{ color: 'var(--text-secondary)' }}
-        />
-        <Input
-          role="searchbox"
-          aria-label="검색"
-          type="search"
-          placeholder="제목, 본문 검색..."
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          className="pl-8"
-          style={{
-            background: 'var(--bg-elevated)',
-            borderColor: 'var(--border-standard)',
-            color: 'var(--text-primary)',
-          }}
-        />
-      </div>
-
+      {/* Right-side controls */}
       <div className="ml-auto flex items-center gap-2">
+        {/* Search — compact, fixed width */}
+        <div className="relative">
+          <Search
+            size={13}
+            aria-hidden
+            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: 'var(--text-secondary)' }}
+          />
+          <Input
+            role="searchbox"
+            aria-label="검색"
+            type="search"
+            placeholder="제목, 본문 검색..."
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            className="pl-7 h-7 w-56 text-xs"
+            style={{
+              background: 'var(--bg-elevated)',
+              borderColor: 'var(--border-standard)',
+              color: 'var(--text-primary)',
+            }}
+          />
+        </div>
+
         <VocNotificationsDropdown {...notifications} />
+
         <Button
           type="button"
           onClick={onCreate}
           style={{ background: 'var(--brand)', color: 'var(--text-on-brand)' }}
-          className="gap-1.5"
+          className="h-7 px-2.5 gap-1 text-xs font-medium"
         >
-          <Plus size={16} aria-hidden />새 VOC 등록
+          <Plus size={13} aria-hidden />새 VOC 등록
         </Button>
       </div>
     </div>

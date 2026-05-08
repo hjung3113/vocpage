@@ -96,7 +96,7 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
     expect(screen.getByLabelText('new comment')).toBeInTheDocument();
     // 내부노트는 탭 전환 후 노출
-    await user.click(screen.getByRole('tab', { name: 'InternalNote' }));
+    await user.click(screen.getByRole('tab', { name: '내부메모' }));
     await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
   });
 
@@ -119,7 +119,7 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     const user = userEvent.setup();
     renderDrawer('manager', target.id);
     await waitFor(() => expect(screen.getByRole('tablist')).toBeInTheDocument());
-    await user.click(screen.getByRole('tab', { name: 'History' }));
+    await user.click(screen.getByRole('tab', { name: '이력' }));
     await waitFor(() => {
       const history = screen.getByTestId('drawer-history');
       expect(within(history).getAllByRole('listitem').length).toBeGreaterThanOrEqual(1);
@@ -154,6 +154,21 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     await waitFor(() => expect(screen.getByTestId('drawer-btn-copy-link')).toBeInTheDocument());
   });
 
+  it('copy-link 클릭 → ?id=ISSUE-CODE 포맷으로 clipboard 기록', async () => {
+    const written: string[] = [];
+    const spy = vi.spyOn(navigator.clipboard, 'writeText').mockImplementation((t) => {
+      written.push(t);
+      return Promise.resolve();
+    });
+    renderDrawer('manager', target.id);
+    await waitFor(() => expect(screen.getByTestId('voc-detail-panel')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('drawer-btn-copy-link'));
+    await waitFor(() => expect(written.length).toBeGreaterThan(0));
+    expect(written[0]).toMatch(/\?id=/);
+    expect(written[0]).toContain(target.issue_code);
+    spy.mockRestore();
+  });
+
   it('delete 버튼은 미구현 — 어떤 role에서도 미노출', async () => {
     renderDrawer('admin', target.id);
     await waitFor(() => expect(screen.getByTestId('voc-detail-panel')).toBeInTheDocument());
@@ -168,5 +183,24 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(btn).toHaveAttribute('aria-label', '이전 크기로');
     fireEvent.click(btn);
     expect(btn).toHaveAttribute('aria-label', '큰 화면으로 보기');
+  });
+
+  it('role=manager → 분류 섹션에 chip(button) 형태의 편집 가능 필드 노출', async () => {
+    renderDrawer('manager', target.id);
+    await waitFor(() => expect(screen.getByTestId('voc-detail-panel')).toBeInTheDocument());
+    // EditableSelect trigger buttons: 상태, 우선순위 등 여러 button이 렌더돼야 함
+    const detailPanel = screen.getByTestId('voc-detail-panel');
+    const editBtns = within(detailPanel).getAllByRole('button');
+    expect(editBtns.length).toBeGreaterThan(0);
+    // 각 버튼에 border 어포던스 클래스 있어야 함
+    expect(editBtns[0]!.className).toMatch(/border/);
+  });
+
+  it('role=user → 분류 섹션에 편집 button 미노출 (read-only span만 렌더)', async () => {
+    renderDrawer('user', target.id);
+    await waitFor(() => expect(screen.getByTestId('voc-detail-panel')).toBeInTheDocument());
+    const detailPanel = screen.getByTestId('voc-detail-panel');
+    // role=user면 EditableSelect 트리거 버튼 없어야 함
+    expect(within(detailPanel).queryAllByRole('button')).toHaveLength(0);
   });
 });

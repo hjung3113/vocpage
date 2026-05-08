@@ -11,6 +11,17 @@ export function useVocDetail(id: string | null) {
   });
 }
 
+export function useVocDetailByCode(issueCode: string | null) {
+  const { role } = useRole();
+  return useQuery({
+    queryKey: issueCode
+      ? ['voc', role, 'detail-by-code', issueCode]
+      : ['voc', role, 'detail-by-code', 'none'],
+    queryFn: () => vocApi.getByCode(issueCode!),
+    enabled: !!issueCode,
+  });
+}
+
 export function useVocHistory(id: string | null) {
   const { role } = useRole();
   return useQuery({

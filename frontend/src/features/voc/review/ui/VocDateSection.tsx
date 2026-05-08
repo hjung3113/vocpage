@@ -1,37 +1,13 @@
 import type { Voc } from '@contracts/voc/entity';
+import type { VocUpdate } from '@contracts/voc';
 import { VocSection } from './VocSection';
+import { PropRow } from '@features/voc/shared/ui/PropRow';
+import { EditableDatePicker } from '@features/voc/shared/ui/EditableDatePicker';
 
 export interface VocDateSectionProps {
-  voc: Voc;
-}
-
-const LABEL_STYLE: React.CSSProperties = {
-  fontSize: '11px',
-  color: 'var(--text-secondary)',
-  marginBottom: '2px',
-};
-
-const VALUE_STYLE: React.CSSProperties = {
-  fontSize: '12px',
-  color: 'var(--text-primary)',
-  fontWeight: 500,
-};
-
-function MetaField({
-  label,
-  testId,
-  children,
-}: {
-  label: string;
-  testId: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span style={LABEL_STYLE}>{label}</span>
-      <div data-testid={testId}>{children}</div>
-    </div>
-  );
+  voc: Partial<Voc>;
+  editable?: boolean;
+  onPatch?: (patch: VocUpdate) => void;
 }
 
 function formatDate(iso: string | null | undefined): string {
@@ -39,20 +15,28 @@ function formatDate(iso: string | null | undefined): string {
   return iso.slice(0, 10);
 }
 
-export function VocDateSection({ voc }: VocDateSectionProps) {
+export function VocDateSection({ voc, editable = false, onPatch }: VocDateSectionProps) {
   return (
     <VocSection title="일정" testId="voc-date-panel">
-      <div
-        data-pcomp="VocDateSection"
-        className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-      >
-        <MetaField label="등록일" testId="meta-created_at">
-          <span style={VALUE_STYLE}>{formatDate(voc.created_at)}</span>
-        </MetaField>
-
-        <MetaField label="마감일" testId="meta-due_date">
-          <span style={VALUE_STYLE}>{formatDate(voc.due_date)}</span>
-        </MetaField>
+      <div data-pcomp="VocDateSection">
+        <PropRow label="등록일" testId="meta-created_at">
+          {voc.created_at ? formatDate(voc.created_at) : '— (자동 설정)'}
+        </PropRow>
+        <PropRow label="마감일" testId="meta-due_date">
+          {editable ? (
+            <EditableDatePicker
+              value={voc.due_date ? voc.due_date.slice(0, 10) : null}
+              disabled={!editable}
+              onChange={(v) => {
+                const iso = v ? `${v}T00:00:00.000Z` : null;
+                onPatch?.({ due_date: iso });
+              }}
+              placeholder="날짜 선택"
+            />
+          ) : (
+            formatDate(voc.due_date)
+          )}
+        </PropRow>
       </div>
     </VocSection>
   );

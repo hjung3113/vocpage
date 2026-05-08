@@ -2,7 +2,19 @@
 
 ## 다음 세션 시작점
 
-→ **현재: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
+→ **현재: VOC Linear Realignment Phase 2~5 완료 + PR 생성** (정본: `docs/specs/plans/voc-linear-realign.md`).
+   feat/voc-review-ui-linear-jira 브랜치 5 commit (`053f782` Phase 2 sidebar/topbar/filter / `ac9d597` Phase 3 table+icons / `30e44b8` Phase 3 follow-up row 36px / `ba2e73a` Phase 4 review / `d446922` Phase 5 status grouping) — 1 PR로 통합 발행.
+   검증: 436/436 vitest PASS / typecheck PASS / Playwright 50/51 PASS / code-reviewer Blocking 0.
+   **다음 세션 P1 follow-up (PR 머지 전 또는 후속 PR)**:
+   1) Review sheet `상태` row icon 누락 (현재 text-only) — type와 일관 위해 icon+text 권장
+   2) `VocStatusGroupHeader` 인라인 마법값(12px·11px·14·8px·tracking) 토큰화
+   3) `Sidebar` `13.5px` 비표준 step — `uidesign.md §typography` 등재 또는 13/14px 정렬
+   4) `VocStatusFilters`의 status별 pressed 토큰(`STATUS_TOKEN`) 제거 의도 확인 — plan 명시 외 회귀 가능성
+   5) `useLocalStorageState`: defaultValue ref/모듈 상수화, mount-time write skip
+   6) Phase 5 그룹 collapse 통합 테스트 추가 (현재 unit만)
+   7) `VocStatusGroupHeader` `data-testid` 한국어 → slug
+→ **이전 컨텍스트: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
+→ **이전 컨텍스트: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
    **다음:** Wave 1.6 η-batch — VOC 리뷰 페이지 고도화 우선 (C-20~C-23 병렬) → 이후 ζ(C-17~C-19) → Phase D.
    **PR #232-236 리뷰 피드백 반영 완료 (2026-05-06)**: formatActivityTime lib 분리+단위테스트, SubTaskListResponse shared/contracts 이동, dead props 4개 제거, comments/subtasks/history 쿼리 VocActionSection co-location, 적대적 리뷰 1회. fix/review-feedback-232-236 브랜치 → PR 머지.
    §7.2 batch 순서: ~~α~~ → ~~β~~ → ~~γ~~ → ~~δ~~ → ~~ε~~ → **η(C-20∥C-21∥C-22∥C-23)** → ζ(C-17 → C-18∥C-19) → Phase D.

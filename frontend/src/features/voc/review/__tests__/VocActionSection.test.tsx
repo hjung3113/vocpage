@@ -74,7 +74,7 @@ describe('VocActionSection — LoadingState', () => {
     const user = userEvent.setup();
     setupMocks({ subtasksLoading: true });
     render(<VocActionSection {...baseProps} />);
-    await user.click(screen.getByRole('tab', { name: 'Subtask' }));
+    await user.click(screen.getByRole('tab', { name: '하위작업' }));
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 });

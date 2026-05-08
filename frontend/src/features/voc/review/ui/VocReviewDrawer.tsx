@@ -4,29 +4,16 @@ import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
 import { useVocDetail } from '../model/useDrawerQueries';
 import { useVocPermissions } from '../model/useVocPermissions';
+import { useUpdateVoc } from '@features/voc/model/useVocMutation';
 import { AuthContext } from '@features/auth/model/AuthContext';
 import { type InternalNote } from '@contracts/voc';
 import { VocPermissionGate } from './VocPermissionGate';
 import { LoadingState } from '@shared/ui/skeleton';
 import { ErrorState } from '@shared/ui/error-state';
 import { type AttachmentItem } from './VocAttachmentSection';
-import { VocActionSection } from './VocActionSection';
-import { VocDetailSection } from './VocDetailSection';
-import { VocPeopleSection } from './VocPeopleSection';
-import { VocDateSection } from './VocDateSection';
 import { DrawerActionButtons } from './DrawerActionButtons';
-import { VocBodySection } from './VocBodySection';
-import { VocAttachmentSection } from './VocAttachmentSection';
-import { CollapsibleSection } from './CollapsibleSection';
-
-const ISSUE_CODE_STYLE: React.CSSProperties = {
-  color: 'var(--accent)',
-  fontFamily: 'D2Coding, monospace',
-};
-
-const TITLE_STYLE: React.CSSProperties = {
-  color: 'var(--text-primary)',
-};
+import { VocDrawerBody } from './VocDrawerBody';
+import { VocStatusBadge, VocPriorityBadge } from '@entities/voc';
 
 interface Props {
   vocId: string | null;
@@ -61,19 +48,18 @@ export function VocReviewDrawer({
   const { canWrite, canUpload, canSeeInternal } = useVocPermissions();
   const { role } = useRole();
   const auth = useContext(AuthContext);
+  const updateVoc = useUpdateVoc();
   const open = !!vocId;
   const voc = detail.data;
   const isDeleted = !!voc?.deleted_at;
   const blockedDeleted = isDeleted && role !== 'admin';
-
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?voc=${vocId}`;
+    const code = voc?.issue_code ?? vocId;
+    const url = `${window.location.origin}${window.location.pathname}?id=${code}`;
     void navigator.clipboard.writeText(url);
   };
-
-  const handleToggleFullscreen = () => setIsFullscreen((v) => !v);
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -86,39 +72,51 @@ export function VocReviewDrawer({
         data-testid="voc-drawer"
         style={{ background: 'var(--bg-panel)' }}
       >
-        {/* Visually hidden a11y title/description */}
         <DialogTitle className="sr-only">{voc ? voc.title : 'VOC'}</DialogTitle>
         <DialogDescription className="sr-only">VOC 상세 검토 패널</DialogDescription>
 
-        {/* Custom header */}
         <div
-          className="flex items-start gap-3 px-4 py-5 shrink-0"
-          style={{ borderBottom: '1px solid var(--border-standard)' }}
+          className="px-4 pt-4 pb-3 shrink-0"
+          style={{ borderBottom: '1px solid var(--border-subtle)' }}
         >
-          <div className="flex-1 min-w-0">
-            {voc && (
-              <div
-                className="text-xs font-semibold mb-1"
-                style={ISSUE_CODE_STYLE}
-                data-testid="drawer-issue-code"
-              >
-                {voc.issue_code}
-              </div>
-            )}
-            <div className="text-base font-bold truncate" style={TITLE_STYLE}>
-              {voc ? voc.title : 'VOC'}
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              {voc ? (
+                <span
+                  className="inline-flex shrink-0 items-center rounded px-1.5 py-0.5 text-[11px] font-semibold"
+                  style={{
+                    fontFamily: 'D2Coding, monospace',
+                    background: 'var(--brand-bg)',
+                    color: 'var(--accent)',
+                  }}
+                  data-testid="drawer-issue-code"
+                >
+                  {voc.issue_code}
+                </span>
+              ) : null}
+              {voc && <VocStatusBadge status={voc.status} iconOnly />}
+              {voc && <VocPriorityBadge priority={voc.priority} iconOnly />}
             </div>
+            <DrawerActionButtons
+              isFullscreen={isFullscreen}
+              onToggleFullscreen={() => setIsFullscreen((v) => !v)}
+              onCopyLink={handleCopyLink}
+              onClose={onClose}
+            />
           </div>
-          <DrawerActionButtons
-            isFullscreen={isFullscreen}
-            onToggleFullscreen={handleToggleFullscreen}
-            onCopyLink={handleCopyLink}
-            onClose={onClose}
-          />
+          <div
+            className="text-sm font-semibold leading-snug"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {voc ? voc.title : 'VOC'}
+          </div>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <div
+          className={
+            isFullscreen ? 'flex-1 flex overflow-hidden' : 'flex-1 overflow-y-auto px-4 pt-4 pb-4'
+          }
+        >
           {detail.isLoading && <LoadingState />}
           {detail.isError &&
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -129,40 +127,27 @@ export function VocReviewDrawer({
             ))}
           {voc && blockedDeleted && <VocPermissionGate reason="deleted" />}
           {voc && !blockedDeleted && (
-            <div className="flex flex-col gap-4">
-              <CollapsibleSection title="상세 정보">
-                <VocDetailSection
-                  voc={voc}
-                  vocTypeMap={vocTypeMap}
-                  systemMap={systemMap}
-                  menuMap={menuMap}
-                  tags={tags}
-                />
-              </CollapsibleSection>
-              <CollapsibleSection title="담당자">
-                <VocPeopleSection voc={voc} assigneeMap={assigneeMap} />
-              </CollapsibleSection>
-              <CollapsibleSection title="날짜">
-                <VocDateSection voc={voc} />
-              </CollapsibleSection>
-              <CollapsibleSection title="본문">
-                <VocBodySection body={voc.body} />
-              </CollapsibleSection>
-              <VocAttachmentSection items={attachments} canUpload={canUpload} />
-              <VocActionSection
-                vocId={voc.id}
-                parentIsSubtask={voc.parent_id !== null}
-                currentUserId={auth?.user?.id ?? ''}
-                role={role}
-                isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
-                canWrite={canWrite}
-                canSeeInternal={canSeeInternal}
-                pending={pending}
-                notes={notes}
-                notesLoading={notesLoading}
-                onAddNote={(body) => void onAddNote(voc.id, body)}
-              />
-            </div>
+            <VocDrawerBody
+              voc={voc}
+              isFullscreen={isFullscreen}
+              attachments={attachments}
+              assigneeMap={assigneeMap}
+              vocTypeMap={vocTypeMap}
+              systemMap={systemMap}
+              menuMap={menuMap}
+              tags={tags}
+              currentUserId={auth?.user?.id ?? ''}
+              role={role}
+              isOwner={!!auth?.user?.id && voc.assignee_id === auth.user.id}
+              canWrite={canWrite}
+              canUpload={canUpload}
+              canSeeInternal={canSeeInternal}
+              pending={pending}
+              notes={notes}
+              notesLoading={notesLoading}
+              onAddNote={(body) => void onAddNote(voc.id, body)}
+              onPatch={(patch) => void updateVoc.mutate({ id: voc.id, patch })}
+            />
           )}
         </div>
       </DialogContent>

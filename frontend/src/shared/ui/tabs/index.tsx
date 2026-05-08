@@ -11,7 +11,7 @@ const tabsListVariants = cva('inline-flex items-center', {
       default:
         'h-10 justify-center rounded-md bg-[color:var(--bg-elevated)] p-1 text-[color:var(--text-secondary)]',
       underline:
-        'w-full justify-start gap-1 rounded-none border-b border-[color:var(--bg-elevated)] bg-transparent p-0',
+        'w-full justify-start gap-1 rounded-none border-b border-[color:var(--border-subtle)] bg-transparent p-0',
     },
   },
   defaultVariants: { variant: 'default' },

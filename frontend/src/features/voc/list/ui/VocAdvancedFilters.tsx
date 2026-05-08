@@ -35,6 +35,7 @@ export function VocAdvancedFiltersToggle({ open, onToggle }: VocAdvancedFiltersT
       aria-expanded={open}
       aria-controls={VOC_ADVANCED_FILTERS_PANEL_ID}
       className="advanced-filters-toggle"
+      data-open={open}
     >
       <SlidersHorizontal className="advanced-filters-toggle-icon" aria-hidden />
       필터 더보기

@@ -1,65 +1,143 @@
 import type { Voc } from '@contracts/voc/entity';
+import type { VocUpdate } from '@contracts/voc';
 import { VocSection } from './VocSection';
 import { VocStatusBadge, VocPriorityBadge, VocTypeBadge, VocTagPill } from '@entities/voc';
-import { MetaField } from '@shared/ui/meta-field';
+import { PropRow } from '@features/voc/shared/ui/PropRow';
+import { EditableSelect } from '@features/voc/shared/ui/EditableSelect';
+import {
+  STATUS_OPTIONS,
+  PRIORITY_OPTIONS,
+  REVIEW_STATUS_OPTIONS,
+  RESOLUTION_QUALITY_OPTIONS,
+  DROP_REASON_OPTIONS,
+} from './VocDetailOptions';
 
 export interface VocDetailSectionProps {
-  voc: Voc;
+  voc: Partial<Voc>;
+  editable?: boolean;
+  onPatch?: (patch: VocUpdate) => void;
   vocTypeMap?: Record<string, { slug: string; name: string }>;
   systemMap?: Record<string, string>;
   menuMap?: Record<string, string>;
   tags?: string[];
 }
 
-const VALUE_STYLE: React.CSSProperties = {
-  fontSize: '12px',
-  color: 'var(--text-primary)',
-  fontWeight: 500,
-};
-
 export function VocDetailSection({
   voc,
+  editable = false,
+  onPatch,
   vocTypeMap,
   systemMap,
   menuMap,
   tags,
 }: VocDetailSectionProps) {
-  const vocType = vocTypeMap?.[voc.voc_type_id];
-  const systemLabel = systemMap?.[voc.system_id] ?? '—';
-  const menuLabel = menuMap?.[voc.menu_id] ?? '—';
+  const vocType = voc.voc_type_id ? vocTypeMap?.[voc.voc_type_id] : undefined;
+  const systemLabel = voc.system_id ? (systemMap?.[voc.system_id] ?? '—') : '—';
+  const menuLabel = voc.menu_id ? (menuMap?.[voc.menu_id] ?? '—') : '—';
   const tagList = tags ?? [];
 
+  const systemOptions = systemMap
+    ? Object.entries(systemMap).map(([id, label]) => ({ id, label }))
+    : [];
+  const menuOptions = menuMap ? Object.entries(menuMap).map(([id, label]) => ({ id, label })) : [];
+  const vocTypeOptions = vocTypeMap
+    ? Object.entries(vocTypeMap).map(([id, { name }]) => ({ id, label: name }))
+    : [];
+
+  function patch(p: VocUpdate) {
+    if (editable) onPatch?.(p);
+  }
+
   return (
-    <VocSection title="정보" testId="voc-detail-panel">
-      <div
-        data-pcomp="VocDetailSection"
-        className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md px-3 py-3"
-      >
-        <MetaField label="시스템" testId="meta-system">
-          <span style={VALUE_STYLE}>{systemLabel}</span>
-        </MetaField>
-
-        <MetaField label="메뉴" testId="meta-menu">
-          <span style={VALUE_STYLE}>{menuLabel}</span>
-        </MetaField>
-
-        <MetaField label="우선순위" testId="meta-priority">
-          <VocPriorityBadge priority={voc.priority} />
-        </MetaField>
-
-        <MetaField label="상태" testId="meta-status">
-          <VocStatusBadge status={voc.status} />
-        </MetaField>
-
-        <MetaField label="유형" testId="meta-type">
-          {vocType ? (
+    <VocSection title="분류" testId="voc-detail-panel">
+      <div data-pcomp="VocDetailSection">
+        <PropRow label="시스템" testId="meta-system">
+          {editable && systemOptions.length > 0 ? (
+            <EditableSelect
+              value={voc.system_id ?? null}
+              options={systemOptions}
+              disabled={!editable}
+              onChange={(v) => patch({ system_id: v })}
+              searchable={false}
+              placeholder="—"
+            />
+          ) : (
+            systemLabel
+          )}
+        </PropRow>
+        <PropRow label="메뉴" testId="meta-menu">
+          {editable && menuOptions.length > 0 ? (
+            <EditableSelect
+              value={voc.menu_id ?? null}
+              options={menuOptions}
+              disabled={!editable}
+              onChange={(v) => patch({ menu_id: v })}
+              searchable={false}
+              placeholder="—"
+            />
+          ) : (
+            menuLabel
+          )}
+        </PropRow>
+        <PropRow label="우선순위" testId="meta-priority">
+          {editable ? (
+            <EditableSelect
+              value={voc.priority ?? null}
+              options={PRIORITY_OPTIONS}
+              disabled={!editable}
+              onChange={(v) => patch({ priority: v as Voc['priority'] })}
+              searchable={false}
+              placeholder="—"
+              renderTrigger={
+                voc.priority ? () => <VocPriorityBadge priority={voc.priority!} /> : undefined
+              }
+            />
+          ) : voc.priority ? (
+            <VocPriorityBadge priority={voc.priority} />
+          ) : (
+            <span style={{ color: 'var(--text-quaternary)' }}>—</span>
+          )}
+        </PropRow>
+        <PropRow label="상태" testId="meta-status">
+          {editable ? (
+            <EditableSelect
+              value={voc.status ?? null}
+              options={STATUS_OPTIONS}
+              disabled={!editable}
+              onChange={(v) => patch({ status: v as Voc['status'] })}
+              searchable={false}
+              placeholder="—"
+              renderTrigger={voc.status ? () => <VocStatusBadge status={voc.status!} /> : undefined}
+            />
+          ) : voc.status ? (
+            <VocStatusBadge status={voc.status} />
+          ) : (
+            <span style={{ color: 'var(--text-quaternary)' }}>—</span>
+          )}
+        </PropRow>
+        <PropRow label="유형" testId="meta-type">
+          {editable && vocTypeOptions.length > 0 ? (
+            <EditableSelect
+              value={voc.voc_type_id ?? null}
+              options={vocTypeOptions}
+              disabled={!editable}
+              onChange={(v) => patch({ voc_type_id: v })}
+              placeholder="—"
+              renderTrigger={() =>
+                vocType ? (
+                  <VocTypeBadge slug={vocType.slug} name={vocType.name} />
+                ) : (
+                  <span style={{ color: 'var(--text-quaternary)' }}>—</span>
+                )
+              }
+            />
+          ) : vocType ? (
             <VocTypeBadge slug={vocType.slug} name={vocType.name} />
           ) : (
-            <span style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>—</span>
+            <span style={{ color: 'var(--text-quaternary)' }}>—</span>
           )}
-        </MetaField>
-
-        <MetaField label="태그" testId="meta-tags">
+        </PropRow>
+        <PropRow label="태그" testId="meta-tags">
           {tagList.length > 0 ? (
             <div className="flex flex-wrap gap-1">
               {tagList.map((tag) => (
@@ -67,9 +145,53 @@ export function VocDetailSection({
               ))}
             </div>
           ) : (
-            <span style={VALUE_STYLE}>—</span>
+            <span style={{ color: 'var(--text-quaternary)' }}>—</span>
           )}
-        </MetaField>
+        </PropRow>
+        <PropRow label="검토상태" testId="meta-review_status">
+          {editable ? (
+            <EditableSelect
+              value={voc.review_status ?? null}
+              options={REVIEW_STATUS_OPTIONS}
+              disabled={!editable}
+              onChange={(v) => patch({ review_status: v as NonNullable<Voc['review_status']> })}
+              searchable={false}
+              placeholder="—"
+            />
+          ) : (
+            <span style={{ color: 'var(--text-quaternary)' }}>{voc.review_status ?? '—'}</span>
+          )}
+        </PropRow>
+        <PropRow label="해결품질" testId="meta-resolution_quality">
+          {editable ? (
+            <EditableSelect
+              value={voc.resolution_quality ?? null}
+              options={RESOLUTION_QUALITY_OPTIONS}
+              disabled={!editable}
+              onChange={(v) =>
+                patch({ resolution_quality: v as NonNullable<Voc['resolution_quality']> })
+              }
+              searchable={false}
+              placeholder="—"
+            />
+          ) : (
+            <span style={{ color: 'var(--text-quaternary)' }}>{voc.resolution_quality ?? '—'}</span>
+          )}
+        </PropRow>
+        <PropRow label="드랍사유" testId="meta-drop_reason">
+          {editable ? (
+            <EditableSelect
+              value={voc.drop_reason ?? null}
+              options={DROP_REASON_OPTIONS}
+              disabled={!editable}
+              onChange={(v) => patch({ drop_reason: v as NonNullable<Voc['drop_reason']> })}
+              searchable={false}
+              placeholder="—"
+            />
+          ) : (
+            <span style={{ color: 'var(--text-quaternary)' }}>{voc.drop_reason ?? '—'}</span>
+          )}
+        </PropRow>
       </div>
     </VocSection>
   );

@@ -11,11 +11,12 @@ export interface AttachmentItem {
 interface AttachmentSectionProps {
   items: AttachmentItem[];
   canUpload: boolean;
+  noBorder?: boolean;
 }
 
-export function VocAttachmentSection({ items, canUpload }: AttachmentSectionProps) {
+export function VocAttachmentSection({ items, canUpload, noBorder }: AttachmentSectionProps) {
   return (
-    <CollapsibleSection title="첨부" testId="drawer-attachments">
+    <CollapsibleSection title="첨부" testId="drawer-attachments" noBorder={noBorder}>
       {items.length === 0 ? (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           첨부 파일이 없습니다.

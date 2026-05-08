@@ -191,6 +191,16 @@ export const vocHandlers = [
     return HttpResponse.json(created, { status: 201 });
   }),
 
+  http.get('/api/vocs/by-code/:code', ({ params, request }) => {
+    const { role } = currentRole(request);
+    const code = decodeURIComponent(String(params.code));
+    const row = store.find((r) => r.issue_code === code);
+    if (!row) return envelope('NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+    if (row.deleted_at !== null && role !== 'admin')
+      return envelope('NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+    return HttpResponse.json(row);
+  }),
+
   http.get('/api/vocs/:id', ({ params, request }) => {
     const { role } = currentRole(request);
     const row = store.find((r) => r.id === params.id);

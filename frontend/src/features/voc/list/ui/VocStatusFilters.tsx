@@ -4,14 +4,6 @@ import type { ReactNode } from 'react';
 import type { VocStatus as VocStatusType } from '@contracts/voc';
 import { ToggleGroup, ToggleGroupItem } from '@shared/ui/toggle-group';
 
-const STATUS_TOKEN: Record<VocStatusType, string> = {
-  접수: 'var(--status-pending, var(--bg-info-subtle))',
-  검토중: 'var(--status-review, var(--bg-warning-subtle))',
-  처리중: 'var(--status-progress, var(--bg-info-subtle))',
-  완료: 'var(--status-done, var(--bg-success-subtle))',
-  드랍: 'var(--status-drop, var(--bg-muted))',
-};
-
 interface PillConfig {
   label: string;
   value: VocStatusType | 'all';
@@ -55,43 +47,44 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
   return (
     <div
       data-pcomp="voc-status-filters"
-      className="flex items-center gap-2 flex-nowrap overflow-x-auto px-6 h-11 scrollbar-none"
+      className="flex items-center gap-1.5 flex-nowrap overflow-x-auto px-6 scrollbar-none"
       style={{
         background: 'var(--bg-app)',
         borderBottom: '1px solid var(--border-subtle)',
+        height: '44px',
       }}
     >
       <ToggleGroup
         type="multiple"
         value={toggleValue}
         onValueChange={handleValueChange}
-        className="flex items-center gap-2"
+        className="flex items-center gap-1"
       >
         {PILLS.map(({ label, value: pillValue, icon: Icon }) => {
           const pressed =
             pillValue === 'all'
               ? isAll
               : !isAll && (value as VocStatusType[]).includes(pillValue as VocStatusType);
-          const statusBg =
-            pillValue !== 'all' && pressed ? STATUS_TOKEN[pillValue as VocStatusType] : undefined;
 
           return (
             <ToggleGroupItem
               key={pillValue}
               value={pillValue}
               data-testid={`status-chip-${pillValue}`}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors border"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-[color:var(--text-primary)]"
               style={{
-                background: pressed
-                  ? pillValue === 'all'
-                    ? 'var(--brand-bg, var(--brand))'
-                    : (statusBg ?? 'var(--brand-bg, var(--brand))')
-                  : 'var(--bg-elevated)',
-                color: pressed ? 'var(--text-on-brand)' : 'var(--text-secondary)',
-                borderColor: 'var(--border-subtle)',
+                height: '26px',
+                padding: '5px 12px',
+                borderRadius: '9999px',
+                border: '1px solid transparent',
+                fontSize: '13px',
+                fontWeight: pressed ? 600 : 500,
+                background: pressed ? 'var(--brand-bg)' : 'transparent',
+                color: pressed ? 'var(--accent)' : 'var(--text-secondary)',
+                borderColor: pressed ? 'var(--brand-border)' : 'transparent',
               }}
             >
-              <Icon size={13} aria-hidden />
+              <Icon size={12} aria-hidden />
               {label}
             </ToggleGroupItem>
           );

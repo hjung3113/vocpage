@@ -22,22 +22,15 @@ export function VocSubTask({ parentId, parentIsSubtask, subs, canAdd, onOpen, on
     <section
       data-testid="drawer-subtasks"
       data-parent-id={parentId}
-      className="flex flex-col gap-2"
-      aria-labelledby="voc-subtasks-heading"
+      className="flex flex-col gap-2 py-1"
+      aria-label={`서브태스크 ${subs.length}개`}
     >
-      <h3
-        id="voc-subtasks-heading"
-        className="text-xs font-medium"
-        style={{ color: 'var(--text-secondary)' }}
-      >
-        서브태스크 {subs.length}개
-      </h3>
       {subs.length === 0 ? (
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
           서브태스크가 없습니다.
         </p>
       ) : (
-        <ul className="flex flex-col gap-1" aria-labelledby="voc-subtasks-heading">
+        <ul className="flex flex-col gap-1" aria-label="서브태스크 목록">
           {subs.map((s) => (
             <li
               key={s.id}
