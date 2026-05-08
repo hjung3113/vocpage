@@ -2,46 +2,47 @@
 
 ## 다음 세션 시작점
 
-→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기 (head `08f95f0`, 11 commit)**
-   verifier evidence-based PASS (D-1~D-5 모두 GO). 머지는 사용자.
-   머지 후 Wave 2(Dashboard) 진입.
+→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기 (12 commit, follow-up 5건 반영)**
+   verifier evidence-based PASS — D-3 재실행: BE 116/123 PASS (+5 M-1) · FE 472/472 PASS (+3 L-1·L-2) · FE lint clean · FE+BE typecheck clean.
+   머지는 사용자. 머지 후 Phase 2 (`feat/voc-list-expand`) → Wave 2(Dashboard).
 
 → **다음 세션 액션**
-   1. `gh pr create` (driver L73 형식) → 사용자 review → `gh pr merge --merge --delete-branch`
-   2. 머지 직후 main 기준으로 `feat/dashboard-shell` 브랜치 신설
-   3. Wave 2 정본 `docs/specs/requires/dashboard.md` 읽기 → 진입 plan 작성
-   4. follow-up bucket 진입 candidates 재확인 (M-1·M-2·M-3·L-1·L-2 + Playwright 실행 환경)
+   1. `gh pr create` → 사용자 review → `gh pr merge --merge --delete-branch`
+   2. 머지 직후 main 기준 `feat/voc-list-expand` 브랜치 신설 (§9.2.2 인라인 expand)
+   3. Phase 2 spec 보강 ADR 1건 (BE `total` 의미 / zod self-recursive 회피 / status grouping × expand 배타) → 구현
+   4. Phase 2 머지 후 `feat/dashboard-shell` 진입 (Wave 2)
 
-→ **PR 본문 = `docs/voc-completion-single-pr` 9 commit + driver D-1~D-5 PASS evidence + 머지 요청 1줄**
+→ **PR 본문 = `docs/voc-completion-single-pr` 12 commit + driver D-1~D-5 재PASS + 머지 요청 1줄**
    - Phase B (BE master + create 강제룰) — `ad1ef50`
-   - Phase C minimal + major (모달 200자 카운터·priority lock·2×2 grid·cascade·body skeleton·첨부 sync·auto-tag·send-icon) — `c56af67` + `b85240a`
-   - Wave 1.6 잔여 (SidebarUserSwitcher · UploadZone thumb · ActivityTimeline · ErrorSimSelector · Sidebar/Topbar 폴리시) — `dc4527c`
+   - Phase C minimal + major — `c56af67` + `b85240a`
+   - Wave 1.6 잔여 — `dc4527c`
    - Phase 6 (payload-review BE/FE + Playwright spec) — `a8c08ca` + `64069e2`
    - Follow-up 7건 (status icon · 토큰화 · 13.5px · ReviewStatus · collapse test · data-testid slug) — `d266bd7`
-   - Code-review fix B-1 / H-1 / H-2 (errorSim 격리 · 권한 헬퍼 통일 · INSERT+UPDATE 트랜잭션) — `97e002c`
+   - Code-review fix B-1 / H-1 / H-2 — `97e002c`
    - Wave close progress sync — `4ad8dbe`
-   - Untracked entity icons + shadcn primitives 추적 (build-blocking fix) — `08f95f0`
+   - Untracked entity icons + shadcn primitives — `08f95f0`
+   - **NEW** Follow-up M-1·M-2·M-3·L-1·L-2 일괄 처리 (이번 세션)
 
-→ **D-1~D-5 evidence (driver `voc-completion-driver.md`)**
-   - D-1 기능: §2.2 사용자 흐름 / §2.3 처리 lane / §8.16 Result Review / §13.3 등록→검토→완료 1바퀴 — 코드 PASS
-   - D-2 시각: token-only / spec 정합 — `rg` hex/oklch 외부 0건
-   - D-3 테스트: FE 469/469 PASS · BE 111/118 PASS (+7 todo) · FE lint clean · BE+FE typecheck clean · Playwright spec 작성(실행은 docker compose 기동 필요)
-   - D-4 무결성: shared/contracts ↔ openapi ↔ BE 응답 정합 / `scripts/check-fixture-seed-parity.ts` PASS / prototype/ 활성 인용 0건
-   - D-5 운영: `docs/specs/reviews/voc-completion-decisions.md` append, 본 progress + next-session-tasks 동기화
+→ **D-1~D-5 재실행 evidence (2026-05-09)**
+   - D-1 기능: 변경 없음 (M-1·M-3 docs/test only). M-2 onError 토스트 추가 / L-1 다탭 동기화 / L-2 secondary sort.
+   - D-2 시각: token-only — `npm run lint -w frontend` 0 warnings.
+   - D-3 테스트: BE 116/123 PASS (+5 M-1) · FE 472/472 PASS (+3 L-1·L-2) · 7 todo 동일.
+   - D-4 무결성: shared/contracts/openapi 변경 없음 (M-3 changelog only). fixture-seed parity 영향 없음.
+   - D-5 운영: `voc-completion-decisions.md` 5 changelog row append, 본 파일 + next-session-tasks 동기화.
+
+→ **Phase 2 (분리 PR) — 적대적 리뷰 결과**
+   §9.2.2 VOC 목록 인라인 서브태스크 펼침은 본 PR 에 끼우지 않음.
+   근거: critic + codex 양측 합의 — Wave 1.6 close PR 정체성 / D-1~D-5 evidence stale 위험 / BE `total` 의미 silent change /
+   zod self-recursive (`VocListItem.subTasks`) 함정 / status grouping × expand 충돌 / openapi 동기화 / Playwright deferred.
 
 ## Active Waves
 
 **`/voc` 완성 — 단일 PR (PR open 대기)**
-- ✅ 9 commit, BE/FE green, code-review FIX-THEN-MERGE 지적 모두 처리
-- ⏳ 사용자 PR open + merge → Wave 2 진입
+- ✅ 12 commit, BE/FE green, follow-up 5건 반영
+- ⏳ 사용자 PR open + merge → Phase 2 진입
+
+**Phase 2 — `feat/voc-list-expand`** (§9.2.2 D16, 2026-04-26)
+- ⛔ `/voc` 완성 PR 머지 후 진입. ADR 선행 (total 의미 · 자기참조 zod · grouping 배타 · 자식 페이로드 cap).
 
 **Wave 2 — Dashboard** (정본: `docs/specs/requires/dashboard.md`)
-- ⛔ `/voc` 완성 PR 머지 후 진입
-
-## 후속 (Medium/Low — 본 PR 외 follow-up bucket)
-
-- M-1 `computeInitialDueDate` Date.now() injectable 파라미터 (테스트 flake 회피)
-- M-2 `PayloadReviewActions` mutation onError 사용자 피드백
-- M-3 `decision: 'approve'|'reject'` enum 변경 — changelog 표기
-- L-1 `VocErrorSimSelector` 멀티탭 동기화
-- L-2 `VocActivityTimeline` 정렬 secondary key
+- ⛔ Phase 2 머지 후 진입.

@@ -44,4 +44,36 @@ describe('VocActivityTimeline', () => {
     render(<VocActivityTimeline history={[]} comments={[]} loading={false} />);
     expect(screen.getByText('활동이 없습니다.')).toBeInTheDocument();
   });
+
+  it('FU L-2: 동일 timestamp 두 항목은 id 기준으로 안정 정렬', () => {
+    const sameAt = '2026-05-03T10:00:00Z';
+    const items = buildTimeline(
+      [
+        {
+          id: 'aaaaaaaa-1111-4111-8111-111111111111',
+          voc_id: 'aaaaaaaa-0000-4000-8000-000000000001',
+          field: 'status',
+          old_value: '접수',
+          new_value: '검토중',
+          changed_by: 'aaaaaaaa-0000-4000-8000-000000000099',
+          changed_at: sameAt,
+        },
+      ],
+      [
+        {
+          id: 'bbbbbbbb-2222-4222-8222-222222222222',
+          voc_id: 'aaaaaaaa-0000-4000-8000-000000000001',
+          author_id: 'aaaaaaaa-0000-4000-8000-000000000088',
+          body: '동시 도착 코멘트',
+          created_at: sameAt,
+          updated_at: sameAt,
+        },
+      ],
+    );
+    // primary `at` 동률 → secondary id desc: 'h-aaaa…' > 'c-bbbb…' (h > c)
+    expect(items.map((i) => i.id)).toEqual([
+      'h-aaaaaaaa-1111-4111-8111-111111111111',
+      'c-bbbbbbbb-2222-4222-8222-222222222222',
+    ]);
+  });
 });

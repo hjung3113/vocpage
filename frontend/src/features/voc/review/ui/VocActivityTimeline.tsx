@@ -47,7 +47,11 @@ export function buildTimeline(
     at: c.created_at,
     summary: c.body.length > 80 ? `${c.body.slice(0, 80)}…` : c.body,
   }));
-  return [...fromHistory, ...fromComments].sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  // L-2: secondary stable key (id) so equal timestamps keep deterministic order.
+  return [...fromHistory, ...fromComments].sort((a, b) => {
+    if (a.at !== b.at) return a.at < b.at ? 1 : -1;
+    return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
+  });
 }
 
 export function VocActivityTimeline({ history, comments, loading }: Props) {

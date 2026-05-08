@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { VocErrorSimSelector } from '../VocErrorSimSelector';
@@ -18,6 +18,7 @@ vi.mock('@entities/user/model/useRole', () => ({
 
 describe('VocErrorSimSelector', () => {
   beforeEach(() => {
+    window.localStorage.clear();
     setErrorSimMode('off');
   });
 
@@ -34,5 +35,30 @@ describe('VocErrorSimSelector', () => {
     const select = screen.getByLabelText('MSW 오류 시뮬레이션') as HTMLSelectElement;
     await user.selectOptions(select, 'http-500');
     expect(getErrorSimMode()).toBe('http-500');
+  });
+
+  it('FU L-1: 다른 인스턴스(setErrorSimMode 직접 호출)에 동기화 — 같은 탭', () => {
+    mockRole = 'dev';
+    render(<VocErrorSimSelector />);
+    act(() => {
+      setErrorSimMode('slow');
+    });
+    const select = screen.getByLabelText('MSW 오류 시뮬레이션') as HTMLSelectElement;
+    expect(select.value).toBe('slow');
+  });
+
+  it('FU L-1: 다른 탭의 storage 이벤트로 동기화', () => {
+    mockRole = 'dev';
+    render(<VocErrorSimSelector />);
+    act(() => {
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'voc.errorSim.mode',
+          newValue: 'partial',
+        }),
+      );
+    });
+    const select = screen.getByLabelText('MSW 오류 시뮬레이션') as HTMLSelectElement;
+    expect(select.value).toBe('partial');
   });
 });

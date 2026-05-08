@@ -1,6 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRole } from '@entities/user/model/useRole';
-import { setErrorSimMode, getErrorSimMode, type ErrorSimMode } from '../../shared/dev/errorSim';
+import {
+  setErrorSimMode,
+  getErrorSimMode,
+  subscribeErrorSimMode,
+  type ErrorSimMode,
+} from '../../shared/dev/errorSim';
 
 const OPTIONS: { value: ErrorSimMode; label: string }[] = [
   { value: 'off', label: '오류 시뮬: 없음' },
@@ -13,10 +18,15 @@ const OPTIONS: { value: ErrorSimMode; label: string }[] = [
 /**
  * Dev-only error simulation selector — only renders for `dev` / `admin` roles.
  * Toggles the global MSW handler error mode (see `frontend/src/shared/dev/errorSim.ts`).
+ *
+ * FU L-1: subscribes to cross-tab + same-tab mode changes so a select in one
+ * tab/window propagates to all instances of this component.
  */
 export function VocErrorSimSelector() {
   const { role } = useRole();
   const [mode, setMode] = useState<ErrorSimMode>(() => getErrorSimMode());
+
+  useEffect(() => subscribeErrorSimMode(setMode), []);
 
   if (role !== 'dev' && role !== 'admin') return null;
 
@@ -32,7 +42,6 @@ export function VocErrorSimSelector() {
         value={mode}
         onChange={(e) => {
           const next = e.target.value as ErrorSimMode;
-          setMode(next);
           setErrorSimMode(next);
         }}
         className="bg-transparent outline-none"

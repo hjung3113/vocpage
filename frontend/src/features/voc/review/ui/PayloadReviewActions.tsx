@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { vocApi } from '@entities/voc/api/vocApi';
 import type { PayloadReviewSubmit } from '@contracts/voc';
 
@@ -21,6 +22,12 @@ export function PayloadReviewActions({ vocId, onReviewed }: PayloadReviewActions
       setRejectMode(false);
       setRejectComment('');
       onReviewed?.();
+    },
+    // FU M-2: surface mutation failures so reviewers see why the action did not commit.
+    onError: (err: unknown) => {
+      const msg =
+        err instanceof Error && err.message ? err.message : '검토 결정 저장에 실패했습니다';
+      toast.error(msg);
     },
   });
 
