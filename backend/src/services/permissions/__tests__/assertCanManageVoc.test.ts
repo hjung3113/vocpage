@@ -92,4 +92,36 @@ describe('assertCanManageVoc — feature-voc.md §8.4-bis 회귀 5건', () => {
       expect(() => assertCanManageVoc(admin, baseVoc, 'reassign')).not.toThrow();
     });
   });
+
+  describe('submitPayloadReview action — manager/admin only (codex review HIGH H-1)', () => {
+    test('Dev own VOC submitPayloadReview → 403 FORBIDDEN', () => {
+      expect(() => assertCanManageVoc(devUser, baseVoc, 'submitPayloadReview')).toThrow(HttpError);
+      try {
+        assertCanManageVoc(devUser, baseVoc, 'submitPayloadReview');
+      } catch (e) {
+        expect((e as HttpError).status).toBe(403);
+        expect((e as HttpError).code).toBe('FORBIDDEN');
+      }
+    });
+
+    test('Dev 타인 VOC submitPayloadReview → 403 FORBIDDEN', () => {
+      const voc = { ...baseVoc, assignee_id: otherUserId };
+      expect(() => assertCanManageVoc(devUser, voc, 'submitPayloadReview')).toThrow(HttpError);
+    });
+
+    test('User submitPayloadReview → 403 FORBIDDEN', () => {
+      const user = { id: 'u', role: 'user' as const };
+      expect(() => assertCanManageVoc(user, baseVoc, 'submitPayloadReview')).toThrow(HttpError);
+    });
+
+    test('Manager submitPayloadReview → 허용', () => {
+      const manager = { id: 'm', role: 'manager' as const };
+      expect(() => assertCanManageVoc(manager, baseVoc, 'submitPayloadReview')).not.toThrow();
+    });
+
+    test('Admin submitPayloadReview → 허용', () => {
+      const admin = { id: 'a', role: 'admin' as const };
+      expect(() => assertCanManageVoc(admin, baseVoc, 'submitPayloadReview')).not.toThrow();
+    });
+  });
 });

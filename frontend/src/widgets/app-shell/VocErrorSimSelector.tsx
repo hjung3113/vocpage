@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRole } from '@entities/user/model/useRole';
-import { setErrorSimMode, getErrorSimMode, type ErrorSimMode } from '../../test/mocks/errorSim';
+import { setErrorSimMode, getErrorSimMode, type ErrorSimMode } from '../../shared/dev/errorSim';
 
 const OPTIONS: { value: ErrorSimMode; label: string }[] = [
   { value: 'off', label: '오류 시뮬: 없음' },
@@ -12,7 +12,7 @@ const OPTIONS: { value: ErrorSimMode; label: string }[] = [
 
 /**
  * Dev-only error simulation selector — only renders for `dev` / `admin` roles.
- * Toggles the global MSW handler error mode (see `frontend/src/test/mocks/errorSim.ts`).
+ * Toggles the global MSW handler error mode (see `frontend/src/shared/dev/errorSim.ts`).
  */
 export function VocErrorSimSelector() {
   const { role } = useRole();

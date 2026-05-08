@@ -18,7 +18,7 @@ import {
 } from '../../../../../shared/fixtures/voc.fixtures';
 import { TAG_FIXTURES } from '../../../../../shared/fixtures/master.fixtures';
 import { VocListQuery } from '../../../../../shared/contracts/voc';
-import { getErrorSimMode } from '../errorSim';
+import { getErrorSimMode } from '../../../shared/dev/errorSim';
 
 // Dev-only error simulation. Returns a Response when sim is active, or null to proceed.
 function simulateError(): Response | null {

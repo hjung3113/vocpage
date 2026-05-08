@@ -197,9 +197,7 @@ export async function submitPayloadReview(
 ): Promise<repo.PayloadReviewRow> {
   const existing = await repo.getVocById(id);
   if (!existing) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
-  if (user.role !== 'admin' && user.role !== 'manager') {
-    throw new HttpError(403, 'FORBIDDEN', '검토 권한이 없습니다.');
-  }
+  assertCanManageVoc(user, existing, 'submitPayloadReview');
   return repo.insertPayloadReview({
     voc_id: id,
     reviewer_id: user.id,

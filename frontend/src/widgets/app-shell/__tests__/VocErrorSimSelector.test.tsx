@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { VocErrorSimSelector } from '../VocErrorSimSelector';
-import { getErrorSimMode, setErrorSimMode } from '../../../test/mocks/errorSim';
+import { getErrorSimMode, setErrorSimMode } from '../../../shared/dev/errorSim';
 
 let mockRole: 'admin' | 'manager' | 'dev' | 'user' = 'dev';
 vi.mock('@entities/user/model/useRole', () => ({

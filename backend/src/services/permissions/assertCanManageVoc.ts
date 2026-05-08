@@ -14,7 +14,8 @@ export type VocAction =
   | 'createSubtask'
   | 'closeSubtask'
   | 'readInternalNote'
-  | 'writeInternalNote';
+  | 'writeInternalNote'
+  | 'submitPayloadReview';
 
 export interface VocPermissionContext {
   id: string;
@@ -33,6 +34,12 @@ export function assertCanManageVoc(
   // grant Dev the right to reassign self/others. Spec: feature-voc.md.
   if (action === 'reassign') {
     throw new HttpError(403, 'FORBIDDEN', '담당자 변경은 관리자만 수행할 수 있습니다.', { action });
+  }
+
+  // Result Review (payload review) is manager/admin only — feature-voc.md §9.4.5.
+  // Dev/user never allowed regardless of assignee.
+  if (action === 'submitPayloadReview') {
+    throw new HttpError(403, 'FORBIDDEN', '검토 권한이 없습니다.', { action });
   }
 
   if (user.role === 'dev') {

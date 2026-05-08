@@ -234,17 +234,27 @@ export interface PayloadReviewRow {
 
 export async function insertPayloadReview(input: PayloadReviewInsert): Promise<PayloadReviewRow> {
   const pool = getPool();
-  const r = await pool.query(
-    `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
-       VALUES ($1, 'submission', $2, $3, $4)
-       RETURNING id, voc_id, reviewer_id, decision, comment, created_at`,
-    [input.voc_id, input.reviewer_id, input.decision, input.comment],
-  );
-  await pool.query(`UPDATE vocs SET review_status = $1, updated_at = now() WHERE id = $2`, [
-    input.decision,
-    input.voc_id,
-  ]);
-  return r.rows[0] as PayloadReviewRow;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query(
+      `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
+         VALUES ($1, 'submission', $2, $3, $4)
+         RETURNING id, voc_id, reviewer_id, decision, comment, created_at`,
+      [input.voc_id, input.reviewer_id, input.decision, input.comment],
+    );
+    await client.query(`UPDATE vocs SET review_status = $1, updated_at = now() WHERE id = $2`, [
+      input.decision,
+      input.voc_id,
+    ]);
+    await client.query('COMMIT');
+    return r.rows[0] as PayloadReviewRow;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function listHistory(vocId: string): Promise<VocHistoryEntry[]> {
