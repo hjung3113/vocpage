@@ -7,7 +7,9 @@ pattern: gh\s+pr\s+(create|merge)
 
 **Pre-PR doc cleanup reminder** (canonical: `docs/specs/README.md`)
 
-If this PR closes a phase / wave / PR, do this once before the merge:
+**Scope: phase-close or wave-close PRs only.** Intra-phase / leaf / batch PRs are exempt — skip steps 1–7 and run only step 8 (typecheck/lint). This keeps the doc-sync cost off every leaf PR (see Working Style "Progress docs at phase/wave close only" in root `CLAUDE.md`).
+
+If this PR closes a phase or a wave, do this once before the merge:
 
 1. Update first 30 lines of `claude-progress.txt` — reflect this PR in the next-session entry point. Remove phase entries no longer needed (active context only).
 2. Update `docs/specs/plans/next-session-tasks.md` — ✅ closed items, state next entry point.
