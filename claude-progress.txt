@@ -2,8 +2,15 @@
 
 ## 다음 세션 시작점
 
-→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기**
-   머지는 사용자. 머지 후 Wave 2(Dashboard) 진입.
+→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기 (head `08f95f0`, 11 commit)**
+   verifier evidence-based PASS (D-1~D-5 모두 GO). 머지는 사용자.
+   머지 후 Wave 2(Dashboard) 진입.
+
+→ **다음 세션 액션**
+   1. `gh pr create` (driver L73 형식) → 사용자 review → `gh pr merge --merge --delete-branch`
+   2. 머지 직후 main 기준으로 `feat/dashboard-shell` 브랜치 신설
+   3. Wave 2 정본 `docs/specs/requires/dashboard.md` 읽기 → 진입 plan 작성
+   4. follow-up bucket 진입 candidates 재확인 (M-1·M-2·M-3·L-1·L-2 + Playwright 실행 환경)
 
 → **PR 본문 = `docs/voc-completion-single-pr` 9 commit + driver D-1~D-5 PASS evidence + 머지 요청 1줄**
    - Phase B (BE master + create 강제룰) — `ad1ef50`
@@ -12,6 +19,8 @@
    - Phase 6 (payload-review BE/FE + Playwright spec) — `a8c08ca` + `64069e2`
    - Follow-up 7건 (status icon · 토큰화 · 13.5px · ReviewStatus · collapse test · data-testid slug) — `d266bd7`
    - Code-review fix B-1 / H-1 / H-2 (errorSim 격리 · 권한 헬퍼 통일 · INSERT+UPDATE 트랜잭션) — `97e002c`
+   - Wave close progress sync — `4ad8dbe`
+   - Untracked entity icons + shadcn primitives 추적 (build-blocking fix) — `08f95f0`
 
 → **D-1~D-5 evidence (driver `voc-completion-driver.md`)**
    - D-1 기능: §2.2 사용자 흐름 / §2.3 처리 lane / §8.16 Result Review / §13.3 등록→검토→완료 1바퀴 — 코드 PASS
