@@ -1931,6 +1931,295 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /notices:
+    get:
+      tags: [notices]
+      operationId: listNotices
+      summary: List notices (visibility-filtered for non-admin)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - name: mode
+          in: query
+          schema: { type: string, enum: [user, admin], default: user }
+        - name: includeDeleted
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Notice list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items: { $ref: '#/components/schemas/Notice' }
+                  page: { type: integer }
+                  per_page: { type: integer }
+                  total: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [notices]
+      operationId: createNotice
+      summary: Create notice (admin/manager)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoticeInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notice' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /notices/popup:
+    get:
+      tags: [notices]
+      operationId: listPopupNotices
+      summary: Login popup notices (BE stateless; FE owns dismiss state via localStorage per spec §10.3.2)
+      responses:
+        '200':
+          description: Popup notices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items: { $ref: '#/components/schemas/Notice' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /notices/{id}:
+    get:
+      tags: [notices]
+      operationId: getNotice
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200':
+          description: Notice
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notice' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [notices]
+      operationId: updateNotice
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoticeInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notice' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [notices]
+      operationId: deleteNotice
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '204': { description: Soft-deleted }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notices/{id}/restore:
+    post:
+      tags: [notices]
+      operationId: restoreNotice
+      summary: Restore soft-deleted notice (admin only)
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200':
+          description: Restored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notice' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /faqs:
+    get:
+      tags: [faqs]
+      operationId: listFaqs
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - name: category_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: q
+          in: query
+          schema: { type: string, maxLength: 120 }
+        - name: mode
+          in: query
+          schema: { type: string, enum: [user, admin], default: user }
+        - name: includeDeleted
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: FAQ list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items: { $ref: '#/components/schemas/Faq' }
+                  page: { type: integer }
+                  per_page: { type: integer }
+                  total: { type: integer }
+    post:
+      tags: [faqs]
+      operationId: createFaq
+      summary: Create FAQ (admin/manager)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FaqInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faq' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /faqs/{id}:
+    get:
+      tags: [faqs]
+      operationId: getFaq
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200':
+          description: FAQ
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faq' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [faqs]
+      operationId: updateFaq
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FaqInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faq' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    delete:
+      tags: [faqs]
+      operationId: deleteFaq
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '204': { description: Soft-deleted }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /faqs/{id}/restore:
+    post:
+      tags: [faqs]
+      operationId: restoreFaq
+      summary: Restore soft-deleted FAQ (admin only)
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200':
+          description: Restored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Faq' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /faq-categories:
+    get:
+      tags: [faqs]
+      operationId: listFaqCategories
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items: { $ref: '#/components/schemas/FaqCategory' }
+    post:
+      tags: [faqs]
+      operationId: createFaqCategory
+      summary: Create FAQ category (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FaqCategoryInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FaqCategory' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /faq-categories/{id}:
+    patch:
+      tags: [faqs]
+      operationId: updateFaqCategory
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FaqCategoryInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FaqCategory' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    delete:
+      tags: [faqs]
+      operationId: deleteFaqCategory
+      summary: Delete category (admin only). Returns 409 CATEGORY_HAS_ITEMS if FAQs are still attached.
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '204': { description: Deleted }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409':
+          description: Category has FAQ items
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
 components:
   parameters:
     id:
@@ -2814,54 +3103,75 @@ components:
 
     Notice:
       type: object
-      required: [id, title, body, created_at, updated_at]
+      required:
+        [id, title, body, level, is_popup, is_visible, author_id, created_at, updated_at]
       properties:
-        id:
-          type: string
-          format: uuid
-        title:
-          type: string
-        body:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
+        id: { type: string, format: uuid }
+        title: { type: string }
+        body: { type: string }
+        level: { type: string, enum: [normal, important, urgent] }
+        is_popup: { type: boolean }
+        is_visible: { type: boolean }
+        visible_from: { type: string, format: date-time, nullable: true }
+        visible_to: { type: string, format: date-time, nullable: true }
+        author_id: { type: string, format: uuid }
+        deleted_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
 
     NoticeInput:
       type: object
       required: [title, body]
       properties:
-        title:
-          type: string
-        body:
-          type: string
+        title: { type: string }
+        body: { type: string }
+        level: { type: string, enum: [normal, important, urgent] }
+        is_popup: { type: boolean }
+        is_visible: { type: boolean }
+        visible_from: { type: string, format: date-time, nullable: true }
+        visible_to: { type: string, format: date-time, nullable: true }
+
+    FaqCategory:
+      type: object
+      required: [id, name, slug, sort_order, is_archived]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string }
+        sort_order: { type: integer }
+        is_archived: { type: boolean }
+
+    FaqCategoryInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        sort_order: { type: integer }
+        is_archived: { type: boolean }
 
     Faq:
       type: object
-      required: [id, question, answer, created_at, updated_at]
+      required:
+        [id, question, answer, category_id, is_visible, sort_order, author_id, created_at, updated_at]
       properties:
-        id:
-          type: string
-          format: uuid
-        question:
-          type: string
-        answer:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
+        id: { type: string, format: uuid }
+        question: { type: string }
+        answer: { type: string }
+        category_id: { type: string, format: uuid }
+        is_visible: { type: boolean }
+        sort_order: { type: integer }
+        author_id: { type: string, format: uuid }
+        deleted_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
 
     FaqInput:
       type: object
-      required: [question, answer]
+      required: [question, answer, category_id]
       properties:
-        question:
-          type: string
-        answer:
-          type: string
+        question: { type: string }
+        answer: { type: string }
+        category_id: { type: string, format: uuid }
+        is_visible: { type: boolean }
+        sort_order: { type: integer }
