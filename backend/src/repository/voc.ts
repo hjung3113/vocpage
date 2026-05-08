@@ -178,6 +178,7 @@ export interface CreateVocInput {
   assignee_id?: string | null;
   parent_id?: string | null;
   source?: string;
+  due_date?: string | null;
 }
 
 /**
@@ -190,8 +191,8 @@ export async function createVoc(input: CreateVocInput, authorId: string): Promis
   const r = await pool.query(
     `INSERT INTO vocs (
        title, body, status, priority, voc_type_id, system_id, menu_id,
-       assignee_id, parent_id, source, author_id
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+       assignee_id, parent_id, source, author_id, due_date
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
     [
       input.title,
       input.body ?? '',
@@ -204,6 +205,7 @@ export async function createVoc(input: CreateVocInput, authorId: string): Promis
       input.parent_id ?? null,
       input.source ?? 'manual',
       authorId,
+      input.due_date ?? null,
     ],
   );
   return r.rows[0] as Voc;

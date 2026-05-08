@@ -141,6 +141,7 @@ jest.mock('../repository/voc', () => {
           assignee_id?: string | null;
           parent_id?: string | null;
           source?: string;
+          due_date?: string | null;
         },
         authorId: string,
       ) => {
@@ -165,7 +166,7 @@ jest.mock('../repository/voc', () => {
           structured_payload: null,
           resolution_quality: null,
           drop_reason: null,
-          due_date: null,
+          due_date: input.due_date ?? null,
           deleted_at: null,
           created_at: now,
           updated_at: now,
@@ -488,6 +489,37 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
       });
       expect(res.status).toBe(400);
       expect(res.body.error?.code).toBe('VALIDATION_ERROR');
+    });
+
+    // Wave 1.7 Phase B — feature-voc.md §8.4: 클라이언트 priority 무시, BE 강제 medium
+    test('POST priority=urgent (client) → 저장 priority=medium (BE 강제)', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.post('/api/vocs').send({
+        title: 'priority forced',
+        voc_type_id: liveVoc.voc_type_id,
+        system_id: liveVoc.system_id,
+        menu_id: liveVoc.menu_id,
+        priority: 'urgent',
+      });
+      expect(res.status).toBe(201);
+      expect(res.body.priority).toBe('medium');
+    });
+
+    // Wave 1.7 Phase B — §8.4.1: due_date = created_at + 30 일 자동 계산
+    test('POST 시 due_date = created_at + 30 일 자동 계산', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.post('/api/vocs').send({
+        title: 'due date auto',
+        voc_type_id: liveVoc.voc_type_id,
+        system_id: liveVoc.system_id,
+        menu_id: liveVoc.menu_id,
+      });
+      expect(res.status).toBe(201);
+      expect(res.body.due_date).toBeTruthy();
+      const expected = new Date();
+      expected.setUTCDate(expected.getUTCDate() + 30);
+      const expectedDay = expected.toISOString().slice(0, 10);
+      expect(String(res.body.due_date).slice(0, 10)).toBe(expectedDay);
     });
   });
 

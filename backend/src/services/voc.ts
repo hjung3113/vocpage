@@ -142,19 +142,31 @@ export async function notes(id: string, user: AuthUser): Promise<InternalNote[]>
  * 실 BE 라우트로 도달할 수 있도록 신설. 인증된 모든 역할(user 포함)이 본인을
  * author로 등록 가능 — 권한 매트릭스는 PATCH 단계에서 갈린다.
  */
+// feature-voc.md §8.4 — VOC 등록 시 priority 는 BE 가 'medium' 으로 강제하고
+// (클라이언트 값 무시), §8.4.1 표 그대로 due_date = created_at + 30 일을
+// 자동 계산해 저장한다.
+const VOC_CREATE_DUE_DATE_DAYS = 30;
+
+export function computeInitialDueDate(now: Date = new Date()): string {
+  const d = new Date(now);
+  d.setUTCDate(d.getUTCDate() + VOC_CREATE_DUE_DATE_DAYS);
+  return d.toISOString().slice(0, 10);
+}
+
 export async function create(payload: VocCreate, user: AuthUser): Promise<Voc> {
   return repo.createVoc(
     {
       title: payload.title,
       body: payload.body,
       status: payload.status,
-      priority: payload.priority,
+      priority: 'medium',
       voc_type_id: payload.voc_type_id,
       system_id: payload.system_id,
       menu_id: payload.menu_id,
       assignee_id: payload.assignee_id ?? null,
       parent_id: payload.parent_id ?? null,
       source: payload.source,
+      due_date: computeInitialDueDate(),
     },
     user.id,
   );

@@ -638,6 +638,48 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /masters/systems:
+    get:
+      tags: [masters]
+      operationId: listMasterSystems
+      summary: List active systems with nested active menus (VOC create cascade)
+      responses:
+        '200':
+          description: Systems with nested menus (archived rows excluded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /masters/menus:
+    get:
+      tags: [masters]
+      operationId: listMasterMenus
+      summary: List menus (admin only — supports system_id filter and includeArchived)
+      parameters:
+        - in: query
+          name: system_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: includeArchived
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Menus
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
   /vocs/{id}/tags:
     parameters:
       - $ref: '#/components/parameters/id'
@@ -2611,6 +2653,59 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VocTypeListItem'
+
+    MenuListItem:
+      type: object
+      required: [id, system_id, name, slug, is_archived]
+      properties:
+        id:
+          type: string
+          format: uuid
+        system_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        is_archived:
+          type: boolean
+
+    MenuListResponse:
+      type: object
+      required: [rows]
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuListItem'
+
+    SystemListItem:
+      type: object
+      required: [id, name, slug, is_archived, menus]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        is_archived:
+          type: boolean
+        menus:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuListItem'
+
+    SystemListResponse:
+      type: object
+      required: [rows]
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemListItem'
 
     DashboardSummary:
       type: object
