@@ -24,3 +24,10 @@
 - **`VocCreate` zod 의 `priority` 필드 유지**.
   근거: 클라이언트가 보내는 값은 BE 가 무시(§8.4)하지만 contract 호환성을
   위해 schema 에는 유지. 영향: shared/contracts/voc/io.ts 변경 없음.
+
+- **Phase C scope 축소 결정 — minimal spec lock 만 본 PR 에서 처리**.
+  근거: 2×2 grid 재배치, body skeleton(H2 sections), body↔첨부 동기화,
+  자동 태그 row, send-icon footer 는 designer agent dispatch + 시각 회귀
+  필요. 본 PR 에서는 BE 강제룰을 FE 가 깨지 않도록 (1) 제목 200자 카운터,
+  (2) 우선순위 read-only 락 두 변경만 반영. 나머지는 follow-up wave.
+  영향: VocCreateTitleInput · VocCreateDetails 두 파일 한정.

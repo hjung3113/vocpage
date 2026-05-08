@@ -15,12 +15,6 @@ const STATUS_OPTIONS = [
   { id: '완료', label: '완료' },
   { id: '드랍', label: '드랍' },
 ];
-const PRIORITY_OPTIONS = [
-  { id: 'urgent', label: '긴급' },
-  { id: 'high', label: '높음' },
-  { id: 'medium', label: '보통' },
-  { id: 'low', label: '낮음' },
-];
 
 export interface VocCreateDetailsProps {
   status: VocStatus;
@@ -85,14 +79,21 @@ export function VocCreateDetails({
         />
       </DetailRow>
 
+      {/* feature-voc.md §8.4 — 등록 모달 priority 는 항상 'medium'. BE 가
+          클라이언트 값을 무시하므로 UI 도 read-only. 권한자는 등록 후
+          드로어에서 변경 (§8.4-bis 헬퍼 경유). */}
       <DetailRow label="우선순위">
-        <EditableSelect
-          value={priority}
-          options={PRIORITY_OPTIONS}
-          onChange={(v) => onChange({ priority: v as VocPriority })}
-          searchable={false}
-          renderTrigger={() => <VocPriorityBadge priority={priority} />}
-        />
+        <div
+          data-testid="voc-create-priority-locked"
+          aria-readonly="true"
+          className="flex items-center gap-2"
+          title="등록 시 보통(medium)으로 자동 설정. 등록 후 드로어에서 변경하세요."
+        >
+          <VocPriorityBadge priority={priority} />
+          <span className="text-[10.5px]" style={{ color: 'var(--text-quaternary)' }}>
+            자동
+          </span>
+        </div>
       </DetailRow>
 
       <DetailRow label="유형">

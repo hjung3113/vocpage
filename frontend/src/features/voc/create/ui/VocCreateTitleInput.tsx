@@ -1,5 +1,8 @@
 import { forwardRef } from 'react';
 
+// requirements.md §6.3 + feature-voc.md §8.4 — VOC 제목은 최대 200자.
+export const VOC_TITLE_MAX = 200;
+
 interface VocCreateTitleInputProps {
   value: string;
   error: string;
@@ -9,10 +12,14 @@ interface VocCreateTitleInputProps {
 export const VocCreateTitleInput = forwardRef<HTMLTextAreaElement, VocCreateTitleInputProps>(
   function VocCreateTitleInput({ value, error, onChange }, ref) {
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange(e.target.value);
+      const next = e.target.value.slice(0, VOC_TITLE_MAX);
+      onChange(next);
       e.target.style.height = 'auto';
       e.target.style.height = `${e.target.scrollHeight}px`;
     };
+
+    const remaining = VOC_TITLE_MAX - value.length;
+    const isNear = remaining <= 20;
 
     return (
       <div>
@@ -22,6 +29,7 @@ export const VocCreateTitleInput = forwardRef<HTMLTextAreaElement, VocCreateTitl
           onChange={handleChange}
           placeholder="제목을 입력하세요..."
           rows={1}
+          maxLength={VOC_TITLE_MAX}
           aria-label="VOC 제목"
           className="w-full resize-none overflow-hidden"
           style={{
@@ -35,11 +43,22 @@ export const VocCreateTitleInput = forwardRef<HTMLTextAreaElement, VocCreateTitl
             fontFamily: 'var(--font-ui)',
           }}
         />
-        {error && (
-          <span className="mt-1 block text-[11px]" style={{ color: 'var(--status-red)' }}>
-            {error}
+        <div className="mt-1 flex items-center justify-between gap-2">
+          {error ? (
+            <span className="text-[11px]" style={{ color: 'var(--status-red)' }}>
+              {error}
+            </span>
+          ) : (
+            <span />
+          )}
+          <span
+            data-testid="voc-title-counter"
+            className="text-[11px] tabular-nums"
+            style={{ color: isNear ? 'var(--status-orange)' : 'var(--text-quaternary)' }}
+          >
+            {value.length}/{VOC_TITLE_MAX}
           </span>
-        )}
+        </div>
       </div>
     );
   },
