@@ -1,3 +1,5 @@
+import { Send } from 'lucide-react';
+
 interface VocCreateFooterProps {
   createAnother: boolean;
   onCreateAnotherChange: (checked: boolean) => void;
@@ -51,7 +53,7 @@ export function VocCreateFooter({
           type="submit"
           form="voc-create-dialog-form"
           disabled={submitting}
-          className="rounded px-3 py-1.5 text-xs font-medium transition-opacity"
+          className="rounded px-3 py-1.5 text-xs font-medium transition-opacity inline-flex items-center gap-1.5"
           style={{
             background: 'var(--brand)',
             color: 'var(--text-on-brand)',
@@ -59,7 +61,8 @@ export function VocCreateFooter({
             opacity: submitting ? 0.5 : 1,
           }}
         >
-          {submitting ? '등록 중...' : '등록'}
+          <span>{submitting ? '등록 중...' : '등록'}</span>
+          <Send size={12} aria-hidden />
         </button>
       </div>
     </div>
