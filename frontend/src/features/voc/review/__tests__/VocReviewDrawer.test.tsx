@@ -87,12 +87,12 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
 
   const target = VOC_FIXTURES.find((r) => r.deleted_at === null)!;
 
-  it('role=manager → 탭 4개 노출 + 기본(댓글) 탭 활성 + comment form 노출', async () => {
+  it('role=manager → 탭 5개(댓글/이력/활동/하위작업/내부메모) 노출 + 기본(댓글) 탭 활성 + comment form 노출', async () => {
     const user = userEvent.setup();
     renderDrawer('manager', target.id);
     await waitFor(() => expect(screen.getByTestId('drawer-comments')).toBeInTheDocument());
     expect(screen.getByRole('tablist')).toBeInTheDocument();
-    expect(screen.getAllByRole('tab')).toHaveLength(4);
+    expect(screen.getAllByRole('tab')).toHaveLength(5);
     expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
     expect(screen.getByLabelText('new comment')).toBeInTheDocument();
     // 내부노트는 탭 전환 후 노출

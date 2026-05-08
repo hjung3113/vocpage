@@ -1,5 +1,5 @@
-import { useId, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { File as FileIcon, X } from 'lucide-react';
 import { Label } from '@shared/ui/label';
 import { Input } from '@shared/ui/input';
 import { Button } from '@shared/ui/button';
@@ -167,33 +167,66 @@ export function AttachmentZone({ files, onChange, disabled = false }: Attachment
         </div>
       )}
       {files.length > 0 && (
-        <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+        <ul data-testid="attachment-zone-thumbs" className="grid grid-cols-4 gap-2">
           {files.map((f, i) => (
-            <li
-              key={keyFor(f)}
-              className="flex items-center justify-between gap-2 rounded border border-[color:var(--border-standard)] bg-[color:var(--bg-surface)] px-2 py-1 text-xs"
-            >
-              <span
-                className="min-w-0 flex-1 truncate text-[color:var(--text-primary)]"
-                title={f.name}
-              >
-                {f.name}
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label={`${f.name} 제거`}
-                onClick={() => handleRemove(i)}
-                className="h-auto w-auto shrink-0 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-primary)] hover:bg-transparent p-0"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </li>
+            <AttachmentThumb key={keyFor(f)} file={f} onRemove={() => handleRemove(i)} />
           ))}
         </ul>
       )}
     </div>
+  );
+}
+
+interface AttachmentThumbProps {
+  file: File;
+  onRemove: () => void;
+}
+
+function AttachmentThumb({ file, onRemove }: AttachmentThumbProps) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const isImage = file.type.startsWith('image/');
+
+  useEffect(() => {
+    if (!isImage) return;
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file, isImage]);
+
+  return (
+    <li
+      className="relative flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded border border-[color:var(--border-standard)] bg-[color:var(--bg-surface)] p-1 text-xs"
+      title={file.name}
+    >
+      {isImage && previewUrl ? (
+        <img
+          src={previewUrl}
+          alt={file.name}
+          className="h-full w-full object-cover"
+          style={{ borderRadius: '2px' }}
+        />
+      ) : (
+        <>
+          <FileIcon className="h-6 w-6" aria-hidden style={{ color: 'var(--text-tertiary)' }} />
+          <span
+            className="line-clamp-2 w-full text-center"
+            style={{ fontSize: '10px', color: 'var(--text-secondary)' }}
+          >
+            {file.name}
+          </span>
+        </>
+      )}
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label={`${file.name} 제거`}
+        onClick={onRemove}
+        className="absolute right-0 top-0 h-5 w-5 rounded-bl border-0 bg-[color:var(--bg-elevated)] p-0 text-[color:var(--text-secondary)] hover:bg-[color:var(--bg-app)] hover:text-[color:var(--text-primary)]"
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </li>
   );
 }
 

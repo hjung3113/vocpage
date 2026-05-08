@@ -2,6 +2,7 @@ import type { InternalNote } from '@contracts/voc';
 import type { Role } from '@contracts/common';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { VocHistory } from './VocHistory';
+import { VocActivityTimeline } from './VocActivityTimeline';
 import { VocComment } from './VocComment';
 import { VocInternalNotes } from './VocInternalNotes';
 import { VocSubTask } from './VocSubTask';
@@ -50,6 +51,9 @@ export function VocActionSection({
           <TabsTrigger variant="underline" value="history">
             이력
           </TabsTrigger>
+          <TabsTrigger variant="underline" value="activity">
+            활동
+          </TabsTrigger>
           <TabsTrigger variant="underline" value="subtask">
             하위작업
           </TabsTrigger>
@@ -78,6 +82,14 @@ export function VocActionSection({
 
         <TabsContent value="history" data-testid="drawer-history">
           <VocHistory entries={history.data} loading={history.isLoading} />
+        </TabsContent>
+
+        <TabsContent value="activity" data-testid="drawer-activity">
+          <VocActivityTimeline
+            history={history.data}
+            comments={comments.data}
+            loading={history.isLoading || comments.isLoading}
+          />
         </TabsContent>
 
         <TabsContent value="subtask">
