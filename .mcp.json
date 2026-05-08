@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "context-mode": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "context-mode"],
+      "env": {}
+    }
+  }
+}
