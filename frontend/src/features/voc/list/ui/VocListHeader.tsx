@@ -76,7 +76,6 @@ const ARIA_SORT: Record<SortDir, 'ascending' | 'descending'> = {
 export function VocListHeader({ sortBy, sortDir, onSort }: VocListHeaderProps) {
   return (
     <div
-      data-pcomp="list-header"
       data-testid="voc-list-header"
       role="row"
       className="list-header-container"

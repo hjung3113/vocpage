@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
+import { SidebarUserSwitcher } from './SidebarUserSwitcher';
 
 interface NavItem {
   to: string;
@@ -32,22 +33,8 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/health', label: 'Health', icon: Code2, devOnly: true },
 ];
 
-const ROLE_LABELS: Record<string, string> = {
-  user: 'User',
-  dev: 'Dev',
-  manager: 'Manager',
-  admin: 'Admin',
-};
-
-const ROLE_EMAILS: Record<string, string> = {
-  user: 'user@vocpage.io',
-  dev: 'dev@vocpage.io',
-  manager: 'manager@vocpage.io',
-  admin: 'admin@vocpage.io',
-};
-
 export function Sidebar() {
-  const { role, isAdmin, isManager, isDev } = useRole();
+  const { isAdmin, isManager, isDev } = useRole();
 
   const visible = NAV_ITEMS.filter(
     (item) => (!item.adminOnly || isAdmin || isManager) && (!item.devOnly || isDev),
@@ -133,35 +120,9 @@ export function Sidebar() {
         ))}
       </div>
 
-      {/* 유저 카드 */}
-      <div
-        data-testid="user-card"
-        className="flex items-center gap-2 border-t border-[color:var(--border-standard)]"
-        style={{ marginTop: 'auto', padding: '10px 12px' }}
-      >
-        <div
-          className="flex shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-          style={{
-            width: '30px',
-            height: '30px',
-            background: 'var(--brand-bg)',
-            color: 'var(--brand)',
-          }}
-          aria-hidden
-        >
-          {(ROLE_LABELS[role] ?? role).charAt(0).toUpperCase()}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div
-            className="truncate font-medium"
-            style={{ fontSize: '13px', color: 'var(--text-primary)' }}
-          >
-            {ROLE_LABELS[role] ?? role}
-          </div>
-          <div className="truncate" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-            {ROLE_EMAILS[role] ?? `${role}@vocpage.io`}
-          </div>
-        </div>
+      {/* 유저 카드 — 역할 전환 popover */}
+      <div data-testid="user-card" style={{ marginTop: 'auto' }}>
+        <SidebarUserSwitcher />
       </div>
     </nav>
   );

@@ -1,5 +1,6 @@
 import { Bell } from 'lucide-react';
 import { useRole } from '@entities/user/model/useRole';
+import { VocErrorSimSelector } from './VocErrorSimSelector';
 
 interface TopBarProps {
   title: string;
@@ -18,7 +19,8 @@ export function TopBar({ title }: TopBarProps) {
   return (
     <header className="flex h-12 items-center justify-between border-b border-[color:var(--border-standard)] bg-[color:var(--bg-elevated)] px-4">
       <span className="text-sm font-semibold text-[color:var(--text-primary)]">{title}</span>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <VocErrorSimSelector />
         <span className="rounded-full bg-[color:var(--brand-bg)] px-2.5 py-0.5 text-xs font-medium text-[color:var(--brand)]">
           {ROLE_LABELS[role] ?? role}
         </span>

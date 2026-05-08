@@ -15,7 +15,7 @@ export const NotifButton = React.forwardRef<HTMLButtonElement, NotifButtonProps>
       <PopoverTrigger asChild>
         <button
           ref={ref}
-          data-pcomp="notif-button"
+          data-testid="notif-button"
           type="button"
           aria-label="알림"
           aria-haspopup="dialog"

@@ -1,15 +1,17 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { FilePlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@shared/ui/dialog';
 import { LoadingState } from '@shared/ui/skeleton';
 import { AttachmentZone } from '@shared/ui/attachment-zone';
 import { VocCreate, type VocCreate as VocCreateInput } from '@contracts/voc/io';
 import type { VocPriority, VocStatus } from '@contracts/voc/entity';
-import type { VocTypeListItem } from '@contracts/master/io';
+import type { MenuListItem, VocTypeListItem } from '@contracts/master/io';
 import { VocCreateTypeChips } from './VocCreateTypeChips';
 import { VocCreateDetails } from './VocCreateDetails';
 import { VocCreateFooter } from './VocCreateFooter';
 import { VocCreateTitleInput } from './VocCreateTitleInput';
+import { VocCreateAutoTags } from './VocCreateAutoTags';
+import { useBodyAttachmentSync } from './useBodyAttachmentSync';
 
 const ToastBodyEditor = lazy(() => import('./ToastBodyEditor'));
 
@@ -23,7 +25,7 @@ export interface VocCreateDialogProps {
   onOpenChange: (open: boolean) => void;
   vocTypes: VocTypeListItem[];
   systems: IdLabel[];
-  menus: IdLabel[];
+  menus: MenuListItem[];
   assignees?: IdLabel[];
   onSubmit: (payload: VocCreateInput, files: File[]) => Promise<void>;
   submitting: boolean;
@@ -38,6 +40,9 @@ interface DraftState {
   assignee_id: string | null;
 }
 
+// feature-voc.md §8.4 — body 초기 skeleton (재현 단계 / 기대 / 실제)
+export const VOC_CREATE_BODY_SKELETON = '## 재현 단계\n\n## 기대 동작\n\n## 실제 동작\n';
+
 export function VocCreateDialog({
   open,
   onOpenChange,
@@ -48,35 +53,52 @@ export function VocCreateDialog({
   onSubmit,
   submitting,
 }: VocCreateDialogProps) {
-  const makeDraft = (): DraftState => ({
-    voc_type_id: vocTypes[0]?.id,
-    system_id: systems[0]?.id,
-    menu_id: menus[0]?.id,
-    priority: 'medium',
-    status: '접수',
-    assignee_id: null,
-  });
+  const makeDraft = (): DraftState => {
+    const firstSystemId = systems[0]?.id;
+    const firstMenuId = firstSystemId
+      ? menus.find((m) => m.system_id === firstSystemId)?.id
+      : undefined;
+    return {
+      voc_type_id: vocTypes[0]?.id,
+      system_id: firstSystemId,
+      menu_id: firstMenuId,
+      priority: 'medium',
+      status: '접수',
+      assignee_id: null,
+    };
+  };
 
   const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(VOC_CREATE_BODY_SKELETON);
   const [titleErr, setTitleErr] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [draft, setDraft] = useState<DraftState>(makeDraft);
   const [createAnother, setCreateAnother] = useState(false);
   const titleRef = useRef<HTMLTextAreaElement>(null);
 
-  // Reset when dialog opens or master data changes
+  const { resetSyncedUrls } = useBodyAttachmentSync(body, files, setFiles);
+
+  const resetForm = () => {
+    setTitle('');
+    setBody(VOC_CREATE_BODY_SKELETON);
+    setDraft(makeDraft());
+    setTitleErr('');
+    setFiles([]);
+    resetSyncedUrls();
+    setTimeout(() => titleRef.current?.focus(), 50);
+  };
+
   useEffect(() => {
-    if (open) {
-      setTitle('');
-      setBody('');
-      setDraft(makeDraft());
-      setTitleErr('');
-      setFiles([]);
-      setTimeout(() => titleRef.current?.focus(), 50);
-    }
+    if (open) resetForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, vocTypes, systems, menus]);
+
+  const filteredMenus = useMemo<IdLabel[]>(() => {
+    if (!draft.system_id) return [];
+    return menus
+      .filter((m) => m.system_id === draft.system_id && !m.is_archived)
+      .map((m) => ({ id: m.id, label: m.name }));
+  }, [menus, draft.system_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +109,7 @@ export function VocCreateDialog({
     }
     const parsed = VocCreate.safeParse({
       title: title.trim(),
-      body: body || undefined,
+      body: body && body !== VOC_CREATE_BODY_SKELETON ? body : undefined,
       priority: draft.priority,
       voc_type_id: draft.voc_type_id,
       system_id: draft.system_id,
@@ -99,16 +121,8 @@ export function VocCreateDialog({
       return;
     }
     await onSubmit(parsed.data, files);
-    if (createAnother) {
-      setTitle('');
-      setBody('');
-      setDraft(makeDraft());
-      setTitleErr('');
-      setFiles([]);
-      setTimeout(() => titleRef.current?.focus(), 50);
-    } else {
-      onOpenChange(false);
-    }
+    if (createAnother) resetForm();
+    else onOpenChange(false);
   };
 
   return (
@@ -124,7 +138,6 @@ export function VocCreateDialog({
           maxHeight: 'min(85vh, 720px)',
         }}
       >
-        {/* Header */}
         <div
           className="flex items-center gap-2 px-4 py-3 shrink-0"
           style={{ borderBottom: '1px solid var(--border-subtle)' }}
@@ -138,14 +151,12 @@ export function VocCreateDialog({
           </DialogTitle>
         </div>
 
-        {/* Body: 2-column layout */}
         <form
           id="voc-create-dialog-form"
           onSubmit={handleSubmit}
           className="flex flex-col flex-1 min-h-0"
         >
           <div data-testid="voc-create-body" className="flex flex-1 min-h-0 overflow-hidden">
-            {/* Left: main content */}
             <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4 min-w-0">
               <VocCreateTypeChips
                 vocTypes={vocTypes}
@@ -163,18 +174,15 @@ export function VocCreateDialog({
                 }}
               />
 
-              {/* Body editor */}
               <div className="flex-1">
                 <Suspense fallback={<LoadingState label="에디터 로딩" />}>
                   <ToastBodyEditor value={body} onChange={(md) => setBody(md)} />
                 </Suspense>
               </div>
 
-              {/* Attachments */}
               <AttachmentZone files={files} onChange={setFiles} disabled={submitting} />
             </div>
 
-            {/* Right: details sidebar */}
             <VocCreateDetails
               status={draft.status}
               priority={draft.priority}
@@ -184,11 +192,21 @@ export function VocCreateDialog({
               assignee_id={draft.assignee_id}
               vocTypes={vocTypes}
               systems={systems}
-              menus={menus}
+              menus={filteredMenus}
+              menuDisabled={!draft.system_id}
               assignees={assignees}
-              onChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+              onChange={(patch) =>
+                setDraft((prev) => {
+                  if ('system_id' in patch && patch.system_id !== prev.system_id) {
+                    return { ...prev, ...patch, menu_id: undefined };
+                  }
+                  return { ...prev, ...patch };
+                })
+              }
             />
           </div>
+
+          <VocCreateAutoTags body={body} />
 
           <VocCreateFooter
             createAnother={createAnother}

@@ -118,4 +118,13 @@ describe('AttachmentZone', () => {
     // input is labeled via <label htmlFor>; dropzone via aria-labelledby — both should resolve
     expect(screen.getAllByLabelText(/첨부파일/).length).toBeGreaterThanOrEqual(2);
   });
+
+  it('썸네일 grid 4 cols + 비-이미지는 file icon', () => {
+    const img = makeFile('a.png', 0.1, 'image/png');
+    const doc = makeFile('b.pdf', 0.1, 'application/pdf');
+    renderZone({ files: [img, doc] });
+    const thumbs = screen.getByTestId('attachment-zone-thumbs');
+    expect(thumbs.className).toMatch(/grid-cols-4/);
+    expect(thumbs.querySelectorAll('li').length).toBe(2);
+  });
 });

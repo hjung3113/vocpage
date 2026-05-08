@@ -105,10 +105,10 @@ describe('VocListHeader', () => {
     expect(screen.getByTestId('voc-list-header-cell-created_at')).toHaveTextContent('등록일');
   });
 
-  it('container has correct data-pcomp marker and role row', () => {
+  it('container has correct data-testid marker and role row', () => {
     render(<VocListHeader sortBy="created_at" sortDir="desc" onSort={() => {}} />);
     const container = screen.getByTestId('voc-list-header');
-    expect(container).toHaveAttribute('data-pcomp', 'list-header');
+    expect(container).toHaveAttribute('data-testid', 'voc-list-header');
     expect(container).toHaveAttribute('role', 'row');
     expect(container.className).toContain('list-header-container');
   });

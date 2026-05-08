@@ -64,12 +64,11 @@ export function VocReviewDrawer({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
-        data-pcomp="review-drawer"
+        data-testid="review-drawer"
         className={cn(
           'right-0 top-0 left-auto h-screen translate-x-0 translate-y-0 rounded-none sm:rounded-none p-0 flex flex-col',
           isFullscreen ? 'max-w-full w-full' : 'max-w-xl',
         )}
-        data-testid="voc-drawer"
         style={{ background: 'var(--bg-panel)' }}
       >
         <DialogTitle className="sr-only">{voc ? voc.title : 'VOC'}</DialogTitle>

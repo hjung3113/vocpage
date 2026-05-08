@@ -16,13 +16,11 @@ npm run test                                     # Jest
 npm run test -- --testPathPattern=filename       # Single test
 ```
 
-## Working from the Prototype
+## Implementation Reference (2026-05-09~)
 
-The frontend prototype (`prototype/`) is a **product/UX reference**, not a backend spec. Treat it as evidence of real requirements — never as a DB schema or API blueprint.
+정본은 `docs/specs/requires/requirements.md` (+ 보조 `feature-*.md`, `dashboard.md`). `prototype/` 디렉터리는 더 이상 backend reference 가 아니다 — 도메인 추론·DB 스키마·API blueprint 모두 spec 만 본다.
 
-Infer backend needs from: pages, user actions, forms, displayed data, filters/sorting, status values, empty/error states, permission hints.
-
-Before coding an endpoint, define:
+엔드포인트 작성 전 정의:
 
 - Domain entities + relationships, required/optional fields, enums/statuses
 - API contract (route, method, request/response shape, status codes, error shape)
@@ -30,13 +28,13 @@ Before coding an endpoint, define:
 
 Rules:
 
-- Design APIs around **product behavior**, not UI layout — models reflect business concepts, not screen labels
-- Keep business logic out of route handlers (route → service → repository)
-- Validate all external input; use clear status codes and stable error shapes
-- Support FE states: pagination, filtering, sorting, loading-friendly responses, empty/error semantics
-- Avoid vague strings, generic models, and prototype-driven DB design (e.g., a column per UI badge)
+- API는 **product behavior** 기준 — UI label 이 아닌 business concept 으로 모델링
+- route → service → repository, 비즈니스 로직은 route handler 밖
+- 모든 외부 입력 검증; status code · error shape 안정적
+- FE 상태 지원: pagination, filtering, sorting, loading-friendly responses, empty/error
+- 모호한 string / 제네릭 모델 / UI 배지마다 컬럼 두는 식의 설계 금지
 
-Flow: review prototype behavior → define entities/types → design API contract → service logic → persistence → validation/errors → confirm FE integration.
+Flow: read requirements/feature-\*.md → entities/types → API contract → service → persistence → validation/errors → FE integration 확인.
 
 ## Architecture
 

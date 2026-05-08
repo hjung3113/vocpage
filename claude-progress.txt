@@ -2,79 +2,47 @@
 
 ## 다음 세션 시작점
 
-→ **현재: VOC Linear Realignment Phase 2~5 완료 + PR 생성** (정본: `docs/specs/plans/voc-linear-realign.md`).
-   feat/voc-review-ui-linear-jira 브랜치 5 commit (`053f782` Phase 2 sidebar/topbar/filter / `ac9d597` Phase 3 table+icons / `30e44b8` Phase 3 follow-up row 36px / `ba2e73a` Phase 4 review / `d446922` Phase 5 status grouping) — 1 PR로 통합 발행.
-   검증: 436/436 vitest PASS / typecheck PASS / Playwright 50/51 PASS / code-reviewer Blocking 0.
-   **다음 세션 P1 follow-up (PR 머지 전 또는 후속 PR)**:
-   1) Review sheet `상태` row icon 누락 (현재 text-only) — type와 일관 위해 icon+text 권장
-   2) `VocStatusGroupHeader` 인라인 마법값(12px·11px·14·8px·tracking) 토큰화
-   3) `Sidebar` `13.5px` 비표준 step — `uidesign.md §typography` 등재 또는 13/14px 정렬
-   4) `VocStatusFilters`의 status별 pressed 토큰(`STATUS_TOKEN`) 제거 의도 확인 — plan 명시 외 회귀 가능성
-   5) `useLocalStorageState`: defaultValue ref/모듈 상수화, mount-time write skip
-   6) Phase 5 그룹 collapse 통합 테스트 추가 (현재 unit만)
-   7) `VocStatusGroupHeader` `data-testid` 한국어 → slug
-→ **이전 컨텍스트: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
-→ **이전 컨텍스트: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
-   **다음:** Wave 1.6 η-batch — VOC 리뷰 페이지 고도화 우선 (C-20~C-23 병렬) → 이후 ζ(C-17~C-19) → Phase D.
-   **PR #232-236 리뷰 피드백 반영 완료 (2026-05-06)**: formatActivityTime lib 분리+단위테스트, SubTaskListResponse shared/contracts 이동, dead props 4개 제거, comments/subtasks/history 쿼리 VocActionSection co-location, 적대적 리뷰 1회. fix/review-feedback-232-236 브랜치 → PR 머지.
-   §7.2 batch 순서: ~~α~~ → ~~β~~ → ~~γ~~ → ~~δ~~ → ~~ε~~ → **η(C-20∥C-21∥C-22∥C-23)** → ζ(C-17 → C-18∥C-19) → Phase D.
-   FSD Migration: ~~Step 0~7 전부 완료~~ (PR #207~#220) — `docs/specs/archive/plans/fsd-migration.md`.
-   룰북: `docs/specs/plans/wave-1-6-phase-c-precedent.md`.
-   정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`.
+→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기 (12 commit, follow-up 5건 반영)**
+   verifier evidence-based PASS — D-3 재실행: BE 116/123 PASS (+5 M-1) · FE 472/472 PASS (+3 L-1·L-2) · FE lint clean · FE+BE typecheck clean.
+   머지는 사용자. 머지 후 Phase 2 (`feat/voc-list-expand`) → Wave 2(Dashboard).
+
+→ **다음 세션 액션**
+   1. `gh pr create` → 사용자 review → `gh pr merge --merge --delete-branch`
+   2. 머지 직후 main 기준 `feat/voc-list-expand` 브랜치 신설 (§9.2.2 인라인 expand)
+   3. Phase 2 spec 보강 ADR 1건 (BE `total` 의미 / zod self-recursive 회피 / status grouping × expand 배타) → 구현
+   4. Phase 2 머지 후 `feat/dashboard-shell` 진입 (Wave 2)
+
+→ **PR 본문 = `docs/voc-completion-single-pr` 12 commit + driver D-1~D-5 재PASS + 머지 요청 1줄**
+   - Phase B (BE master + create 강제룰) — `ad1ef50`
+   - Phase C minimal + major — `c56af67` + `b85240a`
+   - Wave 1.6 잔여 — `dc4527c`
+   - Phase 6 (payload-review BE/FE + Playwright spec) — `a8c08ca` + `64069e2`
+   - Follow-up 7건 (status icon · 토큰화 · 13.5px · ReviewStatus · collapse test · data-testid slug) — `d266bd7`
+   - Code-review fix B-1 / H-1 / H-2 — `97e002c`
+   - Wave close progress sync — `4ad8dbe`
+   - Untracked entity icons + shadcn primitives — `08f95f0`
+   - **NEW** Follow-up M-1·M-2·M-3·L-1·L-2 일괄 처리 (이번 세션)
+
+→ **D-1~D-5 재실행 evidence (2026-05-09)**
+   - D-1 기능: 변경 없음 (M-1·M-3 docs/test only). M-2 onError 토스트 추가 / L-1 다탭 동기화 / L-2 secondary sort.
+   - D-2 시각: token-only — `npm run lint -w frontend` 0 warnings.
+   - D-3 테스트: BE 116/123 PASS (+5 M-1) · FE 472/472 PASS (+3 L-1·L-2) · 7 todo 동일.
+   - D-4 무결성: shared/contracts/openapi 변경 없음 (M-3 changelog only). fixture-seed parity 영향 없음.
+   - D-5 운영: `voc-completion-decisions.md` 5 changelog row append, 본 파일 + next-session-tasks 동기화.
+
+→ **Phase 2 (분리 PR) — 적대적 리뷰 결과**
+   §9.2.2 VOC 목록 인라인 서브태스크 펼침은 본 PR 에 끼우지 않음.
+   근거: critic + codex 양측 합의 — Wave 1.6 close PR 정체성 / D-1~D-5 evidence stale 위험 / BE `total` 의미 silent change /
+   zod self-recursive (`VocListItem.subTasks`) 함정 / status grouping × expand 충돌 / openapi 동기화 / Playwright deferred.
 
 ## Active Waves
 
-**Wave 1.6 — `/voc` prototype parity** (정본: `wave-1-6-voc-parity.md`)
-- ✅ Phase A 분해 (PR #126) / B 토큰 갭 (PR #128, violet 보강 #132) / B-add-2 chip 토큰 (#142)
-- 🟡 Phase C — α/β/γ/δ/**ε** 완료 (C-13 #192, C-14 #194, C-15 #197, C-16 #196 머지). 활동 패널 UI 개선 PR #232~#234 머지 완료 (언더라인 탭 variant, history/comment 아바타 레이아웃, ActivityAvatar 추출, mock 데이터 연결). **다음: 코드 리뷰 수령 후 η 진입**
-- ⛔ Phase D — Phase C 전체 batch 머지 후 진입
+**`/voc` 완성 — 단일 PR (PR open 대기)**
+- ✅ 12 commit, BE/FE green, follow-up 5건 반영
+- ⏳ 사용자 PR open + merge → Phase 2 진입
 
-**Wave 1.7 — VOC 등록 모달 정합화** (정본: `wave-1-7-voc-create-modal.md`, 사양: `feature-voc.md §9.11`)
-- ✅ Phase A — spec/contract 머지 (PR #185, 2026-05-03)
-- ⏳ Phase B(BE master endpoints) → C(FE 모달 rebuild) → D(visual diff) — Wave 1.6 종료 후 진입
+**Phase 2 — `feat/voc-list-expand`** (§9.2.2 D16, 2026-04-26)
+- ⛔ `/voc` 완성 PR 머지 후 진입. ADR 선행 (total 의미 · 자기참조 zod · grouping 배타 · 자식 페이로드 cap).
 
-## Hard-blocks
-
-- Wave 2 (Dashboard) 및 Follow-up C-2 (seed UUID v4): Wave 1.6 종료 전까지 진입 금지.
-- Wave 1.7 Phase B 이후: Wave 1.6 종료 후.
-
-## 직전 머지 (참고용, 상세는 `git log` / archive)
-
-- PR #234 (2026-05-06) — refactor: ActivityAvatar + formatActivityTime 추출 (VocComment/VocHistory 중복 제거).
-- PR #233 (2026-05-06) — feat: comment/subtask mock 데이터 연결 (MSW handler, vocApi, useDrawerQueries 분리).
-- PR #232 (2026-05-06) — feat: underline tab variant (cva) + VocHistory/VocComment 아바타 레이아웃.
-- PR #231 (2026-05-05) — refactor: voc structure cleanup.
-- PR #189 (2026-05-03) — `scripts/session-stats.ts` 추가 (Claude transcript analyzer).
-- PR #188 (2026-05-03) — `.claude/CLAUDE.md` FE test batch 명령에 `-- --run` 추가.
-- PR #187 (2026-05-03) — Wave 1.6 **C-12 VocReviewDrawer** shell parity.
-  I-2 approved-lock + `VocReviewMetaPanel` (7-field grid) + DialogDescription sr-only.
-  4-reviewer 적대적 패널 7 fix-required 반영(P0 3 / P1 4) + 5건 defer(C-13 후속).
-  본문/서브태스크/첨부 dropzone/Toast Editor/댓글리스트 재설계는 C-13~16에서 처리.
-  FE 350/350 green, typecheck/lint clean.
-
-## Wave 1.5-γ defer 항목 (별도 PR)
-
-- VocCreateModal RHF+Zod resolver 마이그레이션
-- DOMPurify customHTMLSanitizer (defense-in-depth)
-- VocAdvancedFilters tag/voc_type chip 테스트 보강
-- NativeSelect 단위 테스트
-- systems/menus placeholder UUID → Wave 3 admin masters 연결
-- openapi guard 확장 (VocListQuery + masters 3 schema)
-
-## Wave 1.6 follow-up (Phase D 또는 별도 PR)
-
-- a11y audit — C1.D5 aria-label 중복 패턴 재검토
-- eslint `no-restricted-imports` — `shared/contracts/voc/*` deep path 금지 (C1.D6)
-- grep-based CI — `VOC_*_SLUG` 0 hits (C1.D2)
-- `--status-purple` (hue 290°, 0 callers) 사용 시점 — `--status-processing` family hue 충돌 재검토
-- `vocGridLayout.ts` `--sp-5` 시맨틱 토큰 승격 여부 (Issue #166 후속)
-- badge-family `font-size` 통일 (C-1 11px vs C-2 11.5px)
-- mock data priority `low` 보강
-- `p-${priority}` 암묵 className → 명시적 cssClass 필드
-- `--status-*` 토큰 `tokens.ts` SSOT 마이그
-- uidesign §11~§14 stable slug anchor
-
----
-
-> 누적 이력(Wave 1~3, Wave 1.5/1.6 상세)은 `docs/specs/plans/progress-archive.md` 참조.
-> 다음 작업은 본 파일 첫 30줄로 충분 — 상세는 plan 문서 cite.
+**Wave 2 — Dashboard** (정본: `docs/specs/requires/dashboard.md`)
+- ⛔ Phase 2 머지 후 진입.

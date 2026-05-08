@@ -40,7 +40,7 @@ export function Pagination({ page, totalPages, onChange, siblingCount = 1 }: Pag
 
   return (
     <PaginationRoot
-      data-pcomp="pagination"
+      data-testid="pagination"
       aria-label="페이지"
       className="flex items-center justify-center gap-1"
     >

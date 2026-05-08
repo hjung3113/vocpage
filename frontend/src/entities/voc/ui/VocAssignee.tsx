@@ -49,7 +49,6 @@ export function VocAssignee({
   if (!trimmed) {
     return (
       <span
-        data-pcomp="VocAssignee"
         data-testid="assignee-unassigned"
         aria-label="미배정"
         style={{ ...ROW_STYLE, color: 'var(--text-quaternary)' }}
@@ -65,7 +64,6 @@ export function VocAssignee({
 
   return (
     <span
-      data-pcomp="VocAssignee"
       data-testid={`assignee-${bucket}`}
       aria-label={`담당자 ${trimmed}`}
       style={ROW_STYLE}

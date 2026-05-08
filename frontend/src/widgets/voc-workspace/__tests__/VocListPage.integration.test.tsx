@@ -109,6 +109,7 @@ describe('VocListPage — Wave D D5 integration', () => {
     vi.clearAllMocks();
     setupMasters();
     vi.mocked(vocApi.list).mockImplementation((q) => Promise.resolve(defaultListImpl(q)));
+    window.localStorage.clear();
   });
 
   it('"검토중" pill 클릭 → MSW handler가 status 필터된 rows만 반환 + count 갱신', async () => {
@@ -179,6 +180,44 @@ describe('VocListPage — Wave D D5 integration', () => {
     await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
     expect(screen.queryByTestId('voc-loading')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /다시 시도/ })).not.toBeInTheDocument();
+  });
+
+  it('status 그룹 헤더 클릭 → 그룹 접기 + localStorage("voc-list-group-collapsed") 영속', async () => {
+    renderPage();
+    await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
+
+    // pick a status that has at least one fixture row to assert row hide/show
+    const status = (live.find((r) => r.status)?.status ?? '검토중') as VocStatus;
+    const header = await screen.findByTestId(`voc-status-group-header-${status}`);
+    expect(header).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(header);
+
+    // collapse persists to localStorage under the documented key
+    await waitFor(() => {
+      const raw = window.localStorage.getItem('voc-list-group-collapsed');
+      expect(raw).not.toBeNull();
+      expect(JSON.parse(raw!)).toContain(status);
+    });
+    expect(
+      screen.getByTestId(`voc-status-group-header-${status}`),
+    ).toHaveAttribute('aria-expanded', 'false');
+
+    // toggle back: localStorage must round-trip to empty array
+    await userEvent.click(screen.getByTestId(`voc-status-group-header-${status}`));
+    await waitFor(() => {
+      const raw = window.localStorage.getItem('voc-list-group-collapsed');
+      expect(JSON.parse(raw!)).not.toContain(status);
+    });
+  });
+
+  it('localStorage 에 미리 collapsed 상태가 있으면 페이지 마운트 시 그룹이 접혀 있어야 한다', async () => {
+    window.localStorage.setItem('voc-list-group-collapsed', JSON.stringify(['검토중']));
+    renderPage();
+    await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
+    const header = await screen.findByTestId('voc-status-group-header-검토중');
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+    expect(header).toHaveAttribute('data-collapsed', 'true');
   });
 
   it('vocTypeMap threads VocListPage → VocTable → VocRow → VocTypeBadge (renders type icon for each row)', async () => {

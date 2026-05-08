@@ -14,7 +14,7 @@ export function VocBodySection({ body }: Props) {
         본문
       </span>
       <div
-        data-pcomp="voc-body-section"
+        data-testid="voc-body-section"
         className="rounded px-3 py-3"
         style={{ background: 'var(--bg-surface)' }}
       >

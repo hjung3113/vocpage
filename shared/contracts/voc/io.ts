@@ -101,3 +101,28 @@ export type VocIdParam = z.infer<typeof VocIdParam>;
 
 export const VocDetail = Voc;
 export type VocDetail = z.infer<typeof VocDetail>;
+
+/**
+ * Result Review submission — feature-voc.md §9.4.5.
+ * decision='reject' requires a non-empty comment (manager/admin gate enforced BE-side).
+ */
+export const PayloadReviewSubmit = z
+  .object({
+    decision: z.enum(['approve', 'reject']),
+    comment: z.string().trim().max(1000).optional(),
+  })
+  .refine((v) => v.decision === 'approve' || (v.comment && v.comment.length > 0), {
+    message: 'reject 결정 시 comment 가 필요합니다.',
+    path: ['comment'],
+  });
+export type PayloadReviewSubmit = z.infer<typeof PayloadReviewSubmit>;
+
+export const PayloadReviewResponse = z.object({
+  id: Uuid,
+  voc_id: Uuid,
+  reviewer_id: Uuid,
+  decision: z.enum(['approved', 'rejected']),
+  comment: z.string().nullable(),
+  created_at: z.string(),
+});
+export type PayloadReviewResponse = z.infer<typeof PayloadReviewResponse>;

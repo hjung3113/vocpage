@@ -25,7 +25,7 @@ export function VocPeopleSection({
 
   return (
     <VocSection title="인원" testId="voc-people-panel">
-      <div data-pcomp="VocPeopleSection">
+      <div data-testid="VocPeopleSection">
         <PropRow label="담당자" testId="meta-assignee">
           {editable ? (
             <EditableSelect

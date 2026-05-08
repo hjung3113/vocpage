@@ -11,6 +11,7 @@ import { LoadingState } from '@shared/ui/skeleton';
 import { ErrorState } from '@shared/ui/error-state';
 import { VocDrawerBody } from './VocDrawerBody';
 import { VocStatusBadge, VocPriorityBadge } from '@entities/voc';
+import { PayloadReviewActions } from './PayloadReviewActions';
 
 const EMPTY_ASSIGNEE_MAP: Record<string, string> = {};
 
@@ -26,10 +27,11 @@ export function VocReviewPage() {
   const voc = detail.data;
   const isDeleted = !!voc?.deleted_at;
   const blockedDeleted = isDeleted && role !== 'admin';
+  const canReview = role === 'manager' || role === 'admin';
 
   return (
     <div
-      data-pcomp="voc-review-page"
+      data-testid="voc-review-page"
       className="flex flex-col h-full"
       style={{ background: 'var(--bg-panel)' }}
     >
@@ -69,6 +71,9 @@ export function VocReviewPage() {
               {voc.title}
             </span>
           </div>
+        )}
+        {voc && canReview && !blockedDeleted && (
+          <PayloadReviewActions vocId={voc.id} onReviewed={() => void detail.refetch()} />
         )}
       </div>
 

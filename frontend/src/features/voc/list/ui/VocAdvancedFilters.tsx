@@ -108,7 +108,7 @@ export function VocAdvancedFilters({
   return (
     <div
       id={VOC_ADVANCED_FILTERS_PANEL_ID}
-      data-pcomp="voc-advanced-filters"
+      data-testid="voc-advanced-filters"
       className={open ? 'advanced-filters advanced-filters--open' : 'advanced-filters'}
       aria-hidden={!open}
     >

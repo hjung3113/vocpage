@@ -47,7 +47,7 @@ export function DataTable<T>({
   return (
     <Table className="border-collapse text-[color:var(--text-primary)]">
       <TableHeader
-        data-pcomp="data-table"
+        data-testid="data-table"
         style={{ background: 'var(--bg-panel)', borderBottom: '2px solid var(--border-subtle)' }}
       >
         <TableRow>

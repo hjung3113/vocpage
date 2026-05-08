@@ -87,7 +87,7 @@ describe('VocAdvancedFilters', () => {
 
   it('flips aria-hidden on the panel when open toggles', () => {
     const { rerender } = renderClosed();
-    const panel = document.querySelector('[data-pcomp="voc-advanced-filters"]');
+    const panel = document.querySelector('[data-testid="voc-advanced-filters"]');
     expect(panel).toHaveAttribute('aria-hidden', 'true');
     rerender(
       <VocAdvancedFilters
@@ -134,6 +134,6 @@ describe('VocAdvancedFiltersToggle (F-3)', () => {
     renderClosed();
     const panel = document.getElementById(controlsId!);
     expect(panel).not.toBeNull();
-    expect(panel).toHaveAttribute('data-pcomp', 'voc-advanced-filters');
+    expect(panel).toHaveAttribute('data-testid', 'voc-advanced-filters');
   });
 });

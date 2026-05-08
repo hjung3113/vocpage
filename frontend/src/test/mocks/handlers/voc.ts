@@ -18,6 +18,31 @@ import {
 } from '../../../../../shared/fixtures/voc.fixtures';
 import { TAG_FIXTURES } from '../../../../../shared/fixtures/master.fixtures';
 import { VocListQuery } from '../../../../../shared/contracts/voc';
+import { getErrorSimMode } from '../../../shared/dev/errorSim';
+
+// Dev-only error simulation. Returns a Response when sim is active, or null to proceed.
+function simulateError(): Response | null {
+  const mode = getErrorSimMode();
+  if (mode === 'off') return null;
+  if (mode === 'network-fail') return HttpResponse.error();
+  if (mode === 'http-500') {
+    return HttpResponse.json(
+      { error: { code: 'INTERNAL', message: '시뮬레이션된 서버 오류' } },
+      { status: 500 },
+    );
+  }
+  return null;
+}
+
+async function simulateLatency(): Promise<void> {
+  if (getErrorSimMode() === 'slow') {
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+}
+
+function maybeTruncate<T>(rows: T[]): T[] {
+  return getErrorSimMode() === 'partial' ? rows.slice(0, 1) : rows;
+}
 
 const TAG_NAME_BY_ID = new Map(TAG_FIXTURES.map((t) => [t.id, t.name] as const));
 function tagsForVoc(vocId: string): string[] {
@@ -60,7 +85,10 @@ function currentRole(req: Request): { role: 'admin' | 'manager' | 'dev' | 'user'
 }
 
 export const vocHandlers = [
-  http.get('/api/vocs', ({ request }) => {
+  http.get('/api/vocs', async ({ request }) => {
+    const sim = simulateError();
+    if (sim) return sim;
+    await simulateLatency();
     const url = new URL(request.url);
     const { role } = currentRole(request);
     // Mirror BE: shared VocListQuery zod validates sort_by/sort_dir enum +
@@ -155,7 +183,7 @@ export const vocHandlers = [
       notes_count: notes.filter((n) => n.voc_id === r.id).length,
       tags: tagsForVoc(r.id),
     }));
-    return HttpResponse.json({ rows: slice, page, per_page, total });
+    return HttpResponse.json({ rows: maybeTruncate(slice), page, per_page, total });
   }),
 
   http.post('/api/vocs', async ({ request }) => {
@@ -271,14 +299,48 @@ export const vocHandlers = [
     return HttpResponse.json(note);
   }),
 
-  http.get('/api/vocs/:id/history', ({ params }) => {
-    const rows = VOC_HISTORY_FIXTURES.filter((h) => h.voc_id === params.id);
-    return HttpResponse.json({ rows });
+  http.post('/api/vocs/:id/payload-review', async ({ params, request }) => {
+    const { role, id: userId } = currentRole(request);
+    const row = store.find((r) => r.id === params.id);
+    if (!row) return envelope('NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+    if (role !== 'manager' && role !== 'admin') {
+      return envelope('FORBIDDEN', '검토 권한이 없습니다.');
+    }
+    const body = (await request.json()) as { decision: 'approve' | 'reject'; comment?: string };
+    if (body.decision === 'reject' && !body.comment) {
+      return HttpResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: 'reject 결정 시 comment 가 필요합니다.' } },
+        { status: 400 },
+      );
+    }
+    const decision = body.decision === 'approve' ? 'approved' : 'rejected';
+    return HttpResponse.json(
+      {
+        id: `eeeeeeee-0000-4000-8000-${String(Date.now()).slice(-12).padStart(12, '0')}`,
+        voc_id: String(params.id),
+        reviewer_id: userId,
+        decision,
+        comment: body.comment ?? null,
+        created_at: new Date().toISOString(),
+      },
+      { status: 201 },
+    );
   }),
 
-  http.get('/api/vocs/:id/comments', ({ params }) => {
+  http.get('/api/vocs/:id/history', async ({ params }) => {
+    const sim = simulateError();
+    if (sim) return sim;
+    await simulateLatency();
+    const rows = VOC_HISTORY_FIXTURES.filter((h) => h.voc_id === params.id);
+    return HttpResponse.json({ rows: maybeTruncate(rows) });
+  }),
+
+  http.get('/api/vocs/:id/comments', async ({ params }) => {
+    const sim = simulateError();
+    if (sim) return sim;
+    await simulateLatency();
     const rows = VOC_COMMENT_FIXTURES.filter((c) => c.voc_id === params.id);
-    return HttpResponse.json({ rows });
+    return HttpResponse.json({ rows: maybeTruncate(rows) });
   }),
 
   http.get('/api/vocs/:id/subtasks', ({ params }) => {

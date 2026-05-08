@@ -18,7 +18,7 @@ function formatDate(iso: string | null | undefined): string {
 export function VocDateSection({ voc, editable = false, onPatch }: VocDateSectionProps) {
   return (
     <VocSection title="일정" testId="voc-date-panel">
-      <div data-pcomp="VocDateSection">
+      <div data-testid="VocDateSection">
         <PropRow label="등록일" testId="meta-created_at">
           {voc.created_at ? formatDate(voc.created_at) : '— (자동 설정)'}
         </PropRow>

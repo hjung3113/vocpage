@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react';
-import type { CSSProperties, KeyboardEvent } from 'react';
+import type { CSSProperties, KeyboardEvent, MouseEvent } from 'react';
 import type { VocListResponse } from '@contracts/voc';
 import { VOC_GRID_COLUMNS, VOC_GRID_PADDING_X } from './vocGridLayout';
 import {
@@ -23,12 +23,16 @@ export interface VocRowProps {
   vocTypeMap?: Record<string, VocTypeMapEntry>;
   selected?: boolean;
   onClick: () => void;
+  /** Spec §9.2.2: parent rows expose ▶/▼ toggle when subtasks exist. */
+  hasChildren?: boolean;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
+  /** Spec §9.2.2: child row indents issue_code by 24px to convey hierarchy. */
+  indented?: boolean;
 }
 
 // Phase 3 follow-up: align with benchmark Tasks.html `.irow`
 //   padding: 7px 24px; min-height: 36px; font-size: 13px; gap: 10px.
-// Vertical padding (7px) replaces fixed 52px height; min-height keeps a
-// stable row floor while letting tag chips relax growth.
 const CONTAINER_STYLE: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: VOC_GRID_COLUMNS,
@@ -43,7 +47,17 @@ const CONTAINER_STYLE: CSSProperties = {
   fontSize: '13px',
 };
 
-export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick }: VocRowProps) {
+export function VocRow({
+  row,
+  assigneeMap,
+  vocTypeMap,
+  selected = false,
+  onClick,
+  hasChildren = false,
+  expanded = false,
+  onToggleExpand,
+  indented = false,
+}: VocRowProps) {
   const vocType = vocTypeMap?.[row.voc_type_id];
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -52,11 +66,17 @@ export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick
     }
   };
 
+  const handleToggle = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onToggleExpand?.();
+  };
+
   return (
     <div
       role="row"
-      data-pcomp="voc-row"
       data-testid="voc-row"
+      data-child={indented ? 'true' : undefined}
+      aria-expanded={hasChildren ? expanded : undefined}
       className={selected ? 'voc-row is-selected' : 'voc-row'}
       style={CONTAINER_STYLE}
       onClick={onClick}
@@ -64,10 +84,45 @@ export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick
       onKeyDown={handleKeyDown}
     >
       <div role="presentation">
-        <ChevronRight aria-hidden="true" className="voc-row-expand" />
+        {hasChildren && onToggleExpand ? (
+          <button
+            type="button"
+            data-testid="voc-row-expand-toggle"
+            aria-label={expanded ? '서브태스크 접기' : '서브태스크 펼치기'}
+            aria-expanded={expanded}
+            onClick={handleToggle}
+            className="voc-row-expand-button"
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-tertiary)',
+            }}
+          >
+            <ChevronRight
+              aria-hidden="true"
+              className="voc-row-expand"
+              style={{
+                transition: 'transform 120ms ease',
+                transform: expanded ? 'rotate(90deg)' : 'none',
+              }}
+            />
+          </button>
+        ) : (
+          <span aria-hidden="true" style={{ display: 'inline-block', width: '16px' }} />
+        )}
       </div>
 
-      <div role="gridcell" className="voc-row-issue-code">
+      <div
+        role="gridcell"
+        className="voc-row-issue-code"
+        style={indented ? { paddingLeft: '24px' } : undefined}
+      >
         {row.issue_code}
       </div>
 

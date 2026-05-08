@@ -21,7 +21,7 @@ export function VocTopbar({
 }: VocTopbarProps) {
   return (
     <div
-      data-pcomp="voc-topbar"
+      data-testid="voc-topbar"
       className="flex items-center gap-3 px-6"
       style={{
         background: 'var(--bg-app)',

@@ -61,7 +61,6 @@ export function VocStatusGroupHeader({
   return (
     <button
       type="button"
-      data-pcomp="voc-status-group-header"
       data-testid={`voc-status-group-header-${status}`}
       data-collapsed={collapsed ? 'true' : 'false'}
       aria-expanded={!collapsed}

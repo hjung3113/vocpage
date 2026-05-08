@@ -10,9 +10,10 @@
 | 현재 진행 (Phase·다음 작업) | [`claude-progress.txt`](./claude-progress.txt) (≤30줄)                                |
 | 전체 Phase 계획             | [`docs/specs/plans/next-session-tasks.md`](./docs/specs/plans/next-session-tasks.md)  |
 | NextGen 백로그              | [`docs/specs/plans/nextgen-backlog.md`](./docs/specs/plans/nextgen-backlog.md)        |
-| 프로토타입                  | [`prototype/CLAUDE.md`](./prototype/CLAUDE.md)                                        |
 | 디자인 시스템               | [`docs/specs/requires/uidesign.md`](./docs/specs/requires/uidesign.md) (English only) |
 | 기능 요구사항               | [`docs/specs/requires/requirements.md`](./docs/specs/requires/requirements.md)        |
+
+> **2026-05-09~ 정책**: 구현 정본은 `requirements.md` + `uidesign.md` 만. `prototype/` 는 더 이상 reference 가 아니다 (parity·픽셀·DOM 인용 금지).
 
 ## 세션 시작 절차
 

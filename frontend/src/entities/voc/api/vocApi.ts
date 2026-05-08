@@ -14,6 +14,8 @@ import {
   type Comment,
   SubTaskListResponse,
   type SubTaskItem,
+  PayloadReviewResponse,
+  type PayloadReviewSubmit,
 } from '@contracts/voc';
 
 function toQs(query: Partial<VocListQuery>): string {
@@ -64,5 +66,8 @@ export const vocApi = {
   },
   subtasks(id: string): Promise<SubTaskItem[]> {
     return apiGet(`/api/vocs/${id}/subtasks`, SubTaskListResponse).then((r) => r.rows);
+  },
+  submitPayloadReview(id: string, payload: PayloadReviewSubmit) {
+    return apiPost(`/api/vocs/${id}/payload-review`, payload, PayloadReviewResponse);
   },
 };

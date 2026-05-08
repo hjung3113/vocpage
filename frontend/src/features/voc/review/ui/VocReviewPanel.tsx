@@ -71,7 +71,6 @@ export function VocReviewPanel({
 
   return (
     <div
-      data-pcomp="review-panel"
       data-testid="voc-drawer"
       className="flex flex-col h-full"
       style={{ background: 'var(--bg-panel)' }}

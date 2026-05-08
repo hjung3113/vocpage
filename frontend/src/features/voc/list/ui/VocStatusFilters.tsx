@@ -46,7 +46,7 @@ export function VocStatusFilters({ value, onChange, rightSlot }: VocStatusFilter
 
   return (
     <div
-      data-pcomp="voc-status-filters"
+      data-testid="voc-status-filters"
       className="flex items-center gap-1.5 flex-nowrap overflow-x-auto px-6 scrollbar-none"
       style={{
         background: 'var(--bg-app)',

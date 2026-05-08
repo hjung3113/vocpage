@@ -30,7 +30,7 @@ export function VocSidePanel({
 }: VocSidePanelProps) {
   return (
     <aside
-      data-pcomp="voc-side-panel"
+      data-testid="voc-side-panel"
       className="flex flex-col h-full"
       style={{
         width: isFullscreen ? '100%' : '440px',

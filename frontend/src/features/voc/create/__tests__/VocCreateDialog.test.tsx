@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { VocCreateDialog } from '../ui/VocCreateDialog';
-import type { VocTypeListItem } from '@contracts/master/io';
+import type { MenuListItem, VocTypeListItem } from '@contracts/master/io';
 
 const vocTypes: VocTypeListItem[] = [
   {
@@ -24,7 +24,15 @@ const vocTypes: VocTypeListItem[] = [
 ];
 
 const systems = [{ id: '66666666-6666-6666-6666-666666666666', label: 'WMS' }];
-const menus = [{ id: '77777777-7777-7777-7777-777777777777', label: '입고 관리' }];
+const menus: MenuListItem[] = [
+  {
+    id: '77777777-7777-7777-7777-777777777777',
+    system_id: '66666666-6666-6666-6666-666666666666',
+    name: '입고 관리',
+    slug: 'inbound',
+    is_archived: false,
+  },
+];
 const assignees = [{ id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', label: '홍길동' }];
 
 function renderDialog(overrides: Partial<React.ComponentProps<typeof VocCreateDialog>> = {}) {
@@ -115,6 +123,38 @@ describe('VocCreateDialog', () => {
     renderDialog({ onOpenChange });
     await user.click(screen.getByRole('button', { name: /취소/ }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('Details 사이드바에 2×2 그리드 컨테이너가 렌더링된다', () => {
+    renderDialog();
+    const grid = screen.getByTestId('voc-create-details-grid');
+    expect(grid).toBeInTheDocument();
+    expect(grid.className).toMatch(/grid-cols-2/);
+  });
+
+  it('system 미선택 상태에서는 menu select 가 비활성 안내로 대체된다', () => {
+    renderDialog({ systems: [], menus: [] });
+    expect(screen.getByTestId('voc-create-menu-disabled')).toBeInTheDocument();
+  });
+
+  it('body 초기 skeleton(H2 재현/기대/실제) 가 주입된다', async () => {
+    renderDialog();
+    const ta = await screen.findByTestId('voc-body-editor');
+    const text = (ta as HTMLTextAreaElement).value ?? ta.textContent ?? '';
+    expect(text).toMatch(/## 재현 단계/);
+    expect(text).toMatch(/## 기대 동작/);
+    expect(text).toMatch(/## 실제 동작/);
+  });
+
+  it('첨부 5개 초과 추가는 거부된다 (AttachmentZone 안내)', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement | null;
+    expect(input).toBeTruthy();
+    const mk = (n: number) => new File(['x'], `f${n}.png`, { type: 'image/png' });
+    await user.upload(input!, [mk(1), mk(2), mk(3), mk(4), mk(5), mk(6)]);
+    const status = await screen.findByRole('status');
+    expect(status.textContent ?? '').toMatch(/최대 5개/);
   });
 
   it('"Create another" 체크 후 제출 시 폼 초기화되고 다이얼로그 유지', async () => {

@@ -178,6 +178,7 @@ export interface CreateVocInput {
   assignee_id?: string | null;
   parent_id?: string | null;
   source?: string;
+  due_date?: string | null;
 }
 
 /**
@@ -190,8 +191,8 @@ export async function createVoc(input: CreateVocInput, authorId: string): Promis
   const r = await pool.query(
     `INSERT INTO vocs (
        title, body, status, priority, voc_type_id, system_id, menu_id,
-       assignee_id, parent_id, source, author_id
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+       assignee_id, parent_id, source, author_id, due_date
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
     [
       input.title,
       input.body ?? '',
@@ -204,9 +205,56 @@ export async function createVoc(input: CreateVocInput, authorId: string): Promis
       input.parent_id ?? null,
       input.source ?? 'manual',
       authorId,
+      input.due_date ?? null,
     ],
   );
   return r.rows[0] as Voc;
+}
+
+/**
+ * Insert a payload review row + flip vocs.review_status. feature-voc.md §9.4.5.
+ * Maps wire decision (approve/reject) → DB enum (approved/rejected) and updates
+ * vocs.review_status to the same DB enum (already supports approved|rejected).
+ */
+export interface PayloadReviewInsert {
+  voc_id: string;
+  reviewer_id: string;
+  decision: 'approved' | 'rejected';
+  comment: string | null;
+}
+
+export interface PayloadReviewRow {
+  id: string;
+  voc_id: string;
+  reviewer_id: string;
+  decision: 'approved' | 'rejected';
+  comment: string | null;
+  created_at: string;
+}
+
+export async function insertPayloadReview(input: PayloadReviewInsert): Promise<PayloadReviewRow> {
+  const pool = getPool();
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const r = await client.query(
+      `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
+         VALUES ($1, 'submission', $2, $3, $4)
+         RETURNING id, voc_id, reviewer_id, decision, comment, created_at`,
+      [input.voc_id, input.reviewer_id, input.decision, input.comment],
+    );
+    await client.query(`UPDATE vocs SET review_status = $1, updated_at = now() WHERE id = $2`, [
+      input.decision,
+      input.voc_id,
+    ]);
+    await client.query('COMMIT');
+    return r.rows[0] as PayloadReviewRow;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function listHistory(vocId: string): Promise<VocHistoryEntry[]> {

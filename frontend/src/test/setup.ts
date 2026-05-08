@@ -10,6 +10,12 @@ window.HTMLElement.prototype.setPointerCapture = vi.fn();
 window.HTMLElement.prototype.releasePointerCapture = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
+// jsdom lacks URL.createObjectURL/revokeObjectURL — used by AttachmentZone image thumbnails.
+if (typeof URL.createObjectURL !== 'function') {
+  URL.createObjectURL = vi.fn(() => 'blob:mock');
+  URL.revokeObjectURL = vi.fn();
+}
+
 // cmdk uses ResizeObserver which jsdom doesn't implement.
 if (typeof global.ResizeObserver === 'undefined') {
   global.ResizeObserver = class ResizeObserver {
