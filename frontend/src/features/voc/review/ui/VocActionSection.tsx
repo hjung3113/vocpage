@@ -43,7 +43,7 @@ export function VocActionSection({
   const history = useVocHistory(vocId);
   return (
     <div data-testid="drawer-actions">
-      <Tabs defaultValue="comment" data-pcomp="review-sections">
+      <Tabs defaultValue="comment" data-testid="review-sections">
         <TabsList variant="underline">
           <TabsTrigger variant="underline" value="comment">
             댓글

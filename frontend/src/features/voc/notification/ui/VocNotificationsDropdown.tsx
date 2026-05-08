@@ -19,7 +19,7 @@ export function VocNotificationsDropdown({
   onItemClick = noop,
 }: VocNotificationsDropdownProps) {
   return (
-    <div data-pcomp="voc-notif-dropdown">
+    <div data-testid="voc-notif-dropdown">
       <Popover>
         <NotifButton unreadCount={unreadCount} />
         <NotifPanel

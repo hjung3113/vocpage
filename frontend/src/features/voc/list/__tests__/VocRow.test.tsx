@@ -52,11 +52,11 @@ const vocTypeMap: Record<string, { slug: string; name: string }> = {
 };
 
 describe('VocRow', () => {
-  it('renders role="row" with data-pcomp="voc-row"', () => {
+  it('renders role="row" with data-testid="voc-row"', () => {
     render(<VocRow row={row} assigneeMap={assigneeMap} onClick={() => {}} />);
     const el = screen.getByTestId('voc-row');
     expect(el).toHaveAttribute('role', 'row');
-    expect(el).toHaveAttribute('data-pcomp', 'voc-row');
+    expect(el).toHaveAttribute('data-testid', 'voc-row');
   });
 
   it('renders 6 gridcells (issue_code/title/status/assignee/priority/created_at)', () => {

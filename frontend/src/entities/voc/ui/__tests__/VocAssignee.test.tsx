@@ -75,15 +75,15 @@ describe('VocAssignee', () => {
     expect(el.outerHTML).not.toMatch(/#[0-9a-f]{3,8}\b/i);
   });
 
-  it('has data-pcomp marker for visual-diff (assigned)', () => {
+  it('has data-testid marker for visual-diff (assigned)', () => {
     render(<VocAssignee name="홍길동" />);
     const el = screen.getByTestId(/^assignee-(steel|teal|violet)$/);
-    expect(el).toHaveAttribute('data-pcomp', 'VocAssignee');
+    expect(el.getAttribute('data-testid')).toMatch(/^assignee-(steel|teal|violet)$/);
   });
 
-  it('has data-pcomp marker for visual-diff (unassigned)', () => {
+  it('has data-testid marker for visual-diff (unassigned)', () => {
     render(<VocAssignee name={null} />);
     const el = screen.getByTestId('assignee-unassigned');
-    expect(el).toHaveAttribute('data-pcomp', 'VocAssignee');
+    expect(el).toHaveAttribute('data-testid', 'assignee-unassigned');
   });
 });

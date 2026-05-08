@@ -55,7 +55,6 @@ export function VocRow({ row, assigneeMap, vocTypeMap, selected = false, onClick
   return (
     <div
       role="row"
-      data-pcomp="voc-row"
       data-testid="voc-row"
       className={selected ? 'voc-row is-selected' : 'voc-row'}
       style={CONTAINER_STYLE}

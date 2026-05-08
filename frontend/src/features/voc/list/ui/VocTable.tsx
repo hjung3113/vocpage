@@ -56,7 +56,7 @@ export function VocTable({
   }, [rows, groupByStatus]);
 
   return (
-    <div data-pcomp="voc-table" data-testid="voc-table" className="voc-table-wrapper">
+    <div data-testid="voc-table" className="voc-table-wrapper">
       <div role="grid" aria-label="VOC 목록" className="voc-table-grid">
         <VocListHeader sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
         {!groups &&

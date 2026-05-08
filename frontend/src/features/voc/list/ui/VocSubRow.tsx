@@ -14,7 +14,6 @@ export function VocSubRow({ status, title, onClick, trailing }: VocSubRowProps) 
     <button
       type="button"
       data-testid="voc-sub-row"
-      data-pcomp="voc-sub-row"
       onClick={onClick}
       aria-label={`서브태스크 ${title} 열기`}
       style={{

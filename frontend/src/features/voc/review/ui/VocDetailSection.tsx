@@ -50,7 +50,7 @@ export function VocDetailSection({
 
   return (
     <VocSection title="분류" testId="voc-detail-panel">
-      <div data-pcomp="VocDetailSection">
+      <div data-testid="VocDetailSection">
         <PropRow label="시스템" testId="meta-system">
           {editable && systemOptions.length > 0 ? (
             <EditableSelect
