@@ -3,6 +3,9 @@ import session from 'express-session';
 import { authRouter } from '../../routes/auth';
 import { vocRouter } from '../../routes/voc';
 import { mastersRouter } from '../../routes/masters';
+import { noticesRouter } from '../../routes/notices';
+import { faqsRouter } from '../../routes/faqs';
+import { faqCategoriesRouter } from '../../routes/faq-categories';
 import { errorHandler } from '../../middleware/errorHandler';
 import { setPool } from '../../db';
 import type { Pool } from 'pg';
@@ -36,6 +39,9 @@ export function createTestApp(pool?: Pool, authMode = 'mock') {
   app.use('/api/auth', authRouter);
   app.use('/api/vocs', vocRouter);
   app.use('/api/masters', mastersRouter);
+  app.use('/api/notices', noticesRouter);
+  app.use('/api/faqs', faqsRouter);
+  app.use('/api/faq-categories', faqCategoriesRouter);
 
   app.use(errorHandler);
 
