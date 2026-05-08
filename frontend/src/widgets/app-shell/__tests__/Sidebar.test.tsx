@@ -46,7 +46,7 @@ describe('Sidebar — Linear 스타일', () => {
     renderSidebar();
     expect(screen.getByRole('link', { name: /VOC/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Dashboard/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /공지\/FAQ/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /공지사항/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /^FAQ$/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /^Tag$/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /알림/ })).toBeInTheDocument();

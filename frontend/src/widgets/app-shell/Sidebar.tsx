@@ -26,7 +26,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/voc', label: 'VOC', icon: MessageSquare },
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/notice', label: '공지/FAQ', icon: Megaphone },
+  { to: '/notice', label: '공지사항', icon: Megaphone },
   { to: '/faq', label: 'FAQ', icon: HelpCircle },
   { to: '/tags', label: 'Tag', icon: Tag },
   { to: '/notifications', label: '알림', icon: Bell },
