@@ -31,3 +31,9 @@
   필요. 본 PR 에서는 BE 강제룰을 FE 가 깨지 않도록 (1) 제목 200자 카운터,
   (2) 우선순위 read-only 락 두 변경만 반영. 나머지는 follow-up wave.
   영향: VocCreateTitleInput · VocCreateDetails 두 파일 한정.
+
+- **POST /api/vocs/:id/payload-review wire decision = `approve|reject`**.
+  근거: §9.4.5 도입. Wire 토큰은 action 형(`approve/reject`), DB enum 은
+  과거형(`approved/rejected`) — service 레이어에서 매핑한다. reject 시
+  comment 필수(zod superRefine). manager/admin gate 는 service 에서.
+  영향: contracts/voc/io.ts + backend/{routes,controllers,services,repository}/voc.ts.

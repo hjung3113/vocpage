@@ -8,6 +8,7 @@ import {
   vocCreateSchema,
   vocIdParamSchema,
   internalNoteCreateSchema,
+  payloadReviewSubmitSchema,
 } from '../validators/voc';
 
 const auth: RequestHandler = (req, res, next) => createAuthMiddleware()(req, res, next);
@@ -30,4 +31,9 @@ vocRouter.post(
   '/:id/notes',
   validate({ params: vocIdParamSchema, body: internalNoteCreateSchema }),
   controller.postNote,
+);
+vocRouter.post(
+  '/:id/payload-review',
+  validate({ params: vocIdParamSchema, body: payloadReviewSubmitSchema }),
+  controller.postPayloadReview,
 );

@@ -299,6 +299,34 @@ export const vocHandlers = [
     return HttpResponse.json(note);
   }),
 
+  http.post('/api/vocs/:id/payload-review', async ({ params, request }) => {
+    const { role, id: userId } = currentRole(request);
+    const row = store.find((r) => r.id === params.id);
+    if (!row) return envelope('NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+    if (role !== 'manager' && role !== 'admin') {
+      return envelope('FORBIDDEN', '검토 권한이 없습니다.');
+    }
+    const body = (await request.json()) as { decision: 'approve' | 'reject'; comment?: string };
+    if (body.decision === 'reject' && !body.comment) {
+      return HttpResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: 'reject 결정 시 comment 가 필요합니다.' } },
+        { status: 400 },
+      );
+    }
+    const decision = body.decision === 'approve' ? 'approved' : 'rejected';
+    return HttpResponse.json(
+      {
+        id: `eeeeeeee-0000-4000-8000-${String(Date.now()).slice(-12).padStart(12, '0')}`,
+        voc_id: String(params.id),
+        reviewer_id: userId,
+        decision,
+        comment: body.comment ?? null,
+        created_at: new Date().toISOString(),
+      },
+      { status: 201 },
+    );
+  }),
+
   http.get('/api/vocs/:id/history', async ({ params }) => {
     const sim = simulateError();
     if (sim) return sim;

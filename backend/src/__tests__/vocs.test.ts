@@ -175,6 +175,31 @@ jest.mock('../repository/voc', () => {
         return row;
       },
     ),
+    insertPayloadReview: jest.fn(
+      async (input: {
+        voc_id: string;
+        reviewer_id: string;
+        decision: 'approved' | 'rejected';
+        comment: string | null;
+      }) => {
+        const idx = store.findIndex((r) => r.id === input.voc_id);
+        if (idx >= 0) {
+          store[idx] = {
+            ...store[idx]!,
+            review_status: input.decision,
+            updated_at: new Date().toISOString(),
+          } as Row;
+        }
+        return {
+          id: `eeeeeeee-0000-4000-8000-${String(Date.now()).slice(-12).padStart(12, '0')}`,
+          voc_id: input.voc_id,
+          reviewer_id: input.reviewer_id,
+          decision: input.decision,
+          comment: input.comment,
+          created_at: new Date().toISOString(),
+        };
+      },
+    ),
     __reset: () => {
       store.length = 0;
       store.push(...fixtures.VOC_FIXTURES);
@@ -536,6 +561,44 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
     test('non-existent VOC id returns 404 NOT_FOUND', async () => {
       const agent = await loginAs('manager');
       const res = await agent.get('/api/vocs/00000000-0000-4000-8000-00000000ffff/history');
+      expect(res.status).toBe(404);
+    });
+  });
+
+  // ─── voc-completion Phase 6 — POST /api/vocs/:id/payload-review ───
+  describe('voc-completion §9.4.5 — POST /api/vocs/:id/payload-review', () => {
+    test('manager approve returns 201 + decision=approved', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent
+        .post(`/api/vocs/${liveVoc.id}/payload-review`)
+        .send({ decision: 'approve' });
+      expect(res.status).toBe(201);
+      expect(res.body.decision).toBe('approved');
+      expect(res.body.voc_id).toBe(liveVoc.id);
+    });
+
+    test('reject without comment returns 400 VALIDATION_ERROR', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent
+        .post(`/api/vocs/${liveVoc.id}/payload-review`)
+        .send({ decision: 'reject' });
+      expect(res.status).toBe(400);
+      expect(res.body.error?.code).toBe('VALIDATION_ERROR');
+    });
+
+    test('user role returns 403 FORBIDDEN', async () => {
+      const agent = await loginAs('user');
+      const res = await agent
+        .post(`/api/vocs/${liveVoc.id}/payload-review`)
+        .send({ decision: 'approve' });
+      expect(res.status).toBe(403);
+    });
+
+    test('non-existent VOC id returns 404 NOT_FOUND', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent
+        .post('/api/vocs/00000000-0000-4000-8000-00000000ffff/payload-review')
+        .send({ decision: 'approve' });
       expect(res.status).toBe(404);
     });
   });

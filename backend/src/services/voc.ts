@@ -22,6 +22,7 @@ import type {
   VocCreate,
   InternalNote,
   VocHistoryEntry,
+  PayloadReviewSubmit,
 } from '../../../shared/contracts/voc';
 
 function toListItem(v: ListVocsRow) {
@@ -181,6 +182,30 @@ export async function history(id: string, user: AuthUser): Promise<VocHistoryEnt
   const existing = await repo.getVocById(id, { includeDeleted });
   if (!existing) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
   return repo.listHistory(id);
+}
+
+/**
+ * Submit a Result Review decision. feature-voc.md §9.4.5.
+ * Manager/admin only — gated here (assertCanManageVoc only covers per-VOC
+ * mutation surfaces). 404 first when VOC absent so existence isn't leaked
+ * to authorized roles via 403.
+ */
+export async function submitPayloadReview(
+  id: string,
+  payload: PayloadReviewSubmit,
+  user: AuthUser,
+): Promise<repo.PayloadReviewRow> {
+  const existing = await repo.getVocById(id);
+  if (!existing) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+  if (user.role !== 'admin' && user.role !== 'manager') {
+    throw new HttpError(403, 'FORBIDDEN', '검토 권한이 없습니다.');
+  }
+  return repo.insertPayloadReview({
+    voc_id: id,
+    reviewer_id: user.id,
+    decision: payload.decision === 'approve' ? 'approved' : 'rejected',
+    comment: payload.comment ?? null,
+  });
 }
 
 export async function addNote(id: string, body: string, user: AuthUser): Promise<InternalNote> {

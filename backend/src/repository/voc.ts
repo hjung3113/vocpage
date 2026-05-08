@@ -211,6 +211,42 @@ export async function createVoc(input: CreateVocInput, authorId: string): Promis
   return r.rows[0] as Voc;
 }
 
+/**
+ * Insert a payload review row + flip vocs.review_status. feature-voc.md §9.4.5.
+ * Maps wire decision (approve/reject) → DB enum (approved/rejected) and updates
+ * vocs.review_status to the same DB enum (already supports approved|rejected).
+ */
+export interface PayloadReviewInsert {
+  voc_id: string;
+  reviewer_id: string;
+  decision: 'approved' | 'rejected';
+  comment: string | null;
+}
+
+export interface PayloadReviewRow {
+  id: string;
+  voc_id: string;
+  reviewer_id: string;
+  decision: 'approved' | 'rejected';
+  comment: string | null;
+  created_at: string;
+}
+
+export async function insertPayloadReview(input: PayloadReviewInsert): Promise<PayloadReviewRow> {
+  const pool = getPool();
+  const r = await pool.query(
+    `INSERT INTO voc_payload_reviews (voc_id, action, reviewer_id, decision, comment)
+       VALUES ($1, 'submission', $2, $3, $4)
+       RETURNING id, voc_id, reviewer_id, decision, comment, created_at`,
+    [input.voc_id, input.reviewer_id, input.decision, input.comment],
+  );
+  await pool.query(`UPDATE vocs SET review_status = $1, updated_at = now() WHERE id = $2`, [
+    input.decision,
+    input.voc_id,
+  ]);
+  return r.rows[0] as PayloadReviewRow;
+}
+
 export async function listHistory(vocId: string): Promise<VocHistoryEntry[]> {
   const pool = getPool();
   const r = await pool.query(

@@ -18,6 +18,7 @@ vi.mock('@entities/voc/api/vocApi', () => ({
     notes: vi.fn(),
     addNote: vi.fn(),
     history: vi.fn(),
+    submitPayloadReview: vi.fn(),
   },
 }));
 
@@ -71,6 +72,27 @@ describe('VocReviewPage — A5', () => {
     );
     renderPage(target.issue_code);
     await waitFor(() => expect(screen.getByTestId('voc-permission-gate')).toBeInTheDocument());
+  });
+
+  it('manager approve 클릭 시 submitPayloadReview 호출', async () => {
+    vi.mocked(vocApi.getByCode).mockResolvedValue(target);
+    vi.mocked(vocApi.history).mockResolvedValue([]);
+    vi.mocked(vocApi.submitPayloadReview).mockResolvedValue({
+      id: 'eeeeeeee-0000-4000-8000-000000000001',
+      voc_id: target.id,
+      reviewer_id: 'r',
+      decision: 'approved',
+      comment: null,
+      created_at: new Date().toISOString(),
+    });
+    renderPage(target.issue_code, 'manager');
+    await waitFor(() => expect(screen.getByTestId('payload-review-approve')).toBeInTheDocument());
+    await userEvent.click(screen.getByTestId('payload-review-approve'));
+    await waitFor(() =>
+      expect(vi.mocked(vocApi.submitPayloadReview)).toHaveBeenCalledWith(target.id, {
+        decision: 'approve',
+      }),
+    );
   });
 
   it('role=user → 편집 필드 disabled', async () => {

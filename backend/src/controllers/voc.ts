@@ -79,3 +79,20 @@ export async function postNote(req: Request, res: Response, next: NextFunction):
     next(err);
   }
 }
+
+export async function postPayloadReview(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const result = await service.submitPayloadReview(
+      req.params.id as string,
+      req.body as Parameters<typeof service.submitPayloadReview>[1],
+      user(req),
+    );
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+}
