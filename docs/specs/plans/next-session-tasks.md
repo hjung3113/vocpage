@@ -1,27 +1,30 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-05
-> 현재 위치: **Phase 8 Wave 1.6 진행 중** (η-batch 진입 — VOC 리뷰 페이지 고도화 C-20~C-23)
+> 최종 업데이트: 2026-05-09
+> 현재 위치: **`/voc` 단일 PR 통합 완성** (Wave 1.6/1.7 잔여 + follow-up 통합)
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → 활성 plan
+> **2026-05-09 정책**: 구현 정본 = `requirements.md` + `uidesign.md` 만. prototype 참조 종료.
 
 ---
 
 ## 활성 작업
 
-| Wave    | 정본 plan                                                                                                 | 상태                                                                                                                        |
-| ------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **FSD** | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md` | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                                        |
-| **1.6** | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) + [룰북](./wave-1-6-phase-c-precedent.md)            | 🟡 Phase C — α/β/γ/δ/ε 완료 (C-2~C-16) / **다음: η(C-20~C-23) VOC 리뷰 고도화 → ζ(C-17~C-19)** / Phase D는 η+ζ 전부 머지 후 |
-| **1.7** | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md)                                          | ✅ Phase A spec/contract 머지 (PR #185) / ⏳ Phase B(BE) → C(FE) → D(visual) — Wave 1.6 종료 후 진입                        |
+| Wave          | 정본 plan                                                                                                 | 상태                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **FSD**       | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md` | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                                     |
+| **/voc 완성** | `voc-completion.md` (다음 세션 신설)                                                                      | ⏳ Wave 1.6 잔여(η/ζ/D) + Wave 1.7 잔여(B/C/D) + linear-realign Phase 6 + 직전 follow-up 7건 + FU C-2 → **단일 PR 통합** |
+| **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                            | 🟡 잔여 작업은 `/voc 완성` 단일 PR 로 흡수. parity-driven phasing 종료.                                                  |
+| **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                | ✅ Phase A spec/contract 머지 (PR #185) / ⏳ B+C+D 는 `/voc 완성` 단일 PR 로 흡수.                                       |
 
 ### Hard-blocks
 
-- **Wave 2 (Dashboard)** + **Follow-up C-2 (seed UUID v4)** : Wave 1.6 종료 전까지 진입 금지.
-- **Wave 1.7 Phase B 이후**: Wave 1.6 종료 후.
+- **Wave 2 (Dashboard)** : `/voc 완성` 단일 PR 머지 전까지 진입 금지.
+- **Follow-up C-2 (seed UUID v4)** : `/voc 완성` 단일 PR 에 포함.
+- **Wave 1.7 Phase B/C/D**: `/voc 완성` 단일 PR 에 포함.
 
 ### 진행 순서
 
-~~FSD Migration (완료)~~ → Wave 1.6 잔여 (**η C-20∥C-21∥C-22∥C-23** → ζ C-17 → C-18∥C-19 → Phase D) → Wave 1.7 B/C/D → Follow-up C-2 → Wave 2.
+~~FSD Migration (완료)~~ → **`/voc 완성` 단일 PR** (Wave 1.6 잔여 η/ζ/D + Wave 1.7 B/C/D + linear-realign Phase 6 + follow-up 7건 + FU C-2) → Wave 2 (Dashboard).
 
 ---
 
@@ -34,9 +37,9 @@
 | 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint, CI, PR template | ✅ PR #102                         |
 | 1    | 기준 화면 — VOC 리스트 + 검토 드로어 vertical slice + 회고 + RTL 보강                                         | ✅ #110/#111/#112/#113 + 수락 #114 |
 | 1.5  | Wave 1 보강 — `/voc` 시각 동등화 + Playwright e2e                                                             | ✅ PR #125 머지 (2026-05-02)       |
-| 1.6  | `/voc` prototype 일치화 — Phase A 분해 / B 토큰 / C 컴포넌트 rebuild 19개 / D 종합 검증                       | 🟡 진행 중 (위 표 참조)            |
-| 1.7  | VOC 등록 모달 정합화 — A spec → B BE master → C FE rebuild → D visual diff                                    | 🟡 Phase A 머지, B~D 대기          |
-| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                         | Wave 1.6/1.7 종료 후               |
+| 1.6  | `/voc` 시각·구조 정합 (history) — `/voc 완성` 단일 PR 에 흡수                                                 | 🟡 위 표 참조                      |
+| 1.7  | VOC 등록 모달 — A spec 머지 / B+C+D 는 `/voc 완성` 단일 PR 에 흡수                                            | 🟡 위 표 참조                      |
+| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                         | `/voc 완성` 단일 PR 머지 후        |
 | 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users)                                                  | 병렬 가능                          |
 | 4    | 공지/FAQ + Notice popup                                                                                       | 병렬 가능                          |
 | 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 (N-03 BE polling)                                                          | close gate                         |
@@ -96,6 +99,6 @@ migration 013 dev role / `assertCanManageVoc` 헬퍼 / FE/BE Role union `'dev'` 
 
 ## 구현 진입 상시 룰
 
-- 구현 중 `requirements.md` (및 `feature-*.md`, `dashboard.md`) 와 `prototype/prototype.html` 사이에 **불일치 발견 시 임의 결정 금지** — 사용자에게 먼저 질문.
-- 질문 형식: "요구사항 §X: A / 프로토타입: B — 어느 쪽 기준으로 구현할까요?" (양쪽 라인/섹션 명시)
+- **2026-05-09~**: 구현 정본은 `requirements.md` (+ `feature-*.md`, `dashboard.md`) + `uidesign.md` 만. `prototype/` 비교·픽셀 측정·DOM 인용 금지.
+- spec 내부 불일치(예: `requirements.md §X` vs `feature-voc.md §Y`) 발견 시 임의 결정 금지 — 사용자에게 라인/섹션 명시하여 질문.
 - 사용자 답변 확정 후 정답 쪽을 정본으로 두고 나머지 동기화 커밋. 동기화 없이 구현 진행 금지.

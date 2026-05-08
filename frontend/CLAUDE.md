@@ -6,7 +6,7 @@ React SPA for the VOC management system. Read root `CLAUDE.md` first for cross-c
 
 ## Status
 
-Phase 8 Wave 1.5-β merged (`/voc` prototype-equivalent UI). Current `src/` tree: `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, `api/`, `components/{common,voc,layout,ui}/`, `features/`, `contexts/`, `hooks/`, `lib/`, `mocks/` (MSW v2 handlers), `styles/`, `test/`. Next: Wave 2 (Dashboard) — see `docs/specs/plans/next-session-tasks.md`.
+`/voc` 단일 PR 통합 완성 작업 중 (정본: `docs/specs/plans/voc-completion.md` — 다음 세션 신설). Current `src/` tree: `main.tsx`, `router.tsx`, `tokens.ts`, `pages/`, `api/`, `components/{common,voc,layout,ui}/`, `features/`, `contexts/`, `hooks/`, `lib/`, `mocks/` (MSW v2 handlers), `styles/`, `test/`. Next: Wave 2 (Dashboard).
 
 ## Commands
 
@@ -17,23 +17,19 @@ npm run test                             # Vitest
 npm run test -- path/to/file.test.ts     # Single test file
 ```
 
-## Working from the Prototype
+## Implementation Reference (2026-05-09~)
 
-The prototype (`prototype/`) is a **visual/UX reference**, not source code. **Never** copy its HTML/CSS/JS into React.
+정본은 `docs/specs/requires/requirements.md` + `docs/specs/requires/uidesign.md` 두 문서뿐. `prototype/` 디렉터리는 더 이상 reference 가 아니다 (parity·픽셀·DOM 인용 금지).
 
-Before coding a screen, extract from the prototype:
+화면 구현 시:
 
-- Pages and layout, reusable components, props/data shape, UI states, interactions, responsive behavior
+- requirements.md 의 화면/기능 사양 → uidesign.md 의 토큰·레이아웃·상태로 치환
+- Reuse existing components first; 새 컴포넌트는 UI/로직 반복 시에만
+- 페이지 컴포넌트는 작게, Tailwind 중복은 `@apply` / 컴포넌트로 추출
+- 데이터가 있는 경우 TypeScript 타입 먼저 (no `any`)
+- 항상 처리: loading / error / empty / hover / focus / responsive
 
-Implementation rules:
-
-- Rebuild with clean React structure — preserve the prototype's visual result, not its DOM
-- Reuse existing components first; extract a new component only when UI/logic repeats
-- Keep page components small; avoid duplicated Tailwind patterns (extract via `@apply` or a component)
-- Define TypeScript types **before** UI when data is involved; never use `any`
-- Always handle: loading, error, empty, hover, focus, and responsive states
-
-Flow: analyze prototype → map components → define types → build with dummy data → wire interactions → connect API → polish states/responsive → visual diff vs prototype.
+Flow: read requirements + uidesign → map components → define types → build with dummy data → wire interactions → connect API → polish states/responsive.
 
 ## Architecture
 

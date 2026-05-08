@@ -2,79 +2,36 @@
 
 ## 다음 세션 시작점
 
-→ **현재: VOC Linear Realignment Phase 2~5 완료 + PR 생성** (정본: `docs/specs/plans/voc-linear-realign.md`).
-   feat/voc-review-ui-linear-jira 브랜치 5 commit (`053f782` Phase 2 sidebar/topbar/filter / `ac9d597` Phase 3 table+icons / `30e44b8` Phase 3 follow-up row 36px / `ba2e73a` Phase 4 review / `d446922` Phase 5 status grouping) — 1 PR로 통합 발행.
-   검증: 436/436 vitest PASS / typecheck PASS / Playwright 50/51 PASS / code-reviewer Blocking 0.
-   **다음 세션 P1 follow-up (PR 머지 전 또는 후속 PR)**:
-   1) Review sheet `상태` row icon 누락 (현재 text-only) — type와 일관 위해 icon+text 권장
-   2) `VocStatusGroupHeader` 인라인 마법값(12px·11px·14·8px·tracking) 토큰화
-   3) `Sidebar` `13.5px` 비표준 step — `uidesign.md §typography` 등재 또는 13/14px 정렬
-   4) `VocStatusFilters`의 status별 pressed 토큰(`STATUS_TOKEN`) 제거 의도 확인 — plan 명시 외 회귀 가능성
-   5) `useLocalStorageState`: defaultValue ref/모듈 상수화, mount-time write skip
-   6) Phase 5 그룹 collapse 통합 테스트 추가 (현재 unit만)
-   7) `VocStatusGroupHeader` `data-testid` 한국어 → slug
-→ **이전 컨텍스트: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
-→ **이전 컨텍스트: Wave 1.6 η-batch C-20 진입** (FSD 전 단계 완료 / ε batch C-14~C-16 완료)
-   **다음:** Wave 1.6 η-batch — VOC 리뷰 페이지 고도화 우선 (C-20~C-23 병렬) → 이후 ζ(C-17~C-19) → Phase D.
-   **PR #232-236 리뷰 피드백 반영 완료 (2026-05-06)**: formatActivityTime lib 분리+단위테스트, SubTaskListResponse shared/contracts 이동, dead props 4개 제거, comments/subtasks/history 쿼리 VocActionSection co-location, 적대적 리뷰 1회. fix/review-feedback-232-236 브랜치 → PR 머지.
-   §7.2 batch 순서: ~~α~~ → ~~β~~ → ~~γ~~ → ~~δ~~ → ~~ε~~ → **η(C-20∥C-21∥C-22∥C-23)** → ζ(C-17 → C-18∥C-19) → Phase D.
-   FSD Migration: ~~Step 0~7 전부 완료~~ (PR #207~#220) — `docs/specs/archive/plans/fsd-migration.md`.
-   룰북: `docs/specs/plans/wave-1-6-phase-c-precedent.md`.
-   정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`.
+→ **정책 변경 (2026-05-09): prototype 참조 종료. 이후 `/voc` 구현은 `requirements.md` + `uidesign.md` 만 보고 진행.**
+   parity-driven phasing(Wave 1.6 η/ζ/D, Wave 1.7 B/C/D, voc-linear-realign Phase 6, 직전 PR follow-up 7건)을
+   **하나의 PR로 묶어 `/voc` 페이지 완성**까지 일괄 진행한다. (대시보드 = Wave 2 진입 전 마지막 단계)
+
+→ **다음 세션 진입점: `feat/voc-completion` 브랜치에서 단일 PR 작성 시작**
+   1. `feat/voc-review-ui-linear-jira` 머지 상태 확인 → 머지 완료 시 main 기준으로 새 브랜치 생성
+   2. requirements.md + uidesign.md 만 읽고 `/voc`(목록·검토·등록) 잔여 기능/시각 격차 식별
+   3. 식별 결과를 `docs/specs/plans/voc-completion.md` 단일 plan으로 신설(prototype 언급 금지)
+   4. plan 승인 후 단일 브랜치에서 BE+FE 통합 구현·테스트 → 1 PR
+   5. 머지 후 Wave 2(Dashboard) 진입
+
+→ **포함 범위 (단일 PR)**
+   - 직전 follow-up 7건 (status row icon / 토큰화 / 13.5px 비표준 / STATUS_TOKEN 의도 / useLocalStorageState / collapse 통합 테스트 / data-testid slug)
+   - Wave 1.6 잔여: η(C-20 VocTagPills · C-21 VocActivityTimeline · C-22 VocAttachmentUploadZone · C-23 VocErrorSimSelector) / ζ(C-17 SidebarUserSwitcher · C-18 Sidebar · C-19 Topbar) / Phase D 검증
+   - Wave 1.7 잔여: BE master endpoints (systems/menus) + FE 모달 rebuild (2×2 grid · medium 강제 · 본문↔첨부 동기화 · 5개·10MB cap · 자동 태그 row · 푸터 안내)
+   - voc-linear-realign Phase 6 검증 (Playwright + code-reviewer)
+   - Follow-up C-2 seed UUID v4
+   - 8-PR1 일부 (`/voc` 회귀에 영향 가는 항목 한정: F4·F6 role union, F10/8-M4 토큰화)
+   기준은 모두 requirements.md + uidesign.md. prototype 비교 금지.
+
+→ **제외(별도 wave)**: 8-PR2/PR3 운영 차단 migration, 8-M1~M3 명세 보강, NextGen 백로그 — Phase 8 close 단계로 분리.
+
+→ **이전 컨텍스트(참고만)**: Linear Realign 5 commit(`053f782`/`ac9d597`/`30e44b8`/`ba2e73a`/`d446922`) 검증 436/436 vitest PASS, Playwright 50/51 PASS, code-reviewer Blocking 0.
 
 ## Active Waves
 
-**Wave 1.6 — `/voc` prototype parity** (정본: `wave-1-6-voc-parity.md`)
-- ✅ Phase A 분해 (PR #126) / B 토큰 갭 (PR #128, violet 보강 #132) / B-add-2 chip 토큰 (#142)
-- 🟡 Phase C — α/β/γ/δ/**ε** 완료 (C-13 #192, C-14 #194, C-15 #197, C-16 #196 머지). 활동 패널 UI 개선 PR #232~#234 머지 완료 (언더라인 탭 variant, history/comment 아바타 레이아웃, ActivityAvatar 추출, mock 데이터 연결). **다음: 코드 리뷰 수령 후 η 진입**
-- ⛔ Phase D — Phase C 전체 batch 머지 후 진입
+**`/voc` 완성 — 단일 PR 통합** (정본: `docs/specs/plans/voc-completion.md` — 다음 세션 신설)
+- ⏳ plan 신설 → BE+FE 단일 브랜치 → 1 PR → 머지 → Wave 2 진입
+- 기준 문서: `docs/specs/requires/requirements.md` + `docs/specs/requires/uidesign.md` 만
+- prototype/ 비교·참조 금지 (governance 갱신: CLAUDE.md, AGENTS.md, frontend/CLAUDE.md, backend/CLAUDE.md)
 
-**Wave 1.7 — VOC 등록 모달 정합화** (정본: `wave-1-7-voc-create-modal.md`, 사양: `feature-voc.md §9.11`)
-- ✅ Phase A — spec/contract 머지 (PR #185, 2026-05-03)
-- ⏳ Phase B(BE master endpoints) → C(FE 모달 rebuild) → D(visual diff) — Wave 1.6 종료 후 진입
-
-## Hard-blocks
-
-- Wave 2 (Dashboard) 및 Follow-up C-2 (seed UUID v4): Wave 1.6 종료 전까지 진입 금지.
-- Wave 1.7 Phase B 이후: Wave 1.6 종료 후.
-
-## 직전 머지 (참고용, 상세는 `git log` / archive)
-
-- PR #234 (2026-05-06) — refactor: ActivityAvatar + formatActivityTime 추출 (VocComment/VocHistory 중복 제거).
-- PR #233 (2026-05-06) — feat: comment/subtask mock 데이터 연결 (MSW handler, vocApi, useDrawerQueries 분리).
-- PR #232 (2026-05-06) — feat: underline tab variant (cva) + VocHistory/VocComment 아바타 레이아웃.
-- PR #231 (2026-05-05) — refactor: voc structure cleanup.
-- PR #189 (2026-05-03) — `scripts/session-stats.ts` 추가 (Claude transcript analyzer).
-- PR #188 (2026-05-03) — `.claude/CLAUDE.md` FE test batch 명령에 `-- --run` 추가.
-- PR #187 (2026-05-03) — Wave 1.6 **C-12 VocReviewDrawer** shell parity.
-  I-2 approved-lock + `VocReviewMetaPanel` (7-field grid) + DialogDescription sr-only.
-  4-reviewer 적대적 패널 7 fix-required 반영(P0 3 / P1 4) + 5건 defer(C-13 후속).
-  본문/서브태스크/첨부 dropzone/Toast Editor/댓글리스트 재설계는 C-13~16에서 처리.
-  FE 350/350 green, typecheck/lint clean.
-
-## Wave 1.5-γ defer 항목 (별도 PR)
-
-- VocCreateModal RHF+Zod resolver 마이그레이션
-- DOMPurify customHTMLSanitizer (defense-in-depth)
-- VocAdvancedFilters tag/voc_type chip 테스트 보강
-- NativeSelect 단위 테스트
-- systems/menus placeholder UUID → Wave 3 admin masters 연결
-- openapi guard 확장 (VocListQuery + masters 3 schema)
-
-## Wave 1.6 follow-up (Phase D 또는 별도 PR)
-
-- a11y audit — C1.D5 aria-label 중복 패턴 재검토
-- eslint `no-restricted-imports` — `shared/contracts/voc/*` deep path 금지 (C1.D6)
-- grep-based CI — `VOC_*_SLUG` 0 hits (C1.D2)
-- `--status-purple` (hue 290°, 0 callers) 사용 시점 — `--status-processing` family hue 충돌 재검토
-- `vocGridLayout.ts` `--sp-5` 시맨틱 토큰 승격 여부 (Issue #166 후속)
-- badge-family `font-size` 통일 (C-1 11px vs C-2 11.5px)
-- mock data priority `low` 보강
-- `p-${priority}` 암묵 className → 명시적 cssClass 필드
-- `--status-*` 토큰 `tokens.ts` SSOT 마이그
-- uidesign §11~§14 stable slug anchor
-
----
-
-> 누적 이력(Wave 1~3, Wave 1.5/1.6 상세)은 `docs/specs/plans/progress-archive.md` 참조.
-> 다음 작업은 본 파일 첫 30줄로 충분 — 상세는 plan 문서 cite.
+**Wave 2 — Dashboard** (정본: `docs/specs/requires/dashboard.md`)
+- ⛔ `/voc` 완성 PR 머지 후 진입

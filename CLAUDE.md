@@ -18,12 +18,11 @@ Three-tier app: React SPA → Express REST API → PostgreSQL.
 
 - Frontend: React + TypeScript + Vite + Tailwind v4 → `frontend/CLAUDE.md`
 - Backend: Node + Express + TypeScript + PostgreSQL/pgvector → `backend/CLAUDE.md`
-- Prototype: static HTML visual sandbox → `prototype/CLAUDE.md`
 - Container: Docker Compose (`docker compose up` starts FE + BE + Postgres)
 
 **Rule:** folder-level `CLAUDE.md` files are the project map. Before code investigation or editing, use this root file plus the nearest relevant sub-directory `CLAUDE.md` files to choose likely folders/domains. This file covers cross-cutting governance only.
 
-**Prototype-as-reference (shared FE/BE principle):** the prototype is a visual + behavioral reference, **not** production architecture. FE preserves UX while rebuilding cleanly; BE infers real requirements and defines stable contracts. Never copy prototype code directly into production. Detail rules: `frontend/CLAUDE.md` and `backend/CLAUDE.md`.
+**Implementation reference (2026-05-09~):** `docs/specs/requires/requirements.md` + `docs/specs/requires/uidesign.md` 만 정본. `prototype/` 디렉터리는 더 이상 시각·동작 reference 가 아니다. parity 비교, 픽셀 측정, prototype DOM/CSS 인용 모두 금지. 기존 plan/문서의 prototype 언급은 history 로만 취급한다.
 
 ## Design System (canonical hard rule)
 
@@ -104,7 +103,7 @@ Rules:
 
 - **Irreversible**: stop and ask. State both options + rationale. No proceeding under 90% confidence.
 - **Reversible**: state the assumption in one line, proceed, report what was done in the end-of-turn summary. Do not block on user response for reversible decisions.
-- **Visual-surface decisions** (anything affecting `/voc` parity, prototype-as-reference output) are treated as irreversible during a parity wave (currently Wave 1.6) — keep the gate.
+- **Visual-surface decisions** (anything affecting `/voc` 시각 결과)는 `uidesign.md` 토큰·구조와 어긋나면 irreversible 로 취급 — 토큰 정의 변경은 spec 갱신이 선결.
 
 ### Engineering rules
 
