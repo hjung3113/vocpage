@@ -2,36 +2,37 @@
 
 ## 다음 세션 시작점
 
-→ **정책 변경 (2026-05-09): prototype 참조 종료. 이후 `/voc` 구현은 `requirements.md` + `uidesign.md` 만 보고 진행.**
-   parity-driven phasing(Wave 1.6 η/ζ/D, Wave 1.7 B/C/D, voc-linear-realign Phase 6, 직전 PR follow-up 7건)을
-   **하나의 PR로 묶어 `/voc` 페이지 완성**까지 일괄 진행한다. (대시보드 = Wave 2 진입 전 마지막 단계)
+→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기**
+   머지는 사용자. 머지 후 Wave 2(Dashboard) 진입.
 
-→ **다음 세션 진입점: `feat/voc-completion` 브랜치에서 단일 PR 작성 시작**
-   1. `feat/voc-review-ui-linear-jira` 머지 상태 확인 → 머지 완료 시 main 기준으로 새 브랜치 생성
-   2. requirements.md + uidesign.md 만 읽고 `/voc`(목록·검토·등록) 잔여 기능/시각 격차 식별
-   3. 식별 결과를 `docs/specs/plans/voc-completion.md` 단일 plan으로 신설(prototype 언급 금지)
-   4. plan 승인 후 단일 브랜치에서 BE+FE 통합 구현·테스트 → 1 PR
-   5. 머지 후 Wave 2(Dashboard) 진입
+→ **PR 본문 = `docs/voc-completion-single-pr` 9 commit + driver D-1~D-5 PASS evidence + 머지 요청 1줄**
+   - Phase B (BE master + create 강제룰) — `ad1ef50`
+   - Phase C minimal + major (모달 200자 카운터·priority lock·2×2 grid·cascade·body skeleton·첨부 sync·auto-tag·send-icon) — `c56af67` + `b85240a`
+   - Wave 1.6 잔여 (SidebarUserSwitcher · UploadZone thumb · ActivityTimeline · ErrorSimSelector · Sidebar/Topbar 폴리시) — `dc4527c`
+   - Phase 6 (payload-review BE/FE + Playwright spec) — `a8c08ca` + `64069e2`
+   - Follow-up 7건 (status icon · 토큰화 · 13.5px · ReviewStatus · collapse test · data-testid slug) — `d266bd7`
+   - Code-review fix B-1 / H-1 / H-2 (errorSim 격리 · 권한 헬퍼 통일 · INSERT+UPDATE 트랜잭션) — `97e002c`
 
-→ **포함 범위 (단일 PR)**
-   - 직전 follow-up 7건 (status row icon / 토큰화 / 13.5px 비표준 / STATUS_TOKEN 의도 / useLocalStorageState / collapse 통합 테스트 / data-testid slug)
-   - Wave 1.6 잔여: η(C-20 VocTagPills · C-21 VocActivityTimeline · C-22 VocAttachmentUploadZone · C-23 VocErrorSimSelector) / ζ(C-17 SidebarUserSwitcher · C-18 Sidebar · C-19 Topbar) / Phase D 검증
-   - Wave 1.7 잔여: BE master endpoints (systems/menus) + FE 모달 rebuild (2×2 grid · medium 강제 · 본문↔첨부 동기화 · 5개·10MB cap · 자동 태그 row · 푸터 안내)
-   - voc-linear-realign Phase 6 검증 (Playwright + code-reviewer)
-   - Follow-up C-2 seed UUID v4
-   - 8-PR1 일부 (`/voc` 회귀에 영향 가는 항목 한정: F4·F6 role union, F10/8-M4 토큰화)
-   기준은 모두 requirements.md + uidesign.md. prototype 비교 금지.
-
-→ **제외(별도 wave)**: 8-PR2/PR3 운영 차단 migration, 8-M1~M3 명세 보강, NextGen 백로그 — Phase 8 close 단계로 분리.
-
-→ **이전 컨텍스트(참고만)**: Linear Realign 5 commit(`053f782`/`ac9d597`/`30e44b8`/`ba2e73a`/`d446922`) 검증 436/436 vitest PASS, Playwright 50/51 PASS, code-reviewer Blocking 0.
+→ **D-1~D-5 evidence (driver `voc-completion-driver.md`)**
+   - D-1 기능: §2.2 사용자 흐름 / §2.3 처리 lane / §8.16 Result Review / §13.3 등록→검토→완료 1바퀴 — 코드 PASS
+   - D-2 시각: token-only / spec 정합 — `rg` hex/oklch 외부 0건
+   - D-3 테스트: FE 469/469 PASS · BE 111/118 PASS (+7 todo) · FE lint clean · BE+FE typecheck clean · Playwright spec 작성(실행은 docker compose 기동 필요)
+   - D-4 무결성: shared/contracts ↔ openapi ↔ BE 응답 정합 / `scripts/check-fixture-seed-parity.ts` PASS / prototype/ 활성 인용 0건
+   - D-5 운영: `docs/specs/reviews/voc-completion-decisions.md` append, 본 progress + next-session-tasks 동기화
 
 ## Active Waves
 
-**`/voc` 완성 — 단일 PR 통합** (정본: `docs/specs/plans/voc-completion.md` — 다음 세션 신설)
-- ⏳ plan 신설 → BE+FE 단일 브랜치 → 1 PR → 머지 → Wave 2 진입
-- 기준 문서: `docs/specs/requires/requirements.md` + `docs/specs/requires/uidesign.md` 만
-- prototype/ 비교·참조 금지 (governance 갱신: CLAUDE.md, AGENTS.md, frontend/CLAUDE.md, backend/CLAUDE.md)
+**`/voc` 완성 — 단일 PR (PR open 대기)**
+- ✅ 9 commit, BE/FE green, code-review FIX-THEN-MERGE 지적 모두 처리
+- ⏳ 사용자 PR open + merge → Wave 2 진입
 
 **Wave 2 — Dashboard** (정본: `docs/specs/requires/dashboard.md`)
 - ⛔ `/voc` 완성 PR 머지 후 진입
+
+## 후속 (Medium/Low — 본 PR 외 follow-up bucket)
+
+- M-1 `computeInitialDueDate` Date.now() injectable 파라미터 (테스트 flake 회피)
+- M-2 `PayloadReviewActions` mutation onError 사용자 피드백
+- M-3 `decision: 'approve'|'reject'` enum 변경 — changelog 표기
+- L-1 `VocErrorSimSelector` 멀티탭 동기화
+- L-2 `VocActivityTimeline` 정렬 secondary key

@@ -9,18 +9,16 @@
 
 ## 활성 작업
 
-| Wave          | 정본 plan                                                                                                 | 상태                                                                                                                     |
-| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **FSD**       | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md` | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                                     |
-| **/voc 완성** | `voc-completion.md` (다음 세션 신설)                                                                      | ⏳ Wave 1.6 잔여(η/ζ/D) + Wave 1.7 잔여(B/C/D) + linear-realign Phase 6 + 직전 follow-up 7건 + FU C-2 → **단일 PR 통합** |
-| **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                            | 🟡 잔여 작업은 `/voc 완성` 단일 PR 로 흡수. parity-driven phasing 종료.                                                  |
-| **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                | ✅ Phase A spec/contract 머지 (PR #185) / ⏳ B+C+D 는 `/voc 완성` 단일 PR 로 흡수.                                       |
+| Wave          | 정본 plan                                                                                                 | 상태                                                                                                               |
+| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **FSD**       | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md` | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                               |
+| **/voc 완성** | [`voc-completion-driver.md`](./voc-completion-driver.md)                                                  | 🟢 `docs/voc-completion-single-pr` 9 commit, FE 469 / BE 111 PASS, code-review B-1·H-1·H-2 처리 — **PR open 대기** |
+| **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                            | ✅ 잔여 η/ζ/D 모두 `/voc 완성` 단일 PR 로 흡수.                                                                    |
+| **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR 로 흡수.                                                      |
 
 ### Hard-blocks
 
 - **Wave 2 (Dashboard)** : `/voc 완성` 단일 PR 머지 전까지 진입 금지.
-- **Follow-up C-2 (seed UUID v4)** : `/voc 완성` 단일 PR 에 포함.
-- **Wave 1.7 Phase B/C/D**: `/voc 완성` 단일 PR 에 포함.
 
 ### 진행 순서
 
