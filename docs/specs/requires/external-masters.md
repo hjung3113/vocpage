@@ -1,7 +1,13 @@
 # 외부 마스터 연동 명세
 
-> 상태: 2026-04-24 확정 (설비 마스터 MSSQL 스키마 TBD)
-> 연관 스펙: `requirements.md §16.3`
+> 상태: 2026-04-24 확정 (설비 마스터 MSSQL 스키마 TBD) · 2026-05-09 OQ-2 read 권한 추가
+> 연관 스펙: `requirements.md §16.3`, `docs/adr/0004-admin-permission-model.md`
+
+## 0. Admin 페이지 read 권한 (OQ-2 Option B, 2026-05-09 grill 결정)
+
+- **Read** (목록·status 조회): **Manager+ + Dev**. Dev 는 본인 담당 VOC 가 외부 마스터 의존하므로 status 모니터링용 read 허용 (mutate 차단).
+- **Refresh trigger** (`POST /api/admin/masters/refresh`): Manager 이상 (`requirements.md §16.3` 기존 룰 유지).
+- **Sidebar 노출**: Admin / Manager / Dev. User 미노출.
 
 ## 1. 마스터 3종 개요
 

@@ -530,6 +530,21 @@ Three distinct tiers for scannable information density:
 - **Gap between sidebar sections**: `8px` minimum spacing between the last item of one group and the label of the next
 - **Section label purpose**: Acts as a visual divider — must have enough top padding (≥14px) to feel separate from the preceding nav group
 
+### Sidebar Admin Group — Item Order
+
+Fixed top-to-bottom order for the `관리자` (admin) section. Visual order only.
+
+| Order | Label            |
+| ----- | ---------------- |
+| 1     | Result Review    |
+| 2     | Users            |
+| 3     | External Masters |
+| 4     | Tag Master       |
+| 5     | Trash            |
+
+- Active state styling reuses the base `Sidebar Navigation Items` rules; no admin-specific colour overrides.
+- Inter-item spacing follows the `Sidebar Spacing` rules above (`8px` section gap, `10px 12px` nav-item padding).
+
 ### Content Width Policy
 
 All page content areas expand freely with screen width. No per-page `max-width` constraint on the content body.

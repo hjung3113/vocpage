@@ -8,7 +8,7 @@
 
 - **Hard-block**: Wave 2 (Dashboard) 머지 완료 후에만 진입. 현재 `next-session-tasks.md` §"활성 작업"은 Wave 2 hard-block 명시.
 - **사용자 승인**: 본 plan 의 §3 결정·§5 ADR 결정·§6 Phase 게이트가 모두 사용자 승인된 후 Phase A 진입.
-- **ADR 결정 의존**: [`docs/adr/0004-admin-permission-model.md`](../../adr/0004-admin-permission-model.md) + [`docs/adr/0005-trash-restore-policy.md`](../../adr/0005-trash-restore-policy.md) 가 사용자 결정 (Status: Accepted) 으로 전환된 후 Phase B/C 진입 가능.
+- **ADR 결정 의존**: [`docs/adr/0004-admin-permission-model.md`](../../adr/0004-admin-permission-model.md) (Accepted 2026-05-09) + [`docs/adr/0005-trash-restore-policy.md`](../../adr/0005-trash-restore-policy.md) (Accepted 2026-05-09). Phase B/C 진입 unblock.
 
 ## 1. 배경
 
@@ -22,10 +22,10 @@
 
 | 화면 | 진입 동선 | 권한 (spec 인용) | FE 라우트 | BE 라우트 (신규) | 마이그 |
 | --- | --- | --- | --- | --- | --- |
-| **Tag Master** | 사이드바 `관리자` 그룹 → "태그 마스터" | Admin/Manager (`feature-voc.md §9.4.6`) — **§15.3 과 불일치, OQ-1** | `/admin/tags` | `GET /api/admin/tags` · `POST` · `PATCH /:id` · `DELETE /:id` · `POST /:id/merge` | 013 (`tags.is_external` / `tags.merged_into_id` / `tag_rules.suspended_until`) |
+| **Tag Master** | 사이드바 `관리자` 그룹 → "태그 마스터" | Manager+ add/edit · Admin only merge/외부잠금/영구삭제 (ADR 0004 Option D) · Read = Admin/Manager/Dev | `/admin/tags` | `GET /api/admin/tags` · `POST` · `PATCH /:id` · `DELETE /:id` · `POST /:id/merge` | 014 (`tags.is_external` / `tags.merged_into_id` / `tag_rules.suspended_until`) |
 | **Trash** | 사이드바 `관리자` 그룹 → "휴지통" | Admin only (`§15.4` + `feature-voc.md §9.4.7`) | `/admin/trash` | `GET /api/admin/vocs/trash` · `PATCH /api/vocs/:id/restore` | 015 (`vocs.deleted_by` / `voc_restore_log`) |
-| **External Masters** | 사이드바 `관리자` 그룹 → "외부 마스터" | Manager+ refresh, **읽기 권한 OQ-2** | `/admin/masters` | `POST /api/admin/masters/refresh` (기존 §16.3) + `GET /api/admin/masters/status` (신규) | 없음 (메모리 캐시 + JSON 파일) |
-| **Users** | 사이드바 `관리자` 그룹 → "사용자" | Admin only (§15.2 D14, §2.3) | `/admin/users` | `GET /api/admin/users` · `PATCH /api/admin/users/:id` (role, is_active) | 없음 (012 = 별 트랙으로 선행 — `migration-012-draft.md`) |
+| **External Masters** | 사이드바 `관리자` 그룹 → "외부 마스터" | Manager+ refresh · Read = Manager+ + Dev (ADR 0004 OQ-2 Option B) | `/admin/masters` | `POST /api/admin/masters/refresh` (기존 §16.3) + `GET /api/admin/masters/status` (신규) | 없음 (메모리 캐시 + JSON 파일) |
+| **Users** | 사이드바 `관리자` 그룹 → "사용자" | Admin only (§15.2 D14, §2.3). Audit = `user_role_log` (마이그 017, OQ-3 Option A) | `/admin/users` | `GET /api/admin/users` · `PATCH /api/admin/users/:id` (role, is_active) | 017 (`user_role_log` 별 테이블) — 012 (`users.role` enum) 별 트랙 선행 |
 
 ### 2.2 Out-of-scope (이 Wave 에서 다루지 않음)
 
@@ -37,26 +37,26 @@
 
 ### 2.3 Touch budget (변경 / 비변경)
 
-- **변경**: `frontend/src/features/admin/**` (신규), `frontend/src/pages/admin/**` (신규), `frontend/src/app/router.tsx` (라우트 추가), `backend/src/routes/admin/**` (신규), `backend/src/services/admin/**` (신규), `shared/contracts/admin/**` (신규), `shared/fixtures/admin-*.json` (신규), `backend/migrations/013_*.sql` / `015_*.sql` (신규), `docs/specs/requires/feature-voc.md §9.4.6 / §9.4.7` (필요 시 spec sync), `docs/specs/requires/external-masters.md` (운영 화면 필드 보강).
+- **변경**: `frontend/src/features/admin/**` (신규), `frontend/src/pages/admin/**` (신규), `frontend/src/app/router.tsx` (라우트 추가), `backend/src/routes/admin/**` (신규), `backend/src/services/admin/**` (신규), `shared/contracts/admin/**` (신규), `shared/fixtures/admin-*.json` (신규), `backend/migrations/014_*.sql` / `015_*.sql` / `017_*.sql` (신규), `docs/specs/requires/feature-voc.md §9.4.6 / §9.4.7` (필요 시 spec sync), `docs/specs/requires/external-masters.md` (운영 화면 필드 보강).
 - **비변경**: `frontend/src/features/voc/**` 본문, VOC 도메인 라우트, 대시보드 코드, 토큰 정의부 (Phase B addendum 외). uidesign.md §14.3 Role Pill 토큰 그대로 재사용 (이미 §10 에 등록).
 
 ## 3. 결정 (잠금 — 사용자 최종 승인 시점에 잠긴다)
 
 | ID | 항목 | 결정 (제안) | 근거 |
 | --- | --- | --- | --- |
-| W3-D1 | 권한 모델 | ADR 0004 — 화면별 차등 (Tag Master = Admin/Manager 양쪽 mutate / Trash = Admin only / Masters Refresh = Manager+ / Users = Admin only) | `requirements.md §2.3` + `§15.x` + `§16.3` + ADR 0004 |
-| W3-D2 | Trash 복구 정책 | ADR 0005 — 30 일 보존 + Admin 복원 + 영구삭제 disabled (NextGen) + `voc_restore_log` audit | `§15.4` + `feature-voc.md §9.4.7` + ADR 0005 |
+| W3-D1 | 권한 모델 | ADR 0004 Accepted — Option D: Tag Master `add`/`edit` = Manager+ / `merge`/`외부잠금`/`영구삭제` = Admin only · Trash = Admin only · External Masters refresh = Manager+ / read = Manager+ + Dev · Users = Admin only | `requirements.md §2.3` + `§15.x` + `§16.3` + ADR 0004 |
+| W3-D2 | Trash 복구 정책 | ADR 0005 Accepted — 무기한 보존 (D7) + Admin only 복원 + 영구삭제 disabled (NextGen) + `voc_restore_log` audit | `§15.4` + `feature-voc.md §9.4.7` + ADR 0005 |
 | W3-D3 | Phase 분할 | Phase A = 마이그·contract spec / Phase B = Tag Master / Phase C = Trash / Phase D = External Masters / Phase E = Users / Phase F = 종합 검증 | 본 plan §6 |
 | W3-D4 | PR 단위 | 화면당 1 PR (FE+BE+contract+fixture 동봉). 마이그 PR 은 별도 (Phase A). 영구삭제 placeholder 만 자리 확보. | D9 precedent (Wave 1.6) |
 | W3-D5 | TDD 의무 surface | 권한 매트릭스 (BE Jest+Supertest) + 마이그 (rollback) + Tag merge 트랜잭션 + Trash restore 의 `tag_rules` 재실행 | `CLAUDE.md §Engineering rules` "TDD for irreversible surface" |
-| W3-D6 | role guard 진입 | sidebar group 자체를 `role ∈ {admin, manager}` 에서만 렌더 (`uidesign.md §10.5.1` precedent — 본 wave 신설). 라우트 진입 시 BE 403 이중 방어. | `requirements.md §6.1` 표준 에러 + `uidesign.md §14.3` 노트 |
+| W3-D6 | role guard 진입 | sidebar group 자체를 화면별 허용 role 에서만 렌더 (Admin/Manager/Dev 매트릭스, `uidesign.md §10.5.1` precedent — 본 wave 신설). 라우트 진입 시 BE 403 이중 방어. | `requirements.md §6.1` 표준 에러 + `uidesign.md §14.3` 노트 |
 | W3-D7 | 시각 검증 | 4 화면 visual-diff baseline 신규 추가 (`benchmark/admin/*.png` + `INDEX.md` row). 자손 SKIP 0. | `CLAUDE.md §Top-level directories` benchmark 룰 |
 | W3-D8 | 자동화 정책 | Phase 진행 중 autopilot/ralph 사용 허용. 머지·완료 선언은 사용자 검수 후에만. | Wave 1.6 D10 precedent |
 
 ## 4. 원칙
 
 1. **Spec 정본 우선** — `requirements.md §15` + `feature-voc.md §9.4.6/9.4.7` 가 충돌하면 사용자에게 보고 (§7 OQ). 임의 동기화 금지.
-2. **마이그는 별 PR** — Phase A 에서 마이그 013 / 015 spec 확정 + 별 PR 머지 후 Phase B 시작.
+2. **마이그는 별 PR** — Phase A 에서 마이그 014 / 015 / 017 spec 확정 + 별 PR 머지 후 Phase B 시작.
 3. **권한 이중 방어** — FE role guard (sidebar group + route boundary) + BE 403 (admin route guard middleware). 단일 방어 금지.
 4. **Audit 우선** — Trash 복원 / Tag merge / User role 변경은 모두 `voc_history` 또는 `voc_restore_log` 또는 신규 `user_role_log` (OQ-3) 에 기록. side-effect 없는 mutate 금지.
 5. **토큰 위반 0** — Role Pill 4 종은 `uidesign.md §14.3` 토큰 그대로. raw hex/OKLCH 도입 금지. 미정의 토큰 발견 시 별 PR 로 spec 갱신 후 진입 (Wave 1.6 Phase B addendum precedent).
@@ -68,8 +68,9 @@
 
 - **Wave 2 (Dashboard) 머지** — `next-session-tasks.md` 명시. Phase 8 기조상 dashboard 가 widget contract 도입 → admin 화면이 같은 contract 패턴을 재사용.
 - **마이그 012 (`users.role` enum 4 종)** — 별 트랙. `migration-012-draft.md` 정본. 본 Wave Phase E (Users) 진입 전 머지 필수.
-- **마이그 013 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR.
-- **마이그 015 (`vocs.deleted_by` / `voc_restore_log`)** — 본 Wave Phase A 1 PR. (`next-session-tasks.md §권한·스키마 인프라 PR 후보` 는 8-PR3 = 015 로 표기. **8-M1/M2 은 마이그 014 = `notices` 별 트랙** — OQ-4 명세 정합 필요.)
+- **마이그 014 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR (W3-1, OQ-4 결정 2026-05-09).
+- **마이그 015 (`vocs.deleted_by` / `voc_restore_log`)** — 본 Wave Phase A 1 PR (W3-2).
+- **마이그 017 (`user_role_log` 별 테이블)** — 본 Wave Phase A 1 PR (W3-9, OQ-3 Option A). 016 은 별 트랙 점유.
 
 ### 5.2 외부 차단 (해소 불가 항목)
 
@@ -84,10 +85,11 @@
 ## 6. Phase 흐름
 
 ```
-Phase A: 마이그 + contract spec (코드 0줄 + SQL 2 PR)
-  ├─ 013_tag_master_ops.sql (tags.is_external / merged_into_id / tag_rules.suspended_until)
+Phase A: 마이그 + contract spec (코드 0줄 + SQL 3 PR + contract 1 PR · full parallel)
+  ├─ 014_tag_master_ops.sql (tags.is_external / merged_into_id / tag_rules.suspended_until)
   ├─ 015_trash_audit.sql (vocs.deleted_by / voc_restore_log)
-  ├─ shared/contracts/admin/{tag,trash,master,user}.ts (zod)
+  ├─ 017_user_role_log.sql (user_role_log 별 테이블 — OQ-3 Option A)
+  ├─ shared/contracts/admin/{tag,trash,master,user}.ts (zod) + openapi.yaml
   └─ 사용자 승인 게이트 ──┐
                           ▼
 Phase B: Tag Master 화면 (1 PR)
@@ -133,21 +135,33 @@ Phase F: 종합 검증
 
 | ID | Phase | 작업 (한 줄) | trigger / 비고 |
 | --- | --- | --- | --- |
-| W3-1 | A | 마이그 013 (`tag master ops` 컬럼 3 건) + rollback | spec §15.3 / §9.4.6 |
+| W3-1 | A | 마이그 014 (`tag master ops` 컬럼 3 건) + rollback | spec §15.3 / §9.4.6 (OQ-4) |
 | W3-2 | A | 마이그 015 (`trash audit` 컬럼 1 + 테이블 1) + rollback | spec §15.4 / §9.4.7 |
 | W3-3 | A | shared/contracts/admin/{tag,trash,master,user}.ts (zod) + openapi.yaml 갱신 | spec §6.1 |
-| W3-4 | B | Tag Master FE+BE+fixture+E2E (1 PR) | spec §9.4.6 |
+| W3-4 | B | Tag Master FE+BE+fixture+E2E (1 PR) | spec §9.4.6 (Option D 액션 분기) |
 | W3-5 | C | Trash FE+BE+fixture+E2E (1 PR) | spec §9.4.7 |
-| W3-6 | D | External Masters FE+BE+fixture+E2E (1 PR) | spec §16.3 |
-| W3-7 | E | Users FE+BE+fixture+E2E (1 PR) | spec §15.2 |
+| W3-6 | D | External Masters FE+BE+fixture+E2E (1 PR) | spec §16.3 (Manager+ + Dev read) |
+| W3-7 | E | Users FE+BE+fixture+E2E (1 PR — `user_role_log` 의존) | spec §15.2 |
 | W3-8 | F | 종합 검증 + progress 갱신 (1 PR) | gate close |
+| W3-9 | A | 마이그 017 (`user_role_log` 별 테이블) + rollback | OQ-3 Option A |
 
 > **R5 준수**: 묶음 PR 금지. W3-1 / W3-2 / W3-3 모두 별 PR. W3-4~W3-7 도 화면당 별 PR.
 > **R3 준수**: Phase A/B/C/D/E/F 는 grouping 메타데이터일 뿐 ID 에 부착 금지.
 
-## 7. Open Questions (사용자 결정 대기)
+## 7. Open Questions — closed (2026-05-09 grill)
 
-> 본 Wave 진입 전 사용자 답변 필수. 답변 후 정본 spec 동기화 PR 선행 (`CLAUDE.md` "spec 내부 불일치 발견 시 임의 결정 금지").
+> 5 건 모두 사용자 결정 + spec 동기화 (PR-α `docs/wave-3-oq-sync`) 완료. 본 절은 결정 요약만 남기고 옵션 분석 본문은 [`open-questions.md`](./open-questions.md) 와 ADR 0004 / 0005 에 흡수.
+
+| OQ | 결정 | spec sync |
+| --- | --- | --- |
+| OQ-1 Tag Master mutate | **Option D** — Manager+ add/edit · Admin only merge/외부잠금/영구삭제 | `requirements.md §15.3` + `feature-voc.md §9.4.6` + ADR 0004 |
+| OQ-2 External Masters read | **Option B** — Manager+ + Dev | `external-masters.md` |
+| OQ-3 Users role/is_active audit | **Option A** — `user_role_log` 별 테이블 (마이그 017) | `requirements.md §4` + 본 plan §6.2 W3-9 |
+| OQ-4 마이그 번호 | 014 Tag Master / 015 Trash / 017 user_role_log (013/016 점유) | `requirements.md §15.3 / §15.4` + `next-session-tasks.md` + 본 plan §2.1 / §5.1 / §6.2 |
+| OQ-5 사이드바 순서 | **Option B** — Result Review → Users → External Masters → Tag Master → Trash | `feature-voc.md §9.4` + `uidesign.md Sidebar Spacing` |
+
+<details>
+<summary>(아카이브) 결정 전 옵션 분석</summary>
 
 ### OQ-1 — Tag Master 권한: Admin only vs Admin/Manager
 
@@ -196,12 +210,14 @@ Phase F: 종합 검증
 
 > 위 OQ 5 건은 [`docs/specs/plans/open-questions.md`](./open-questions.md) (본 Wave 한정) 에 동기화. (.omc/plans/open-questions.md 가 아닌 docs/specs/plans/ 트리 내 파일 — 정본 위치는 docs hygiene 룰 §3 SoT).
 
+</details>
+
 ## 8. 위험과 대응
 
 | 위험 | 신호 | 대응 |
 | --- | --- | --- |
-| OQ 미해결 채로 Phase B 진입 | Phase A 머지 시 `requirements.md §15.3` ↔ `feature-voc.md §9.4.6` 동기화 PR 부재 | Phase A 게이트에 OQ-1 / OQ-3 / OQ-4 답변 필수. 한 건이라도 미답이면 Phase B 진입 차단 |
-| 마이그 013 / 015 rollback 누락 | rollback SQL 미작성 또는 검증 없이 머지 | TDD `down.sql` 작성 + 적용 후 컬럼 검증 통합 테스트 그린 후 머지 |
+| OQ 결정 미동기화 상태로 Phase B 진입 | Phase A 머지 시 `requirements.md §15.3` ↔ `feature-voc.md §9.4.6` 동기화 누락 또는 ADR Accepted 불일치 | Phase A 게이트에서 OQ-1~5 sync evidence 확인. 한 건이라도 불일치하면 Phase B 진입 차단 |
+| 마이그 014 / 015 / 017 rollback 누락 | rollback SQL 미작성 또는 검증 없이 머지 | TDD `down.sql` 작성 + 적용 후 컬럼 검증 통합 테스트 그린 후 머지 |
 | Tag merge 트랜잭션 실패 시 부분 적용 | `voc_tags` 재배선 중 `tag_rules.tag_id` 갱신 실패 | 단일 트랜잭션 + savepoint 없는 atomic rollback. 회귀 테스트 4 건 (§9.4.6) |
 | Trash 복원 시 `tag_rules` 재실행이 idempotent 깨짐 | 재실행 후 `voc_tags` 중복 row | `INSERT ... ON CONFLICT DO NOTHING` + 회귀 테스트 (§9.4.7 회귀 3 건) |
 | Last-admin 강등으로 시스템 잠금 | Users Phase E 에서 마지막 admin → user 강등 시 모든 admin 액션 불가 | BE 단일 helper `assertLastAdminGuard` 도입 + CONFLICT 409 응답 (§6.1 정합) + 회귀 테스트 |
@@ -212,7 +228,7 @@ Phase F: 종합 검증
 
 | Phase | 추정 | 비고 |
 | --- | --- | --- |
-| A | 1 세션 | 마이그 2 PR + contract 1 PR. zod 스키마는 spec 가독성에 의존. |
+| A | 1 세션 | 마이그 3 PR + contract 1 PR. zod 스키마는 spec 가독성에 의존. |
 | B | 1.5 세션 | Tag Master + merge 트랜잭션 + visual-diff |
 | C | 1 세션 | Trash + 복원 회귀 3 건 |
 | D | 1 세션 | External Masters + 스냅샷/콜드스타트 배지 |
