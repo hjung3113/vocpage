@@ -29,6 +29,10 @@ export type TagKind = z.infer<typeof TagKind>;
 /**
  * Row shape for Tag Master list (`GET /api/admin/tags`).
  * Includes operational columns from migration 014 + computed `usage_count`.
+ *
+ * NOTE: `merged_into_id` removed per Resolution α (PR #251) — merge action is
+ * hard-delete (source row removed, voc_tags rewired to target). Audit trail
+ * deferred (no tombstone column). See feature-voc.md §9.4.6.
  */
 export const TagMasterItem = z.object({
   id: Uuid,
@@ -36,7 +40,6 @@ export const TagMasterItem = z.object({
   slug: z.string().min(1),
   kind: TagKind,
   is_external: z.boolean(),
-  merged_into_id: Uuid.nullable(),
   usage_count: z.number().int().nonnegative(),
   rule_ref_count: z.number().int().nonnegative(),
   created_at: Iso,
