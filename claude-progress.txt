@@ -1,6 +1,16 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-09 Wave 3 Phase F (W3-8) close — Wave 3 완료)
+## 다음 세션 시작점 (2026-05-09 FU bucket P1 batch close — drift 정리 + audit closure)
+
+→ **FU P1 batch close (docs-only, 2026-05-09)** — followup-bucket row drift 3건 + audit closure 3건.
+   - **Drift 정리**: FU-001 (PR #248 `67b1eda` + harden `4fe9e25`) / FU-002 (PR #249 `264b908`) / FU-017 (PR #265 `00bfb33`) 모두 실머지 상태였으나 bucket row 가 Open 으로 남아 drift. ✅ 로 갱신 + Resolution 한 줄.
+   - **Audit closure**: FU-003 (popup dismiss — 현 localStorage 구현 spec §10.3.2 정합, 코드변경 X) / FU-004 (FAQ 한국어 morpheme tokenizer — overspec, 현 substring 매치 충분) / FU-005 (urgent auto-open — spec 미정의, 정책 신설 시 별 FU). 세 건 모두 wontfix 결정.
+   - **R5 위반 기록**: 본 PR 은 FU 6건 단일 묶음 PR (사용자 명시 지시 고수). docs-only 라 reversibility 영향 없음. R5 grandfather 패턴.
+   - **다음 P1 잔여 = 0**. P2 batch (FU-006~010, FU-015/016/018) 진입 가능.
+
+→ **마이그 번호** — 다음 마이그 번호 = 021 (변동 없음).
+
+## 이전 세션 시작점 (2026-05-09 Wave 3 Phase F (W3-8) close — Wave 3 완료)
 
 → **Wave 3 close (W3-8 종합 검증, 2026-05-09)** — 사용자 수락 게이트 통과 시 Wave 3 완료.
    - **검증 결과**: BE 269 passed / 7 todo (26 suites) · FE 561 passed (72 files) · FE lint (`lint:tokens` 포함) 0 error · 토큰 lint (raw hex / OKLCH) 소비자 파일 0 hits.
