@@ -23,7 +23,7 @@
 
 → **잔여 / 후속**
    - **FU-010** user_role_log CHECK constraint 보강 (codex W3-9 P2 deferral) — `old/new value` 컬럼에 CHECK 추가, BE validator 와 별 PR 로 분리. P2.
-   - **FU-011** `lint-root` pre-existing 실패 (faqs/notices/faq-categories `.test.ts` 의 `@typescript-eslint/no-var-requires` 3건) — Phase B 진입 전 처리 권장.
+   - ~~**FU-011** `lint-root` pre-existing 실패 3건~~ — ✅ PR #260 `13395c7` (2026-05-09) 머지. `require()` → `import * as`.
    - **FU-012** Tag merge audit 도입 시 `tag_merge_log` 테이블 spec 작성 (Resolution α 으로 보류된 audit trail 의 정식 진입 경로).
    - **FU-003/4/5** (P1) Phase A 머지 후 idle slot 에서 hotfix-style. **FU-006~009** (P2) Wave 3 close 후 batch.
    - **Wave 5 plan** = Wave 3 close 후 작성 진입.
