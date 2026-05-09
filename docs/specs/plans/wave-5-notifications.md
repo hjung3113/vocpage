@@ -55,6 +55,7 @@
 | W5-D8  | nav badge 추상화      | `<NavItemCountBadge>` 단일 컴포넌트 — 알림 unread / Notice unread / FAQ unread 세 곳에서 동일 패턴 사용. **FU-008 흡수**.                                                          | grilling Q12 (a) + uidesign §14.10                    |
 | W5-D9  | PR 분할               | **2 PR 직렬**: PR-1 = Phase A (BE 단독, contract irreversible) → PR-2 = Phase B (FE + spec 두 줄)                                                                                 | grilling Q8 (b)                                       |
 | W5-D10 | ADR                   | **신설 없음** — `feature-voc.md §8.6` 두 줄 추가 (W5-D2 / W5-D4) 로 갈음                                                                                                          | grilling Q9 (b)                                       |
+| W5-D11 | comments BE 신설      | **Phase A 에 흡수** (사용자 결정 2026-05-09 세션). spec §8.13 (4 라우트 GET/POST/PATCH/DELETE) 그대로 구현, `notifyOnComment` 를 `routes/comments.ts` POST 핸들러에 wire (시맨틱 일관, internal-note wire 폐기). plan §2.3 touch budget 확장. 신규 마이그 없음 (comments table = migration 005 기존, body length CHECK = migration 011 기존). | 사용자 결정 (2026-05-09)                              |
 
 ## 4. 원칙
 
