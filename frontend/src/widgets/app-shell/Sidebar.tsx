@@ -8,6 +8,7 @@ import {
   Bell,
   Code2,
   ChevronDown,
+  Trash2,
 } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
@@ -19,6 +20,8 @@ interface NavItem {
   label: string;
   icon: React.ElementType;
   adminOnly?: boolean;
+  /** Visible to admin role only — manager is excluded (ADR 0005). */
+  adminStrict?: boolean;
   devOnly?: boolean;
   /** admin group: visible to admin/manager/dev */
   adminGroup?: boolean;
@@ -34,9 +37,13 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/health', label: 'Health', icon: Code2, devOnly: true },
 ];
 
-/** Admin group: visible to admin / manager / dev (ADR 0004 §6.2 OQ-5 Option B order) */
+/**
+ * Admin group: visible to admin / manager / dev (ADR 0004 §6.2 OQ-5 Option B order).
+ * 휴지통 (Trash) 은 Admin only — `adminStrict` 로 Manager / Dev 미노출 (ADR 0005).
+ */
 const ADMIN_NAV_ITEMS: NavItem[] = [
   { to: '/admin/tags', label: '태그 마스터', icon: Tag, adminGroup: true },
+  { to: '/admin/vocs/trash', label: '휴지통', icon: Trash2, adminStrict: true },
 ];
 
 export function Sidebar() {
@@ -45,7 +52,10 @@ export function Sidebar() {
   const hasUrgentNotice = !popup.isError && !!popup.data?.rows?.some((n) => n.level === 'urgent');
 
   const visible = NAV_ITEMS.filter(
-    (item) => (!item.adminOnly || isAdmin || isManager) && (!item.devOnly || isDev),
+    (item) =>
+      (!item.adminOnly || isAdmin || isManager) &&
+      (!item.adminStrict || isAdmin) &&
+      (!item.devOnly || isDev),
   );
 
   // Admin group: visible to admin / manager / dev
@@ -169,7 +179,8 @@ export function Sidebar() {
             >
               관리자
             </div>
-            {ADMIN_NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+            {ADMIN_NAV_ITEMS.filter((item) => !item.adminStrict || isAdmin).map(
+              ({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
