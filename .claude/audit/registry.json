@@ -1,7 +1,7 @@
 {
   "version": 2,
   "registry_version": 2,
-  "updated": "2026-05-05T10:46:16.671392+00:00",
+  "updated": "2026-05-09T08:35:24Z",
   "fix_type_strength": ["hookify", "claude_md", "spec", "manual"],
   "rule_taxonomy": [
     "tool_routing",
@@ -333,12 +333,23 @@
       "detection": "main 직접 commit 또는 squash/rebase merge",
       "hookify_feasible": true,
       "allowed_fix_types": ["hookify", "claude_md", "spec", "manual"],
-      "status": "candidate",
-      "fix_history": [],
+      "status": "under_remediation",
+      "fix_history": [
+        {
+          "fix_type": "hookify",
+          "queued_at": "2026-05-09T08:32:42Z",
+          "applied_at": "2026-05-09T08:32:42Z",
+          "reference": "hookify:.claude/hookify.block-reset-hard.local.md",
+          "note": "block-reset-hard.local.md added; complements existing block-force-push. Covers session 5f319c57 R13 evidence (unauthorized git reset --hard in worktree)."
+        }
+      ],
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": true,
-      "baseline_hooked_note": "Hook pre-existing since day 1 (block-push-to-main.local.md). No pre-hook baseline exists — remediation lifecycle is not applicable because attempt rate cannot be compared against an unhooked baseline. 7/12 occ are all hook-blocked attempts (0 bypasses confirmed). Attempt rate is tracked by hook log itself; no formal registry transition needed. Re-evaluate only if hook is found to be bypassable."
+      "baseline_hooked_note": "Hook pre-existing since day 1 (block-push-to-main.local.md). No pre-hook baseline exists — remediation lifecycle is not applicable because attempt rate cannot be compared against an unhooked baseline. 7/12 occ are all hook-blocked attempts (0 bypasses confirmed). Attempt rate is tracked by hook log itself; no formal registry transition needed. Re-evaluate only if hook is found to be bypassable.",
+      "promoted_at": "2026-05-09T08:26:53Z",
+      "promotion_note": "occ=8/13, disp_conf=0.43, 8 work_types, force-push regression incident PR#252→#254. Promote per session 5f319c57.",
+      "fix_applied_at": "2026-05-09T08:32:42Z"
     },
     {
       "id": "R14",
@@ -369,18 +380,20 @@
     {
       "id": "C1",
       "category": "cost_anomaly",
-      "title": "Cache invalidation",
-      "detection": "cache_invalidation.events >= 1",
+      "title": "Unnecessary subagent fanout",
+      "detection": "Multiple parallel TaskCreate dispatches where work could collapse into a single agent (same keyword search split across N agents, sequential dependencies dispatched in parallel, or trivial 1-shot reads delegated). NOT cache_create>0 alone - independent parallel work legitimately re-creates cache.",
       "hookify_feasible": false,
       "allowed_fix_types": ["spec", "manual"],
-      "status": "candidate",
+      "status": "promoted",
       "fix_history": [],
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": false,
       "defer_reason": "Partially infra-level. Defer until attachment burst root cause is better understood.",
       "defer_recorded_at": "2026-05-05T07:35:00.000Z",
-      "defer_review_trigger": "next_session_redetect"
+      "defer_review_trigger": "next_session_redetect",
+      "promoted_at": "2026-05-09T08:26:53Z",
+      "promotion_note": "occ=9/13, disp_conf=0.48, 6 work_types, parallel-fanout cache invalidation. Promote per session 5f319c57. | Redefined 2026-05-09: prior detection (cache_create>0 / cache_read=0) was structurally normal for subagents; narrowed to fanout-judgment errors only. Session 5f319c57 evidence retroactively re-classified as legitimate independent fanout (not a hit)."
     },
     {
       "id": "C2",
@@ -431,8 +444,16 @@
       "detection": "한 prompt 토큰이 세션 전체의 50% 초과",
       "hookify_feasible": false,
       "allowed_fix_types": ["claude_md", "spec", "manual"],
-      "status": "candidate",
-      "fix_history": [],
+      "status": "under_remediation",
+      "fix_history": [
+        {
+          "fix_type": "claude_md",
+          "queued_at": "2026-05-09T08:35:24Z",
+          "applied_at": "2026-05-09T08:35:24Z",
+          "reference": "file:CLAUDE.md",
+          "note": "Added Single-prompt token budget rule under Engineering Rules > Execution. Caps any single tool call / subagent dispatch / pasted context at ~50% of running session token total; mandates targeted slices and pre-summarization."
+        }
+      ],
       "regression_count": 0,
       "reactivation_count": 0,
       "baseline_hooked": false,
@@ -440,7 +461,10 @@
       "defer_recorded_at": "2026-05-05T07:35:00.000Z",
       "defer_review_trigger": "next_session_redetect",
       "infra_noise_candidate": true,
-      "infra_noise_note": "duplicate_request_ids is Claude Code client HTTP retry — model has no control. Reclassify to infra_noise. Stats contribution should be zeroed if reclassified."
+      "infra_noise_note": "duplicate_request_ids is Claude Code client HTTP retry — model has no control. Reclassify to infra_noise. Stats contribution should be zeroed if reclassified.",
+      "promoted_at": "2026-05-09T08:26:53Z",
+      "promotion_note": "occ=8/13, disp_conf=0.43, 6 work_types, single-prompt token overload pattern (count_sum=170). Promote per session 5f319c57.",
+      "fix_applied_at": "2026-05-09T08:35:24Z"
     },
     {
       "id": "C6",
