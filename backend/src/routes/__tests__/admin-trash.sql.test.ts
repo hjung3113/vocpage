@@ -217,15 +217,8 @@ describe('admin-trash routes — DB-backed (FU-015)', () => {
       expect(res.body.rows).toEqual([]);
     });
 
-    // pg-mem cannot parse `ILIKE … ESCAPE '\\'` — listTrashedVocs `q` filter
-    // exercises that pattern. Tracked as FU-024 (testcontainers Postgres).
-    it.skip('filters by ?q on title / issue_code — pg-mem lacks ESCAPE clause (FU-024)', async () => {
-      const res = await request(makeApp())
-        .get('/api/admin/vocs/trash')
-        .query({ q: 'VOC-1002', page: 1, per_page: 20 });
-      expect(res.status).toBe(200);
-      expect(res.body.total).toBe(1);
-    });
+    // FU-024: ILIKE ESCAPE q filter activated under testcontainers Postgres
+    // → see admin-sql-tc.test.ts.
 
     it('returns empty list when no VOCs are soft-deleted', async () => {
       // Hard-clear the trash for this test only.
