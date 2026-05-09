@@ -25,11 +25,18 @@ const MIGRATIONS_DIR = path.resolve(__dirname, '../../migrations');
 const FILE_021 = path.join(MIGRATIONS_DIR, '021_user_role_log_check.sql');
 
 function stripUnsupported(sql: string): string {
-  return sql
-    .split('\n')
-    .filter((line) => !/CREATE EXTENSION/i.test(line))
-    .join('\n')
-    .replace(/uuid_generate_v4\(\)/g, 'gen_random_uuid()');
+  return (
+    sql
+      .split('\n')
+      .filter((line) => !/CREATE EXTENSION/i.test(line))
+      .join('\n')
+      .replace(/uuid_generate_v4\(\)/g, 'gen_random_uuid()')
+      // pg-mem cannot parse `ADD CONSTRAINT … NOT VALID`. The migration uses
+      // NOT VALID for backfill safety in production (codex P1 on PR #281);
+      // pg-mem-side we strip it so the constraint applies eagerly to both
+      // existing and new rows. Eager-validate is the behavior under test.
+      .replace(/\)\s*NOT\s+VALID\s*;/gi, ');')
+  );
 }
 
 function splitUpDown(sql: string): { up: string; down: string } {
@@ -135,9 +142,11 @@ describe('migration 021 — user_role_log role CHECK constraints (FU-010)', () =
       const { up } = splitUpDown(fs.readFileSync(FILE_021, 'utf-8'));
       db.public.query(stripUnsupported(up));
 
+      // Match the constraint name so a future pg-mem parse-error doesn't
+      // pass green (codex P3 on PR #281).
       expect(() =>
         insertLog(db, { old_role: 'superadmin', new_role: 'admin' }),
-      ).toThrow();
+      ).toThrow(/user_role_log_old_role_check/);
     });
 
     it('rejects an invalid new_role value', () => {
@@ -148,7 +157,7 @@ describe('migration 021 — user_role_log role CHECK constraints (FU-010)', () =
 
       expect(() =>
         insertLog(db, { old_role: 'user', new_role: 'root' }),
-      ).toThrow();
+      ).toThrow(/user_role_log_new_role_check/);
     });
 
     it('still allows NULL old_role / new_role (sentinel for system-driven rows)', () => {
@@ -170,7 +179,9 @@ describe('migration 021 — user_role_log role CHECK constraints (FU-010)', () =
       const { up, down } = splitUpDown(fs.readFileSync(FILE_021, 'utf-8'));
       db.public.query(stripUnsupported(up));
       // Sanity: invalid rejected post-up.
-      expect(() => insertLog(db, { old_role: 'wat', new_role: 'admin' })).toThrow();
+      expect(() => insertLog(db, { old_role: 'wat', new_role: 'admin' })).toThrow(
+        /user_role_log_old_role_check/,
+      );
 
       db.public.query(stripUnsupported(down));
       // After down: invalid value flows through.
