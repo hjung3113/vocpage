@@ -60,7 +60,7 @@ export function TrashTableRow({ row, onRestore }: Props) {
         style={{
           padding: '10px 14px',
           fontSize: '12px',
-          color: 'var(--text-muted)',
+          color: 'var(--text-tertiary)',
           fontFamily: 'D2Coding, monospace',
         }}
       >
@@ -70,7 +70,7 @@ export function TrashTableRow({ row, onRestore }: Props) {
         style={{
           padding: '10px 14px',
           fontSize: '12px',
-          color: 'var(--text-muted)',
+          color: 'var(--text-tertiary)',
           fontFamily: 'D2Coding, monospace',
         }}
       >
@@ -96,7 +96,7 @@ export function TrashTableRow({ row, onRestore }: Props) {
         style={{
           padding: '10px 14px',
           fontSize: '12px',
-          color: 'var(--text-muted)',
+          color: 'var(--text-tertiary)',
           fontFamily: 'D2Coding, monospace',
         }}
       >

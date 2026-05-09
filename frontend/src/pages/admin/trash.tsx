@@ -18,7 +18,7 @@ export default function AdminTrashPage() {
   }
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '24px 32px' }}>
       <PageTitle title="휴지통" />
       <div
         style={{
@@ -28,7 +28,7 @@ export default function AdminTrashPage() {
           marginBottom: '24px',
         }}
       >
-        <Trash2 size={20} style={{ color: 'var(--text-muted)' }} aria-hidden />
+        <Trash2 size={20} style={{ color: 'var(--text-tertiary)' }} aria-hidden />
         <h1
           style={{
             fontSize: '18px',
@@ -42,7 +42,7 @@ export default function AdminTrashPage() {
         <span
           style={{
             fontSize: '12px',
-            color: 'var(--text-muted)',
+            color: 'var(--text-tertiary)',
             marginLeft: '4px',
           }}
         >

@@ -59,7 +59,7 @@ export async function listTrashedVocs(
     `SELECT COUNT(*) AS total FROM vocs v WHERE ${where}`,
     values,
   );
-  const total = parseInt(countRows[0].total, 10);
+  const total = parseInt(countRows[0]?.total ?? '0', 10);
 
   const { rows } = await pool.query(
     `SELECT v.id, v.issue_code, v.title, v.status, v.system_id, v.menu_id,
@@ -124,10 +124,11 @@ export async function restoreVoc(
     );
 
     // 3. Insert voc_history restore event
+    //    (schema 003: field/old_value/new_value/changed_by/changed_at)
     await client.query(
-      `INSERT INTO voc_history (voc_id, actor_id, event_type, snapshot, created_at)
-       VALUES ($1, $2, 'restore', '{}'::jsonb, $3)`,
-      [vocId, actorId, restoredAt],
+      `INSERT INTO voc_history (voc_id, field, old_value, new_value, changed_by, changed_at)
+       VALUES ($1, 'deleted_at', $2, NULL, $3, $4)`,
+      [vocId, beforeDeletedAt, actorId, restoredAt],
     );
 
     // 4. Insert voc_restore_log
@@ -141,14 +142,15 @@ export async function restoreVoc(
     );
     const logRow = logRows[0];
 
-    // 5. Re-run tag_rules idempotently — INSERT … ON CONFLICT DO NOTHING (§9.4.7)
+    // 5. Re-run tag_rules idempotently — INSERT … ON CONFLICT DO NOTHING (§9.4.7).
+    //    tag_rules 는 시스템 무관 글로벌 규칙 (004 스키마: pattern/kind/tag_id).
+    //    suspended_until (014) 가 미래시점이면 일시중지 — 본 재실행에서 제외.
     await client.query(
       `INSERT INTO voc_tags (voc_id, tag_id, source, created_at)
        SELECT $1, tr.tag_id, 'rule', now()
        FROM tag_rules tr
        WHERE tr.is_active = true
-         AND (tr.system_id IS NULL
-              OR tr.system_id = (SELECT system_id FROM vocs WHERE id = $1))
+         AND (tr.suspended_until IS NULL OR tr.suspended_until <= now())
        ON CONFLICT (voc_id, tag_id) DO NOTHING`,
       [vocId],
     );

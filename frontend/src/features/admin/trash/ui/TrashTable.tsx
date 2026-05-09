@@ -45,7 +45,7 @@ export function TrashTable() {
 
   if (isPending) {
     return (
-      <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
+      <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '14px' }}>
         불러오는 중…
       </div>
     );
@@ -66,7 +66,7 @@ export function TrashTable() {
 
   if (rows.length === 0) {
     return (
-      <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
+      <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '14px' }}>
         <Trash2 size={32} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
         <p>휴지통이 비어 있습니다.</p>
       </div>
@@ -88,7 +88,7 @@ export function TrashTable() {
             <tr
               style={{
                 borderBottom: '1px solid var(--border-standard)',
-                color: 'var(--text-muted)',
+                color: 'var(--text-tertiary)',
                 fontWeight: 600,
                 fontSize: '12px',
                 textTransform: 'uppercase',

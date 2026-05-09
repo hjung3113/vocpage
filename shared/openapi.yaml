@@ -1800,9 +1800,8 @@ paths:
                   $ref: '#/components/schemas/VocRestoreLogEntry'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
         '404':
+          # ADR 0005: hidden from non-admin as 404 ("존재 자체 은닉"), not 403.
           $ref: '#/components/responses/NotFound'
 
   /vocs/{id}/restore:
@@ -1821,10 +1820,11 @@ paths:
                 $ref: '#/components/schemas/VocRestoreResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
         '404':
+          # ADR 0005: hidden from non-admin as 404, not 403.
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
 
   /admin/users/{id}/role-log:
     parameters:

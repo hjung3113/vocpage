@@ -37,7 +37,7 @@ export function RestoreDialog({ item, open, isPending, onConfirm, onClose }: Pro
         >
           <strong style={{ color: 'var(--text-primary)' }}>{item.issue_code}</strong>를 복원하시겠습니까?
           <br />
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.title}</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{item.title}</span>
         </p>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isPending}>
@@ -55,7 +55,7 @@ export function RestoreDialog({ item, open, isPending, onConfirm, onClose }: Pro
             variant="outline"
             disabled
             title="MVP는 영구삭제 미지원"
-            style={{ color: 'var(--text-muted)', cursor: 'not-allowed' }}
+            style={{ color: 'var(--text-tertiary)', cursor: 'not-allowed' }}
           >
             영구삭제
           </Button>
