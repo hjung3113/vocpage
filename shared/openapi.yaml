@@ -1778,8 +1778,9 @@ paths:
                 $ref: '#/components/schemas/TrashListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        '404':
+          # ADR 0004 §3: Trash hidden from non-admin as 404 ("존재 자체 은닉"), not 403.
+          $ref: '#/components/responses/NotFound'
 
   /admin/vocs/{id}/restore-log:
     parameters:
@@ -3352,7 +3353,11 @@ components:
         total: { type: integer, minimum: 0 }
 
     AdminUserPatch:
+      # At least one of `role` / `is_active` required (mirrors zod .refine()).
       type: object
+      anyOf:
+        - required: [role]
+        - required: [is_active]
       properties:
         role: { $ref: '#/components/schemas/UserRole' }
         is_active: { type: boolean }
