@@ -1,22 +1,21 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 5 Phase A 코드 완료 — PR-1 생성 대기)
+## 다음 세션 시작점 (2026-05-10 Wave 5 Phase A 머지 완료 — Phase B 진입)
 
-→ **Wave 5 Phase A 코드 완료 — branch `feat/wave-5-phase-a-notifications-be` (커밋됨, push/PR 대기)**.
-   - **완료된 부분**:
-     - notifications BE (repo/service/route + index.ts 마운트) + contract additive 갱신 + openapi 정렬.
-     - `services/voc.ts` 트리거 wire (`update` 의 status/assignee 변화 → notifyOnStatusChange / notifyOnAssign).
-     - `notifyOnComment` 시맨틱 정합화: addNote wire 제거 + visibility 필터 제거 + repo `getUserRole` 삭제.
-     - **comments BE 신설 (W5-D11)**: `shared/contracts/comment/` + `repository/comments.ts` + `services/comments.ts` + `routes/comments.ts` + openapi 4 endpoint + integration test 15건. POST → `notifyOnComment` wire.
-     - `feature-voc.md §8.6` 명문화 (internal-note 한정 문구 제거 — 영구 wire = comments BE).
-     - `wave-5-notifications.md §3 W5-D11` 추가 (comments BE Phase A 흡수).
-     - BE 회귀 **28 suites · 304 passed · 7 todo · typecheck 0**.
-   - **다음 세션 잔여 (Phase A close)**:
-     1. 사용자가 contract diff 검수 (`shared/contracts/comment/` + `shared/openapi.yaml`).
-     2. 사용자가 push + PR-1 생성 (`gh pr create`).
-     3. 사용자가 PR 머지 후 → Phase B 진입 (FE wiring + FU-008 `<NavItemCountBadge>` 흡수, PR-2).
-   - **결정 잠금 W5-D1~D11** (변동 없음): bell placement (Sidebar) · Urgent 표시 = 표시 시점 priority · 디바운스 = 앱 레이어 + DB 조회 (D8) · cap = lazy trim · 트리거 = `services/notifications.ts` · BE TDD 1~4 + 통합 테스트 · 두 쿼리 키 분리 · `<NavItemCountBadge>` 추상 (FU-008 흡수) · 2 PR · ADR 없음 · comments BE 신설 (W5-D11).
-   - **세션 회고 (2026-05-10)**: 트리비얼 3건 (addNote wire 제거 / visibility 필터 제거 / spec 문구) 직접 처리, comments BE 신설 (8 파일 / 15 테스트) 은 sonnet sub-agent 위임. `assertCanManageVoc` 에 `writeComment` action 미추가 — comment 는 public surface 라 단순 "VOC 존재 + 미삭제" 체크로 충분 (sub-agent 판단, 브리핑 일치).
+→ **Wave 5 Phase A 머지 완료** (PR #276, merge `75b1b0b`, 2026-05-09T15:25Z). Phase B 진입.
+   - **Phase A 머지 내용**: notifications BE (repo/service/route + ETag/304/lazy trim/5분 디바운스) + comments BE 신설 (W5-D11, 4 endpoint + 15 test) + voc.ts 트리거 wire (status_change/assigned/comment) + spec §8.6/§8.13 정합화. BE 28 suites · 304 passed · typecheck 0.
+
+→ **다음 세션 = Wave 5 Phase B PR-2 (FE wiring + P2 FE 흡수 batch)**.
+   - **범위**:
+     1. **FE notifications**: bell + dropdown (Sidebar 배치 W5-D1) + 30s 폴링 + ETag/304 / visibilityState 일시중단 / 401 → 로그인 리다이렉트 (spec §8.14). 두 쿼리 키 분리 (W5-D7).
+     2. **FE comments UI**: `VocComment.tsx` 의 `<Textarea>` → `<ToastBodyEditor>` 교체. POST/PATCH/DELETE 훅 wire. DOMPurify 렌더 (spec §8.13).
+     3. **`<NavItemCountBadge>` 추상** (W5-D8): 알림 / Notice / FAQ unread count 단일 컴포넌트. **FU-008 흡수**.
+     4. **FU-006 흡수**: shadcn token drift (`--border` / `--danger` 잔존) 정리.
+     5. **FU-009 흡수**: visual-diff baseline 추가 (bell dropdown / 댓글 에디터 surface).
+   - **결정 잠금 W5-D1~D11** 유지. P2 BE batch (FU-007/010/015/018) 은 별 PR — 다음 세션 범위 밖.
+   - **세션 회고 (2026-05-10)**: Phase A 코드 완료 → 사용자가 위임 → push + PR-1 + 머지까지 자동 진행 (PR #276). 위임 패턴 = trivial 직접 + 큰 덩어리 sub-agent + 검증/문서/git 자동.
+
+→ **마이그 번호** — 다음 마이그 번호 = 021 (변동 없음).
 
 → **마이그 번호** — 다음 마이그 번호 = 021 (변동 없음).
 
