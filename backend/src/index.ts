@@ -17,6 +17,8 @@ import { adminTagsRouter } from './routes/admin-tags';
 import { adminTrashRouter } from './routes/admin-trash';
 import { adminUsersRouter } from './routes/admin-users';
 import { adminMastersRouter } from './routes/admin-masters';
+import { notificationsRouter } from './routes/notifications';
+import { commentsRouter } from './routes/comments';
 import { initMasterCache } from './services/admin/external-masters';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './logger';
@@ -79,6 +81,8 @@ app.use('/api/admin', adminTagsRouter);
 app.use('/api/admin', adminTrashRouter);
 app.use('/api/admin', adminUsersRouter);
 app.use('/api/admin', adminMastersRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/vocs/:id/comments', commentsRouter);
 
 app.use(errorHandler);
 

@@ -11,6 +11,7 @@
  */
 import { HttpError } from '../middleware/httpError';
 import { assertCanManageVoc, type VocAction } from './permissions/assertCanManageVoc';
+import * as notifService from './notifications';
 import * as repo from '../repository/voc';
 import type { ListVocsRow } from '../repository/voc';
 import type { AuthUser } from '../auth/types';
@@ -110,6 +111,19 @@ export async function update(id: string, patch: VocUpdate, user: AuthUser): Prom
   }
   const next = await repo.updateVoc(id, patch);
   if (!next) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
+  // Wave 5 Phase A — fire notifications after the patch lands. Both calls
+  // are idempotent (5-min debounce inside the service) and recipient-skipping
+  // (self-actions short-circuit), so we never block on failures.
+  if ('status' in patch && patch.status !== existing.status) {
+    await notifService.notifyOnStatusChange({ voc_id: id, actor_id: user.id });
+  }
+  if ('assignee_id' in patch && patch.assignee_id !== existing.assignee_id) {
+    await notifService.notifyOnAssign({
+      voc_id: id,
+      new_assignee_id: patch.assignee_id ?? null,
+      actor_id: user.id,
+    });
+  }
   return next;
 }
 
@@ -211,5 +225,6 @@ export async function addNote(id: string, body: string, user: AuthUser): Promise
   const existing = await repo.getVocById(id);
   if (!existing) throw new HttpError(404, 'NOT_FOUND', 'VOC를 찾을 수 없습니다.');
   assertCanManageVoc(user, existing, 'writeInternalNote');
-  return repo.createNote(id, user.id, body);
+  const note = await repo.createNote(id, user.id, body);
+  return note;
 }

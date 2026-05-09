@@ -314,16 +314,18 @@ paths:
     get:
       tags: [comments]
       operationId: listComments
-      summary: List comments for VOC
+      summary: List comments for a VOC (created_at ASC, max 200)
+      description: |
+        Returns up to 200 comments ordered by created_at ASC.
+        Requires VOC read access. Internal notes are never included.
+        See feature-voc.md §8.13.
       responses:
         '200':
-          description: Comments
+          description: Comment list
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
+                $ref: '#/components/schemas/CommentListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -332,27 +334,35 @@ paths:
       tags: [comments]
       operationId: createComment
       summary: Add comment to VOC
+      description: |
+        Any authenticated user may comment on a non-deleted VOC.
+        Body is HTML (Toast UI output), max 16 KB. Empty or
+        whitespace-only HTML is rejected with 422 BODY_REQUIRED.
+        Fires notifyOnComment for author + assignee (debounced 5 min).
+        See feature-voc.md §8.13.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [body]
-              properties:
-                body:
-                  type: string
+              $ref: '#/components/schemas/CreateCommentInput'
       responses:
         '201':
-          description: Created comment
+          description: Comment created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Comment'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                $ref: '#/components/schemas/CommentResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation error (BODY_REQUIRED or BODY_TOO_LARGE)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /vocs/{id}/comments/{commentId}:
     parameters:
@@ -366,32 +376,42 @@ paths:
     patch:
       tags: [comments]
       operationId: updateComment
-      summary: Update comment
+      summary: Update comment (author or admin only)
+      description: |
+        Author or admin may update a comment body. updated_at is auto-refreshed.
+        Empty body → 422 BODY_REQUIRED. See feature-voc.md §8.13.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [body]
-              properties:
-                body:
-                  type: string
+              $ref: '#/components/schemas/CreateCommentInput'
       responses:
         '200':
           description: Updated comment
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Comment'
+                $ref: '#/components/schemas/CommentResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation error (BODY_REQUIRED or BODY_TOO_LARGE)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags: [comments]
       operationId: deleteComment
-      summary: Delete comment
+      summary: Hard-delete comment (author or admin only)
+      description: |
+        Hard delete — no soft delete, no audit log entry (spec §8.13).
+        Author or admin only. See feature-voc.md §8.13.
       responses:
         '200':
           description: Deleted
@@ -401,6 +421,8 @@ paths:
                 $ref: '#/components/schemas/OkResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -739,16 +761,20 @@ paths:
     get:
       tags: [notifications]
       operationId: listNotifications
-      summary: List notifications for current user
+      summary: List notifications for current user (with isUrgent join + lazy trim)
+      description: |
+        Returns up to 50 most recent notifications. Lazy trim runs on every
+        call: deletes rows older than 30 days and trims per-user beyond the
+        50-row cap (Wave 5 W5-D4). `isUrgent` is computed at read time from
+        the joined `vocs.priority` (W5-D2) — Urgent demotion auto-clears the
+        flag on the next call.
       responses:
         '200':
           description: Notifications
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Notification'
+                $ref: '#/components/schemas/NotificationListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -756,18 +782,52 @@ paths:
     get:
       tags: [notifications]
       operationId: getUnreadCount
-      summary: Get unread notification count
+      summary: Get unread notification count (ETag/304)
+      description: |
+        Returns the unread count for the current user. Response carries an
+        ETag derived from `(count, latest_unread_id, latest_unread_created_at)`.
+        Conditional GET with `If-None-Match` returns 304 with no body
+        (Wave 5 W5-D7, 30-second polling endpoint).
+      parameters:
+        - name: If-None-Match
+          in: header
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Count
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Strong-ish hash of the unread state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnreadCountResponse'
+        '304':
+          description: Not Modified — unread state unchanged since the supplied ETag.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/mark-all-read:
+    post:
+      tags: [notifications]
+      operationId: markAllRead
+      summary: Mark every unread notification of the current user as read
+      responses:
+        '200':
+          description: Marked all read
           content:
             application/json:
               schema:
                 type: object
-                required: [count]
+                required: [unreadCount]
                 properties:
-                  count:
+                  unreadCount:
                     type: integer
+                    enum: [0]
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -2631,6 +2691,31 @@ components:
           type: string
           format: date-time
 
+    CommentListResponse:
+      type: object
+      required: [rows]
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+
+    CommentResponse:
+      type: object
+      required: [comment]
+      properties:
+        comment:
+          $ref: '#/components/schemas/Comment'
+
+    CreateCommentInput:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          description: HTML string (Toast UI output). Max 16 KB. Empty / whitespace-only rejected.
+          maxLength: 16384
+
     Note:
       type: object
       required: [id, voc_id, author_id, body, created_at, updated_at]
@@ -2876,28 +2961,53 @@ components:
 
     Notification:
       type: object
-      required: [id, user_id, type, message, is_read, created_at]
+      required: [id, type, label, createdAt, read]
       properties:
         id:
           type: string
           format: uuid
-        user_id:
-          type: string
-          format: uuid
         type:
           type: string
-          enum: ['status_change', 'comment', 'mention', 'assignment', 'urgent']
+          # `mention` retained for FE backward compat (Wave 1.5 PR-β fixtures);
+          # BE only emits the three DB-CHECK constrained values.
+          enum: ['comment', 'status_change', 'assigned', 'mention']
+        label:
+          type: string
+        href:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        read:
+          type: boolean
+        # Wave 5 Phase A — VOC backref + Urgent flag (priority join).
         voc_id:
           type: string
           format: uuid
-          nullable: true
-        message:
+        voc_issue_code:
           type: string
-        is_read:
+        voc_title:
+          type: string
+        isUrgent:
           type: boolean
-        created_at:
-          type: string
-          format: date-time
+    NotificationListResponse:
+      type: object
+      required: [items, unreadCount]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        unreadCount:
+          type: integer
+          minimum: 0
+    UnreadCountResponse:
+      type: object
+      required: [count]
+      properties:
+        count:
+          type: integer
+          minimum: 0
 
     VocListItem:
       type: object

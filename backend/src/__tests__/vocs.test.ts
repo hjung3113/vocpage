@@ -8,6 +8,16 @@ import { VOC_FIXTURES, FIXTURE_USERS } from '../../../shared/fixtures/voc.fixtur
  *
  * U3=A: 테스트는 mock repository(jest.mock) 모듈 단위 mocking 으로 동작.
  */
+jest.mock('../repository/notifications', () => ({
+  hasRecentNotification: jest.fn(async () => false),
+  insertNotification: jest.fn(async () => ({ id: 'n1', created_at: '2026-05-09T00:00:00Z' })),
+  lazyTrim: jest.fn(),
+  listForUser: jest.fn(async () => []),
+  unreadSummaryForUser: jest.fn(async () => ({ count: 0, latest_id: null, latest_created_at: null })),
+  markAllRead: jest.fn(),
+  markOneRead: jest.fn(async () => true),
+  getUserRole: jest.fn(async () => 'manager'),
+}));
 jest.mock('../repository/voc', () => {
   type Row = (typeof import('../../../shared/fixtures/voc.fixtures'))['VOC_FIXTURES'][number];
   const fixtures = jest.requireActual('../../../shared/fixtures/voc.fixtures') as {
@@ -600,6 +610,74 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
         .post('/api/vocs/00000000-0000-4000-8000-00000000ffff/payload-review')
         .send({ decision: 'approve' });
       expect(res.status).toBe(404);
+    });
+  });
+
+  // ─── Wave 5 Phase A — notification trigger wiring ──────────────────────
+  describe('Wave 5 §8.6 notification triggers', () => {
+    /* eslint-disable @typescript-eslint/no-require-imports */
+    const notifRepo = require('../repository/notifications') as {
+      hasRecentNotification: jest.Mock;
+      insertNotification: jest.Mock;
+    };
+    /* eslint-enable @typescript-eslint/no-require-imports */
+
+    beforeEach(() => {
+      notifRepo.hasRecentNotification.mockClear();
+      notifRepo.insertNotification.mockClear();
+      notifRepo.hasRecentNotification.mockResolvedValue(false);
+    });
+
+    test('PATCH status fires notifyOnStatusChange (insert with type=status_change)', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ status: '검토중' });
+      expect(res.status).toBe(200);
+      expect(notifRepo.insertNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'status_change', voc_id: liveVoc.id }),
+      );
+    });
+
+    test('PATCH assignee fires notifyOnAssign with new assignee as recipient', async () => {
+      const agent = await loginAs('manager');
+      const res = await agent
+        .patch(`/api/vocs/${liveVoc.id}`)
+        .send({ assignee_id: FIXTURE_USERS.devOther });
+      expect(res.status).toBe(200);
+      expect(notifRepo.insertNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'assigned',
+          voc_id: liveVoc.id,
+          user_id: FIXTURE_USERS.devOther,
+        }),
+      );
+    });
+
+    test('PATCH assignee=null skips notifyOnAssign (no recipient)', async () => {
+      const agent = await loginAs('admin');
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ assignee_id: null });
+      expect(res.status).toBe(200);
+      expect(notifRepo.insertNotification).not.toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'assigned' }),
+      );
+    });
+
+    test('debounce: hasRecentNotification=true → no insert', async () => {
+      notifRepo.hasRecentNotification.mockResolvedValue(true);
+      const agent = await loginAs('manager');
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ status: '처리중' });
+      expect(res.status).toBe(200);
+      expect(notifRepo.hasRecentNotification).toHaveBeenCalled();
+      expect(notifRepo.insertNotification).not.toHaveBeenCalled();
+    });
+
+    test('PATCH same status (no change) does not fire trigger', async () => {
+      const agent = await loginAs('manager');
+      const sameStatus = liveVoc.status;
+      const res = await agent.patch(`/api/vocs/${liveVoc.id}`).send({ status: sameStatus });
+      expect(res.status).toBe(200);
+      expect(notifRepo.insertNotification).not.toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'status_change' }),
+      );
     });
   });
 });
