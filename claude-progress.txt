@@ -1,6 +1,24 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 5 Phase B PR-2 코드 완료 — 사용자 검토 / PR 대기)
+## 다음 세션 시작점 (2026-05-10 P2 BE batch 머지 완료 — FU-021/022 P1 후속)
+
+→ **P2 BE batch 4건 전부 머지 완료** (2026-05-09~10):
+   - **FU-018** (PR #279): `backend/src/__tests__/permission-matrix.test.ts` 단일 파일에 §8.3 21 cell × 5 role = 115 case 합치기. codex P1×2 / P2×2 / P3×2 → 전부 반영.
+   - **FU-015** (PR #280): `admin-{tags,trash}.sql.test.ts` 신규 — pg-mem DB-backed (마이그 002-006 + 014 + 015 + 020 Up sections), restore 트랜잭션 end-to-end 포함, 13 pass / 4 skip / 1 todo. codex P1 (restore route 미커버) 반영.
+   - **FU-010** (PR #281): 마이그 021 — `user_role_log_{old,new}_role_check` (NULL sentinel + 4 enum). `NOT VALID` + pre-flight SELECT 로 backfill safety. codex P1/P2/P3 전부 반영. 회귀 6건.
+   - **FU-007** (PR #282): doc-only — `requirements.md §4` + `feature-notice-faq.md §10.3.1` + §10.3.3-bis 신설 (timestamptz 정책 + inclusive-end + 정책 vs 현 코드 mismatch 명시). codex P2 (aspirational claim) 발견 → descriptive 로 재작성.
+
+→ **신규 spawn 5건**: FU-021 (P1, VOC list/detail user 스코핑 누락) · FU-022 (P1, `/api/admin/*` router-level `use(requireAdmin())` leak — production 라우팅 버그) · FU-023 (P2, `createTag` slug+kind 정합) · FU-024 (P2, testcontainers Postgres 인프라 — 4 cell skip 활성화) · FU-025 (P2, Notice `visible_from` KST 자정 정규화 — FE 미구현).
+
+→ **메트릭**: BE 442/442 그린. 마이그 021 추가, 회귀 +6 (FU-010) + 매트릭스 +115 (FU-018) + DB-backed 통합 +13 (FU-015).
+
+→ **다음 세션 작업**: P1 인 **FU-021 / FU-022** 가 가장 시급 (FU-018 가 발견한 production gate 갭 / 라우팅 버그). FU-021 = `service.list/detail` 에 user 스코핑 + 매트릭스 cell 활성화. FU-022 = adminTrashRouter 의 `use(requireAdmin())` 가 다른 admin 라우터 경로를 가로채는 prod 버그 수정 (route-scoped guard 또는 sub-prefix 마운트). P2 후속 (FU-023/024/025) 은 별도 사이클.
+
+→ **마이그 번호** — 다음 마이그 번호 = **022** (021 머지로 +1).
+
+---
+
+## 이전 세션 시작점 (2026-05-10 Wave 5 Phase B PR-2 코드 완료 — 사용자 검토 / PR 대기)
 
 → **Wave 5 Phase B PR-2 코드 완료** (`feat/wave-5-phase-b-fe`, 2026-05-10).
    - **변경 요약**: `<NavItemCountBadge>` 추상 신설 · Sidebar `/notifications` `/notice` `/faq` nav-item 일괄 적용 · notifications API/훅 (`useNotificationsList` + `useUnreadBadge` 30s 폴링, ETag 헬퍼 `etagFetch.ts` 부수 보유) · `/notifications` 페이지 신설 (StubPage 대체, mount 시 mark-all-read) · comments BE wiring (POST/PATCH/DELETE 추가, `useAddComment`/`useUpdateComment`/`useDeleteComment` 훅) · VocComment Textarea → ToastBodyEditor (`format='html'`) + SafeHtml(DOMPurify) 렌더 · FU-006 `var(--border)` 직접 소비자 4곳 정리.
