@@ -68,7 +68,9 @@ function mapServiceError(err: unknown): { status: number; code: string; message:
 export const adminUsersRouter = Router();
 
 adminUsersRouter.use(auth);
-adminUsersRouter.use(requireAdmin());
+// FU-022: requireAdmin() applied per-route (not router-level) so non-matching
+// paths fall through to the next admin-* router instead of being intercepted
+// here. See admin-trash.ts and __tests__/admin-router-mount.test.ts.
 
 /**
  * GET /api/admin/users
@@ -76,6 +78,7 @@ adminUsersRouter.use(requireAdmin());
  */
 adminUsersRouter.get(
   '/users',
+  requireAdmin(),
   validate({ query: AdminUserListQuery }),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -94,6 +97,7 @@ adminUsersRouter.get(
  */
 adminUsersRouter.patch(
   '/users/:id',
+  requireAdmin(),
   validate({ params: UserIdParam, body: AdminUserPatch }),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

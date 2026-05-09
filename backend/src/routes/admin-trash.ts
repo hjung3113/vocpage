@@ -41,7 +41,10 @@ const auth: RequestHandler = (req, res, next) => createAuthMiddleware()(req, res
 export const adminTrashRouter = Router();
 
 adminTrashRouter.use(auth);
-adminTrashRouter.use(requireAdmin());
+// FU-022: requireAdmin() applied per-route (not router-level) so non-matching
+// paths fall through to the next admin-* router instead of being intercepted
+// here. Mounting all four admin routers under `/api/admin` simultaneously
+// (index.ts) exposes the router-level interception bug; per-route guard fixes.
 
 /** Validate and coerce TrashListQuery from query-string. */
 function parseTrashQuery(): RequestHandler {
@@ -66,6 +69,7 @@ function parseTrashQuery(): RequestHandler {
 // GET /api/admin/vocs/trash
 adminTrashRouter.get(
   '/vocs/trash',
+  requireAdmin(),
   parseTrashQuery(),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -82,6 +86,7 @@ adminTrashRouter.get(
 // GET /api/admin/vocs/:id/restore-log
 adminTrashRouter.get(
   '/vocs/:id/restore-log',
+  requireAdmin(),
   validate({ params: TrashIdParam }),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
