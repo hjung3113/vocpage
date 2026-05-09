@@ -142,7 +142,7 @@ Phase F: 종합 검증
 | W3-5 | C     | Trash FE+BE+fixture+E2E (1 PR)                                                                                                                                                           | spec §9.4.7                      |
 | W3-6 | D     | External Masters FE+BE+fixture+E2E (1 PR)                                                                                                                                                | spec §16.3 (Manager+ + Dev read) |
 | W3-7 | E     | Users FE+BE+fixture+E2E (1 PR — `user_role_log` 의존)                                                                                                                                    | spec §15.2                       |
-| W3-8 | F     | 종합 검증 + progress 갱신 (1 PR)                                                                                                                                                         | gate close                       |
+| W3-8 | F     | ✅ 종합 검증 + progress 갱신 — 2026-05-09. BE 269 / FE 561 / lint 0. 권한 매트릭스 분산 커버 (admin-{tags,trash,users,masters} + assertCanManageVoc + vocs reassign) 100% 그린. 단일 통합 테스트 파일 = FU-018. 토큰 lint 0 hits. | gate close                       |
 | W3-9 | A     | ✅ 마이그 017 (`user_role_log` 별 테이블) + rollback — PR #250 `55548a6` (2026-05-09). FU-010 (CHECK constraint) deferral.                                                               | OQ-3 Option A                    |
 
 > **R5 준수**: 묶음 PR 금지. W3-1 / W3-2 / W3-3 모두 별 PR. W3-4~W3-7 도 화면당 별 PR.
