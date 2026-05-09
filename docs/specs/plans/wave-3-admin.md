@@ -1,7 +1,7 @@
 # Wave 3 — Admin 4 화면 Plan
 
 > 목적: 관리자 페이지 4 화면 (Tag Master / Trash / External Masters / Users) 의 vertical slice 를 spec 정본에 맞춰 구현·검증한다.
-> 인덱스 규칙: `docs/specs/README.md §7`. Wave 계보: `wave-index.md`. Follow-up bucket: `followup-bucket.md`.
+> Follow-up bucket: `followup-bucket.md`. ID 규칙은 root `CLAUDE.md` 참조.
 > 정본 product spec: `requires/requirements.md §15` + `requires/feature-voc.md §9.4.6 / §9.4.7` + `requires/external-masters.md` + `requires/uidesign.md §14.3 (Role Pill) / §10.5 (Sidebar admin group)`.
 
 ## 0. 진입 게이트
@@ -67,7 +67,7 @@
 ### 5.1 진입 차단 (선행 필수)
 
 - **Wave 2 (Dashboard) 머지** — `next-session-tasks.md` 명시. Phase 8 기조상 dashboard 가 widget contract 도입 → admin 화면이 같은 contract 패턴을 재사용.
-- **마이그 012 (`users.role` enum 4 종)** — 별 트랙. `migration-012-draft.md` 정본. 본 Wave Phase E (Users) 진입 전 머지 필수.
+- **마이그 012 (`users.role` enum 4 종)** — 별 트랙. `../archive/plans/migration-012-draft.md` 정본. 본 Wave Phase E (Users) 진입 전 머지 필수.
 - **마이그 014 (`tags.is_external` / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR (W3-1, OQ-4 결정 2026-05-09). `merged_into_id` 자기참조 FK 는 Resolution α (2026-05-09) 로 보류; 병합은 source-row hard-delete 정책 (`feature-voc.md §9.4.6` · ADR 0004) 그대로.
 - **마이그 015 (`vocs.deleted_by` / `voc_restore_log`)** — 본 Wave Phase A 1 PR (W3-2).
 - **마이그 017 (`user_role_log` 별 테이블)** — 본 Wave Phase A 1 PR (W3-9, OQ-3 Option A). 016 은 별 트랙 점유.
@@ -121,7 +121,7 @@ Phase F: 종합 검증
   ├─ 권한 매트릭스 BE 통합 테스트 그린 (§13.x 권한 시나리오 100%)
   ├─ FE/BE typecheck + lint + test 모두 그린
   ├─ 토큰 lint (raw hex/OKLCH 0 hits)
-  ├─ claude-progress.txt + next-session-tasks.md + wave-index.md 갱신
+  ├─ claude-progress.txt + next-session-tasks.md 갱신
   └─ 사용자 최종 승인 → Wave 3 완료
 ```
 
@@ -150,7 +150,7 @@ Phase F: 종합 검증
 
 ## 7. Open Questions — closed (2026-05-09 grill)
 
-> 5 건 모두 사용자 결정 + spec 동기화 (PR-α `docs/wave-3-oq-sync`) 완료. 본 절은 결정 요약만 남기고 옵션 분석 본문은 [`open-questions.md`](./open-questions.md) 와 ADR 0004 / 0005 에 흡수.
+> 5 건 모두 사용자 결정 + spec 동기화 (PR-α `docs/wave-3-oq-sync`) 완료. 본 절은 결정 요약만 남기고 옵션 분석 본문은 + ADR 0004 / 0005 에 흡수.
 
 | OQ                              | 결정                                                                         | spec sync                                                                              |
 | ------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -208,7 +208,7 @@ Phase F: 종합 검증
 - **권장**: **Result Review → Users → Tag Master → External Masters → Trash** (운영 빈도 + Trash = 마지막 = 데이터 폐기성 정합). 단 spec 명시가 없으므로 사용자 결정 필요.
 - **결정 후**: `feature-voc.md §9.4` 또는 `uidesign.md §10.5` 에 sidebar admin 그룹 순서 박스 추가.
 
-> 위 OQ 5 건은 [`docs/specs/plans/open-questions.md`](./open-questions.md) (본 Wave 한정) 에 동기화. (.omc/plans/open-questions.md 가 아닌 docs/specs/plans/ 트리 내 파일 — 정본 위치는 docs hygiene 룰 §3 SoT).
+> 위 OQ 5 건은 본 plan §7 표 + spec sync 컬럼에 동기화. 추가 OQ 발생 시 본 plan 또는 `next-session-tasks.md` 「이연 항목」 에 누적.
 
 </details>
 
@@ -244,16 +244,14 @@ Phase F: 종합 검증
 - visual-diff 4 화면 baseline 추가 (`benchmark/admin/01-tag-master.png` ~ `04-users.png` + `INDEX.md` row 4 건). 자손 포함 SKIP 0.
 - 토큰 lint 통과 (raw hex/OKLCH 0 hits, `var(--*)` 만 사용).
 - `shared/openapi.yaml` 갱신 + `shared/contracts/admin/**` zod schema 단일 정본.
-- `wave-index.md` Wave 3 row Status `대기 → ✅ PR #N` + `claude-progress.txt` 첫 30 줄 동기화 + `next-session-tasks.md` 활성 작업 표 갱신.
+- `next-session-tasks.md` Wave 3 row Status 갱신 + `claude-progress.txt` 첫 30 줄 동기화 + `next-session-tasks.md` 활성 작업 표 갱신.
 - ADR 0004 / 0005 Status `Proposed → Accepted` + Decision 본문 사용자 결정 반영.
 - 사용자 최종 승인 → Wave 3 close.
 
 ## 11. 참조
 
-- 정본 governance: `CLAUDE.md` (root) + `.claude/CLAUDE.md` + `docs/CLAUDE.md`
-- Doc 정책: `docs/specs/README.md`
+- 정본 governance: root `CLAUDE.md` + `.claude/CLAUDE.md` + `frontend/CLAUDE.md` + `backend/CLAUDE.md`
 - 정본 product spec: `docs/specs/requires/requirements.md §15`, `feature-voc.md §9.4.6 / §9.4.7`, `external-masters.md`, `uidesign.md §14.3 / §10.5`
-- ID 규칙: `docs/specs/README.md §7` (R1~R7) + `wave-index.md` + `followup-bucket.md`
-- 직전 Wave precedent: `wave-1-6-voc-parity.md` (Phase 게이트 / batch / D9 PR 단위), `wave-1-7-voc-create-modal.md` (모달 spec 패턴)
+- ID 규칙: root `CLAUDE.md §Documents` + `followup-bucket.md`
+- 직전 Wave precedent: `../archive/plans/wave-1-6-voc-parity.md` (Phase 게이트 / batch / D9 PR 단위), `../archive/plans/wave-1-7-voc-create-modal.md` (모달 spec 패턴)
 - ADR: `docs/adr/0004-admin-permission-model.md`, `docs/adr/0005-trash-restore-policy.md`
-- 본 Wave Open Questions: `docs/specs/plans/open-questions.md`

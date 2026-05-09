@@ -11,6 +11,7 @@
 Reference: `servey_Remix App.html` capture (1440×900).
 
 Key visual patterns from reference:
+
 - 2-col card grid at 1440px viewport
 - Status badge top-right of each card
 - Filter tabs (진행중/완료/대기) below page header
@@ -25,12 +26,12 @@ Key visual patterns from reference:
 
 ## Captured
 
-| Screen | Path |
-|---|---|
-| /notice (user) | `captures/voc-notice.png` |
-| /faq (user) | `captures/voc-faq.png` |
+| Screen             | Path                            |
+| ------------------ | ------------------------------- |
+| /notice (user)     | `captures/voc-notice.png`       |
+| /faq (user)        | `captures/voc-faq.png`          |
 | /notice?mode=admin | `captures/voc-notice-admin.png` |
-| /faq?mode=admin | `captures/voc-faq-admin.png` |
+| /faq?mode=admin    | `captures/voc-faq-admin.png`    |
 
 Viewport: 1440×900, fullPage=true. Dev server from `feat/wave-4-fe` worktree with MSW fixture data.
 
@@ -95,6 +96,7 @@ Both `NoticeRow.tsx:95` and `FaqRow.tsx:136` have `// TODO(security): wrap with 
 ## Token Discipline Audit
 
 All inspected components pass:
+
 - `LevelBadge.tsx`: uses `var(--status-blue)`, `var(--status-amber)`, `var(--status-red)`, `var(--bg-elevated)` — no hex
 - `NoticeRow.tsx`: all colors via `var(--*)` or Tailwind token classes — no hex
 - `FaqRow.tsx`: uses `var(--mark-bg)`, `var(--bg-elevated)`, `var(--border-standard)`, `var(--text-*)` — no hex

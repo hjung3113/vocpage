@@ -1,7 +1,7 @@
 # Follow-up Bucket
 
 > 닫힌 wave에서 발견된 후속 작업의 단일 누적 위치. ID 규칙: `FU-NNN` flat global, append-only (R6).
-> 정본: 본 파일. 인덱스 규칙은 [`docs/specs/README.md §7`](../README.md). Wave 계보는 [`wave-index.md`](./wave-index.md).
+> 정본: 본 파일. ID 규칙은 root `CLAUDE.md §Documents`.
 
 ## 운영 룰
 
@@ -29,7 +29,7 @@
 | FU-011 | Wave 3 Phase A (4 PR CI noise, 2026-05-09)          | `lint-root` pre-existing 실패 3건 — `@typescript-eslint/no-var-requires` (faqs/notices/faq-categories `.test.ts`) | Open   | P1. Phase B 진입 전 처리 권장. `require()` → `import` 전환.                                                                                                  |
 | FU-012 | Wave 3 Phase A (Resolution α, PR #251, 2026-05-09)  | Tag merge audit 도입 시 `tag_merge_log` 테이블 spec                                                               | Open   | P3. Resolution α 으로 `tags.merged_into_id` 보류됨 → audit 요구가 발생할 때만 진입. 병합은 source-row hard-delete (`feature-voc.md §9.4.6` · ADR 0004) 유지. |
 
-> Wave 3 (Admin 4 화면) 의 OQ 5 건은 닫힌 wave 가 아니므로 본 bucket 진입 X — `plans/open-questions.md` 에서 추적 (R6 정합).
+> Wave 3 (Admin 4 화면) 의 OQ 5 건은 닫힌 wave 가 아니므로 본 bucket 진입 X — `wave-3-admin.md §7` 에서 추적.
 
 ## 머지 완료 (✅)
 

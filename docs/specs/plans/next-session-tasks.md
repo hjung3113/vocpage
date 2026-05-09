@@ -12,38 +12,25 @@
 | Wave          | 정본 plan                                                                                                                                                                | 상태                                                                                                                                                                                                                                                                                                                                                  |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **FSD**       | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md`                                                                | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                                                                                                                                                                                                                                                                  |
-| **/voc 완성** | [`voc-completion-driver.md`](./voc-completion-driver.md)                                                                                                                 | 🟢 `docs/voc-completion-single-pr` 9 commit, FE 469 / BE 111 PASS, code-review B-1·H-1·H-2 처리 — **PR open 대기**                                                                                                                                                                                                                                    |
-| **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                                                                                           | ✅ 잔여 η/ζ/D 모두 `/voc 완성` 단일 PR 로 흡수.                                                                                                                                                                                                                                                                                                       |
-| **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                                                                               | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR 로 흡수.                                                                                                                                                                                                                                                                                         |
+| **/voc 완성** | [`archive/plans/voc-completion-driver.md`](./archive/plans/voc-completion-driver.md)                                                                                     | ✅ PR #242 머지 — Wave 1.6 잔여 + 1.7 B/C/D 단일 PR 흡수 완료                                                                                                                                                                                                                                                                                         |
+| **1.6**       | [`../archive/plans/wave-1-6-voc-parity.md`](../archive/plans/wave-1-6-voc-parity.md) (history)                                                                           | ✅ 잔여 η/ζ/D 모두 `/voc 완성` 단일 PR (#242) 로 흡수.                                                                                                                                                                                                                                                                                                |
+| **1.7**       | [`../archive/plans/wave-1-7-voc-create-modal.md`](../archive/plans/wave-1-7-voc-create-modal.md) (history)                                                               | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR (#242) 로 흡수.                                                                                                                                                                                                                                                                                  |
+| **4**         | `feature-notice-faq.md` §10                                                                                                                                              | ✅ PR #245 머지 — 공지/FAQ + Notice popup. Adversarial review (1 P0, 5 P1, 4 P2) → P0 fix 동봉 머지.                                                                                                                                                                                                                                                  |
 | **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | 🟡 **Phase A 머지 완료 (2026-05-09)** — PR #250 (W3-9 마이그 017) `55548a6` / PR #251 (W3-1 마이그 014 + Resolution α) `7a46d6a` / PR #252 (W3-3 contracts) `7907b1e` / PR #254 (W3-3 codex P1 hotfix) `93ed028` / PR #253 (W3-2 마이그 015) `f9ed85f`. **다음**: Phase B (Tag Master `/admin/tags`) + Phase C (Trash `/admin/vocs/trash`) 병렬 진입. |
 
 ### Hard-blocks
 
-- **Wave 2 (Dashboard)** : `/voc 완성` 단일 PR 머지 전까지 진입 금지.
+- 없음 (`/voc 완성` PR #242, Wave 4 PR #245 모두 머지 완료).
 
 ### 진행 순서
 
-~~FSD Migration (완료)~~ → ~~`/voc 완성` 단일 PR~~ → ~~Wave 3 Phase A (4 PR + hotfix, 2026-05-09 머지)~~ → **Wave 3 Phase B+C 병렬** → Phase D+E 병렬 → Phase F 종합 검증 → Wave 5 plan 작성 → Wave 2 (Dashboard).
+~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix, 2026-05-09)~~ → **Wave 3 Phase B+C 병렬** → Phase D+E 병렬 → Phase F 종합 검증 → Wave 5 plan 작성 → Wave 2 (Dashboard).
 
 ---
 
-## Phase 8 — 6 Wave 전체 계획
+## 닫힌 Wave
 
-> **계획서 정본**: [`phase-8.md`](./phase-8.md). 운영 전제·폐쇄망 사후 재현·Wave 0 첫 commit 정책 모두 그쪽.
-
-| Wave | 범위                                                                                                          | 상태                               |
-| ---- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| 0    | Foundation — shared/, shadcn 8종, TanStack Query, MSW, AppShell, RoleContext, BE Zod, ESLint, CI, PR template | ✅ PR #102                         |
-| 1    | 기준 화면 — VOC 리스트 + 검토 드로어 vertical slice + 회고 + RTL 보강                                         | ✅ #110/#111/#112/#113 + 수락 #114 |
-| 1.5  | Wave 1 보강 — `/voc` 시각 동등화 + Playwright e2e                                                             | ✅ PR #125 머지 (2026-05-02)       |
-| 1.6  | `/voc` 시각·구조 정합 (history) — `/voc 완성` 단일 PR 에 흡수                                                 | 🟡 위 표 참조                      |
-| 1.7  | VOC 등록 모달 — A spec 머지 / B+C+D 는 `/voc 완성` 단일 PR 에 흡수                                            | 🟡 위 표 참조                      |
-| 2    | Dashboard + 위젯 8종 (계약 → FE → BE)                                                                         | `/voc 완성` 단일 PR 머지 후        |
-| 3    | Admin 4 화면 (Tag Master / Trash / External Masters / Users)                                                  | 병렬 가능                          |
-| 4    | 공지/FAQ + Notice popup                                                                                       | 병렬 가능                          |
-| 5    | 알림 + 셸 마감 + 시각 회귀 12 화면 (N-03 BE polling)                                                          | close gate                         |
-
-**Phase 8 close 조건**: 빌드/테스트/lint clean / fixture-seed parity / Playwright 9 시나리오 PASS / 12 화면 시각 회귀 통과 / NextGen 갱신.
+Wave 0/1/1.5/1.6/1.7/4 머지 완료. Wave 3 Phase A 머지 완료. 상세는 `git log --merges` 와 PR description 참조.
 
 ---
 
@@ -93,7 +80,7 @@ migration 013 dev role / `assertCanManageVoc` 헬퍼 / FE/BE Role union `'dev'` 
 
 ### 외부 의존 / NextGen
 
-→ [`nextgen-backlog.md`](./nextgen-backlog.md) (G-1 / N-1 / N-2 / P-NG + 우선순위 4개 + 기능별 유보).
+G-1 (외부 의존 — 실 MSSQL) / N-1·N-2 (NextGen 알림·AI) / P-NG (Playwright NextGen flow). 우선순위·기능별 유보는 본 문서 「이연 항목」 안에 누적.
 
 ---
 

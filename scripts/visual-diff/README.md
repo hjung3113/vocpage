@@ -70,4 +70,4 @@ Sections:
 This tool is a dev-only utility (never deployed to production). Playwright's
 bundled Chromium is used rather than vendoring. This is documented as an
 exemption from the phase-8 §7.2 closed-network vendoring discipline in
-`docs/specs/plans/phase-8-mirror-check.md`.
+`docs/specs/archive/plans/phase-8-mirror-check.md`.

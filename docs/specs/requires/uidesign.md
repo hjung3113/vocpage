@@ -6,6 +6,7 @@
 > Behavior, business logic, API contracts, role policy → `requirements.md` / `feature-*.md`.
 >
 > **Revision history**:
+>
 > - 2025.06 — initial Linear-inspired indigo palette overhauled to Samsung Blue + automatic system theme sync.
 > - 2026-04-27 — renamed `design.md` → `uidesign.md` to make the visual-only scope unambiguous.
 > - 2026-05-09 — removed prototype references and frontend implementation paths; consolidated archetype amendments and wave/phase markers into history; added Surfaces, Border-radius, Shadows, and Agent Prompt Guide sections for AI-followable lookups.
@@ -59,12 +60,12 @@ Clean corporate look on blue-tinted white. Similar to the light version of Galax
 
 Four numbered elevation levels — pick layer by depth, not by mood.
 
-| Level | Token            | Light                    | Dark                     | Purpose                                      |
-| ----- | ---------------- | ------------------------ | ------------------------ | -------------------------------------------- |
-| **0** | `--bg-app`       | `oklch(98% 0.007 252)`   | `oklch(11% 0.016 264)`   | Lowest canvas — page body                    |
-| **1** | `--bg-panel`     | `oklch(96.5% 0.009 255)` | `oklch(14.5% 0.019 262)` | Sidebar, sticky topbars, panel zones         |
-| **2** | `--bg-surface`   | `oklch(100% 0 0)`        | `oklch(18.5% 0.021 260)` | Cards, drawers, modal dialog surface         |
-| **3** | `--bg-elevated`  | `oklch(95% 0.011 256)`   | `oklch(23% 0.022 258)`   | Hover, popovers, nested-card / row-hover     |
+| Level | Token           | Light                    | Dark                     | Purpose                                  |
+| ----- | --------------- | ------------------------ | ------------------------ | ---------------------------------------- |
+| **0** | `--bg-app`      | `oklch(98% 0.007 252)`   | `oklch(11% 0.016 264)`   | Lowest canvas — page body                |
+| **1** | `--bg-panel`    | `oklch(96.5% 0.009 255)` | `oklch(14.5% 0.019 262)` | Sidebar, sticky topbars, panel zones     |
+| **2** | `--bg-surface`  | `oklch(100% 0 0)`        | `oklch(18.5% 0.021 260)` | Cards, drawers, modal dialog surface     |
+| **3** | `--bg-elevated` | `oklch(95% 0.011 256)`   | `oklch(23% 0.022 258)`   | Hover, popovers, nested-card / row-hover |
 
 > **Principle**: All backgrounds must be micro-tinted with blue hue (250–268). Pure white/black forbidden.
 >
@@ -135,15 +136,15 @@ CDN: `https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variabl
 
 ### Type Scale
 
-| Role    | Size    | Line height | Weight  | Tracking      | Usage                                       |
-| ------- | ------- | ----------- | ------- | ------------- | ------------------------------------------- |
-| Display | 32px    | 1.2         | 700     | `-0.02em`     | Rarely used (empty-state hero, error 404)   |
-| Heading | 20–24px | 1.3         | 700     | `-0.015em`    | Section titles                              |
-| Title   | 15px    | 1.4         | 700     | normal        | **Page header title**, card/drawer headings |
-| Body UI | 14px    | 1.5 (1.65 KR) | 400   | normal        | Default body text                           |
-| Label   | 13px    | 1.4         | 400–600 | normal        | Table cells, form labels                    |
-| Caption | 11–12px | 1.4         | 400–600 | normal        | Metadata, dates                             |
-| Micro   | 10–11px | 1.3         | 600     | `0.06–0.08em` (uppercase) | Badges, tags, uppercase labels    |
+| Role    | Size    | Line height   | Weight  | Tracking                  | Usage                                       |
+| ------- | ------- | ------------- | ------- | ------------------------- | ------------------------------------------- |
+| Display | 32px    | 1.2           | 700     | `-0.02em`                 | Rarely used (empty-state hero, error 404)   |
+| Heading | 20–24px | 1.3           | 700     | `-0.015em`                | Section titles                              |
+| Title   | 15px    | 1.4           | 700     | normal                    | **Page header title**, card/drawer headings |
+| Body UI | 14px    | 1.5 (1.65 KR) | 400     | normal                    | Default body text                           |
+| Label   | 13px    | 1.4           | 400–600 | normal                    | Table cells, form labels                    |
+| Caption | 11–12px | 1.4           | 400–600 | normal                    | Metadata, dates                             |
+| Micro   | 10–11px | 1.3           | 600     | `0.06–0.08em` (uppercase) | Badges, tags, uppercase labels              |
 
 > Token reference for sizes: not exposed as discrete `--text-*` tokens — use literal px on `font-size`, but only one of the values above. Do not invent sizes between tiers.
 
@@ -203,7 +204,7 @@ box-shadow: 0 0 0 3px var(--brand-bg);
 
 ### Tag Pill (Auto-tag)
 
-> In-row VOC tag pill uses the text-only quiet style (no border/background, smaller). The chip-style spec below is **retained** for non-row contexts (filter UI, badges in headings, future imported-source badges) and is the canonical OutlineChip primitive (`docs/specs/reviews/wave-1-6-voc-badge-audit.md` §2.2). For the in-row VOC tag visual, use the TextMark variant immediately below. Cross-reference: audit §1 row 2.
+> In-row VOC tag pill uses the text-only quiet style (no border/background, smaller). The chip-style spec below is **retained** for non-row contexts (filter UI, badges in headings, future imported-source badges) and is the canonical OutlineChip primitive (`docs/specs/archive/reviews/wave-1-6-voc-badge-audit.md` §2.2). For the in-row VOC tag visual, use the TextMark variant immediately below. Cross-reference: audit §1 row 2.
 
 **In-row VOC tag (current — TextMark `size='xs'`):**
 
@@ -457,11 +458,11 @@ Every list, table, drawer, and dashboard widget MUST render one of three non-dat
 
 Dark backgrounds suppress shadows — light/dark are separately optimized.
 
-| Token             | Geometry           | Where to use                                              |
-| ----------------- | ------------------ | --------------------------------------------------------- |
-| `--shadow-sm`     | `0 1px 3px`        | Inline cards lifting above Surface (Level 2)              |
-| `--shadow-md`     | `0 4px 16px`       | Popovers, dropdowns, sticky headers when scrolled         |
-| `--shadow-dialog` | `0 12px 40px`      | Modal dialog surface, full-page drawer                    |
+| Token             | Geometry      | Where to use                                      |
+| ----------------- | ------------- | ------------------------------------------------- |
+| `--shadow-sm`     | `0 1px 3px`   | Inline cards lifting above Surface (Level 2)      |
+| `--shadow-md`     | `0 4px 16px`  | Popovers, dropdowns, sticky headers when scrolled |
+| `--shadow-dialog` | `0 12px 40px` | Modal dialog surface, full-page drawer            |
 
 ```css
 --shadow-sm: light-dark(oklch(70% 0.04 260 / 0.1) 0 1px 3px, oklch(5% 0.01 265 / 0.4) 0 1px 3px);
@@ -488,14 +489,14 @@ Dark backgrounds suppress shadows — light/dark are separately optimized.
 
 Base unit: 4px. Use only these tokens — no arbitrary px between steps.
 
-| Token     | Value | Typical use                                      |
-| --------- | ----- | ------------------------------------------------ |
-| `--sp-1`  | 4px   | Icon ↔ label gap, chip inner padding             |
-| `--sp-2`  | 8px   | Element gap (default), nav-item icon gap         |
-| `--sp-3`  | 12px  | Form field internal padding, card body padding   |
-| `--sp-4`  | 16px  | Card outer padding, section internal stack       |
-| `--sp-5`  | 24px  | Section gap, admin-body padding, page margin     |
-| `--sp-6`  | 32px  | Major section break (hero, heading clearance)    |
+| Token    | Value | Typical use                                    |
+| -------- | ----- | ---------------------------------------------- |
+| `--sp-1` | 4px   | Icon ↔ label gap, chip inner padding           |
+| `--sp-2` | 8px   | Element gap (default), nav-item icon gap       |
+| `--sp-3` | 12px  | Form field internal padding, card body padding |
+| `--sp-4` | 16px  | Card outer padding, section internal stack     |
+| `--sp-5` | 24px  | Section gap, admin-body padding, page margin   |
+| `--sp-6` | 32px  | Major section break (hero, heading clearance)  |
 
 > Density rhythm: row content uses `--sp-2` / `--sp-3` for internal padding; section-level layout uses `--sp-4` / `--sp-5`. Never mix `--sp-1` and `--sp-6` directly without an intermediate step.
 
@@ -575,16 +576,16 @@ grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 
 Single source of radius decisions. Pick by element role — never by visual feel.
 
-| Element                                      | Radius   | Notes                                                           |
-| -------------------------------------------- | -------- | --------------------------------------------------------------- |
-| Card / Page-section panel                    | `8px`    | `.admin-card`, drawer body                                      |
-| Modal / Drawer outer surface                 | `12px`   | top corners only on bottom-anchored sheets                      |
-| Button                                       | `6px`    | primary, secondary, `.admin-btn`                                |
-| Input / Select / Search                      | `6px`    | `.faq-search`, admin form fields                                |
-| Pill (filter chip, tag pill, count badge)    | `9999px` | `--chip-radius-pill`                                            |
-| Rounded chip (status badge)                  | `4px`    | `--chip-radius-rounded`, `.role-pill`, `.notice-badge`          |
-| Status dot                                   | `50%`    | `.status-dot`                                                   |
-| Avatar (mini)                                | `50%`    | always perfect circle                                           |
+| Element                                   | Radius   | Notes                                                  |
+| ----------------------------------------- | -------- | ------------------------------------------------------ |
+| Card / Page-section panel                 | `8px`    | `.admin-card`, drawer body                             |
+| Modal / Drawer outer surface              | `12px`   | top corners only on bottom-anchored sheets             |
+| Button                                    | `6px`    | primary, secondary, `.admin-btn`                       |
+| Input / Select / Search                   | `6px`    | `.faq-search`, admin form fields                       |
+| Pill (filter chip, tag pill, count badge) | `9999px` | `--chip-radius-pill`                                   |
+| Rounded chip (status badge)               | `4px`    | `--chip-radius-rounded`, `.role-pill`, `.notice-badge` |
+| Status dot                                | `50%`    | `.status-dot`                                          |
+| Avatar (mini)                             | `50%`    | always perfect circle                                  |
 
 > If a new element type is introduced, choose the closest row above. Do not invent intermediate radii.
 
@@ -903,7 +904,7 @@ OS/browser dark mode setting automatically switches the entire theme.
 
 ## 13. Badge System
 
-> Canonical source for VOC scope: `docs/specs/reviews/wave-1-6-voc-badge-audit.md` (C-2.5).
+> Canonical source for VOC scope: `docs/specs/archive/reviews/wave-1-6-voc-badge-audit.md` (C-2.5).
 > This section defines the design-system–level contract. VOC-specific icon/color mappings live in the audit doc.
 
 ### 13.0 Presentational-only rule
@@ -914,11 +915,11 @@ All badge and chip **primitives** are `<span>`-based. No click handler, no focus
 
 Three archetypes cover all VOC badge use cases. Additional archetypes require a new audit.
 
-| Archetype       | Background                      | Border                              | Icon                                            | Border-radius           | Used for                                                                                                                                                                                                                             |
-| --------------- | ------------------------------- | ----------------------------------- | ----------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **TextMark**    | none                            | none                                | lucide (domain-specific) or `#` glyph (xs only) | n/a                     | Semantic color signal, no chip container. Priority, Type, **Tag (size='xs')**. Size variant `'sm' \| 'xs'` — `'xs'` (10.5px) used by VocTagPill, no fixed cell height.                                                                |
-| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide                      | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. No current VOC consumer — primitive retained for future tag-like use cases requiring chip prominence (e.g. Jira-imported source badge, filter pills).                                       |
-| **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                                        | `--chip-radius-rounded` | Status with filled background. Status.                                                                                                                                                                                               |
+| Archetype       | Background                      | Border                              | Icon                                            | Border-radius           | Used for                                                                                                                                                                                        |
+| --------------- | ------------------------------- | ----------------------------------- | ----------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **TextMark**    | none                            | none                                | lucide (domain-specific) or `#` glyph (xs only) | n/a                     | Semantic color signal, no chip container. Priority, Type, **Tag (size='xs')**. Size variant `'sm' \| 'xs'` — `'xs'` (10.5px) used by VocTagPill, no fixed cell height.                          |
+| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide                      | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. No current VOC consumer — primitive retained for future tag-like use cases requiring chip prominence (e.g. Jira-imported source badge, filter pills). |
+| **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                                        | `--chip-radius-rounded` | Status with filled background. Status.                                                                                                                                                          |
 
 ### 13.2 Shared dimension tokens (`--chip-*`)
 
@@ -1334,41 +1335,47 @@ Class ↔ token mapping: `.rv-diff-row.added` → `--diff-add-*`, `.rv-diff-row.
 
 ### Quick Token Reference
 
-| Role             | Token                                  |
-| ---------------- | -------------------------------------- |
-| Page background  | `var(--bg-app)`                        |
-| Panel / sidebar  | `var(--bg-panel)`                      |
-| Card surface     | `var(--bg-surface)`                    |
-| Hover / popover  | `var(--bg-elevated)`                   |
-| Primary text     | `var(--text-primary)`                  |
-| Secondary text   | `var(--text-secondary)`                |
-| Muted metadata   | `var(--text-tertiary)` / `--text-quaternary` |
-| Brand / CTA      | `var(--brand)` (filled) · `var(--accent)` (link/active) |
-| Brand tint bg    | `var(--brand-bg)`                      |
-| Border (subtle)  | `var(--border-subtle)`                 |
-| Border (default) | `var(--border-standard)`               |
-| Status: red/amber/green/sky | `var(--status-{red\|amber\|green\|sky})` |
+| Role                        | Token                                                   |
+| --------------------------- | ------------------------------------------------------- |
+| Page background             | `var(--bg-app)`                                         |
+| Panel / sidebar             | `var(--bg-panel)`                                       |
+| Card surface                | `var(--bg-surface)`                                     |
+| Hover / popover             | `var(--bg-elevated)`                                    |
+| Primary text                | `var(--text-primary)`                                   |
+| Secondary text              | `var(--text-secondary)`                                 |
+| Muted metadata              | `var(--text-tertiary)` / `--text-quaternary`            |
+| Brand / CTA                 | `var(--brand)` (filled) · `var(--accent)` (link/active) |
+| Brand tint bg               | `var(--brand-bg)`                                       |
+| Border (subtle)             | `var(--border-subtle)`                                  |
+| Border (default)            | `var(--border-standard)`                                |
+| Status: red/amber/green/sky | `var(--status-{red\|amber\|green\|sky})`                |
 
 ### Component Example Prompts
 
 Use these as templates when generating new components. They reference only tokens — copy-paste ready.
 
 **1. Primary CTA button**
+
 > Filled button with `background: var(--brand)`, `color: var(--text-on-brand)`, font Pretendard Variable weight 600 at 14px, `border-radius: 6px`, padding `8px 16px`. Hover: `background: var(--accent-hover)`. Disabled: `opacity: 0.5; cursor: not-allowed`.
 
 **2. Secondary / ghost button**
+
 > Transparent background, `color: var(--accent)`, `border: 1px solid var(--brand-border)`, `border-radius: 6px`, padding `6px 12px`. Hover: `background: color-mix(in oklch, var(--brand-bg) 80%, var(--accent) 10%)`.
 
 **3. Card (page-section panel)**
+
 > `background: var(--bg-surface)`, `border: 1px solid var(--border-standard)`, `border-radius: 8px`, padding `var(--sp-4)`. Title at 15px / weight 700 / `color: var(--text-primary)`; body at 14px / 400 / `var(--text-secondary)`. Cards stack with `var(--sp-5)` gap.
 
 **4. Sidebar nav item**
+
 > `display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 6px; font-size: 13.5px; color: var(--text-secondary)`. Hover: `background: var(--bg-elevated); color: var(--text-primary)`. Active: `background: var(--brand-bg); color: var(--accent); font-weight: 600`.
 
 **5. Input field**
+
 > `background: var(--bg-elevated)`, `color: var(--text-primary)`, `border: 1px solid var(--border-subtle)`, `border-radius: 6px`, padding `6px 11px`, font Pretendard Variable 13px. Focus: `border-color: var(--accent); box-shadow: 0 0 0 2px var(--brand-bg); outline: none`.
 
 **6. Status badge (SolidChip)**
+
 > `display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600`. Background `var(--status-{slug}-bg)`, color `var(--status-{slug}-fg)`, border `1px solid var(--status-{slug}-border)`. Leading 6px dot in matching status color.
 
 ### Hard rules — agents must enforce
