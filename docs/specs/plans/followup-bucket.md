@@ -14,17 +14,17 @@
 
 ## 활성 (Open / Triaging)
 
-| ID     | Trigger (spawn)                          | Title                                                          | Status | Notes |
-| ------ | ---------------------------------------- | -------------------------------------------------------------- | ------ | ----- |
-| FU-001 | Wave 4 close (PR #245, 2026-05-09)       | dompurify + SafeHtml wrapper — 4 surfaces (XSS hotfix)         | Open · P1 | Notice body / FAQ answer / VOC body / comment HTML render. PR-β `fix/fu-001-dompurify`. 가장 시급. |
-| FU-002 | Wave 4 close (PR #245, 2026-05-09)       | 마이그 018 — `notices` / `faqs` hot-path 인덱스                | Open · P1 | `notices(is_visible, visible_from, visible_to)` partial idx + `faqs(category_id, is_visible, sort_order)` idx. PR-γ `fix/fu-002-notice-faq-indexes`. |
-| FU-003 | Wave 4 close (PR #245, 2026-05-09)       | Notice popup dismiss audit — per-user dismiss row 정합          | Open · P1 | Wave 3 Phase A 머지 후 idle slot. |
-| FU-004 | Wave 4 close (PR #245, 2026-05-09)       | FAQ search highlight tokenizer — Korean morpheme               | Open · P1 | Wave 3 Phase A 머지 후 idle slot. |
-| FU-005 | Wave 4 close (PR #245, 2026-05-09)       | Notice level=urgent 시 Notice popup auto-open 정책 정합         | Open · P1 | Wave 3 Phase A 머지 후 idle slot. |
-| FU-006 | Wave 4 close (PR #245, 2026-05-09)       | shadcn token rewrite drift — `--border` / `--danger` 잔존      | Open · P2 | Wave 3 close 후 batch. |
-| FU-007 | Wave 4 close (PR #245, 2026-05-09)       | Notice / FAQ visible_from KST 자정 timestamptz 정합 (8-M2 흡수) | Open · P2 | Wave 3 close 후 batch. |
-| FU-008 | Wave 4 close (PR #245, 2026-05-09)       | Sidebar count badge — Notice / FAQ unread count 실연동         | Open · P2 | Wave 3 close 후 batch. |
-| FU-009 | Wave 4 close (PR #245, 2026-05-09)       | Visual-diff baseline 추가 — Notice popup / FAQ search 결과     | Open · P2 | Wave 3 close 후 batch. |
+| ID     | Trigger (spawn)                    | Title                                                            | Status | Notes |
+| ------ | ---------------------------------- | ---------------------------------------------------------------- | ------ | ----- |
+| FU-001 | Wave 4 close (PR #245, 2026-05-09) | dompurify + SafeHtml wrapper — 4 surfaces (XSS hotfix)           | Open   | P1. Notice body / FAQ answer / VOC body / comment HTML render. PR-β `fix/fu-001-dompurify`. 가장 시급. |
+| FU-002 | Wave 4 close (PR #245, 2026-05-09) | 마이그 018 — `notices` / `faqs` hot-path 인덱스                  | Open   | P1. `notices(is_visible, visible_from, visible_to)` partial idx + `faqs(category_id, is_visible, sort_order)` idx. PR-γ `fix/fu-002-notice-faq-indexes`. |
+| FU-003 | Wave 4 close (PR #245, 2026-05-09) | Notice popup dismiss audit — per-user dismiss row 정합            | Open   | P1. Wave 3 Phase A 머지 후 idle slot. |
+| FU-004 | Wave 4 close (PR #245, 2026-05-09) | FAQ search highlight tokenizer — Korean morpheme                 | Open   | P1. Wave 3 Phase A 머지 후 idle slot. |
+| FU-005 | Wave 4 close (PR #245, 2026-05-09) | Notice level=urgent 시 Notice popup auto-open 정책 정합           | Open   | P1. Wave 3 Phase A 머지 후 idle slot. |
+| FU-006 | Wave 4 close (PR #245, 2026-05-09) | shadcn token rewrite drift — `--border` / `--danger` 잔존        | Open   | P2. Wave 3 close 후 batch. |
+| FU-007 | Wave 4 close (PR #245, 2026-05-09) | Notice / FAQ visible_from KST 자정 timestamptz 정합 (8-M2 흡수)   | Open   | P2. Wave 3 close 후 batch. |
+| FU-008 | Wave 4 close (PR #245, 2026-05-09) | Sidebar count badge — Notice / FAQ unread count 실연동           | Open   | P2. Wave 3 close 후 batch. |
+| FU-009 | Wave 4 close (PR #245, 2026-05-09) | Visual-diff baseline 추가 — Notice popup / FAQ search 결과       | Open   | P2. Wave 3 close 후 batch. |
 
 > Wave 3 (Admin 4 화면) 의 OQ 5 건은 닫힌 wave 가 아니므로 본 bucket 진입 X — `plans/open-questions.md` 에서 추적 (R6 정합).
 

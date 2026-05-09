@@ -532,18 +532,18 @@ Three distinct tiers for scannable information density:
 
 ### Sidebar Admin Group — Item Order
 
-Fixed top-to-bottom order for the `관리자` (admin) section. Visual rendering only — role-guarded behaviour and routing live in `feature-voc.md §9.4`.
+Fixed top-to-bottom order for the `관리자` (admin) section. Visual order only.
 
-| Order | Label | Notes |
-| ----- | ----- | ----- |
-| 1 | Result Review | top of group |
-| 2 | Users | |
-| 3 | External Masters | |
-| 4 | Tag Master | |
-| 5 | Trash | bottom — destructive surface anchored last |
+| Order | Label            |
+| ----- | ---------------- |
+| 1     | Result Review    |
+| 2     | Users            |
+| 3     | External Masters |
+| 4     | Tag Master       |
+| 5     | Trash            |
 
-- Items hidden by role guard collapse — sibling spacing (`8px` section gap) is preserved across the remaining items.
 - Active state styling reuses the base `Sidebar Navigation Items` rules; no admin-specific colour overrides.
+- Inter-item spacing follows the `Sidebar Spacing` rules above (`8px` section gap, `10px 12px` nav-item padding).
 
 ### Content Width Policy
 

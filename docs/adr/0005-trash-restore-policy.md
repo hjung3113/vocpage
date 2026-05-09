@@ -16,7 +16,7 @@ Wave 3 Phase C 의 Trash 화면은 §8.9 Soft Delete 로 `deleted_at IS NOT NULL
 - **§15.4 운영 갭 해소**: `vocs.deleted_by` / `voc_restore_log` 컬럼/테이블 추가 (마이그 015, OQ-4 grill 결정 2026-05-09 — 014=Tag Master / 015=Trash / 017=user_role_log).
 - **§9.4.7 회귀 테스트 3 건**: (1) Manager `/trash` 호출 시 403, (2) 복원 후 일반 목록 노출, (3) 복원 시 `tag_rules` 재실행으로 `voc_tags.source='rule'` 재부착.
 
-미결 항목: 보존 기간(`§15.4` "30일 보존 후 자동 영구 삭제" ↔ §D7 "무기한"), cascade 룰(부모 hard delete 시 복원), audit 컬럼 정합, Manager 의 진입 권한 (404 vs 403).
+기존 단편 통합 결과: 보존 기간은 **MVP 무기한** (D7 정합) — `§15.4` "30일 보존 후 자동 영구 삭제" 표현은 본 ADR Accepted 시점에 폐기, NextGen 자동 영구삭제 cron 은 별 ADR 로 재논의. cascade 룰·audit 컬럼·Manager 진입 권한(404 vs 403) 도 본 ADR §"Decision" 에서 잠금.
 
 본 ADR 은 위 단편을 통합하여 Trash 화면 복원 정책을 정본으로 잠근다.
 
