@@ -1,0 +1,5 @@
+{
+  "db_tables": ["users", "vocs", "comments"],
+  "jobs": ["nightly_backup", "weekly_report"],
+  "sps": ["sp_get_voc", "sp_update_status"]
+}

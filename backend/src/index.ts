@@ -16,11 +16,16 @@ import { faqCategoriesRouter } from './routes/faq-categories';
 import { adminTagsRouter } from './routes/admin-tags';
 import { adminTrashRouter } from './routes/admin-trash';
 import { adminUsersRouter } from './routes/admin-users';
+import { adminMastersRouter } from './routes/admin-masters';
+import { initMasterCache } from './services/admin/external-masters';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './logger';
 
 // Fail fast if AUTH_MODE is misconfigured — throws before server starts
 createAuthMiddleware();
+
+// Boot master cache (cold-start safe — never throws)
+initMasterCache();
 
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction && !process.env.SESSION_SECRET) {
@@ -73,6 +78,7 @@ app.use('/api/faq-categories', faqCategoriesRouter);
 app.use('/api/admin', adminTagsRouter);
 app.use('/api/admin', adminTrashRouter);
 app.use('/api/admin', adminUsersRouter);
+app.use('/api/admin', adminMastersRouter);
 
 app.use(errorHandler);
 

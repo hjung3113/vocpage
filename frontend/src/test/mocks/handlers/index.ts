@@ -9,6 +9,7 @@ import { faqCategoryHandlers } from './faq-categories';
 import { adminTagsHandlers } from './admin-tags';
 import { adminTrashHandlers } from './admin-trash';
 import { adminUsersHandlers } from './admin-users';
+import { adminMastersHandlers } from './admin-masters';
 
 export const handlers = [
   ...healthHandlers,
@@ -22,4 +23,5 @@ export const handlers = [
   ...adminTagsHandlers,
   ...adminTrashHandlers,
   ...adminUsersHandlers,
+  ...adminMastersHandlers,
 ];
