@@ -27,6 +27,7 @@
     "zod": "^4.4.1"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "^11.14.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",

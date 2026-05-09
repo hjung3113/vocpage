@@ -274,40 +274,13 @@ describe('admin-tags routes — DB-backed (FU-015)', () => {
       expect(row.rule_ref_count).toBe(1);
     });
 
-    // pg-mem cannot parse `ILIKE … ESCAPE '\\'` (used by listTags for
-     // pattern-injection safety). Tracked as FU-024 — needs real Postgres
-     // (testcontainers) to exercise the full filter path.
-    it.skip('filters by ?q ILIKE on name — pg-mem cannot parse ESCAPE clause (FU-024)', async () => {
-      await request(makeApp()).post('/api/admin/tags').send({ name: 'alpha', kind: 'general' });
-      await request(makeApp()).post('/api/admin/tags').send({ name: 'beta', kind: 'general' });
-      const res = await request(makeApp())
-        .get('/api/admin/tags')
-        .query({ q: 'alp', page: 1, per_page: 20 });
-      expect(res.status).toBe(200);
-      expect(res.body.rows.map((r: { name: string }) => r.name)).toEqual(['alpha']);
-    });
+    // FU-024: ILIKE ESCAPE filter activated under testcontainers Postgres
+    // → see admin-sql-tc.test.ts.
   });
 
   describe('PATCH /api/admin/tags/:id', () => {
-    // pg-mem rejects correlated subqueries inside RETURNING (`tag_id =
-    // tags.id`). renameTag / toggleExternal both rely on this pattern.
-    // Tracked as FU-024 (testcontainers Postgres needed).
-    it.skip('renames and persists new name — pg-mem rejects correlated subquery in RETURNING (FU-024)', async () => {
-      const created = await request(makeApp())
-        .post('/api/admin/tags')
-        .send({ name: 'old', kind: 'general' });
-      const id = created.body.id;
-
-      const patched = await request(makeApp())
-        .patch(`/api/admin/tags/${id}`)
-        .send({ name: 'new' });
-
-      expect(patched.status).toBe(200);
-      expect(patched.body.name).toBe('new');
-
-      const { rows } = await pool.query(`SELECT name FROM tags WHERE id = $1`, [id]);
-      expect(rows[0].name).toBe('new');
-    });
+    // FU-024: renameTag (correlated subquery in RETURNING) activated under
+    // testcontainers Postgres → see admin-sql-tc.test.ts.
   });
 
   describe('DELETE /api/admin/tags/:id', () => {
@@ -344,20 +317,7 @@ describe('admin-tags routes — DB-backed (FU-015)', () => {
   });
 
   describe('PATCH /api/admin/tags/:id/external', () => {
-    it.skip('toggles is_external (added by migration 014) — pg-mem rejects correlated subquery in RETURNING (FU-024)', async () => {
-      const created = await request(makeApp())
-        .post('/api/admin/tags')
-        .send({ name: 'ext', kind: 'general' });
-      const id = created.body.id;
-
-      const toggled = await request(makeApp())
-        .patch(`/api/admin/tags/${id}/external`)
-        .send({ is_external: true });
-      expect(toggled.status).toBe(200);
-      expect(toggled.body.is_external).toBe(true);
-
-      const { rows } = await pool.query(`SELECT is_external FROM tags WHERE id = $1`, [id]);
-      expect(rows[0].is_external).toBe(true);
-    });
+    // FU-024: toggleExternal (correlated subquery in RETURNING) activated
+    // under testcontainers Postgres → see admin-sql-tc.test.ts.
   });
 });
