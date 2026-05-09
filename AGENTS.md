@@ -13,8 +13,6 @@
 | 디자인 시스템               | [`docs/specs/requires/uidesign.md`](./docs/specs/requires/uidesign.md) (English only) |
 | 기능 요구사항               | [`docs/specs/requires/requirements.md`](./docs/specs/requires/requirements.md)        |
 
-> **2026-05-09~ 정책**: 구현 정본은 `requirements.md` + `uidesign.md` 만. `prototype/` 는 더 이상 reference 가 아니다 (parity·픽셀·DOM 인용 금지).
-
 ## 세션 시작 절차
 
 1. `claude-progress.txt` (첫 30줄)
@@ -22,12 +20,6 @@
 3. 필요한 spec만 선택적으로
 4. 룰은 `CLAUDE.md` 참조
 
-## 핵심 룰 요약 (정본은 CLAUDE.md)
+## 룰
 
-- 항상 feature branch (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`), main 직접 푸시 금지
-- PR 머지는 `gh pr merge <n> --merge --delete-branch` (squash·rebase 금지)
-- CSS 색상은 토큰만 — hex/raw OKLCH 직접 사용 금지
-- 작업 완료 선언은 사용자 명시적 승인 후
-- 구현 코드 작성은 사용자 승인 후
-
-세부 사항·예외·refactor 체크리스트는 `CLAUDE.md`에 있다.
+전부 `CLAUDE.md` 가 정본 — 본 파일에는 룰을 복제하지 않는다. Codex/다른 agent 도 `CLAUDE.md` 를 그대로 따른다.

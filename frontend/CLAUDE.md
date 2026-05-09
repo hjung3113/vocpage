@@ -17,19 +17,15 @@ npm run test                             # Vitest
 npm run test -- path/to/file.test.ts     # Single test file
 ```
 
-## Implementation Reference (2026-05-09~)
+## Implementation Flow
 
-정본은 `docs/specs/requires/requirements.md` + `docs/specs/requires/uidesign.md` 두 문서뿐. `prototype/` 디렉터리는 더 이상 reference 가 아니다 (parity·픽셀·DOM 인용 금지).
+Spec/디자인 정본·정책은 root `CLAUDE.md` 참조. FE 화면 구현 순서:
 
-화면 구현 시:
-
-- requirements.md 의 화면/기능 사양 → uidesign.md 의 토큰·레이아웃·상태로 치환
-- Reuse existing components first; 새 컴포넌트는 UI/로직 반복 시에만
-- 페이지 컴포넌트는 작게, Tailwind 중복은 `@apply` / 컴포넌트로 추출
-- 데이터가 있는 경우 TypeScript 타입 먼저 (no `any`)
-- 항상 처리: loading / error / empty / hover / focus / responsive
-
-Flow: read requirements + uidesign → map components → define types → build with dummy data → wire interactions → connect API → polish states/responsive.
+1. requirements + uidesign 읽기 → 컴포넌트 매핑 → 타입 정의 (no `any`)
+2. dummy data 로 빌드 → interaction → API 연결 → states/responsive 마무리
+3. Reuse existing components first; 새 컴포넌트는 UI/로직 반복 시에만
+4. 페이지 컴포넌트는 작게, Tailwind 중복은 `@apply` 또는 컴포넌트로 추출
+5. 항상 처리: loading / error / empty / hover / focus / responsive
 
 ## Architecture
 
@@ -40,25 +36,9 @@ Flow: read requirements + uidesign → map components → define types → build
 
 ## Styling Architecture
 
-Token pipeline: `src/tokens.ts` → `tailwind.config.ts` (utility classes) + CSS custom properties (`var(--*)`)
+FE token pipeline: `src/tokens.ts` 가 raw 값의 단일 source — 여기서 `tailwind.config.ts` (utility) + CSS custom properties (`var(--*)`) 두 surface 가 생성된다. 새 토큰이 필요하면 `tokens.ts` + `uidesign.md` 양쪽을 같은 PR(또는 직전 PR)에서 갱신.
 
-Full token reference: `docs/specs/requires/uidesign.md §10 CSS Reference` and `§12 Token Architecture`.
-
-**When to use which:**
-
-- Layout / spacing / flex / grid → Tailwind utility (`flex gap-2 px-4`)
-- Static color on a standard element → Tailwind utility (`bg-brand text-primary`)
-- Dynamic color passed to JS (charts, Toast UI, canvas) → import from `tokens.ts` directly
-- Inline style in JSX → CSS var (`style={{ color: 'var(--text-secondary)' }}`)
-- Custom CSS / `@apply` → CSS var (`color: var(--text-primary)`)
-
-**Hard rules:**
-
-- Never write hex or raw OKLCH values outside of `src/tokens.ts`
-- If a token doesn't exist for what you need, add it to `src/tokens.ts` + `uidesign.md §12` first, then use it
-- Never duplicate a token value — one source, two surfaces (Tailwind + CSS vars)
-
-Key tokens: `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--brand)` / `var(--accent)` / `var(--text-primary)` / `var(--text-secondary)`
+토큰 정의·use rule·Tailwind vs CSS var 사용 매트릭스 정본: `docs/specs/requires/uidesign.md` (§10/§12). 룰은 root `CLAUDE.md` 가 정본.
 
 ## Conventions
 
