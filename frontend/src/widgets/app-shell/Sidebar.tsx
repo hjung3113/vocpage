@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
+import { useNoticePopup } from '@entities/notice';
 import { SidebarUserSwitcher } from './SidebarUserSwitcher';
 
 interface NavItem {
@@ -25,7 +26,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/voc', label: 'VOC', icon: MessageSquare },
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/notice', label: '공지/FAQ', icon: Megaphone },
+  { to: '/notice', label: '공지사항', icon: Megaphone },
   { to: '/faq', label: 'FAQ', icon: HelpCircle },
   { to: '/tags', label: 'Tag', icon: Tag },
   { to: '/notifications', label: '알림', icon: Bell },
@@ -35,6 +36,9 @@ const NAV_ITEMS: NavItem[] = [
 
 export function Sidebar() {
   const { isAdmin, isManager, isDev } = useRole();
+  const popup = useNoticePopup();
+  const hasUrgentNotice =
+    !popup.isError && !!popup.data?.rows?.some((n) => n.level === 'urgent');
 
   const visible = NAV_ITEMS.filter(
     (item) => (!item.adminOnly || isAdmin || isManager) && (!item.devOnly || isDev),
@@ -115,7 +119,29 @@ export function Sidebar() {
                 flexShrink: 0,
               }}
             />
-            {label}
+            <span style={{ flex: 1 }}>{label}</span>
+            {to === '/notice' && hasUrgentNotice ? (
+              <span
+                data-testid="sidebar-notice-urgent-badge"
+                aria-label="긴급 공지"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: '16px',
+                  height: '16px',
+                  padding: '0 4px',
+                  borderRadius: '8px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  background: 'var(--status-red)',
+                  color: 'var(--bg-elevated)',
+                }}
+              >
+                !
+              </span>
+            ) : null}
           </NavLink>
         ))}
       </div>

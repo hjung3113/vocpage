@@ -10,6 +10,9 @@ import { createAuthMiddleware } from './auth';
 import { authRouter } from './routes/auth';
 import { vocRouter } from './routes/voc';
 import { mastersRouter } from './routes/masters';
+import { noticesRouter } from './routes/notices';
+import { faqsRouter } from './routes/faqs';
+import { faqCategoriesRouter } from './routes/faq-categories';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './logger';
 
@@ -61,6 +64,9 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/vocs', vocRouter);
 app.use('/api/masters', mastersRouter);
+app.use('/api/notices', noticesRouter);
+app.use('/api/faqs', faqsRouter);
+app.use('/api/faq-categories', faqCategoriesRouter);
 
 app.use(errorHandler);
 

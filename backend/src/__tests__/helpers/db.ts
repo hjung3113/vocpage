@@ -12,6 +12,7 @@ const MIGRATION_FILES = [
   '004_tags.sql',
   '005_content.sql',
   '006_settings.sql',
+  '016_notice_faq_alignment.sql',
 ];
 
 function stripPgvector(sql: string): string {

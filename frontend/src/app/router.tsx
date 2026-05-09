@@ -8,6 +8,8 @@ import { LoadingState } from '@shared/ui/skeleton';
 const MockLoginPage = env.AUTH_MODE === 'mock' ? lazy(() => import('@pages/mock-login')) : null;
 const VocPage = lazy(() => import('@pages/voc'));
 const VocReviewPage = lazy(() => import('@pages/voc-review'));
+const NoticePage = lazy(() => import('@pages/notice'));
+const FaqPage = lazy(() => import('@pages/faq'));
 
 function VocRoute() {
   return (
@@ -64,8 +66,22 @@ export const router = createBrowserRouter([
       { path: 'voc', element: <VocRoute /> },
       { path: 'voc/:id', element: <VocReviewRoute /> },
       { path: 'dashboard', element: <StubPage title="Dashboard" /> },
-      { path: 'notice', element: <StubPage title="공지" /> },
-      { path: 'faq', element: <StubPage title="FAQ" /> },
+      {
+        path: 'notice',
+        element: (
+          <Suspense fallback={<LoadingState />}>
+            <NoticePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'faq',
+        element: (
+          <Suspense fallback={<LoadingState />}>
+            <FaqPage />
+          </Suspense>
+        ),
+      },
       { path: 'tags', element: <StubPage title="Tag" /> },
       { path: 'notifications', element: <StubPage title="알림" /> },
       { path: 'admin/*', element: <StubPage title="Admin" /> },

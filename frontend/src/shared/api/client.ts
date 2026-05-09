@@ -112,3 +112,15 @@ export function apiPatch<T>(
     opts,
   );
 }
+
+export async function apiDelete(url: string, opts?: ApiClientOptions): Promise<void> {
+  const res = await fetch(url, {
+    method: 'DELETE',
+    credentials: opts?.credentials ?? 'include',
+    signal: opts?.signal,
+    headers: { Accept: 'application/json', ...(opts?.headers ?? {}) },
+  });
+  if (!res.ok) {
+    throw await parseError(res);
+  }
+}
