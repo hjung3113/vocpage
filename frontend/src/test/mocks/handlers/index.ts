@@ -6,6 +6,7 @@ import { authHandlers } from './auth';
 import { noticeHandlers } from './notice';
 import { faqHandlers } from './faq';
 import { faqCategoryHandlers } from './faq-categories';
+import { adminTrashHandlers } from './admin-trash';
 
 export const handlers = [
   ...healthHandlers,
@@ -16,4 +17,5 @@ export const handlers = [
   ...noticeHandlers,
   ...faqHandlers,
   ...faqCategoryHandlers,
+  ...adminTrashHandlers,
 ];
