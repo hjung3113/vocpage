@@ -76,11 +76,14 @@ export async function listTags(query: TagMasterListQuery) {
 
 export async function createTag(input: { name: string; kind: string }) {
   const pool = getPool();
-  const slug = input.name
+  // FU-023: include `kind` in slug so (name, kind) pairs distinct under
+  // FU-014 row UNIQUE also yield distinct slugs (e.g. '공통-general' vs
+  // '공통-menu'). Slug shape: <sanitized-name>-<kind>, capped to 100.
+  const namePart = input.name
     .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-가-힣]/g, '')
-    .slice(0, 100);
+    .replace(/[^a-z0-9-가-힣]/g, '');
+  const slug = `${namePart}-${input.kind}`.slice(0, 100);
 
   try {
     const result = await pool.query(
