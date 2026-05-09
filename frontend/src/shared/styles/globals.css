@@ -118,6 +118,31 @@
    */
   --app-main-pad: 0px;
 
+  /*
+   * UI control sizing — applies to Button, Input, Select, DropdownMenu trigger.
+   * Spec: uidesign.md §5 Buttons (size token table).
+   * `md` is the canonical default (incl. all page-header actions).
+   */
+  --ui-h-sm: 28px;
+  --ui-h-md: 32px;
+  --ui-h-lg: 40px;
+  --ui-px-sm: 10px;
+  --ui-px-md: 12px;
+  --ui-px-lg: 16px;
+
+  /*
+   * Page layout — owned by <PageLayout> / <PageHeader>.
+   * Spec: uidesign.md §5 Page Header → Slot contract.
+   * Pages MUST consume via the components only, never inline.
+   */
+  --page-header-h: 56px;
+  --page-gutter-x: 24px;
+  --page-header-gap-bottom: 16px;
+  --page-toolbar-gap-bottom: 12px;
+  --page-header-actions-gap-tight: 8px;
+  --page-header-actions-gap-loose: 16px;
+  --page-header-search-w: 320px;
+
   /* Typography */
   --font-ui:
     'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
@@ -235,6 +260,25 @@ body {
   color: var(--text-primary);
   font-family: var(--font-ui);
 }
+
+/* === Page header action cascade ===
+   Spec: uidesign.md §5 Page Header → Slot contract → Action-group rule 2.
+   Forces every interactive child inside <PageHeader actions> to --ui-h-md so a
+   page passing size="lg" or className="h-12" cannot break header alignment.
+   `:where()` keeps specificity 0,0,0 — easy to override only with intent. */
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--page-header-actions-gap-tight);
+  height: var(--page-header-h);
+}
+.page-header-actions :where(button, input, [role='combobox'], [role='button']) {
+  height: var(--ui-h-md);
+}
+.page-header-actions [role='separator'][data-gap='loose'] {
+  width: var(--page-header-actions-gap-loose);
+}
+/* === Page header action cascade END === */
 
 /* === C-6 VocListHeader styles START ===
    Token-purity guarded block (rules below must use var(--*) only).

@@ -161,30 +161,44 @@ CDN: `https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variabl
 
 ### Buttons
 
+**Size tokens** (canonical — `Button` `size` variant maps 1:1):
+
+| Size | Token       | Height | Horizontal padding   | Use                                     |
+| ---- | ----------- | ------ | -------------------- | --------------------------------------- |
+| `sm` | `--ui-h-sm` | 28px   | `var(--ui-px-sm)` 10 | Inline row actions, dense filter chips. |
+| `md` | `--ui-h-md` | 32px   | `var(--ui-px-md)` 12 | **Default. Page header actions.**       |
+| `lg` | `--ui-h-lg` | 40px   | `var(--ui-px-lg)` 16 | CTA in empty/error states only.         |
+
+- `Button` variant `size` MUST resolve to one of these tokens. No raw Tailwind `h-9 / h-10 / h-11` literals in `buttonVariants`.
+- **Forbidden on `<Button>`**: `className` containing `h-*`, `p[xy]-*`, `text-*`, `font-*` — these defeat the size system. If a new size is needed, add a token, do not override at call site.
+- Same token set applies to `Input`, `Select` trigger, `DropdownMenu` trigger so a header row of mixed parts aligns visually.
+
 **Primary (Samsung Blue)**
 
 ```css
 background: var(--brand);
 color: var(--text-on-brand);
 border-radius: 8px;
-padding: 7px 14px;
+height: var(--ui-h-md);
+padding: 0 var(--ui-px-md);
 font-weight: 600;
 ```
 
-**Ghost**
+**Ghost / Outline**
 
 ```css
 background: var(--bg-surface);
 border: 1px solid var(--border-solid);
 border-radius: 8px;
-padding: 6px 11px;
+height: var(--ui-h-md);
+padding: 0 var(--ui-px-md);
 ```
 
-**Icon Button**
+**Icon Button** (square at the same height token):
 
 ```css
-width: 32px;
-height: 32px;
+width: var(--ui-h-md);
+height: var(--ui-h-md);
 border-radius: 8px;
 border: 1px solid var(--border-subtle);
 background: var(--bg-surface);
@@ -397,6 +411,58 @@ margin-left: 6px;
 The count badge deliberately uses tertiary text color — supporting metadata, not the title itself.
 
 > Diverging heights or title styles between pages misaligns the top border line across page transitions. Reuse the component class — never hard-code values per page.
+
+#### Slot contract — `<PageHeader>` / `<PageLayout>`
+
+Every page is rendered through one container so the header line, title typography, and body gutter cannot drift per page:
+
+```tsx
+<PageLayout
+  header={
+    <PageHeader
+      title="FAQ"
+      count={3} // optional — renders the page count badge
+      actions={<>{/* free slot */}</>} // right-aligned action group, see rules below
+    />
+  }
+  toolbar={<FilterChips />} // optional second row (filters, tabs)
+>
+  {body}
+</PageLayout>
+```
+
+- Pages MUST NOT render `<h1>`, `PageTitle`, or any custom header bar. The only entry point is `<PageHeader>`.
+- `PageLayout` owns vertical rhythm via tokens — pages MUST NOT set `padding` / `margin` on their root.
+
+**Layout tokens** (defined once, not per page):
+
+| Token                             | Value | Purpose                                  |
+| --------------------------------- | ----- | ---------------------------------------- |
+| `--page-header-h`                 | 56px  | Header row height (matches §5 spec).     |
+| `--page-gutter-x`                 | 24px  | Left/right page gutter.                  |
+| `--page-header-gap-bottom`        | 16px  | Header → toolbar/body gap.               |
+| `--page-toolbar-gap-bottom`       | 12px  | Toolbar → body gap (when toolbar shown). |
+| `--page-header-actions-gap-tight` | 8px   | Within one action group.                 |
+| `--page-header-actions-gap-loose` | 16px  | Between action groups.                   |
+| `--page-header-search-w`          | 320px | Default search-input width in header.    |
+
+**Action-group rules** (apply inside the `actions` slot — enforced by `<PageHeader>` cascade, not page discipline alone):
+
+1. **One row, one height.** `actions` slot is `display:flex; align-items:center; height: var(--ui-h-md)`. Children whose intrinsic height differs are clipped to header height — pages cannot stack actions vertically here.
+2. **Size cascade.** `:where(.page-header-actions) :is(button, input, [role="combobox"]) { height: var(--ui-h-md); }`. A page passing `size="lg"` to a `Button` inside the slot is overridden — defense against drift.
+3. **Primary cap.** Max **one** `variant="default"` (Samsung Blue) button per page header. Additional actions use `outline` / `ghost` / icon-only.
+4. **Group spacing hierarchy.** Same-purpose actions: `gap-tight`. Different-purpose groups (e.g. `[search] | [bell] | [+ create]`): `gap-loose`. Use a `<span role="separator">` between groups when token gap alone is ambiguous.
+5. **Icon-only is square.** Width === `var(--ui-h-md)`. No bare lucide icons — wrap in `Button size="md" variant="ghost"` or the `IconButton` primitive.
+6. **Search input width fixed.** Header search uses `width: var(--page-header-search-w)` (clamp `min(320px, 40vw)` allowed). Pages MUST NOT free-grow the input.
+
+**Forbidden patterns** (lint candidates):
+
+- `<h1>` inside `pages/**` or `widgets/**` page containers.
+- Inline `style={{ padding: ... }}` on a page root.
+- `className="h-*"` / `className="p[xy]-*"` on `Button`, `Input`, `Select`.
+- Custom topbar wrappers (e.g. ad-hoc `<header>` inside a page) — must be replaced by `<PageHeader>`.
+
+**Reference** — applies to all five pages: `/voc`, `/notice`, `/faq`, `/admin/tags`, `/admin/vocs/trash`. See `docs/specs/plans/followup-bucket.md` FU-017 for rollout sequencing.
 
 ### Load-more Button
 

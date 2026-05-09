@@ -14,7 +14,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { PageTitle } from '@widgets/app-shell';
+import { PageLayout, PageHeader } from '@widgets/app-shell';
 import { Button } from '@shared/ui/button';
 import { EmptyState } from '@shared/ui/empty-state';
 import { LoadingState } from '@shared/ui/skeleton';
@@ -59,8 +59,7 @@ export default function NoticePage() {
   // id 별 자유 업데이트 — 인라인 토글과 모달 수정 모두에 사용.
   // optimistic update + onError rollback (§10.3.4 인라인 토글 즉시 반영).
   const updateMut = useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: NoticeUpdate }) =>
-      noticeApi.update(id, patch),
+    mutationFn: ({ id, patch }: { id: string; patch: NoticeUpdate }) => noticeApi.update(id, patch),
     onMutate: async ({ id, patch }) => {
       await qc.cancelQueries({ queryKey: noticeQueryKeys.all });
       const snapshots = qc.getQueriesData<{ rows: Notice[] }>({
@@ -120,70 +119,68 @@ export default function NoticePage() {
   }
 
   return (
-    <div
-      data-testid="notice-page"
-      className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 py-4"
+    <PageLayout
+      header={
+        <PageHeader
+          title="공지사항"
+          count={total}
+          actions={
+            <>
+              {canManage ? (
+                <Button
+                  type="button"
+                  variant={isAdminMode ? 'secondary' : 'outline'}
+                  data-testid="notice-admin-toggle"
+                  onClick={toggleAdminMode}
+                >
+                  {isAdminMode ? '읽기 모드' : '관리'}
+                </Button>
+              ) : null}
+              {isAdminMode ? (
+                <Button type="button" data-testid="notice-create-button" onClick={openCreate}>
+                  + 등록
+                </Button>
+              ) : null}
+            </>
+          }
+        />
+      }
     >
-      <header className="flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-3">
-        <div className="flex items-center gap-2">
-          <PageTitle title="공지사항" />
-          <span data-testid="notice-count" className="text-sm text-[color:var(--text-secondary)]">
-            ({total})
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {canManage ? (
-            <Button
-              type="button"
-              size="sm"
-              variant={isAdminMode ? 'secondary' : 'outline'}
-              data-testid="notice-admin-toggle"
-              onClick={toggleAdminMode}
-            >
-              {isAdminMode ? '읽기 모드' : '관리'}
-            </Button>
-          ) : null}
-          {isAdminMode ? (
-            <Button type="button" size="sm" data-testid="notice-create-button" onClick={openCreate}>
-              + 등록
-            </Button>
-          ) : null}
-        </div>
-      </header>
+      <div data-testid="notice-page" className="flex flex-col gap-4">
+        {list.isPending ? <LoadingState /> : null}
+        {list.isError ? <ErrorState message="공지 목록을 불러오지 못했습니다." /> : null}
+        {!list.isPending && !list.isError && total === 0 ? (
+          <EmptyState title="공지가 없습니다." />
+        ) : null}
 
-      {list.isPending ? <LoadingState /> : null}
-      {list.isError ? <ErrorState message="공지 목록을 불러오지 못했습니다." /> : null}
-      {!list.isPending && !list.isError && total === 0 ? (
-        <EmptyState title="공지가 없습니다." />
-      ) : null}
+        {total > 0 ? (
+          <ul data-testid="notice-list" className="flex flex-col">
+            {visibleRows.map((n) => (
+              <NoticeRow
+                key={n.id}
+                notice={n}
+                expanded={expandedId === n.id}
+                onToggle={() => setExpandedId((id) => (id === n.id ? null : n.id))}
+                isAdminMode={isAdminMode}
+                isAdmin={isAdmin}
+                onEdit={openEdit}
+                onDelete={(x) => deleteMut.mutate(x.id)}
+                onRestore={(x) => restoreMut.mutate(x.id)}
+                onToggleVisible={(x, next) =>
+                  updateMut.mutate({ id: x.id, patch: { is_visible: next } })
+                }
+              />
+            ))}
+          </ul>
+        ) : null}
 
-      {total > 0 ? (
-        <ul data-testid="notice-list" className="flex flex-col">
-          {visibleRows.map((n) => (
-            <NoticeRow
-              key={n.id}
-              notice={n}
-              expanded={expandedId === n.id}
-              onToggle={() => setExpandedId((id) => (id === n.id ? null : n.id))}
-              isAdminMode={isAdminMode}
-              isAdmin={isAdmin}
-              onEdit={openEdit}
-              onDelete={(x) => deleteMut.mutate(x.id)}
-              onRestore={(x) => restoreMut.mutate(x.id)}
-              onToggleVisible={(x, next) =>
-                updateMut.mutate({ id: x.id, patch: { is_visible: next } })
-              }
-            />
-          ))}
-        </ul>
-      ) : null}
-
-      <NoticeFormDialog
-        open={formOpen}
-        initial={editing}
-        onClose={closeForm}
-        onSubmit={submitForm}
-      />
-    </div>
+        <NoticeFormDialog
+          open={formOpen}
+          initial={editing}
+          onClose={closeForm}
+          onSubmit={submitForm}
+        />
+      </div>
+    </PageLayout>
   );
 }

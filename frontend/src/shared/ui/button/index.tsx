@@ -19,13 +19,13 @@ const buttonVariants = cva(
         link: 'text-[color:var(--brand)] underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-10 w-10',
+        sm: 'h-[var(--ui-h-sm)] px-[var(--ui-px-sm)] rounded-md',
+        md: 'h-[var(--ui-h-md)] px-[var(--ui-px-md)] rounded-md',
+        lg: 'h-[var(--ui-h-lg)] px-[var(--ui-px-lg)] rounded-md',
+        icon: 'h-[var(--ui-h-md)] w-[var(--ui-h-md)] rounded-md',
       },
     },
-    defaultVariants: { variant: 'default', size: 'default' },
+    defaultVariants: { variant: 'default', size: 'md' },
   },
 );
 

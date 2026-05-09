@@ -14,7 +14,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { PageTitle } from '@widgets/app-shell';
+import { PageLayout, PageHeader } from '@widgets/app-shell';
 import { Button } from '@shared/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { useRole } from '@entities/user/model/useRole';
@@ -50,17 +50,14 @@ export default function FaqPage() {
   const [categoryId, setCategoryId] = useState<string>(ALL_CATEGORIES);
 
   const qc = useQueryClient();
-  const list = useFaqList(
-    isAdminMode ? { mode: 'admin', includeDeleted: true } : { mode: 'user' },
-  );
+  const list = useFaqList(isAdminMode ? { mode: 'admin', includeDeleted: true } : { mode: 'user' });
   const categoriesQuery = useFaqCategories();
   const categories: FaqCategory[] = categoriesQuery.data?.rows ?? [];
 
   const createMut = useCreateFaq();
   // Generic per-id update with optimistic+rollback (matches NoticePage pattern).
   const updateMut = useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: FaqUpdate }) =>
-      faqApi.update(id, patch),
+    mutationFn: ({ id, patch }: { id: string; patch: FaqUpdate }) => faqApi.update(id, patch),
     onMutate: async ({ id, patch }) => {
       await qc.cancelQueries({ queryKey: faqQueryKeys.all });
       const snapshots = qc.getQueriesData<{ rows: Faq[] }>({
@@ -87,21 +84,15 @@ export default function FaqPage() {
 
   const visibleRows = useMemo(() => {
     const rows = list.data?.rows ?? [];
-    const base = isAdminMode
-      ? rows
-      : rows.filter((r) => r.deleted_at === null && r.is_visible);
+    const base = isAdminMode ? rows : rows.filter((r) => r.deleted_at === null && r.is_visible);
 
     const trimmed = q.trim().toLowerCase();
     const filteredByCategory =
-      categoryId === ALL_CATEGORIES
-        ? base
-        : base.filter((r) => r.category_id === categoryId);
+      categoryId === ALL_CATEGORIES ? base : base.filter((r) => r.category_id === categoryId);
 
     if (!trimmed) return filteredByCategory;
     return filteredByCategory.filter(
-      (r) =>
-        r.question.toLowerCase().includes(trimmed) ||
-        r.answer.toLowerCase().includes(trimmed),
+      (r) => r.question.toLowerCase().includes(trimmed) || r.answer.toLowerCase().includes(trimmed),
     );
   }, [list.data, isAdminMode, q, categoryId]);
 
@@ -150,78 +141,74 @@ export default function FaqPage() {
       onEdit={openEdit}
       onDelete={(x) => deleteMut.mutate(x.id)}
       onRestore={(x) => restoreMut.mutate(x.id)}
-      onToggleVisible={(x, next) =>
-        updateMut.mutate({ id: x.id, patch: { is_visible: next } })
-      }
+      onToggleVisible={(x, next) => updateMut.mutate({ id: x.id, patch: { is_visible: next } })}
     />
   );
 
   return (
-    <div
-      data-testid="faq-page"
-      className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 py-4"
+    <PageLayout
+      header={
+        <PageHeader
+          title="FAQ"
+          count={total}
+          actions={
+            <>
+              {canManage ? (
+                <Button
+                  type="button"
+                  variant={isAdminMode ? 'secondary' : 'outline'}
+                  data-testid="faq-admin-toggle"
+                  onClick={toggleAdminMode}
+                >
+                  {isAdminMode ? '읽기 모드' : '관리'}
+                </Button>
+              ) : null}
+              {isAdminMode && tab === 'items' ? (
+                <Button type="button" data-testid="faq-create-button" onClick={openCreate}>
+                  + 등록
+                </Button>
+              ) : null}
+            </>
+          }
+        />
+      }
     >
-      <header className="flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-3">
-        <div className="flex items-center gap-2">
-          <PageTitle title="FAQ" />
-          <span data-testid="faq-count" className="text-sm text-[color:var(--text-secondary)]">
-            ({total})
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {canManage ? (
-            <Button
-              type="button"
-              size="sm"
-              variant={isAdminMode ? 'secondary' : 'outline'}
-              data-testid="faq-admin-toggle"
-              onClick={toggleAdminMode}
-            >
-              {isAdminMode ? '읽기 모드' : '관리'}
-            </Button>
-          ) : null}
-          {isAdminMode && tab === 'items' ? (
-            <Button type="button" size="sm" data-testid="faq-create-button" onClick={openCreate}>
-              + 등록
-            </Button>
-          ) : null}
-        </div>
-      </header>
-
-      {isAdminMode ? (
-        <Tabs value={tab} onValueChange={(v) => setTab(v as 'items' | 'categories')}>
-          <TabsList variant="underline" data-testid="faq-admin-tabs">
-            <TabsTrigger value="items" variant="underline" data-testid="faq-tab-items">
-              FAQ 항목
-            </TabsTrigger>
-            {isAdmin ? (
-              <TabsTrigger
-                value="categories"
-                variant="underline"
-                data-testid="faq-tab-categories"
-              >
-                카테고리 관리
+      <div data-testid="faq-page" className="flex flex-col gap-4">
+        {isAdminMode ? (
+          <Tabs value={tab} onValueChange={(v) => setTab(v as 'items' | 'categories')}>
+            <TabsList variant="underline" data-testid="faq-admin-tabs">
+              <TabsTrigger value="items" variant="underline" data-testid="faq-tab-items">
+                FAQ 항목
               </TabsTrigger>
+              {isAdmin ? (
+                <TabsTrigger
+                  value="categories"
+                  variant="underline"
+                  data-testid="faq-tab-categories"
+                >
+                  카테고리 관리
+                </TabsTrigger>
+              ) : null}
+            </TabsList>
+            <TabsContent value="items">{itemsView}</TabsContent>
+            {isAdmin ? (
+              <TabsContent value="categories">
+                <FaqCategoriesTab categories={categories} faqs={list.data?.rows ?? []} />
+              </TabsContent>
             ) : null}
-          </TabsList>
-          <TabsContent value="items">{itemsView}</TabsContent>
-          {isAdmin ? (
-            <TabsContent value="categories">
-              <FaqCategoriesTab categories={categories} faqs={list.data?.rows ?? []} />
-            </TabsContent>
-          ) : null}
-        </Tabs>
-      ) : (
-        itemsView
-      )}
+          </Tabs>
+        ) : (
+          itemsView
+        )}
 
-      <FaqFormDialog
-        open={formOpen}
-        initial={editing}
-        categories={categories}
-        onClose={closeForm}
-        onSubmit={submitForm}
-      />
-    </div>
+        <FaqFormDialog
+          open={formOpen}
+          initial={editing}
+          categories={categories}
+          onClose={closeForm}
+          onSubmit={submitForm}
+        />
+      </div>
+    </PageLayout>
   );
 }
