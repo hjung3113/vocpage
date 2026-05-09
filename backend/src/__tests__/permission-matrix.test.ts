@@ -13,9 +13,25 @@
  *   - requirements.md §13.2 (integration test mandate)
  *   - ADR 0005 (admin-namespace existence hiding → 404)
  *
- * Scope: gate-only. ALLOW cells assert the gate did NOT reject (status ∉
- * {401, 403} and not the existence-hiding 404). Downstream behavior (200/201/
- * 400/500) is irrelevant to this file — per-route tests own that.
+ * Scope: gate-only. ALLOW cells assert the gate did NOT reject (status not
+ * 401/403, not the existence-hiding 404, and < 500 — a 5xx means the gate
+ * passed but downstream broke; per-route tests catch that, not this matrix).
+ *
+ * **Out of scope** (codex review, 2026-05-09 — tracked in FU-021):
+ *   - §8.3 "전체 VOC 조회" (User ❌) — `service.list()` does not currently
+ *     scope by user role. Pre-existing gap; assert here would force-pass
+ *     a buggy ALLOW.
+ *   - §8.3 "본인 VOC 조회" (User ✅, ownership-scoped) — `service.detail()`
+ *     does not enforce ownership for User. Same FU-021 thread.
+ *   - Sub-task / Dashboard rows — no routed endpoint at MVP scope.
+ *
+ * **Production routing risk** (codex P1, tracked in FU-022): mounting all
+ * admin-* routers under `/api/admin` causes `adminTrashRouter`'s
+ * `requireAdmin()` middleware (router-level `use()`) to intercept
+ * `/api/admin/masters/refresh` BEFORE `adminMastersRouter` sees it. Manager+
+ * should ALLOW per spec but may receive 404 in production. This matrix
+ * mounts one router per cell to test the spec-defined gate; FU-022 covers
+ * the prod routing fix.
  */
 import express from 'express';
 import session from 'express-session';
@@ -59,19 +75,19 @@ jest.mock('../repository/notices', () => ({
 }));
 
 jest.mock('../repository/faqs', () => ({
-  list: jest.fn().mockResolvedValue({ rows: [], total: 0 }),
-  getById: jest.fn().mockResolvedValue({ id: 'f1' }),
-  create: jest.fn().mockResolvedValue({ id: 'f1' }),
-  update: jest.fn().mockResolvedValue({ id: 'f1' }),
-  softDelete: jest.fn().mockResolvedValue(true),
-  restore: jest.fn().mockResolvedValue({ id: 'f1' }),
+  listFaqs: jest.fn().mockResolvedValue({ rows: [], total: 0 }),
+  getFaqById: jest.fn().mockResolvedValue({ id: 'f1' }),
+  createFaq: jest.fn().mockResolvedValue({ id: 'f1' }),
+  updateFaq: jest.fn().mockResolvedValue({ id: 'f1' }),
+  softDeleteFaq: jest.fn().mockResolvedValue(true),
+  restoreFaq: jest.fn().mockResolvedValue({ id: 'f1' }),
+  listCategories: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock('../repository/trash', () => ({
-  listVocs: jest.fn().mockResolvedValue({ rows: [], total: 0 }),
-  listNotices: jest.fn().mockResolvedValue({ rows: [], total: 0 }),
-  listFaqs: jest.fn().mockResolvedValue({ rows: [], total: 0 }),
+  listTrashedVocs: jest.fn().mockResolvedValue({ rows: [], total: 0 }),
   restoreVoc: jest.fn().mockResolvedValue({ id: 'v1' }),
+  getRestoreLog: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock('../services/notifications', () => ({
@@ -226,21 +242,18 @@ const matrix: Cell[] = [
     path: '/api/vocs',
     body: {
       title: 'permission-matrix',
-      content: 'matrix-fixture',
       voc_type_id: '00000000-0000-0000-0000-000000000001',
+      system_id: '00000000-0000-0000-0000-000000000003',
       menu_id: '00000000-0000-0000-0000-000000000002',
     },
     expect: { user: 'ALLOW', dev: 'ALLOW', manager: 'ALLOW', admin: 'ALLOW' },
   },
 
-  // §8.3: 전체 VOC 조회 (gate-level — visibility filter is downstream)
-  {
-    label: 'GET /api/vocs (gate)',
-    method: 'get',
-    router: 'voc',
-    path: '/api/vocs',
-    expect: { user: 'ALLOW', dev: 'ALLOW', manager: 'ALLOW', admin: 'ALLOW' },
-  },
+  // §8.3: "전체 VOC 조회" / "본인 VOC 조회" rows are intentionally NOT covered
+  //   here — `service.list()` / `service.detail()` do not enforce role
+  //   scoping at the gate today (FU-021). Asserting ALLOW would lock the
+  //   buggy current behavior; asserting DENY would fail the matrix until
+  //   FU-021 lands. Tracked as a known-gap rather than force-asserted.
 
   // §8.3 + §8.4-bis: Internal Note R/W
   // user → 404 hidden; dev on unassigned VOC → 403; manager/admin → ALLOW
@@ -268,6 +281,47 @@ const matrix: Cell[] = [
       manager: 'ALLOW',
       admin: 'ALLOW',
     },
+  },
+
+  // §8.3: 상태 변경 / Priority / Due Date — Manager+/Admin allow; Dev own only;
+  // User deny. With seeded VOC assignee_id=null, Dev hits §8.4-bis "unassigned
+  // VOC → FORBIDDEN" branch (DEV_OWN_403). Per-VOC ownership matrix is in
+  // vocs.test.ts; this row locks the role-level gate.
+  {
+    label: 'PATCH /api/vocs/:id { status } (상태 변경)',
+    method: 'patch',
+    router: 'voc',
+    path: `/api/vocs/${VOC_ID}`,
+    body: { status: '검토중' },
+    expect: {
+      user: 'DENY_403',
+      dev: 'DEV_OWN_403',
+      manager: 'ALLOW',
+      admin: 'ALLOW',
+    },
+  },
+  {
+    label: 'PATCH /api/vocs/:id { priority } (Priority)',
+    method: 'patch',
+    router: 'voc',
+    path: `/api/vocs/${VOC_ID}`,
+    body: { priority: 'high' },
+    expect: {
+      user: 'DENY_403',
+      dev: 'DEV_OWN_403',
+      manager: 'ALLOW',
+      admin: 'ALLOW',
+    },
+  },
+  // §8.3: 담당자 배정/해제 — Manager/Admin only (action='reassign' explicitly
+  // denies Dev even on own VOC — see assertCanManageVoc.ts:35-37).
+  {
+    label: 'PATCH /api/vocs/:id { assignee_id } (담당자 배정/해제)',
+    method: 'patch',
+    router: 'voc',
+    path: `/api/vocs/${VOC_ID}`,
+    body: { assignee_id: '55555555-5555-4555-8555-555555555555' },
+    expect: { user: 'DENY_403', dev: 'DENY_403', manager: 'ALLOW', admin: 'ALLOW' },
   },
 
   // §8.3: 공지사항 작성/관리 — manager+
@@ -345,7 +399,7 @@ const matrix: Cell[] = [
     method: 'post',
     router: 'adminTags',
     path: '/api/admin/tags',
-    body: { name: 'tag', kind: 'manual' },
+    body: { name: 'tag', kind: 'general' },
     expect: { user: 'DENY_403', dev: 'DENY_403', manager: 'ALLOW', admin: 'ALLOW' },
   },
   {
@@ -453,15 +507,13 @@ function assertOutcome(
       expect(res.status).toBe(403);
       return;
     case 'ALLOW':
-      // Gate did not reject. Accept any status that is not the gate-level
-      // rejection set. Downstream handler may legitimately return 200/201/
-      // 204/400/409/etc — that is per-route territory.
+      // Gate did not reject. Accept any 2xx/3xx/4xx response so per-route
+      // tests own the exact status. Forbid 401/403 (gate-level rejection)
+      // AND 5xx — a 500 means the gate passed but downstream broke,
+      // which would silently hide a regression in this matrix (codex P2).
       expect(res.status).not.toBe(401);
       expect(res.status).not.toBe(403);
-      // For existence-hiding routes, ALLOW must not be the canned hidden 404.
-      // Distinguishing hidden-404 from a real 404 by status alone is not
-      // possible; here we trust the cell label + the fact that the same
-      // route returns 200/201 when mocks are wired (admin GETs above).
+      expect(res.status).toBeLessThan(500);
       return;
   }
 }
@@ -480,6 +532,12 @@ describe('Permission matrix (§8.3 + §13.2 — consolidated, FU-018)', () => {
         const req = request(app)[cell.method](cell.path);
         const res = await (cell.body ? req.send(cell.body) : req);
         expect(res.status).toBe(401);
+        // Lock the mockAuth body shape so envelope drift surfaces here.
+        // mockAuthMiddleware emits `{ error: 'Unauthorized' }` (string body,
+        // not the standard error envelope). If the auth middleware ever
+        // switches to the canonical envelope, this assertion forces the
+        // matrix to update in lockstep.
+        expect(res.body).toEqual({ error: 'Unauthorized' });
       });
     }
   });
