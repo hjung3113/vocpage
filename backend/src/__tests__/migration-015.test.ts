@@ -125,7 +125,9 @@ describe('migration 015 — trash audit', () => {
     const idxList = restoreLogTable.listIndices();
     // pg-mem's index objects expose `.name` (and sometimes `indexName`).
     const indexNames = new Set(
-      idxList.map((i: any) => i.indexName ?? i.name).filter(Boolean),
+      idxList
+        .map((i: Record<string, unknown>) => (i.indexName ?? i.name) as string | undefined)
+        .filter(Boolean),
     );
     // Sanity: at least 3 user-defined indexes from Up. (PK index may also appear.)
     expect(indexNames.has('idx_voc_restore_log_actor')).toBe(true);
@@ -137,7 +139,7 @@ describe('migration 015 — trash audit', () => {
       `SELECT column_name FROM information_schema.columns
        WHERE table_name='voc_restore_log'`,
     ).rows;
-    const names = new Set(cols.map((r: any) => r.column_name));
+    const names = new Set(cols.map((r: Record<string, unknown>) => r.column_name as string));
     for (const c of [
       'id',
       'voc_id',
@@ -206,6 +208,19 @@ describe('migration 015 — trash audit', () => {
       VALUES ('66666666-6666-6666-6666-666666666666','hard_delete',
               '11111111-1111-1111-1111-111111111111');
     `);
+
+    // 2d. FK deletion semantics — referenced rows must be protected while
+    // audit rows reference them (ADR 0005 §5: "RESTRICT vocs hard delete 시
+    // audit 보호"; actor_id / before_deleted_by preserve attribution).
+    expect(() =>
+      db.public.query(`DELETE FROM vocs WHERE id = '66666666-6666-6666-6666-666666666666'`),
+    ).toThrow();
+    expect(() =>
+      db.public.query(`DELETE FROM users WHERE id = '11111111-1111-1111-1111-111111111111'`),
+    ).toThrow();
+    expect(() =>
+      db.public.query(`DELETE FROM users WHERE id = '22222222-2222-2222-2222-222222222222'`),
+    ).toThrow();
 
     // PK + defaults: id auto-generated, created_at auto-now, before_* nullable.
     const rows = db.public.query(
