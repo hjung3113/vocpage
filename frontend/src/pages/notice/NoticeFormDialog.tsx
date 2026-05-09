@@ -29,15 +29,26 @@ const EMPTY_FORM: NoticeFormState = {
   visible_to: '',
 };
 
-function toCreatePayload(form: NoticeFormState): NoticeCreate {
+/**
+ * Convert a `YYYY-MM-DD` date input to a KST-midnight instant per
+ * `feature-notice-faq.md §10.3.3-bis` (FU-025): date-only Notice inputs are
+ * normalized to `YYYY-MM-DDT00:00:00+09:00` so the persisted instant matches
+ * the admin's intent regardless of browser timezone. KST has had no DST since
+ * 1988 → fixed `+09:00` offset is unambiguous for forward-looking dates.
+ */
+export function toKstMidnightInstant(dateStr: string): string {
+  return `${dateStr}T00:00:00+09:00`;
+}
+
+export function toCreatePayload(form: NoticeFormState): NoticeCreate {
   return {
     title: form.title,
     body: form.body,
     level: form.level,
     is_popup: form.is_popup,
     is_visible: form.is_visible,
-    visible_from: form.visible_from ? new Date(form.visible_from).toISOString() : null,
-    visible_to: form.visible_to ? new Date(form.visible_to).toISOString() : null,
+    visible_from: form.visible_from ? toKstMidnightInstant(form.visible_from) : null,
+    visible_to: form.visible_to ? toKstMidnightInstant(form.visible_to) : null,
   };
 }
 
