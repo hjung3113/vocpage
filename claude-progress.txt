@@ -1,6 +1,10 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-09 Wave 3 Phase B + C 머지 완료)
+## 다음 세션 시작점 (2026-05-09 FU-017 Page Layout 시스템 머지 완료)
+
+→ **FU-017 머지** (브랜치 `docs/page-layout-system`, 2026-05-09): 5 페이지 헤더 drift 제거. Spec(`uidesign.md §5` 슬롯 계약 + 액션 그룹 6규칙 + UI size 토큰) → `<PageLayout>` + `<PageHeader>` (closed surface) → Button/Input/Select 토큰화 (`--ui-h-md` 32px 통일) → VOC/Notice/FAQ/Tag Master/Trash + StubPage/HealthPage 마이그. `PageTitle.tsx` / `TopBar.tsx` 삭제. `benchmark/` 폐기 (사용자 결정 — visual-diff baseline 더 이상 참조 X). 542/542 FE 테스트 green.
+
+## 이전 세션 시작점 (2026-05-09 Wave 3 Phase B + C 머지 완료)
 
 → **Wave 3 Phase B + C 머지** (origin/main `fa3986c`, 2026-05-09):
    - PR #262 (W3-4 Tag Master `/admin/tags`) merge `9959ed0` — FE+BE+fixture+test 단일 PR. 32 BE tests / 6 FE tests. Codex P1/P2 fix 동봉 (`c83245f`): PATCH/external 응답 shape (usage_count/rule_ref_count), FE 라우트 가드, 일시중지 버튼 disabled placeholder.

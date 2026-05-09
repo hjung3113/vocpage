@@ -1,7 +1,8 @@
+/* eslint-disable max-lines -- prettier-expanded mock blocks push past 200; splitting into 4 helpers harms readability for marginal gain. */
 /**
  * FaqPage - user-view tests (10.4.2).
  */
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
@@ -216,6 +217,3 @@ describe('FaqPage - 카테고리 관리 탭 가시성 (10.4.4)', () => {
     expect(screen.queryByTestId('faq-admin-tabs')).not.toBeInTheDocument();
   });
 });
-
-// avoid unused import warning
-void within;
