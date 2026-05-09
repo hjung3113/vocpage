@@ -42,7 +42,7 @@ FE token pipeline: `src/tokens.ts` 가 raw 값의 단일 source — 여기서 `t
 
 ## Conventions
 
-Before writing FE code, look up the task in `docs/specs/README.md §0.2` (task → file + section routing table). Read any convention file with `limit=2` first — line 2 is `When to read` — then read in full only if relevant.
+Before writing FE code, scan `docs/specs/requires/*-conventions.md` filenames — pick the matching one. Read with `limit=2` first — line 2 is `When to read` — then read in full only if relevant.
 
 All files in `docs/specs/requires/`: `naming-conventions.md` · `state-management-conventions.md` · `api-conventions.md` · `routing-conventions.md` · `error-loading-conventions.md` · `form-conventions.md` · `table-filter-conventions.md` · `datetime-conventions.md` · `test-conventions.md` · `env-conventions.md`.
 

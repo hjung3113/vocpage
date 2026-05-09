@@ -57,7 +57,7 @@ Every design decision → spec or ADR before session ends. Phase close → `clau
 
 ## Documents
 
-Doc hygiene: **`docs/specs/README.md`**. Index IDs (Wave/Phase/Task/FU): consult `README.md §7` (rules R1–R7) + `plans/wave-index.md` (lineage) + `plans/followup-bucket.md` (FU register). Next free integer from `wave-index.md`; closed-wave follow-ups → `FU-NNN`. On merge: status update in both + sync `claude-progress.txt`.
+진행 상황 = `claude-progress.txt` (첫 30줄, current pointer) + `docs/specs/plans/next-session-tasks.md` (활성 작업 + 이연) + `docs/specs/plans/wave-3-admin.md` (활성 Wave 상세) + `docs/specs/plans/followup-bucket.md` (closed-wave 후속 FU-NNN). 영구 spec = `docs/specs/requires/`. 과거 이력은 git log + PR description (별도 파일 보관 금지). ID = Wave/Phase 정수 append-only, sub-decimal 금지, batch 그룹은 plan 표 column 일 뿐 ID 아님, closed wave 후속은 FU-NNN. 머지 시 `next-session-tasks.md` + `claude-progress.txt` 동기화.
 
 ## Input Interpretation
 

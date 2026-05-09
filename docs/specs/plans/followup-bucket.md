@@ -1,7 +1,7 @@
 # Follow-up Bucket
 
 > 닫힌 wave에서 발견된 후속 작업의 단일 누적 위치. ID 규칙: `FU-NNN` flat global, append-only (R6).
-> 정본: 본 파일. 인덱스 규칙은 [`docs/specs/README.md §7`](../README.md). Wave 계보는 [`wave-index.md`](./wave-index.md).
+> 정본: 본 파일. ID 규칙은 root `CLAUDE.md §Documents`.
 
 ## 운영 룰
 
@@ -14,19 +14,22 @@
 
 ## 활성 (Open / Triaging)
 
-| ID     | Trigger (spawn)                    | Title                                                            | Status | Notes |
-| ------ | ---------------------------------- | ---------------------------------------------------------------- | ------ | ----- |
-| FU-001 | Wave 4 close (PR #245, 2026-05-09) | dompurify + SafeHtml wrapper — 4 surfaces (XSS hotfix)           | Open   | P1. Notice body / FAQ answer / VOC body / comment HTML render. PR-β `fix/fu-001-dompurify`. 가장 시급. |
-| FU-002 | Wave 4 close (PR #245, 2026-05-09) | 마이그 018 — `notices` / `faqs` hot-path 인덱스                  | Open   | P1. `notices(is_visible, visible_from, visible_to)` partial idx + `faqs(category_id, is_visible, sort_order)` idx. PR-γ `fix/fu-002-notice-faq-indexes`. |
-| FU-003 | Wave 4 close (PR #245, 2026-05-09) | Notice popup dismiss audit — per-user dismiss row 정합            | Open   | P1. Wave 3 Phase A 머지 후 idle slot. |
-| FU-004 | Wave 4 close (PR #245, 2026-05-09) | FAQ search highlight tokenizer — Korean morpheme                 | Open   | P1. Wave 3 Phase A 머지 후 idle slot. |
-| FU-005 | Wave 4 close (PR #245, 2026-05-09) | Notice level=urgent 시 Notice popup auto-open 정책 정합           | Open   | P1. Wave 3 Phase A 머지 후 idle slot. |
-| FU-006 | Wave 4 close (PR #245, 2026-05-09) | shadcn token rewrite drift — `--border` / `--danger` 잔존        | Open   | P2. Wave 3 close 후 batch. |
-| FU-007 | Wave 4 close (PR #245, 2026-05-09) | Notice / FAQ visible_from KST 자정 timestamptz 정합 (8-M2 흡수)   | Open   | P2. Wave 3 close 후 batch. |
-| FU-008 | Wave 4 close (PR #245, 2026-05-09) | Sidebar count badge — Notice / FAQ unread count 실연동           | Open   | P2. Wave 3 close 후 batch. |
-| FU-009 | Wave 4 close (PR #245, 2026-05-09) | Visual-diff baseline 추가 — Notice popup / FAQ search 결과       | Open   | P2. Wave 3 close 후 batch. |
+| ID     | Trigger (spawn)                                     | Title                                                                                                             | Status | Notes                                                                                                                                                        |
+| ------ | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| FU-001 | Wave 4 close (PR #245, 2026-05-09)                  | dompurify + SafeHtml wrapper — 4 surfaces (XSS hotfix)                                                            | Open   | P1. Notice body / FAQ answer / VOC body / comment HTML render. PR-β `fix/fu-001-dompurify`. 가장 시급.                                                       |
+| FU-002 | Wave 4 close (PR #245, 2026-05-09)                  | 마이그 018 — `notices` / `faqs` hot-path 인덱스                                                                   | Open   | P1. `notices(is_visible, visible_from, visible_to)` partial idx + `faqs(category_id, is_visible, sort_order)` idx. PR-γ `fix/fu-002-notice-faq-indexes`.     |
+| FU-003 | Wave 4 close (PR #245, 2026-05-09)                  | Notice popup dismiss audit — per-user dismiss row 정합                                                            | Open   | P1. Wave 3 Phase A 머지 후 idle slot.                                                                                                                        |
+| FU-004 | Wave 4 close (PR #245, 2026-05-09)                  | FAQ search highlight tokenizer — Korean morpheme                                                                  | Open   | P1. Wave 3 Phase A 머지 후 idle slot.                                                                                                                        |
+| FU-005 | Wave 4 close (PR #245, 2026-05-09)                  | Notice level=urgent 시 Notice popup auto-open 정책 정합                                                           | Open   | P1. Wave 3 Phase A 머지 후 idle slot.                                                                                                                        |
+| FU-006 | Wave 4 close (PR #245, 2026-05-09)                  | shadcn token rewrite drift — `--border` / `--danger` 잔존                                                         | Open   | P2. Wave 3 close 후 batch.                                                                                                                                   |
+| FU-007 | Wave 4 close (PR #245, 2026-05-09)                  | Notice / FAQ visible_from KST 자정 timestamptz 정합 (8-M2 흡수)                                                   | Open   | P2. Wave 3 close 후 batch.                                                                                                                                   |
+| FU-008 | Wave 4 close (PR #245, 2026-05-09)                  | Sidebar count badge — Notice / FAQ unread count 실연동                                                            | Open   | P2. Wave 3 close 후 batch.                                                                                                                                   |
+| FU-009 | Wave 4 close (PR #245, 2026-05-09)                  | Visual-diff baseline 추가 — Notice popup / FAQ search 결과                                                        | Open   | P2. Wave 3 close 후 batch.                                                                                                                                   |
+| FU-010 | Wave 3 Phase A (PR #250 codex deferral, 2026-05-09) | `user_role_log` CHECK constraint — `old/new role/active` 값 invariant                                             | Open   | P2. codex 가 deferral 한 defense-in-depth — BE validator 가 1차 게이트, CHECK 는 보강. 별 마이그로 분리 권장 (contract 변경 검토 단위 분리).                 |
+| FU-011 | Wave 3 Phase A (4 PR CI noise, 2026-05-09)          | `lint-root` pre-existing 실패 3건 — `@typescript-eslint/no-var-requires` (faqs/notices/faq-categories `.test.ts`) | Open   | P1. Phase B 진입 전 처리 권장. `require()` → `import` 전환.                                                                                                  |
+| FU-012 | Wave 3 Phase A (Resolution α, PR #251, 2026-05-09)  | Tag merge audit 도입 시 `tag_merge_log` 테이블 spec                                                               | Open   | P3. Resolution α 으로 `tags.merged_into_id` 보류됨 → audit 요구가 발생할 때만 진입. 병합은 source-row hard-delete (`feature-voc.md §9.4.6` · ADR 0004) 유지. |
 
-> Wave 3 (Admin 4 화면) 의 OQ 5 건은 닫힌 wave 가 아니므로 본 bucket 진입 X — `plans/open-questions.md` 에서 추적 (R6 정합).
+> Wave 3 (Admin 4 화면) 의 OQ 5 건은 닫힌 wave 가 아니므로 본 bucket 진입 X — `wave-3-admin.md §7` 에서 추적.
 
 ## 머지 완료 (✅)
 

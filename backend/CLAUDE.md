@@ -68,7 +68,7 @@ Behavioral contracts (what auto-tagging does, what the AD session middleware rej
 
 ## Conventions
 
-Before coding an endpoint, check `docs/specs/README.md §0.2`. Backend-relevant convention files in `docs/specs/requires/`: `api-conventions.md` (response envelope target, auth split boundary) · `routing-conventions.md §10.1` (route list) · `test-conventions.md §17.2` (shared/fixtures parity rules).
+Backend-relevant convention files in `docs/specs/requires/`: `api-conventions.md` (response envelope target, auth split boundary) · `routing-conventions.md §10.1` (route list) · `test-conventions.md §17.2` (shared/fixtures parity rules).
 
 ## Sub-tree map
 

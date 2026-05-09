@@ -3,8 +3,7 @@
 **When to read:** 파일명·폴더명·컴포넌트명·Hook명·이벤트 핸들러 규칙이 필요할 때
 
 > Frontend (React + TypeScript) 네이밍 정본 문서.  
-> LLM 코드 생성 · 리뷰 · 리팩토링 시 이 문서를 기준으로 판단한다.  
-> 이전 컴포넌트 suffix 규칙: `component-naming.md` → 본 문서 §5.3으로 통합.
+> LLM 코드 생성 · 리뷰 · 리팩토링 시 이 문서를 기준으로 판단한다.
 
 ---
 

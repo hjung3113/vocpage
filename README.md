@@ -4,7 +4,7 @@ VOC(Voice of Customer) 관리 시스템 — 사내 분석 시스템에 통합되
 
 Linear의 간결한 UX + Jira의 관리 기능을 결합. Samsung Blue 디자인 시스템 (OS 테마 자동 연동, dark/light 양방향 지원).
 
-> **현재 상태**: Phase 8 Wave 1.6 진행 중 (`/voc` prototype parity, Phase C δ-batch — C-12 머지, C-13 다음). Wave 1.5 시각 동등화 + Playwright e2e 머지 완료, Wave 1.7 Phase A(VOC 등록 모달 spec/contract, PR #185) 머지 완료. Wave 0~5 정본 plan: [`docs/specs/plans/phase-8.md`](docs/specs/plans/phase-8.md). 진행 포인터: [`claude-progress.txt`](claude-progress.txt) (첫 30줄).
+> **현재 상태**: Wave 3 Phase A 머지 완료 (Admin 4 화면 — 마이그 014/015/017 + contracts, PR #250–#254, 2026-05-09). Wave 1.5/1.6/1.7/4 모두 머지. 다음 작업 = Wave 3 Phase B(Tag Master) + Phase C(Trash) 병렬. 진행 포인터: [`claude-progress.txt`](claude-progress.txt) (첫 30줄) → [`docs/specs/plans/next-session-tasks.md`](docs/specs/plans/next-session-tasks.md).
 
 ---
 
@@ -145,11 +145,11 @@ prototype/
 | [`docs/specs/requires/dashboard.md`](docs/specs/requires/dashboard.md)                   | 대시보드 위젯 spec                                    |
 | [`docs/specs/requires/feature-notice-faq.md`](docs/specs/requires/feature-notice-faq.md) | 공지/FAQ 기능 상세                                    |
 | [`docs/specs/requires/external-masters.md`](docs/specs/requires/external-masters.md)     | 외부 마스터 캐시·스왑 spec                            |
-| [`docs/specs/plans/next-session-tasks.md`](docs/specs/plans/next-session-tasks.md)       | 진행 중 Phase 계획                                    |
-| [`docs/specs/plans/nextgen-backlog.md`](docs/specs/plans/nextgen-backlog.md)             | NextGen(MVP 이후) 백로그                              |
+| [`docs/specs/plans/next-session-tasks.md`](docs/specs/plans/next-session-tasks.md)       | 진행 중 Phase 계획 + 이연 항목 + NextGen              |
+| [`docs/specs/plans/followup-bucket.md`](docs/specs/plans/followup-bucket.md)             | Closed-wave 후속 FU 등록부                            |
 
 ---
 
 ## NextGen (MVP 이후 차세대 기능)
 
-이메일 알림 / AI 자동 분류 / FTS / SLA 에스컬레이션 등은 본 MVP 범위 밖입니다. 전체 백로그: [`docs/specs/plans/nextgen-backlog.md`](docs/specs/plans/nextgen-backlog.md).
+이메일 알림 / AI 자동 분류 / FTS / SLA 에스컬레이션 등은 본 MVP 범위 밖. 자세한 항목은 `next-session-tasks.md` 「이연 항목」 섹션 참조.

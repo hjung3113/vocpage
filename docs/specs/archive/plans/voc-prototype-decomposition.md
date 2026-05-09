@@ -2,7 +2,7 @@
 
 > 목적: prototype의 시각·동작 위계를 production /voc + 공통 셸과 노드 단위로 비교 가능한 형태로 분해한다. 이 문서가 Phase B(토큰 갭)·Phase C(컴포넌트 rebuild) 결정의 단일 근거이다.
 >
-> 정본 plan: `docs/specs/plans/wave-1-6-voc-parity.md`. 본 문서는 Phase A 산출물이며 코드 0줄을 변경한다.
+> 정본 plan: `docs/specs/archive/plans/wave-1-6-voc-parity.md`. 본 문서는 Phase A 산출물이며 코드 0줄을 변경한다.
 >
 > 분석 자료: `prototype/prototype.html` (1080줄), `prototype/css/**`, `prototype/js/**` (~18.7k줄). subagent 3종(HTML/CSS/JS) 병렬 분석 후 합본.
 >
