@@ -3,6 +3,7 @@
  * Spec: docs/specs/requires/feature-notice-faq.md §10.4.4, §10.5.
  */
 import request from 'supertest';
+import * as faqsRepoModule from '../repository/faqs';
 import { createTestApp } from './helpers/app';
 import type { FaqCategory } from '../../../shared/contracts/faq';
 
@@ -63,8 +64,7 @@ jest.mock('../repository/faqs', () => {
   };
 });
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const repoMock = require('../repository/faqs') as {
+const repoMock = faqsRepoModule as unknown as {
   __resetCats(seed: FaqCategory[], hasItems?: boolean): void;
 };
 
