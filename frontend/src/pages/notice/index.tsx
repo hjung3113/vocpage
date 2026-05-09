@@ -120,8 +120,11 @@ export default function NoticePage() {
   }
 
   return (
-    <div data-testid="notice-page" className="flex flex-col gap-4">
-      <header className="flex items-center justify-between">
+    <div
+      data-testid="notice-page"
+      className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 py-4"
+    >
+      <header className="flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-3">
         <div className="flex items-center gap-2">
           <PageTitle title="공지사항" />
           <span data-testid="notice-count" className="text-sm text-[color:var(--text-secondary)]">

@@ -157,8 +157,11 @@ export default function FaqPage() {
   );
 
   return (
-    <div data-testid="faq-page" className="flex flex-col gap-4">
-      <header className="flex items-center justify-between">
+    <div
+      data-testid="faq-page"
+      className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-6 py-4"
+    >
+      <header className="flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-3">
         <div className="flex items-center gap-2">
           <PageTitle title="FAQ" />
           <span data-testid="faq-count" className="text-sm text-[color:var(--text-secondary)]">
