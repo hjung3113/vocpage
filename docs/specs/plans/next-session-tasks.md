@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-09 (PR #271 W3-8 + PR #273 FU P1 batch 머지 완료)
-> 현재 위치: **Wave 3 완료 (PR #271) + FU P1 잔여 0 (PR #273) — Wave 5 plan 작성 또는 P2 batch 진입 가능**
+> 최종 업데이트: 2026-05-09 (Wave 5 plan 작성 — 알림 + Sidebar nav count badge)
+> 현재 위치: **Wave 5 plan 승인 대기 — Phase A (BE) 진입 게이트**
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → 활성 plan
 > **2026-05-09 정책**: 구현 정본 = `requirements.md` + `uidesign.md` 만. prototype 참조 종료.
 
@@ -17,6 +17,7 @@
 | **1.7**       | [`../archive/plans/wave-1-7-voc-create-modal.md`](../archive/plans/wave-1-7-voc-create-modal.md) (history)                                                               | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR (#242) 로 흡수.                                                                                                                                                                                                                                                                   |
 | **4**         | `feature-notice-faq.md` §10                                                                                                                                              | ✅ PR #245 머지 — 공지/FAQ + Notice popup. Adversarial review (1 P0, 5 P1, 4 P2) → P0 fix 동봉 머지.                                                                                                                                                                                                                                   |
 | **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | ✅ **Wave 3 완료 (2026-05-09)** — Phase A: PR #250/#251/#252/#254/#253 · Phase B: PR #262 · Phase C: PR #263 · Phase D: PR #269 · Phase E: PR #270 · Phase F (W3-8): PR #271 머지. BE 269 / FE 561 / lint 0 / 토큰 lint 0. 권한 매트릭스 §8.3 분산 커버 100% 그린. 통합 테스트 단일 파일 = FU-018. |
+| **5**         | [`wave-5-notifications.md`](./wave-5-notifications.md)                                                                                                                  | 🟡 **plan 작성 (2026-05-09)** — 알림 (§8.6 / §8.14) + Sidebar nav count badge 정착 (FU-008 흡수). 2 Phase 직렬 (BE → FE 2 PR). 신규 마이그 / ADR 없음. spec 두 줄 추가 (lazy trim + Urgent 표시 시점).        |
 
 ### Hard-blocks
 
@@ -24,7 +25,7 @@
 
 ### 진행 순서
 
-~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix)~~ → ~~Wave 3 Phase B+C (PR #262/#263)~~ → ~~Phase D+E 병렬 (PR #269/#270)~~ → ~~Phase F 종합 검증 (PR #271)~~ → ~~FU P1 batch close (PR #273)~~ → **Wave 5 plan 작성** 또는 **FU P2 batch** → Wave 2 (Dashboard).
+~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix)~~ → ~~Wave 3 Phase B+C (PR #262/#263)~~ → ~~Phase D+E 병렬 (PR #269/#270)~~ → ~~Phase F 종합 검증 (PR #271)~~ → ~~FU P1 batch close (PR #273)~~ → ~~Wave 5 plan 작성~~ → **Wave 5 Phase A (BE) PR-1** → Wave 5 Phase B (FE + FU-008 흡수) PR-2 → FU P2 batch → Wave 2 (Dashboard).
 
 ---
 
