@@ -47,6 +47,30 @@ describe('SafeHtml', () => {
     expect(container.textContent).toBe('safe');
   });
 
+  it('strips SVG and MathML namespaces from rich text', () => {
+    const { container } = render(
+      <SafeHtml
+        html={
+          '<svg><a href="https://example.com"><text>svg</text></a></svg><math><mi>math</mi></math><p>safe</p>'
+        }
+      />,
+    );
+
+    expect(container.querySelector('svg')).toBeNull();
+    expect(container.querySelector('math')).toBeNull();
+    expect(container.textContent).toContain('safe');
+  });
+
+  it('forces noopener noreferrer on target blank anchors', () => {
+    const { container } = render(
+      <SafeHtml html={'<a href="https://example.com" target="_blank">link</a>'} />,
+    );
+
+    const anchor = container.querySelector('a');
+    expect(anchor?.getAttribute('target')).toBe('_blank');
+    expect(anchor?.getAttribute('rel')).toBe('noopener noreferrer');
+  });
+
   it('applies className to wrapper element', () => {
     const { container } = render(
       <SafeHtml html={'<p>text</p>'} className="my-class" />,

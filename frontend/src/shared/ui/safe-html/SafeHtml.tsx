@@ -1,4 +1,18 @@
 import DOMPurify from 'dompurify';
+import type { Config } from 'dompurify';
+
+const SAFE_HTML_CONFIG: Config = {
+  ADD_ATTR: ['target'],
+  USE_PROFILES: { html: true },
+};
+
+if (DOMPurify.isSupported) {
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A' && node.getAttribute('target') === '_blank') {
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+}
 
 interface SafeHtmlProps {
   html: string;
@@ -9,22 +23,11 @@ interface SafeHtmlProps {
 
 /**
  * SafeHtml — renders sanitized HTML via DOMPurify.
- * Drop-in replacement for raw dangerouslySetInnerHTML usage.
  * Strips scripts, event handlers, and javascript: URIs.
  * Preserves target=_blank and forces rel="noopener noreferrer" on anchors.
  */
 export function SafeHtml({ html, className, as: Tag = 'div', 'data-testid': testId }: SafeHtmlProps) {
-  if (DOMPurify.isSupported) {
-    DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-      if (node.tagName === 'A') {
-        node.setAttribute('rel', 'noopener noreferrer');
-      }
-    });
-  }
-
-  const sanitized = DOMPurify.sanitize(html, {
-    ADD_ATTR: ['target'],
-  });
+  const sanitized = DOMPurify.sanitize(html, SAFE_HTML_CONFIG) as string;
 
   return (
     <Tag
