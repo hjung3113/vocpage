@@ -17,12 +17,12 @@
  * 401/403, not the existence-hiding 404, and < 500 — a 5xx means the gate
  * passed but downstream broke; per-route tests catch that, not this matrix).
  *
- * **Out of scope** (codex review, 2026-05-09 — tracked in FU-021):
- *   - §8.3 "전체 VOC 조회" (User ❌) — `service.list()` does not currently
- *     scope by user role. Pre-existing gap; assert here would force-pass
- *     a buggy ALLOW.
- *   - §8.3 "본인 VOC 조회" (User ✅, ownership-scoped) — `service.detail()`
- *     does not enforce ownership for User. Same FU-021 thread.
+ * **Spec interpretation (FU-021, 2026-05-10 user decision)**: §8.3 "전체 VOC
+ * 조회 User ❌" refers to operational/management permissions, not read access.
+ * Read-only `GET /api/vocs` and `GET /api/vocs/:id` are ALLOW for all 4 roles;
+ * the matrix locks that contract below.
+ *
+ * **Out of scope**:
  *   - Sub-task / Dashboard rows — no routed endpoint at MVP scope.
  *
  * **Production routing fix** (FU-022, 2026-05-10): adminTrashRouter and
@@ -244,11 +244,24 @@ const matrix: Cell[] = [
     expect: { user: 'ALLOW', dev: 'ALLOW', manager: 'ALLOW', admin: 'ALLOW' },
   },
 
-  // §8.3: "전체 VOC 조회" / "본인 VOC 조회" rows are intentionally NOT covered
-  //   here — `service.list()` / `service.detail()` do not enforce role
-  //   scoping at the gate today (FU-021). Asserting ALLOW would lock the
-  //   buggy current behavior; asserting DENY would fail the matrix until
-  //   FU-021 lands. Tracked as a known-gap rather than force-asserted.
+  // §8.3: "본인 VOC 조회" + "전체 VOC 조회" — read access ALLOW for all roles
+  //   (FU-021 spec decision, 2026-05-10). The "전체 VOC 조회 User ❌" cell is
+  //   about operational permissions, not read access; list/detail GET have no
+  //   gate beyond authentication.
+  {
+    label: 'GET /api/vocs (VOC 목록 조회)',
+    method: 'get',
+    router: 'voc',
+    path: '/api/vocs',
+    expect: { user: 'ALLOW', dev: 'ALLOW', manager: 'ALLOW', admin: 'ALLOW' },
+  },
+  {
+    label: 'GET /api/vocs/:id (VOC 상세 조회)',
+    method: 'get',
+    router: 'voc',
+    path: `/api/vocs/${VOC_ID}`,
+    expect: { user: 'ALLOW', dev: 'ALLOW', manager: 'ALLOW', admin: 'ALLOW' },
+  },
 
   // §8.3 + §8.4-bis: Internal Note R/W
   // user → 404 hidden; dev on unassigned VOC → 403; manager/admin → ALLOW
