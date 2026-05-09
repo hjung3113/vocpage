@@ -3227,9 +3227,114 @@ components:
         avg_resolution_days:
           type: number
 
+    WidgetId:
+      type: string
+      enum:
+        - kpi
+        - distribution
+        - priority-status-matrix
+        - heatmap
+        - weekly-trend
+        - tag-bar
+        - system-card
+        - assignee-table
+        - aging-top10
+        - sla
+        - aging
+      description: 대시보드 위젯 stable ID. dashboard.md §위젯 상세 명세 §1~§11.
+
+    WidgetLayout:
+      type: object
+      required: [x, y, w, h]
+      additionalProperties: false
+      description: |
+        RGL 12-col 그리드 좌표. bounds: x>=0, x+w<=12, w>=1, h>=1, 모두 정수.
+      properties:
+        x:
+          type: integer
+          minimum: 0
+          maximum: 11
+        y:
+          type: integer
+          minimum: 0
+        w:
+          type: integer
+          minimum: 1
+          maximum: 12
+        h:
+          type: integer
+          minimum: 1
+        static:
+          type: boolean
+
+    WidgetSizesV2:
+      type: object
+      description: |
+        breakpoint-keyed widget layout map (Wave 2 W2-D2). xs 는 RGL 자동
+        1-col stack — 직렬화 X. md/sm 미지정 시 lg fallback.
+      additionalProperties:
+        type: object
+        required: [lg]
+        properties:
+          lg:
+            $ref: '#/components/schemas/WidgetLayout'
+          md:
+            $ref: '#/components/schemas/WidgetLayout'
+          sm:
+            $ref: '#/components/schemas/WidgetLayout'
+
     DashboardSettings:
       type: object
-      additionalProperties: true
+      required:
+        - widget_order
+        - widget_visibility
+        - widget_sizes
+        - locked_widgets
+        - default_date_range
+        - heatmap_default_x_axis
+      properties:
+        widget_order:
+          type: array
+          items:
+            $ref: '#/components/schemas/WidgetId'
+        widget_visibility:
+          type: object
+          additionalProperties:
+            type: object
+            required: [visible]
+            properties:
+              visible:
+                type: boolean
+              locked:
+                type: boolean
+        widget_sizes:
+          $ref: '#/components/schemas/WidgetSizesV2'
+        locked_widgets:
+          type: array
+          description: |
+            Admin tier widget lock list. Admin 행 (`user_id IS NULL`) 에서만
+            의미 — 머지 규칙: `static = adminLocked || personalLocked`.
+            Migration 022 + Wave 2 W2-D3.
+          items:
+            $ref: '#/components/schemas/WidgetId'
+        default_date_range:
+          type: string
+          enum: ['1m', '3m', '1y', 'all', 'custom']
+        heatmap_default_x_axis:
+          type: string
+          enum: ['status', 'priority', 'tag']
+        globaltabs_order:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required: [systemId, visible]
+            properties:
+              systemId:
+                type: string
+                format: uuid
+              visible:
+                type: boolean
 
     DistributionItem:
       type: object
