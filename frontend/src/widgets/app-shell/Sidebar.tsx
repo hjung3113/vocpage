@@ -6,7 +6,6 @@ import {
   HelpCircle,
   Tag,
   Bell,
-  Settings,
   Code2,
   ChevronDown,
 } from 'lucide-react';
@@ -21,6 +20,8 @@ interface NavItem {
   icon: React.ElementType;
   adminOnly?: boolean;
   devOnly?: boolean;
+  /** admin group: visible to admin/manager/dev */
+  adminGroup?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -30,19 +31,25 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/faq', label: 'FAQ', icon: HelpCircle },
   { to: '/tags', label: 'Tag', icon: Tag },
   { to: '/notifications', label: '알림', icon: Bell },
-  { to: '/admin', label: 'Admin', icon: Settings, adminOnly: true },
   { to: '/health', label: 'Health', icon: Code2, devOnly: true },
+];
+
+/** Admin group: visible to admin / manager / dev (ADR 0004 §6.2 OQ-5 Option B order) */
+const ADMIN_NAV_ITEMS: NavItem[] = [
+  { to: '/admin/tags', label: '태그 마스터', icon: Tag, adminGroup: true },
 ];
 
 export function Sidebar() {
   const { isAdmin, isManager, isDev } = useRole();
   const popup = useNoticePopup();
-  const hasUrgentNotice =
-    !popup.isError && !!popup.data?.rows?.some((n) => n.level === 'urgent');
+  const hasUrgentNotice = !popup.isError && !!popup.data?.rows?.some((n) => n.level === 'urgent');
 
   const visible = NAV_ITEMS.filter(
     (item) => (!item.adminOnly || isAdmin || isManager) && (!item.devOnly || isDev),
   );
+
+  // Admin group: visible to admin / manager / dev
+  const showAdminGroup = isAdmin || isManager || isDev;
 
   return (
     <nav
@@ -144,6 +151,48 @@ export function Sidebar() {
             ) : null}
           </NavLink>
         ))}
+
+        {/* 관리자 그룹 — admin / manager / dev 만 노출 (ADR 0004 §6.2) */}
+        {showAdminGroup && (
+          <>
+            <div
+              data-testid="section-header-admin"
+              style={{
+                marginTop: '16px',
+                padding: '4px 2px',
+                fontSize: '11px',
+                fontWeight: 500,
+                letterSpacing: '0.6px',
+                textTransform: 'uppercase',
+                color: 'var(--text-muted)',
+              }}
+            >
+              관리자
+            </div>
+            {ADMIN_NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  cn('flex items-center transition-colors', isActive ? 'font-medium' : '')
+                }
+                style={({ isActive }) => ({
+                  height: '34px',
+                  padding: '9px 12px',
+                  gap: '10px',
+                  borderRadius: '6px',
+                  fontSize: '13.5px',
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                  background: isActive ? 'var(--brand-bg)' : undefined,
+                })}
+              >
+                <Icon size={16} aria-hidden style={{ flexShrink: 0 }} />
+                <span style={{ flex: 1 }}>{label}</span>
+              </NavLink>
+            ))}
+          </>
+        )}
       </div>
 
       {/* 유저 카드 — 역할 전환 popover */}

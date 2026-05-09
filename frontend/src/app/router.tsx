@@ -10,6 +10,7 @@ const VocPage = lazy(() => import('@pages/voc'));
 const VocReviewPage = lazy(() => import('@pages/voc-review'));
 const NoticePage = lazy(() => import('@pages/notice'));
 const FaqPage = lazy(() => import('@pages/faq'));
+const AdminTagsPage = lazy(() => import('@pages/admin/tags'));
 
 function VocRoute() {
   return (
@@ -84,7 +85,21 @@ export const router = createBrowserRouter([
       },
       { path: 'tags', element: <StubPage title="Tag" /> },
       { path: 'notifications', element: <StubPage title="알림" /> },
-      { path: 'admin/*', element: <StubPage title="Admin" /> },
+      {
+        path: 'admin',
+        children: [
+          {
+            path: 'tags',
+            element: (
+              <Suspense fallback={<LoadingState />}>
+                <AdminTagsPage />
+              </Suspense>
+            ),
+          },
+          { path: '*', element: <StubPage title="Admin" /> },
+          { index: true, element: <StubPage title="Admin" /> },
+        ],
+      },
       { path: 'health', element: <HealthPage /> },
     ],
   },
