@@ -1,20 +1,20 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 P2 BE batch 머지 완료 — FU-021/022 P1 후속)
+## 다음 세션 시작점 (2026-05-10 FU-021/022 P1 머지 완료 — P2 후속 진입)
 
-→ **P2 BE batch 4건 전부 머지 완료** (2026-05-09~10):
-   - **FU-018** (PR #279): `backend/src/__tests__/permission-matrix.test.ts` 단일 파일에 §8.3 21 cell × 5 role = 115 case 합치기. codex P1×2 / P2×2 / P3×2 → 전부 반영.
-   - **FU-015** (PR #280): `admin-{tags,trash}.sql.test.ts` 신규 — pg-mem DB-backed (마이그 002-006 + 014 + 015 + 020 Up sections), restore 트랜잭션 end-to-end 포함, 13 pass / 4 skip / 1 todo. codex P1 (restore route 미커버) 반영.
-   - **FU-010** (PR #281): 마이그 021 — `user_role_log_{old,new}_role_check` (NULL sentinel + 4 enum). `NOT VALID` + pre-flight SELECT 로 backfill safety. codex P1/P2/P3 전부 반영. 회귀 6건.
-   - **FU-007** (PR #282): doc-only — `requirements.md §4` + `feature-notice-faq.md §10.3.1` + §10.3.3-bis 신설 (timestamptz 정책 + inclusive-end + 정책 vs 현 코드 mismatch 명시). codex P2 (aspirational claim) 발견 → descriptive 로 재작성.
+→ **P1 후속 2건 머지 완료** (2026-05-10):
+   - **FU-021** (PR #284): §8.3 spec 해석 확정. "전체 VOC 조회 User ❌" 은 운영/관리 권한 행으로 read access 와 무관. read-only `GET /api/vocs` + `GET /api/vocs/:id` 4 role 모두 ALLOW. permission-matrix.test.ts 셀 2건 활성화 (115 → 125 case). `service.list/detail` 코드 변경 0 — 현 동작이 spec 정합이었음.
+   - **FU-022** (PR #285): adminTrash / adminUsers router-level `use(requireAdmin())` 제거 → 4 route per-route guard 로 전환 (adminTags / adminMasters 와 동일 패턴). 회귀: `__tests__/admin-router-mount.test.ts` 9 case (4 router 동시 마운트 — manager / dev fall-through, admin 본인 router ALLOW, non-admin existence-hide 404 보존). API contract 변경 0.
 
-→ **신규 spawn 5건**: FU-021 (P1, VOC list/detail user 스코핑 누락) · FU-022 (P1, `/api/admin/*` router-level `use(requireAdmin())` leak — production 라우팅 버그) · FU-023 (P2, `createTag` slug+kind 정합) · FU-024 (P2, testcontainers Postgres 인프라 — 4 cell skip 활성화) · FU-025 (P2, Notice `visible_from` KST 자정 정규화 — FE 미구현).
+→ **메트릭**: BE 456/461 그린 (+19 from 442 baseline = +10 matrix cells + 9 admin-router-mount). typecheck 0.
 
-→ **메트릭**: BE 442/442 그린. 마이그 021 추가, 회귀 +6 (FU-010) + 매트릭스 +115 (FU-018) + DB-backed 통합 +13 (FU-015).
+→ **다음 세션 작업**: **P2 후속 batch (FU-023/024/025)** 진입 후보:
+   - **FU-023** (P2, BE): `createTag` slug 파생을 (name, kind) 기반으로 변경 — FU-014 (name, kind) UNIQUE 와 정합. `tag-master.ts:79-83`.
+   - **FU-024** (P2, infra): testcontainers Postgres 도입 — pg-mem 한계 (`ILIKE ESCAPE`, RETURNING 안 correlated subquery) 우회로 4 cell skip 활성화.
+   - **FU-025** (P2, FE): Notice `visible_from/to` KST 자정 정규화 — `NoticeFormDialog.tsx:39-40` `toISOString()` (UTC) → `+09:00` 직렬화 + 회귀.
+   - Wave 2 (Dashboard) 또는 운영/배포 phase 도 옵션. 사용자 결정 필요.
 
-→ **다음 세션 작업**: P1 인 **FU-021 / FU-022** 가 가장 시급 (FU-018 가 발견한 production gate 갭 / 라우팅 버그). FU-021 = `service.list/detail` 에 user 스코핑 + 매트릭스 cell 활성화. FU-022 = adminTrashRouter 의 `use(requireAdmin())` 가 다른 admin 라우터 경로를 가로채는 prod 버그 수정 (route-scoped guard 또는 sub-prefix 마운트). P2 후속 (FU-023/024/025) 은 별도 사이클.
-
-→ **마이그 번호** — 다음 마이그 번호 = **022** (021 머지로 +1).
+→ **마이그 번호** — 다음 마이그 번호 = **022**.
 
 ---
 
