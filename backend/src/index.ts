@@ -15,6 +15,7 @@ import { faqsRouter } from './routes/faqs';
 import { faqCategoriesRouter } from './routes/faq-categories';
 import { adminTagsRouter } from './routes/admin-tags';
 import { adminTrashRouter } from './routes/admin-trash';
+import { adminUsersRouter } from './routes/admin-users';
 import { adminMastersRouter } from './routes/admin-masters';
 import { initMasterCache } from './services/admin/external-masters';
 import { errorHandler } from './middleware/errorHandler';
@@ -76,6 +77,7 @@ app.use('/api/faqs', faqsRouter);
 app.use('/api/faq-categories', faqCategoriesRouter);
 app.use('/api/admin', adminTagsRouter);
 app.use('/api/admin', adminTrashRouter);
+app.use('/api/admin', adminUsersRouter);
 app.use('/api/admin', adminMastersRouter);
 
 app.use(errorHandler);
