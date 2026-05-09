@@ -664,10 +664,9 @@ interface AssigneeTableState {
 
 ## 커스터마이징 (MVP)
 
-> 드래그앤드롭 재배치, 위젯 크기 조절, 항목별 잠금은 NextGen으로 이동.
-> 상세: `docs/specs/plans/dashboard-v2-layout-editor.md` (파일명은 초안 시점 유지 — 내용은 NextGen 기능)
+> 2026-05-10: 드래그/리사이즈/잠금/반응형이 NextGen → MVP 로 승격 (Wave 2 결정 W2-D1~D3). 상세 엔진 명세는 본 §"커스터마이즈 v2 — 레이아웃 엔진" 참조.
 
-MVP 범위: **위젯 숨기기/표시** + **기본 날짜 범위** + **히트맵 기본 X축** + **GlobalTabs 순서·숨김(Admin)**
+MVP 범위: **위젯 숨기기/표시** + **드래그 재배치** + **크기 조절** + **위젯 고정** + **반응형 브레이크포인트 레이아웃** + **기본 날짜 범위** + **히트맵 기본 X축** + **GlobalTabs 순서·숨김(Admin)**
 
 ### 설정 계층
 
@@ -684,6 +683,12 @@ dashboard_settings (
   widget_visibility      JSONB       NOT NULL DEFAULT '{}',
   -- 예: {"kpi": true, "heatmap": true, "aging": false}
   widget_sizes           JSONB       NOT NULL DEFAULT '{}',
+  -- v2 (2026-05-10~): breakpoint-keyed { [widgetId]: { lg: {x,y,w,h,static}, md:{...}, sm:{...} } }
+  -- 예: { "kpi": { "lg": {"x":0,"y":0,"w":12,"h":2,"static":false} } }
+  -- v1 (flat {w,h}) 데이터는 존재하지 않음 (Wave 2 미출시) → in-app 마이그 불필요.
+  locked_widgets         JSONB       NOT NULL DEFAULT '[]',
+  -- Admin 기본값 행에서만 의미 있음 (user_id IS NULL). 예: ["kpi","heatmap"] → 모든 사용자에게 RGL static 강제.
+  -- 개인 행에서는 빈 배열로 둠. 개인 잠금은 widget_visibility[id].locked 필드로 표현.
   locked_fields          JSONB       NOT NULL DEFAULT '[]',
   default_date_range     VARCHAR(8)  NOT NULL DEFAULT '3m',
   -- enum: '1m' | '3m' | '1y' | 'all' | 'custom' (정본: migration 011 + requirements.md §4)
@@ -704,14 +709,108 @@ dashboard_settings (
 
 ### 편집 가능 항목 (MVP)
 
-| 항목                 | 개인 | Admin 기본값 |
-| -------------------- | ---- | ------------ |
-| 위젯 숨기기/표시     | ✓    | ✓            |
-| 기본 날짜 범위       | ✓    | ✓            |
-| 히트맵 기본 X축      | ✓    | ✓            |
-| GlobalTabs 순서·숨김 | —    | ✓            |
+| 항목                       | 개인 | Admin 기본값 |
+| -------------------------- | ---- | ------------ |
+| 위젯 숨기기/표시           | ✓    | ✓            |
+| 위젯 위치 (drag)           | ✓    | ✓            |
+| 위젯 크기 (resize)         | ✓    | ✓            |
+| 위젯 고정 (lock)           | ✓    | ✓ (강제)     |
+| 브레이크포인트 (lg/md/sm)  | auto | —            |
+| 기본 날짜 범위             | ✓    | ✓            |
+| 히트맵 기본 X축            | ✓    | ✓            |
+| GlobalTabs 순서·숨김       | —    | ✓            |
 
 ### 세션 임시 설정 (sessionStorage)
 
 - 저장 없이 닫으면 초기화
 - 동일 항목 오버라이드 (세션 중 임시 변경 유지)
+
+---
+
+## 커스터마이즈 v2 — 레이아웃 엔진
+
+> 정본 결정 게이트: `docs/specs/plans/wave-2-dashboard.md §3` (W2-D1~D4).
+
+### 라이브러리
+
+- **`react-grid-layout`** (RGL) ^1.4 — `Responsive` + `WidthProvider` HOC.
+- 채택 근거: 드래그·리사이즈·반응형 브레이크포인트·`static` 잠금이 단일 라이브러리로 해결. 직렬화 형식이 JSONB 스키마와 1:1.
+- 거부: `dnd-kit` (그리드 수학 / 리사이즈 / 반응형 모두 자체 구현 부담), `gridstack.js` (jQuery 기반 레거시).
+
+### 그리드 계약
+
+| 항목 | 값 |
+| --- | --- |
+| 컬럼 수 | 12 (모든 브레이크포인트) |
+| `rowHeight` | 80px |
+| `margin` | `[16, 16]` |
+| `containerPadding` | `[24, 24]` |
+| `compactType` | `'vertical'` |
+| `preventCollision` | `false` |
+
+### 브레이크포인트
+
+| key | min-width | 비고 |
+| --- | --------- | ---- |
+| `lg` | ≥1200 | 데스크톱 기본 |
+| `md` | ≥996  | 태블릿 가로 |
+| `sm` | ≥768  | 태블릿 세로 |
+| `xs` | <768  | 단일 컬럼 auto-stack (RGL 기본) |
+
+`xs` 는 사용자가 편집하지 않음 — RGL 가 `lg` 레이아웃을 자동으로 1-col 풀폭으로 압축. 모바일은 read-only 모드 (드래그/리사이즈 비활성).
+
+### `widget_sizes` v2 직렬화
+
+```ts
+// shared/contracts/dashboard.ts
+type WidgetLayout = { x: number; y: number; w: number; h: number; static?: boolean };
+type WidgetSizesV2 = {
+  [widgetId: string]: {
+    lg: WidgetLayout;
+    md?: WidgetLayout;
+    sm?: WidgetLayout;
+    // xs 는 RGL 자동 처리 — 저장하지 않음
+  };
+};
+```
+
+- `md`/`sm` 미지정 시 RGL 가 `lg` 에서 폴백.
+- `static: true` 인 위젯은 드래그·리사이즈 비활성. UI 헤더에 🔒 표시.
+
+### 잠금 머지 규칙
+
+```ts
+const isStatic = adminLockedWidgets.includes(widgetId)
+              || personalWidgetVisibility[widgetId]?.locked === true;
+```
+
+- `dashboard_settings` 의 Admin 행(`user_id IS NULL`) `locked_widgets` 가 우선.
+- 개인 잠금은 자기 화면에만 적용. 개인이 unlock 해도 Admin 잠금은 해제 불가 (UI 토글 disabled + tooltip "Admin 강제 잠금").
+- 권한: `locked_widgets` mutate 는 **Admin only** (BE 403 + FE 토글 hidden). `widget_visibility[id].locked` 는 모든 role.
+
+### 저장/복원
+
+- **저장**: `PATCH /api/dashboard/settings` 페이로드에 `widget_sizes: WidgetSizesV2` 포함. 디바운스 500ms (드래그 종료 시 발사).
+- **복원**: 페이지 mount 시 `GET /api/dashboard/settings` → `Responsive` 의 `layouts` prop 으로 hydrate.
+- **기본 레이아웃**: `frontend/src/features/dashboard/defaultLayouts.ts` 가 8 위젯의 lg/md/sm 기본 좌표 export. 사용자 저장값 없으면 fallback.
+
+### 편집 모드 토글
+
+- 헤더 우측 "편집" 버튼 → `isEditing: true` 시에만 RGL `isDraggable`/`isResizable` 활성. 비편집 시 read-only.
+- 편집 모드 진입 시 모든 위젯 헤더에 grab 커서 + 우하단 리사이즈 핸들 노출.
+- "저장" / "취소" / "기본값으로 초기화" 버튼은 편집 모드에서만 표시.
+
+### 마이그레이션
+
+- 기존 `widget_sizes JSONB` 컬럼 (마이그 011/012) 재사용 — 추가 마이그 불필요.
+- v1 (flat `{w,h}`) 데이터 부재 (Wave 2 미출시) → in-app 마이그 코드 작성 안 함. zod 가 v2 형식만 허용.
+
+### 시각 토큰
+
+- `uidesign.md` 신규 토큰 필요: `--dashboard-grid-gap` (16px), `--dashboard-grid-padding` (24px), `--dashboard-widget-resize-handle` (위젯 우하단 핸들 색).
+- 신규 토큰은 Wave 2 Phase A 에서 spec PR 별도 머지.
+
+### 접근성
+
+- 키보드 reorder: 미지원 (RGL 한계). NextGen 으로 분리.
+- 스크린리더: 위젯 헤더 `aria-label` 에 위치 정보 포함 ("KPI 위젯, 1행 1열, 잠김").
