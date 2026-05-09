@@ -1,44 +1,44 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-09 Wave 3 Phase A 4 PR + 1 hotfix 머지 완료)
+## 다음 세션 시작점 (2026-05-09 Wave 3 Phase B + C 머지 완료)
 
-→ **Wave 3 Phase A 전부 머지** (origin/main `f9ed85f`, 2026-05-09):
-   - PR #250 (W3-9 마이그 017 user_role_log) merge `55548a6`
-   - PR #251 (W3-1 마이그 014 tags + Resolution α) merge `7a46d6a`
-   - PR #252 (W3-3 admin contracts zod+openapi + α 동기화) merge `7907b1e`
-   - PR #254 (W3-3 codex P1 hotfix — AdminUserPatch anyOf + Trash 404; force-push 사고로 #252 에서 누락된 commit 복구) merge `93ed028`
-   - PR #253 (W3-2 마이그 015 vocs.deleted_by + voc_restore_log + codex P2 FK deletion 테스트) merge `f9ed85f`
+→ **Wave 3 Phase B + C 머지** (origin/main `fa3986c`, 2026-05-09):
+   - PR #262 (W3-4 Tag Master `/admin/tags`) merge `9959ed0` — FE+BE+fixture+test 단일 PR. 32 BE tests / 6 FE tests. Codex P1/P2 fix 동봉 (`c83245f`): PATCH/external 응답 shape (usage_count/rule_ref_count), FE 라우트 가드, 일시중지 버튼 disabled placeholder.
+   - PR #263 (W3-5 Trash `/admin/vocs/trash`) merge `fa3986c` — FE+BE+fixture+test 단일 PR. 10 BE tests + 3 SQL 회귀 / 5 FE tests. Codex P0/P1 + visual P2 fix 동봉 (`5aaa46c`): voc_history 003 컬럼 정합, tag_rules.system_id 제거, openapi 403→404, --text-tertiary 토큰 정합, maxWidth wrapper 제거.
+   - visual-diff baseline `benchmark/admin/01-tag-master.png` + `02-trash.png` (real screenshot baseline TBD by user).
 
-→ **Resolution α (2026-05-09)** — `tags.merged_into_id` 자기참조 FK 는 마이그 014 에서 제외. 병합 동작은 source-row hard-delete (`feature-voc.md §9.4.6` · ADR 0004) 그대로. 추후 audit 필요해지면 별 `tag_merge_log` 테이블 신규 마이그로 도입. requirements.md §15.3 동기화 완료.
+→ **Wave 3 Phase A 머지 (참조)** — PR #250/#251/#252/#254/#253 (origin/main `f9ed85f`, 2026-05-09).
 
-→ **다음 세션 진입: Phase B + C 병렬** (Phase A 머지 종속 해제됨)
-   - **Phase B** Tag Master 화면 (`/admin/tags`) — ADR 0004 Option D 권한 매트릭스, mutate(create/edit) Manager+, merge/외부잠금/영구삭제 Admin only.
-   - **Phase C** Trash 화면 (`/admin/vocs/trash`) — ADR 0005 admin-only, hard_delete UI placeholder 만, voc_restore_log 노출.
-   - 두 phase 독립 → full-parallel 가능. 각 화면당 1 PR (FE+BE+fixture+test 동봉).
-   - 정본 plan: `docs/specs/plans/wave-3-admin.md` §6.2 행 W3-4 (Phase B), W3-5 (Phase C).
+→ **다음 세션 진입: Phase D + E 병렬**
+   - **Phase D** External Masters (`/admin/masters`) — OQ-2 Option B (Manager+ refresh / Manager+ + Dev read), refresh 쿨다운 5분 + atomic swap.
+   - **Phase E** Users (`/admin/users`) — Admin only, last-admin guard 409, role 변경 audit `user_role_log` (마이그 017).
+   - 두 phase 독립 → full-parallel 가능. 각 화면당 1 PR. 정본 plan `wave-3-admin.md §6.2 W3-6 / W3-7`.
 
-→ **Phase D + E 는 B+C 머지 후** — D = External Masters (`/admin/masters`, OQ-2 Option B 매니저+/Dev 읽기), E = Users (`/admin/users`, Admin only, user_role_log audit).
-
-→ **Phase F = 종합 검증** — visual-diff / Playwright / lint / fixture-seed parity / 사용자 수락.
+→ **Phase F = 종합 검증** — visual-diff 4 화면 baseline 확정 / 권한 매트릭스 BE 통합 / lint / fixture-seed parity / 사용자 수락 → Wave 3 close.
 
 → **잔여 / 후속**
-   - **FU-010** user_role_log CHECK constraint 보강 (codex W3-9 P2 deferral) — `old/new value` 컬럼에 CHECK 추가, BE validator 와 별 PR 로 분리. P2.
-   - ~~**FU-011** `lint-root` pre-existing 실패 3건~~ — ✅ PR #260 `13395c7` (2026-05-09) 머지. `require()` → `import * as`.
-   - **FU-012** Tag merge audit 도입 시 `tag_merge_log` 테이블 spec 작성 (Resolution α 으로 보류된 audit trail 의 정식 진입 경로).
-   - **FU-003/4/5** (P1) Phase A 머지 후 idle slot 에서 hotfix-style. **FU-006~009** (P2) Wave 3 close 후 batch.
+   - **FU-013** (P1, NEW) `vocs.parent_id` ON DELETE SET NULL 마이그 (003 미적용, ADR 0005 §6 case 6 정합). Phase D 진입 전 hotfix 권장.
+   - **FU-014** (P1, NEW) `tags(name, kind)` UNIQUE 제약 (현재 slug UNIQUE 우연 의존).
+   - **FU-015** (P2, NEW) Admin BE 테스트 service mock 의존 → DB-backed 통합 테스트.
+   - **FU-016** (P2, NEW) Tag rule 일시중지 UI — 규칙 선택 진입점 (PR #262 hotfix 에서 disabled placeholder).
+   - **FU-010** (P2) user_role_log CHECK constraint 보강.
+   - **FU-012** (P3) Tag merge audit 도입 시 `tag_merge_log` 테이블 spec.
+   - **FU-003/4/5** (P1) idle slot hotfix. **FU-006~009** (P2) Wave 3 close 후 batch.
    - **Wave 5 plan** = Wave 3 close 후 작성 진입.
 
 → **사고 기록 (2026-05-09)** — PR #252 cycle 중 background agent 가 stalled 라고 오판하고 force-push 한 결과 codex P1 fix 2개 (`0724825`) 가 remote 에서 덮여서 hotfix PR #254 로 복구해야 했음. 메모리 룰 등록(`feedback_no_concurrent_force_push.md`).
 
-→ **Grill 결정 정합 (19건, 2026-05-09)** — OQ-1 Option D / OQ-2 B / OQ-3 A / OQ-4 014/015/017 / OQ-5 사이드바 B. ADR 0004/0005 Accepted. `user_role_log` schema = `id, user_id, changed_by(NOT NULL), old_role, new_role, old_active, new_active, reason, created_at` + `(user_id, created_at DESC)` idx (구현 시 #250 으로 머지됨).
+→ **Grill 결정 정합 (19건, 2026-05-09)** — OQ-1 Option D / OQ-2 B / OQ-3 A / OQ-4 014/015/017 / OQ-5 사이드바 B. ADR 0004/0005 Accepted.
 
 → **Wave 4 (공지/FAQ/Notice popup) 머지 완료** — PR #245 (08070cc, 2026-05-09).
 
 ## Active Waves
 
 **Wave 3 — Admin 4 화면**
-- ✅ Phase A 4 PR + 1 hotfix 머지 (origin/main `f9ed85f`)
-- ⏳ Phase B (Tag Master) + Phase C (Trash) 병렬 진입 가능
+- ✅ Phase A 4 PR + 1 hotfix 머지 (`f9ed85f`)
+- ✅ Phase B + C 머지 (`fa3986c`)
+- ⏳ Phase D (External Masters) + Phase E (Users) 병렬 진입 가능
+- ⏭️ Phase F 종합 검증 → Wave 3 close
 
 **Wave 2 — Dashboard**
 - ⛔ Wave 3 close 후 진입.
