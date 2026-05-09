@@ -542,7 +542,8 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 - **진입점**: 관리자 페이지 → "태그 마스터" 서브탭 (사이드바 `관리자` 그룹 — 순서 정본은 `feature-voc.md §9.4` 사이드바 박스).
 - **권한** (ADR 0004 Accepted, OQ-1 Option D — 2026-05-09): Manager+ `add`/`edit` 허용 · Admin only `merge` / 외부 잠금 (`tags.is_external` 토글) / 영구삭제 / 규칙 일시중지. Read = Admin / Manager / Dev.
-- **운영 갭 해소**: `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` 컬럼 (Wave 3 Phase A 마이그 014, OQ-4 결정 2026-05-09).
+- **운영 갭 해소**: `tags.is_external`, `tag_rules.suspended_until` 컬럼 (Wave 3 Phase A 마이그 014, OQ-4 결정 2026-05-09).
+  - `tags.merged_into_id` 는 보류 — 병합 동작은 `feature-voc.md §9.4.6` 의 source-row hard-delete 그대로 유지하며, 감사 흔적이 필요해지면 별도 `tag_merge_log` 테이블을 미래 마이그레이션에서 도입한다 (Resolution α, 2026-05-09).
 
 ### 15.4 휴지통 (D23)
 
