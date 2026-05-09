@@ -10,6 +10,7 @@ const VocPage = lazy(() => import('@pages/voc'));
 const VocReviewPage = lazy(() => import('@pages/voc-review'));
 const NoticePage = lazy(() => import('@pages/notice'));
 const FaqPage = lazy(() => import('@pages/faq'));
+const AdminTagsPage = lazy(() => import('@pages/admin/tags'));
 const AdminTrashPage = lazy(() => import('@pages/admin/trash'));
 
 function VocRoute() {
@@ -90,6 +91,14 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/voc" replace /> },
           {
+            path: 'tags',
+            element: (
+              <Suspense fallback={<LoadingState />}>
+                <AdminTagsPage />
+              </Suspense>
+            ),
+          },
+          {
             path: 'vocs/trash',
             element: (
               <Suspense fallback={<LoadingState />}>
@@ -97,7 +106,6 @@ export const router = createBrowserRouter([
               </Suspense>
             ),
           },
-          // Other admin screens (Tag Master, External Masters, Users) added in later Phases
           { path: '*', element: <StubPage title="Admin" /> },
         ],
       },

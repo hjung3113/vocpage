@@ -13,6 +13,7 @@ import { mastersRouter } from './routes/masters';
 import { noticesRouter } from './routes/notices';
 import { faqsRouter } from './routes/faqs';
 import { faqCategoriesRouter } from './routes/faq-categories';
+import { adminTagsRouter } from './routes/admin-tags';
 import { adminTrashRouter } from './routes/admin-trash';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './logger';
@@ -68,6 +69,7 @@ app.use('/api/masters', mastersRouter);
 app.use('/api/notices', noticesRouter);
 app.use('/api/faqs', faqsRouter);
 app.use('/api/faq-categories', faqCategoriesRouter);
+app.use('/api/admin', adminTagsRouter);
 app.use('/api/admin', adminTrashRouter);
 
 app.use(errorHandler);

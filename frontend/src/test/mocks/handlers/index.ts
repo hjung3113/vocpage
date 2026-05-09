@@ -6,6 +6,7 @@ import { authHandlers } from './auth';
 import { noticeHandlers } from './notice';
 import { faqHandlers } from './faq';
 import { faqCategoryHandlers } from './faq-categories';
+import { adminTagsHandlers } from './admin-tags';
 import { adminTrashHandlers } from './admin-trash';
 
 export const handlers = [
@@ -17,5 +18,6 @@ export const handlers = [
   ...noticeHandlers,
   ...faqHandlers,
   ...faqCategoryHandlers,
+  ...adminTagsHandlers,
   ...adminTrashHandlers,
 ];

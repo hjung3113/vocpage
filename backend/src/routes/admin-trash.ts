@@ -85,7 +85,7 @@ adminTrashRouter.get(
   validate({ params: TrashIdParam }),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const log = await repo.getRestoreLog(req.params.id);
+      const log = await repo.getRestoreLog(req.params.id as string);
       res.json(log);
     } catch (err) {
       next(err);

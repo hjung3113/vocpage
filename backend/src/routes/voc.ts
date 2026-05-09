@@ -72,7 +72,7 @@ vocRouter.patch(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const actor = req.user as AuthUser;
-      const result = await trashRepo.restoreVoc(req.params.id, actor.id);
+      const result = await trashRepo.restoreVoc(req.params.id as string, actor.id);
       res.json(result);
     } catch (err) {
       next(err);
