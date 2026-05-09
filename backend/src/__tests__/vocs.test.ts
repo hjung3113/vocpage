@@ -615,12 +615,12 @@ describe('VOC endpoints — Wave 1 회귀 매트릭스', () => {
 
   // ─── Wave 5 Phase A — notification trigger wiring ──────────────────────
   describe('Wave 5 §8.6 notification triggers', () => {
-    /* eslint-disable @typescript-eslint/no-require-imports */
+    /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
     const notifRepo = require('../repository/notifications') as {
       hasRecentNotification: jest.Mock;
       insertNotification: jest.Mock;
     };
-    /* eslint-enable @typescript-eslint/no-require-imports */
+    /* eslint-enable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
 
     beforeEach(() => {
       notifRepo.hasRecentNotification.mockClear();

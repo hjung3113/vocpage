@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch } from '@shared/api/client';
+import { apiDelete, apiGet, apiPost, apiPatch } from '@shared/api/client';
 import {
   VocListResponse,
   VocDetail,
@@ -11,6 +11,7 @@ import {
   VocHistoryListResponse,
   type VocHistoryEntry,
   CommentListResponse,
+  CommentResponse,
   type Comment,
   SubTaskListResponse,
   type SubTaskItem,
@@ -63,6 +64,23 @@ export const vocApi = {
   },
   comments(id: string): Promise<Comment[]> {
     return apiGet(`/api/vocs/${id}/comments`, CommentListResponse).then((r) => r.rows);
+  },
+  createComment(id: string, body: string): Promise<Comment> {
+    return apiPost(
+      `/api/vocs/${id}/comments`,
+      { body },
+      CommentResponse,
+    ).then((r) => r.comment);
+  },
+  updateComment(id: string, commentId: string, body: string): Promise<Comment> {
+    return apiPatch(
+      `/api/vocs/${id}/comments/${commentId}`,
+      { body },
+      CommentResponse,
+    ).then((r) => r.comment);
+  },
+  deleteComment(id: string, commentId: string): Promise<void> {
+    return apiDelete(`/api/vocs/${id}/comments/${commentId}`);
   },
   subtasks(id: string): Promise<SubTaskItem[]> {
     return apiGet(`/api/vocs/${id}/subtasks`, SubTaskListResponse).then((r) => r.rows);

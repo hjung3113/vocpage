@@ -58,3 +58,6 @@ export type Comment = z.infer<typeof Comment>;
 
 export const CommentListResponse = z.object({ rows: z.array(Comment) });
 export type CommentListResponse = z.infer<typeof CommentListResponse>;
+
+export const CommentResponse = z.object({ comment: Comment });
+export type CommentResponse = z.infer<typeof CommentResponse>;

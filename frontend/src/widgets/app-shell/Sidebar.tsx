@@ -13,7 +13,9 @@ import {
 import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
 import { useNoticePopup } from '@entities/notice';
+import { useUnreadBadge } from '@entities/notification';
 import { SidebarUserSwitcher } from './SidebarUserSwitcher';
+import { NavItemCountBadge } from './NavItemCountBadge';
 
 interface NavItem {
   to: string;
@@ -50,6 +52,7 @@ export function Sidebar() {
   const { isAdmin, isManager, isDev } = useRole();
   const popup = useNoticePopup();
   const hasUrgentNotice = !popup.isError && !!popup.data?.rows?.some((n) => n.level === 'urgent');
+  const { unreadCount: notifUnread, hasUrgent: notifUrgent } = useUnreadBadge();
 
   const visible = NAV_ITEMS.filter(
     (item) =>
@@ -137,27 +140,24 @@ export function Sidebar() {
               }}
             />
             <span style={{ flex: 1 }}>{label}</span>
-            {to === '/notice' && hasUrgentNotice ? (
-              <span
-                data-testid="sidebar-notice-urgent-badge"
-                aria-label="긴급 공지"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '16px',
-                  height: '16px',
-                  padding: '0 4px',
-                  borderRadius: '8px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  lineHeight: 1,
-                  background: 'var(--status-red)',
-                  color: 'var(--bg-elevated)',
-                }}
-              >
-                !
-              </span>
+            {to === '/notice' ? (
+              <NavItemCountBadge
+                count={0}
+                urgent={hasUrgentNotice}
+                urgentAriaLabel="긴급 공지"
+                testId="sidebar-notice"
+              />
+            ) : null}
+            {to === '/notifications' ? (
+              <NavItemCountBadge
+                count={notifUnread}
+                urgent={notifUrgent}
+                urgentAriaLabel="긴급 알림"
+                testId="sidebar-notifications"
+              />
+            ) : null}
+            {to === '/faq' ? (
+              <NavItemCountBadge count={0} testId="sidebar-faq" />
             ) : null}
           </NavLink>
         ))}

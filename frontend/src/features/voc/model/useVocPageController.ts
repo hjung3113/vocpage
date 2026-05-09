@@ -37,14 +37,14 @@ export function useVocPageController() {
     staleTime: 5 * 60_000,
   });
   const notificationsQ = useQuery({
-    queryKey: notificationQueryKeys.list(role.role),
+    queryKey: notificationQueryKeys.list(),
     queryFn: () => notificationsApi.list(),
     staleTime: 30_000,
   });
 
   const markAllRead = useMutation({
     mutationFn: () => notificationsApi.markAllRead(),
-    onSuccess: () => qc.invalidateQueries({ queryKey: notificationQueryKeys.all(role.role) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: notificationQueryKeys.all }),
   });
 
   const createVoc = useCreateVoc();

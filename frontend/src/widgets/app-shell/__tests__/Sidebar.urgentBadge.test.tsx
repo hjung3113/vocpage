@@ -27,6 +27,10 @@ vi.mock('@entities/notice', () => ({
   useNoticePopup: () => popupMock(),
 }));
 
+vi.mock('@entities/notification', () => ({
+  useUnreadBadge: () => ({ unreadCount: 0, hasUrgent: false, isLoading: false, isError: false }),
+}));
+
 import { Sidebar } from '../Sidebar';
 
 function renderSidebar() {
@@ -54,7 +58,7 @@ describe('Sidebar — urgent notice badge (§10.2.2)', () => {
       isPending: false,
     });
     renderSidebar();
-    expect(screen.getByTestId('sidebar-notice-urgent-badge')).toBeInTheDocument();
+    expect(screen.getByTestId('sidebar-notice-urgent')).toBeInTheDocument();
   });
 
   it('urgent 공지가 없으면 (다른 level만) 배지가 숨겨짐', () => {
@@ -66,7 +70,7 @@ describe('Sidebar — urgent notice badge (§10.2.2)', () => {
       isPending: false,
     });
     renderSidebar();
-    expect(screen.queryByTestId('sidebar-notice-urgent-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('sidebar-notice-urgent')).not.toBeInTheDocument();
   });
 
   it('rows가 빈 배열이면 배지가 숨겨짐', () => {
@@ -76,7 +80,7 @@ describe('Sidebar — urgent notice badge (§10.2.2)', () => {
       isPending: false,
     });
     renderSidebar();
-    expect(screen.queryByTestId('sidebar-notice-urgent-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('sidebar-notice-urgent')).not.toBeInTheDocument();
   });
 
   it('fetch 에러 시 배지가 숨겨짐', () => {
@@ -86,6 +90,6 @@ describe('Sidebar — urgent notice badge (§10.2.2)', () => {
       isPending: false,
     });
     renderSidebar();
-    expect(screen.queryByTestId('sidebar-notice-urgent-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('sidebar-notice-urgent')).not.toBeInTheDocument();
   });
 });

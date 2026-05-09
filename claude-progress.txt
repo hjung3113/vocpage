@@ -1,6 +1,15 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 5 Phase A 머지 완료 — Phase B 진입)
+## 다음 세션 시작점 (2026-05-10 Wave 5 Phase B PR-2 코드 완료 — 사용자 검토 / PR 대기)
+
+→ **Wave 5 Phase B PR-2 코드 완료** (`feat/wave-5-phase-b-fe`, 2026-05-10).
+   - **변경 요약**: `<NavItemCountBadge>` 추상 신설 · Sidebar `/notifications` `/notice` `/faq` nav-item 일괄 적용 · notifications API/훅 (`useNotificationsList` + `useUnreadBadge` 30s 폴링, ETag 헬퍼 `etagFetch.ts` 부수 보유) · `/notifications` 페이지 신설 (StubPage 대체, mount 시 mark-all-read) · comments BE wiring (POST/PATCH/DELETE 추가, `useAddComment`/`useUpdateComment`/`useDeleteComment` 훅) · VocComment Textarea → ToastBodyEditor (`format='html'`) + SafeHtml(DOMPurify) 렌더 · FU-006 `var(--border)` 직접 소비자 4곳 정리.
+   - **W5-D7 contract gap 결정 (사용자 2026-05-10)**: BE `unread-count` 응답에 `hasUrgent` 미포함 → Sidebar 🔴! 산출 위해 `list` 엔드포인트를 30s 폴링으로 전환. `useUnreadBadge` 가 동일 캐시에서 count + hasUrgent 도출. 두 쿼리 키 결정은 panel UI 캐시 분리로 재해석.
+   - **검증**: FE typecheck 0 · 570 tests pass · lint 0 · lint:tokens 0 · BE typecheck 0 · 304 tests pass.
+   - **followup-bucket**: FU-006 / FU-008 Closed, FU-009 사용자 ad-hoc 보류 (plan §2.2 정책 정합).
+   - **다음 세션 작업**: 사용자 코드 검토 → push → PR 생성 → 머지. 머지 후 시각 baseline (FU-009 잔여) ad-hoc 캡처.
+
+## 이전 세션 시작점 (2026-05-10 Wave 5 Phase A 머지 완료 — Phase B 진입)
 
 → **Wave 5 Phase A 머지 완료** (PR #276, merge `75b1b0b`, 2026-05-09T15:25Z). Phase B 진입.
    - **Phase A 머지 내용**: notifications BE (repo/service/route + ETag/304/lazy trim/5분 디바운스) + comments BE 신설 (W5-D11, 4 endpoint + 15 test) + voc.ts 트리거 wire (status_change/assigned/comment) + spec §8.6/§8.13 정합화. BE 28 suites · 304 passed · typecheck 0.

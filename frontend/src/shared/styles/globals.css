@@ -596,7 +596,7 @@ body {
   padding: 0 var(--voc-list-padding-x);
   height: 32px;
   align-items: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-standard);
   background: var(--bg-panel);
   position: sticky;
   top: 0;

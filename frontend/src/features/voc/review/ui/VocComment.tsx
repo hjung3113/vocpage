@@ -1,6 +1,16 @@
+/**
+ * VocComment — comment list + write/edit using Toast UI editor (HTML format).
+ *
+ * Wave 5 Phase B: Textarea → ToastBodyEditor (html) + SafeHtml render
+ * (DOMPurify) per `feature-voc.md §8.13` (HTML body, 16KB DB CHECK).
+ *
+ * Mutation wiring lives in `VocActionSection.tsx` — this component is
+ * presentation-only and forwards body strings via `onAdd/onEdit/onDelete`.
+ */
 import { useState } from 'react';
 import { Button } from '@shared/ui/button';
-import { Textarea } from '@shared/ui/textarea';
+import { SafeHtml } from '@shared/ui/safe-html/SafeHtml';
+import ToastBodyEditor from '../../create/ui/ToastBodyEditor';
 import type { Comment } from '@contracts/voc';
 import { ActivityAvatar } from './ActivityAvatar';
 import { formatActivityTime } from '../lib/formatActivityTime';
@@ -17,6 +27,11 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
+/** Strip HTML to detect "empty" submissions (Toast UI may emit `<p><br></p>`). */
+function isEmptyHtml(html: string): boolean {
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim().length === 0;
+}
+
 export function VocComment({
   comments,
   currentUserId,
@@ -31,9 +46,8 @@ export function VocComment({
   const [editBody, setEditBody] = useState('');
 
   const submitDraft = () => {
-    const next = draft.trim();
-    if (next) {
-      onAdd(next);
+    if (!isEmptyHtml(draft)) {
+      onAdd(draft);
       setDraft('');
     }
   };
@@ -108,17 +122,17 @@ export function VocComment({
                       className="mt-1 flex flex-col gap-2"
                       onSubmit={(e) => {
                         e.preventDefault();
-                        const next = editBody.trim();
-                        if (next) {
-                          onEdit(c.id, next);
+                        if (!isEmptyHtml(editBody)) {
+                          onEdit(c.id, editBody);
                           setEditingId(null);
                         }
                       }}
                     >
-                      <Textarea
+                      <ToastBodyEditor
                         value={editBody}
-                        onChange={(e) => setEditBody(e.target.value)}
-                        aria-label="댓글 수정"
+                        onChange={setEditBody}
+                        format="html"
+                        height="200px"
                       />
                       <div className="flex justify-end gap-2">
                         <Button
@@ -129,15 +143,21 @@ export function VocComment({
                         >
                           취소
                         </Button>
-                        <Button type="submit" size="sm" disabled={pending || !editBody.trim()}>
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={pending || isEmptyHtml(editBody)}
+                        >
                           저장
                         </Button>
                       </div>
                     </form>
                   ) : (
-                    <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
-                      {c.body}
-                    </p>
+                    <SafeHtml
+                      data-testid={`comment-body-${c.id}`}
+                      className="text-sm"
+                      html={c.body}
+                    />
                   )}
                 </div>
               </li>
@@ -153,21 +173,21 @@ export function VocComment({
             e.preventDefault();
             submitDraft();
           }}
+          aria-label="새 댓글"
         >
-          <Textarea
+          <ToastBodyEditor
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-                e.preventDefault();
-                submitDraft();
-              }
-            }}
-            placeholder="댓글을 입력하세요 (⌘+Enter로 등록)"
-            aria-label="new comment"
+            onChange={setDraft}
+            format="html"
+            height="200px"
           />
           <div className="flex justify-end">
-            <Button type="submit" size="sm" disabled={pending || !draft.trim()}>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={pending || isEmptyHtml(draft)}
+              data-testid="comment-submit"
+            >
               저장
             </Button>
           </div>
