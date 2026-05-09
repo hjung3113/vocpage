@@ -225,19 +225,24 @@ describe('admin-tags routes — DB-backed (FU-015)', () => {
       expect(second.body.code).toBe('CONFLICT');
     });
 
-    // FU-023 — surfaced impl gap: `createTag` (`tag-master.ts:79-83`) derives
-    // `slug` from `name` only, so two tags with the same `name` and
-    // different `kind` collide on the slug UNIQUE constraint despite
-    // FU-014's row-level UNIQUE(name, kind) allowing them. Spec resolution:
-    // fold `kind` into the slug, or formalize global slug uniqueness as
-    // intended (and update the matrix here in lockstep).
-    //
-    // Lock the spec-correct behavior as a `todo` — Jest treats failing todos
-    // as suite failures, so when FU-023 lands the implementer MUST flip this
-    // back to `it()` rather than the row going stale in the bucket.
-    it.todo(
-      'FU-023: same name across different kinds — `createTag` slug must include kind to avoid slug UNIQUE collision',
-    );
+    // FU-023 (resolved 2026-05-10): `createTag` derives slug as
+    // `<name>-<kind>` so two tags with the same name and different kinds
+    // produce distinct slugs (general / menu) — satisfying both row-level
+    // UNIQUE(name, kind) and the slug UNIQUE constraint.
+    it('FU-023: same name across different kinds → both succeed with distinct slugs', async () => {
+      const first = await request(makeApp())
+        .post('/api/admin/tags')
+        .send({ name: '공통', kind: 'general' });
+      expect(first.status).toBe(201);
+      expect(first.body.slug).toBe('공통-general');
+
+      const second = await request(makeApp())
+        .post('/api/admin/tags')
+        .send({ name: '공통', kind: 'menu' });
+      expect(second.status).toBe(201);
+      expect(second.body.slug).toBe('공통-menu');
+      expect(second.body.id).not.toBe(first.body.id);
+    });
   });
 
   describe('GET /api/admin/tags', () => {
