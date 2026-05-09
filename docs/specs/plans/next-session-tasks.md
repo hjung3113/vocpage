@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-10 (P2 BE batch 4건 머지 완료 — FU-021/022 P1 후속)
-> 현재 위치: **P2 BE batch close (PR #279/#280/#281/#282 머지) · 다음 = FU-021 / FU-022 P1**
+> 최종 업데이트: 2026-05-10 (FU-021/022 P1 머지 완료 — P2 후속 진입)
+> 현재 위치: **FU-021/022 P1 close (PR #284/#285 머지) · 다음 = FU-023/024/025 P2 후속 또는 Wave 2**
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → 활성 plan
 > **2026-05-09 정책**: 구현 정본 = `requirements.md` + `uidesign.md` 만. prototype 참조 종료.
 
@@ -19,6 +19,7 @@
 | **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | ✅ **Wave 3 완료 (2026-05-09)** — Phase A: PR #250/#251/#252/#254/#253 · Phase B: PR #262 · Phase C: PR #263 · Phase D: PR #269 · Phase E: PR #270 · Phase F (W3-8): PR #271 머지. BE 269 / FE 561 / lint 0 / 토큰 lint 0. 권한 매트릭스 §8.3 분산 커버 100% 그린. 통합 테스트 단일 파일 = FU-018. |
 | **5**         | [`wave-5-notifications.md`](./wave-5-notifications.md)                                                                                                                  | ✅ **Phase A 머지 (PR #276, 2026-05-09)** + **Phase B PR-2 머지 (PR #278, 2026-05-10)** — notifications BE/FE + comments BE/FE + `<NavItemCountBadge>` + FU-006/008 close + FU-009 사용자 ad-hoc 보류. P2 BE batch (FU-007/010/015/018) 별도 진행 완료 (PR #279/#280/#281/#282 머지, 2026-05-10). |
 | **P2 BE batch** | (별 plan 없음 — bucket FU-007/010/015/018)                                                                                                                              | ✅ **4건 전부 머지** (2026-05-10). FU-018 (PR #279, 권한 매트릭스 단일 파일 115 case) · FU-015 (PR #280, admin DB-backed 통합 13 pass + restore 트랜잭션 end-to-end) · FU-010 (PR #281, 마이그 021 user_role_log CHECK + NOT VALID backfill safety) · FU-007 (PR #282, doc-only timestamptz 정책 + inclusive-end + mismatch 명시). 신규 spawn: FU-021/022 (P1) · FU-023/024/025 (P2). |
+| **P1 후속**     | (별 plan 없음 — bucket FU-021/022)                                                                                                                                       | ✅ **2건 머지** (2026-05-10). FU-021 (PR #284, §8.3 spec 해석 확정 — read access 4 role ALLOW · matrix +10 case · service 코드 변경 0) · FU-022 (PR #285, adminTrash/adminUsers router-level guard → per-route guard · 회귀 9 case · API contract 변경 0). BE 456/461 그린. |
 
 ### Hard-blocks
 
@@ -26,7 +27,7 @@
 
 ### 진행 순서
 
-~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix)~~ → ~~Wave 3 Phase B+C (PR #262/#263)~~ → ~~Phase D+E 병렬 (PR #269/#270)~~ → ~~Phase F 종합 검증 (PR #271)~~ → ~~FU P1 batch close (PR #273)~~ → ~~Wave 5 plan 작성~~ → ~~Wave 5 Phase A (notifications + comments BE, PR #276)~~ → ~~Wave 5 Phase B PR-2 (PR #278)~~ → ~~P2 BE batch (FU-007/010/015/018, PR #279/#280/#281/#282)~~ → **FU-021 / FU-022 P1 batch (production gate / 라우팅 버그)** → FU-023/024/025 P2 후속 → Wave 2 (Dashboard) → 운영/배포 phase.
+~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix)~~ → ~~Wave 3 Phase B+C (PR #262/#263)~~ → ~~Phase D+E 병렬 (PR #269/#270)~~ → ~~Phase F 종합 검증 (PR #271)~~ → ~~FU P1 batch close (PR #273)~~ → ~~Wave 5 plan 작성~~ → ~~Wave 5 Phase A (notifications + comments BE, PR #276)~~ → ~~Wave 5 Phase B PR-2 (PR #278)~~ → ~~P2 BE batch (FU-007/010/015/018, PR #279/#280/#281/#282)~~ → ~~FU-021 / FU-022 P1 batch (PR #284/#285)~~ → **FU-023/024/025 P2 후속** → Wave 2 (Dashboard) → 운영/배포 phase.
 
 ---
 
