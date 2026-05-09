@@ -62,7 +62,7 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 - First-pass git log: `--all` + wide keywords; never narrow on retry.
 - Minimum context for judgment: single most relevant file first.
 - Before editing: summarize selected files / symbols + why.
-- Single-prompt token budget: no single tool call, subagent dispatch, or pasted context may exceed ~50% of the session's running token total. Pull only the slice you need (`offset / limit`, `find_symbol`, `rg -n` with narrow paths); pre-summarize large context before handing it to a subagent; split a bloated request into multiple smaller ops rather than one mega-prompt.
+- Single-prompt token budget (applies to Claude's outgoing ops only — never gates user input): no single tool call, subagent dispatch, or pasted context may exceed ~50% of the session's running token total. Pull only the slice you need (`offset / limit`, `find_symbol`, `rg -n` with narrow paths); pre-summarize large context before handing it to a subagent; split a bloated request into multiple smaller ops rather than one mega-prompt.
 
 **Reversibility gate:**
 
