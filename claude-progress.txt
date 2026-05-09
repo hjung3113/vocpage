@@ -1,6 +1,18 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-09 FU bucket P1 batch close — drift 정리 + audit closure)
+## 다음 세션 시작점 (2026-05-09 Wave 5 plan 작성 — 알림 + Sidebar nav count badge)
+
+→ **Wave 5 plan 작성 (docs-only, 2026-05-09)** — `docs/specs/plans/wave-5-notifications.md` 신설.
+   - **범위**: 인앱 알림 (§8.6 / §8.14 — 벨 / 미읽음 배지 / 🔴! Urgent / 30초 폴링 / ETag 304 / 5분 디바운스 / 50건·30일 cap) + Sidebar nav count badge 정착 (FU-008 흡수).
+   - **시각 회귀 12 화면 제외** (사용자 ad-hoc 진행). AppShell 글로벌 top bar 신설 부정 — Sidebar `/notifications` nav item 옆 배치 (W5-D1).
+   - **Phase 구조**: A (BE 단독, contract irreversible) → B (FE + spec 두 줄). 2 PR 직렬. 신규 마이그 / ADR 없음.
+   - **결정 잠금 W5-D1~D10**: bell placement (Sidebar) · Urgent 표시 = 표시 시점 priority · 디바운스 = 앱 레이어 + DB 조회 (D8) · cap = lazy trim · 트리거 = `services/notifications.ts` · BE TDD 1~4, 트리거는 통합 테스트 흡수 · 두 쿼리 키 분리 · `<NavItemCountBadge>` 추상 (FU-008 흡수) · 2 PR · ADR 없음.
+   - **부수 변경**: `next-session-tasks.md` Wave 5 row 추가 + 진행 순서 갱신 · `followup-bucket.md` FU-008 Resolution 에 Phase B 흡수 메모.
+   - **다음 진입**: Wave 5 Phase A (BE 단독 PR-1).
+
+→ **마이그 번호** — 다음 마이그 번호 = 021 (변동 없음).
+
+## 이전 세션 시작점 (2026-05-09 FU bucket P1 batch close — drift 정리 + audit closure)
 
 → **FU P1 batch close (docs-only, 2026-05-09)** — followup-bucket row drift 3건 + audit closure 3건.
    - **Drift 정리**: FU-001 (PR #248 `67b1eda` + harden `4fe9e25`) / FU-002 (PR #249 `264b908`) / FU-017 (PR #265 `00bfb33`) 모두 실머지 상태였으나 bucket row 가 Open 으로 남아 drift. ✅ 로 갱신 + Resolution 한 줄.
