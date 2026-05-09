@@ -68,3 +68,4 @@
 | `20-admin-users.png`       | **사용자 관리** — 사용자 목록(이름, 이메일, 역할 배지 Admin/Manager/User, 활성/비활성 상태, 마지막 접속), 역할 변경·삭제 버튼, 사용자 초대 버튼   |
 | `21-admin-notices.png`     | **공지사항 관리** — 제목, 중요도(긴급/중요/일반) 배지, 팝업 ON/OFF, 노출 기간, 노출 토글 스위치, 삭제 버튼. 공지 추가 버튼                        |
 | `22-admin-faq.png`         | **FAQ 관리** — 질문 목록, 카테고리 배지, 노출 토글, 삭제 버튼. FAQ 추가 버튼                                                                      |
+| `admin/02-trash.png`       | **휴지통** — Admin-only. 소프트 삭제된 VOC 목록(이슈 코드/제목/상태/시스템/메뉴/삭제일시/삭제자), 복원 버튼, 복원 다이얼로그, 영구삭제 disabled 버튼 (W3-5 placeholder — real screenshot pending) |

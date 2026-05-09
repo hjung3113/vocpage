@@ -10,6 +10,7 @@ const VocPage = lazy(() => import('@pages/voc'));
 const VocReviewPage = lazy(() => import('@pages/voc-review'));
 const NoticePage = lazy(() => import('@pages/notice'));
 const FaqPage = lazy(() => import('@pages/faq'));
+const AdminTrashPage = lazy(() => import('@pages/admin/trash'));
 
 function VocRoute() {
   return (
@@ -84,7 +85,22 @@ export const router = createBrowserRouter([
       },
       { path: 'tags', element: <StubPage title="Tag" /> },
       { path: 'notifications', element: <StubPage title="알림" /> },
-      { path: 'admin/*', element: <StubPage title="Admin" /> },
+      {
+        path: 'admin',
+        children: [
+          { index: true, element: <Navigate to="/voc" replace /> },
+          {
+            path: 'vocs/trash',
+            element: (
+              <Suspense fallback={<LoadingState />}>
+                <AdminTrashPage />
+              </Suspense>
+            ),
+          },
+          // Other admin screens (Tag Master, External Masters, Users) added in later Phases
+          { path: '*', element: <StubPage title="Admin" /> },
+        ],
+      },
       { path: 'health', element: <HealthPage /> },
     ],
   },

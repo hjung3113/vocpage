@@ -9,6 +9,7 @@ import {
   Settings,
   Code2,
   ChevronDown,
+  Trash2,
 } from 'lucide-react';
 import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
@@ -20,6 +21,8 @@ interface NavItem {
   label: string;
   icon: React.ElementType;
   adminOnly?: boolean;
+  /** Visible to admin role only — manager is excluded (ADR 0005). */
+  adminStrict?: boolean;
   devOnly?: boolean;
 }
 
@@ -31,6 +34,8 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/tags', label: 'Tag', icon: Tag },
   { to: '/notifications', label: '알림', icon: Bell },
   { to: '/admin', label: 'Admin', icon: Settings, adminOnly: true },
+  // 휴지통: admin-strict — Manager does NOT see this (ADR 0005)
+  { to: '/admin/vocs/trash', label: '휴지통', icon: Trash2, adminStrict: true },
   { to: '/health', label: 'Health', icon: Code2, devOnly: true },
 ];
 
@@ -41,7 +46,10 @@ export function Sidebar() {
     !popup.isError && !!popup.data?.rows?.some((n) => n.level === 'urgent');
 
   const visible = NAV_ITEMS.filter(
-    (item) => (!item.adminOnly || isAdmin || isManager) && (!item.devOnly || isDev),
+    (item) =>
+      (!item.adminOnly || isAdmin || isManager) &&
+      (!item.adminStrict || isAdmin) &&
+      (!item.devOnly || isDev),
   );
 
   return (
