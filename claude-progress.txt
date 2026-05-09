@@ -1,34 +1,33 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점
+## 다음 세션 시작점 (2026-05-09 grill 종료)
 
-→ **`/voc` 단일 PR `docs/voc-completion-single-pr` PR open 대기 (12 commit, follow-up 5건 반영)**
-   verifier evidence-based PASS — D-3 재실행: BE 116/123 PASS (+5 M-1) · FE 472/472 PASS (+3 L-1·L-2) · FE lint clean · FE+BE typecheck clean.
-   머지는 사용자. 머지 후 Phase 2 (`feat/voc-list-expand`) → Wave 2(Dashboard).
+→ **PR-α2 머지 완료 (2026-05-09)** — `docs/uidesign-cleanup`. uidesign.md leak 16건 정리(prototype 4 / FE 경로 5 / tooling 1 / 이력 3 / contract 3) + 구조 보강(Surfaces level numbering / Type·Spacing·Shadow·Radius 표 / §15 Agent Prompt Guide) + uidesign 단독 정책 블록을 root CLAUDE.md 한 곳으로 통합하고 AGENTS.md·frontend·prototype CLAUDE.md 의 룰 중복 제거. CLAUDE.md 197→114줄.
 
-→ **다음 세션 액션**
-   1. `gh pr create` → 사용자 review → `gh pr merge --merge --delete-branch`
-   2. 머지 직후 main 기준 `feat/voc-list-expand` 브랜치 신설 (§9.2.2 인라인 expand)
-   3. Phase 2 spec 보강 ADR 1건 (BE `total` 의미 / zod self-recursive 회피 / status grouping × expand 배타) → 구현
-   4. Phase 2 머지 후 `feat/dashboard-shell` 진입 (Wave 2)
+→ **다음 세션 우선: 3 PR 병렬 작성 (Wave 3 진입 unblock + Wave 4 hotfix)**
+   - **PR-α**  `docs/wave-3-oq-sync`           — OQ-1~5 결정 반영 + ADR 0004/0005 Accepted + spec sync 10개 + 사이드바 양쪽 갱신
+   - **PR-β**  `fix/fu-001-dompurify`          — dompurify + SafeHtml wrapper, 4 surfaces (XSS, 가장 시급)
+   - **PR-γ**  `fix/fu-002-notice-faq-indexes` — 마이그 018 (notices/faqs hot-path 인덱스)
+   3 worktree 동시 작성, 의존성 0, 머지 순서 무관.
 
-→ **Wave 3 plan draft (병렬 트랙, branch `docs/wave-3-plan`, 2026-05-09)**
-   - `docs/specs/plans/wave-3-admin.md` — Admin 4 화면 (Tag Master / Trash / External Masters / Users) plan
-   - `docs/adr/0004-admin-permission-model.md` (Proposed) + `docs/adr/0005-trash-restore-policy.md` (Proposed)
-   - OQ 5 건 (`docs/specs/plans/open-questions.md`) — 사용자 결정 후 spec 동기화 PR 선행
-   - Hard-block: Wave 2 머지 + 마이그 012 머지 + OQ 5건 답변 모두 충족 후 Phase A 진입
-   - PR 은 사용자가 open. 본 worktree 는 commit only.
+→ **머지 후 진입 순서**
+   1. Wave 3 Phase A — **4 PR full parallel**: W3-1=마이그 014 / W3-2=마이그 015 / W3-3=contract zod+openapi / W3-9=마이그 017
+   2. Phase B+C 병렬 (Tag Master + Trash) → Phase D+E 병렬 (External Masters + Users) → Phase F 종합 검증
+   3. FU-003/4/5 = Phase A 머지 후 idle slot 에서 hotfix-style. FU-006~009(P2) = Wave 3 close 후 batch.
+   4. Wave 5 plan = Wave 3 close 후 작성 진입.
 
-→ **PR 본문 = `docs/voc-completion-single-pr` 12 commit + driver D-1~D-5 재PASS + 머지 요청 1줄**
-   - Phase B (BE master + create 강제룰) — `ad1ef50`
-   - Phase C minimal + major — `c56af67` + `b85240a`
-   - Wave 1.6 잔여 — `dc4527c`
-   - Phase 6 (payload-review BE/FE + Playwright spec) — `a8c08ca` + `64069e2`
-   - Follow-up 7건 (status icon · 토큰화 · 13.5px · ReviewStatus · collapse test · data-testid slug) — `d266bd7`
-   - Code-review fix B-1 / H-1 / H-2 — `97e002c`
-   - Wave close progress sync — `4ad8dbe`
-   - Untracked entity icons + shadcn primitives — `08f95f0`
-   - **NEW** Follow-up M-1·M-2·M-3·L-1·L-2 일괄 처리 (이번 세션)
+→ **Grill 결정 정합 (19건, 2026-05-09)**
+   - **OQ-1** Tag Master mutate = **Option D** (Manager add/edit, Admin only merge/외부잠금/영구삭제)
+   - **OQ-2** External Masters read = **B** (Manager+ + Dev)
+   - **OQ-3** user_role_log = **A** (별 테이블, 마이그 017)
+   - **OQ-4** 마이그 번호 = **014** Tag Master / **015** Trash / **017** user_role_log (013/016 점유)
+   - **OQ-5** 사이드바 순서 = **B** (Result Review → Users → External Masters → Tag Master → Trash)
+   - **ADR 0004** Accepted + 본문 재작성 (Option D 신설). **ADR 0005** Accepted (본문 유지).
+   - **user_role_log schema** = `id, user_id, changed_by(NOT NULL), old_role, new_role, old_active, new_active, reason, created_at` + `(user_id, created_at DESC)` idx
+   - **FU-001~009** 모두 등록 (P1 5 + P2 4). FU-001 = dompurify+SafeHtml 4 surfaces. FU-002 = 마이그 018.
+   - **새 phase 생성 X** — uidesign cleanup 은 별 PR-α2 로 본 다음 세션 우선 처리, 그 뒤는 위 계획 그대로.
+
+→ **Wave 4 (공지/FAQ/Notice popup) 머지 완료** — PR #245 (08070cc, 2026-05-09). Wave 3 plan draft = PR #244 머지.
 
 → **D-1~D-5 재실행 evidence (2026-05-09)**
    - D-1 기능: 변경 없음 (M-1·M-3 docs/test only). M-2 onError 토스트 추가 / L-1 다탭 동기화 / L-2 secondary sort.

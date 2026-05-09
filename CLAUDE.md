@@ -1,171 +1,114 @@
 # CLAUDE.md
 
-Guidance for Claude Code in this repo.
-
 ## Project
 
-**VOC (Voice of Customer) management system.**
+VOC (Voice of Customer) management system. Three-tier: React SPA → Express REST → PostgreSQL/pgvector. Docker Compose runs all three.
 
-- Current progress: `claude-progress.txt` (first 30 lines) → `docs/specs/plans/next-session-tasks.md`
-- Product spec: `docs/specs/requires/requirements.md`
-- Design system: `docs/specs/requires/uidesign.md`
+- Progress: `claude-progress.txt` (first 30 lines) → `docs/specs/plans/next-session-tasks.md`
+- Spec: `docs/specs/requires/requirements.md` + `feature-*.md`
+- Design: `docs/specs/requires/uidesign.md`
+- Sub-dir maps: `frontend/CLAUDE.md`, `backend/CLAUDE.md` (consult before editing in those trees)
 
-Do not record phase/wave progress in this file — canonical source is the progress + plan docs above.
+Implementation reference (2026-05-09~): `requirements.md` + `uidesign.md` only. `prototype/` is no longer a visual/behavior reference — pixel/DOM/CSS citation forbidden.
 
-## Stack (summary — details in sub-dir CLAUDE.md)
+## Design System (canonical)
 
-Three-tier app: React SPA → Express REST API → PostgreSQL.
+Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Architecture, §15 Agent Prompt Guide).
 
-- Frontend: React + TypeScript + Vite + Tailwind v4 → `frontend/CLAUDE.md`
-- Backend: Node + Express + TypeScript + PostgreSQL/pgvector → `backend/CLAUDE.md`
-- Container: Docker Compose (`docker compose up` starts FE + BE + Postgres)
+- All colors via `var(--token)` — never hex/OKLCH literals
+- Typography: Pretendard Variable (UI), D2Coding (code/issue IDs)
+- 8px grid, max-width ~1200px, elevation via background opacity not shadow darkness
 
-**Rule:** folder-level `CLAUDE.md` files are the project map. Before code investigation or editing, use this root file plus the nearest relevant sub-directory `CLAUDE.md` files to choose likely folders/domains. This file covers cross-cutting governance only.
+### `uidesign.md` 단독 정책 (이 한 곳에서만 정의 — 복제 금지)
 
-**Implementation reference (2026-05-09~):** `docs/specs/requires/requirements.md` + `docs/specs/requires/uidesign.md` 만 정본. `prototype/` 디렉터리는 더 이상 시각·동작 reference 가 아니다. parity 비교, 픽셀 측정, prototype DOM/CSS 인용 모두 금지. 기존 plan/문서의 prototype 언급은 history 로만 취급한다.
+**포함**: 토큰 정의·use rule, 컴포넌트 visual contract, §15 Agent Prompt Guide.
+**금지**: 구현 경로(`frontend/src/...`, `*.tsx`, `tokens.ts`) · 빌드/린트 툴명(Stylelint/ESLint/husky) · Wave/Phase/PR 번호·날짜 · 동작·라우팅·상태 contract(→ `feature-*.md`) · 스키마·migration(→ `requirements.md`). 발견 시 leak 으로 즉시 분리.
 
-## Design System (canonical hard rule)
-
-Full spec: `docs/specs/requires/uidesign.md` (§10 CSS Reference, §12 Token Architecture).
-
-- Always use CSS custom properties — `var(--bg-app)`, `var(--brand)`, `var(--text-primary)`, etc.
-- **Never write hex values** (no `#5e6ad2`, no `#ffffff`). No raw OKLCH either — go through the token.
-- Typography: Pretendard Variable (UI), D2Coding (code/issue IDs).
-- 8px spacing grid, max-width ~1200px, elevation via background opacity not shadow darkness.
+**FE 작업 절대 룰**: visual surface 를 만지면 `uidesign.md` 를 먼저 읽고 기존 토큰 contract 를 확인한 뒤 코드 작성. 새 토큰이 필요하면 spec 갱신을 같은 PR(또는 직전 PR)에서 끝낸다. 컴포넌트 신설은 §15 예시를 베이스로.
 
 ## Start Every Session
 
-1. Read `claude-progress.txt` (first 30 lines only)
-2. Read `docs/specs/plans/next-session-tasks.md` to find current Phase and pending tasks
-3. Read relevant spec in `docs/` (selectively — only what's needed)
-4. Continue from progress file — don't re-read what you already know
-5. Review `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — delete entries already reflected in specs or git
+1. `claude-progress.txt` (first 30 lines)
+2. `next-session-tasks.md` for current Phase
+3. Relevant spec selectively
+4. Memory index `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — purge entries already in specs/git
 
 ## Core Rules
 
-- **Tool routing — match task to tool, picking the wrong tool wastes tokens and is itself a rule violation:**
-  - TS/TSX symbol body / references / rename → **Serena** (`get_symbols_overview`, `find_symbol`, `find_referencing_symbols`, `rename_symbol`)
-  - Cross-file keyword / literal / error string / file discovery → **`rg -n`**
-  - Known small range or tight cluster needing imports+body together → **`Read`** with `offset`/`limit` (or `sed -n 'A,Bp'`)
-  - Architecture map / dependency graph / UI→API→DB flow / "what connects to X" → **Graphify** — required at least once before a wide refactor or first entry into an unfamiliar feature; details below
-  - **Never** `cat <file>` to dump source, **never** `Read` a whole TS/TSX file you could `find_symbol` instead, **never** re-read a file already in context. Exception: config/JSON under ~1KB.
-- **Parallel tool calls** — independent tool calls MUST go in one single message, never sequential. Gate: "Can I write call B's exact arguments right now, before call A runs?" — if yes, batch it. Common violations: (1) typecheck + test as separate Bash calls (use `&&` instead); (2) consecutive Read calls on unrelated files; (3) consecutive Bash greps; (4) sequential subagent dispatches. Full violation patterns, exceptions, and rationalization table: `.claude/specs/parallel-dispatch.md`.
-- **No re-read** — never re-read a file already in session context (exception: modified files)
-- **Tail test output** — pipe through `| tail -20`; never print full traces
-- **No Read before delete** — files being deleted must never be Read first; just `rm`
-- **Broad git history first pass** — use `--all` and wide keywords on first `git log --grep`; never retry with a narrower pattern
-- **Minimum context for decisions** — for judgment tasks, use only the single most relevant file; open supporting files only if the first is insufficient
-- **Before editing** — summarize selected files/symbols and why they are in scope
-- **Git workflow** — Create the feature branch (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`) **before** making any changes; never work on main then move commits after. Never commit or push to main directly. PRs are opened by the user. Merge with `gh pr merge <n> --merge --delete-branch` (`--squash` and `--rebase` forbidden). After merge: `git branch -D <branch>`. Enforced by hookify rules in `.claude/hookify.block-*.local.md`.
-- Run tests before committing; follow existing code style (read 2–3 nearby files first)
-- No features beyond what the task requires (YAGNI)
-- CLAUDE.md stays under 200 lines
+- **Tool routing**:
+  - TS/TSX symbol/refs/rename → Serena
+  - Cross-file keyword/file discovery → `rg -n`
+  - Small known range → `Read` with `offset/limit`
+  - Architecture / dependency flow → Graphify (required once before wide refactor or unfamiliar feature)
+  - Never `cat <file>` to dump source; never `Read` whole TS/TSX file when `find_symbol` works; never re-read a file already in context (modified files OK)
+- **Parallel tool calls**: independent calls go in one message. Gate: "Can I write call B's args before A runs?" — if yes, batch. Common violations + exceptions: `.claude/specs/parallel-dispatch.md`.
+- **Tail test output**: `| tail -20`; never full traces
+- **No Read before delete**: just `rm`
+- **First-pass git log**: `--all` + wide keywords; never narrow on retry
+- **Minimum context for judgment**: single most relevant file first
+- **Before editing**: summarize selected files/symbols + why
+- **Git workflow**: feature branch (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`) **before** any change; never push to main; PRs opened by user; merge with `gh pr merge <n> --merge --delete-branch` (squash/rebase forbidden); after merge `git branch -D <branch>`. Enforced by `.claude/hookify.block-*.local.md`.
+- Tests before commit; match nearby code style; YAGNI
+- This file stays under 200 lines
 
 ## Session Continuity
 
-Every design decision → written to spec or ADR before session ends.
-Every phase completion → update `claude-progress.txt` + git commit.
-No implementation without a written spec section covering it.
+Every design decision → spec or ADR before session ends. Phase close → `claude-progress.txt` + commit. No implementation without a spec section.
 
 ## Documents
 
-Documentation hygiene canonical source: **`docs/specs/README.md`**. Consult it before creating, moving, or cleaning up any doc.
-
-**Index IDs (Wave / Phase / Task / FU)** — when assigning, citing, or closing any ID, consult these three canonical sources:
-
-- Rules — `docs/specs/README.md §7` (R1–R7: append-only / flat integer / grouping is metadata / Issue# is cross-ref / no bundle IDs / closed waves use FU bucket / one work unit per ID)
-- Wave lineage + batch glossary — `docs/specs/plans/wave-index.md`
-- Follow-up flat-ID register — `docs/specs/plans/followup-bucket.md`
-
-Before assigning a new ID, check the next free integer in `wave-index.md`. Follow-ups against closed waves get the next `FU-NNN` in `followup-bucket.md`. On merge, update the status column in both docs and sync the first 30 lines of `claude-progress.txt`.
+Doc hygiene: **`docs/specs/README.md`**. Index IDs (Wave/Phase/Task/FU): consult `README.md §7` (rules R1–R7) + `plans/wave-index.md` (lineage) + `plans/followup-bucket.md` (FU register). Next free integer from `wave-index.md`; closed-wave follow-ups → `FU-NNN`. On merge: status update in both + sync `claude-progress.txt`.
 
 ## Input Interpretation
 
-Normalize a request into this frame before coding. Ask only about items that materially affect the result; otherwise state the assumption and proceed.
-
-- **Goal** — what + why (one line)
-- **Scope** — files/paths involved; what _not_ to touch
-- **Done when** — verifiable conditions (test passes, build clean, observable behavior)
-- **Constraints** — style, tokens, dependencies, existing patterns
-
-Skip the frame for trivial one-liners (rename, obvious typo, single-file change with explicit path).
+Before coding, frame: **Goal** (what + why, 1 line) · **Scope** (files in/out) · **Done when** (verifiable conditions) · **Constraints** (style/tokens/patterns). Skip for trivial one-liners.
 
 ## Working Style
 
-### Reversibility gate (apply before any pause)
+### Reversibility gate
 
-Classify the decision first; the gate level follows the class.
+- **Irreversible**: DB schema/migration, public API contract (`shared/openapi.yaml`, `shared/contracts/**`), merged commits, external comms, file deletes, auth/billing/permissions/tenant boundary. → stop and ask, ≥90% confidence required.
+- **Reversible**: code/style/test in unmerged branch, file moves, naming, local refactors. → state assumption in 1 line, proceed, report in summary.
+- **Visual surface** (영향 `/voc`): `uidesign.md` 토큰·구조와 어긋나면 irreversible — 토큰 정의 변경은 spec 갱신 선결.
 
-- **Irreversible** — DB schema/migration, public API contract (`shared/openapi.yaml`, `shared/contracts/**`), merged commits, external comms (push, PR merge, issue/comment), file deletes, anything touching auth / billing / permissions / tenant boundary.
-- **Reversible** — code/style/test changes inside an unmerged feature branch, file moves within the working tree, naming choices, local refactors.
+### Engineering
 
-Rules:
-
-- **Irreversible**: stop and ask. State both options + rationale. No proceeding under 90% confidence.
-- **Reversible**: state the assumption in one line, proceed, report what was done in the end-of-turn summary. Do not block on user response for reversible decisions.
-- **Visual-surface decisions** (anything affecting `/voc` 시각 결과)는 `uidesign.md` 토큰·구조와 어긋나면 irreversible 로 취급 — 토큰 정의 변경은 spec 갱신이 선결.
-
-### Engineering rules
-
-- **TDD for irreversible surface** — auth, billing, permissions, contracts, migrations, BE routes: write the test first, confirm it fails, then implement. Bug fixes start with a failing regression test. Stack: Vitest (FE) / Jest+Supertest (BE) — see `requirements.md §3`.
-- **Smoke test for reversible UI** — components and styles only need a single happy-path render test plus the visual-diff baseline. Don't author exhaustive unit tests for trivial JSX.
-- **Debate, don't defer** — raise counterarguments or missed cases before agreeing; no passive "yes".
-- **Think before coding** — state assumptions; if multiple interpretations exist, present them, don't pick silently.
-- **Simplicity first** — minimum code; no speculative abstractions; if 200 lines could be 50, rewrite.
-- **Surgical changes** — touch only what the request requires; match existing style; remove only orphans your changes made unused.
-- **Goal-driven execution** — convert tasks into verifiable goals; for multi-step work, plan per-step verification and loop until verified.
-- **Pre-commit lint dry-run** — before the first `git commit`, run `npm run lint -w frontend` once. Fix and re-stage on failure to avoid a husky retry loop. (Backend lint script is undefined — same pattern applies once added.)
-- **Progress docs at phase/wave close only** — sync `claude-progress.txt` + the relevant plan doc on the same branch only when the PR closes a phase or wave. Intra-phase PRs are exempt; do not commit progress diffs for every leaf. The `warn-doc-cleanup-before-pr` hookify rule fires on every `gh pr` — apply its 8-step checklist only if this PR is a phase/wave-close PR.
+- **TDD for irreversible surface** (auth/billing/permissions/contracts/migrations/BE routes): test first, confirm fail, implement. Bug fix = failing regression test first. Stack: Vitest (FE) / Jest+Supertest (BE) — `requirements.md §3`.
+- **Smoke test for reversible UI**: one happy-path render test + visual-diff baseline.
+- **Debate, don't defer**: raise counterarguments before agreeing.
+- **Think before coding**: state assumptions; surface multiple interpretations.
+- **Simplicity first**; **surgical changes**; **goal-driven verification per step**.
+- **Pre-commit**: `npm run lint -w frontend` once before first commit.
+- **Progress docs at phase/wave close only** — intra-phase PRs exempt. `warn-doc-cleanup-before-pr` hookify 8-step checklist applies only on phase/wave-close PR.
 
 ### Approval scope
 
-A user approval applies to its declared scope and everything reversible inside it:
+User approval covers its declared scope + reversible items inside. Plan approval → batches OK. Batch approval → leaves OK. Spec-derived → no extra approval. Re-ask on (1) new plan/batch, (2) irreversible not in spec, (3) user contradiction.
 
-- **Plan approval** → all batches in that plan are approved; per-batch ack not required
-- **Batch approval** → all leaves in that batch are approved; per-leaf ack not required
-- **Spec-derived implementation** → no extra approval needed; the spec is the approval
-
-Re-ask only when (1) crossing into a new plan/batch, (2) hitting an irreversible decision not covered by the spec, or (3) the user contradicts the prior approval.
-
-Completion language:
-
-- For leaves and intra-batch work: report what landed in the end-of-turn summary, do not declare "done".
-- For phase / wave / PR-merge milestones: wait for explicit user confirmation before declaring closure.
+Completion language: leaves → report what landed, no "done"; phase/wave/PR-merge → wait for explicit user confirmation.
 
 ## Refactoring
 
-A refactor changes structure without changing observable behavior. Refactor and feature change must NOT land together — separate commits/PRs.
+Refactor = structure change without behavior change. Refactor + feature change MUST NOT land together.
 
-- **Before:** state symbols/files/paths to be changed in chat; ensure tests cover affected behavior (write tests first if not).
-- **During:** `git mv` for file moves; one refactor at a time.
-- **After (in order):** update all references (imports, dynamic strings, config, `docs/specs/**`, plan files, README/CLAUDE.md, comments) → `rg -n "<old>"` returns 0 hits → Serena reference checks when symbols moved/renamed → typecheck passes → tests pass → exercise the touched surface (UI: browser; API: endpoint).
-- **Escalate to `code-reviewer`** only when public API surface changed, ≥3 modules touched, or DB schema/migration involved.
+- **Before**: state symbols/files; ensure test coverage (write tests first if not).
+- **During**: `git mv` for moves; one refactor at a time.
+- **After (in order)**: update all references → `rg -n "<old>"` returns 0 → Serena ref-check on renames → typecheck → tests → exercise the surface.
+- **Escalate to `code-reviewer`** only on public API change, ≥3 modules, or DB schema/migration.
 
 ## Graphify
 
-Knowledge graph at `graphify-out/`. Triggered by the routing rule above (architecture / dependency / cross-domain flow questions only). Prefer `graphify-out/wiki/index.md` over raw files; specific queries via `/graphify query|path|explain`. After modifying code files, run `graphify update .` to keep the graph current.
+Knowledge graph at `graphify-out/`. Use for architecture / dependency / cross-domain flow questions. Prefer `wiki/index.md` over raw files; queries via `/graphify query|path|explain`. After code edits: `graphify update .`.
 
 ## Top-level directories
 
-- `benchmark/` — visual ground-truth PNGs (`01-…`–`22-…`) compared by `scripts/visual-diff.ts`. Index: `INDEX.md`. New screen = baseline + INDEX row.
-- `graphify-out/` — auto-generated knowledge-graph output. Do not hand-edit. Architecture/community Q → `GRAPH_REPORT.md` or `wiki/index.md`. Refresh: `graphify update .`.
-- `scripts/` — repo utilities. Fixture↔seed parity: `check-fixture-seed-parity.ts`. Shadcn token rewrite: `shadcn-token-rewrite.ts`. Visual diff: `visual-diff.ts` + `visual-diff/` (helpers + `__tests__/`).
-- `shared/` — types/zod-schemas/fixtures used by **both** FE+BE.
-  - `shared/types/` — TS domain entities/enums/response shapes. Single-side types stay in that side.
-  - `shared/contracts/` — zod schemas (FE forms + BE route input, single source). Sub-trees: `voc/`, `notification/`, `master/` (source data in `backend/config/masters/`).
-  - `shared/fixtures/` — FE MSW + BE seed shared data; parity enforced by `scripts/check-fixture-seed-parity.ts`.
-  - REST contract reference → `shared/openapi.yaml`.
+- `benchmark/` — ground-truth PNGs (`01–22-…`) for `scripts/visual-diff.ts`. New screen = baseline + INDEX row.
+- `graphify-out/` — auto-generated, do not hand-edit. Refresh: `graphify update .`.
+- `scripts/` — utilities (`check-fixture-seed-parity.ts`, `shadcn-token-rewrite.ts`, `visual-diff.ts`).
+- `shared/` — `types/` (FE+BE entities/enums) · `contracts/` (zod schemas, single source) · `fixtures/` (MSW+seed, parity enforced) · `openapi.yaml` (REST contract reference).
 
 ## Agent skills
 
-### Issue tracker
-
-Issues live in GitHub Issues. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default label vocabulary (needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix). See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context — one `CONTEXT.md` at the repo root + `docs/adr/`. See `docs/agents/domain.md`.
+- Issues: GitHub Issues — `docs/agents/issue-tracker.md`
+- Triage labels: needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix — `docs/agents/triage-labels.md`
+- Domain docs: single `CONTEXT.md` + `docs/adr/` — `docs/agents/domain.md`

@@ -1,9 +1,16 @@
 # VOCpage UI Design System
 
+> **Theme:** light + dark (automatic, system-driven)
+>
 > **Scope**: Visual layer only — color tokens, typography, component visuals, spacing, elevation, layout rules.
 > Behavior, business logic, API contracts, role policy → `requirements.md` / `feature-*.md`.
 >
-> **Revision history**: Initial Linear-inspired indigo palette → Samsung Blue palette + automatic system theme sync, fully overhauled (2025.06). Renamed `design.md` → `uidesign.md` (2026-04-27) to make the visual-only scope unambiguous.
+> **Revision history**:
+> - 2025.06 — initial Linear-inspired indigo palette overhauled to Samsung Blue + automatic system theme sync.
+> - 2026-04-27 — renamed `design.md` → `uidesign.md` to make the visual-only scope unambiguous.
+> - 2026-05-09 — removed prototype references and frontend implementation paths; consolidated archetype amendments and wave/phase markers into history; added Surfaces, Border-radius, Shadows, and Agent Prompt Guide sections for AI-followable lookups.
+
+VOCpage's design language is a **focused, blue-tinted enterprise canvas**. A single saturated chromatic — Samsung Blue — carries every CTA, focus, and active state. Everything else is blue-tinted neutral, layered through OKLCH-uniform background tiers (App → Panel → Surface → Elevated). Korean and Latin coexist on Pretendard Variable; D2Coding is reserved for issue codes and code blocks. The system follows the user's OS theme automatically — light and dark are designed separately, not as inversions.
 
 ---
 
@@ -48,16 +55,20 @@ Clean corporate look on blue-tinted white. Similar to the light version of Galax
 
 > Why OKLCH: perceptually uniform — equal lightness steps look equal visually. No chroma-lightness interference like HSL.
 
-### Background Layers
+### Background Layers (Surfaces)
 
-| Role         | Light                    | Dark                     | Usage           |
-| ------------ | ------------------------ | ------------------------ | --------------- |
-| **App Base** | `oklch(98% 0.007 252)`   | `oklch(11% 0.016 264)`   | Lowest canvas   |
-| **Panel**    | `oklch(96.5% 0.009 255)` | `oklch(14.5% 0.019 262)` | Sidebar, panels |
-| **Surface**  | `oklch(100% 0 0)`        | `oklch(18.5% 0.021 260)` | Cards, drawer   |
-| **Elevated** | `oklch(95% 0.011 256)`   | `oklch(23% 0.022 258)`   | Hover, popups   |
+Four numbered elevation levels — pick layer by depth, not by mood.
+
+| Level | Token            | Light                    | Dark                     | Purpose                                      |
+| ----- | ---------------- | ------------------------ | ------------------------ | -------------------------------------------- |
+| **0** | `--bg-app`       | `oklch(98% 0.007 252)`   | `oklch(11% 0.016 264)`   | Lowest canvas — page body                    |
+| **1** | `--bg-panel`     | `oklch(96.5% 0.009 255)` | `oklch(14.5% 0.019 262)` | Sidebar, sticky topbars, panel zones         |
+| **2** | `--bg-surface`   | `oklch(100% 0 0)`        | `oklch(18.5% 0.021 260)` | Cards, drawers, modal dialog surface         |
+| **3** | `--bg-elevated`  | `oklch(95% 0.011 256)`   | `oklch(23% 0.022 258)`   | Hover, popovers, nested-card / row-hover     |
 
 > **Principle**: All backgrounds must be micro-tinted with blue hue (250–268). Pure white/black forbidden.
+>
+> Layer rule: a child surface uses the next level up from its parent. Never skip more than one level (Level 0 → 3 looks unanchored).
 
 ### Text Hierarchy
 
@@ -124,15 +135,17 @@ CDN: `https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variabl
 
 ### Type Scale
 
-| Role    | Size    | Weight  | Usage                                       |
-| ------- | ------- | ------- | ------------------------------------------- |
-| Display | 32px    | 700     | Rarely used                                 |
-| Heading | 20–24px | 700     | Section titles                              |
-| Title   | 15px    | 700     | **Page header title**, card/drawer headings |
-| Body UI | 14px    | 400     | Default body text                           |
-| Label   | 13px    | 400–600 | Table cells, form labels                    |
-| Caption | 11–12px | 400–600 | Metadata, dates                             |
-| Micro   | 10–11px | 600     | Badges, tags, uppercase labels              |
+| Role    | Size    | Line height | Weight  | Tracking      | Usage                                       |
+| ------- | ------- | ----------- | ------- | ------------- | ------------------------------------------- |
+| Display | 32px    | 1.2         | 700     | `-0.02em`     | Rarely used (empty-state hero, error 404)   |
+| Heading | 20–24px | 1.3         | 700     | `-0.015em`    | Section titles                              |
+| Title   | 15px    | 1.4         | 700     | normal        | **Page header title**, card/drawer headings |
+| Body UI | 14px    | 1.5 (1.65 KR) | 400   | normal        | Default body text                           |
+| Label   | 13px    | 1.4         | 400–600 | normal        | Table cells, form labels                    |
+| Caption | 11–12px | 1.4         | 400–600 | normal        | Metadata, dates                             |
+| Micro   | 10–11px | 1.3         | 600     | `0.06–0.08em` (uppercase) | Badges, tags, uppercase labels    |
+
+> Token reference for sizes: not exposed as discrete `--text-*` tokens — use literal px on `font-size`, but only one of the values above. Do not invent sizes between tiers.
 
 **Core principles**:
 
@@ -190,7 +203,7 @@ box-shadow: 0 0 0 3px var(--brand-bg);
 
 ### Tag Pill (Auto-tag)
 
-> **[AMENDED 2026-05-02 post-PR-144 visual review]** — In-row VOC tag pill switched from chip-style to text-only quiet style after user visual review ("테두리/배경 없는 회색 글씨로 더 작게"). The chip-style spec below is **retained** for non-row contexts (filter UI, badges in headings, future imported-source badges) and is the canonical OutlineChip primitive (`docs/specs/reviews/wave-1-6-voc-badge-audit.md` §2.2). For the in-row VOC tag visual, use the TextMark variant immediately below. Cross-reference: audit §1 row 2.
+> In-row VOC tag pill uses the text-only quiet style (no border/background, smaller). The chip-style spec below is **retained** for non-row contexts (filter UI, badges in headings, future imported-source badges) and is the canonical OutlineChip primitive (`docs/specs/reviews/wave-1-6-voc-badge-audit.md` §2.2). For the in-row VOC tag visual, use the TextMark variant immediately below. Cross-reference: audit §1 row 2.
 
 **In-row VOC tag (current — TextMark `size='xs'`):**
 
@@ -317,7 +330,6 @@ gap: 5px;
 - Low: `var(--text-quaternary)` — `font-weight: 400`
 - `font-size: 11.5px` — metadata tier (§7). Color + weight together carry the semantic signal; the absence of a chip keeps the row visually quiet.
 - aria-label: `Priority ${label}` (English, matches the label).
-- Implementation: `frontend/src/components/voc/VocPriorityBadge.tsx` (Wave 1.6 Phase C-2)
 
 ### Card & Container
 
@@ -443,7 +455,13 @@ Every list, table, drawer, and dashboard widget MUST render one of three non-dat
 
 ## 6. Shadows (Elevation)
 
-Dark backgrounds suppress shadows — light/dark are separately optimized:
+Dark backgrounds suppress shadows — light/dark are separately optimized.
+
+| Token             | Geometry           | Where to use                                              |
+| ----------------- | ------------------ | --------------------------------------------------------- |
+| `--shadow-sm`     | `0 1px 3px`        | Inline cards lifting above Surface (Level 2)              |
+| `--shadow-md`     | `0 4px 16px`       | Popovers, dropdowns, sticky headers when scrolled         |
+| `--shadow-dialog` | `0 12px 40px`      | Modal dialog surface, full-page drawer                    |
 
 ```css
 --shadow-sm: light-dark(oklch(70% 0.04 260 / 0.1) 0 1px 3px, oklch(5% 0.01 265 / 0.4) 0 1px 3px);
@@ -457,8 +475,10 @@ Dark backgrounds suppress shadows — light/dark are separately optimized:
 );
 ```
 
-**Dark mode**: Blue-black deep shadows for depth  
-**Light mode**: Blue-tinted soft shadows (pure gray shadows forbidden)
+**Dark mode**: Blue-black deep shadows for depth.  
+**Light mode**: Blue-tinted soft shadows (pure gray shadows forbidden).
+
+> Never combine more than one shadow token on the same element. If a UI feels under-elevated, raise the surface level (§3) before reaching for a heavier shadow.
 
 ---
 
@@ -466,10 +486,18 @@ Dark backgrounds suppress shadows — light/dark are separately optimized:
 
 ### Spacing (4pt scale)
 
-```
---sp-1: 4px   --sp-2: 8px   --sp-3: 12px
---sp-4: 16px  --sp-5: 24px  --sp-6: 32px
-```
+Base unit: 4px. Use only these tokens — no arbitrary px between steps.
+
+| Token     | Value | Typical use                                      |
+| --------- | ----- | ------------------------------------------------ |
+| `--sp-1`  | 4px   | Icon ↔ label gap, chip inner padding             |
+| `--sp-2`  | 8px   | Element gap (default), nav-item icon gap         |
+| `--sp-3`  | 12px  | Form field internal padding, card body padding   |
+| `--sp-4`  | 16px  | Card outer padding, section internal stack       |
+| `--sp-5`  | 24px  | Section gap, admin-body padding, page margin     |
+| `--sp-6`  | 32px  | Major section break (hero, heading clearance)    |
+
+> Density rhythm: row content uses `--sp-2` / `--sp-3` for internal padding; section-level layout uses `--sp-4` / `--sp-5`. Never mix `--sp-1` and `--sp-6` directly without an intermediate step.
 
 ### Key Dimensions
 
@@ -527,6 +555,23 @@ VOCpage uses **two distinct layout patterns**:
 grid-template-columns: 22px 144px 1fr 115px 108px 84px 96px;
 /* toggle | issue ID | title | status | assignee | priority | date */
 ```
+
+### Border Radius by Element
+
+Single source of radius decisions. Pick by element role — never by visual feel.
+
+| Element                                      | Radius   | Notes                                                           |
+| -------------------------------------------- | -------- | --------------------------------------------------------------- |
+| Card / Page-section panel                    | `8px`    | `.admin-card`, drawer body                                      |
+| Modal / Drawer outer surface                 | `12px`   | top corners only on bottom-anchored sheets                      |
+| Button                                       | `6px`    | primary, secondary, `.admin-btn`                                |
+| Input / Select / Search                      | `6px`    | `.faq-search`, admin form fields                                |
+| Pill (filter chip, tag pill, count badge)    | `9999px` | `--chip-radius-pill`                                            |
+| Rounded chip (status badge)                  | `4px`    | `--chip-radius-rounded`, `.role-pill`, `.notice-badge`          |
+| Status dot                                   | `50%`    | `.status-dot`                                                   |
+| Avatar (mini)                                | `50%`    | always perfect circle                                           |
+
+> If a new element type is introduced, choose the closest row above. Do not invent intermediate radii.
 
 ---
 
@@ -685,19 +730,19 @@ Full token set — copy into `:root` as the single source of truth.
   --status-drop-fg: light-dark(oklch(50% 0.16 68), oklch(72% 0.16 72));
   --status-drop-border: light-dark(oklch(80% 0.065 72), oklch(33% 0.068 70));
 
-  /* VOC row state backgrounds (Wave 1.6 Phase B — prototype list.css:L83/L90) */
+  /* VOC row state backgrounds */
   --voc-row-hover-bg: light-dark(oklch(94% 0.014 257), oklch(21% 0.028 261));
   --voc-row-selected-bg: light-dark(oklch(90% 0.03 260), oklch(24% 0.042 262));
 
-  /* Mini-avatar palette — muted, distinct from brand blue (prototype list.css:L289–L303) */
+  /* Mini-avatar palette — muted, distinct from brand blue */
   --avatar-steel: oklch(44% 0.08 255);
   --avatar-teal: oklch(42% 0.1 155);
   --avatar-violet: oklch(42% 0.1 300);
 
-  /* Inline highlight (`<mark>`, prototype misc.css:L17) */
+  /* Inline highlight (`<mark>`) */
   --mark-bg: oklch(75% 0.16 72 / 0.35);
 
-  /* Role pill — Admin · Manager · Dev · User (D18 / D20, 2026-04-26) */
+  /* Role pill — Admin · Manager · Dev · User */
   /* admin / manager / user reuse existing brand & status tokens; only `dev` requires net-new tokens. */
   --role-dev-fg: light-dark(
     oklch(40% 0.13 215),
@@ -810,15 +855,15 @@ where α = lerp(0.06, 0.62, value / maxValue)
 
 ### 12.1 Single Source of Truth
 
-All design tokens originate from `frontend/src/tokens.ts`. This file is the only place where raw values (hex, OKLCH, px) are allowed to appear.
+All design tokens have a single source — the canonical `:root` block in §10. Every Tailwind utility and CSS variable derives from there. Raw color/typography/dimension literals must never appear outside that block.
 
 ```
-tokens.ts  (raw values live here — only place hex/OKLCH is permitted)
-    ├── tailwind.config.ts   → utility classes  (bg-brand, text-primary, …)
-    └── CSS custom properties → var(--brand), var(--bg-app), …
+canonical token block (§10)
+    ├── Tailwind utility classes  (bg-brand, text-primary, …)
+    └── CSS custom properties     (var(--brand), var(--bg-app), …)
 ```
 
-Both Tailwind utilities and CSS vars are generated from `tokens.ts`. Editing a token in `tokens.ts` propagates to both surfaces automatically.
+Editing a token at the source propagates to both surfaces automatically.
 
 ### 12.2 When to Use Tailwind Utilities vs CSS Vars
 
@@ -826,35 +871,16 @@ Both Tailwind utilities and CSS vars are generated from `tokens.ts`. Editing a t
 | ----------------------------------------------- | ---------------- | -------------------------------------------- |
 | Layout, spacing, flex, grid                     | Tailwind utility | `flex gap-2 px-4`                            |
 | Static color on a standard element              | Tailwind utility | `bg-brand text-primary`                      |
-| Dynamic color via JS (charts, Toast UI, canvas) | CSS var via JS   | `tokens.brand` imported from `tokens.ts`     |
+| Dynamic color via JS (charts, Toast UI, canvas) | CSS var via JS   | `var(--brand)` resolved at runtime           |
 | Inline style override in JSX                    | CSS var          | `style={{ color: 'var(--text-secondary)' }}` |
 | Theme-aware color in custom CSS / `@apply`      | CSS var          | `color: var(--text-primary)`                 |
 
-**Rule:** never write a raw hex or OKLCH value outside of `tokens.ts`. If a token does not exist for what you need, add it to `tokens.ts` + this file first, then use it.
+**Rule:** never write a raw hex or OKLCH value outside the §10 token block. If a token does not exist for what you need, add it there first, then use it.
 
-### 12.3 Token File Structure
+### 12.3 Enforcement
 
-```ts
-// frontend/src/tokens.ts
-export const colors = {
-  brand:        '#0f62fe',   // Samsung Blue
-  bgApp:        'oklch(12% 0.01 250)',
-  // …
-} as const;
-
-export const spacing = { … } as const;
-export const fontSize = { … } as const;
-
-// Re-export flat map for Tailwind config consumption
-export default { colors, spacing, fontSize };
-```
-
-### 12.4 Enforcement
-
-- **Stylelint `declaration-strict-value`** — rejects raw color/font values in `.css` / `.module.css` files; only `var(--*)` or Tailwind utility classes pass.
-- **ESLint `no-restricted-syntax`** — rejects inline `style={{ color: '#...' }}` in JSX.
-- **Pre-commit hook (husky + lint-staged)** — runs both linters; commit is rejected if violations exist.
-- CI runs the same lint check and blocks merge on failure.
+- Linting rejects raw color/font literals in stylesheets and inline `style={{ … }}` props — only `var(--*)` or Tailwind utility classes pass.
+- Pre-commit and CI both run the lint gate; violations block merge.
 
 OS/browser dark mode setting automatically switches the entire theme.
 
@@ -875,13 +901,13 @@ Three archetypes cover all VOC badge use cases. Additional archetypes require a 
 
 | Archetype       | Background                      | Border                              | Icon                                            | Border-radius           | Used for                                                                                                                                                                                                                             |
 | --------------- | ------------------------------- | ----------------------------------- | ----------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **TextMark**    | none                            | none                                | lucide (domain-specific) or `#` glyph (xs only) | n/a                     | Semantic color signal, no chip container. Priority, Type, **Tag (size='xs')**. **[AMENDED 2026-05-02 post-PR-144]** size variant `'sm' \| 'xs'` — `'xs'` (10.5px) used by VocTagPill, no fixed cell height.                          |
-| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide                      | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. **[AMENDED 2026-05-02 post-PR-144]** No current VOC consumer — primitive retained for future tag-like use cases requiring chip prominence (e.g. Jira-imported source badge, filter pills). |
+| **TextMark**    | none                            | none                                | lucide (domain-specific) or `#` glyph (xs only) | n/a                     | Semantic color signal, no chip container. Priority, Type, **Tag (size='xs')**. Size variant `'sm' \| 'xs'` — `'xs'` (10.5px) used by VocTagPill, no fixed cell height.                                                                |
+| **OutlineChip** | `var(--brand-bg)`               | `var(--brand-border)`               | structural glyph or lucide                      | `--chip-radius-pill`    | Neutral labeled chip for dynamic content. No current VOC consumer — primitive retained for future tag-like use cases requiring chip prominence (e.g. Jira-imported source badge, filter pills).                                       |
 | **SolidChip**   | semantic (`--status-{slug}-bg`) | semantic (`--status-{slug}-border`) | dot only                                        | `--chip-radius-rounded` | Status with filled background. Status.                                                                                                                                                                                               |
 
 ### 13.2 Shared dimension tokens (`--chip-*`)
 
-These tokens are defined in `frontend/src/styles/index.css` `:root` and shared between all primitives and interactive chip components. Color tokens are **not** shared — each component owns its own color logic.
+These tokens are exposed at `:root` in the canonical token block (§10) and shared between all primitives and interactive chip components. Color tokens are **not** shared — each component owns its own color logic.
 
 ```css
 --chip-height-sm: 20px; /* consistent row-height budget across all badge/chip types */
@@ -889,12 +915,12 @@ These tokens are defined in `frontend/src/styles/index.css` `:root` and shared b
 --chip-radius-pill: 9999px; /* full pill — OutlineChip, FilterChip */
 --chip-radius-rounded: 4px; /* rectangular — SolidChip */
 --chip-font-size-sm: 11.5px; /* metadata tier (§7 VOC List Typography Tiers) */
---chip-font-size-xs: 10.5px; /* compact text-only marks (Tag pill) — added post-PR-144 visual review */
+--chip-font-size-xs: 10.5px; /* compact text-only marks (Tag pill) */
 --chip-gap: 4px; /* gap between icon and text */
 --chip-dot-size: 6px; /* status dot diameter in SolidChip */
 ```
 
-These 7 tokens ship in **B-add-2** (Phase B addendum PR), per §5.1 ≥4-token policy from `wave-1-6-phase-c-precedent.md`. Implementation primitives ship in C-2.6, after B-add-2 is merged.
+All 7 tokens are shared dimension primitives — color tokens stay scoped per archetype.
 
 ### 13.3 TextMark spec
 
@@ -910,7 +936,7 @@ font-size: var(--chip-font-size-sm);
 - `icon-only` mode: render icon only; `aria-label` carries the text label
 - `icon+text` mode: render icon + label side by side
 - Color = text color only (no background fill)
-- **size variant** (added 2026-05-02 post-PR-144): `'sm'` (11.5px, default, used by Priority/Type) or `'xs'` (10.5px, used by VocTagPill — no fixed cell height; flows at natural line height for the "quiet/recede" tag visual)
+- **size variant**: `'sm'` (11.5px, default, used by Priority/Type) or `'xs'` (10.5px, used by VocTagPill — no fixed cell height; flows at natural line height for the "quiet/recede" tag visual)
 - **icon prop** widened to `LucideIcon | '#'` — `'#'` is a literal glyph used by VocTagPill at `size='xs'` (not a lucide icon)
 - **weight prop** is wrapper-controlled (numeric `400|500|600|700`); the primitive does not encapsulate per-variant weight (rationale: weight is determined by domain wrapper — see audit §2.1 amended note)
 
@@ -959,9 +985,9 @@ Dot element:
 ### 13.6 Prop surface (closed set — all archetypes)
 
 - `variant`: enum only — no free `color` prop
-- `size`: `'sm' | 'xs'` — `'sm'` default; `'xs'` added post-PR-144 for TextMark-only (VocTagPill). `'md'` still reserved — opening requires a separate audit (closed-prop-surface principle)
+- `size`: `'sm' | 'xs'` — `'sm'` default; `'xs'` is TextMark-only (VocTagPill). `'md'` reserved — opening requires a separate audit (closed-prop-surface principle)
 - `iconMode` + `icon`: only customization surface for TextMark
-- `bold` / `font-weight`: **wrapper-controlled** for TextMark (numeric `400|500|600|700`, set by domain wrapper); fixed for OutlineChip (600) and SolidChip (600). Callsites in `features/voc/**` still never set weight directly — they call the wrapper. **[AMENDED 2026-05-02 post-PR-144 visual review — original: "fixed per archetype — callsite cannot override"]**
+- `bold` / `font-weight`: **wrapper-controlled** for TextMark (numeric `400|500|600|700`, set by the domain wrapper); fixed for OutlineChip (600) and SolidChip (600). VOC callsites never set weight directly — they call the wrapper.
 
 ### 13.7 Interactive components — token sharing boundary
 
@@ -969,7 +995,7 @@ Dot element:
 
 ## 14. Admin · Notice · FAQ Components
 
-> Added 2026-04-26 (D20). Closes the gap between `prototype/prototype.html` and the formal design system. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
+> Visual contract for Admin / Notice / FAQ surfaces. Every rule below MUST consume `var(--token)` only — no raw `oklch(...)` or hex literals.
 
 ### 14.1 Admin Topbar / Body / Card
 
@@ -1036,7 +1062,7 @@ Iconography: optional 13×13 SVG icon at the leading edge.
 
 ### 14.3 Role Pill (`.role-pill`)
 
-Compact identity badge shown next to display name in user lists, member pickers, and the topbar avatar tooltip. Four variants for the four-role enum (D18).
+Compact identity badge shown next to display name in user lists, member pickers, and the topbar avatar tooltip. Four variants for the four-role enum (Admin / Manager / Dev / User).
 
 ```css
 .role-pill {
@@ -1086,7 +1112,7 @@ Small label used in the Admin VOC-Types table to render the `voc_types.color` sw
 }
 ```
 
-> Token-color contract: `voc_types.color` stored as the **token name** (e.g. `--type-bug`) referenced from the global token sheet — not as a raw hex. Migration follow-up if current schema stores hex.
+> Token-color contract: the type badge MUST consume a token name (e.g. `--type-bug`) from the global token sheet, never a raw hex. Storage/migration of the underlying value is owned by `requirements.md`.
 
 ### 14.5 Status Dot (`.status-dot`)
 
@@ -1219,14 +1245,12 @@ Three severity tiers — every Notice list row leads with one of these.
 
 ### 14.8 Admin Mode Entry Button (Page Header Action Slot)
 
-> Added in tandem with `feature-notice-faq.md §10.5` (D19). Replaces the previously-planned Admin-tab subtab.
+> Visual contract only. Routing/state contract (URL query param, browser history, link shareability, admin-vs-read mode flip) lives in `feature-notice-faq.md §10.5`.
 
 - Renders **only** for `role ∈ {admin, manager}`. User/Dev never receive this DOM node — guard at the component tree, not via `display: none`.
 - Visual: reuse `.admin-btn` from §14.2.1.
-- Activation contract: clicking the button flips a `?mode=admin` URL query param. Read mode is the absence of the param. The toggle MUST survive page reload, browser back/forward, and shareable links.
-- When `mode=admin`, the host page (Notice / FAQ) renders inline admin actions: register/edit/delete row controls, visibility toggle switch, Soft-Delete button. The page route does not change.
+- When admin mode is active, the host page (Notice / FAQ) renders inline admin actions in the same DOM tree (register/edit/delete row controls, visibility toggle switch, Soft-Delete button). The page route does not change.
 - Recommended placement: right edge of the page header band, vertically aligned with the page title. On widths < 640px the button collapses to icon only (gear glyph) without changing semantics.
-- Implementation note (FE): admin-only handlers and form components MUST be loaded via dynamic `import()` so they do not ship in the user/Dev bundle.
 
 ### 14.9 Login-time Notice Popup
 
@@ -1286,3 +1310,58 @@ Usage: apply via `.rv-diff-row.added`, `.rv-diff-row.removed`, `.rv-diff-row.cha
 Unchanged rows (`.rv-diff-row.same`) use `transparent` background and `var(--text-secondary)` text — no dedicated token needed.
 
 Class ↔ token mapping: `.rv-diff-row.added` → `--diff-add-*`, `.rv-diff-row.removed` → `--diff-del-*`, `.rv-diff-row.changed` → `--diff-mod-*`. Class names use full English words; token prefix uses 3-letter shorthand.
+
+---
+
+## 15. Agent Prompt Guide
+
+> Quick lookups for AI agents and humans drafting components. Every value below is **token-only** — never paste raw hex/OKLCH into generated code.
+
+### Quick Token Reference
+
+| Role             | Token                                  |
+| ---------------- | -------------------------------------- |
+| Page background  | `var(--bg-app)`                        |
+| Panel / sidebar  | `var(--bg-panel)`                      |
+| Card surface     | `var(--bg-surface)`                    |
+| Hover / popover  | `var(--bg-elevated)`                   |
+| Primary text     | `var(--text-primary)`                  |
+| Secondary text   | `var(--text-secondary)`                |
+| Muted metadata   | `var(--text-tertiary)` / `--text-quaternary` |
+| Brand / CTA      | `var(--brand)` (filled) · `var(--accent)` (link/active) |
+| Brand tint bg    | `var(--brand-bg)`                      |
+| Border (subtle)  | `var(--border-subtle)`                 |
+| Border (default) | `var(--border-standard)`               |
+| Status: red/amber/green/sky | `var(--status-{red\|amber\|green\|sky})` |
+
+### Component Example Prompts
+
+Use these as templates when generating new components. They reference only tokens — copy-paste ready.
+
+**1. Primary CTA button**
+> Filled button with `background: var(--brand)`, `color: var(--text-on-brand)`, font Pretendard Variable weight 600 at 14px, `border-radius: 6px`, padding `8px 16px`. Hover: `background: var(--accent-hover)`. Disabled: `opacity: 0.5; cursor: not-allowed`.
+
+**2. Secondary / ghost button**
+> Transparent background, `color: var(--accent)`, `border: 1px solid var(--brand-border)`, `border-radius: 6px`, padding `6px 12px`. Hover: `background: color-mix(in oklch, var(--brand-bg) 80%, var(--accent) 10%)`.
+
+**3. Card (page-section panel)**
+> `background: var(--bg-surface)`, `border: 1px solid var(--border-standard)`, `border-radius: 8px`, padding `var(--sp-4)`. Title at 15px / weight 700 / `color: var(--text-primary)`; body at 14px / 400 / `var(--text-secondary)`. Cards stack with `var(--sp-5)` gap.
+
+**4. Sidebar nav item**
+> `display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 6px; font-size: 13.5px; color: var(--text-secondary)`. Hover: `background: var(--bg-elevated); color: var(--text-primary)`. Active: `background: var(--brand-bg); color: var(--accent); font-weight: 600`.
+
+**5. Input field**
+> `background: var(--bg-elevated)`, `color: var(--text-primary)`, `border: 1px solid var(--border-subtle)`, `border-radius: 6px`, padding `6px 11px`, font Pretendard Variable 13px. Focus: `border-color: var(--accent); box-shadow: 0 0 0 2px var(--brand-bg); outline: none`.
+
+**6. Status badge (SolidChip)**
+> `display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600`. Background `var(--status-{slug}-bg)`, color `var(--status-{slug}-fg)`, border `1px solid var(--status-{slug}-border)`. Leading 6px dot in matching status color.
+
+### Hard rules — agents must enforce
+
+- ❌ Raw hex or OKLCH outside the §10 `:root` block
+- ❌ Pure `#fff` / `#000` (use `var(--text-on-brand)` / token equivalents)
+- ❌ Inline `style={{ color: '#…' }}` — always `var(--token)`
+- ❌ Card wrappers around page-level tables / lists / accordions (cards = floating UI only)
+- ❌ Mixed shadow tokens on one element — raise the surface level instead
+- ✅ Every color comes from `var(--…)`; every spacing from `--sp-*`; every radius from §7 "Border Radius by Element"
+- ✅ Light and dark must both be tested before considering a component done

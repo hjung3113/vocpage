@@ -29,18 +29,9 @@ Open `prototype.html` directly in a browser, or serve the directory:
 npx http-server prototype -p 8080
 ```
 
-## Design Tokens (authoritative — echoed here because this is a rendered visual surface)
+## Design Tokens
 
-Full reference: `docs/specs/requires/uidesign.md §10 CSS Reference`. Every color, spacing, and typography value must go through a CSS custom property:
-
-- **Background (OKLCH, blue-tinted):** `var(--bg-app)` / `var(--bg-panel)` / `var(--bg-surface)` / `var(--bg-elevated)`
-- **Brand accent (Samsung Blue):** `var(--brand)` / `var(--accent)` / `var(--accent-hover)` — **never the old Linear indigo `#5e6ad2`**
-- **Text:** `var(--text-primary)` / `var(--text-secondary)` / `var(--text-tertiary)` / `var(--text-quaternary)`
-- **Typography:** Pretendard Variable (UI), D2Coding (code/issue IDs)
-- **Spacing:** 8px grid base; max content width ~1200px
-- **Elevation:** via background opacity (`rgba(255,255,255,0.05)`) — multi-layer shadow only for dialogs
-
-**Hard rule:** **never hardcode hex or raw OKLCH values** in prototype HTML. If a token doesn't exist, add it to `uidesign.md` first, then use it here. A prototype with hex values silently drifts from the real design system.
+토큰 정의·use rule·hex/OKLCH 금지 룰은 root `CLAUDE.md` + `docs/specs/requires/uidesign.md` 정본을 그대로 따른다. 본 디렉토리는 rendered visual surface 라 토큰을 직접 소비하지만, 룰을 여기 복제하지 않는다.
 
 ## graphify
 
