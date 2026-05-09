@@ -31,10 +31,8 @@ jest.mock('../../repository/voc', () => ({
 import { adminTrashRouter } from '../admin-trash';
 import { vocRouter } from '../voc';
 import * as trashRepo from '../../repository/trash';
-import * as vocRepo from '../../repository/voc';
 
 const mockTrashRepo = trashRepo as jest.Mocked<typeof trashRepo>;
-const mockVocRepo = vocRepo as jest.Mocked<typeof vocRepo>;
 
 // ---------------------------------------------------------------------------
 // Test app factory — injects mock user for the given role
@@ -51,10 +49,10 @@ function makeApp(role: 'admin' | 'manager' | 'dev' | 'user' = 'admin') {
     }),
   );
   const roleToUser: Record<string, object> = {
-    admin:   { id: '00000000-0000-4000-8000-0000000000a1', role: 'admin',   name: 'Mock Admin' },
+    admin: { id: '00000000-0000-4000-8000-0000000000a1', role: 'admin', name: 'Mock Admin' },
     manager: { id: '00000000-0000-4000-8000-0000000000b1', role: 'manager', name: 'Mock Manager' },
-    dev:     { id: '00000000-0000-4000-8000-0000000000c1', role: 'dev',     name: 'Mock Dev' },
-    user:    { id: '00000000-0000-4000-8000-0000000000d1', role: 'user',    name: 'Mock User' },
+    dev: { id: '00000000-0000-4000-8000-0000000000c1', role: 'dev', name: 'Mock Dev' },
+    user: { id: '00000000-0000-4000-8000-0000000000d1', role: 'user', name: 'Mock User' },
   };
   // Inject mock user into session.user so mockAuthMiddleware sees it
   app.use((req, _res, next) => {
@@ -127,7 +125,10 @@ describe('Case 2 — Admin restore → visible in general list', () => {
 describe('Case 3 — Restore idempotency: second call → 409', () => {
   it('calling restore on active voc returns 409', async () => {
     mockTrashRepo.restoreVoc.mockRejectedValueOnce(
-      Object.assign(new Error('이미 복원된 VOC입니다.'), { statusCode: 409, code: 'ALREADY_ACTIVE' }),
+      Object.assign(new Error('이미 복원된 VOC입니다.'), {
+        statusCode: 409,
+        code: 'ALREADY_ACTIVE',
+      }),
     );
     const res = await request(makeApp('admin')).patch(`/api/vocs/${TRASH_ID}/restore`);
     expect(res.status).toBe(409);
@@ -181,7 +182,10 @@ describe('Case 6 — Sub-task restore after parent hard-delete', () => {
     });
     const res = await request(makeApp('admin')).patch(`/api/vocs/${subId}/restore`);
     expect(res.status).toBe(200);
-    expect(mockTrashRepo.restoreVoc).toHaveBeenCalledWith(subId, '00000000-0000-4000-8000-0000000000a1');
+    expect(mockTrashRepo.restoreVoc).toHaveBeenCalledWith(
+      subId,
+      '00000000-0000-4000-8000-0000000000a1',
+    );
   });
 });
 
