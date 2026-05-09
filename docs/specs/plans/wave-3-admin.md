@@ -37,7 +37,7 @@
 
 ### 2.3 Touch budget (변경 / 비변경)
 
-- **변경**: `frontend/src/features/admin/**` (신규), `frontend/src/pages/admin/**` (신규), `frontend/src/app/router.tsx` (라우트 추가), `backend/src/routes/admin/**` (신규), `backend/src/services/admin/**` (신규), `shared/contracts/admin/**` (신규), `shared/fixtures/admin-*.json` (신규), `backend/migrations/013_*.sql` / `015_*.sql` (신규), `docs/specs/requires/feature-voc.md §9.4.6 / §9.4.7` (필요 시 spec sync), `docs/specs/requires/external-masters.md` (운영 화면 필드 보강).
+- **변경**: `frontend/src/features/admin/**` (신규), `frontend/src/pages/admin/**` (신규), `frontend/src/app/router.tsx` (라우트 추가), `backend/src/routes/admin/**` (신규), `backend/src/services/admin/**` (신규), `shared/contracts/admin/**` (신규), `shared/fixtures/admin-*.json` (신규), `backend/migrations/014_*.sql` / `015_*.sql` / `017_*.sql` (신규), `docs/specs/requires/feature-voc.md §9.4.6 / §9.4.7` (필요 시 spec sync), `docs/specs/requires/external-masters.md` (운영 화면 필드 보강).
 - **비변경**: `frontend/src/features/voc/**` 본문, VOC 도메인 라우트, 대시보드 코드, 토큰 정의부 (Phase B addendum 외). uidesign.md §14.3 Role Pill 토큰 그대로 재사용 (이미 §10 에 등록).
 
 ## 3. 결정 (잠금 — 사용자 최종 승인 시점에 잠긴다)
@@ -49,14 +49,14 @@
 | W3-D3 | Phase 분할 | Phase A = 마이그·contract spec / Phase B = Tag Master / Phase C = Trash / Phase D = External Masters / Phase E = Users / Phase F = 종합 검증 | 본 plan §6 |
 | W3-D4 | PR 단위 | 화면당 1 PR (FE+BE+contract+fixture 동봉). 마이그 PR 은 별도 (Phase A). 영구삭제 placeholder 만 자리 확보. | D9 precedent (Wave 1.6) |
 | W3-D5 | TDD 의무 surface | 권한 매트릭스 (BE Jest+Supertest) + 마이그 (rollback) + Tag merge 트랜잭션 + Trash restore 의 `tag_rules` 재실행 | `CLAUDE.md §Engineering rules` "TDD for irreversible surface" |
-| W3-D6 | role guard 진입 | sidebar group 자체를 `role ∈ {admin, manager}` 에서만 렌더 (`uidesign.md §10.5.1` precedent — 본 wave 신설). 라우트 진입 시 BE 403 이중 방어. | `requirements.md §6.1` 표준 에러 + `uidesign.md §14.3` 노트 |
+| W3-D6 | role guard 진입 | sidebar group 자체를 화면별 허용 role 에서만 렌더 (Admin/Manager/Dev 매트릭스, `uidesign.md §10.5.1` precedent — 본 wave 신설). 라우트 진입 시 BE 403 이중 방어. | `requirements.md §6.1` 표준 에러 + `uidesign.md §14.3` 노트 |
 | W3-D7 | 시각 검증 | 4 화면 visual-diff baseline 신규 추가 (`benchmark/admin/*.png` + `INDEX.md` row). 자손 SKIP 0. | `CLAUDE.md §Top-level directories` benchmark 룰 |
 | W3-D8 | 자동화 정책 | Phase 진행 중 autopilot/ralph 사용 허용. 머지·완료 선언은 사용자 검수 후에만. | Wave 1.6 D10 precedent |
 
 ## 4. 원칙
 
 1. **Spec 정본 우선** — `requirements.md §15` + `feature-voc.md §9.4.6/9.4.7` 가 충돌하면 사용자에게 보고 (§7 OQ). 임의 동기화 금지.
-2. **마이그는 별 PR** — Phase A 에서 마이그 013 / 015 spec 확정 + 별 PR 머지 후 Phase B 시작.
+2. **마이그는 별 PR** — Phase A 에서 마이그 014 / 015 / 017 spec 확정 + 별 PR 머지 후 Phase B 시작.
 3. **권한 이중 방어** — FE role guard (sidebar group + route boundary) + BE 403 (admin route guard middleware). 단일 방어 금지.
 4. **Audit 우선** — Trash 복원 / Tag merge / User role 변경은 모두 `voc_history` 또는 `voc_restore_log` 또는 신규 `user_role_log` (OQ-3) 에 기록. side-effect 없는 mutate 금지.
 5. **토큰 위반 0** — Role Pill 4 종은 `uidesign.md §14.3` 토큰 그대로. raw hex/OKLCH 도입 금지. 미정의 토큰 발견 시 별 PR 로 spec 갱신 후 진입 (Wave 1.6 Phase B addendum precedent).
@@ -216,8 +216,8 @@ Phase F: 종합 검증
 
 | 위험 | 신호 | 대응 |
 | --- | --- | --- |
-| OQ 미해결 채로 Phase B 진입 | Phase A 머지 시 `requirements.md §15.3` ↔ `feature-voc.md §9.4.6` 동기화 PR 부재 | Phase A 게이트에 OQ-1 / OQ-3 / OQ-4 답변 필수. 한 건이라도 미답이면 Phase B 진입 차단 |
-| 마이그 013 / 015 rollback 누락 | rollback SQL 미작성 또는 검증 없이 머지 | TDD `down.sql` 작성 + 적용 후 컬럼 검증 통합 테스트 그린 후 머지 |
+| OQ 결정 미동기화 상태로 Phase B 진입 | Phase A 머지 시 `requirements.md §15.3` ↔ `feature-voc.md §9.4.6` 동기화 누락 또는 ADR Accepted 불일치 | Phase A 게이트에서 OQ-1~5 sync evidence 확인. 한 건이라도 불일치하면 Phase B 진입 차단 |
+| 마이그 014 / 015 / 017 rollback 누락 | rollback SQL 미작성 또는 검증 없이 머지 | TDD `down.sql` 작성 + 적용 후 컬럼 검증 통합 테스트 그린 후 머지 |
 | Tag merge 트랜잭션 실패 시 부분 적용 | `voc_tags` 재배선 중 `tag_rules.tag_id` 갱신 실패 | 단일 트랜잭션 + savepoint 없는 atomic rollback. 회귀 테스트 4 건 (§9.4.6) |
 | Trash 복원 시 `tag_rules` 재실행이 idempotent 깨짐 | 재실행 후 `voc_tags` 중복 row | `INSERT ... ON CONFLICT DO NOTHING` + 회귀 테스트 (§9.4.7 회귀 3 건) |
 | Last-admin 강등으로 시스템 잠금 | Users Phase E 에서 마지막 admin → user 강등 시 모든 admin 액션 불가 | BE 단일 helper `assertLastAdminGuard` 도입 + CONFLICT 409 응답 (§6.1 정합) + 회귀 테스트 |
@@ -228,7 +228,7 @@ Phase F: 종합 검증
 
 | Phase | 추정 | 비고 |
 | --- | --- | --- |
-| A | 1 세션 | 마이그 2 PR + contract 1 PR. zod 스키마는 spec 가독성에 의존. |
+| A | 1 세션 | 마이그 3 PR + contract 1 PR. zod 스키마는 spec 가독성에 의존. |
 | B | 1.5 세션 | Tag Master + merge 트랜잭션 + visual-diff |
 | C | 1 세션 | Trash + 복원 회귀 3 건 |
 | D | 1 세션 | External Masters + 스냅샷/콜드스타트 배지 |
