@@ -1,4 +1,5 @@
 import { Button } from '@shared/ui/button';
+import { SafeHtml } from '@shared/ui/safe-html/SafeHtml';
 import type { Notice } from '@entities/notice';
 import { LevelBadge } from './LevelBadge';
 
@@ -88,12 +89,10 @@ export function NoticeRow({
         ) : null}
       </div>
       {expanded ? (
-        <div
+        <SafeHtml
+          html={notice.body}
           data-testid={`notice-body-${notice.id}`}
           className="mt-2 rounded border border-[color:var(--border-standard)] bg-[color:var(--bg-surface)] p-3 text-sm text-[color:var(--text-primary)]"
-          // TODO(security): wrap with DOMPurify once available; BE는 Toast UI Editor의
-          // 화이트리스트 산출물만 저장하지만, FE-side 추가 sanitize 필요.
-          dangerouslySetInnerHTML={{ __html: notice.body }}
         />
       ) : null}
     </li>
