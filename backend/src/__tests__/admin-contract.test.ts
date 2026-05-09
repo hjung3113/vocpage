@@ -179,4 +179,15 @@ describe('admin contract — user domain', () => {
     expectRequiredSubset('UserRoleLogEntry', Admin.UserRoleLogEntry as unknown as AnyZodObject);
     expectNullableSubset('UserRoleLogEntry', Admin.UserRoleLogEntry as unknown as AnyZodObject);
   });
+  test('AdminUserPatch openapi anyOf constraint mirrors zod refine (at least one of role/is_active)', () => {
+    // If this fails, openapi allows {} which zod .refine() rejects at runtime.
+    const schema = doc.components?.schemas?.['AdminUserPatch'] as SchemaShape & {
+      anyOf?: Array<{ required?: string[] }>;
+    };
+    expect(schema).toBeDefined();
+    expect(schema.anyOf).toBeDefined();
+    const covered = (schema.anyOf ?? []).flatMap((s) => s.required ?? []);
+    expect(covered).toContain('role');
+    expect(covered).toContain('is_active');
+  });
 });
