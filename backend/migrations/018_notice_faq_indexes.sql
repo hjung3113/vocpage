@@ -9,10 +9,12 @@
 --      AND (visible_from IS NULL OR visible_from <= now())
 --      AND (visible_to IS NULL OR visible_to >= now())
 --      ORDER BY created_at DESC
---    → partial composite index on (is_visible, created_at DESC)
---      WHERE deleted_at IS NULL covers the dominant user-mode path.
---    → separate partial index on (is_popup, created_at DESC)
---      WHERE deleted_at IS NULL AND is_visible = true covers popup feed.
+--    → partial index on (created_at DESC)
+--      WHERE deleted_at IS NULL AND is_visible = true covers user-mode list
+--      without leading on low-cardinality is_visible.
+--    → separate partial expression index for popup feed ORDER BY.
+--      visible_from/visible_to are intentionally not in the partial predicate
+--      because now() is not immutable.
 --
 -- 2. faqs.listFaqs() with category filter:
 --      WHERE deleted_at IS NULL AND is_visible = true
@@ -25,24 +27,28 @@
 --
 -- 3. faq_categories.listCategories():
 --      ORDER BY sort_order ASC, name ASC  (full-table, tiny table)
---    → (sort_order, name) index — supports ORDER BY and covers slug lookups.
+--    → no index. The table is tiny and slug lookup is already covered by the
+--      UNIQUE constraint from 005_content.sql.
 --
 -- CONCURRENTLY note: node-pg-migrate runs SQL inside a transaction block.
 -- CREATE INDEX CONCURRENTLY is not allowed inside a transaction, so we use
 -- plain CREATE INDEX. This is safe for the current data volume; add
 -- CONCURRENTLY in a manual step on a live large-data environment if needed.
 
--- up migration
+-- Up Migration
 
 -- notices: user-mode list (dominant path)
 CREATE INDEX IF NOT EXISTS idx_notices_visible_created
-  ON notices (is_visible, created_at DESC)
-  WHERE deleted_at IS NULL;
+  ON notices (created_at DESC)
+  WHERE deleted_at IS NULL AND is_visible = true;
 
 -- notices: popup feed
 CREATE INDEX IF NOT EXISTS idx_notices_popup_created
-  ON notices (is_popup, created_at DESC)
-  WHERE deleted_at IS NULL AND is_visible = true;
+  ON notices (
+    (CASE level WHEN 'urgent' THEN 0 WHEN 'important' THEN 1 ELSE 2 END),
+    created_at DESC
+  )
+  WHERE deleted_at IS NULL AND is_visible = true AND is_popup = true;
 
 -- faqs: category-filtered list with sort
 CREATE INDEX IF NOT EXISTS idx_faqs_cat_sort_created
@@ -54,14 +60,9 @@ CREATE INDEX IF NOT EXISTS idx_faqs_sort_created
   ON faqs (sort_order ASC, created_at DESC)
   WHERE deleted_at IS NULL AND is_visible = true;
 
--- faq_categories: ordered listing (small table, but supports ORDER BY pushdown)
-CREATE INDEX IF NOT EXISTS idx_faq_categories_sort_name
-  ON faq_categories (sort_order ASC, name ASC);
-
--- down migration
+-- Down Migration
 
 DROP INDEX IF EXISTS idx_notices_visible_created;
 DROP INDEX IF EXISTS idx_notices_popup_created;
 DROP INDEX IF EXISTS idx_faqs_cat_sort_created;
 DROP INDEX IF EXISTS idx_faqs_sort_created;
-DROP INDEX IF EXISTS idx_faq_categories_sort_name;
