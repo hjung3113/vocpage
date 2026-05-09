@@ -3,6 +3,7 @@
  * Spec: docs/specs/requires/feature-notice-faq.md §10.4, §10.5.
  */
 import request from 'supertest';
+import * as faqsRepoModule from '../repository/faqs';
 import { createTestApp } from './helpers/app';
 import type { Faq } from '../../../shared/contracts/faq';
 
@@ -57,8 +58,7 @@ jest.mock('../repository/faqs', () => {
         if (opts.q) {
           const q = opts.q.toLowerCase();
           rows = rows.filter(
-            (r) =>
-              r.question.toLowerCase().includes(q) || r.answer.toLowerCase().includes(q),
+            (r) => r.question.toLowerCase().includes(q) || r.answer.toLowerCase().includes(q),
           );
         }
         return { rows, total: rows.length };
@@ -119,8 +119,7 @@ jest.mock('../repository/faqs', () => {
   };
 });
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const repoMock = require('../repository/faqs') as { __reset(seed: Faq[]): void };
+const repoMock = faqsRepoModule as unknown as { __reset(seed: Faq[]): void };
 
 beforeEach(() => {
   repoMock.__reset([FAQ_A, FAQ_HIDDEN, FAQ_DELETED]);

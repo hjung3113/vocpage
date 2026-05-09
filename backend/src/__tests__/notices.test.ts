@@ -5,6 +5,7 @@
  * U3=A pattern: jest.mock('../repository/notices') for module-level isolation.
  */
 import request from 'supertest';
+import * as noticesRepoModule from '../repository/notices';
 import { createTestApp } from './helpers/app';
 import type { Notice } from '../../../shared/contracts/notice';
 
@@ -117,8 +118,7 @@ jest.mock('../repository/notices', () => {
   };
 });
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const repoMock = require('../repository/notices') as {
+const repoMock = noticesRepoModule as unknown as {
   __reset(seed: Notice[]): void;
   __all(): Notice[];
 };
