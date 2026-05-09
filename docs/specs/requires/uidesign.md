@@ -837,8 +837,23 @@ Full token set — copy into `:root` as the single source of truth.
   --text-on-brand: oklch(
     100% 0 0
   ); /* defined once; replaces every `#fff` literal in component CSS */
+
+  /* Dashboard RGL (Wave 2 Phase D) — theme-independent layout primitives */
+  --dashboard-grid-margin: 16px; /* RGL margin between grid cells */
+  --dashboard-grid-row-h: 64px;  /* RGL rowHeight — 1 grid unit height */
+  --dashboard-handle-size: 12px; /* drag handle icon bounding box */
 }
 ```
+
+### 10.1 Dashboard RGL tokens
+
+Theme-independent layout primitives used by the react-grid-layout shell (Wave 2 Phase D). SSOT: `tokens.ts`; mirrored to `:root` via `globals.css`.
+
+| Token | Value | Purpose |
+|---|---|---|
+| `--dashboard-grid-margin` | `16px` | RGL `margin` prop — gap between grid cells (x and y) |
+| `--dashboard-grid-row-h` | `64px` | RGL `rowHeight` — height of one grid unit |
+| `--dashboard-handle-size` | `12px` | Drag handle icon bounding box (`draggableHandle=".dashboard-widget-handle"`) |
 
 ---
 

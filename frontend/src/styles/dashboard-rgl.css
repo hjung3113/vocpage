@@ -1,0 +1,28 @@
+/**
+ * dashboard-rgl.css — Wave 2 Phase D
+ * RGL container styles. Tokens via CSS vars defined in globals.css.
+ */
+
+/* react-grid-layout override — use token for margin */
+.layout .react-grid-item {
+  transition: none;
+}
+
+/* Edit mode: show resize handle */
+.react-grid-item > .react-resizable-handle {
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.react-grid-item.resizing > .react-resizable-handle,
+.react-grid-item:hover > .react-resizable-handle {
+  opacity: 1;
+}
+
+/* Drag ghost */
+.react-grid-item.react-grid-placeholder {
+  background-color: var(--brand-bg);
+  border: 1px dashed var(--brand-border);
+  border-radius: 8px;
+  opacity: 0.6;
+}

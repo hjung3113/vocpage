@@ -1154,13 +1154,13 @@ paths:
     put:
       tags: [dashboard]
       operationId: updateDashboardSettings
-      summary: Update dashboard settings
+      summary: Update dashboard settings (locked_fields/globaltabs_order are admin-only)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DashboardSettings'
+              $ref: '#/components/schemas/DashboardSettingsUpdate'
       responses:
         '200':
           description: Updated settings
@@ -1172,6 +1172,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/menus:
     get:
@@ -2377,7 +2379,7 @@ paths:
           description: Category has FAQ items
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Error' }
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
 
 components:
   parameters:
@@ -2455,6 +2457,12 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
     NotFound:
       description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflict
       content:
         application/json:
           schema:
@@ -3227,9 +3235,105 @@ components:
         avg_resolution_days:
           type: number
 
+    RglLayoutItem:
+      type: object
+      required: [i, x, y, w, h]
+      additionalProperties: false
+      properties:
+        i: { type: string, minLength: 1 }
+        x: { type: integer, minimum: 0 }
+        y: { type: integer, minimum: 0 }
+        w: { type: integer, minimum: 1 }
+        h: { type: integer, minimum: 1 }
+        minW: { type: integer, minimum: 1 }
+        minH: { type: integer, minimum: 1 }
+        static: { type: boolean }
+
+    RglLayouts:
+      type: object
+      additionalProperties: false
+      properties:
+        xs: { type: array, items: { $ref: '#/components/schemas/RglLayoutItem' } }
+        sm: { type: array, items: { $ref: '#/components/schemas/RglLayoutItem' } }
+        md: { type: array, items: { $ref: '#/components/schemas/RglLayoutItem' } }
+        lg: { type: array, items: { $ref: '#/components/schemas/RglLayoutItem' } }
+        xl: { type: array, items: { $ref: '#/components/schemas/RglLayoutItem' } }
+
+    GlobalTabsOrderItem:
+      type: object
+      required: [systemId, visible]
+      additionalProperties: false
+      properties:
+        systemId: { type: string, minLength: 1 }
+        visible: { type: boolean }
+
     DashboardSettings:
       type: object
-      additionalProperties: true
+      required:
+        - user_id
+        - widget_order
+        - widget_visibility
+        - widget_sizes
+        - locked_fields
+        - default_date_range
+        - heatmap_default_x_axis
+        - globaltabs_order
+        - updated_at
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+        widget_order:
+          type: array
+          items: { type: string }
+        widget_visibility:
+          type: object
+          additionalProperties: { type: boolean }
+        widget_sizes:
+          $ref: '#/components/schemas/RglLayouts'
+        locked_fields:
+          type: array
+          items: { type: string }
+        default_date_range:
+          type: string
+          enum: ['1m', '3m', '1y', 'all', 'custom']
+        heatmap_default_x_axis:
+          type: string
+          enum: ['status', 'priority', 'tag']
+        globaltabs_order:
+          nullable: true
+          type: array
+          items: { $ref: '#/components/schemas/GlobalTabsOrderItem' }
+        updated_at:
+          type: string
+          format: date-time
+
+    DashboardSettingsUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        widget_order:
+          type: array
+          items: { type: string }
+        widget_visibility:
+          type: object
+          additionalProperties: { type: boolean }
+        widget_sizes:
+          $ref: '#/components/schemas/RglLayouts'
+        locked_fields:
+          type: array
+          items: { type: string }
+        default_date_range:
+          type: string
+          enum: ['1m', '3m', '1y', 'all', 'custom']
+        heatmap_default_x_axis:
+          type: string
+          enum: ['status', 'priority', 'tag']
+        globaltabs_order:
+          nullable: true
+          type: array
+          items: { $ref: '#/components/schemas/GlobalTabsOrderItem' }
 
     DistributionItem:
       type: object

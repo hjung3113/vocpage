@@ -15,6 +15,7 @@ const AdminTrashPage = lazy(() => import('@pages/admin/trash'));
 const AdminUsersPage = lazy(() => import('@pages/admin/users'));
 const AdminMastersPage = lazy(() => import('@pages/admin/masters'));
 const NotificationsPage = lazy(() => import('@pages/notifications'));
+const DashboardPage = lazy(() => import('@pages/DashboardPage'));
 
 function VocRoute() {
   return (
@@ -68,7 +69,14 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/voc" replace /> },
       { path: 'voc', element: <VocRoute /> },
       { path: 'voc/:id', element: <VocReviewRoute /> },
-      { path: 'dashboard', element: <StubPage title="Dashboard" /> },
+      {
+        path: 'dashboard',
+        element: (
+          <Suspense fallback={<LoadingState />}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
       {
         path: 'notice',
         element: (

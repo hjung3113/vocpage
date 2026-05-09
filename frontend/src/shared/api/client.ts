@@ -113,6 +113,24 @@ export function apiPatch<T>(
   );
 }
 
+export function apiPut<T>(
+  url: string,
+  body: unknown,
+  schema: ZodSchema<T>,
+  opts?: ApiClientOptions,
+): Promise<T> {
+  return request(
+    url,
+    {
+      method: 'PUT',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    },
+    schema,
+    opts,
+  );
+}
+
 export async function apiDelete(url: string, opts?: ApiClientOptions): Promise<void> {
   const res = await fetch(url, {
     method: 'DELETE',
