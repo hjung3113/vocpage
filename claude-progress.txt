@@ -1,18 +1,18 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 FU-021/022 P1 머지 완료 — P2 후속 진입)
+## 다음 세션 시작점 (2026-05-10 P2 후속 batch 머지 완료 — Wave 2 또는 운영/배포 phase)
 
-→ **P1 후속 2건 머지 완료** (2026-05-10):
-   - **FU-021** (PR #284): §8.3 spec 해석 확정. "전체 VOC 조회 User ❌" 은 운영/관리 권한 행으로 read access 와 무관. read-only `GET /api/vocs` + `GET /api/vocs/:id` 4 role 모두 ALLOW. permission-matrix.test.ts 셀 2건 활성화 (115 → 125 case). `service.list/detail` 코드 변경 0 — 현 동작이 spec 정합이었음.
-   - **FU-022** (PR #285): adminTrash / adminUsers router-level `use(requireAdmin())` 제거 → 4 route per-route guard 로 전환 (adminTags / adminMasters 와 동일 패턴). 회귀: `__tests__/admin-router-mount.test.ts` 9 case (4 router 동시 마운트 — manager / dev fall-through, admin 본인 router ALLOW, non-admin existence-hide 404 보존). API contract 변경 0.
+→ **P2 후속 3건 머지 완료** (2026-05-10):
+   - **FU-023** (PR #287): `createTag` slug 파생을 `<name>-<kind>` 로 변경 — FU-014 (name, kind) UNIQUE 와 정합. `('공통','general')` / `('공통','menu')` 둘 다 distinct slug. admin-tags.sql.test.ts `it.todo` → 실 테스트.
+   - **FU-024** (PR #289): `@testcontainers/postgresql` 도입 + `__tests__/helpers/testPostgres.ts` (pgvector pg16 컨테이너 + 21 마이그 Up 적용). `admin-sql-tc.test.ts` 5 cell — pg-mem 한계 (ILIKE ESCAPE / RETURNING correlated subquery) 우회. 4 skip 모두 제거.
+   - **FU-025** (PR #288): Notice `visible_from/to` KST 자정 정규화 — `NoticeFormDialog.tsx` 에 `toKstMidnightInstant(dateStr)` helper 추출, `+09:00` 직렬화. 회귀 테스트 5 case.
 
-→ **메트릭**: BE 456/461 그린 (+19 from 442 baseline = +10 matrix cells + 9 admin-router-mount). typecheck 0.
+→ **메트릭**: BE 462/462 그린 (skip 4 → 0). FE 575/575 그린. typecheck 0.
 
-→ **다음 세션 작업**: **P2 후속 batch (FU-023/024/025)** 진입 후보:
-   - **FU-023** (P2, BE): `createTag` slug 파생을 (name, kind) 기반으로 변경 — FU-014 (name, kind) UNIQUE 와 정합. `tag-master.ts:79-83`.
-   - **FU-024** (P2, infra): testcontainers Postgres 도입 — pg-mem 한계 (`ILIKE ESCAPE`, RETURNING 안 correlated subquery) 우회로 4 cell skip 활성화.
-   - **FU-025** (P2, FE): Notice `visible_from/to` KST 자정 정규화 — `NoticeFormDialog.tsx:39-40` `toISOString()` (UTC) → `+09:00` 직렬화 + 회귀.
-   - Wave 2 (Dashboard) 또는 운영/배포 phase 도 옵션. 사용자 결정 필요.
+→ **다음 세션 작업**: 활성 Open follow-up 다 닫혔음 (P3 만 잔존: FU-009/012/019/020). 진입 후보:
+   - **Wave 2 (Dashboard)** — `dashboard.md` plan 작성부터. KPI 8종 + 분포 4탭 + 우선순위×상태 매트릭스 + 히트맵 + 트렌드 + 처리속도 등 §11.7 엔드포인트 구현.
+   - **운영/배포 phase** — `connect-pg-simple` 세션 스토어 / OIDC 실구현 / production Dockerfile / 실 MSSQL 연동 / Playwright E2E 등.
+   - **Wave 2 권장** (운영/배포는 외부 의존 큼; 기능 완성도 우선).
 
 → **마이그 번호** — 다음 마이그 번호 = **022**.
 
