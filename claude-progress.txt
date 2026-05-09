@@ -1,20 +1,25 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 P2 후속 batch 머지 완료 — Wave 2 또는 운영/배포 phase)
+## 다음 세션 시작점 (2026-05-10 Wave 2 Phase A 4 PR 오픈 — 머지 대기 → Phase D 진입)
 
-→ **P2 후속 3건 머지 완료** (2026-05-10):
-   - **FU-023** (PR #287): `createTag` slug 파생을 `<name>-<kind>` 로 변경 — FU-014 (name, kind) UNIQUE 와 정합. `('공통','general')` / `('공통','menu')` 둘 다 distinct slug. admin-tags.sql.test.ts `it.todo` → 실 테스트.
-   - **FU-024** (PR #289): `@testcontainers/postgresql` 도입 + `__tests__/helpers/testPostgres.ts` (pgvector pg16 컨테이너 + 21 마이그 Up 적용). `admin-sql-tc.test.ts` 5 cell — pg-mem 한계 (ILIKE ESCAPE / RETURNING correlated subquery) 우회. 4 skip 모두 제거.
-   - **FU-025** (PR #288): Notice `visible_from/to` KST 자정 정규화 — `NoticeFormDialog.tsx` 에 `toKstMidnightInstant(dateStr)` helper 추출, `+09:00` 직렬화. 회귀 테스트 5 case.
+→ **Wave 2 Phase A 4 PR 오픈** (2026-05-10, 머지 대기):
+   - **PR #291** (`docs/wave-2-dashboard-plan`): dashboard.md spec sync (NextGen → MVP 승격) + 신규 §"커스터마이즈 v2 — 레이아웃 엔진" + `wave-2-dashboard.md` plan (180+ 줄, Wave 3 구조 미러). codex:rescue 적대적 리뷰 (2026-05-10) 반영 — 위젯 11종 / PUT verb / zod bounds / draft buffer / Phase 순서 D 우선.
+   - **PR #292** (`chore/wave-2-rgl-install`): `react-grid-layout@^1.5.3` + `@types/react-grid-layout@^1.3.6` + Responsive smoke test 1 건. FE 575 → 576.
+   - **PR #293** (`migration/022-locked-widgets`): `dashboard_settings.locked_widgets jsonb NOT NULL DEFAULT '[]'` + Down + pg-mem 회귀 3 건. codex 가 011/012 SQL 스캔 → 컬럼 부재 확정 후 신설. BE 462 → 465.
+   - **PR #294** (`feat/wave-2-contract`): `shared/contracts/dashboard/{io.ts,index.ts}` zod v2 (WidgetId 11종 / Layout bounds `x+w<=12` / SizesV2 breakpoint-keyed / DashboardSettingsPutBody) + `shared/openapi.yaml` PUT 명세 explicit + `shared/fixtures/dashboard.fixtures.ts` stub (DEFAULT_DASHBOARD_SETTINGS). BE 465 → 489 (contract 27 회귀 추가).
 
-→ **메트릭**: BE 462/462 그린 (skip 4 → 0). FE 575/575 그린. typecheck 0.
+→ **결정 잠금** (`wave-2-dashboard.md §3`): W2-D1 react-grid-layout · W2-D2 widget_sizes v2 (breakpoint-keyed) · W2-D3 2-tier lock (Admin `locked_widgets` || personal `widget_visibility[id].locked`, 마이그 022 의존) · W2-D4 `defaultLayouts.ts` · W2-D5 Phase 순서 A → D → B/C 병렬 → E → F · W2-D7 TDD bounds + verb parity + draft cancel · W2-D9 codex:rescue 적대적 리뷰.
 
-→ **다음 세션 작업**: 활성 Open follow-up 다 닫혔음 (P3 만 잔존: FU-009/012/019/020). 진입 후보:
-   - **Wave 2 (Dashboard)** — `dashboard.md` plan 작성부터. KPI 8종 + 분포 4탭 + 우선순위×상태 매트릭스 + 히트맵 + 트렌드 + 처리속도 등 §11.7 엔드포인트 구현.
-   - **운영/배포 phase** — `connect-pg-simple` 세션 스토어 / OIDC 실구현 / production Dockerfile / 실 MSSQL 연동 / Playwright E2E 등.
-   - **Wave 2 권장** (운영/배포는 외부 의존 큼; 기능 완성도 우선).
+→ **OQ-3 변경** (auto-save → draft buffer + 명시 저장): drag/resize end → local draft 만 갱신. "저장" 클릭 → `PUT /api/dashboard/settings`. "취소" → draft 폐기 + 서버 hydrate 재로드. spec dashboard.md §저장/복원 정합.
 
-→ **마이그 번호** — 다음 마이그 번호 = **022**.
+→ **메트릭**: BE 489/489, FE 576/576. typecheck 0. lint 0.
+
+→ **다음 세션 작업**: 4 PR 머지 후 **Phase D (W2-5)** 진입. 별 브랜치 `feat/wave-2-phase-d-rgl-shell`.
+   - 11 위젯 placeholder + Responsive + WidthProvider + 편집 모드 토글 + `defaultLayouts.ts` + draft buffer + lock 머지 + xs read-only.
+   - TDD: widget_sizes v2 zod bounds (이미 PR-γ 에 27 회귀) + lock 머지 / xs read-only / draft cancel 회귀 신규.
+   - visual-diff baseline 1 건 (편집 모드 grab cursor + 11 placeholder).
+
+→ **마이그 번호** — 다음 마이그 번호 = **023** (022 본 세션 점유).
 
 ---
 
