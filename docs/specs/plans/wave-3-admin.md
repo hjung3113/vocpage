@@ -14,7 +14,7 @@
 
 - Wave 0~1.7 은 `/voc` 단일 화면 + 셸 정합화에 집중. 관리자 페이지는 **사이드바 그룹만 자리 확보** 상태.
 - §15.1 Result Review 는 별개 트랙(`feature-voc.md §9.4 관리자 페이지`) 으로 다뤄지며 본 Wave 범위 외. 본 Wave 는 §15.2~§15.4 + 외부 마스터 운영 화면(§16.3) 4 종에 집중.
-- 운영 차단 해소 항목으로 spec 이 예약한 마이그레이션 3 종(`tags.is_external` / `merged_into_id` / `tag_rules.suspended_until` / `vocs.deleted_by` / `voc_restore_log`) 은 본 Wave 진입 전 / 진입 시 별도 PR 로 선행한다.
+- 운영 차단 해소 항목으로 spec 이 예약한 마이그레이션 3 종(`tags.is_external` / `tag_rules.suspended_until` / `vocs.deleted_by` / `voc_restore_log` / `user_role_log`) 은 본 Wave 진입 전 / 진입 시 별도 PR 로 선행한다. `tags.merged_into_id` 는 Resolution α (2026-05-09) 로 보류 — 병합은 source-row hard-delete 정책 그대로 (`feature-voc.md §9.4.6` · ADR 0004).
 
 ## 2. 범위
 
@@ -22,7 +22,7 @@
 
 | 화면 | 진입 동선 | 권한 (spec 인용) | FE 라우트 | BE 라우트 (신규) | 마이그 |
 | --- | --- | --- | --- | --- | --- |
-| **Tag Master** | 사이드바 `관리자` 그룹 → "태그 마스터" | Manager+ add/edit · Admin only merge/외부잠금/영구삭제 (ADR 0004 Option D) · Read = Admin/Manager/Dev | `/admin/tags` | `GET /api/admin/tags` · `POST` · `PATCH /:id` · `DELETE /:id` · `POST /:id/merge` | 014 (`tags.is_external` / `tags.merged_into_id` / `tag_rules.suspended_until`) |
+| **Tag Master** | 사이드바 `관리자` 그룹 → "태그 마스터" | Manager+ add/edit · Admin only merge/외부잠금/영구삭제 (ADR 0004 Option D) · Read = Admin/Manager/Dev | `/admin/tags` | `GET /api/admin/tags` · `POST` · `PATCH /:id` · `DELETE /:id` · `POST /:id/merge` | 014 (`tags.is_external` / `tag_rules.suspended_until`) — `merged_into_id` 보류 (Resolution α) |
 | **Trash** | 사이드바 `관리자` 그룹 → "휴지통" | Admin only (`§15.4` + `feature-voc.md §9.4.7`) | `/admin/trash` | `GET /api/admin/vocs/trash` · `PATCH /api/vocs/:id/restore` | 015 (`vocs.deleted_by` / `voc_restore_log`) |
 | **External Masters** | 사이드바 `관리자` 그룹 → "외부 마스터" | Manager+ refresh · Read = Manager+ + Dev (ADR 0004 OQ-2 Option B) | `/admin/masters` | `POST /api/admin/masters/refresh` (기존 §16.3) + `GET /api/admin/masters/status` (신규) | 없음 (메모리 캐시 + JSON 파일) |
 | **Users** | 사이드바 `관리자` 그룹 → "사용자" | Admin only (§15.2 D14, §2.3). Audit = `user_role_log` (마이그 017, OQ-3 Option A) | `/admin/users` | `GET /api/admin/users` · `PATCH /api/admin/users/:id` (role, is_active) | 017 (`user_role_log` 별 테이블) — 012 (`users.role` enum) 별 트랙 선행 |
@@ -68,7 +68,7 @@
 
 - **Wave 2 (Dashboard) 머지** — `next-session-tasks.md` 명시. Phase 8 기조상 dashboard 가 widget contract 도입 → admin 화면이 같은 contract 패턴을 재사용.
 - **마이그 012 (`users.role` enum 4 종)** — 별 트랙. `migration-012-draft.md` 정본. 본 Wave Phase E (Users) 진입 전 머지 필수.
-- **마이그 014 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR (W3-1, OQ-4 결정 2026-05-09).
+- **마이그 014 (`tags.is_external` / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR (W3-1, OQ-4 결정 2026-05-09). `merged_into_id` 자기참조 FK 는 Resolution α (2026-05-09) 로 보류; 병합은 source-row hard-delete 정책 (`feature-voc.md §9.4.6` · ADR 0004) 그대로.
 - **마이그 015 (`vocs.deleted_by` / `voc_restore_log`)** — 본 Wave Phase A 1 PR (W3-2).
 - **마이그 017 (`user_role_log` 별 테이블)** — 본 Wave Phase A 1 PR (W3-9, OQ-3 Option A). 016 은 별 트랙 점유.
 
@@ -86,7 +86,7 @@
 
 ```
 Phase A: 마이그 + contract spec (코드 0줄 + SQL 3 PR + contract 1 PR · full parallel)
-  ├─ 014_tag_master_ops.sql (tags.is_external / merged_into_id / tag_rules.suspended_until)
+  ├─ 014_tag_master_ops.sql (tags.is_external / tag_rules.suspended_until — `merged_into_id` 보류, Resolution α)
   ├─ 015_trash_audit.sql (vocs.deleted_by / voc_restore_log)
   ├─ 017_user_role_log.sql (user_role_log 별 테이블 — OQ-3 Option A)
   ├─ shared/contracts/admin/{tag,trash,master,user}.ts (zod) + openapi.yaml

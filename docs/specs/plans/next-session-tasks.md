@@ -68,7 +68,7 @@ migration 013 dev role / `assertCanManageVoc` 헬퍼 / FE/BE Role union `'dev'` 
 ### 권한·스키마 인프라 PR 후보
 
 - **8-PR1** = migration 013 실파일(F1) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 단일화(F3)
-- **8-PR2** (= W3-1) = migration 014 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`) — D22 운영 차단 (OQ-4 결정 2026-05-09)
+- **8-PR2** (= W3-1) = migration 014 (`tags.is_external` / `tag_rules.suspended_until`) — D22 운영 차단 (OQ-4 결정 2026-05-09). `merged_into_id` 는 Resolution α (2026-05-09) 로 보류 — 병합은 source-row hard-delete (`feature-voc.md §9.4.6` · ADR 0004) 그대로.
 - **8-PR3** (= W3-2) = migration 015 (`vocs.deleted_by` / `voc_restore_log`) — D23 운영 차단
 - **8-PR4** (= W3-9) = migration 017 (`user_role_log` 별 테이블) — OQ-3 Option A (013/016 점유)
 

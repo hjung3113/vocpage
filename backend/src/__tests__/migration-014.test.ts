@@ -3,10 +3,13 @@
  *
  * Spec: requirements.md §15.3, feature-voc.md §9.4.6, plans/wave-3-admin.md W3-1.
  *
- * Adds three columns supporting Tag Master operational gaps:
+ * Adds two columns supporting Tag Master operational gaps:
  *   - tags.is_external          (boolean NOT NULL DEFAULT false) — Admin-only 외부잠금 토글
- *   - tags.merged_into_id       (uuid NULL, FK → tags.id ON DELETE SET NULL) — 병합 흔적
  *   - tag_rules.suspended_until (timestamptz NULL) — 규칙 일시중지
+ *
+ * Resolution α (2026-05-09): `tags.merged_into_id` 는 제외 — 병합은 source-row
+ * hard-delete (feature-voc.md §9.4.6 · ADR 0004). 감사 흔적이 필요하면 미래
+ * `tag_merge_log` 테이블로 분리.
  *
  * This test verifies up/down round-trip on a scratch pg-mem DB.
  */
@@ -82,7 +85,7 @@ function describeColumns(db: IMemoryDb, table: string): ColInfo[] {
 }
 
 describe('migration 014 — tags master ops columns', () => {
-  test('up.sql adds tags.is_external, tags.merged_into_id, tag_rules.suspended_until', async () => {
+  test('up.sql adds tags.is_external and tag_rules.suspended_until', async () => {
     const db = await bootDb();
     const { up } = readMigration('014_tag_master_ops.sql');
     await db.public.query(up);
@@ -92,21 +95,6 @@ describe('migration 014 — tags master ops columns', () => {
     expect(isExternal).toBeDefined();
     expect(isExternal!.is_nullable).toBe('NO');
     expect(isExternal!.data_type).toMatch(/bool/i);
-
-    const mergedInto = tagsCols.find((c) => c.column_name === 'merged_into_id');
-    expect(mergedInto).toBeDefined();
-    expect(mergedInto!.data_type).toMatch(/uuid/i);
-    // Nullability is verified behaviourally below by inserting a tag without
-    // merged_into_id (pg-mem's information_schema reports differs from real
-    // Postgres on explicit NULL columns).
-    db.public.query(`
-      INSERT INTO tags (id, name, slug, kind) VALUES
-        ('00000000-0000-0000-0000-000000000099', 'nullcheck', 'nullcheck', 'general');
-    `);
-    const probe = db.public.query(
-      `SELECT merged_into_id FROM tags WHERE id = '00000000-0000-0000-0000-000000000099'`,
-    );
-    expect(probe.rows[0].merged_into_id).toBeNull();
 
     const ruleCols = describeColumns(db, 'tag_rules');
     const suspended = ruleCols.find((c) => c.column_name === 'suspended_until');
@@ -126,28 +114,6 @@ describe('migration 014 — tags master ops columns', () => {
     expect(ruleProbe.rows[0].suspended_until).toBeNull();
   });
 
-  test('merged_into_id FK enforces SET NULL on referenced tag delete', async () => {
-    const db = await bootDb();
-    const { up } = readMigration('014_tag_master_ops.sql');
-    await db.public.query(up);
-
-    await db.public.query(`
-      INSERT INTO tags (id, name, slug, kind) VALUES
-        ('11111111-1111-1111-1111-111111111111', 'src', 'src', 'general'),
-        ('22222222-2222-2222-2222-222222222222', 'tgt', 'tgt', 'general');
-    `);
-    await db.public.query(`
-      UPDATE tags SET merged_into_id = '22222222-2222-2222-2222-222222222222'
-      WHERE id = '11111111-1111-1111-1111-111111111111';
-    `);
-    // Delete target — source should have merged_into_id set to NULL.
-    await db.public.query(`DELETE FROM tags WHERE id = '22222222-2222-2222-2222-222222222222'`);
-    const rs = db.public.query(
-      `SELECT merged_into_id FROM tags WHERE id = '11111111-1111-1111-1111-111111111111'`,
-    );
-    expect(rs.rows[0].merged_into_id).toBeNull();
-  });
-
   test('is_external defaults to false for new rows', async () => {
     // pg-mem does not retroactively backfill DEFAULT on ALTER ADD COLUMN
     // (real Postgres ≥11 does — verified manually). Test forward-insert path.
@@ -164,7 +130,7 @@ describe('migration 014 — tags master ops columns', () => {
     expect(rs.rows[0].is_external).toBe(false);
   });
 
-  test('down.sql removes all three columns', async () => {
+  test('down.sql removes both columns', async () => {
     const db = await bootDb();
     const { up, down } = readMigration('014_tag_master_ops.sql');
     await db.public.query(up);
@@ -172,7 +138,6 @@ describe('migration 014 — tags master ops columns', () => {
 
     const tagsCols = await describeColumns(db, 'tags');
     expect(tagsCols.find((c) => c.column_name === 'is_external')).toBeUndefined();
-    expect(tagsCols.find((c) => c.column_name === 'merged_into_id')).toBeUndefined();
 
     const ruleCols = await describeColumns(db, 'tag_rules');
     expect(ruleCols.find((c) => c.column_name === 'suspended_until')).toBeUndefined();
