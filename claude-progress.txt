@@ -1,6 +1,32 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-09 FU-017 Page Layout 시스템 머지 완료)
+## 다음 세션 시작점 (2026-05-09 Wave 3 Phase F (W3-8) close — Wave 3 완료)
+
+→ **Wave 3 close (W3-8 종합 검증, 2026-05-09)** — 사용자 수락 게이트 통과 시 Wave 3 완료.
+   - **검증 결과**: BE 269 passed / 7 todo (26 suites) · FE 561 passed (72 files) · FE lint (`lint:tokens` 포함) 0 error · 토큰 lint (raw hex / OKLCH) 소비자 파일 0 hits.
+   - **권한 매트릭스 (§8.3 / §13.2)** — per-route 분산 커버 100% 그린: `admin-{tags,trash,users,masters}.test.ts` 4-role matrix + `services/permissions/__tests__/assertCanManageVoc.test.ts` (5 회귀 + reassign + submitPayloadReview) + `vocs.test.ts` reassign 매트릭스. **단일 통합 테스트 파일은 FU-018 별 PR 후보**.
+   - **이연**: FU-013/014 ✅ (PR #266/#267 Phase D+E 동봉 머지). 신규 FU-018 (perm matrix integration test) / FU-019 (equipment/db real loader) / FU-020 (multi-instance advisory lock) 등록.
+
+→ **다음 세션 진입 후보**
+   - **Wave 5 plan 작성** — Wave 3 close 후 진입 unblock. 알림 / 셸 마감 / 시각 회귀 12 화면.
+   - **FU batch 처리** (P1 우선): FU-001 (dompurify XSS) · FU-002 (notice/faq 인덱스 마이그 018) · FU-003/4/5 (Wave 4 idle slot hotfix) · FU-017 (✅ 머지 완료 — 활성 row 정리).
+   - **P2 batch**: FU-006~009 + FU-010 + FU-015 + FU-016 + FU-018.
+   - **P3**: FU-012 / FU-019 / FU-020 (외부 의존 / NextGen).
+
+→ **마이그 번호** — Wave 3 close 시점 다음 마이그 번호 = 021.
+
+## 이전 세션 시작점 (2026-05-09 Wave 3 Phase D + E 머지 완료)
+
+→ **Wave 3 Phase D + E 머지** (origin/main `8501003`, 2026-05-09): hotfix 2 + chore 1 + feature 2, 총 5 PR 단일 세션 처리.
+   - **PR #266** FU-013 마이그 019 (`vocs.parent_id ON DELETE SET NULL`) — ADR 0005 §6 case 6 정합. pg-mem 회귀 3건.
+   - **PR #267** FU-014 마이그 020 (`tags(name, kind) UNIQUE`) — 동일 name 다른 kind 허용 / 동일 (name, kind) 거부. pg-mem 회귀 3건.
+   - **PR #268** chore: lint config (`argsIgnorePattern: '^_'`) + 죽은 `mockVocRepo` 제거.
+   - **PR #269** W3-6 Phase D External Masters (`/admin/masters`) — Manager+ refresh + Manager+/Dev read, 5분 쿨다운 + atomic swap, 3-mode badge. BE 14 + FE 11 tests.
+   - **PR #270** W3-7 Phase E Admin Users (`/admin/users`) — Admin only (404 hide), last-admin 409, role/is_active → `user_role_log` audit. BE 13 + FE 8 tests.
+
+→ **에이전트 디스패치 결정 (2026-05-09)** — Phase D + E 독립이라 worktree-isolated 병렬 dispatch (`general-purpose` × 2). 머지 시 router/index 등록 줄 keep-both 충돌 1건 (resolve `be305c9`).
+
+## 이전 세션 시작점 (2026-05-09 FU-017 Page Layout 시스템 머지 완료)
 
 → **FU-017 머지** (브랜치 `docs/page-layout-system`, 2026-05-09): 5 페이지 헤더 drift 제거. Spec(`uidesign.md §5` 슬롯 계약 + 액션 그룹 6규칙 + UI size 토큰) → `<PageLayout>` + `<PageHeader>` (closed surface) → Button/Input/Select 토큰화 (`--ui-h-md` 32px 통일) → VOC/Notice/FAQ/Tag Master/Trash + StubPage/HealthPage 마이그. `PageTitle.tsx` / `TopBar.tsx` 삭제. `benchmark/` 폐기 (사용자 결정 — visual-diff baseline 더 이상 참조 X). 542/542 FE 테스트 green.
 
