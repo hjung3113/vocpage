@@ -12,6 +12,7 @@ const NoticePage = lazy(() => import('@pages/notice'));
 const FaqPage = lazy(() => import('@pages/faq'));
 const AdminTagsPage = lazy(() => import('@pages/admin/tags'));
 const AdminTrashPage = lazy(() => import('@pages/admin/trash'));
+const AdminUsersPage = lazy(() => import('@pages/admin/users'));
 
 function VocRoute() {
   return (
@@ -101,6 +102,14 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<LoadingState />}>
                 <AdminTrashPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'users',
+            element: (
+              <Suspense fallback={<LoadingState />}>
+                <AdminUsersPage />
               </Suspense>
             ),
           },
