@@ -19,6 +19,10 @@ vi.mock('@entities/notice', () => ({
   useNoticePopup: () => ({ data: { rows: [] }, isError: false, isPending: false }),
 }));
 
+vi.mock('@entities/notification', () => ({
+  useUnreadBadge: () => ({ unreadCount: 0, hasUrgent: false, isLoading: false, isError: false }),
+}));
+
 function renderSidebar() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(

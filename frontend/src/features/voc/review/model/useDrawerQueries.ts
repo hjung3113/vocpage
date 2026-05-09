@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { vocApi, vocQueryKeys } from '@entities/voc';
 import { useRole } from '@entities/user/model/useRole';
 
@@ -46,5 +46,37 @@ export function useVocSubtasks(id: string) {
     queryKey: vocQueryKeys.subtasks(role, id),
     queryFn: () => vocApi.subtasks(id),
     enabled: !!id,
+  });
+}
+
+/** Wave 5 Phase B — comments BE wiring (POST/PATCH/DELETE per `feature-voc.md §8.13`). */
+function useInvalidateComments(id: string) {
+  const { role } = useRole();
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: vocQueryKeys.comments(role, id) });
+}
+
+export function useAddComment(id: string) {
+  const invalidate = useInvalidateComments(id);
+  return useMutation({
+    mutationFn: (body: string) => vocApi.createComment(id, body),
+    onSuccess: () => void invalidate(),
+  });
+}
+
+export function useUpdateComment(id: string) {
+  const invalidate = useInvalidateComments(id);
+  return useMutation({
+    mutationFn: (input: { commentId: string; body: string }) =>
+      vocApi.updateComment(id, input.commentId, input.body),
+    onSuccess: () => void invalidate(),
+  });
+}
+
+export function useDeleteComment(id: string) {
+  const invalidate = useInvalidateComments(id);
+  return useMutation({
+    mutationFn: (commentId: string) => vocApi.deleteComment(id, commentId),
+    onSuccess: () => void invalidate(),
   });
 }

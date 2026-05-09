@@ -8,6 +8,16 @@ vi.mock('../model/useDrawerQueries', () => ({
   useVocComments: vi.fn(),
   useVocSubtasks: vi.fn(),
   useVocHistory: vi.fn(),
+  useAddComment: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+  useUpdateComment: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+  useDeleteComment: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+}));
+
+// Toast UI editor cannot run in jsdom — substitute a textarea.
+vi.mock('../../create/ui/ToastBodyEditor', () => ({
+  default: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <textarea aria-label="댓글 본문" value={value} onChange={(e) => onChange(e.target.value)} />
+  ),
 }));
 
 import { useVocComments, useVocSubtasks, useVocHistory } from '../model/useDrawerQueries';

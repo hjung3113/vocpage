@@ -41,7 +41,7 @@ export function EditableDatePicker({
             type="button"
             disabled={disabled}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded border border-[color:var(--border)] px-2 py-0.5 text-sm',
+              'inline-flex items-center gap-1.5 rounded border border-[color:var(--border-standard)] px-2 py-0.5 text-sm',
               'hover:border-[color:var(--border-strong)] hover:bg-[color:var(--bg-hover)]',
               'focus:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--brand)]',
               'disabled:cursor-not-allowed disabled:opacity-50',

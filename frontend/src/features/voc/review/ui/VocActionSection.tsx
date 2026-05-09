@@ -7,7 +7,14 @@ import { VocComment } from './VocComment';
 import { VocInternalNotes } from './VocInternalNotes';
 import { VocSubTask } from './VocSubTask';
 import { LoadingState } from '@shared/ui/skeleton';
-import { useVocComments, useVocSubtasks, useVocHistory } from '../model/useDrawerQueries';
+import {
+  useVocComments,
+  useVocSubtasks,
+  useVocHistory,
+  useAddComment,
+  useUpdateComment,
+  useDeleteComment,
+} from '../model/useDrawerQueries';
 
 interface Props {
   vocId: string;
@@ -41,6 +48,11 @@ export function VocActionSection({
   const subtasks = useVocSubtasks(vocId);
   // history is read-only; fetching is co-located here alongside comments/subtasks
   const history = useVocHistory(vocId);
+  const addComment = useAddComment(vocId);
+  const updateComment = useUpdateComment(vocId);
+  const deleteComment = useDeleteComment(vocId);
+  const commentPending =
+    pending || addComment.isPending || updateComment.isPending || deleteComment.isPending;
   return (
     <div data-testid="drawer-actions">
       <Tabs defaultValue="comment" data-testid="review-sections">
@@ -72,10 +84,10 @@ export function VocActionSection({
               comments={comments.data ?? []}
               currentUserId={currentUserId}
               canWrite={canWrite}
-              pending={pending}
-              onAdd={() => {}}
-              onEdit={() => {}}
-              onDelete={() => {}}
+              pending={commentPending}
+              onAdd={(body) => addComment.mutate(body)}
+              onEdit={(commentId, body) => updateComment.mutate({ commentId, body })}
+              onDelete={(commentId) => deleteComment.mutate(commentId)}
             />
           )}
         </TabsContent>

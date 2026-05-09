@@ -47,7 +47,7 @@ export function LoginForm() {
           style={{
             color: 'var(--text-primary)',
             background: 'var(--bg-surface)',
-            borderColor: 'var(--border)',
+            borderColor: 'var(--border-standard)',
           }}
         >
           <option value="admin">Admin</option>

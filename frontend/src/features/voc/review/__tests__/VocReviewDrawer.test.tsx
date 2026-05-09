@@ -17,7 +17,19 @@ vi.mock('@entities/voc/api/vocApi', () => ({
     notes: vi.fn(),
     addNote: vi.fn(),
     history: vi.fn(),
+    comments: vi.fn().mockResolvedValue([]),
+    createComment: vi.fn(),
+    updateComment: vi.fn(),
+    deleteComment: vi.fn(),
+    subtasks: vi.fn().mockResolvedValue([]),
   },
+}));
+
+// Toast UI editor cannot run in jsdom — substitute textarea (Wave 5 Phase B).
+vi.mock('@features/voc/create/ui/ToastBodyEditor', () => ({
+  default: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <textarea aria-label="댓글 본문" value={value} onChange={(e) => onChange(e.target.value)} />
+  ),
 }));
 
 import { vocApi } from '@entities/voc/api/vocApi';
@@ -94,7 +106,7 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     expect(screen.getAllByRole('tab')).toHaveLength(5);
     expect(screen.getByTestId('drawer-comments')).toBeInTheDocument();
-    expect(screen.getByLabelText('new comment')).toBeInTheDocument();
+    expect(screen.getByTestId('comment-submit')).toBeInTheDocument();
     // 내부노트는 탭 전환 후 노출
     await user.click(screen.getByRole('tab', { name: '내부메모' }));
     await waitFor(() => expect(screen.getByLabelText('new internal note')).toBeInTheDocument());
@@ -103,7 +115,7 @@ describe('ReviewDrawer — Wave 1.6 C-13 (flat sections)', () => {
   it('role=user → 댓글 form 미노출 + 내부메모 섹션 미노출 + 첨부 업로드 미노출', async () => {
     renderDrawer('user', target.id);
     await waitFor(() => expect(screen.getByTestId('drawer-comments')).toBeInTheDocument());
-    expect(screen.queryByLabelText('new comment')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('comment-submit')).not.toBeInTheDocument();
     expect(screen.queryByTestId('drawer-internal-notes')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('첨부 업로드')).not.toBeInTheDocument();
   });
