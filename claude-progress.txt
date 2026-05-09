@@ -12,6 +12,13 @@
    3. Phase 2 spec 보강 ADR 1건 (BE `total` 의미 / zod self-recursive 회피 / status grouping × expand 배타) → 구현
    4. Phase 2 머지 후 `feat/dashboard-shell` 진입 (Wave 2)
 
+→ **Wave 3 plan draft (병렬 트랙, branch `docs/wave-3-plan`, 2026-05-09)**
+   - `docs/specs/plans/wave-3-admin.md` — Admin 4 화면 (Tag Master / Trash / External Masters / Users) plan
+   - `docs/adr/0004-admin-permission-model.md` (Proposed) + `docs/adr/0005-trash-restore-policy.md` (Proposed)
+   - OQ 5 건 (`docs/specs/plans/open-questions.md`) — 사용자 결정 후 spec 동기화 PR 선행
+   - Hard-block: Wave 2 머지 + 마이그 012 머지 + OQ 5건 답변 모두 충족 후 Phase A 진입
+   - PR 은 사용자가 open. 본 worktree 는 commit only.
+
 → **PR 본문 = `docs/voc-completion-single-pr` 12 commit + driver D-1~D-5 재PASS + 머지 요청 1줄**
    - Phase B (BE master + create 강제룰) — `ad1ef50`
    - Phase C minimal + major — `c56af67` + `b85240a`

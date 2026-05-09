@@ -18,6 +18,8 @@
 | ---------- | --------------- | ----- | ------ | ----- |
 | _none yet_ |                 |       |        |       |
 
+> Wave 3 (Admin 4 화면) 의 OQ 5 건은 닫힌 wave 가 아니므로 본 bucket 진입 X — `plans/open-questions.md` 에서 추적 (R6 정합).
+
 ## 머지 완료 (✅)
 
 | ID         | Trigger (spawn) | Title | Resolution |
