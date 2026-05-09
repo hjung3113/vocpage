@@ -15,6 +15,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@shared/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog';
+import { SafeHtml } from '@shared/ui/safe-html/SafeHtml';
 import { LevelBadge } from '@pages/notice/LevelBadge';
 import {
   dismissKey,
@@ -105,13 +106,10 @@ export function NoticePopupModal() {
                 >
                   {selected.title}
                 </h2>
-                <div
+                <SafeHtml
+                  html={selected.body}
                   data-testid={`notice-popup-detail-body-${selected.id}`}
                   className="text-sm text-[color:var(--text-primary)]"
-                  // TODO(security): wrap with DOMPurify once available; BE는
-                  // Toast UI Editor의 화이트리스트 산출물만 저장하지만, FE-side
-                  // 추가 sanitize 필요 (NoticeRow.tsx 와 동일 정책).
-                  dangerouslySetInnerHTML={{ __html: selected.body }}
                 />
               </>
             ) : null}

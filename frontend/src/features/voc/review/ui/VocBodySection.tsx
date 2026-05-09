@@ -1,4 +1,5 @@
 import { VocSection } from './VocSection';
+import { SafeHtml } from '@shared/ui/safe-html/SafeHtml';
 
 interface Props {
   body: string | null | undefined;
@@ -19,10 +20,9 @@ export function VocBodySection({ body }: Props) {
         style={{ background: 'var(--bg-surface)' }}
       >
         {body ? (
-          <div
+          <SafeHtml
+            html={body}
             className="prose prose-sm max-w-none text-sm"
-            style={{ color: 'var(--text-primary)' }}
-            dangerouslySetInnerHTML={{ __html: body }}
           />
         ) : (
           <span style={{ color: 'var(--text-tertiary)' }}>—</span>
