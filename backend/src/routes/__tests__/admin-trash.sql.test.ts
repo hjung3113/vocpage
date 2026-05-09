@@ -4,9 +4,14 @@
  * `admin-trash.test.ts` mocks `repository/trash`, so SQL drift slips through.
  * `repository/__tests__/trash.sql.test.ts` (PR #263 hotfix) pins SQL column
  * shape via a recording fake pool but does not exercise the real schema.
- * This file boots pg-mem with the admin-relevant migrations (001-006 + 014 +
- * 015 + 016 + 020 Up sections) and drives `listTrashedVocs` /
- * `getRestoreLog` end-to-end through the route → repository path.
+ * This file boots pg-mem with migrations 002-006 (raw) + 014 + 015 (Up
+ * sections) and drives `listTrashedVocs` / `getRestoreLog` /
+ * `restoreVoc` end-to-end through the route → service → repository path.
+ * Migration 001 (extensions) is stripped by pg-mem and not applied.
+ *
+ * Test isolation: `setPool()` mutates module-global state. Safe under Jest
+ * `--runInBand` (configured in backend/package.json `test` script). Do not
+ * use `test.concurrent` here.
  *
  * Spec sources:
  *   - docs/specs/plans/followup-bucket.md FU-015
@@ -25,6 +30,7 @@ import type { Pool } from 'pg';
 process.env.AUTH_MODE = 'mock';
 
 import { adminTrashRouter } from '../admin-trash';
+import { vocRouter } from '../voc';
 import { errorHandler } from '../../middleware/errorHandler';
 import { setPool, resetPool } from '../../db';
 
@@ -52,9 +58,14 @@ function stripUnsupported(sql: string): string {
     .replace(/CREATE OR REPLACE FUNCTION[\s\S]*?\$\$\s*LANGUAGE\s+plpgsql\s*;/gi, '')
     .replace(/CREATE FUNCTION[\s\S]*?\$\$\s*LANGUAGE\s+plpgsql\s*;/gi, '')
     .replace(/CREATE TRIGGER[\s\S]*?EXECUTE FUNCTION\s+\w+\s*\(\s*\)\s*;/gi, '')
-    // pg-mem evaluates CHECK constraints strictly (NULL fails IN-list); FU-015
-    // is about route → service → SQL drift, not enum invariants.
-    .replace(/\s+CHECK\s*\((?:[^()]|\([^()]*\))*\)/gi, '');
+    // pg-mem evaluates `NULL IN (...)` as FALSE (Postgres returns UNKNOWN).
+    // Rewrite `CHECK (col IN (...))` → `CHECK (col IS NULL OR col IN (...))`
+    // so non-NULL enum values are still enforced (drift detection preserved
+    // per codex P2 review on PR #280) while nullable columns accept NULL.
+    .replace(
+      /CHECK\s*\(\s*(\w+)\s+IN\s*\(([^()]*)\)\s*\)/gi,
+      'CHECK ($1 IS NULL OR $1 IN ($2))',
+    );
 }
 
 function readUp(file: string): string {
@@ -156,6 +167,7 @@ function makeApp(): express.Express {
     next();
   });
   app.use('/api/admin', adminTrashRouter);
+  app.use('/api/vocs', vocRouter);
   app.use(errorHandler);
   return app;
 }
@@ -261,6 +273,100 @@ describe('admin-trash routes — DB-backed (FU-015)', () => {
       );
       expect(res.status).toBe(200);
       expect(res.body).toEqual([]);
+    });
+  });
+
+  // PATCH /api/vocs/:id/restore lives on `vocRouter` (admin-only via
+  // `requireAdminOrHide`). repository/__tests__/trash.sql.test.ts already pins
+  // the SQL column shape with a recording fake pool; this case exercises the
+  // full transactional flow against a real schema (FOR UPDATE → UPDATE vocs →
+  // INSERT voc_history → INSERT voc_restore_log → INSERT voc_tags … ON
+  // CONFLICT DO NOTHING) end-to-end via supertest. Codex P1 (PR #280 review).
+  describe('PATCH /api/vocs/:id/restore (transactional flow)', () => {
+    it('clears deleted_at/deleted_by, writes voc_history + voc_restore_log, and re-applies tag rules', async () => {
+      // Seed a tag + active rule so the restore transaction's tag re-apply
+      // step has work to do (non-no-op INSERT … SELECT … ON CONFLICT).
+      const tagId = '99999999-9999-4999-8999-000000000099';
+      await pool.query(
+        `INSERT INTO tags (id, name, slug, kind, is_external)
+         VALUES ($1, 'auto', 'auto', 'general', false)`,
+        [tagId],
+      );
+      await pool.query(
+        `INSERT INTO tag_rules (id, name, pattern, kind, tag_id, is_active, sort_order)
+         VALUES (gen_random_uuid(), 'r', 'pat', 'general', $1, true, 0)`,
+        [tagId],
+      );
+
+      const res = await request(makeApp()).patch(
+        `/api/vocs/${DELETED_VOC}/restore`,
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        voc_id: DELETED_VOC,
+        audit: {
+          action: 'restore',
+          voc_id: DELETED_VOC,
+          actor_id: ADMIN_ID,
+          before_deleted_by: ADMIN_ID,
+        },
+      });
+      expect(typeof res.body.restored_at).toBe('string');
+
+      // 1. vocs.deleted_at / deleted_by cleared
+      const { rows: vocRows } = await pool.query(
+        `SELECT deleted_at, deleted_by FROM vocs WHERE id = $1`,
+        [DELETED_VOC],
+      );
+      expect(vocRows[0].deleted_at).toBeNull();
+      expect(vocRows[0].deleted_by).toBeNull();
+
+      // 2. voc_history audit row written (003 column shape)
+      const { rows: histRows } = await pool.query(
+        `SELECT field, old_value, new_value, changed_by
+         FROM voc_history WHERE voc_id = $1`,
+        [DELETED_VOC],
+      );
+      expect(histRows).toHaveLength(1);
+      expect(histRows[0].field).toBe('deleted_at');
+      expect(histRows[0].new_value).toBeNull();
+      expect(histRows[0].changed_by).toBe(ADMIN_ID);
+
+      // 3. voc_restore_log row written (015 column shape)
+      const { rows: logRows } = await pool.query(
+        `SELECT action, actor_id, before_deleted_by
+         FROM voc_restore_log WHERE voc_id = $1`,
+        [DELETED_VOC],
+      );
+      expect(logRows).toHaveLength(1);
+      expect(logRows[0].action).toBe('restore');
+      expect(logRows[0].actor_id).toBe(ADMIN_ID);
+      expect(logRows[0].before_deleted_by).toBe(ADMIN_ID);
+
+      // 4. tag_rules re-applied → voc_tags now has the rule-attached tag
+      const { rows: tagRows } = await pool.query(
+        `SELECT tag_id, source FROM voc_tags WHERE voc_id = $1`,
+        [DELETED_VOC],
+      );
+      expect(tagRows).toHaveLength(1);
+      expect(tagRows[0].tag_id).toBe(tagId);
+      expect(tagRows[0].source).toBe('rule');
+    });
+
+    it('returns 409 ALREADY_ACTIVE when the VOC is not in trash', async () => {
+      const res = await request(makeApp()).patch(
+        `/api/vocs/${ACTIVE_VOC}/restore`,
+      );
+      expect(res.status).toBe(409);
+      // HttpError → errorHandler → wrapped envelope.
+      expect(res.body.error?.code ?? res.body.code).toBe('ALREADY_ACTIVE');
+    });
+
+    it('returns 404 NOT_FOUND when the VOC does not exist', async () => {
+      const ghost = '00000000-0000-4000-8000-00000000ffff';
+      const res = await request(makeApp()).patch(`/api/vocs/${ghost}/restore`);
+      expect(res.status).toBe(404);
     });
   });
 });
