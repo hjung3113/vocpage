@@ -172,7 +172,7 @@
       "locked_fields": { "kpi_position": true, "widget_visibility.trend": true }
     }
     ```
-- **`notices`**: 공지사항. 컬럼: `id(uuid)`, `title`, `body(HTML)`, `level(enum: normal/important/urgent)`, `is_popup(boolean)`, `is_visible(boolean)`, `visible_from(date)`, `visible_to(date)`, `author_id(FK→users)`, `deleted_at`, `created_at`, `updated_at`.
+- **`notices`**: 공지사항. 컬럼: `id(uuid)`, `title`, `body(HTML)`, `level(enum: normal/important/urgent)`, `is_popup(boolean)`, `is_visible(boolean)`, `visible_from(timestamptz)`, `visible_to(timestamptz)`, `author_id(FK→users)`, `deleted_at`, `created_at`, `updated_at`. **`visible_from` / `visible_to` 시간 의미론**: 마이그 016 (2026-05-09, FU-007 = 8-M2 흡수) 으로 `date` 에서 `timestamptz` 로 승급. Admin UI 가 날짜만 입력해도 BE 는 **KST 자정** (`YYYY-MM-DDT00:00:00+09:00` = UTC `(전날)T15:00:00Z`) 으로 저장한다 — 운영 DST 가 없는 대한민국 표준시 기준.
 - **`faq_categories`**: FAQ 카테고리 동적 관리. 컬럼: `id`, `name`, `slug(UNIQUE)`, `sort_order`, `is_archived`.
 - **`faqs`**: FAQ 항목. 컬럼: `id(uuid)`, `question`, `answer(HTML)`, `category_id(FK→faq_categories)`, `is_visible(boolean)`, `sort_order`, `author_id(FK→users)`, `deleted_at`, `created_at`, `updated_at`.
 
