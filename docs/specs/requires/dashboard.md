@@ -763,19 +763,27 @@ dashboard_settings (
 
 ```ts
 // shared/contracts/dashboard.ts
-type WidgetLayout = { x: number; y: number; w: number; h: number; static?: boolean };
-type WidgetSizesV2 = {
-  [widgetId: string]: {
-    lg: WidgetLayout;
-    md?: WidgetLayout;
-    sm?: WidgetLayout;
+const WidgetLayoutSchema = z.object({
+  x: z.number().int().min(0).max(11),
+  y: z.number().int().min(0),
+  w: z.number().int().min(1).max(12),
+  h: z.number().int().min(1),
+  static: z.boolean().optional(),
+}).refine(({ x, w }) => x + w <= 12, { message: 'x + w must be ≤ 12 (12-col grid)' });
+
+const WidgetSizesV2Schema = z.record(
+  z.object({
+    lg: WidgetLayoutSchema,
+    md: WidgetLayoutSchema.optional(),
+    sm: WidgetLayoutSchema.optional(),
     // xs 는 RGL 자동 처리 — 저장하지 않음
-  };
-};
+  }),
+);
 ```
 
 - `md`/`sm` 미지정 시 RGL 가 `lg` 에서 폴백.
 - `static: true` 인 위젯은 드래그·리사이즈 비활성. UI 헤더에 🔒 표시.
+- bounds 위반 (`x + w > 12`, 음수, 정수 아님) → 400. fixture / seed 생성 시 동일 zod 강제.
 
 ### 잠금 머지 규칙
 
@@ -788,11 +796,14 @@ const isStatic = adminLockedWidgets.includes(widgetId)
 - 개인 잠금은 자기 화면에만 적용. 개인이 unlock 해도 Admin 잠금은 해제 불가 (UI 토글 disabled + tooltip "Admin 강제 잠금").
 - 권한: `locked_widgets` mutate 는 **Admin only** (BE 403 + FE 토글 hidden). `widget_visibility[id].locked` 는 모든 role.
 
-### 저장/복원
+### 저장/복원 (draft buffer 모델)
 
-- **저장**: `PATCH /api/dashboard/settings` 페이로드에 `widget_sizes: WidgetSizesV2` 포함. 디바운스 500ms (드래그 종료 시 발사).
+- **HTTP verb**: `PUT /api/dashboard/settings` (PATCH 아님 — `requirements.md §11.7` 정합).
+- **draft buffer**: 편집 모드 진입 시 서버 hydrate 값을 `draft` 로 복사. drag/resize end → `draft` 만 로컬 갱신 (서버 호출 X).
+- **저장**: "저장" 버튼 클릭 → `PUT /api/dashboard/settings` body = `{ widget_sizes: WidgetSizesV2, ...other }`. 200 OK 시 편집 모드 종료 + `draft` → 적용.
+- **취소**: "취소" 버튼 클릭 → `draft` 폐기 + 서버 값으로 재 hydrate. DB 미변경.
 - **복원**: 페이지 mount 시 `GET /api/dashboard/settings` → `Responsive` 의 `layouts` prop 으로 hydrate.
-- **기본 레이아웃**: `frontend/src/features/dashboard/defaultLayouts.ts` 가 8 위젯의 lg/md/sm 기본 좌표 export. 사용자 저장값 없으면 fallback.
+- **기본 레이아웃**: `frontend/src/features/dashboard/defaultLayouts.ts` 가 11 위젯의 lg/md/sm 기본 좌표 export. 사용자 저장값 없으면 fallback.
 
 ### 편집 모드 토글
 
@@ -809,6 +820,15 @@ const isStatic = adminLockedWidgets.includes(widgetId)
 
 - `uidesign.md` 신규 토큰 필요: `--dashboard-grid-gap` (16px), `--dashboard-grid-padding` (24px), `--dashboard-widget-resize-handle` (위젯 우하단 핸들 색).
 - 신규 토큰은 Wave 2 Phase A 에서 spec PR 별도 머지.
+
+### RGL CSS 규칙
+
+- 위젯 컨테이너: `overflow: hidden`. 위젯 내부 스크롤은 위젯이 자체 처리 (히트맵 / 담당자표 등).
+- z-index: 일반 = 1, hover = 2, dragging = 1000, resizing = 999. 편집 모드 외 zIndex 변동 X.
+- resize handle: 위젯 우하단 절대 배치, 12×12px, `containerPadding` 안에 머무름. dragging 중에는 hidden.
+- scroll container: 페이지 root `overflow-y: auto`. 그리드 자체는 `overflow: visible` (RGL 가 자식 위치를 absolute 로 깔기 때문).
+- 모바일 (`xs` < 768): RGL `isDraggable: false` + `isResizable: false` 강제. 1-col auto-stack.
+- 편집 모드 진입 시 페이지 root `cursor: grab` 추가. dragging 중 `cursor: grabbing`.
 
 ### 접근성
 
