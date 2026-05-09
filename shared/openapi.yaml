@@ -1157,16 +1157,30 @@ paths:
     get:
       tags: [admin]
       operationId: adminListUsers
-      summary: List all users (admin)
+      summary: List users (admin only — paginated; OQ-3 audit via /role-log)
+      parameters:
+        - name: role
+          in: query
+          schema: { $ref: '#/components/schemas/UserRole' }
+        - name: is_active
+          in: query
+          schema: { type: boolean }
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
       responses:
         '200':
           description: Users
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/AdminUserListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1178,31 +1192,30 @@ paths:
     patch:
       tags: [admin]
       operationId: adminUpdateUser
-      summary: Update user role/status (admin)
+      summary: Update user role/is_active (admin only — last-admin guard 409)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                role:
-                  $ref: '#/components/schemas/UserRole'
-                is_active:
-                  type: boolean
+              $ref: '#/components/schemas/AdminUserPatch'
       responses:
         '200':
           description: Updated user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/AdminUserItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/BadRequest'
 
   /admin/systems:
     get:
@@ -1507,7 +1520,7 @@ paths:
     post:
       tags: [admin]
       operationId: adminRefreshMasters
-      summary: Refresh master data cache
+      summary: Refresh master data cache (manager+)
       responses:
         '200':
           description: Refresh result
@@ -1519,6 +1532,321 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/BadRequest'
+        '503':
+          $ref: '#/components/responses/BadRequest'
+
+  /admin/masters/status:
+    get:
+      tags: [admin]
+      operationId: adminMasterStatus
+      summary: External masters status (admin/manager/dev — OQ-2 Option B)
+      responses:
+        '200':
+          description: Master status snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MasterStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/tags:
+    get:
+      tags: [admin]
+      operationId: adminListTags
+      summary: List tag master rows (admin/manager/dev — read)
+      parameters:
+        - name: kind
+          in: query
+          schema:
+            type: string
+            enum: [general, menu]
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Tag master rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagMasterListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [admin]
+      operationId: adminCreateTag
+      summary: Create tag master row (manager+ — slug auto-generated)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagMasterCreate'
+      responses:
+        '201':
+          description: Created tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagMasterItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/BadRequest'
+
+  /admin/tags/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminUpdateTag
+      summary: Update tag name (manager+; kind/slug locked)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagMasterPatch'
+      responses:
+        '200':
+          description: Updated tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagMasterItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [admin]
+      operationId: adminDeleteTag
+      summary: Permanently delete tag (admin only — usage=0 + rules ref=0)
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/BadRequest'
+
+  /admin/tags/{id}/merge:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    post:
+      tags: [admin]
+      operationId: adminMergeTag
+      summary: Merge tag into target (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagMasterMergeInput'
+      responses:
+        '200':
+          description: Merged target tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagMasterItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/tags/{id}/external:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminToggleTagExternal
+      summary: Toggle tag external lock (admin only — tags.is_external)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagExternalToggle'
+      responses:
+        '200':
+          description: Updated tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagMasterItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/tag-rules/{id}/suspend:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [admin]
+      operationId: adminSuspendTagRule
+      summary: Suspend or resume tag rule (admin only — tag_rules.suspended_until)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRuleSuspendInput'
+      responses:
+        '200':
+          description: Updated tag rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/vocs/trash:
+    get:
+      tags: [admin]
+      operationId: adminListTrash
+      summary: List soft-deleted VOCs (admin only — §15.4)
+      parameters:
+        - name: system_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: menu_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: deleted_from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: deleted_to
+          in: query
+          schema: { type: string, format: date-time }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Trash list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrashListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/vocs/{id}/restore-log:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [admin]
+      operationId: adminVocRestoreLog
+      summary: Read voc_restore_log entries (admin only)
+      responses:
+        '200':
+          description: Restore log entries (oldest → newest)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VocRestoreLogEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /vocs/{id}/restore:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [vocs]
+      operationId: restoreVoc
+      summary: Restore soft-deleted VOC (admin only — re-runs tag_rules)
+      responses:
+        '200':
+          description: Restored VOC + audit row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocRestoreResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/users/{id}/role-log:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [admin]
+      operationId: adminUserRoleLog
+      summary: Read user_role_log entries (admin only — PIPA 7y)
+      responses:
+        '200':
+          description: Role log entries (newest → oldest)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRoleLogEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /vocs/{id}/masters/refresh:
     parameters:
@@ -2838,13 +3166,217 @@ components:
 
     MasterRefreshResult:
       type: object
-      required: [swapped, loaded_at]
+      required: [swapped, loaded_at, sources]
       properties:
         swapped:
           type: boolean
         loaded_at:
           type: string
           format: date-time
+        sources:
+          type: object
+          required: [equipment, db]
+          properties:
+            equipment:
+              type: object
+              required: [loaded_at]
+              properties:
+                loaded_at: { type: string, format: date-time }
+            db:
+              type: object
+              required: [loaded_at]
+              properties:
+                loaded_at: { type: string, format: date-time }
+
+    MasterStatusSourceEntry:
+      type: object
+      required: [loaded_at]
+      properties:
+        loaded_at:
+          type: string
+          format: date-time
+        kept_loaded_at:
+          type: string
+          format: date-time
+
+    MasterStatus:
+      type: object
+      required: [loaded_at, cooldown_until, sources]
+      properties:
+        loaded_at:
+          type: string
+          format: date-time
+          nullable: true
+        cooldown_until:
+          type: string
+          format: date-time
+          nullable: true
+        sources:
+          type: object
+          required: [equipment, db, program]
+          properties:
+            equipment: { $ref: '#/components/schemas/MasterStatusSourceEntry' }
+            db:        { $ref: '#/components/schemas/MasterStatusSourceEntry' }
+            program:   { $ref: '#/components/schemas/MasterStatusSourceEntry' }
+
+    TagMasterItem:
+      type: object
+      required: [id, name, slug, kind, is_external, merged_into_id, usage_count, rule_ref_count, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string }
+        kind:
+          type: string
+          enum: [general, menu]
+        is_external: { type: boolean }
+        merged_into_id: { type: string, format: uuid, nullable: true }
+        usage_count: { type: integer, minimum: 0 }
+        rule_ref_count: { type: integer, minimum: 0 }
+        created_at: { type: string, format: date-time }
+
+    TagMasterListResponse:
+      type: object
+      required: [rows, page, per_page, total]
+      properties:
+        rows:
+          type: array
+          items: { $ref: '#/components/schemas/TagMasterItem' }
+        page: { type: integer, minimum: 1 }
+        per_page: { type: integer, minimum: 1 }
+        total: { type: integer, minimum: 0 }
+
+    TagMasterCreate:
+      type: object
+      required: [name, kind]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        kind:
+          type: string
+          enum: [general, menu]
+
+    TagMasterPatch:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+
+    TagMasterMergeInput:
+      type: object
+      required: [targetId]
+      properties:
+        targetId: { type: string, format: uuid }
+
+    TagExternalToggle:
+      type: object
+      required: [is_external]
+      properties:
+        is_external: { type: boolean }
+
+    TagRuleSuspendInput:
+      type: object
+      required: [suspended_until]
+      properties:
+        suspended_until:
+          type: string
+          format: date-time
+          nullable: true
+
+    TrashListItem:
+      type: object
+      required: [id, issue_code, title, status, system_id, menu_id, deleted_by, deleted_at]
+      properties:
+        id: { type: string, format: uuid }
+        issue_code: { type: string }
+        title: { type: string }
+        status: { $ref: '#/components/schemas/VocStatus' }
+        system_id: { type: string, format: uuid }
+        menu_id: { type: string, format: uuid }
+        deleted_by: { type: string, format: uuid, nullable: true }
+        deleted_at: { type: string, format: date-time }
+
+    TrashListResponse:
+      type: object
+      required: [rows, page, per_page, total]
+      properties:
+        rows:
+          type: array
+          items: { $ref: '#/components/schemas/TrashListItem' }
+        page: { type: integer, minimum: 1 }
+        per_page: { type: integer, minimum: 1 }
+        total: { type: integer, minimum: 0 }
+
+    VocRestoreLogEntry:
+      type: object
+      required: [id, voc_id, action, actor_id, before_deleted_at, before_deleted_by, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        voc_id: { type: string, format: uuid }
+        action:
+          type: string
+          enum: [restore, hard_delete]
+        actor_id: { type: string, format: uuid }
+        before_deleted_at: { type: string, format: date-time, nullable: true }
+        before_deleted_by: { type: string, format: uuid, nullable: true }
+        created_at: { type: string, format: date-time }
+
+    VocRestoreResponse:
+      type: object
+      required: [voc_id, restored_at, audit]
+      properties:
+        voc_id: { type: string, format: uuid }
+        restored_at: { type: string, format: date-time }
+        audit: { $ref: '#/components/schemas/VocRestoreLogEntry' }
+
+    AdminUserItem:
+      type: object
+      required: [id, ad_username, display_name, email, role, is_active, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        ad_username: { type: string }
+        display_name: { type: string }
+        email: { type: string, format: email }
+        role: { $ref: '#/components/schemas/UserRole' }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    AdminUserListResponse:
+      type: object
+      required: [rows, page, per_page, total]
+      properties:
+        rows:
+          type: array
+          items: { $ref: '#/components/schemas/AdminUserItem' }
+        page: { type: integer, minimum: 1 }
+        per_page: { type: integer, minimum: 1 }
+        total: { type: integer, minimum: 0 }
+
+    AdminUserPatch:
+      type: object
+      properties:
+        role: { $ref: '#/components/schemas/UserRole' }
+        is_active: { type: boolean }
+        reason: { type: string, maxLength: 500 }
+
+    UserRoleLogEntry:
+      type: object
+      required: [id, user_id, changed_by, old_role, new_role, old_active, new_active, reason, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        changed_by: { type: string, format: uuid }
+        old_role:
+          type: string
+          enum: [user, dev, manager, admin]
+          nullable: true
+        new_role:
+          type: string
+          enum: [user, dev, manager, admin]
+          nullable: true
+        old_active: { type: boolean, nullable: true }
+        new_active: { type: boolean, nullable: true }
+        reason: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
 
     VocPayloadHistory:
       type: object
