@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-10 (Wave 5 Phase A 코드 완료 — PR-1 생성 대기)
-> 현재 위치: **Wave 5 Phase A 코드 완료 — branch `feat/wave-5-phase-a-notifications-be` (커밋됨) · 사용자 push + PR-1 대기**
+> 최종 업데이트: 2026-05-10 (Wave 5 Phase A 머지 완료 — Phase B 진입)
+> 현재 위치: **Wave 5 Phase A 머지 완료 (PR #276) · Phase B PR-2 진입 (FE notifications + comments + FU-006/008/009 흡수)**
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → 활성 plan
 > **2026-05-09 정책**: 구현 정본 = `requirements.md` + `uidesign.md` 만. prototype 참조 종료.
 
@@ -17,7 +17,7 @@
 | **1.7**       | [`../archive/plans/wave-1-7-voc-create-modal.md`](../archive/plans/wave-1-7-voc-create-modal.md) (history)                                                               | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR (#242) 로 흡수.                                                                                                                                                                                                                                                                   |
 | **4**         | `feature-notice-faq.md` §10                                                                                                                                              | ✅ PR #245 머지 — 공지/FAQ + Notice popup. Adversarial review (1 P0, 5 P1, 4 P2) → P0 fix 동봉 머지.                                                                                                                                                                                                                                   |
 | **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | ✅ **Wave 3 완료 (2026-05-09)** — Phase A: PR #250/#251/#252/#254/#253 · Phase B: PR #262 · Phase C: PR #263 · Phase D: PR #269 · Phase E: PR #270 · Phase F (W3-8): PR #271 머지. BE 269 / FE 561 / lint 0 / 토큰 lint 0. 권한 매트릭스 §8.3 분산 커버 100% 그린. 통합 테스트 단일 파일 = FU-018. |
-| **5**         | [`wave-5-notifications.md`](./wave-5-notifications.md)                                                                                                                  | 🟡 **Phase A 코드 완료 (2026-05-10)** — branch `feat/wave-5-phase-a-notifications-be` (커밋됨). 완료: notifications BE + status_change/assigned/comment 트리거 wire + comments BE 신설 (W5-D11 — contract/repo/service/route/openapi 4 endpoint + 15 integration test) + spec §8.6/§8.13 정합화. 사용자 잔여: contract diff 검수 → push → PR-1. BE 28 suites · 304 passed · 7 todo · typecheck 0. |
+| **5**         | [`wave-5-notifications.md`](./wave-5-notifications.md)                                                                                                                  | 🟡 **Phase A 머지 완료 (PR #276, 2026-05-09)** — notifications BE + comments BE (W5-D11) + 트리거 wire. **Phase B 진입 (PR-2)**: FE notifications (bell/dropdown/폴링) + comments UI (Toast 에디터 교체) + `<NavItemCountBadge>` 추상 + **FU-006/008/009 흡수**. P2 BE batch (FU-007/010/015/018) 은 별 PR. |
 
 ### Hard-blocks
 
@@ -25,7 +25,7 @@
 
 ### 진행 순서
 
-~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix)~~ → ~~Wave 3 Phase B+C (PR #262/#263)~~ → ~~Phase D+E 병렬 (PR #269/#270)~~ → ~~Phase F 종합 검증 (PR #271)~~ → ~~FU P1 batch close (PR #273)~~ → ~~Wave 5 plan 작성~~ → ~~Wave 5 Phase A WIP (notifications BE)~~ → **Wave 5 Phase A 코드 완료 (notifications + comments BE, PR-1 대기)** → Wave 5 Phase B (FE + FU-008 흡수) PR-2 → FU P2 batch → Wave 2 (Dashboard).
+~~FSD Migration~~ → ~~`/voc 완성` PR #242~~ → ~~Wave 4 PR #245~~ → ~~Wave 3 Phase A (4 PR + hotfix)~~ → ~~Wave 3 Phase B+C (PR #262/#263)~~ → ~~Phase D+E 병렬 (PR #269/#270)~~ → ~~Phase F 종합 검증 (PR #271)~~ → ~~FU P1 batch close (PR #273)~~ → ~~Wave 5 plan 작성~~ → ~~Wave 5 Phase A (notifications + comments BE, PR #276)~~ → **Wave 5 Phase B PR-2 (FE + FU-006/008/009 흡수)** → P2 BE batch (FU-007/010/015/018) → Wave 2 (Dashboard) → 운영/배포 phase.
 
 ---
 
