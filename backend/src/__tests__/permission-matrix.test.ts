@@ -25,13 +25,14 @@
  * **Out of scope**:
  *   - Sub-task / Dashboard rows — no routed endpoint at MVP scope.
  *
- * **Production routing risk** (codex P1, tracked in FU-022): mounting all
- * admin-* routers under `/api/admin` causes `adminTrashRouter`'s
- * `requireAdmin()` middleware (router-level `use()`) to intercept
- * `/api/admin/masters/refresh` BEFORE `adminMastersRouter` sees it. Manager+
- * should ALLOW per spec but may receive 404 in production. This matrix
- * mounts one router per cell to test the spec-defined gate; FU-022 covers
- * the prod routing fix.
+ * **Production routing fix** (FU-022, 2026-05-10): adminTrashRouter and
+ * adminUsersRouter previously had `router.use(requireAdmin())` at router
+ * level, which intercepted every `/api/admin/*` request when all four admin
+ * routers are mounted at the same prefix. Switched to per-route
+ * `requireAdmin()` so non-matching paths fall through to the next admin
+ * router. Integration regression: `__tests__/admin-router-mount.test.ts`.
+ * This matrix continues to mount one router per cell to keep gate
+ * decisions isolated.
  */
 import express from 'express';
 import session from 'express-session';
@@ -160,15 +161,9 @@ const userByRole: Record<Exclude<Role, 'anon'>, object> = {
   },
 };
 
-// Mount only the cell's target router. Mounting all admin-* routers under
-// `/api/admin` simultaneously triggers Express's router-middleware semantics:
-// `router.use(requireAdmin())` in adminTrashRouter / adminUsersRouter fires
-// for *every* /api/admin/* request, not just the routes defined in that
-// router (verified empirically — `r1.use(mw)` runs even when the eventual
-// match lives in r2). So a manager hitting /api/admin/masters/refresh
-// would 404 from adminTrashRouter before adminMastersRouter ever sees it.
-// Per-cell router mounting mirrors how production behaves when only one
-// router is reachable for a given path and matches per-route test setup.
+// Mount only the cell's target router so each gate decision is isolated.
+// Production multi-mount integration is covered separately by
+// `admin-router-mount.test.ts` (FU-022 regression).
 type RouterId = 'voc' | 'notices' | 'faqs' | 'adminTags' | 'adminTrash' | 'adminMasters' | 'adminUsers';
 
 const ROUTERS: Record<RouterId, { router: express.Router; mount: string }> = {
