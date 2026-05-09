@@ -1,7 +1,7 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-09
-> 현재 위치: **`/voc` 단일 PR 통합 완성** (Wave 1.6/1.7 잔여 + follow-up 통합)
+> 최종 업데이트: 2026-05-09 (Wave 3 Phase A 4 PR + hotfix 머지 완료)
+> 현재 위치: **Wave 3 Phase A 머지 완료 — Phase B (Tag Master) + Phase C (Trash) 병렬 진입 가능**
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → 활성 plan
 > **2026-05-09 정책**: 구현 정본 = `requirements.md` + `uidesign.md` 만. prototype 참조 종료.
 
@@ -9,13 +9,13 @@
 
 ## 활성 작업
 
-| Wave          | 정본 plan                                                                                                 | 상태                                                                                                               |
-| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **FSD**       | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md` | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                               |
-| **/voc 완성** | [`voc-completion-driver.md`](./voc-completion-driver.md)                                                  | 🟢 `docs/voc-completion-single-pr` 9 commit, FE 469 / BE 111 PASS, code-review B-1·H-1·H-2 처리 — **PR open 대기** |
-| **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                            | ✅ 잔여 η/ζ/D 모두 `/voc 완성` 단일 PR 로 흡수.                                                                    |
-| **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR 로 흡수.                                                      |
-| **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | 🟢 OQ 5 건 close (2026-05-09 grill, PR-α `docs/wave-3-oq-sync`). Phase A 4 PR full-parallel 진입 가능 — W3-1 마이그 014 / W3-2 마이그 015 / W3-3 contract zod+openapi / W3-9 마이그 017. |
+| Wave          | 정본 plan                                                                                                                                                                | 상태                                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **FSD**       | [`archive/plans/fsd-migration.md`](./archive/plans/fsd-migration.md) · `.omc/plans/fsd-migration-plan.md`                                                                | ✅ Step 0~7 전부 완료 (PR #207~#220, 2026-05-05) — **완료·아카이브**                                                                                                                                                                                                                                                                                  |
+| **/voc 완성** | [`voc-completion-driver.md`](./voc-completion-driver.md)                                                                                                                 | 🟢 `docs/voc-completion-single-pr` 9 commit, FE 469 / BE 111 PASS, code-review B-1·H-1·H-2 처리 — **PR open 대기**                                                                                                                                                                                                                                    |
+| **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                                                                                           | ✅ 잔여 η/ζ/D 모두 `/voc 완성` 단일 PR 로 흡수.                                                                                                                                                                                                                                                                                                       |
+| **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                                                                               | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR 로 흡수.                                                                                                                                                                                                                                                                                         |
+| **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | 🟡 **Phase A 머지 완료 (2026-05-09)** — PR #250 (W3-9 마이그 017) `55548a6` / PR #251 (W3-1 마이그 014 + Resolution α) `7a46d6a` / PR #252 (W3-3 contracts) `7907b1e` / PR #254 (W3-3 codex P1 hotfix) `93ed028` / PR #253 (W3-2 마이그 015) `f9ed85f`. **다음**: Phase B (Tag Master `/admin/tags`) + Phase C (Trash `/admin/vocs/trash`) 병렬 진입. |
 
 ### Hard-blocks
 
@@ -23,7 +23,7 @@
 
 ### 진행 순서
 
-~~FSD Migration (완료)~~ → **`/voc 완성` 단일 PR** (Wave 1.6 잔여 η/ζ/D + Wave 1.7 B/C/D + linear-realign Phase 6 + follow-up 7건 + FU C-2) → Wave 2 (Dashboard).
+~~FSD Migration (완료)~~ → ~~`/voc 완성` 단일 PR~~ → ~~Wave 3 Phase A (4 PR + hotfix, 2026-05-09 머지)~~ → **Wave 3 Phase B+C 병렬** → Phase D+E 병렬 → Phase F 종합 검증 → Wave 5 plan 작성 → Wave 2 (Dashboard).
 
 ---
 
@@ -68,9 +68,9 @@ migration 013 dev role / `assertCanManageVoc` 헬퍼 / FE/BE Role union `'dev'` 
 ### 권한·스키마 인프라 PR 후보
 
 - **8-PR1** = migration 013 실파일(F1) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 단일화(F3)
-- **8-PR2** (= W3-1) = migration 014 (`tags.is_external` / `tag_rules.suspended_until`) — D22 운영 차단 (OQ-4 결정 2026-05-09). `merged_into_id` 는 Resolution α (2026-05-09) 로 보류 — 병합은 source-row hard-delete (`feature-voc.md §9.4.6` · ADR 0004) 그대로.
-- **8-PR3** (= W3-2) = migration 015 (`vocs.deleted_by` / `voc_restore_log`) — D23 운영 차단
-- **8-PR4** (= W3-9) = migration 017 (`user_role_log` 별 테이블) — OQ-3 Option A (013/016 점유)
+- **8-PR2** (= W3-1) = ✅ migration 014 (`tags.is_external` / `tag_rules.suspended_until`) — PR #251 `7a46d6a` 머지 (2026-05-09). `merged_into_id` 는 Resolution α 로 보류 → FU-012 trigger.
+- **8-PR3** (= W3-2) = ✅ migration 015 (`vocs.deleted_by` / `voc_restore_log`) — PR #253 `f9ed85f` 머지 (2026-05-09).
+- **8-PR4** (= W3-9) = ✅ migration 017 (`user_role_log` 별 테이블) — PR #250 `55548a6` 머지 (2026-05-09). FU-010 (CHECK constraint) deferral.
 
 ### 명세 보강 (M)
 
