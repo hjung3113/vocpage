@@ -14,13 +14,14 @@ describe('PageHeader', () => {
     render(<PageHeader title="FAQ" count={3} />);
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toHaveTextContent('FAQ');
-    expect(heading).toHaveTextContent('(3)');
+    expect(heading).toHaveTextContent('3');
   });
 
   it('omits count when undefined', () => {
-    render(<PageHeader title="공지사항" />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('공지사항');
-    expect(screen.queryByText(/^\(\d+\)$/)).not.toBeInTheDocument();
+    const { container } = render(<PageHeader title="공지사항" />);
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent('공지사항');
+    expect(container.querySelectorAll('h1 > span')).toHaveLength(0);
   });
 
   it('wraps actions slot with .page-header-actions for cascade rule', () => {

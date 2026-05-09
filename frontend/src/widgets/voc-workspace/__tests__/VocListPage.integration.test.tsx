@@ -122,7 +122,9 @@ describe('VocListPage — Wave D D5 integration', () => {
     });
     const expected = rowsByStatus('검토중').length;
     await waitFor(() =>
-      expect(screen.getByTestId('voc-topbar-total-count')).toHaveTextContent(`${expected}`),
+      expect(
+        screen.getByRole('heading', { level: 1, name: new RegExp(`전체 VOC\\s*${expected}`) }),
+      ).toBeInTheDocument(),
     );
   });
 
@@ -199,9 +201,10 @@ describe('VocListPage — Wave D D5 integration', () => {
       expect(raw).not.toBeNull();
       expect(JSON.parse(raw!)).toContain(status);
     });
-    expect(
-      screen.getByTestId(`voc-status-group-header-${status}`),
-    ).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId(`voc-status-group-header-${status}`)).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
 
     // toggle back: localStorage must round-trip to empty array
     await userEvent.click(screen.getByTestId(`voc-status-group-header-${status}`));

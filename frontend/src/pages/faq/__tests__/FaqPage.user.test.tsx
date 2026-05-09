@@ -18,7 +18,11 @@ beforeEach(resetAll);
 
 function userRole() {
   roleMock.mockReturnValue({
-    role: 'user', isUser: true, isDev: false, isManager: false, isAdmin: false,
+    role: 'user',
+    isUser: true,
+    isDev: false,
+    isManager: false,
+    isAdmin: false,
   });
 }
 
@@ -28,16 +32,22 @@ describe('FaqPage - user mode', () => {
     categoriesMock.mockReturnValue({ data: { rows: [baseCategory] }, isPending: false });
     const visible = { ...baseFaq, id: 'a', question: '노출됨' };
     const hidden = { ...baseFaq, id: 'b', question: '숨김', is_visible: false };
-    const deleted = { ...baseFaq, id: 'c', question: '삭제', deleted_at: '2026-04-01T00:00:00.000Z' };
+    const deleted = {
+      ...baseFaq,
+      id: 'c',
+      question: '삭제',
+      deleted_at: '2026-04-01T00:00:00.000Z',
+    };
     listMock.mockReturnValue({
       data: { rows: [visible, hidden, deleted], page: 1, per_page: 20, total: 3 },
-      isPending: false, isError: false,
+      isPending: false,
+      isError: false,
     });
     renderPage();
     expect(screen.getByText('노출됨')).toBeInTheDocument();
     expect(screen.queryByText('숨김')).not.toBeInTheDocument();
     expect(screen.queryByText('삭제')).not.toBeInTheDocument();
-    expect(screen.getByTestId('faq-count')).toHaveTextContent('(1)');
+    expect(screen.getByRole('heading', { level: 1, name: /FAQ\s*1/ })).toBeInTheDocument();
   });
 
   it('Q 클릭 시 A 가 펼쳐졌다가 닫힌다', async () => {
@@ -46,7 +56,8 @@ describe('FaqPage - user mode', () => {
     categoriesMock.mockReturnValue({ data: { rows: [baseCategory] }, isPending: false });
     listMock.mockReturnValue({
       data: { rows: [baseFaq], page: 1, per_page: 20, total: 1 },
-      isPending: false, isError: false,
+      isPending: false,
+      isError: false,
     });
     renderPage();
     expect(screen.queryByTestId(`faq-answer-${baseFaq.id}`)).not.toBeInTheDocument();
@@ -64,7 +75,8 @@ describe('FaqPage - user mode', () => {
     const b = { ...baseFaq, id: 'b', question: '회원 탈퇴' };
     listMock.mockReturnValue({
       data: { rows: [a, b], page: 1, per_page: 20, total: 2 },
-      isPending: false, isError: false,
+      isPending: false,
+      isError: false,
     });
     renderPage();
     await user.type(screen.getByTestId('faq-search-input'), '비밀');
@@ -89,7 +101,8 @@ describe('FaqPage - user mode', () => {
     const b = { ...baseFaq, id: 'b', question: 'Q-결제', category_id: 'cat-2' };
     listMock.mockReturnValue({
       data: { rows: [a, b], page: 1, per_page: 20, total: 2 },
-      isPending: false, isError: false,
+      isPending: false,
+      isError: false,
     });
     renderPage();
     expect(screen.getByText('Q-계정')).toBeInTheDocument();
@@ -106,14 +119,19 @@ describe('FaqPage - 관리 버튼 가시성 (10.5.1)', () => {
   beforeEach(() => {
     listMock.mockReturnValue({
       data: { rows: [baseFaq], page: 1, per_page: 20, total: 1 },
-      isPending: false, isError: false,
+      isPending: false,
+      isError: false,
     });
     categoriesMock.mockReturnValue({ data: { rows: [baseCategory] }, isPending: false });
   });
 
   it('admin 에게 관리 버튼이 보인다', () => {
     roleMock.mockReturnValue({
-      role: 'admin', isUser: false, isDev: false, isManager: false, isAdmin: true,
+      role: 'admin',
+      isUser: false,
+      isDev: false,
+      isManager: false,
+      isAdmin: true,
     });
     renderPage();
     expect(screen.getByTestId('faq-admin-toggle')).toBeInTheDocument();
@@ -121,7 +139,11 @@ describe('FaqPage - 관리 버튼 가시성 (10.5.1)', () => {
 
   it('manager 에게 관리 버튼이 보인다', () => {
     roleMock.mockReturnValue({
-      role: 'manager', isUser: false, isDev: false, isManager: true, isAdmin: false,
+      role: 'manager',
+      isUser: false,
+      isDev: false,
+      isManager: true,
+      isAdmin: false,
     });
     renderPage();
     expect(screen.getByTestId('faq-admin-toggle')).toBeInTheDocument();
@@ -135,7 +157,11 @@ describe('FaqPage - 관리 버튼 가시성 (10.5.1)', () => {
 
   it('dev 에게는 DOM 자체가 없다', () => {
     roleMock.mockReturnValue({
-      role: 'dev', isUser: false, isDev: true, isManager: false, isAdmin: false,
+      role: 'dev',
+      isUser: false,
+      isDev: true,
+      isManager: false,
+      isAdmin: false,
     });
     renderPage();
     expect(screen.queryByTestId('faq-admin-toggle')).not.toBeInTheDocument();
@@ -146,14 +172,19 @@ describe('FaqPage - 카테고리 관리 탭 가시성 (10.4.4)', () => {
   beforeEach(() => {
     listMock.mockReturnValue({
       data: { rows: [baseFaq], page: 1, per_page: 20, total: 1 },
-      isPending: false, isError: false,
+      isPending: false,
+      isError: false,
     });
     categoriesMock.mockReturnValue({ data: { rows: [baseCategory] }, isPending: false });
   });
 
   it('admin + admin mode 에서 "카테고리 관리" 탭이 보인다', () => {
     roleMock.mockReturnValue({
-      role: 'admin', isUser: false, isDev: false, isManager: false, isAdmin: true,
+      role: 'admin',
+      isUser: false,
+      isDev: false,
+      isManager: false,
+      isAdmin: true,
     });
     renderPage('/faq?mode=admin');
     expect(screen.getByTestId('faq-tab-categories')).toBeInTheDocument();
@@ -162,7 +193,11 @@ describe('FaqPage - 카테고리 관리 탭 가시성 (10.4.4)', () => {
 
   it('manager + admin mode 에서 "카테고리 관리" 탭은 숨김 (FAQ 항목 탭만)', () => {
     roleMock.mockReturnValue({
-      role: 'manager', isUser: false, isDev: false, isManager: true, isAdmin: false,
+      role: 'manager',
+      isUser: false,
+      isDev: false,
+      isManager: true,
+      isAdmin: false,
     });
     renderPage('/faq?mode=admin');
     expect(screen.queryByTestId('faq-tab-categories')).not.toBeInTheDocument();
@@ -171,7 +206,11 @@ describe('FaqPage - 카테고리 관리 탭 가시성 (10.4.4)', () => {
 
   it('admin 이지만 admin mode 가 아니면 탭 자체가 없다', () => {
     roleMock.mockReturnValue({
-      role: 'admin', isUser: false, isDev: false, isManager: false, isAdmin: true,
+      role: 'admin',
+      isUser: false,
+      isDev: false,
+      isManager: false,
+      isAdmin: true,
     });
     renderPage('/faq');
     expect(screen.queryByTestId('faq-admin-tabs')).not.toBeInTheDocument();

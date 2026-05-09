@@ -4,7 +4,7 @@
  * BE 403 is secondary defense.
  */
 import { Navigate } from 'react-router-dom';
-import { PageTitle } from '@widgets/app-shell';
+import { PageLayout, PageHeader } from '@widgets/app-shell';
 import { useRole } from '@entities/user/model/useRole';
 import { TagMasterTable } from '@features/admin/tag-master/TagMasterTable';
 
@@ -14,9 +14,8 @@ export default function AdminTagsPage() {
     return <Navigate to="/voc" replace />;
   }
   return (
-    <div style={{ padding: '24px' }}>
-      <PageTitle title="태그 마스터" />
+    <PageLayout header={<PageHeader title="태그 마스터" />}>
       <TagMasterTable />
-    </div>
+    </PageLayout>
   );
 }

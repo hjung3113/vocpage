@@ -38,7 +38,7 @@ export function PageHeader({ title, count, actions }: PageHeaderProps) {
             className="text-[color:var(--text-tertiary)]"
             style={{ fontSize: '13px', fontWeight: 400, marginLeft: '6px' }}
           >
-            ({count})
+            {count}
           </span>
         )}
       </h1>
