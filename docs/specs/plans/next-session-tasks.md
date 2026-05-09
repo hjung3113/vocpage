@@ -15,7 +15,7 @@
 | **/voc 완성** | [`voc-completion-driver.md`](./voc-completion-driver.md)                                                  | 🟢 `docs/voc-completion-single-pr` 9 commit, FE 469 / BE 111 PASS, code-review B-1·H-1·H-2 처리 — **PR open 대기** |
 | **1.6**       | [`wave-1-6-voc-parity.md`](./wave-1-6-voc-parity.md) (history)                                            | ✅ 잔여 η/ζ/D 모두 `/voc 완성` 단일 PR 로 흡수.                                                                    |
 | **1.7**       | [`wave-1-7-voc-create-modal.md`](./wave-1-7-voc-create-modal.md) (history)                                | ✅ Phase A 머지(PR #185) + B/C/D `/voc 완성` 단일 PR 로 흡수.                                                      |
-| **3 (draft)** | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) / [`0005`](../../adr/0005-trash-restore-policy.md) | 🟡 plan draft (사용자 승인 + OQ 5건 결정 대기 — `open-questions.md`). Wave 2 머지 + 마이그 012 머지 후 Phase A 진입. |
+| **3**         | [`wave-3-admin.md`](./wave-3-admin.md) + ADR [`0004`](../../adr/0004-admin-permission-model.md) (Accepted) / [`0005`](../../adr/0005-trash-restore-policy.md) (Accepted) | 🟢 OQ 5 건 close (2026-05-09 grill, PR-α `docs/wave-3-oq-sync`). Phase A 4 PR full-parallel 진입 가능 — W3-1 마이그 014 / W3-2 마이그 015 / W3-3 contract zod+openapi / W3-9 마이그 017. |
 
 ### Hard-blocks
 
@@ -68,8 +68,9 @@ migration 013 dev role / `assertCanManageVoc` 헬퍼 / FE/BE Role union `'dev'` 
 ### 권한·스키마 인프라 PR 후보
 
 - **8-PR1** = migration 013 실파일(F1) + dev role 4파일 동기화(F4·F6) + `assertCanManageVoc` 단일화(F3)
-- **8-PR2** = migration 014 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`) — D22 운영 차단
-- **8-PR3** = migration 015 (`vocs.deleted_by` / `voc_restore_log`) — D23 운영 차단
+- **8-PR2** (= W3-1) = migration 014 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`) — D22 운영 차단 (OQ-4 결정 2026-05-09)
+- **8-PR3** (= W3-2) = migration 015 (`vocs.deleted_by` / `voc_restore_log`) — D23 운영 차단
+- **8-PR4** (= W3-9) = migration 017 (`user_role_log` 별 테이블) — OQ-3 Option A (013/016 점유)
 
 ### 명세 보강 (M)
 

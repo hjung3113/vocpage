@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed (Wave 3 진입 전 사용자 결정 필요 — `docs/specs/plans/wave-3-admin.md §7 OQ-3 / OQ-4`)
+Accepted (2026-05-09 사용자 grill 결정 — OQ-3 / OQ-4 close).
 
 ## Context
 
@@ -13,7 +13,7 @@ Wave 3 Phase C 의 Trash 화면은 §8.9 Soft Delete 로 `deleted_at IS NOT NULL
 - **§9.4.7 영구삭제**: "MVP 는 영구삭제 비활성화 (disabled + tooltip "MVP는 영구삭제 미지원"). NextGen 활성화 자리만 확보."
 - **§9.4.7 복원**: "`PATCH /api/vocs/:id/restore` → `vocs.deleted_at=NULL` + `voc_history` `restore` 이벤트 + `tag_rules` 멱등 재실행."
 - **§D13 (`vocs.parent_id` ON DELETE SET NULL)**: 부모 hard delete 시 sub-task 보존 (D7 무기한 보존과 일관).
-- **§15.4 운영 갭 해소**: `vocs.deleted_by` / `voc_restore_log` 컬럼/테이블 추가 (마이그 015 — `next-session-tasks.md` 표기와 spec 표기 충돌 OQ-4).
+- **§15.4 운영 갭 해소**: `vocs.deleted_by` / `voc_restore_log` 컬럼/테이블 추가 (마이그 015, OQ-4 grill 결정 2026-05-09 — 014=Tag Master / 015=Trash / 017=user_role_log).
 - **§9.4.7 회귀 테스트 3 건**: (1) Manager `/trash` 호출 시 403, (2) 복원 후 일반 목록 노출, (3) 복원 시 `tag_rules` 재실행으로 `voc_tags.source='rule'` 재부착.
 
 미결 항목: 보존 기간(`§15.4` "30일 보존 후 자동 영구 삭제" ↔ §D7 "무기한"), cascade 룰(부모 hard delete 시 복원), audit 컬럼 정합, Manager 의 진입 권한 (404 vs 403).
@@ -97,8 +97,8 @@ Wave 3 Phase C 의 Trash 화면은 §8.9 Soft Delete 로 `deleted_at IS NOT NULL
 
 ## Follow-ups
 
-- [ ] OQ-3 사용자 결정 (`user_role_log` vs `voc_history` 확장) — Users 화면 audit 와 본 ADR `voc_restore_log` 의 정합 검토
-- [ ] OQ-4 사용자 결정 → 마이그 번호 (`015` vs `next-session-tasks.md` 8-PR3) 정합 + `next-session-tasks.md §권한·스키마 인프라 PR 후보` 동기화
-- [ ] `requirements.md §15.4` "30일 보존" 표현 → "MVP 무기한, NextGen 재논의" 동기화 PR
-- [ ] `feature-voc.md §9.4.7` 회귀 테스트 3 건 → 7 건 (sub-task / cascade / audit) 보강
+- [x] OQ-3 사용자 결정 (Option A — `user_role_log` 별 테이블) → 마이그 017 (PR-α docs/wave-3-oq-sync)
+- [x] OQ-4 사용자 결정 → 마이그 번호 014 Tag Master / 015 Trash / 017 user_role_log (013/016 점유) → `next-session-tasks.md §권한·스키마 인프라 PR 후보` 동기화 (PR-α)
+- [x] `requirements.md §15.4` "30일 보존" 표현 → "MVP 무기한, NextGen 재논의" (PR-α)
+- [ ] `feature-voc.md §9.4.7` 회귀 테스트 3 건 → 7 건 (sub-task / cascade / audit) 보강 — Wave 3 Phase C 에 동봉
 - [ ] NextGen 영구삭제 활성화 시 별 ADR 또는 본 ADR Status `Accepted → Superseded by 000X`

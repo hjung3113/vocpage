@@ -8,7 +8,7 @@
 
 - **Hard-block**: Wave 2 (Dashboard) 머지 완료 후에만 진입. 현재 `next-session-tasks.md` §"활성 작업"은 Wave 2 hard-block 명시.
 - **사용자 승인**: 본 plan 의 §3 결정·§5 ADR 결정·§6 Phase 게이트가 모두 사용자 승인된 후 Phase A 진입.
-- **ADR 결정 의존**: [`docs/adr/0004-admin-permission-model.md`](../../adr/0004-admin-permission-model.md) + [`docs/adr/0005-trash-restore-policy.md`](../../adr/0005-trash-restore-policy.md) 가 사용자 결정 (Status: Accepted) 으로 전환된 후 Phase B/C 진입 가능.
+- **ADR 결정 의존**: [`docs/adr/0004-admin-permission-model.md`](../../adr/0004-admin-permission-model.md) (Accepted 2026-05-09) + [`docs/adr/0005-trash-restore-policy.md`](../../adr/0005-trash-restore-policy.md) (Accepted 2026-05-09). Phase B/C 진입 unblock.
 
 ## 1. 배경
 
@@ -22,10 +22,10 @@
 
 | 화면 | 진입 동선 | 권한 (spec 인용) | FE 라우트 | BE 라우트 (신규) | 마이그 |
 | --- | --- | --- | --- | --- | --- |
-| **Tag Master** | 사이드바 `관리자` 그룹 → "태그 마스터" | Admin/Manager (`feature-voc.md §9.4.6`) — **§15.3 과 불일치, OQ-1** | `/admin/tags` | `GET /api/admin/tags` · `POST` · `PATCH /:id` · `DELETE /:id` · `POST /:id/merge` | 013 (`tags.is_external` / `tags.merged_into_id` / `tag_rules.suspended_until`) |
+| **Tag Master** | 사이드바 `관리자` 그룹 → "태그 마스터" | Manager+ add/edit · Admin only merge/외부잠금/영구삭제 (ADR 0004 Option D) · Read = Admin/Manager/Dev | `/admin/tags` | `GET /api/admin/tags` · `POST` · `PATCH /:id` · `DELETE /:id` · `POST /:id/merge` | 014 (`tags.is_external` / `tags.merged_into_id` / `tag_rules.suspended_until`) |
 | **Trash** | 사이드바 `관리자` 그룹 → "휴지통" | Admin only (`§15.4` + `feature-voc.md §9.4.7`) | `/admin/trash` | `GET /api/admin/vocs/trash` · `PATCH /api/vocs/:id/restore` | 015 (`vocs.deleted_by` / `voc_restore_log`) |
-| **External Masters** | 사이드바 `관리자` 그룹 → "외부 마스터" | Manager+ refresh, **읽기 권한 OQ-2** | `/admin/masters` | `POST /api/admin/masters/refresh` (기존 §16.3) + `GET /api/admin/masters/status` (신규) | 없음 (메모리 캐시 + JSON 파일) |
-| **Users** | 사이드바 `관리자` 그룹 → "사용자" | Admin only (§15.2 D14, §2.3) | `/admin/users` | `GET /api/admin/users` · `PATCH /api/admin/users/:id` (role, is_active) | 없음 (012 = 별 트랙으로 선행 — `migration-012-draft.md`) |
+| **External Masters** | 사이드바 `관리자` 그룹 → "외부 마스터" | Manager+ refresh · Read = Manager+ + Dev (ADR 0004 OQ-2 Option B) | `/admin/masters` | `POST /api/admin/masters/refresh` (기존 §16.3) + `GET /api/admin/masters/status` (신규) | 없음 (메모리 캐시 + JSON 파일) |
+| **Users** | 사이드바 `관리자` 그룹 → "사용자" | Admin only (§15.2 D14, §2.3). Audit = `user_role_log` (마이그 017, OQ-3 Option A) | `/admin/users` | `GET /api/admin/users` · `PATCH /api/admin/users/:id` (role, is_active) | 017 (`user_role_log` 별 테이블) — 012 (`users.role` enum) 별 트랙 선행 |
 
 ### 2.2 Out-of-scope (이 Wave 에서 다루지 않음)
 
@@ -44,8 +44,8 @@
 
 | ID | 항목 | 결정 (제안) | 근거 |
 | --- | --- | --- | --- |
-| W3-D1 | 권한 모델 | ADR 0004 — 화면별 차등 (Tag Master = Admin/Manager 양쪽 mutate / Trash = Admin only / Masters Refresh = Manager+ / Users = Admin only) | `requirements.md §2.3` + `§15.x` + `§16.3` + ADR 0004 |
-| W3-D2 | Trash 복구 정책 | ADR 0005 — 30 일 보존 + Admin 복원 + 영구삭제 disabled (NextGen) + `voc_restore_log` audit | `§15.4` + `feature-voc.md §9.4.7` + ADR 0005 |
+| W3-D1 | 권한 모델 | ADR 0004 Accepted — Option D: Tag Master `add`/`edit` = Manager+ / `merge`/`외부잠금`/`영구삭제` = Admin only · Trash = Admin only · External Masters refresh = Manager+ / read = Manager+ + Dev · Users = Admin only | `requirements.md §2.3` + `§15.x` + `§16.3` + ADR 0004 |
+| W3-D2 | Trash 복구 정책 | ADR 0005 Accepted — 무기한 보존 (D7) + Admin only 복원 + 영구삭제 disabled (NextGen) + `voc_restore_log` audit | `§15.4` + `feature-voc.md §9.4.7` + ADR 0005 |
 | W3-D3 | Phase 분할 | Phase A = 마이그·contract spec / Phase B = Tag Master / Phase C = Trash / Phase D = External Masters / Phase E = Users / Phase F = 종합 검증 | 본 plan §6 |
 | W3-D4 | PR 단위 | 화면당 1 PR (FE+BE+contract+fixture 동봉). 마이그 PR 은 별도 (Phase A). 영구삭제 placeholder 만 자리 확보. | D9 precedent (Wave 1.6) |
 | W3-D5 | TDD 의무 surface | 권한 매트릭스 (BE Jest+Supertest) + 마이그 (rollback) + Tag merge 트랜잭션 + Trash restore 의 `tag_rules` 재실행 | `CLAUDE.md §Engineering rules` "TDD for irreversible surface" |
@@ -68,8 +68,9 @@
 
 - **Wave 2 (Dashboard) 머지** — `next-session-tasks.md` 명시. Phase 8 기조상 dashboard 가 widget contract 도입 → admin 화면이 같은 contract 패턴을 재사용.
 - **마이그 012 (`users.role` enum 4 종)** — 별 트랙. `migration-012-draft.md` 정본. 본 Wave Phase E (Users) 진입 전 머지 필수.
-- **마이그 013 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR.
-- **마이그 015 (`vocs.deleted_by` / `voc_restore_log`)** — 본 Wave Phase A 1 PR. (`next-session-tasks.md §권한·스키마 인프라 PR 후보` 는 8-PR3 = 015 로 표기. **8-M1/M2 은 마이그 014 = `notices` 별 트랙** — OQ-4 명세 정합 필요.)
+- **마이그 014 (`tags.is_external` / `tags.merged_into_id` FK / `tag_rules.suspended_until`)** — 본 Wave Phase A 1 PR (W3-1, OQ-4 결정 2026-05-09).
+- **마이그 015 (`vocs.deleted_by` / `voc_restore_log`)** — 본 Wave Phase A 1 PR (W3-2).
+- **마이그 017 (`user_role_log` 별 테이블)** — 본 Wave Phase A 1 PR (W3-9, OQ-3 Option A). 016 은 별 트랙 점유.
 
 ### 5.2 외부 차단 (해소 불가 항목)
 
@@ -84,10 +85,11 @@
 ## 6. Phase 흐름
 
 ```
-Phase A: 마이그 + contract spec (코드 0줄 + SQL 2 PR)
-  ├─ 013_tag_master_ops.sql (tags.is_external / merged_into_id / tag_rules.suspended_until)
+Phase A: 마이그 + contract spec (코드 0줄 + SQL 3 PR + contract 1 PR · full parallel)
+  ├─ 014_tag_master_ops.sql (tags.is_external / merged_into_id / tag_rules.suspended_until)
   ├─ 015_trash_audit.sql (vocs.deleted_by / voc_restore_log)
-  ├─ shared/contracts/admin/{tag,trash,master,user}.ts (zod)
+  ├─ 017_user_role_log.sql (user_role_log 별 테이블 — OQ-3 Option A)
+  ├─ shared/contracts/admin/{tag,trash,master,user}.ts (zod) + openapi.yaml
   └─ 사용자 승인 게이트 ──┐
                           ▼
 Phase B: Tag Master 화면 (1 PR)
@@ -133,21 +135,33 @@ Phase F: 종합 검증
 
 | ID | Phase | 작업 (한 줄) | trigger / 비고 |
 | --- | --- | --- | --- |
-| W3-1 | A | 마이그 013 (`tag master ops` 컬럼 3 건) + rollback | spec §15.3 / §9.4.6 |
+| W3-1 | A | 마이그 014 (`tag master ops` 컬럼 3 건) + rollback | spec §15.3 / §9.4.6 (OQ-4) |
 | W3-2 | A | 마이그 015 (`trash audit` 컬럼 1 + 테이블 1) + rollback | spec §15.4 / §9.4.7 |
 | W3-3 | A | shared/contracts/admin/{tag,trash,master,user}.ts (zod) + openapi.yaml 갱신 | spec §6.1 |
-| W3-4 | B | Tag Master FE+BE+fixture+E2E (1 PR) | spec §9.4.6 |
+| W3-4 | B | Tag Master FE+BE+fixture+E2E (1 PR) | spec §9.4.6 (Option D 액션 분기) |
 | W3-5 | C | Trash FE+BE+fixture+E2E (1 PR) | spec §9.4.7 |
-| W3-6 | D | External Masters FE+BE+fixture+E2E (1 PR) | spec §16.3 |
-| W3-7 | E | Users FE+BE+fixture+E2E (1 PR) | spec §15.2 |
+| W3-6 | D | External Masters FE+BE+fixture+E2E (1 PR) | spec §16.3 (Manager+ + Dev read) |
+| W3-7 | E | Users FE+BE+fixture+E2E (1 PR — `user_role_log` 의존) | spec §15.2 |
 | W3-8 | F | 종합 검증 + progress 갱신 (1 PR) | gate close |
+| W3-9 | A | 마이그 017 (`user_role_log` 별 테이블) + rollback | OQ-3 Option A |
 
 > **R5 준수**: 묶음 PR 금지. W3-1 / W3-2 / W3-3 모두 별 PR. W3-4~W3-7 도 화면당 별 PR.
 > **R3 준수**: Phase A/B/C/D/E/F 는 grouping 메타데이터일 뿐 ID 에 부착 금지.
 
-## 7. Open Questions (사용자 결정 대기)
+## 7. Open Questions — closed (2026-05-09 grill)
 
-> 본 Wave 진입 전 사용자 답변 필수. 답변 후 정본 spec 동기화 PR 선행 (`CLAUDE.md` "spec 내부 불일치 발견 시 임의 결정 금지").
+> 5 건 모두 사용자 결정 + spec 동기화 (PR-α `docs/wave-3-oq-sync`) 완료. 본 절은 결정 요약만 남기고 옵션 분석 본문은 [`open-questions.md`](./open-questions.md) 와 ADR 0004 / 0005 에 흡수.
+
+| OQ | 결정 | spec sync |
+| --- | --- | --- |
+| OQ-1 Tag Master mutate | **Option D** — Manager+ add/edit · Admin only merge/외부잠금/영구삭제 | `requirements.md §15.3` + `feature-voc.md §9.4.6` + ADR 0004 |
+| OQ-2 External Masters read | **Option B** — Manager+ + Dev | `external-masters.md` |
+| OQ-3 Users role/is_active audit | **Option A** — `user_role_log` 별 테이블 (마이그 017) | `requirements.md §4` + 본 plan §6.2 W3-9 |
+| OQ-4 마이그 번호 | 014 Tag Master / 015 Trash / 017 user_role_log (013/016 점유) | `requirements.md §15.3 / §15.4` + `next-session-tasks.md` + 본 plan §2.1 / §5.1 / §6.2 |
+| OQ-5 사이드바 순서 | **Option B** — Result Review → Users → External Masters → Tag Master → Trash | `feature-voc.md §9.4` + `uidesign.md Sidebar Spacing` |
+
+<details>
+<summary>(아카이브) 결정 전 옵션 분석</summary>
 
 ### OQ-1 — Tag Master 권한: Admin only vs Admin/Manager
 
@@ -195,6 +209,8 @@ Phase F: 종합 검증
 - **결정 후**: `feature-voc.md §9.4` 또는 `uidesign.md §10.5` 에 sidebar admin 그룹 순서 박스 추가.
 
 > 위 OQ 5 건은 [`docs/specs/plans/open-questions.md`](./open-questions.md) (본 Wave 한정) 에 동기화. (.omc/plans/open-questions.md 가 아닌 docs/specs/plans/ 트리 내 파일 — 정본 위치는 docs hygiene 룰 §3 SoT).
+
+</details>
 
 ## 8. 위험과 대응
 

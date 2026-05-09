@@ -157,6 +157,10 @@
   - **UI**: VOC 상세 우측 패널에 **"Internal Notes"** 섹션을 공개 댓글과 별도 배치. warning/accent 계열 배경으로 시각 구분. User 로그인 시 DOM 자체에 비렌더링.
   - **Timeline 통합**: Manager/Admin 한정으로 공개 댓글 + internal note + status change를 시간순 혼합 표시하되 배지/배경으로 구분. User role은 internal note 이벤트를 Timeline API 응답에서 수신 불가.
   - **회귀 테스트 필수**: (1) User가 `/notes` 호출 시 404, (2) 공개 댓글 응답에 internal note 절대 미포함, (3) Timeline API에서 User는 internal note 이벤트 수신 불가.
+- **`user_role_log`** (OQ-3 Option A, Wave 3 Phase A 마이그 017, ADR 0004 audit 의무): Users 화면에서 Admin 이 role / `is_active` 변경 시 단일 audit row.
+  - 컬럼: `id(uuid)`, `user_id(FK→users.id, ON DELETE RESTRICT — audit 보호)`, `changed_by(FK→users.id NOT NULL — 변경자)`, `old_role(text)`, `new_role(text)`, `old_active(boolean)`, `new_active(boolean)`, `reason(text NULL)`, `created_at(timestamptz default now())`.
+  - 인덱스: `(user_id, created_at DESC)`.
+  - 보존: PIPA 7 년 (`§15.1.1` precedent).
 - **`notifications`**: 컬럼: `id`, `user_id`, `type(enum: comment/status_change/assigned)`, `voc_id`, `read_at`, `created_at`.
 - **`dashboard_settings`**: 컬럼: `id(uuid)`, `user_id(FK→users, NULL=Admin 기본값)`, `widget_order(jsonb)`, `widget_visibility(jsonb)`, `widget_sizes(jsonb)`, `locked_fields(jsonb)`, `default_date_range(enum: 1m/3m/1y/all/custom, default '1m')`, `heatmap_default_x_axis(enum: status/priority/tag)`, `globaltabs_order(jsonb, Admin 기본값 행에만 유효)`, `updated_at`. `user_id IS NULL` 행이 Admin 기본값, 로그인 사용자별 개인 설정은 `user_id` 지정.
   - JSONB 컬럼 예시 구조:
@@ -536,17 +540,18 @@ networks: 내부 bridge (frontend ↔ backend ↔ db)
 
 > 본문은 `feature-voc.md §9.4.6` 단일 출처. 진입점·권한·운영 차단 해소 항목만 본 절에서 포인터.
 
-- **진입점**: 관리자 페이지 → "태그 마스터" 서브탭 (사이드바 `관리자` 그룹 하단).
-- **권한**: Admin (병합/외부 잠금/규칙 일시중지). Manager 읽기 전용.
-- **운영 갭 해소**: `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` 컬럼 (Phase 8 마이그 013 예정).
+- **진입점**: 관리자 페이지 → "태그 마스터" 서브탭 (사이드바 `관리자` 그룹 — 순서 정본은 `feature-voc.md §9.4` 사이드바 박스).
+- **권한** (ADR 0004 Accepted, OQ-1 Option D — 2026-05-09): Manager+ `add`/`edit` 허용 · Admin only `merge` / 외부 잠금 (`tags.is_external` 토글) / 영구삭제 / 규칙 일시중지. Read = Admin / Manager / Dev.
+- **운영 갭 해소**: `tags.is_external`, `tags.merged_into_id` FK, `tag_rules.suspended_until` 컬럼 (Wave 3 Phase A 마이그 014, OQ-4 결정 2026-05-09).
 
 ### 15.4 휴지통 (D23)
 
 > 본문은 `feature-voc.md §9.4.7` 단일 출처. 진입점·권한·운영 차단 해소 항목만 본 절에서 포인터.
 
-- **진입점**: 관리자 페이지 → "휴지통" 서브탭 (사이드바 `관리자` 그룹 최하단). 30일 보존 후 자동 영구 삭제.
-- **권한**: Admin (복원/즉시 영구삭제). Manager 읽기 전용.
-- **운영 갭 해소**: `vocs.deleted_by`, `voc_restore_log` 테이블 (Phase 8 마이그 014 예정).
+- **진입점**: 관리자 페이지 → "휴지통" 서브탭 (사이드바 `관리자` 그룹 최하단 — 순서 정본은 `feature-voc.md §9.4`).
+- **보존**: **MVP 무기한** (D7 정합). NextGen 자동 영구삭제 cron 은 별 ADR 로 재논의 (ADR 0005 Accepted).
+- **권한**: Admin only (복원). 영구삭제는 MVP disabled (ADR 0005). Manager 진입 자체 차단(404, 존재 은닉).
+- **운영 갭 해소**: `vocs.deleted_by`, `voc_restore_log` 테이블 (Wave 3 Phase A 마이그 015, OQ-4 결정 2026-05-09).
 
 ---
 

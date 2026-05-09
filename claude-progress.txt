@@ -1,16 +1,15 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-09 grill 종료)
+## 다음 세션 시작점 (2026-05-09 PR-α 작성 완료)
 
-→ **PR-α2 머지 완료 (2026-05-09)** — `docs/uidesign-cleanup`. uidesign.md leak 16건 정리(prototype 4 / FE 경로 5 / tooling 1 / 이력 3 / contract 3) + 구조 보강(Surfaces level numbering / Type·Spacing·Shadow·Radius 표 / §15 Agent Prompt Guide) + uidesign 단독 정책 블록을 root CLAUDE.md 한 곳으로 통합하고 AGENTS.md·frontend·prototype CLAUDE.md 의 룰 중복 제거. CLAUDE.md 197→114줄.
+→ **PR-α 작성 완료 (2026-05-09)** — `docs/wave-3-oq-sync`. OQ-1~5 close (사용자 grill) + ADR 0004/0005 Accepted + 11 파일 spec sync (ADR 2 + plans 4 + requires 4 + progress 1). uidesign.md leak grep 0 net new 유지 (baseline 2 hits 그대로). 사용자 PR open 대기.
 
-→ **다음 세션 우선: 3 PR 병렬 작성 (Wave 3 진입 unblock + Wave 4 hotfix)**
-   - **PR-α**  `docs/wave-3-oq-sync`           — OQ-1~5 결정 반영 + ADR 0004/0005 Accepted + spec sync 10개 + 사이드바 양쪽 갱신
-   - **PR-β**  `fix/fu-001-dompurify`          — dompurify + SafeHtml wrapper, 4 surfaces (XSS, 가장 시급)
-   - **PR-γ**  `fix/fu-002-notice-faq-indexes` — 마이그 018 (notices/faqs hot-path 인덱스)
-   3 worktree 동시 작성, 의존성 0, 머지 순서 무관.
+→ **다음 세션 우선: 남은 2 PR 병렬 작성 (Wave 4 hotfix)**
+   - **PR-β**  `fix/fu-001-dompurify`          — dompurify + SafeHtml wrapper, 4 surfaces (XSS, 가장 시급) — FU-001
+   - **PR-γ**  `fix/fu-002-notice-faq-indexes` — 마이그 018 (notices/faqs hot-path 인덱스) — FU-002
+   2 worktree 동시 작성, 의존성 0, 머지 순서 무관.
 
-→ **머지 후 진입 순서**
+→ **머지 후 진입 순서** (PR-α 머지 후)
    1. Wave 3 Phase A — **4 PR full parallel**: W3-1=마이그 014 / W3-2=마이그 015 / W3-3=contract zod+openapi / W3-9=마이그 017
    2. Phase B+C 병렬 (Tag Master + Trash) → Phase D+E 병렬 (External Masters + Users) → Phase F 종합 검증
    3. FU-003/4/5 = Phase A 머지 후 idle slot 에서 hotfix-style. FU-006~009(P2) = Wave 3 close 후 batch.

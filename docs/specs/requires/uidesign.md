@@ -530,6 +530,21 @@ Three distinct tiers for scannable information density:
 - **Gap between sidebar sections**: `8px` minimum spacing between the last item of one group and the label of the next
 - **Section label purpose**: Acts as a visual divider — must have enough top padding (≥14px) to feel separate from the preceding nav group
 
+### Sidebar Admin Group — Item Order
+
+Fixed top-to-bottom order for the `관리자` (admin) section. Visual rendering only — role-guarded behaviour and routing live in `feature-voc.md §9.4`.
+
+| Order | Label | Notes |
+| ----- | ----- | ----- |
+| 1 | Result Review | top of group |
+| 2 | Users | |
+| 3 | External Masters | |
+| 4 | Tag Master | |
+| 5 | Trash | bottom — destructive surface anchored last |
+
+- Items hidden by role guard collapse — sibling spacing (`8px` section gap) is preserved across the remaining items.
+- Active state styling reuses the base `Sidebar Navigation Items` rules; no admin-specific colour overrides.
+
 ### Content Width Policy
 
 All page content areas expand freely with screen width. No per-page `max-width` constraint on the content body.

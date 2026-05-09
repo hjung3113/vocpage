@@ -529,6 +529,18 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 
 ### 9.4 관리자 페이지 상세 명세
 
+**사이드바 `관리자` 그룹 항목 순서** (OQ-5 Option B, 2026-05-09 grill 결정):
+
+| 순서 | 항목 | 노출 role |
+| --- | --- | --- |
+| 1 | Result Review | Admin / Manager |
+| 2 | Users | Admin only |
+| 3 | External Masters | Admin / Manager / Dev (read) |
+| 4 | Tag Master | Admin / Manager / Dev (read) |
+| 5 | Trash | Admin only (Manager/Dev/User 미노출 — 존재 은닉) |
+
+> 시각 토큰·간격은 `uidesign.md Sidebar Spacing` 정본. 본 표는 동작·권한 정의만.
+
 #### 9.4.1 태그 규칙 관리
 
 - 테이블: 키워드 목록(쉼표 구분) | 생성 태그명 | 매칭 방식(키워드) | 작업(수정/삭제)
@@ -654,7 +666,10 @@ FE 가드: window.currentUser.role ∈ {manager, admin}일 때만 승인/반려 
 #### 9.4.6 태그 마스터 관리 (D22 확정, 2026-04-27)
 
 - **목적**: `tags` 테이블의 마스터 레코드(`name`, `kind`, `slug`)를 UI로 관리. §8.8.1이 "신규 태그 생성은 Admin/Manager 전용 관리 페이지에서만 가능"으로 규정한 진입점을 충족.
-- **권한**: Admin/Manager (시스템/메뉴/유형 관리와 동일 정책).
+- **권한** (ADR 0004 Accepted, OQ-1 Option D — 2026-05-09):
+  - **Read** (목록·상세): Admin / Manager / Dev.
+  - **Manager+ mutate** (일상 운영): `POST /api/admin/tags` (add) · `PATCH /api/admin/tags/:id` (edit name).
+  - **Admin only mutate** (irreversible 보호): `POST /api/admin/tags/:id/merge` (병합) · `tags.is_external` 외부잠금 토글 · `DELETE /api/admin/tags/:id` (영구삭제 — 사용 VOC 수=0 + 규칙 참조 0 일 때만) · `tag_rules.suspended_until` 일시중지.
 - **테이블 컬럼**: 태그명 | 슬러그 | 종류(`general`/`menu`) | 사용 VOC 수(`voc_tags` 카운트) | 작업(편집/삭제 또는 병합).
 - **추가**: "태그 추가" 버튼 → 모달(이름·kind·자동 생성 슬러그). 동일 `name+kind` 중복 방지(전역 UNIQUE).
 - **편집**: 행 우측 편집 버튼 → 모달. `kind` 변경은 차단(태그 의미 보존). `name` 변경 시 슬러그 자동 갱신 옵션은 미제공(레거시 슬러그 보호).
