@@ -104,7 +104,10 @@ export async function renameTag(id: string, name: string) {
   try {
     const result = await pool.query(
       `UPDATE tags SET name = $1 WHERE id = $2
-       RETURNING id, name, slug, kind, is_external, created_at`,
+       RETURNING id, name, slug, kind, is_external,
+                 (SELECT COUNT(*)::int FROM voc_tags WHERE tag_id = tags.id) AS usage_count,
+                 (SELECT COUNT(*)::int FROM tag_rules WHERE tag_id = tags.id) AS rule_ref_count,
+                 created_at`,
       [name, id],
     );
     if (result.rowCount === 0) {
@@ -184,7 +187,10 @@ export async function toggleExternal(id: string, isExternal: boolean) {
   const pool = getPool();
   const result = await pool.query(
     `UPDATE tags SET is_external = $1 WHERE id = $2
-     RETURNING id, name, slug, kind, is_external, created_at`,
+     RETURNING id, name, slug, kind, is_external,
+               (SELECT COUNT(*)::int FROM voc_tags WHERE tag_id = tags.id) AS usage_count,
+               (SELECT COUNT(*)::int FROM tag_rules WHERE tag_id = tags.id) AS rule_ref_count,
+               created_at`,
     [isExternal, id],
   );
   if (result.rowCount === 0) {

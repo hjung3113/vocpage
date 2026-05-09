@@ -74,10 +74,15 @@ export function TagMasterRow({
             onClick={() => onMerge(tag)}
             testId={`btn-merge-${tag.id}`}
           />
+          {/*
+            일시중지: tag_rules.id 별 액션이라 tag row 에서 직접 호출 불가.
+            (Codex P2 — tag.id 를 rule id 자리에 넘기는 오매핑.)
+            규칙 선택 UI 가 들어올 때까지 disabled placeholder.
+          */}
           <ActionButton
             icon={<PauseCircle size={13} />}
             label="일시중지"
-            enabled={isAdmin}
+            enabled={false}
             onClick={() => onSuspend(tag.id)}
             testId={`btn-suspend-${tag.id}`}
           />
