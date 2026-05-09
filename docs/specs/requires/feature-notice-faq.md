@@ -74,7 +74,7 @@
 | 내용            | richtext (Toast UI Editor) | 필수                                        |
 | 중요도          | enum: 일반/중요/긴급       | 목록에서 시각적 강조                        |
 | 팝업 여부       | boolean                    | 로그인 시 팝업 표시 여부                    |
-| 노출 기간(차한) | date range (from~to)       | 기간 외에는 자동 비노출 (삭제 아님)         |
+| 노출 기간(차한) | timestamptz range (from~to) | 기간 외에는 자동 비노출 (삭제 아님). 컬럼은 `timestamptz` 로 instant 보존 (마이그 016). 정책 / 현 구현 상태는 §10.3.3-bis 참조. |
 | 노출 여부       | boolean                    | Admin/Manager가 수동으로 보이기/숨기기 제어 |
 
 #### 10.3.2 로그인 팝업 동작
@@ -95,6 +95,17 @@
 - 노출 기간 내이고 노출 여부 = ON인 공지만 표시
 - 중요도에 따른 배지(일반/중요/긴급) 시각 표시
 - 제목 클릭 시 상세 내용 표시 (드로어 또는 인라인 펼침)
+
+#### 10.3.3-bis 노출 기간 시간 의미론 (FU-007 / 8-M2 흡수)
+
+- DB 컬럼 타입: `timestamptz` (마이그 016, 2026-05-09 머지). instant 보존 — TZ 변환은 표시 단에서.
+- 운영 가정: 대한민국 표준시 (KST = UTC+9) — DST 없음 → 단일 오프셋. 정책상 사용자 의도 = "한국 시간 자정 경계".
+- 비교 술어는 `visible_from <= now() AND visible_to >= now()` (`backend/src/repository/notices.ts:49-50`). 양 끝점 **모두 inclusive** — `to = 2026-05-10T00:00:00+09:00` 인 공지는 KST 5/10 자정 정확히 그 instant 까지 노출된다 (의도된 inclusive-end).
+- **현 구현 상태 (2026-05-09)** — *aspirational vs descriptive*:
+  - **정책 (목표)**: Admin UI 가 날짜만 입력하면 KST 자정 (`YYYY-MM-DDT00:00:00+09:00`) 으로 정규화되어 저장.
+  - **현 코드**: FE (`frontend/src/pages/notice/NoticeFormDialog.tsx:39-40`) 가 `new Date(form.visible_from).toISOString()` 으로 직렬화 → 브라우저 로컬 TZ 해석 후 UTC 출력. KST 브라우저에서는 `2026-05-09` → `2026-05-09T00:00:00.000Z` (UTC 자정 = KST 09:00 — 의도와 9 시간 차이). BE (`backend/src/routes/notices.ts:83`, `repository/notices.ts:97`) 는 어떤 정규화도 수행하지 않고 그대로 저장.
+  - **Trigger**: 정규화 구현은 **FU-025 trigger** — FE 의 `+09:00` 오프셋 직렬화 또는 BE 의 date-only 입력 자동 KST midnight 변환 둘 중 하나 (정책 결정은 FU-025 PR 에서).
+- API 직접 호출자 (외부 통합) 가 다른 오프셋 (`+00:00` 등) 으로 보낼 경우 그 instant 그대로 저장 — 강제 KST 오프셋 정규화는 BE validator 가 수행하지 **않는다** (의도적 — `timestamptz` 가 instant 를 보존하므로 표시 시점에 클라이언트 timezone 으로 변환). 본 정책은 FU-025 가 FE-only fix 를 채택해도 그대로 유지.
 
 #### 10.3.4 Admin/Manager 관리 기능
 

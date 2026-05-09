@@ -63,7 +63,7 @@ migration 013 dev role / `assertCanManageVoc` 헬퍼 / FE/BE Role union `'dev'` 
 ### 명세 보강 (M)
 
 - **8-M1** `005_content.sql` `faq_categories.slug UNIQUE`/`is_archived` §10.4 보완
-- **8-M2** `notices.visible_from/to` → `timestamptz` + KST 자정 명문화
+- ~~**8-M2** `notices.visible_from/to` → `timestamptz` + KST 자정 명문화~~ — FU-007 흡수 (2026-05-09): 마이그 016 스키마 + `requirements.md §4` + `feature-notice-faq.md §10.3` doc 업데이트.
 - **8-M3** external-masters refresh 스케줄러/실패 처리 spec (Q5 반영)
 - **8-M4** FE 미정의 토큰 정리 — `MockLoginPage.tsx:48,57` `--border` → `--border-standard`, `--danger` → `--status-red`
 
