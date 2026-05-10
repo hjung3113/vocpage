@@ -3,3 +3,4 @@
  */
 export * from './entity';
 export * from './io';
+export * from './summary';

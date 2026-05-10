@@ -503,7 +503,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get KPI summary (8 metrics) */
+        /** Get KPI summary (8 metrics — Volume + Quality) */
         get: operations["getDashboardSummary"];
         put?: never;
         post?: never;
@@ -1772,15 +1772,28 @@ export interface components {
         SystemListResponse: {
             rows: components["schemas"]["SystemListItem"][];
         };
+        /** @enum {string} */
+        KpiDeltaKind: "percent" | "count" | "days" | "percentage_point";
+        KpiMetric: {
+            value: number;
+            delta: number | null;
+            delta_kind: components["schemas"]["KpiDeltaKind"];
+        };
+        KpiVolume: {
+            total_voc: components["schemas"]["KpiMetric"];
+            unresolved: components["schemas"]["KpiMetric"];
+            this_week_new: components["schemas"]["KpiMetric"];
+            this_week_completed: components["schemas"]["KpiMetric"];
+        };
+        KpiQuality: {
+            avg_resolution_days: components["schemas"]["KpiMetric"];
+            resolution_rate: components["schemas"]["KpiMetric"];
+            urgent_high_unresolved: components["schemas"]["KpiMetric"];
+            overdue_14d: components["schemas"]["KpiMetric"];
+        };
         DashboardSummary: {
-            total: number;
-            open: number;
-            in_progress: number;
-            completed: number;
-            dropped: number;
-            urgent: number;
-            overdue: number;
-            avg_resolution_days: number;
+            kpi_volume: components["schemas"]["KpiVolume"];
+            kpi_quality: components["schemas"]["KpiQuality"];
         };
         RglLayoutItem: {
             i: string;
@@ -2154,6 +2167,8 @@ export interface components {
         dashboardAssigneeId: string;
         dashboardStartDate: string;
         dashboardEndDate: string;
+        /** @description Date-range preset. Overrides the user's default_date_range. Required iff using a fixed window; with `custom`, supply startDate+endDate. */
+        dashboardRange: "1m" | "3m" | "1y" | "all" | "custom";
     };
     requestBodies: never;
     headers: never;
@@ -3041,6 +3056,8 @@ export interface operations {
                 assigneeId?: components["parameters"]["dashboardAssigneeId"];
                 startDate?: components["parameters"]["dashboardStartDate"];
                 endDate?: components["parameters"]["dashboardEndDate"];
+                /** @description Date-range preset. Overrides the user's default_date_range. Required iff using a fixed window; with `custom`, supply startDate+endDate. */
+                range?: components["parameters"]["dashboardRange"];
             };
             header?: never;
             path?: never;
@@ -3048,7 +3065,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description KPI summary */
+            /** @description KPI summary (Volume + Quality, 8 metrics) */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3057,7 +3074,9 @@ export interface operations {
                     "application/json": components["schemas"]["DashboardSummary"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getDashboardDistribution: {
