@@ -1,6 +1,29 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 2 Phase B 머지 완료 — 사용자 피드백 대기 → Phase C/E)
+## 다음 세션 시작점 (2026-05-10 PageFrame 프리미티브 + VOC 마이그 — branch `refactor/page-frame-primitives`, PR 대기)
+
+→ **PageFrame 아키텍처 도입 (브랜치 `refactor/page-frame-primitives`, 4 commits)** — 사용자 PR 생성 대기:
+   - **원인 진단 — 더블 스크롤**: AppShell `<main>` 의 `overflow-auto` 와 `BodyScrollLayout` 본문 `overflow-auto` 가 동시 활성. 대시보드는 RGL 이 명시 height 를 주입해 main 이 함께 스크롤바를 띄움.
+   - **아키텍처 — 2-레이어 프리미티브 합성**: `PageFrame` (AppShell↔페이지 경계 유일 계약, `absolute inset-0 flex flex-col`) + 4 프리미티브 (`Sticky` / `Sticky variant=toolbar` / `Scroll` / `SplitRow` / `SidePanel`). 페이지는 flex chain 책임 없음 → 합성만.
+   - **`StickyHeaderLayout` sugar (이름 변경)**: 기존 `BodyScrollLayout` 을 PageFrame 합성으로 재작성. 외부 시그니처 동일 → 8 페이지 무변경 유지. 이름 변경 이유: body 만 스크롤하려면 헤더를 형제로 받아야 하므로 본질은 "헤더 sticky 레이아웃".
+   - **`<main>` invariant**: `overflow-auto` → `overflow-hidden`. 모든 페이지가 PageFrame 으로 main 패딩박스를 채우므로 main 은 절대 스크롤바를 띄울 수 없음 → 더블 스크롤 구조적 차단.
+   - **`PageLayout` 삭제** + 라우터 스텁 2개(StubPage / HealthPage) → `StickyHeaderLayout` (EmptyState 한 줄, overflow 발생 X).
+   - **VOC 마이그**: 인라인 `flex flex-col h-full` + 수동 `overflow-hidden` row 체인 제거. `Sticky × 3 (Topbar / Status / Advanced) + SplitRow ⊃ Scroll(padded=false) + VocSidePanel`. 거동 100% 보존 (페이지네이션 동반 스크롤 포함).
+   - **MSW dashboard 핸들러** (`/api/dashboard/{settings,summary}`): 별도 commit (`test(msw):`).
+   - **검증**: typecheck 0 / FE 603 pass / lint 0 / 토큰 lint 0.
+
+→ **다음 세션 작업** (우선순위 순):
+   1. PR 생성 + 사용자 시각 검증 (대시보드 / VOC / 8 페이지 더블 스크롤 0 확인).
+   2. vite proxy 포트 정합 (3001→3000 또는 BE 포트 변경) — 별건.
+   3. **Wave 2 Phase C** — 7 endpoint BE 단일 PR + 7 위젯 FE PR (분포/매트릭스/히트맵/트렌드/SLA/담당자/Top10).
+   4. **Phase E** — DashboardSettingsDialog.
+   5. 운영/배포 phase.
+
+→ **마이그 번호** — 다음 = **023**.
+
+---
+
+## 이전 세션 시작점 (2026-05-10 Wave 2 Phase B 머지 완료 — 사용자 피드백 대기 → Phase C/E)
 
 → **Wave 2 Phase B KPI Volume + Quality 머지 완료** (PR #297 BE + PR #298 FE, 2026-05-10):
    - **BE (PR #297)**: `GET /api/dashboard/summary` (8 KPI = Volume × 4 + Quality × 4). `dashboard-metrics.repo.ts` (5 SQL: countCreatedAndCompleted / snapshotUnresolved / snapshotUrgentHighUnresolved / snapshotOverdue14d / avgResolutionDaysInWindow) + `services/dashboard/summary.service.ts` (KST midnight helpers, `default_date_range` fallback user → admin → '1m', custom-range validation, 전주 동기간/동시점 delta 산출) + `routes/dashboard-summary.ts` (auth + `requireRole('dev','manager','admin')` — User 403). `index.ts` 마운트.
