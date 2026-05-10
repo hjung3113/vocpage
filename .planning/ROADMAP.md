@@ -5,7 +5,7 @@ Coverage: 5/5 v1 requirements mapped (REQ-admin-pages-wave split across Phases 1
 
 ## Phases
 
-- [ ] **Phase 1: Tag Rules Consolidation** — Wave 4 Phase A: `/admin/tags` row-action으로 tag_rules CRUD 통합.
+- [x] **Phase 1: Tag Rules Consolidation** — Wave 4 Phase A: `/admin/tags` row-action으로 tag_rules CRUD 통합. **(8/8 plans complete; SC-1..5 verified 2026-05-11)**
 - [ ] **Phase 2: VOC Types Management** — Wave 4 Phase B: `/admin/voc-types` 신설 (CRUD + archive + 색상 swatch).
 - [ ] **Phase 3: Systems & Menus Management** — Wave 4 Phase C: `/admin/systems` 신설 (cascade + "기타" auto-create + archive cascade).
 - [ ] **Phase 4: Dashboard Custom Round-trip + Migration 023** — 운영 DB 마이그 023 적용 + Dashboard custom 통합 검증. **Gated by ADR-0007 (Proposed).**
@@ -27,14 +27,14 @@ Coverage: 5/5 v1 requirements mapped (REQ-admin-pages-wave split across Phases 1
   5. Spec 동기화 (feature-voc.md §9.4.1, routing-conventions.md, shared/openapi.yaml의 TagRule 스키마)가 동일 PR로 동봉된다.
 **Plans**: 8 plans
 Plans:
-- [ ] 01-01-PLAN.md — Wave 0 scaffolds: matcher audit + parity script generalize + RED tests for mig 024 & D-11 optimistic
-- [ ] 01-02-PLAN.md — Mig 024 SQL (keywords[]+match_mode+created_by add, pattern drop) + tests GREEN + reconcile pattern readers (TDD)
+- [x] 01-01-PLAN.md — Wave 0 scaffolds: matcher audit + parity script generalize + RED tests for mig 024 & D-11 optimistic
+- [x] 01-02-PLAN.md — Mig 024 SQL (keywords[]+match_mode+created_by add, pattern drop) + tests GREEN + reconcile pattern readers (TDD)
 - [x] 01-03-PLAN.md — OpenAPI rewrite to nested paths + zod TagRule/TagRuleCreate/TagRulePatch/TagRuleListQuery/TagRuleListResponse + parity tests
 - [x] 01-04-PLAN.md — [BLOCKING] mig 024 push + 5 nested BE routes + permission matrix + IDOR/created_by-injection tests (TDD)
 - [x] 01-05-PLAN.md — 5 FE TanStack hooks (D-11 optimistic) + MSW handlers + optimistic.test GREEN (TDD)
-- [ ] 01-06-PLAN.md — KeywordChipInput component + TagRulesManagerModal (Dialog + sub-table + permission gating)
-- [ ] 01-07-PLAN.md — TagMasterTable 규칙 N건 column + TagRulesFlatTable + page view-mode tabs + URL state + page integration test
-- [ ] 01-08-PLAN.md — Spec sync (feature-voc.md §9.4.1 + routing-conventions.md) + final SC-3 grep gate evidence
+- [x] 01-06-PLAN.md — KeywordChipInput component + TagRulesManagerModal (Dialog + sub-table + permission gating)
+- [x] 01-07-PLAN.md — TagMasterTable 규칙 N건 column + TagRulesFlatTable + page view-mode tabs + URL state + page integration test
+- [x] 01-08-PLAN.md — Spec sync (feature-voc.md §9.4.1 + routing-conventions.md) + final SC-3 grep gate evidence
 **UI hint**: yes
 
 ### Phase 2: VOC Types Management

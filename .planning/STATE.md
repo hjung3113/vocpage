@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-11T00:47:00.000Z"
+last_updated: "2026-05-11T00:55:24.000Z"
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 8
-  completed_plans: 7
-  percent: 88
+  completed_plans: 8
+  percent: 100
 ---
 
 # STATE — vocpage
@@ -22,10 +22,10 @@ progress:
 
 ## Current Position
 
-- **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-04 + 01-05 + 01-06 + 01-07 complete (Wave 3 — BE 5 nested routes + FE 5 hooks with D-11 optimistic + FE Modal/ChipInput + Page wiring/view-mode tabs/?q debounce); 01-08 next (spec sync + grep gate).
-- **Status**: Waves 0-3 landed + Page integration shipped — scaffolds, mig 024, contract consolidation, BE handlers under /admin/tags/:tagId/rules (D-13 matrix + IDOR + server-derived created_by), FE hooks + MSW handlers + optimistic GREEN, TagRulesManagerModal + KeywordChipInput, /admin/tags 페이지에서 view-mode tabs (태그/전체 규칙) + ?view/?q URL state + 250ms debounce + cross-tag flat rules table. BE 625 pass; FE 721 pass; parity 10/11 OK.
-- **Progress**: ████████░░ Phase 1: 7/8 plans complete; 0/7 phases overall.
+- **Phase**: 1 — Tag Rules Consolidation **COMPLETE** (all 8 plans landed; SC-1..5 verified).
+- **Plan**: 01-08 complete — feature-voc.md §9.4.1 rewritten + routing-conventions.md /admin/tag-rules entry removed + §10.4.1 ?view=/?q= convention added; SC-3 grep gate = 0 hits.
+- **Status**: Phase 1 closed. Waves 0–4 fully landed: scaffolds + mig 024 + contracts + BE 5 nested routes (D-13 matrix + IDOR + server-derived created_by) + FE hooks/MSW with D-11 optimistic + TagRulesManagerModal + KeywordChipInput + /admin/tags page (view-mode tabs + ?view/?q URL state + 250ms debounce + cross-tag flat rules table) + spec sync (this plan). BE 625 pass; FE 721 pass; parity 10/11 OK; lint clean.
+- **Progress**: ██████████ Phase 1: 8/8 plans complete; 1/7 phases overall.
 
 ## Performance Metrics
 
@@ -73,4 +73,4 @@ progress:
 
 ## Next Action
 
-Plan 01-05 (Wave 3 — FE hooks: queryKey + msw handler updates) and Plan 01-06 (FE Modal) can now run in parallel against the live BE contract.
+Phase 1 ready for `/gsd-verify-work` + PR open. Subsequent: Phase 2 (voc_types color + merge) or Phase 3 (systems/menus admin) per ROADMAP priority.
