@@ -106,8 +106,8 @@ function renderModal(onClose = vi.fn()) {
 describe('TagRulesManagerModal', () => {
   it('renders header with tag name + rule count + subtitle', () => {
     renderModal();
-    expect(screen.getByText(/버그/)).toBeInTheDocument();
-    expect(screen.getByText(/규칙 2건/)).toBeInTheDocument();
+    // Header copy: "버그 · 규칙 2건"
+    expect(screen.getByText('버그 · 규칙 2건')).toBeInTheDocument();
     expect(screen.getByText('자동 태깅 규칙 관리')).toBeInTheDocument();
   });
 
@@ -159,7 +159,7 @@ describe('TagRulesManagerModal', () => {
     renderModal();
     // Open first row's action menu
     const menuTriggers = screen.getAllByTestId('rule-action-menu');
-    await user.click(menuTriggers[0]);
+    await user.click(menuTriggers[0]!);
     expect(screen.queryByRole('menuitem', { name: '삭제' })).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: '일시중지' })).not.toBeInTheDocument();
     // 수정 still visible
@@ -170,7 +170,7 @@ describe('TagRulesManagerModal', () => {
     const user = userEvent.setup();
     renderModal();
     const menuTriggers = screen.getAllByTestId('rule-action-menu');
-    await user.click(menuTriggers[0]);
+    await user.click(menuTriggers[0]!);
     await user.click(screen.getByRole('menuitem', { name: '삭제' }));
     // Confirm dialog
     expect(screen.getByText(/삭제된 규칙은 복구할 수 없습니다/)).toBeInTheDocument();
