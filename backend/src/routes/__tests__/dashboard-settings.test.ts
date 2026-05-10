@@ -364,3 +364,42 @@ describe('PUT /api/dashboard/settings (P1-3: globaltabs_order requires scope=adm
     expect(res.body.code).toBe('FORBIDDEN_GLOBALTABS_ORDER_SCOPE');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase E item 1: GET ?scope=admin returns admin-default raw row (admin only)
+// ---------------------------------------------------------------------------
+
+describe('GET /api/dashboard/settings (Phase E: scope=admin)', () => {
+  test('admin GET ?scope=admin returns raw admin-default row', async () => {
+    const adminRow = { ...baseAdminRow, default_date_range: '1y', heatmap_default_x_axis: 'priority' };
+    mockRepo.getAdminDefault.mockResolvedValue(adminRow);
+
+    const res = await request(makeApp(ADMIN_ID, 'admin'))
+      .get('/api/dashboard/settings?scope=admin');
+
+    expect(res.status).toBe(200);
+    expect(res.body.user_id).toBeNull();
+    expect(res.body.default_date_range).toBe('1y');
+    expect(res.body.heatmap_default_x_axis).toBe('priority');
+    expect(mockRepo.getByUserId).not.toHaveBeenCalled();
+  });
+
+  test('non-admin GET ?scope=admin → 403 FORBIDDEN_ADMIN_SCOPE', async () => {
+    const res = await request(makeApp(USER_ID, 'user'))
+      .get('/api/dashboard/settings?scope=admin');
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('FORBIDDEN_ADMIN_SCOPE');
+  });
+
+  test('admin GET without scope param still returns merged (regression)', async () => {
+    mockRepo.getAdminDefault.mockResolvedValue(baseAdminRow);
+    mockRepo.getByUserId.mockResolvedValue(baseUserRow);
+
+    const res = await request(makeApp(ADMIN_ID, 'admin')).get('/api/dashboard/settings');
+
+    expect(res.status).toBe(200);
+    expect(res.body.user_id).toBe(ADMIN_ID === res.body.user_id ? ADMIN_ID : USER_ID);
+    expect(mockRepo.getByUserId).toHaveBeenCalled();
+  });
+});

@@ -24,12 +24,24 @@ vi.mock('../model/useUpdateDashboardSettings', () => ({
   useUpdateDashboardSettings: vi.fn(),
 }));
 
+vi.mock('@features/auth', () => ({
+  useAuth: vi.fn(),
+}));
+
 import { useDashboardSettings } from '../model/useDashboardSettings';
 import { useUpdateDashboardSettings } from '../model/useUpdateDashboardSettings';
+import { useAuth } from '@features/auth';
 import { DashboardSettingsDialog } from '../ui/DashboardSettingsDialog';
 
 const mockUseDashboardSettings = vi.mocked(useDashboardSettings);
 const mockUseUpdateDashboardSettings = vi.mocked(useUpdateDashboardSettings);
+const mockUseAuth = vi.mocked(useAuth);
+
+function setUserRole(role: 'admin' | 'manager' | 'dev' | 'user') {
+  mockUseAuth.mockReturnValue({
+    user: { id: 'u1', name: 'mock', role },
+  } as unknown as ReturnType<typeof useAuth>);
+}
 
 const baseSettings: DashboardSettings = {
   user_id: 'user-1',
@@ -54,6 +66,7 @@ function renderDialog() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  setUserRole('user');
   mockUseUpdateDashboardSettings.mockReturnValue({
     mutate: mockMutate,
     isPending: false,
@@ -187,4 +200,5 @@ describe('DashboardSettingsDialog', () => {
 
     expect(within(dialog).queryByRole('radio', { name: /사용자 지정/ })).not.toBeInTheDocument();
   });
+
 });

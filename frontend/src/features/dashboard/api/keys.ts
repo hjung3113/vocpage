@@ -2,7 +2,7 @@ import type { DashboardFilter, DistributionFilter, HeatmapFilter, WeeklyTrendFil
 
 export const dashboardQueryKeys = {
   all: ['dashboard'] as const,
-  settings: () => ['dashboard', 'settings'] as const,
+  settings: (scope: 'self' | 'admin' = 'self') => ['dashboard', 'settings', scope] as const,
   summary: (filter: DashboardFilter) => ['dashboard', 'summary', filter] as const,
   // Phase C
   distribution: (filter: DistributionFilter) => ['dashboard', 'distribution', filter] as const,

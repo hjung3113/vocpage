@@ -1,12 +1,15 @@
 /**
  * DashboardSettingsDialog.tsx — Wave 2 Phase E
  *
- * Right-side Sheet (per dashboard.md §11.3) for editing personal dashboard
- * preferences: widget visibility (8 widgets), default date range, heatmap X-axis.
+ * Right-side Sheet (per dashboard.md §11.3) for editing dashboard preferences:
+ *   - widget visibility (8 widgets)
+ *   - default date range (1m/3m/1y/all; 'custom' surfaces as disabled radio)
+ *   - heatmap default X-axis
+ *   - admin-default save target toggle (admin only)
+ *   - GlobalTabs reorder + visibility (admin scope only)
  *
- * Out of scope (deferred): admin-default save target, GlobalTabs reorder DnD,
- * 'custom' date range picker. The 'custom' enum value is preserved as a
- * disabled, display-only option to prevent silent state loss.
+ * Out of scope: 'custom' date range picker — schema lacks custom_start/end_date
+ * columns; tracked as FU follow-up.
  */
 import { forwardRef, useEffect, useState, type ComponentPropsWithoutRef } from 'react';
 import { Settings } from 'lucide-react';
@@ -19,20 +22,35 @@ import {
   SheetDescription,
   SheetFooter,
 } from '@shared/ui/sheet';
-import type { DashboardSettings, DateRangePreset, HeatmapXAxis } from '@contracts/dashboard';
+import type {
+  DashboardSettings,
+  DateRangePreset,
+  HeatmapXAxis,
+  GlobalTabsOrderItem,
+  DashboardSettingsUpdate,
+} from '@contracts/dashboard';
+import { useAuth } from '@features/auth';
 import { useDashboardSettings } from '../model/useDashboardSettings';
 import { useUpdateDashboardSettings } from '../model/useUpdateDashboardSettings';
 import { WIDGET_IDS } from '../defaultLayouts';
-import { WIDGET_LABELS, DATE_RANGE_OPTIONS, X_AXIS_OPTIONS } from './dashboard-settings-options';
+import {
+  WidgetVisibilityList,
+  DateRangeRadios,
+  XAxisRadios,
+  ScopeToggle,
+} from './DashboardSettingsForm';
+import { GlobalTabsEditor } from './GlobalTabsEditor';
+
+type Scope = 'self' | 'admin';
 
 type DraftState = {
   widget_visibility: Record<string, boolean>;
   default_date_range: DateRangePreset;
   heatmap_default_x_axis: HeatmapXAxis;
+  globaltabs_order: GlobalTabsOrderItem[] | null;
 };
 
 function toDraft(s: DashboardSettings): DraftState {
-  // Backfill any missing widget visibility entries to true (default = visible).
   const visibility: Record<string, boolean> = { ...s.widget_visibility };
   for (const id of WIDGET_IDS) {
     if (visibility[id] === undefined) visibility[id] = true;
@@ -41,6 +59,7 @@ function toDraft(s: DashboardSettings): DraftState {
     widget_visibility: visibility,
     default_date_range: s.default_date_range,
     heatmap_default_x_axis: s.heatmap_default_x_axis,
+    globaltabs_order: s.globaltabs_order,
   };
 }
 
@@ -59,8 +78,11 @@ const TriggerButton = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<'bu
 );
 
 export function DashboardSettingsDialog() {
-  const { data: settings } = useDashboardSettings();
-  const { mutate, isPending } = useUpdateDashboardSettings();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const [scope, setScope] = useState<Scope>('self');
+  const { data: settings } = useDashboardSettings(scope);
+  const { mutate, isPending } = useUpdateDashboardSettings(scope);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<DraftState | null>(null);
 
@@ -69,39 +91,36 @@ export function DashboardSettingsDialog() {
     if (settings && draft === null) setDraft(toDraft(settings));
   }, [settings, draft]);
 
-  // Reset draft to upstream every time the panel opens.
+  // Reset draft to upstream on open OR when scope changes (settings then refetches).
   useEffect(() => {
     if (open && settings) setDraft(toDraft(settings));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  if (!settings || !draft) {
-    return (
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <TriggerButton />
-        </SheetTrigger>
-      </Sheet>
-    );
-  }
+  }, [open, scope, settings]);
 
   const handleSave = () => {
-    mutate(
-      {
-        widget_visibility: draft.widget_visibility,
-        default_date_range: draft.default_date_range,
-        heatmap_default_x_axis: draft.heatmap_default_x_axis,
-      },
-      { onSuccess: () => setOpen(false) },
-    );
+    if (!draft) return;
+    const patch: DashboardSettingsUpdate = {
+      widget_visibility: draft.widget_visibility,
+      default_date_range: draft.default_date_range,
+      heatmap_default_x_axis: draft.heatmap_default_x_axis,
+    };
+    if (scope === 'admin') {
+      patch.globaltabs_order = draft.globaltabs_order;
+    }
+    mutate(patch, { onSuccess: () => setOpen(false) });
   };
 
-  const handleReset = () => setDraft(toDraft(settings));
-  const showCustomRadio = draft.default_date_range === 'custom';
-  // Block close while a save is in flight to avoid orphaning the mutation.
+  const handleReset = () => {
+    if (settings) setDraft(toDraft(settings));
+  };
   const handleOpenChange = (next: boolean) => {
     if (isPending && !next) return;
     setOpen(next);
+  };
+  const handleScopeChange = (next: Scope) => {
+    if (isPending) return;
+    setScope(next);
+    setDraft(null);
   };
 
   return (
@@ -112,91 +131,46 @@ export function DashboardSettingsDialog() {
       <SheetContent side="right" className="flex w-full flex-col gap-6 sm:max-w-md">
         <SheetHeader>
           <SheetTitle>대시보드 설정</SheetTitle>
-          <SheetDescription>위젯 표시 / 기본 날짜 범위 / 히트맵 기본 X축</SheetDescription>
+          <SheetDescription>
+            {scope === 'admin'
+              ? '전체 사용자에게 적용될 Admin 기본값을 편집합니다.'
+              : '내 대시보드의 표시 / 기본 날짜 범위 / 히트맵 X축'}
+          </SheetDescription>
         </SheetHeader>
 
+        {isAdmin && <ScopeToggle scope={scope} onChange={handleScopeChange} />}
+
+        {!draft ? (
+          <div className="flex-1 px-1 py-4 text-sm text-[var(--text-secondary)]">불러오는 중…</div>
+        ) : (
         <div className="flex-1 overflow-y-auto pr-1">
-          <fieldset className="mb-6">
-            <legend className="mb-2 text-sm font-semibold text-[var(--text-primary)]">위젯 표시</legend>
-            <ul className="space-y-2">
-              {WIDGET_IDS.map((id) => (
-                <li key={id} className="flex items-center justify-between">
-                  <span className="text-sm text-[var(--text-primary)]">{WIDGET_LABELS[id]}</span>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-label={WIDGET_LABELS[id]}
-                    checked={draft.widget_visibility[id] ?? true}
-                    onChange={(e) =>
-                      setDraft((d) =>
-                        d
-                          ? { ...d, widget_visibility: { ...d.widget_visibility, [id]: e.target.checked } }
-                          : d,
-                      )
-                    }
-                    className="h-4 w-4 cursor-pointer accent-[var(--brand)]"
-                  />
-                </li>
-              ))}
-            </ul>
-          </fieldset>
+          <WidgetVisibilityList
+            visibility={draft.widget_visibility}
+            onToggle={(id, next) =>
+              setDraft((d) =>
+                d ? { ...d, widget_visibility: { ...d.widget_visibility, [id]: next } } : d,
+              )
+            }
+          />
 
-          <fieldset className="mb-6" role="radiogroup" aria-label="기본 날짜 범위">
-            <legend className="mb-2 text-sm font-semibold text-[var(--text-primary)]">기본 날짜 범위</legend>
-            <div className="flex flex-wrap gap-3">
-              {DATE_RANGE_OPTIONS.map((opt) => (
-                <label key={opt.value} className="flex cursor-pointer items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="default_date_range"
-                    value={opt.value}
-                    checked={draft.default_date_range === opt.value}
-                    onChange={() => setDraft((d) => (d ? { ...d, default_date_range: opt.value } : d))}
-                    className="cursor-pointer accent-[var(--brand)]"
-                  />
-                  {opt.label}
-                </label>
-              ))}
-              {showCustomRadio && (
-                <label
-                  className="flex items-center gap-2 text-sm opacity-60"
-                  title="현재 저장된 사용자 지정 범위. 변경하려면 다른 옵션을 선택하세요."
-                >
-                  <input
-                    type="radio"
-                    name="default_date_range"
-                    value="custom"
-                    checked={draft.default_date_range === 'custom'}
-                    disabled
-                    readOnly
-                  />
-                  사용자 지정
-                </label>
-              )}
-            </div>
-          </fieldset>
+          <DateRangeRadios
+            value={draft.default_date_range}
+            onChange={(next) => setDraft((d) => (d ? { ...d, default_date_range: next } : d))}
+          />
 
-          <fieldset className="mb-6" role="radiogroup" aria-label="히트맵 기본 X축">
-            <legend className="mb-2 text-sm font-semibold text-[var(--text-primary)]">히트맵 기본 X축</legend>
-            <div className="flex flex-wrap gap-3">
-              {X_AXIS_OPTIONS.map((opt) => (
-                <label key={opt.value} className="flex cursor-pointer items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="heatmap_default_x_axis"
-                    value={opt.value}
-                    checked={draft.heatmap_default_x_axis === opt.value}
-                    onChange={() =>
-                      setDraft((d) => (d ? { ...d, heatmap_default_x_axis: opt.value } : d))
-                    }
-                    className="cursor-pointer accent-[var(--brand)]"
-                  />
-                  {opt.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <XAxisRadios
+            value={draft.heatmap_default_x_axis}
+            onChange={(next) => setDraft((d) => (d ? { ...d, heatmap_default_x_axis: next } : d))}
+          />
+
+          {scope === 'admin' && (
+            <GlobalTabsEditor
+              value={draft.globaltabs_order}
+              onChange={(next) => setDraft((d) => (d ? { ...d, globaltabs_order: next } : d))}
+            />
+          )}
         </div>
+        )}
 
         <SheetFooter className="gap-2">
           <button
