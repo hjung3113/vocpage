@@ -6,7 +6,7 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 
 **Canonical sources:**
 
-- Progress: `claude-progress.txt` (first 30 lines) + `docs/specs/plans/next-session-tasks.md` (active + deferred) + `docs/specs/plans/wave-3-admin.md` (active wave) + `docs/specs/plans/followup-bucket.md` (closed-wave follow-ups, `FU-NNN`).
+- Progress: `claude-progress.txt` (first 30 lines) + `docs/specs/plans/next-session-tasks.md` (active + deferred) + `docs/specs/plans/admin-pages-backlog.md` (admin 미구현 페이지) + `docs/specs/plans/flowline-alignment-cues.md` (Flowline 잔여 시그널). Closed-wave history lives in git log + PR descriptions — no standalone wave plan or follow-up register.
 - Spec: `docs/specs/requires/requirements.md` + `feature-*.md`.
 - Design: `docs/specs/requires/uidesign.md`.
 - Sub-dir maps: `frontend/CLAUDE.md`, `backend/CLAUDE.md` (consult before editing in those trees).
@@ -22,7 +22,6 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 
 **Top-level directories:**
 
-- `benchmark/` — ground-truth PNGs (`01–22-…`) for `scripts/visual-diff.ts`. New screen = baseline + INDEX row.
 - `graphify-out/` — auto-generated, do not hand-edit. Refresh: `graphify update .`.
 - `scripts/` — utilities (`check-fixture-seed-parity.ts`, `shadcn-token-rewrite.ts`, `visual-diff.ts`).
 - `shared/` — `types/` (FE + BE entities / enums) · `contracts/` (zod schemas, single source) · `fixtures/` (MSW + seed, parity enforced) · `openapi.yaml` (REST contract reference).

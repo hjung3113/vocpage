@@ -146,7 +146,8 @@ prototype/
 | [`docs/specs/requires/feature-notice-faq.md`](docs/specs/requires/feature-notice-faq.md) | 공지/FAQ 기능 상세                                    |
 | [`docs/specs/requires/external-masters.md`](docs/specs/requires/external-masters.md)     | 외부 마스터 캐시·스왑 spec                            |
 | [`docs/specs/plans/next-session-tasks.md`](docs/specs/plans/next-session-tasks.md)       | 진행 중 Phase 계획 + 이연 항목 + NextGen              |
-| [`docs/specs/plans/followup-bucket.md`](docs/specs/plans/followup-bucket.md)             | Closed-wave 후속 FU 등록부                            |
+| [`docs/specs/plans/admin-pages-backlog.md`](docs/specs/plans/admin-pages-backlog.md)     | Admin 미구현 페이지 백로그                            |
+| [`docs/specs/plans/flowline-alignment-cues.md`](docs/specs/plans/flowline-alignment-cues.md) | Flowline 잔여 시그널 큐                          |
 
 ---
 

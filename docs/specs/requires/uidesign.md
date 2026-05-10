@@ -462,7 +462,7 @@ Every page is rendered through one container so the header line, title typograph
 - `className="h-*"` / `className="p[xy]-*"` on `Button`, `Input`, `Select`.
 - Custom topbar wrappers (e.g. ad-hoc `<header>` inside a page) — must be replaced by `<PageHeader>`.
 
-**Reference** — applies to all five pages: `/voc`, `/notice`, `/faq`, `/admin/tags`, `/admin/vocs/trash`. See `docs/specs/plans/followup-bucket.md` FU-017 for rollout sequencing.
+**Reference** — applies to all five pages: `/voc`, `/notice`, `/faq`, `/admin/tags`, `/admin/vocs/trash`.
 
 ### Load-more Button
 
