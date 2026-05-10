@@ -14,7 +14,7 @@
 | **마이그 023 운영 적용** | PR #312 머지 (2026-05-10) | rogue row 진단 SQL 선행. 적용 후 Dashboard Dialog 'custom' round-trip 통합 검증. |
 | **Admin 미구현 페이지** | [`admin-pages-backlog.md`](./admin-pages-backlog.md) | 시스템/메뉴 / 유형 / 결과 검토 / 태그 규칙. 권장 순서: 태그 규칙(태그 마스터 통합) → 시스템/메뉴 → 유형 → 결과 검토(NextGen). |
 | **ADR 0007 timezone 잠금** | `docs/adr/0007-custom-date-range-timezone.md` (Proposed) | 다중 timezone 운영 진입 전 별 세션. 잠금 전 다중 TZ 진입 금지. |
-| **Flowline Wave D 후보** | `uidesign.md §16` · ADR-0008 | Wave C (S1·S2) 머지 (PR #317). 차기 — S3 priority-bars / S5 list-group-header / S6 OutlineChip dot-pill 은 사용처 발생 시 진입. S7 / sparkline deferred. |
+| **Flowline 정합화 — 잔여** | `uidesign.md §16` · ADR-0008 | Wave C + C-ext 머지 (PR #317 / #319) — S1·S2·S3·S5·S6 implemented (sibling 8.3/10). 잔여: S7 활동 피드 시각 점검 + sparkline (사용처 발생 시 별 wave) + sub-pixel polish (filled-vs-ring radius / 16px chevron slot / UserX 15px 비대칭). |
 | **운영/배포 phase** | 본 문서 §운영/배포 | session store · OIDC · Production build · 실 MSSQL · E2E. |
 
 ### Hard-blocks
