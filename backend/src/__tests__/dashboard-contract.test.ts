@@ -9,7 +9,13 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import yaml from 'js-yaml';
-import { DashboardSettings, RglLayouts, RglLayoutItem } from '../../../shared/contracts/dashboard';
+import {
+  DashboardSettings,
+  RglLayouts,
+  RglLayoutItem,
+  DashboardFilter,
+  ProcessingSpeedFilter,
+} from '../../../shared/contracts/dashboard';
 
 const yamlPath = join(__dirname, '../../../shared/openapi.yaml');
 interface RglLayoutsSchema {
@@ -67,6 +73,42 @@ describe('P1-5: RglLayouts partial record', () => {
 
 // ---------------------------------------------------------------------------
 // P2-1: RglLayoutItem.strict() — reject unknown extra properties
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// P1 (codex:rescue): range=custom requires startDate + endDate (DashboardFilter refine)
+// ---------------------------------------------------------------------------
+
+describe('P1: DashboardFilter range=custom validation', () => {
+  it('range=custom without dates → invalid', () => {
+    const result = DashboardFilter.safeParse({ range: 'custom' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const paths = result.error.issues.map((i) => i.path.join('.'));
+      expect(paths).toContain('startDate');
+    }
+  });
+
+  it('range=custom with both dates → valid', () => {
+    const result = DashboardFilter.safeParse({
+      range: 'custom',
+      startDate: '2026-01-01',
+      endDate: '2026-05-01',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('range=1m (no dates) → valid (refine only fires for custom)', () => {
+    const result = DashboardFilter.safeParse({ range: '1m' });
+    expect(result.success).toBe(true);
+  });
+
+  it('ProcessingSpeedFilter inherits custom-range refine', () => {
+    const result = ProcessingSpeedFilter.safeParse({ range: 'custom' });
+    expect(result.success).toBe(false);
+  });
+});
+
 // ---------------------------------------------------------------------------
 
 describe('P2-1: RglLayoutItem strict', () => {

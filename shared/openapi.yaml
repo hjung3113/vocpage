@@ -880,7 +880,7 @@ paths:
     get:
       tags: [dashboard]
       operationId: getDashboardDistribution
-      summary: Get distribution by type
+      summary: Get distribution by type (status/priority/voc_type/tag)
       parameters:
         - name: type
           in: query
@@ -888,6 +888,12 @@ paths:
           schema:
             type: string
             enum: [status, priority, voc_type, tag]
+        - name: dim
+          in: query
+          schema:
+            type: string
+            enum: [all, system, menu]
+            default: all
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
@@ -895,21 +901,23 @@ paths:
         - $ref: '#/components/parameters/dashboardEndDate'
       responses:
         '200':
-          description: Distribution array
+          description: Distribution response with items array
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DistributionItem'
+                $ref: '#/components/schemas/DistributionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/priority-status-matrix:
     get:
       tags: [dashboard]
       operationId: getPriorityStatusMatrix
-      summary: Get priority-status matrix
+      summary: Get priority × status matrix (4 priorities × 5 statuses)
       parameters:
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
@@ -918,28 +926,28 @@ paths:
         - $ref: '#/components/parameters/dashboardEndDate'
       responses:
         '200':
-          description: Matrix
+          description: Priority-status matrix with intensity normalisation value
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                $ref: '#/components/schemas/PriorityStatusMatrixResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/heatmap:
     get:
       tags: [dashboard]
       operationId: getDashboardHeatmap
-      summary: Get heatmap data
+      summary: Get drilldown heatmap (system/menu × status|priority|tag)
       parameters:
         - name: xAxis
           in: query
           schema:
             type: string
             enum: [status, priority, tag]
+            default: status
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
@@ -947,44 +955,44 @@ paths:
         - $ref: '#/components/parameters/dashboardEndDate'
       responses:
         '200':
-          description: Heatmap
+          description: Heatmap with headers, totalRow, rows, and max_value
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                $ref: '#/components/schemas/HeatmapResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/weekly-trend:
     get:
       tags: [dashboard]
       operationId: getWeeklyTrend
-      summary: Get weekly trend
+      summary: Get 12-week trend (3 series — new/enteredInProgress/done)
       parameters:
         - name: weeks
           in: query
           schema:
             type: integer
             default: 12
+            description: Fixed at 12 — param accepted but ignored
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
-        - $ref: '#/components/parameters/dashboardStartDate'
-        - $ref: '#/components/parameters/dashboardEndDate'
       responses:
         '200':
-          description: Trend array
+          description: 12-week trend with 3 series and week-start ISO dates
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WeeklyTrendItem'
+                $ref: '#/components/schemas/WeeklyTrendResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/tag-distribution:
     get:
@@ -1041,13 +1049,14 @@ paths:
     get:
       tags: [dashboard]
       operationId: getAssigneeStats
-      summary: Get assignee stats
+      summary: Get assignee processing stats (assignee × status|priority|tag)
       parameters:
         - name: xAxis
           in: query
           schema:
             type: string
             enum: [status, priority, tag]
+            default: status
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
@@ -1055,23 +1064,30 @@ paths:
         - $ref: '#/components/parameters/dashboardEndDate'
       responses:
         '200':
-          description: Assignee stats
+          description: Assignee stats with 미배정 row always last
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                $ref: '#/components/schemas/AssigneeStatsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/processing-speed:
     get:
       tags: [dashboard]
       operationId: getProcessingSpeed
-      summary: Get processing speed (SLA table)
+      summary: Get processing speed and SLA compliance rate per system/menu
       parameters:
+        - name: dim
+          in: query
+          schema:
+            type: string
+            enum: [all, system, menu]
+            default: all
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
@@ -1079,16 +1095,15 @@ paths:
         - $ref: '#/components/parameters/dashboardEndDate'
       responses:
         '200':
-          description: SLA table
+          description: SLA table with avg_days and sla_rate per row
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                $ref: '#/components/schemas/ProcessingSpeedResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/aging:
     get:
@@ -1118,29 +1133,46 @@ paths:
     get:
       tags: [dashboard]
       operationId: getAgingVocs
-      summary: Get top aging VOCs
+      summary: Get top long-pending VOCs (장기 미처리 Top 10)
       parameters:
         - name: limit
           in: query
           schema:
             type: integer
             default: 10
+            maximum: 50
+        - name: dim
+          in: query
+          schema:
+            type: string
+            enum: [all, system]
+            default: all
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
-        - $ref: '#/components/parameters/dashboardStartDate'
-        - $ref: '#/components/parameters/dashboardEndDate'
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Accepted but ignored — endpoint always reflects current snapshot (spec "날짜 무관").
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Accepted but ignored — endpoint always reflects current snapshot (spec "날짜 무관").
       responses:
         '200':
-          description: Top aging VOCs
+          description: Long-pending VOCs sorted by elapsed_days DESC (date filter accepted but ignored)
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Voc'
+                $ref: '#/components/schemas/AgingVocsResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/settings:
     get:
@@ -3371,17 +3403,305 @@ components:
           type: array
           items: { $ref: '#/components/schemas/GlobalTabsOrderItem' }
 
+    # Phase C — widget response schemas
+
     DistributionItem:
       type: object
-      required: [label, count]
+      required: [label, count, percentage, key]
+      additionalProperties: false
       properties:
         label:
           type: string
         count:
           type: integer
+          minimum: 0
         percentage:
           type: number
+          minimum: 0
+          maximum: 100
+        key:
+          type: string
 
+    DistributionResponse:
+      type: object
+      required: [type, dim, total, items]
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum: [status, priority, voc_type, tag]
+        dim:
+          type: string
+          enum: [all, system, menu]
+        total:
+          type: integer
+          minimum: 0
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistributionItem'
+
+    MatrixRow:
+      type: object
+      required: [priority, cells, row_total]
+      additionalProperties: false
+      properties:
+        priority:
+          type: string
+          enum: [urgent, high, medium, low]
+        cells:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        row_total:
+          type: integer
+          minimum: 0
+
+    PriorityStatusMatrixResponse:
+      type: object
+      required: [columns, rows, max_value]
+      additionalProperties: false
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+            enum: ['접수', '검토중', '처리중', '완료', '드랍']
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatrixRow'
+        max_value:
+          type: integer
+          minimum: 0
+
+    HeatmapRow:
+      type: object
+      required: [name, id, level, values, total]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        level:
+          type: string
+          enum: [all, system, menu]
+        values:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+        total:
+          type: integer
+          minimum: 0
+
+    HeatmapResponse:
+      type: object
+      required: [headers, totalRow, rows, max_value]
+      additionalProperties: false
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+        totalRow:
+          type: array
+          nullable: true
+          items:
+            type: integer
+            minimum: 0
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeatmapRow'
+        max_value:
+          type: integer
+          minimum: 0
+
+    WeeklyTrendResponse:
+      type: object
+      required: [weeks, weekStarts, series]
+      additionalProperties: false
+      properties:
+        weeks:
+          type: array
+          minItems: 12
+          maxItems: 12
+          items:
+            type: string
+        weekStarts:
+          type: array
+          minItems: 12
+          maxItems: 12
+          items:
+            type: string
+            format: date
+        series:
+          type: object
+          required: [new, enteredInProgress, done]
+          additionalProperties: false
+          properties:
+            new:
+              type: array
+              minItems: 12
+              maxItems: 12
+              items:
+                type: integer
+                minimum: 0
+            enteredInProgress:
+              description: >-
+                VOCs whose status_changed_at falls in this week and whose new
+                status is 검토중 or 처리중. NOT a snapshot of in-progress count
+                at week end (no status_history table). Spec deviation v3.1
+                (2026-05-10): 'Sun 23:59 snapshot' → 'transitioned-into-in-progress
+                this week'.
+              type: array
+              minItems: 12
+              maxItems: 12
+              items:
+                type: integer
+                minimum: 0
+            done:
+              type: array
+              minItems: 12
+              maxItems: 12
+              items:
+                type: integer
+                minimum: 0
+
+    ProcessingSpeedRow:
+      type: object
+      required: [id, name, avg_days, sla_rate, completed_count, slaEligibleCount, missingDueDateCount]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        avg_days:
+          description: >-
+            Average processing days: AVG(status_changed_at::date - created_at::date)
+            WHERE status='완료'. Uses status_changed_at — there is NO completed_at column.
+          type: number
+          nullable: true
+        sla_rate:
+          description: >-
+            Percentage of completed VOCs finished by their due_date.
+            Null when slaEligibleCount === 0 (no completed VOCs with non-null
+            due_date). SLA check: status_changed_at::date <= due_date.
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+        completed_count:
+          type: integer
+          minimum: 0
+        slaEligibleCount:
+          description: Completed VOCs with a non-null due_date (SLA denominator). When 0, sla_rate is null.
+          type: integer
+          minimum: 0
+        missingDueDateCount:
+          description: Completed VOCs with a null due_date — excluded from SLA computation.
+          type: integer
+          minimum: 0
+
+    ProcessingSpeedResponse:
+      type: object
+      required: [dim, rows]
+      additionalProperties: false
+      properties:
+        dim:
+          type: string
+          enum: [all, system, menu]
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcessingSpeedRow'
+
+    AssigneeStatRow:
+      type: object
+      required: [id, name, is_unassigned, values, total]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        is_unassigned:
+          type: boolean
+        values:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+        total:
+          type: integer
+          minimum: 0
+
+    AssigneeStatsResponse:
+      type: object
+      required: [headers, rows, max_value]
+      additionalProperties: false
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssigneeStatRow'
+        max_value:
+          type: integer
+          minimum: 0
+
+    AgingVocItem:
+      type: object
+      required: [voc_id, issue_code, title, priority, elapsed_days, system_name, menu_name]
+      additionalProperties: false
+      properties:
+        voc_id:
+          type: string
+          format: uuid
+        issue_code:
+          type: string
+        title:
+          type: string
+        priority:
+          type: string
+          enum: [urgent, high, medium, low]
+        elapsed_days:
+          type: integer
+          minimum: 0
+        system_name:
+          type: string
+          nullable: true
+        menu_name:
+          type: string
+          nullable: true
+
+    AgingVocsResponse:
+      type: object
+      required: [dim, items]
+      additionalProperties: false
+      properties:
+        dim:
+          type: string
+          enum: [all, system]
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgingVocItem'
+
+    # Legacy stubs kept for backward-compat reference
     WeeklyTrendItem:
       type: object
       required: [week, count]
