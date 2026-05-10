@@ -1,24 +1,24 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 specs 정리 · Wave 2 Phase E + Wave 3 Custom Date Range 머지 완료)
+## 다음 세션 시작점 (2026-05-10 구조/네이밍 정리 1차 머지 완료)
 
 → **머지 완료 (2026-05-10)**:
    - **PR #310** ADR 0006 (Accepted) + 0007 (Proposed) — `dashboard_settings.default_date_range='custom'` 컬럼 신설 + timezone OQ 별 ADR 분기.
-   - **PR #312** Wave 3 Phase A 구현 — 마이그 023 (custom_start_date/custom_end_date + CHECK + rogue row 가드) · zod superRefine cross-field invariant · BE service (enum auto-clear / 400 / Admin 415 / invariant 500) · FE CustomDateRangePicker (react-day-picker, 5y soft cap) · DateRangeSection 추출 · MSW admin 415 분기. BE 593 / FE 661 pass.
-   - 메모: PR #311 은 base 브랜치 삭제로 자동 close → #312 신규 PR 로 재오픈 후 머지.
+   - **PR #312** Wave 3 Phase A 구현 — 마이그 023 + zod superRefine + BE service + FE CustomDateRangePicker. BE 593 / FE 661 pass.
+   - **PR #313** specs 정리 + stub `/tags` nav 제거 + admin-pages-backlog.md.
+   - **PR #314** 구조/네이밍 정리 1차 (deepening candidates 2 + 4) — `useVocFilter`/`useVocFilters` → `useVocFilterContext`/`useVocFilterUrlState`, `features/admin/tag-master/` 평면 → `api/+ui/`, `ActionButton` → `TagMasterActionButton`, `@contracts/admin/tag` alias 통일.
 
-→ **Specs 대규모 정리 (2026-05-10, 사용자)**:
-   - 삭제: `docs/specs/archive/**` (closed wave plans + reviews) · `docs/screenshots/**` · 닫힌 wave plans (`wave-2-dashboard.md` / `wave-2-phase-c.md` / `wave-3-admin.md` / `wave-5-notifications.md`) · `followup-bucket.md`.
-   - 잔존: `docs/specs/plans/next-session-tasks.md` · `docs/specs/plans/admin-pages-backlog.md` (신규).
-   - 결과: 닫힌 wave 의 history 는 git log + PR description 으로 단일 소스. follow-up 추적은 별 등록부 없음 — 발견 시 ad-hoc 처리.
+→ **구조/네이밍 정리 진행 상태 (2026-05-10 audit, codex 적대적 리뷰)**:
+   - **완료**: Cand 2 (useVocFilter rename) · Cand 4 (tag-master split) — PR #314.
+   - **차기 후보 (PROCEED, 단계적)**: Cand 1 entity api/ slice 네이밍 통일 — `entities/{master,user,notification,voc}/api/*` camelCase + `entities/{faq,notice}/api/*` 평면 → 모두 `subject.api.ts` / `subject.query-keys.ts`. ~9 파일 + 다수 caller, 슬라이스 단위 PR 분할 권장 (voc → master → user → notification → faq → notice → auth).
+   - **DEFER**: Cand 3 `features/dashboard/widgets/` 와 top-level `widgets/` shadow — 12 컴포넌트 import churn 대비 leverage 약함 / Cand 5 backend repo·service suffix 혼재 (`*.repo.ts` vs `*.ts`) — 다음 BE 작업 시 같이 처리.
+   - **REJECT**: Cand 6 backend `controllers/` + `validators/` orphan 의혹 — `backend/src/CLAUDE.md`가 5-layer 명시, ADR-0003 이 validators 보존 결정. 코드 drift 아니라 의도적 layer.
 
 → **다음 세션 작업 후보**:
-   - **운영 DB 마이그 023 적용** — rogue row 진단 SQL 선행 후 적용 → Dashboard Dialog 'custom' 저장 round-trip 통합 검증.
-   - **Admin 미구현 페이지** (`docs/specs/plans/admin-pages-backlog.md` 참조) — 시스템/메뉴 관리 / 유형 관리 / 결과 검토 / 태그 규칙. 권장 순서: 태그 규칙(태그 마스터에 통합 제안) → 시스템/메뉴 → 유형 → 결과 검토(NextGen).
-   - **운영/배포 phase** — `connect-pg-simple` 세션 스토어 / OIDC 실구현 / Production Dockerfile / 실 MSSQL / 배포 + smoke test / Playwright E2E.
+   - **구조/네이밍 정리 2차** — Cand 1 voc 슬라이스부터 (`entities/voc/api/vocApi.ts` → `voc.api.ts` + `vocQueryKeys.ts` → `voc.query-keys.ts`).
+   - **운영 DB 마이그 023 적용** — rogue row 진단 SQL 선행 후 적용 → Dashboard Dialog 'custom' round-trip 통합 검증.
+   - **Admin 미구현 페이지** (`docs/specs/plans/admin-pages-backlog.md`) — 권장 순서: 태그 규칙(태그 마스터 통합) → 시스템/메뉴 → 유형 → 결과 검토(NextGen).
+   - **운영/배포 phase** — session store · OIDC · Production build · 실 MSSQL · E2E.
    - **ADR 0007 (timezone) 잠금** — 다중 timezone 운영 진입 전 별 세션.
 
-→ **현재 브랜치 작업**:
-   - `chore/remove-stub-tags-nav` — 2 커밋 (stub `/tags` workspace nav 제거 + MSW heatmap UUID v4 보정 / admin-pages-backlog.md 신설). PR 미생성.
-
-→ **현재 main 상태**: `e099266` (PR #312 fast-forward).
+→ **현재 main 상태**: `5336d9c` (PR #314 머지 후).
