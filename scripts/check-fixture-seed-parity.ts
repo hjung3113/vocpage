@@ -42,10 +42,10 @@ const TARGETS: Target[] = [
   },
   {
     table: 'tag_rules',
-    // NOTE: Plan 02 (mig 024) will append 'backend/migrations/024_tag_rules_created_by.sql' here.
     migrations: [
       'backend/migrations/004_tags.sql',
       'backend/migrations/014_tag_master_ops.sql',
+      'backend/migrations/024_tag_rules_created_by.sql',
     ],
     fixture: 'shared/fixtures/admin-tag-rule.fixtures.ts',
     sampleKey: 'ADMIN_TAG_RULE_FIXTURES',
@@ -107,31 +107,51 @@ function parseAlters(sql: string, table: string): AlterOp[] {
   const ops: AlterOp[] = [];
   const tableEsc = table.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  // ADD COLUMN
-  const addRe = new RegExp(
-    `ALTER\\s+TABLE\\s+${tableEsc}\\s+ADD\\s+COLUMN\\s+(\\w+)\\s+([^;]+?);`,
+  // Match full ALTER TABLE <table> ... ; statements (single- or multi-clause).
+  // PostgreSQL allows multiple comma-separated actions in one ALTER TABLE.
+  const stmtRe = new RegExp(
+    `ALTER\\s+TABLE\\s+${tableEsc}\\s+([\\s\\S]*?);`,
     'gi',
   );
-  for (const m of sql.matchAll(addRe)) {
-    const name = m[1];
-    const rest = m[2];
-    ops.push({
-      kind: 'add',
-      col: {
-        name,
-        notNull: /NOT\s+NULL/i.test(rest),
-        hasDefault: /\bDEFAULT\b/i.test(rest),
-      },
-    });
-  }
 
-  // DROP COLUMN
-  const dropRe = new RegExp(
-    `ALTER\\s+TABLE\\s+${tableEsc}\\s+DROP\\s+COLUMN(?:\\s+IF\\s+EXISTS)?\\s+(\\w+)\\s*;`,
-    'gi',
-  );
-  for (const m of sql.matchAll(dropRe)) {
-    ops.push({ kind: 'drop', name: m[1] });
+  for (const stmt of sql.matchAll(stmtRe)) {
+    const body = stmt[1];
+
+    // Split the body into top-level clauses by commas. Naïve split is safe
+    // here because no tracked migration uses parenthesised constraint lists
+    // inside ALTER actions (only ADD/DROP COLUMN with type+default).
+    const clauses = body.split(/,(?=\s*(?:ADD|DROP|ALTER|RENAME)\b)/i);
+
+    for (const rawClause of clauses) {
+      const clause = rawClause.trim();
+      if (!clause) continue;
+
+      const addMatch = clause.match(/^ADD\s+COLUMN\s+(\w+)\s+([\s\S]+)$/i);
+      if (addMatch) {
+        const name = addMatch[1];
+        const rest = addMatch[2];
+        ops.push({
+          kind: 'add',
+          col: {
+            name,
+            notNull: /NOT\s+NULL/i.test(rest),
+            hasDefault: /\bDEFAULT\b/i.test(rest),
+          },
+        });
+        continue;
+      }
+
+      const dropMatch = clause.match(
+        /^DROP\s+COLUMN(?:\s+IF\s+EXISTS)?\s+(\w+)/i,
+      );
+      if (dropMatch) {
+        ops.push({ kind: 'drop', name: dropMatch[1] });
+        continue;
+      }
+
+      // Other actions (RENAME, ALTER COLUMN TYPE, constraints) are ignored —
+      // no tracked migration uses those forms today.
+    }
   }
 
   return ops;

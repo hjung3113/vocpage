@@ -3,16 +3,10 @@
  * drops legacy `pattern` (Phase 1 / Plan 02, OQ-R1 Option C).
  *
  * Spec:
- *   - .planning/phases/01-tag-rules-consolidation/01-CONTEXT.md (D-12)
+ *   - .planning/phases/01-tag-rules-consolidation/01-CONTEXT.md (D-05/D-06/D-12)
  *   - .planning/phases/01-tag-rules-consolidation/01-RESEARCH.md (OQ-R1, OQ-R2, OQ-R5)
  *
- * Wave 0 (Plan 01) stages this test BEFORE the migration file exists.
- *
- * Behavior of this test file when `024_tag_rules_created_by.sql` does not yet
- * exist on disk: the suite registers `test.todo` placeholders, which Jest
- * counts as todos (not failures), so the BE 593+ baseline is preserved. Plan
- * 02 ships the migration; on next run the `fs.existsSync` branch flips and
- * the live tests execute end-to-end pg-mem round-trip.
+ * pg-mem up/down round-trip (mirrors migration-014.test.ts pattern).
  */
 import { newDb, DataType, IMemoryDb } from 'pg-mem';
 import * as crypto from 'crypto';
@@ -21,7 +15,6 @@ import * as path from 'path';
 
 const MIGRATIONS_DIR = path.resolve(__dirname, '../../migrations');
 const MIG_024_FILE = '024_tag_rules_created_by.sql';
-const MIG_024_PATH = path.join(MIGRATIONS_DIR, MIG_024_FILE);
 
 // FK target stubs — pg-mem rejects the trigger DDL in 003 and the FK to
 // users(id) referenced by `tag_rules.created_by` (mig 024).
@@ -87,28 +80,7 @@ function describeColumns(db: IMemoryDb, table: string): ColInfo[] {
   return rs.rows as ColInfo[];
 }
 
-const MIG_024_PRESENT = fs.existsSync(MIG_024_PATH);
-
 describe('migration 024 — tag_rules consolidation (keywords[] + match_mode + created_by, drops pattern)', () => {
-  if (!MIG_024_PRESENT) {
-    test.todo(
-      `up adds keywords text[] NOT NULL DEFAULT '{}' to tag_rules — pending ${MIG_024_FILE} (Plan 02)`,
-    );
-    test.todo(
-      `up adds match_mode text NOT NULL DEFAULT 'keyword' to tag_rules — pending ${MIG_024_FILE} (Plan 02)`,
-    );
-    test.todo(
-      `up drops pattern column from tag_rules — pending ${MIG_024_FILE} (Plan 02)`,
-    );
-    test.todo(
-      `up adds created_by uuid NULL REFERENCES users(id) to tag_rules — pending ${MIG_024_FILE} (Plan 02)`,
-    );
-    test.todo(
-      `down restores pattern shape and drops keywords/match_mode/created_by — pending ${MIG_024_FILE} (Plan 02)`,
-    );
-    return;
-  }
-
   test('up adds keywords text[] NOT NULL DEFAULT \'{}\' to tag_rules', async () => {
     const db = await bootDb();
     const { up } = readMigration(MIG_024_FILE);
@@ -150,8 +122,23 @@ describe('migration 024 — tag_rules consolidation (keywords[] + match_mode + c
     const cols = describeColumns(db, 'tag_rules');
     const createdBy = cols.find((c) => c.column_name === 'created_by');
     expect(createdBy).toBeDefined();
-    expect(createdBy!.is_nullable).toBe('YES');
     expect(createdBy!.data_type).toMatch(/uuid/i);
+
+    // Behavioural nullability check (pg-mem information_schema reports NO for
+    // nullable columns added via ALTER — see migration-014.test.ts:103–114
+    // for the established workaround). Insert without created_by must succeed
+    // and SELECT must return NULL.
+    db.public.query(`
+      INSERT INTO tags (id, name, slug, kind) VALUES
+        ('00000000-0000-0000-0000-0000000000aa', 'r', 'r', 'general');
+      INSERT INTO tag_rules (id, name, kind, tag_id) VALUES
+        ('00000000-0000-0000-0000-0000000000ab', 'rule', 'general',
+         '00000000-0000-0000-0000-0000000000aa');
+    `);
+    const probe = db.public.query(
+      `SELECT created_by FROM tag_rules WHERE id = '00000000-0000-0000-0000-0000000000ab'`,
+    );
+    expect(probe.rows[0].created_by).toBeNull();
   });
 
   test('down restores pattern shape and drops keywords/match_mode/created_by', async () => {
