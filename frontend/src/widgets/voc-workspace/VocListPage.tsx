@@ -15,6 +15,7 @@ import { VocCreateDialog } from '@features/voc/create/ui/VocCreateDialog';
 import { EmptyState } from '@shared/ui/empty-state';
 import { ErrorState } from '@shared/ui/error-state';
 import { LoadingState } from '@shared/ui/skeleton';
+import { PageFrame } from '@widgets/app-shell';
 
 const SYSTEMS_PLACEHOLDER = [
   { id: '11111111-1111-4111-8111-111111111111', label: '데이터 분석' },
@@ -72,57 +73,61 @@ export function VocListPage() {
   const panelOpen = !!ctrl.drawer.vocId;
 
   return (
-    <div className="flex flex-col" style={{ height: '100%' }}>
+    <PageFrame>
       {/* Topbar + Filters — hidden in fullscreen panel mode */}
       {!isPanelFullscreen && (
         <>
-          <VocTopbar
-            totalCount={total}
-            query={ctrl.filter.q ?? ''}
-            onQueryChange={(q) => ctrl.setFilter({ ...ctrl.filter, q: q || undefined })}
-            notifications={{
-              items: ctrl.notifications.items,
-              unreadCount: ctrl.notifications.unreadCount,
-              onMarkAllRead: ctrl.notifications.onMarkAllRead,
-              onItemClick: ctrl.notifications.onItemClick,
-            }}
-            onCreate={() => {
-              ctrl.drawer.close();
-              ctrl.create.setOpen(true);
-            }}
-          />
-          <VocStatusFilters
-            value={statusValue}
-            onChange={ctrl.onStatusChange}
-            rightSlot={
-              <VocAdvancedFiltersToggle
-                open={ctrl.advanced.open}
-                onToggle={ctrl.advanced.onToggle}
-              />
-            }
-          />
-          <VocAdvancedFilters
-            open={ctrl.advanced.open}
-            assignees={ctrl.masters.assignees}
-            tags={ctrl.masters.tags}
-            vocTypes={ctrl.masters.vocTypes}
-            value={{
-              assignees: ctrl.filter.assignees,
-              priorities: ctrl.filter.priorities,
-              voc_type_ids: ctrl.filter.voc_type_ids,
-              tag_ids: ctrl.filter.tag_ids,
-            }}
-            onChange={ctrl.advanced.onChange}
-            onReset={ctrl.advanced.onReset}
-          />
+          <PageFrame.Sticky>
+            <VocTopbar
+              totalCount={total}
+              query={ctrl.filter.q ?? ''}
+              onQueryChange={(q) => ctrl.setFilter({ ...ctrl.filter, q: q || undefined })}
+              notifications={{
+                items: ctrl.notifications.items,
+                unreadCount: ctrl.notifications.unreadCount,
+                onMarkAllRead: ctrl.notifications.onMarkAllRead,
+                onItemClick: ctrl.notifications.onItemClick,
+              }}
+              onCreate={() => {
+                ctrl.drawer.close();
+                ctrl.create.setOpen(true);
+              }}
+            />
+          </PageFrame.Sticky>
+          <PageFrame.Sticky>
+            <VocStatusFilters
+              value={statusValue}
+              onChange={ctrl.onStatusChange}
+              rightSlot={
+                <VocAdvancedFiltersToggle
+                  open={ctrl.advanced.open}
+                  onToggle={ctrl.advanced.onToggle}
+                />
+              }
+            />
+          </PageFrame.Sticky>
+          <PageFrame.Sticky>
+            <VocAdvancedFilters
+              open={ctrl.advanced.open}
+              assignees={ctrl.masters.assignees}
+              tags={ctrl.masters.tags}
+              vocTypes={ctrl.masters.vocTypes}
+              value={{
+                assignees: ctrl.filter.assignees,
+                priorities: ctrl.filter.priorities,
+                voc_type_ids: ctrl.filter.voc_type_ids,
+                tag_ids: ctrl.filter.tag_ids,
+              }}
+              onChange={ctrl.advanced.onChange}
+              onReset={ctrl.advanced.onReset}
+            />
+          </PageFrame.Sticky>
         </>
       )}
 
-      {/* Main content area: list + panel */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left: list (hidden when panel is fullscreen) */}
+      <PageFrame.SplitRow>
         {!isPanelFullscreen && (
-          <div className="flex flex-col flex-1 overflow-auto min-w-0">
+          <PageFrame.Scroll padded={false}>
             <div className="flex-1">
               {list.isLoading && (
                 <div className="px-6">
@@ -169,10 +174,9 @@ export function VocListPage() {
               total={total}
               onPageChange={ctrl.setPage}
             />
-          </div>
+          </PageFrame.Scroll>
         )}
 
-        {/* Right: side panel (review only) */}
         {panelOpen && ctrl.drawer.vocId && (
           <VocSidePanel
             review={{
@@ -192,9 +196,8 @@ export function VocListPage() {
             onToggleFullscreen={() => setIsPanelFullscreen((v) => !v)}
           />
         )}
-      </div>
+      </PageFrame.SplitRow>
 
-      {/* Create dialog (modal) */}
       <VocCreateDialog
         open={ctrl.create.open}
         onOpenChange={(v) => {
@@ -207,6 +210,6 @@ export function VocListPage() {
         onSubmit={ctrl.create.onSubmit}
         submitting={ctrl.create.submitting}
       />
-    </div>
+    </PageFrame>
   );
 }
