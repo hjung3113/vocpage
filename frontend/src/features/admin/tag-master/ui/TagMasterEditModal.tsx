@@ -3,7 +3,7 @@
  * Only `name` mutable; kind locked per spec.
  */
 import { useState } from 'react';
-import { useRenameTag } from './api';
+import { useRenameTag } from '../api/tag-master.api';
 import {
   ModalOverlay,
   ModalHeader,
@@ -13,7 +13,7 @@ import {
   cancelBtnStyle,
   submitBtnStyle,
 } from './TagMasterCreateModal';
-import type { TagMasterItem } from '../../../../../shared/contracts/admin/tag';
+import type { TagMasterItem } from '@contracts/admin/tag';
 
 interface Props {
   tag: TagMasterItem;

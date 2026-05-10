@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVocList } from '@features/voc/model/useVocList';
-import { useVocFilters } from '@features/voc/list/model/useVocFilters';
+import { useVocFilterUrlState } from '@features/voc/list/model/useVocFilterUrlState';
 import { useUpdateVoc, useAddNote, useNotes } from '@features/voc/model/useVocMutation';
 import { useRole } from '@entities/user/model/useRole';
 import { useCreateVoc } from '@features/voc/create/model/useCreateVoc';
@@ -14,7 +14,7 @@ import type { NotificationItem } from '@contracts/notification';
 export function useVocPageController() {
   const role = useRole();
   const qc = useQueryClient();
-  const { state, setFilter, setSort, setPage, vocId, setVocId } = useVocFilters();
+  const { state, setFilter, setSort, setPage, vocId, setVocId } = useVocFilterUrlState();
   const { filter, sortBy, sortDir, page, perPage } = state;
   const list = useVocList(filter, sortBy, sortDir, page, perPage);
   const updateVoc = useUpdateVoc();

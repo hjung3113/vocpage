@@ -22,7 +22,7 @@ export interface VocPageFilters {
 const DEFAULT_PER_PAGE = 20;
 
 /** URL ↔ VocFilter+sort+page sync. Multi-status round-trips via repeated keys. */
-export function useVocFilters(): {
+export function useVocFilterUrlState(): {
   state: VocPageFilters;
   setFilter: (next: VocFilter) => void;
   setSort: (sortBy: VocSortColumnT, sortDir: SortDirT) => void;

@@ -14,7 +14,7 @@ import {
   TagRuleSuspendInput,
   TagMasterItem,
   type TagMasterListQuery,
-} from '../../../../../shared/contracts/admin/tag';
+} from '@contracts/admin/tag';
 
 const QUERY_KEY = ['admin', 'tags'] as const;
 

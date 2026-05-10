@@ -4,8 +4,8 @@
  */
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useCreateTag } from './api';
-import type { TagKind } from '../../../../../shared/contracts/admin/tag';
+import { useCreateTag } from '../api/tag-master.api';
+import type { TagKind } from '@contracts/admin/tag';
 
 interface Props {
   onClose: () => void;
