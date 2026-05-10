@@ -123,6 +123,27 @@ describe('admin contract — tag domain', () => {
       Admin.TagRuleSuspendInput as unknown as AnyZodObject,
     );
   });
+
+  // Phase 01 Plan 03 — TagRule consolidation (D-05/D-06/D-07/D-08/D-12 + OQ-R5).
+  test('TagRule required ⊆ zod + nullable parity', () => {
+    expectRequiredSubset('TagRule', Admin.TagRule as unknown as AnyZodObject);
+    expectNullableSubset('TagRule', Admin.TagRule as unknown as AnyZodObject);
+  });
+  test('TagRuleCreate required ⊆ zod', () => {
+    expectRequiredSubset('TagRuleCreate', Admin.TagRuleCreate as unknown as AnyZodObject);
+  });
+  test('TagRulePatch all-optional parity', () => {
+    expectRequiredSubset('TagRulePatch', Admin.TagRulePatch as unknown as AnyZodObject);
+  });
+  test('TagRuleListQuery defaults parity', () => {
+    expectRequiredSubset('TagRuleListQuery', Admin.TagRuleListQuery as unknown as AnyZodObject);
+  });
+  test('TagRuleListResponse required ⊆ zod', () => {
+    expectRequiredSubset(
+      'TagRuleListResponse',
+      Admin.TagRuleListResponse as unknown as AnyZodObject,
+    );
+  });
 });
 
 describe('admin contract — trash domain', () => {
