@@ -93,7 +93,6 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      { path: 'tags', element: <StubPage title="Tag" /> },
       {
         path: 'notifications',
         element: (

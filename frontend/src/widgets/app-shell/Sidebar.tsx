@@ -36,7 +36,6 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/notice', label: '공지사항', icon: Megaphone },
   { to: '/faq', label: 'FAQ', icon: HelpCircle },
-  { to: '/tags', label: 'Tag', icon: Tag },
   { to: '/notifications', label: '알림', icon: Bell },
   { to: '/health', label: 'Health', icon: Code2, devOnly: true },
 ];
