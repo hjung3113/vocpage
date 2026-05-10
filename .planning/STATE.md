@@ -3,14 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-10T15:30:00.000Z"
-last_completed_plan: "01-03"
+last_updated: "2026-05-10T15:12:08.792Z"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 3
-  percent: 38
+  completed_plans: 4
+  percent: 50
 ---
 
 # STATE — vocpage
@@ -24,7 +23,7 @@ progress:
 ## Current Position
 
 - **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-03 complete (Wave 2 — contract rewrite + mig 024 GREEN); 01-04 / 01-05 next (Wave 3 — BE routes ‖ FE hooks).
+- **Plan**: 01-05 complete (Wave 2 — FE data layer + D-11 optimistic GREEN); 01-04 next (Wave 3 — BE routes + IDOR tests).
 - **Status**: Waves 0-2 landed — scaffolds, mig 024 (keywords[]+match_mode+created_by), and OpenAPI/zod/TS contract consolidation. BE 598 pass; FE 691 pass; parity 10/11 OK.
 - **Progress**: ████░░░░░░ Phase 1: 3/8 plans complete; 0/7 phases overall.
 

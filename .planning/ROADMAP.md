@@ -31,7 +31,7 @@ Plans:
 - [ ] 01-02-PLAN.md — Mig 024 SQL (keywords[]+match_mode+created_by add, pattern drop) + tests GREEN + reconcile pattern readers (TDD)
 - [x] 01-03-PLAN.md — OpenAPI rewrite to nested paths + zod TagRule/TagRuleCreate/TagRulePatch/TagRuleListQuery/TagRuleListResponse + parity tests
 - [ ] 01-04-PLAN.md — [BLOCKING] mig 024 push + 5 nested BE routes + permission matrix + IDOR/created_by-injection tests (TDD)
-- [ ] 01-05-PLAN.md — 5 FE TanStack hooks (D-11 optimistic) + MSW handlers + optimistic.test GREEN (TDD)
+- [x] 01-05-PLAN.md — 5 FE TanStack hooks (D-11 optimistic) + MSW handlers + optimistic.test GREEN (TDD)
 - [ ] 01-06-PLAN.md — KeywordChipInput component + TagRulesManagerModal (Dialog + sub-table + permission gating)
 - [ ] 01-07-PLAN.md — TagMasterTable 규칙 N건 column + TagRulesFlatTable + page view-mode tabs + URL state + page integration test
 - [ ] 01-08-PLAN.md — Spec sync (feature-voc.md §9.4.1 + routing-conventions.md) + final SC-3 grep gate evidence
