@@ -424,53 +424,24 @@ export async function deleteTagRule(tagId: string, ruleId: string): Promise<void
   }
 }
 
-/**
- * PATCH /api/admin/tags/:tagId/rules/:ruleId/suspend — admin only. T-01-08 IDOR scope.
- *
- * Overloaded: legacy 2-arg form (used by the soon-to-be-deleted /admin/tag-rules/:id/suspend
- * route) is preserved temporarily so this Plan 01-04 Task 1 can ship a typecheck-clean commit;
- * Task 2 deletes the legacy route and the 2-arg call site, leaving only the (tagId, ruleId, ...)
- * form. The 2-arg path SKIPS the IDOR scope check by design — only the legacy callsite uses it.
- */
+/** PATCH /api/admin/tags/:tagId/rules/:ruleId/suspend — admin only. T-01-08 IDOR scope. */
 export async function suspendTagRule(
-  tagIdOrRuleId: string,
-  suspendedUntilOrRuleId: string | null,
-  suspendedUntil?: string | null,
+  tagId: string,
+  ruleId: string,
+  suspendedUntil: string | null,
 ): Promise<TagRuleT> {
   const pool = getPool();
-  let ruleId: string;
-  let suspended: string | null;
-  let scopeTagId: string | null;
-
-  if (suspendedUntil === undefined) {
-    // Legacy 2-arg form: (id, suspendedUntil) — callsite is the soon-deleted route.
-    ruleId = tagIdOrRuleId;
-    suspended = suspendedUntilOrRuleId;
-    scopeTagId = null;
-  } else {
-    // Nested 3-arg form: (tagId, ruleId, suspendedUntil)
-    scopeTagId = tagIdOrRuleId;
-    ruleId = suspendedUntilOrRuleId as string;
-    suspended = suspendedUntil;
-  }
-
-  if (scopeTagId !== null) {
-    const scope = await pool.query(
-      'SELECT id FROM tag_rules WHERE id = $1 AND tag_id = $2',
-      [ruleId, scopeTagId],
-    );
-    if (scope.rowCount === 0) {
-      throw { code: 'NOT_FOUND', message: '태그 규칙을 찾을 수 없습니다.' };
-    }
-  }
-
-  const updated = await pool.query(
-    'UPDATE tag_rules SET suspended_until = $1 WHERE id = $2 RETURNING id',
-    [suspended, ruleId],
+  const scope = await pool.query(
+    'SELECT id FROM tag_rules WHERE id = $1 AND tag_id = $2',
+    [ruleId, tagId],
   );
-  if (updated.rowCount === 0) {
+  if (scope.rowCount === 0) {
     throw { code: 'NOT_FOUND', message: '태그 규칙을 찾을 수 없습니다.' };
   }
+  await pool.query('UPDATE tag_rules SET suspended_until = $1 WHERE id = $2', [
+    suspendedUntil,
+    ruleId,
+  ]);
   const result = await pool.query(`${TAG_RULE_SELECT_BASE} WHERE tr.id = $1`, [ruleId]);
   return rowToTagRule(result.rows[0]);
 }

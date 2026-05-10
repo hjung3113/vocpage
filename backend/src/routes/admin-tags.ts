@@ -8,7 +8,12 @@
  *   Admin  POST  /api/admin/tags/:id/merge  — admin only
  *          PATCH /api/admin/tags/:id/external — admin only
  *          DELETE /api/admin/tags/:id       — admin only
- *          PATCH /api/admin/tag-rules/:id/suspend — admin only
+ *   Tag Rules (Phase 01 — D-08 nested resource):
+ *          GET    /api/admin/tags/:tagId/rules                — admin / manager / dev
+ *          POST   /api/admin/tags/:tagId/rules                — admin / manager
+ *          PATCH  /api/admin/tags/:tagId/rules/:ruleId        — admin / manager
+ *          DELETE /api/admin/tags/:tagId/rules/:ruleId        — admin only
+ *          PATCH  /api/admin/tags/:tagId/rules/:ruleId/suspend — admin only
  *
  * Spec: requirements.md §15.3 + feature-voc.md §9.4.6 + shared/contracts/admin/tag.ts
  */
@@ -22,7 +27,6 @@ import {
 import { createAuthMiddleware } from '../auth';
 import { requireRole } from '../middleware/requireRole';
 import { validate } from '../middleware/validate';
-import { z } from 'zod';
 import {
   TagMasterListQuery,
   TagMasterCreate,
@@ -31,12 +35,19 @@ import {
   TagExternalToggle,
   TagRuleSuspendInput,
   TagIdParam,
+  TagRuleCreate,
+  TagRulePatch,
+  TagRuleListQuery,
+  RuleIdParam,
   type TagMasterListQuery as TagMasterListQueryT,
   type TagMasterCreate as TagMasterCreateT,
   type TagMasterPatch as TagMasterPatchT,
   type TagMasterMergeInput as TagMasterMergeInputT,
   type TagExternalToggle as TagExternalToggleT,
   type TagRuleSuspendInput as TagRuleSuspendInputT,
+  type TagRuleCreateT,
+  type TagRulePatchT,
+  type TagRuleListQueryT,
 } from '../../../shared/contracts/admin/tag';
 import * as svc from '../services/admin/tag-master';
 
@@ -47,8 +58,6 @@ export const adminTagsRouter = Router();
 adminTagsRouter.use(auth);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-const RuleIdParam = z.object({ id: z.string().uuid() });
 
 function mapServiceError(err: unknown): { status: number; code: string; message: string } {
   if (typeof err === 'object' && err !== null && 'code' in err) {
@@ -185,23 +194,102 @@ adminTagsRouter.delete(
   },
 );
 
-// ── Tag Rules ─────────────────────────────────────────────────────────────────
+// ── Tag Rules — D-08 nested resource (Phase 01) ──────────────────────────────
+// Permission matrix per D-13:
+//   GET    /tags/:tagId/rules                        admin / manager / dev
+//   POST   /tags/:tagId/rules                        admin / manager
+//   PATCH  /tags/:tagId/rules/:ruleId/suspend        admin only  ← REGISTER FIRST (T-01-10 / Pitfall 6)
+//   PATCH  /tags/:tagId/rules/:ruleId                admin / manager
+//   DELETE /tags/:tagId/rules/:ruleId                admin only
+
+/** GET /api/admin/tags/:tagId/rules — admin / manager / dev */
+adminTagsRouter.get(
+  '/tags/:tagId/rules',
+  requireRole('admin', 'manager', 'dev'),
+  validate({ params: RuleIdParam.pick({ tagId: true }), query: TagRuleListQuery }),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await svc.listTagRules(
+        req.params.tagId as string,
+        req.query as unknown as TagRuleListQueryT,
+      );
+      res.json(result);
+    } catch (err) {
+      if (!sendServiceError(res, err)) next(err);
+    }
+  },
+);
+
+/** POST /api/admin/tags/:tagId/rules — admin / manager. created_by from req.user (D-07). */
+adminTagsRouter.post(
+  '/tags/:tagId/rules',
+  requireRole('admin', 'manager'),
+  validate({ params: RuleIdParam.pick({ tagId: true }), body: TagRuleCreate }),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const rule = await svc.createTagRule(
+        req.params.tagId as string,
+        req.body as TagRuleCreateT,
+        req.user!,
+      );
+      res.status(201).json(rule);
+    } catch (err) {
+      if (!sendServiceError(res, err)) next(err);
+    }
+  },
+);
 
 /**
- * PATCH /api/admin/tag-rules/:id/suspend
- * Admin only. Set suspended_until timestamp (NULL = resume).
+ * PATCH /api/admin/tags/:tagId/rules/:ruleId/suspend — admin only.
+ * REGISTERED BEFORE the plain :ruleId PATCH so Express does not match
+ * `/suspend` as a `:ruleId` segment (T-01-10 / Pitfall 6).
  */
 adminTagsRouter.patch(
-  '/tag-rules/:id/suspend',
+  '/tags/:tagId/rules/:ruleId/suspend',
   requireRole('admin'),
   validate({ params: RuleIdParam, body: TagRuleSuspendInput }),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await svc.suspendTagRule(
-        req.params.id as string,
+      const rule = await svc.suspendTagRule(
+        req.params.tagId as string,
+        req.params.ruleId as string,
         (req.body as TagRuleSuspendInputT).suspended_until,
       );
-      res.json(result);
+      res.json(rule);
+    } catch (err) {
+      if (!sendServiceError(res, err)) next(err);
+    }
+  },
+);
+
+/** PATCH /api/admin/tags/:tagId/rules/:ruleId — admin / manager. T-01-08 IDOR enforced in service. */
+adminTagsRouter.patch(
+  '/tags/:tagId/rules/:ruleId',
+  requireRole('admin', 'manager'),
+  validate({ params: RuleIdParam, body: TagRulePatch }),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const rule = await svc.updateTagRule(
+        req.params.tagId as string,
+        req.params.ruleId as string,
+        req.body as TagRulePatchT,
+      );
+      res.json(rule);
+    } catch (err) {
+      if (!sendServiceError(res, err)) next(err);
+    }
+  },
+);
+
+/** DELETE /api/admin/tags/:tagId/rules/:ruleId — admin only. T-01-08 IDOR enforced in service. */
+adminTagsRouter.delete(
+  '/tags/:tagId/rules/:ruleId',
+  requireRole('admin'),
+  validate({ params: RuleIdParam }),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await svc.deleteTagRule(req.params.tagId as string, req.params.ruleId as string);
+      res.status(204).end();
     } catch (err) {
       if (!sendServiceError(res, err)) next(err);
     }
