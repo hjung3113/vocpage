@@ -1,12 +1,12 @@
 /**
- * DashboardShell.test.tsx — Wave 2 Phase D + B TDD.
- * Tests for the DashboardShell RGL wrapper. Phase B wires KpiVolumeWidget
- * and KpiQualityWidget for the `kpi-volume` / `kpi-quality` slots; the
- * remaining 6 slots stay as placeholders.
+ * DashboardShell.test.tsx — Wave 2 Phase D + B + C TDD.
+ * Tests for the DashboardShell RGL wrapper. Phase B wires KPI widgets;
+ * Phase C wires the remaining 6 content slots.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import { defaultLayouts, WIDGET_IDS } from '../defaultLayouts';
 import { DashboardFilterProvider } from '../model/dashboardFilter';
@@ -28,37 +28,56 @@ vi.mock('react-grid-layout/legacy', () => {
 // Mock CSS imports
 vi.mock('react-grid-layout/css/styles.css', () => ({}));
 
-// Phase B widgets call /api/dashboard/summary — mock the hook so the shell
-// can mount without an MSW server in this unit-level test.
+// Mock Phase B hook
 vi.mock('../model/useDashboardSummary', () => ({
   useDashboardSummary: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() }),
 }));
+
+// Mock Phase C hooks so widgets mount without MSW
+vi.mock('../model/useDistribution', () => ({ useDistribution: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() }) }));
+vi.mock('../model/usePriorityStatusMatrix', () => ({ usePriorityStatusMatrix: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() }) }));
+vi.mock('../model/useHeatmap', () => ({ useHeatmap: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn(), xAxis: 'status', setXAxis: vi.fn() }) }));
+vi.mock('../model/useWeeklyTrend', () => ({ useWeeklyTrend: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() }) }));
+vi.mock('../model/useProcessingSpeed', () => ({ useProcessingSpeed: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn(), dim: 'all', setDim: vi.fn() }) }));
+vi.mock('../model/useAssigneeStats', () => ({ useAssigneeStats: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn(), xAxis: 'status', setXAxis: vi.fn() }) }));
+vi.mock('../model/useAgingVocs', () => ({ useAgingVocs: () => ({ isLoading: true, isError: false, data: undefined, refetch: vi.fn() }) }));
 
 import { DashboardShell } from '../ui/DashboardShell';
 
 function renderShell(props: { isEditing: boolean }) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <QueryClientProvider client={qc}>
-      <DashboardFilterProvider initial={{ range: '1m' }}>
-        <DashboardShell
-          layouts={defaultLayouts}
-          isEditing={props.isEditing}
-          onLayoutChange={vi.fn()}
-        />
-      </DashboardFilterProvider>
-    </QueryClientProvider>,
+    <MemoryRouter>
+      <QueryClientProvider client={qc}>
+        <DashboardFilterProvider initial={{ range: '1m' }}>
+          <DashboardShell
+            layouts={defaultLayouts}
+            isEditing={props.isEditing}
+            onLayoutChange={vi.fn()}
+          />
+        </DashboardFilterProvider>
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
 }
 
 describe('DashboardShell', () => {
-  it('renders all 8 widgets — KPI slots use real widgets, others are placeholders', () => {
+  it('renders all 8 widget slots — Phase B+C slots use real widgets', () => {
     renderShell({ isEditing: false });
     expect(screen.getByTestId('widget-kpi-volume')).toBeDefined();
     expect(screen.getByTestId('widget-kpi-quality')).toBeDefined();
+    // Phase C widgets are now wired — dist-matrix slot stacks Distribution + Matrix
+    expect(screen.getByTestId('widget-distribution')).toBeDefined();
+    expect(screen.getByTestId('widget-priority-status-matrix')).toBeDefined();
+    expect(screen.getByTestId('slot-dist-matrix')).toBeDefined();
+    expect(screen.getByTestId('widget-heatmap')).toBeDefined();
+    expect(screen.getByTestId('widget-weekly-trend')).toBeDefined();
+    expect(screen.getByTestId('widget-processing-speed')).toBeDefined();
+    expect(screen.getByTestId('widget-assignee-stats')).toBeDefined();
+    expect(screen.getByTestId('widget-aging-vocs')).toBeDefined();
+    // No placeholder slots remain for these widget IDs
     for (const widgetId of WIDGET_IDS) {
-      if (widgetId === 'kpi-volume' || widgetId === 'kpi-quality') continue;
-      expect(screen.getByTestId(`widget-placeholder-${widgetId}`)).toBeDefined();
+      expect(screen.queryByTestId(`widget-placeholder-${widgetId}`)).toBeNull();
     }
   });
 
@@ -75,7 +94,7 @@ describe('DashboardShell', () => {
 
   it('drag handles are hidden when isEditing=false', () => {
     const { container } = renderShell({ isEditing: false });
-    // Only the 6 placeholder slots have handles in display mode (kpi widgets don't).
+    // Phase C real widgets have no drag handles; only placeholders in edit mode do.
     const handles = container.querySelectorAll('.dashboard-widget-handle');
     handles.forEach((h) => {
       expect(h.classList.contains('opacity-0')).toBe(true);

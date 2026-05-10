@@ -17,6 +17,12 @@ interface DashboardFilterContextValue {
   setFilter: (next: DashboardFilter) => void;
   patch: (delta: Partial<DashboardFilter>) => void;
   reset: () => void;
+  /** Display name for the currently-selected system (UI-layer only, not in contract). */
+  systemName: string | undefined;
+  setSystemName: (name: string | undefined) => void;
+  /** Display name for the currently-selected menu (UI-layer only, not in contract). */
+  menuName: string | undefined;
+  setMenuName: (name: string | undefined) => void;
 }
 
 const DashboardFilterContext = createContext<DashboardFilterContextValue | null>(null);
@@ -28,14 +34,24 @@ export interface DashboardFilterProviderProps {
 
 export function DashboardFilterProvider({ initial, children }: DashboardFilterProviderProps) {
   const [filter, setFilter] = useState<DashboardFilter>(initial ?? {});
+  const [systemName, setSystemName] = useState<string | undefined>(undefined);
+  const [menuName, setMenuName] = useState<string | undefined>(undefined);
   const value = useMemo<DashboardFilterContextValue>(
     () => ({
       filter,
       setFilter,
       patch: (delta) => setFilter((prev) => ({ ...prev, ...delta })),
-      reset: () => setFilter(initial ?? {}),
+      reset: () => {
+        setFilter(initial ?? {});
+        setSystemName(undefined);
+        setMenuName(undefined);
+      },
+      systemName,
+      setSystemName,
+      menuName,
+      setMenuName,
     }),
-    [filter, initial],
+    [filter, initial, systemName, menuName],
   );
   return (
     <DashboardFilterContext.Provider value={value}>{children}</DashboardFilterContext.Provider>
