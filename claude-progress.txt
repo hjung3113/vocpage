@@ -1,6 +1,25 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 2 Phase D 머지 완료 — Phase B/C/E 진입)
+## 다음 세션 시작점 (2026-05-10 Wave 2 Phase B 머지 완료 — 사용자 피드백 대기 → Phase C/E)
+
+→ **Wave 2 Phase B KPI Volume + Quality 머지 완료** (PR #297 BE + PR #298 FE, 2026-05-10):
+   - **BE (PR #297)**: `GET /api/dashboard/summary` (8 KPI = Volume × 4 + Quality × 4). `dashboard-metrics.repo.ts` (5 SQL: countCreatedAndCompleted / snapshotUnresolved / snapshotUrgentHighUnresolved / snapshotOverdue14d / avgResolutionDaysInWindow) + `services/dashboard/summary.service.ts` (KST midnight helpers, `default_date_range` fallback user → admin → '1m', custom-range validation, 전주 동기간/동시점 delta 산출) + `routes/dashboard-summary.ts` (auth + `requireRole('dev','manager','admin')` — User 403). `index.ts` 마운트.
+   - **Contract (PR #297)**: `shared/contracts/dashboard/summary.ts` (zod) — `KpiMetric { value, delta, delta_kind }` (delta_kind enum: percent/count/days/percentage_point) + `DashboardSummary` + `DashboardFilter` (.strict). `shared/openapi.yaml` `DashboardSummary` 스텁 정형화 + `dashboardRange` parameter 신설 (1m/3m/1y/all/custom).
+   - **FE (PR #298)**: `features/dashboard/model/dashboardFilter.tsx` (`DashboardFilterProvider` + `useDashboardFilter`) · `model/useDashboardSummary.ts` (TanStack, queryKey embeds filter → 자동 invalidation, staleTime 30s) · `widgets/KpiCard.tsx` (delta_kind 별 포맷 + inverted 평균처리시간 + accent 보더 delta-driven `color-mix(in oklch, var(--chart-red) 35%, transparent)`) · `widgets/KpiVolumeWidget.tsx` + `KpiQualityWidget.tsx` (loading skeleton + error retry + aria-busy/role=status) · `DashboardShell` `kpi-volume`/`kpi-quality` 슬롯 실제 위젯 교체 (편집 모드는 placeholder fallback) · `DashboardPage` `<DashboardFilterProvider>` wrap.
+   - **codex:rescue 적대적 리뷰 (BE)**: P1 2건 + P2 1건 close. P1-1 = `snapshotUnresolved` as-of 정합 (status_changed_at > at OR NOT_DONE) — 그 시점엔 미해결이었지만 후에 완료된 VOC 누락 차단. P1-2 = 스냅샷 KPI는 KST 자정이 아닌 exact `now` 인스턴트 기준. P2 = `resolution_rate` 분모를 period-end snapshot 으로 정합 (numerator/denominator window-consistent).
+   - **codex:rescue 적대적 리뷰 (FE)**: P1 1건 + P2 2건 close. P1 = accent 보더는 `value > 0` 이 아닌 `delta > 0` (spec §1 "증가 시 강조"). P2-1 = `aria-busy` + `role="status"` + `aria-live="polite"` loading 영역 a11y. P2-2 = `vi.mock(factory, importOriginal spread)` 로 향후 re-export 보존.
+   - **메트릭**: BE 487 → 518 (+31), FE 587 → 599 (+12). typecheck 0 / lint 0 / 토큰 lint 0.
+
+→ **다음 세션 작업**: 사용자 피드백 수집 후 Wave 2 잔여 phase 진입:
+   - **Phase C (분포 / 매트릭스 / 히트맵 / 트렌드 / SLA / 담당자 / Top10)** — 7 endpoint BE 단일 PR + 7 위젯 FE PR.
+   - **Phase E (설정 패널)** — `DashboardSettingsDialog` (widget toggle + default_date_range + heatmap x-axis + admin lock).
+   - **운영/배포 phase** — `connect-pg-simple` / OIDC / production Dockerfile / Playwright E2E.
+
+→ **마이그 번호** — 다음 마이그 번호 = **023** (Phase B 마이그 추가 없음).
+
+---
+
+## 이전 세션 시작점 (2026-05-10 Wave 2 Phase D 머지 완료 — Phase B/C/E 진입)
 
 → **Wave 2 Phase D RGL Shell 머지 완료** (PR #295, 2026-05-10):
    - **BE**: `routes/dashboard-settings.ts` + `services/dashboard/settings.service.ts` + `repository/dashboard.repo.ts` 신규. `GET/PUT /api/dashboard/settings` (auth required, per-field merge admin∘user). 권한: `scope=admin` + `locked_fields` + `globaltabs_order` 모두 admin-only (3종 별 403 코드).
