@@ -26,10 +26,16 @@ describe('StatusGlyph — uidesign.md §16.3', () => {
     expect(el.querySelector('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it('canceled variant renders × glyph', () => {
+  it('canceled variant renders an × stroke path', () => {
     render(<StatusGlyph variant="canceled" />);
     const el = screen.getByTestId('status-glyph-canceled');
-    expect(el.textContent).toContain('×');
+    expect(el.querySelector('svg path')).not.toBeNull();
+  });
+
+  it('done variant renders a check polyline', () => {
+    render(<StatusGlyph variant="done" />);
+    const el = screen.getByTestId('status-glyph-done');
+    expect(el.querySelector('svg polyline')).not.toBeNull();
   });
 
   it('exposes aria-label when provided', () => {

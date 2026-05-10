@@ -7,21 +7,14 @@ import {
   VocPriorityBadge,
   VocAssignee,
   VocTagPill,
-  VocTypeBadge,
 } from '@entities/voc';
 import { IssueId } from '@shared/ui/issue-id';
 
 type VocRowData = VocListResponse['rows'][number];
 
-export interface VocTypeMapEntry {
-  slug: string;
-  name: string;
-}
-
 export interface VocRowProps {
   row: VocRowData;
   assigneeMap: Record<string, string>;
-  vocTypeMap?: Record<string, VocTypeMapEntry>;
   selected?: boolean;
   onClick: () => void;
   /** Spec §9.2.2: parent rows expose ▶/▼ toggle when subtasks exist. */
@@ -51,7 +44,6 @@ const CONTAINER_STYLE: CSSProperties = {
 export function VocRow({
   row,
   assigneeMap,
-  vocTypeMap,
   selected = false,
   onClick,
   hasChildren = false,
@@ -59,7 +51,6 @@ export function VocRow({
   onToggleExpand,
   indented = false,
 }: VocRowProps) {
-  const vocType = vocTypeMap?.[row.voc_type_id];
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -108,6 +99,8 @@ export function VocRow({
             <ChevronRight
               aria-hidden="true"
               className="voc-row-expand"
+              width={14}
+              height={14}
               style={{
                 transition: 'transform 120ms ease',
                 transform: expanded ? 'rotate(90deg)' : 'none',
@@ -128,7 +121,6 @@ export function VocRow({
       </div>
 
       <div role="gridcell" className="voc-row-title">
-        {vocType && <VocTypeBadge slug={vocType.slug} name={vocType.name} iconOnly />}
         <span className="voc-title-text">{row.title}</span>
         {row.tags.length > 0 && (
           <div className="tag-row">

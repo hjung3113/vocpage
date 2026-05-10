@@ -223,17 +223,15 @@ describe('VocListPage — Wave D D5 integration', () => {
     expect(header).toHaveAttribute('data-collapsed', 'true');
   });
 
-  it('vocTypeMap threads VocListPage → VocTable → VocRow → VocTypeBadge (renders type icon for each row)', async () => {
+  it('Flowline C-extension: VocRow title cell does not prepend a type badge (type info moved to detail/drawer)', async () => {
     renderPage();
     await waitFor(() => expect(screen.getByTestId('voc-table')).toBeInTheDocument());
 
-    // All fixture rows reference TYPE_PRIMARY ("기능 요청", slug=feature) — see master.fixtures.ts
     const renderedRows = screen.getAllByTestId('voc-row');
     expect(renderedRows.length).toBeGreaterThan(0);
 
-    // Each rendered row's title cell should contain a VocTypeBadge with aria-label "유형 기능 요청"
-    // (proves vocTypeMap was threaded VocListPage → VocTable → VocRow → VocTypeBadge).
-    const badges = await screen.findAllByLabelText('유형 기능 요청');
-    expect(badges.length).toBe(renderedRows.length);
+    // The VocTypeBadge in the title cell would expose aria-label "유형 ...".
+    // After C-extension, list rows must not render any such badge.
+    expect(screen.queryAllByLabelText(/^유형 /)).toHaveLength(0);
   });
 });

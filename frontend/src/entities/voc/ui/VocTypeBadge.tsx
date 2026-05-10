@@ -5,17 +5,16 @@ export interface VocTypeBadgeProps {
   slug: string;
   name: string;
   color?: string;
-  iconOnly?: boolean;
 }
 
-export function VocTypeBadge({ slug, name, iconOnly = false }: VocTypeBadgeProps) {
+export function VocTypeBadge({ slug, name }: VocTypeBadgeProps) {
   const { Icon, color, weight, isUnknown } = getVocTypeIconConfig(slug);
   const variant = isUnknown ? 'unknown' : slug;
 
   return (
     <TextMark
       variant={variant}
-      iconMode={iconOnly ? 'icon-only' : 'icon+text'}
+      iconMode="icon+text"
       icon={Icon}
       label={name}
       color={color}
