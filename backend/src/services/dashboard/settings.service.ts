@@ -79,13 +79,36 @@ export async function update(
 ): Promise<DashboardSettings> {
   const isAdmin = authUser.role === 'admin';
 
-  // Permission: locked_fields mutation → admin only
-  if ('locked_fields' in patch && patch.locked_fields !== undefined && !isAdmin) {
-    throw new HttpError(403, 'FORBIDDEN_LOCKED_FIELDS', '권한이 없습니다.');
+  // P1-1: scope=admin is restricted to role=admin
+  if (scope === 'admin' && !isAdmin) {
+    throw new HttpError(403, 'FORBIDDEN_ADMIN_SCOPE', '관리자만 scope=admin으로 설정할 수 있습니다.');
   }
 
-  // Permission: globaltabs_order mutation → admin only
-  if ('globaltabs_order' in patch && patch.globaltabs_order !== undefined && !isAdmin) {
+  // P1-2: locked_fields may only be changed via scope=admin
+  if (patch.locked_fields !== undefined && scope !== 'admin') {
+    throw new HttpError(
+      403,
+      'FORBIDDEN_LOCKED_FIELDS_SCOPE',
+      'locked_fields는 ?scope=admin 으로만 변경 가능합니다.',
+    );
+  }
+
+  // P1-3: globaltabs_order may only be changed via scope=admin
+  if (patch.globaltabs_order !== undefined && scope !== 'admin') {
+    throw new HttpError(
+      403,
+      'FORBIDDEN_GLOBALTABS_ORDER_SCOPE',
+      'globaltabs_order는 ?scope=admin 으로만 변경 가능합니다.',
+    );
+  }
+
+  // Legacy guard: non-admin trying to set locked_fields/globaltabs_order
+  // already blocked above (they'd need scope=admin which is also blocked).
+  // Keep explicit role check for clarity if code paths change.
+  if (patch.locked_fields !== undefined && !isAdmin) {
+    throw new HttpError(403, 'FORBIDDEN_LOCKED_FIELDS', '권한이 없습니다.');
+  }
+  if (patch.globaltabs_order !== undefined && !isAdmin) {
     throw new HttpError(403, 'FORBIDDEN_GLOBALTABS_ORDER', '권한이 없습니다.');
   }
 

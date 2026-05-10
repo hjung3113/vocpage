@@ -8,8 +8,8 @@ import React from 'react';
 import { defaultLayouts } from '../defaultLayouts';
 import { WIDGET_IDS } from '../defaultLayouts';
 
-// Mock react-grid-layout to render children inline
-vi.mock('react-grid-layout', () => {
+// Mock react-grid-layout/legacy to match production import path
+vi.mock('react-grid-layout/legacy', () => {
   return {
     Responsive: ({ children }: { children: React.ReactNode }) => (
       <div data-testid="rgl-responsive">{children}</div>

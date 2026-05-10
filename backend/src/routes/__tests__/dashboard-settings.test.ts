@@ -180,23 +180,24 @@ describe('GET /api/dashboard/settings (TDD-3: no user row)', () => {
 // ---------------------------------------------------------------------------
 
 describe('PUT /api/dashboard/settings (TDD-4: locked_fields permission)', () => {
-  test('manager sending locked_fields → 403 FORBIDDEN_LOCKED_FIELDS', async () => {
+  test('manager sending locked_fields (no scope) → 403 FORBIDDEN_LOCKED_FIELDS_SCOPE', async () => {
     const res = await request(makeApp(MGR_ID, 'manager'))
       .put('/api/dashboard/settings')
       .send({ locked_fields: ['default_date_range'] });
 
     expect(res.status).toBe(403);
-    expect(res.body.code).toBe('FORBIDDEN_LOCKED_FIELDS');
+    // P1-2: scope check fires before role check (manager doesn't have scope=admin)
+    expect(res.body.code).toBe('FORBIDDEN_LOCKED_FIELDS_SCOPE');
   });
 
-  test('admin sending locked_fields → 200', async () => {
+  test('admin sending locked_fields with scope=admin → 200', async () => {
     const resolved = { ...baseAdminRow, locked_fields: ['default_date_range'] };
     mockRepo.upsert.mockResolvedValue(resolved);
     mockRepo.getAdminDefault.mockResolvedValue(resolved);
     mockRepo.getByUserId.mockResolvedValue(null);
 
     const res = await request(makeApp(ADMIN_ID, 'admin'))
-      .put('/api/dashboard/settings')
+      .put('/api/dashboard/settings?scope=admin')
       .send({ locked_fields: ['default_date_range'] });
 
     expect(res.status).toBe(200);
@@ -208,13 +209,14 @@ describe('PUT /api/dashboard/settings (TDD-4: locked_fields permission)', () => 
 // ---------------------------------------------------------------------------
 
 describe('PUT /api/dashboard/settings (TDD-5: globaltabs_order permission)', () => {
-  test('dev sending globaltabs_order → 403 FORBIDDEN_GLOBALTABS_ORDER', async () => {
+  test('dev sending globaltabs_order (no scope) → 403 FORBIDDEN_GLOBALTABS_ORDER_SCOPE', async () => {
     const res = await request(makeApp(DEV_ID, 'dev'))
       .put('/api/dashboard/settings')
       .send({ globaltabs_order: [{ systemId: 'overview', visible: true }] });
 
     expect(res.status).toBe(403);
-    expect(res.body.code).toBe('FORBIDDEN_GLOBALTABS_ORDER');
+    // P1-3: scope check fires before role check
+    expect(res.body.code).toBe('FORBIDDEN_GLOBALTABS_ORDER_SCOPE');
   });
 
   test('admin sending globaltabs_order → 200, persisted to admin-default row', async () => {
@@ -293,5 +295,72 @@ describe('Auth required (TDD-8)', () => {
       .put('/api/dashboard/settings')
       .send({ widget_order: [] });
     expect(res.status).toBe(401);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// P1-1: scope=admin requires role=admin
+// ---------------------------------------------------------------------------
+
+describe('PUT /api/dashboard/settings (P1-1: scope=admin requires admin role)', () => {
+  test('non-admin user with ?scope=admin → 403 FORBIDDEN_ADMIN_SCOPE', async () => {
+    const res = await request(makeApp(USER_ID, 'user'))
+      .put('/api/dashboard/settings?scope=admin')
+      .send({ widget_order: ['summary'] });
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('FORBIDDEN_ADMIN_SCOPE');
+  });
+
+  test('manager with ?scope=admin → 403 FORBIDDEN_ADMIN_SCOPE', async () => {
+    const res = await request(makeApp(MGR_ID, 'manager'))
+      .put('/api/dashboard/settings?scope=admin')
+      .send({ widget_order: ['summary'] });
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('FORBIDDEN_ADMIN_SCOPE');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// P1-2: locked_fields without scope=admin → 403
+// ---------------------------------------------------------------------------
+
+describe('PUT /api/dashboard/settings (P1-2: locked_fields requires scope=admin)', () => {
+  test('admin sending locked_fields without ?scope=admin → 403 FORBIDDEN_LOCKED_FIELDS_SCOPE', async () => {
+    const res = await request(makeApp(ADMIN_ID, 'admin'))
+      .put('/api/dashboard/settings')
+      .send({ locked_fields: ['default_date_range'] });
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('FORBIDDEN_LOCKED_FIELDS_SCOPE');
+  });
+
+  test('admin sending locked_fields with ?scope=admin → 200', async () => {
+    const resolved = { ...baseAdminRow, locked_fields: ['default_date_range'] };
+    mockRepo.upsert.mockResolvedValue(resolved);
+    mockRepo.getAdminDefault.mockResolvedValue(resolved);
+    mockRepo.getByUserId.mockResolvedValue(null);
+
+    const res = await request(makeApp(ADMIN_ID, 'admin'))
+      .put('/api/dashboard/settings?scope=admin')
+      .send({ locked_fields: ['default_date_range'] });
+
+    expect(res.status).toBe(200);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// P1-3: globaltabs_order without scope=admin → 403
+// ---------------------------------------------------------------------------
+
+describe('PUT /api/dashboard/settings (P1-3: globaltabs_order requires scope=admin)', () => {
+  test('admin sending globaltabs_order without ?scope=admin → 403 FORBIDDEN_GLOBALTABS_ORDER_SCOPE', async () => {
+    const res = await request(makeApp(ADMIN_ID, 'admin'))
+      .put('/api/dashboard/settings')
+      .send({ globaltabs_order: [{ systemId: 'overview', visible: true }] });
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('FORBIDDEN_GLOBALTABS_ORDER_SCOPE');
   });
 });

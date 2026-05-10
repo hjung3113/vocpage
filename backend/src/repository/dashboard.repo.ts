@@ -51,12 +51,22 @@ export async function getAdminDefault(): Promise<DashboardSettings | null> {
 /**
  * Upsert a dashboard_settings row. If userId is null, targets the admin-default
  * row (user_id IS NULL). Only columns present in patch are updated.
+ *
+ * P0 fix (migration 022): Postgres treats NULLs as distinct in UNIQUE constraints,
+ * so ON CONFLICT (user_id) never fires for userId=null rows, creating duplicates.
+ * When userId is null we use an explicit BEGIN/COMMIT check-then-update-or-insert
+ * transaction to enforce at-most-one admin-default row.
  */
 export async function upsert(
   userId: string | null,
   patch: DashboardSettingsUpdate,
 ): Promise<DashboardSettings> {
   const pool = getPool();
+
+  // P0: admin-default path — explicit transaction to avoid NULL UNIQUE bug
+  if (userId === null) {
+    return upsertAdminDefault(pool, patch);
+  }
 
   // Build column lists for INSERT + UPDATE from patch keys
   const patchEntries = Object.entries(patch).filter(([, v]) => v !== undefined);
@@ -94,4 +104,75 @@ export async function upsert(
     args,
   );
   return row(r.rows[0]);
+}
+
+/**
+ * Admin-default upsert: explicit SELECT-then-UPDATE-or-INSERT within a
+ * serializable transaction. Avoids Postgres NULL UNIQUE blind spot.
+ */
+async function upsertAdminDefault(
+  pool: ReturnType<typeof getPool>,
+  patch: DashboardSettingsUpdate,
+): Promise<DashboardSettings> {
+  const patchEntries = Object.entries(patch).filter(([, v]) => v !== undefined);
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Lock the potential existing row
+    const existing = await client.query(
+      `SELECT id FROM dashboard_settings WHERE user_id IS NULL FOR UPDATE`,
+    );
+
+    let result;
+    if (existing.rowCount && existing.rowCount > 0) {
+      // Row exists → UPDATE
+      if (patchEntries.length === 0) {
+        result = await client.query(
+          `UPDATE dashboard_settings SET updated_at = now()
+             WHERE user_id IS NULL RETURNING ${COLUMNS}`,
+        );
+      } else {
+        const args: unknown[] = [];
+        const setClauses = patchEntries.map(([k, v]) => {
+          args.push(v);
+          return `${k} = $${args.length}`;
+        });
+        const updateSet = [...setClauses, 'updated_at = now()'].join(', ');
+        result = await client.query(
+          `UPDATE dashboard_settings SET ${updateSet}
+             WHERE user_id IS NULL RETURNING ${COLUMNS}`,
+          args,
+        );
+      }
+    } else {
+      // Row does not exist → INSERT
+      if (patchEntries.length === 0) {
+        result = await client.query(
+          `INSERT INTO dashboard_settings (user_id) VALUES (NULL) RETURNING ${COLUMNS}`,
+        );
+      } else {
+        const args: unknown[] = [];
+        const cols = patchEntries.map(([k, v]) => {
+          args.push(v);
+          return k;
+        });
+        const placeholders = args.map((_, i) => `$${i + 1}`).join(', ');
+        result = await client.query(
+          `INSERT INTO dashboard_settings (user_id, ${cols.join(', ')})
+             VALUES (NULL, ${placeholders}) RETURNING ${COLUMNS}`,
+          args,
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+    return row(result.rows[0]);
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }

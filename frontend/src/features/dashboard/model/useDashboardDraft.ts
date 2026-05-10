@@ -5,7 +5,7 @@
  * Public API:
  *   { layouts, isEditing, isDirty, setIsEditing, onLayoutChange, save, discard }
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Layout, LayoutItem } from 'react-grid-layout/legacy';
 import type { RglLayouts } from '@contracts/dashboard';
 import { defaultLayouts } from '../defaultLayouts';
@@ -23,6 +23,10 @@ export function useDashboardDraft() {
   const [isEditing, setIsEditingState] = useState(false);
   const [layouts, setLayouts] = useState<RglLayouts>(defaultLayouts);
   const [lastSaved, setLastSaved] = useState<RglLayouts>(defaultLayouts);
+  // P1-4 race guard: counter incremented on every layout change; checked on success
+  const saveCounterRef = useRef(0);
+  // Tracks the layouts value captured at mutation-start
+  const layoutsAtSaveRef = useRef<RglLayouts>(defaultLayouts);
 
   // Load settings and apply lock merge
   useEffect(() => {
@@ -53,6 +57,7 @@ export function useDashboardDraft() {
   const onLayoutChange = useCallback(
     (_currentLayout: Layout | readonly LayoutItem[], allLayouts: RglLayouts) => {
       if (!isEditing) return;
+      saveCounterRef.current += 1;
       setLayouts(allLayouts);
       setState('dirty');
     },
@@ -61,12 +66,21 @@ export function useDashboardDraft() {
 
   const save = useCallback(() => {
     setState('saving');
+    // Capture the layouts and counter at mutation-start for race detection
+    layoutsAtSaveRef.current = layouts;
+    const counterAtSave = saveCounterRef.current;
     mutate(
       { widget_sizes: layouts },
       {
         onSuccess: () => {
-          setLastSaved(layouts);
-          setState('clean');
+          // P1-4: if the counter advanced since save started, newer edits exist —
+          // keep dirty=true so user must save again; do not stomp with stale snapshot.
+          if (saveCounterRef.current === counterAtSave) {
+            setLastSaved(layoutsAtSaveRef.current);
+            setState('clean');
+          } else {
+            setState('dirty');
+          }
         },
         onError: () => {
           setState('error');

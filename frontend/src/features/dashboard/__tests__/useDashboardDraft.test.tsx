@@ -138,6 +138,54 @@ describe('useDashboardDraft', () => {
     expect(result.current.isDirty).toBe(false);
   });
 
+  it('P1-4: success handler does not stomp newer local edits made during save (race guard)', async () => {
+    mockUseDashboardSettings.mockReturnValue({
+      data: baseSettings,
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof useDashboardSettings>);
+
+    // Capture onSuccess so we can fire it manually AFTER the user makes another edit
+    let capturedOnSuccess: (() => void) | undefined;
+    mockMutate.mockImplementation((_payload: unknown, opts?: { onSuccess?: () => void }) => {
+      capturedOnSuccess = opts?.onSuccess;
+      // Do NOT call onSuccess immediately — simulates in-flight save
+    });
+
+    const { useDashboardDraft } = await import('../model/useDashboardDraft');
+    const { result } = renderHook(() => useDashboardDraft(), { wrapper: makeWrapper() });
+
+    await waitFor(() => expect(result.current.layouts).toBeDefined());
+
+    // 1. User edits layout and saves
+    act(() => result.current.setIsEditing(true));
+    const editA = result.current.layouts.lg!.map((item) =>
+      item.i === 'kpi-volume' ? { ...item, x: 2 } : item,
+    );
+    act(() =>
+      result.current.onLayoutChange(editA, { ...result.current.layouts, lg: editA }),
+    );
+    act(() => { result.current.save(); });
+
+    // 2. While save is in-flight, user makes ANOTHER edit (race condition)
+    const editB = result.current.layouts.lg!.map((item) =>
+      item.i === 'kpi-volume' ? { ...item, x: 9 } : item,
+    );
+    act(() =>
+      result.current.onLayoutChange(editB, { ...result.current.layouts, lg: editB }),
+    );
+
+    // 3. Now the original save completes — should NOT revert to editA layouts
+    act(() => { capturedOnSuccess?.(); });
+
+    // isDirty should remain true since editB wasn't saved
+    expect(result.current.isDirty).toBe(true);
+
+    // The layout should reflect editB (x=9), NOT the stale editA (x=2)
+    const kpiItem = result.current.layouts.lg!.find((i) => i.i === 'kpi-volume');
+    expect(kpiItem?.x).toBe(9);
+  });
+
   it('reverts to lastSaved layout on discard', async () => {
     mockUseDashboardSettings.mockReturnValue({
       data: baseSettings,

@@ -16,7 +16,8 @@ import { Uuid } from '../common';
 
 const Iso = z.string().datetime({ offset: true });
 
-/** react-grid-layout layout item. `i` is the widget id. */
+/** react-grid-layout layout item. `i` is the widget id.
+ * P2-1: .strict() matches `additionalProperties: false` in openapi. */
 export const RglLayoutItem = z.object({
   i: z.string().min(1),
   x: z.number().int().nonnegative(),
@@ -26,14 +27,25 @@ export const RglLayoutItem = z.object({
   minW: z.number().int().positive().optional(),
   minH: z.number().int().positive().optional(),
   static: z.boolean().optional(),
-});
+}).strict();
 export type RglLayoutItem = z.infer<typeof RglLayoutItem>;
 
 export const RglBreakpoint = z.enum(['xs', 'sm', 'md', 'lg', 'xl']);
 export type RglBreakpoint = z.infer<typeof RglBreakpoint>;
 
-/** widget_sizes column shape: per-breakpoint RGL layouts. */
-export const RglLayouts = z.record(RglBreakpoint, z.array(RglLayoutItem));
+/**
+ * widget_sizes column shape: per-breakpoint RGL layouts.
+ * P1-5: all breakpoints are optional — BE zero-state returns `{}` which must
+ * parse without error. Using explicit z.object with optional() keys is more
+ * codegen-friendly and explicit than z.record(enum).
+ */
+export const RglLayouts = z.object({
+  xs: z.array(RglLayoutItem).optional(),
+  sm: z.array(RglLayoutItem).optional(),
+  md: z.array(RglLayoutItem).optional(),
+  lg: z.array(RglLayoutItem).optional(),
+  xl: z.array(RglLayoutItem).optional(),
+});
 export type RglLayouts = z.infer<typeof RglLayouts>;
 
 export const DateRangePreset = z.enum(['1m', '3m', '1y', 'all', 'custom']);
