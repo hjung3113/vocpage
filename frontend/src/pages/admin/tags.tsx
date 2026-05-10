@@ -140,11 +140,29 @@ export default function AdminTagsPage() {
         ) : (
           <TagRulesFlatTable
             q={qParam}
-            onJumpToTag={() => {
+            onJumpToTag={(tagId) => {
               setParams((p) => {
                 p.set('view', 'tags');
                 p.delete('q');
                 return p;
+              });
+              // UI-SPEC §view=rules flat table: switches `?view=tags` and
+              // scrolls to that tag row. Defer until the TagMasterTable mounts.
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  const row = document.querySelector(
+                    `[data-tag-row-id="${tagId}"]`,
+                  ) as HTMLElement | null;
+                  if (row) {
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    row.style.outline = '2px solid var(--accent)';
+                    row.style.outlineOffset = '-2px';
+                    setTimeout(() => {
+                      row.style.outline = '';
+                      row.style.outlineOffset = '';
+                    }, 1200);
+                  }
+                });
               });
             }}
             onEditRule={(tag) => setRulesModalTag(tag)}

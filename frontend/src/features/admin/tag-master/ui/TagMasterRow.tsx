@@ -29,7 +29,10 @@ export function TagMasterRow({
 }: Props) {
   const ruleCount = tag.rule_ref_count;
   return (
-    <tr style={{ borderBottom: '1px solid var(--border-standard)' }}>
+    <tr
+      data-tag-row-id={tag.id}
+      style={{ borderBottom: '1px solid var(--border-standard)' }}
+    >
       <td style={{ padding: '10px 12px', fontWeight: 500 }}>{tag.name}</td>
       <td style={{ padding: '10px 12px', color: 'var(--text-secondary)' }}>
         {tag.kind === 'general' ? '일반' : '메뉴'}

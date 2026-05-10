@@ -180,11 +180,20 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', minWidth: modalMinWidth }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--sp-4)',
+          minWidth: modalMinWidth,
+          maxHeight: 'min(720px, calc(100vh - 96px))',
+        }}
+      >
         <div
           style={{
             paddingBottom: 'var(--sp-3)',
             borderBottom: '1px solid var(--border-subtle)',
+            flexShrink: 0,
           }}
         >
           <ModalHeader title={`${tag.name} · 규칙 ${tag.rule_ref_count}건`} onClose={onClose} />
@@ -216,6 +225,7 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
           />
         )}
 
+        <div style={{ flex: '1 1 auto', overflowY: 'auto', minHeight: 0 }}>
         {isLoading ? (
           <RulesSkeletonTable />
         ) : rules.length === 0 && !createRule.isPending ? (
@@ -237,6 +247,7 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
             }
           />
         )}
+        </div>
       </div>
 
       {confirming && (

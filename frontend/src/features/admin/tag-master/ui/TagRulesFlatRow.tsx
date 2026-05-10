@@ -33,6 +33,7 @@ export function TagRulesFlatRow({
           {visible.map((kw) => (
             <span
               key={kw}
+              title={kw}
               style={{
                 display: 'inline-flex',
                 padding: '2px 8px',
@@ -41,6 +42,10 @@ export function TagRulesFlatRow({
                 color: 'var(--text-primary)',
                 fontSize: '11.5px',
                 fontWeight: 600,
+                maxWidth: '180px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               {kw}

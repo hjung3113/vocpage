@@ -61,6 +61,10 @@ function KeywordChipsView({ keywords }: { keywords: string[] }) {
     background: 'var(--bg-elevated)',
     fontSize: '11.5px',
     fontWeight: 600,
+    maxWidth: '180px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   };
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-1)' }}>

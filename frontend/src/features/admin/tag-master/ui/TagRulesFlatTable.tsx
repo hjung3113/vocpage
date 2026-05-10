@@ -147,9 +147,11 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
   }
 
   return (
+    <div style={{ overflowX: 'auto' }}>
     <table
       style={{
         width: '100%',
+        minWidth: '720px',
         borderCollapse: 'collapse',
         fontSize: '13px',
         color: 'var(--text-primary)',
@@ -206,6 +208,7 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
         )}
       </tbody>
     </table>
+    </div>
   );
 }
 
