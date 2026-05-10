@@ -245,7 +245,7 @@ export async function deleteTag(id: string) {
  * Routes: /api/admin/tags/:tagId/rules*
  * ------------------------------------------------------------------------- */
 
-const TAG_RULE_SELECT_BASE = `
+export const TAG_RULE_SELECT_BASE = `
   SELECT
     tr.id,
     tr.tag_id,
@@ -254,7 +254,7 @@ const TAG_RULE_SELECT_BASE = `
     tr.match_mode,
     tr.suspended_until,
     tr.created_by,
-    u.name AS created_by_name,
+    u.display_name AS created_by_name,
     tr.created_at
   FROM tag_rules tr
   LEFT JOIN users u ON u.id = tr.created_by
