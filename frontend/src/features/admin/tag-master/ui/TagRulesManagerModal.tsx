@@ -64,15 +64,25 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
 
   const rules = data?.rows ?? [];
 
+  // Snapshot of keywords currently being submitted — drives the optimistic
+  // placeholder row in TagRulesSubTable per UI-SPEC §Optimistic update.
+  const [pendingCreateKeywords, setPendingCreateKeywords] = useState<string[] | null>(null);
+
   function handleAdd() {
+    const submitted = keywords;
+    setPendingCreateKeywords(submitted);
     createRule.mutate(
-      { keywords, match_mode: 'keyword' },
+      { keywords: submitted, match_mode: 'keyword' },
       {
         onSuccess: () => {
           setKeywords([]);
           setBannerError(null);
+          setPendingCreateKeywords(null);
         },
-        onError: () => setBannerError(ERROR_COPY.create),
+        onError: () => {
+          setBannerError(ERROR_COPY.create);
+          setPendingCreateKeywords(null);
+        },
       },
     );
   }
@@ -165,7 +175,7 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
 
         {isLoading ? (
           <RulesSkeletonTable />
-        ) : rules.length === 0 ? (
+        ) : rules.length === 0 && !createRule.isPending ? (
           <EmptyRulesState />
         ) : (
           <TagRulesSubTable
@@ -179,6 +189,9 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
             onSaveEdit={saveEdit}
             onRequestConfirm={(kind, rule) => setConfirming({ kind, rule })}
             updatePending={updateRule.isPending}
+            pendingPlaceholderKeywords={
+              createRule.isPending ? pendingCreateKeywords ?? undefined : undefined
+            }
           />
         )}
       </div>

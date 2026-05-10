@@ -87,6 +87,7 @@ export interface TagRulesSubTableProps {
   onSaveEdit: (ruleId: string) => void;
   onRequestConfirm: (kind: TagRuleConfirmKind, rule: TagRuleT) => void;
   updatePending: boolean;
+  pendingPlaceholderKeywords?: string[];
 }
 
 export function TagRulesSubTable({
@@ -100,6 +101,7 @@ export function TagRulesSubTable({
   onSaveEdit,
   onRequestConfirm,
   updatePending,
+  pendingPlaceholderKeywords,
 }: TagRulesSubTableProps) {
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13.5px' }}>
@@ -189,6 +191,29 @@ export function TagRulesSubTable({
             </tr>
           );
         })}
+        {pendingPlaceholderKeywords && pendingPlaceholderKeywords.length > 0 && (
+          <tr
+            data-testid="rule-pending-placeholder"
+            style={{
+              borderBottom: '1px solid var(--border-subtle)',
+              opacity: 0.6,
+              transition: 'opacity 120ms cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            aria-busy="true"
+          >
+            <Td>
+              <KeywordChipsView keywords={pendingPlaceholderKeywords} />
+            </Td>
+            <Td>키워드</Td>
+            <Td>
+              <span style={{ color: 'var(--text-tertiary)' }}>저장 중...</span>
+            </Td>
+            <Td>
+              <span style={{ color: 'var(--text-quaternary)' }}>—</span>
+            </Td>
+            <Td>—</Td>
+          </tr>
+        )}
       </tbody>
     </table>
   );
