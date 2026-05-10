@@ -1,6 +1,6 @@
 # vocpage — 다음 세션 태스크 계획
 
-> 최종 업데이트: 2026-05-10 (specs 정리 · Wave 2 Phase E + Wave 3 Custom Date Range 머지 완료)
+> 최종 업데이트: 2026-05-10 (구조/네이밍 정리 1차 머지 완료 — PR #314)
 > 진행 포인터: `claude-progress.txt` 첫 30줄 → 본 문서 → `admin-pages-backlog.md` (admin 미구현 페이지 메모)
 > **2026-05-09 정책**: 구현 정본 = `requirements.md` + `uidesign.md` 만. prototype 참조 종료.
 
@@ -10,6 +10,7 @@
 
 | 항목 | 출처 | 비고 |
 | --- | --- | --- |
+| **구조/네이밍 정리 2차 (Cand 1)** | 본 문서 §구조/네이밍 정리 | entity `api/` 슬라이스 네이밍 통일. voc 부터 단계적 PR. |
 | **마이그 023 운영 적용** | PR #312 머지 (2026-05-10) | rogue row 진단 SQL 선행. 적용 후 Dashboard Dialog 'custom' round-trip 통합 검증. |
 | **Admin 미구현 페이지** | [`admin-pages-backlog.md`](./admin-pages-backlog.md) | 시스템/메뉴 / 유형 / 결과 검토 / 태그 규칙. 권장 순서: 태그 규칙(태그 마스터 통합) → 시스템/메뉴 → 유형 → 결과 검토(NextGen). |
 | **ADR 0007 timezone 잠금** | `docs/adr/0007-custom-date-range-timezone.md` (Proposed) | 다중 timezone 운영 진입 전 별 세션. 잠금 전 다중 TZ 진입 금지. |
@@ -18,6 +19,27 @@
 ### Hard-blocks
 
 - 없음.
+
+---
+
+## 구조/네이밍 정리 (deepening candidates · 2026-05-10 audit)
+
+`improve-codebase-architecture` 스킬로 6 candidate 도출 → codex 적대적 리뷰 거쳐 verdict 확정.
+
+| ID | 항목 | Verdict | 상태 |
+| --- | --- | --- | --- |
+| 2 | `useVocFilter`/`useVocFilters` → `useVocFilterContext`/`useVocFilterUrlState` | PROCEED | ✅ PR #314 |
+| 4 | `features/admin/tag-master/` 평면 → `api/+ui/` | PROCEED | ✅ PR #314 |
+| 1 | entity `api/` 슬라이스 네이밍 통일 (`subject.api.ts`/`subject.query-keys.ts`) | PROCEED, 단계적 | 🔜 차기 |
+| 3 | `features/dashboard/widgets/` ↔ top-level `widgets/` shadow | DEFER | 보류 |
+| 5 | backend `*.repo.ts`/`*.service.ts` suffix 혼재 통일 | DEFER | BE 작업 묶기 |
+| 6 | backend `controllers/` + `validators/` orphan 의혹 | REJECT | `backend/src/CLAUDE.md` 5-layer + ADR-0003 |
+
+**Cand 1 진입 가이드 (차기)**:
+- 대상 9 파일: `entities/{master,user,notification,voc}/api/*Api.ts` + `*QueryKeys.ts` (camelCase) · `entities/{faq,notice}/api/{keys,queries}.ts` (평면) · `features/auth/api/authApi.ts`.
+- 슬라이스 단위 PR (voc → master → user → notification → faq → notice → auth) — 한 슬라이스 당 2 파일 rename + import 갱신.
+- naming-conventions §5.2 준수: `subject.api.ts` / `subject.query-keys.ts`.
+- entity barrel(`@entities/<name>`)로 caller 변경 최소화 가능하면 그 방향.
 
 ---
 
