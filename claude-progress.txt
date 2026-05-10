@@ -1,6 +1,13 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 사이드바 admin 메뉴 누락 픽스 + 스테일 브랜치 일괄 정리 머지 완료 → Wave 2 Phase C 진입)
+## 다음 세션 시작점 (2026-05-10 Wave 2 Phase C BE+FE 머지 완료 → Phase E 진입)
+
+→ **Wave 2 Phase C — 7 endpoint BE + 7 위젯 FE 머지 완료** (PR #304/#305/#306, 2026-05-10):
+   - **PR #304 — vite proxy 포트 정합**: BE `process.env.PORT ?? 3000` → `?? 3001` (vite proxy 가 `localhost:3001` 으로 forward; docker compose 는 컨테이너 내부 PORT=3000 명시 유지). 로컬 dev 페어링 정합.
+   - **PR #305 — Phase C BE (단일 PR)**: 7 endpoint (`/api/dashboard/{distribution,priority-status-matrix,heatmap,weekly-trend,processing-speed,assignee-stats,aging-vocs}`) + `dashboard-phase-c.{route,service,repo}.ts` + zod 컨트랙트 7종 (`shared/contracts/dashboard/*.ts`) + 권한 매트릭스 (admin/manager/dev 200, user 403). codex:rescue 적대적 리뷰 P0×2 (KST 캘린더 캐스팅 SQL — `(status_changed_at AT TIME ZONE 'Asia/Seoul')::date - (created_at AT TIME ZONE 'Asia/Seoul')::date`) + P1×1 (`range=custom` 시 `startDate`/`endDate` 누락 → 400; `DashboardFilter` 에 `.refine` 추가, `DashboardFilterBase` 분리하여 5개 child 확장 보존) 픽스 동봉. BE 518 → 584 pass (+66).
+   - **PR #306 — Phase C FE (단일 PR)**: 7 위젯 (`{Distribution,PriorityStatusMatrix,Heatmap,WeeklyTrend,ProcessingSpeed,AssigneeStats,AgingVocs}Widget.tsx`) + `GridTable.tsx` 공용 (heatmap / matrix / assignee 3-widget 강도 그리드 — `oklch(63% 0.19 258 / 0.06~0.62)` 선형 보간) + `buildVocUrl.ts` (5 위젯 click-through nav, globalFilter 컨텍스트 보존) + recharts@^3.8.1 (LineChart 3-line 트렌드, PieChart 도넛 분포) + MSW 7 핸들러 (`mocks/handlers/dashboard-phase-c.ts`). codex:rescue 적대적 리뷰 P0×3 (matrix dead code → `dist-matrix` 슬롯이 분포+매트릭스 vertical stack; click-through nav 5위젯 미구현; SLA 토큰 `chart-emerald/amber` → `status-green/amber/red`) + P1×4 (heatmap 빈 카피 `해당 기간 데이터 없음`; 3-level breadcrumb (`전체 › 채널 A › 메뉴 1`); AgingVocs dim toggle 시스템별↔메뉴별 globalTab 연동; AssigneeStats `isHighlighted={r.id === filter.assigneeId}`) 픽스 동봉. FE 603 → 648 pass (+45).
+   - **Spec amendment** (`dashboard.md §5 주간 트렌드` v3.1, 2026-05-10): `inProgress` 의미를 "주말 스냅샷 기준 검토중+처리중 상태 VOC 수" → "해당 주에 검토중 또는 처리중으로 전환된 VOC 수" 로 정정. `voc_status_history` 테이블 부재로 진정한 스냅샷 불가 → 진입 카운트로 수렴 (사용자 결정 옵션 A). 컨트랙트 필드명 `inProgress` → `enteredInProgress`.
+   - **오케스트레이션 메모**: FE 픽스 1차 시도가 codex:rescue Skill 위임 후 9분 정체 → `TaskStop` → "Skill 호출 금지" 명시한 직접 작업 에이전트로 재디스패치 → 정상 완료. codex 위임은 read-only sandbox 한계로 write-heavy 작업에 부적합.
 
 → **사이드바 admin 메뉴 누락 픽스** (PR #302 머지, 2026-05-10):
    - 라우터·페이지·API·MSW·테스트는 W3-6 (외부 마스터) / W3-7 Phase E (사용자) 시점에 모두 머지됐는데 `Sidebar.tsx` `ADMIN_NAV_ITEMS` 등록만 누락 → admin 사용자가 메뉴 진입 불가 상태였음.
@@ -22,10 +29,8 @@
    - **검증**: typecheck 0 / FE 603 pass / lint 0 / 토큰 lint 0.
 
 → **다음 세션 작업** (우선순위 순):
-   1. vite proxy 포트 정합 (3001→3000 또는 BE 포트 변경) — 별건.
-   2. **Wave 2 Phase C** — 7 endpoint BE 단일 PR + 7 위젯 FE PR (분포/매트릭스/히트맵/트렌드/SLA/담당자/Top10).
-   3. **Phase E** — DashboardSettingsDialog (위젯 토글 + default_date_range + heatmap x-axis + admin lock).
-   4. 운영/배포 phase (`connect-pg-simple` / OIDC / production Dockerfile / Playwright E2E).
+   1. **Phase E** — DashboardSettingsDialog (위젯 토글 + default_date_range + heatmap x-axis + admin lock).
+   2. 운영/배포 phase (`connect-pg-simple` / OIDC / production Dockerfile / Playwright E2E).
 
 → **마이그 번호** — 다음 = **023**.
 
