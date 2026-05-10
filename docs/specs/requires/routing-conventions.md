@@ -17,8 +17,7 @@
 /faqs                     → FAQ
 /admin                    → 관리자 홈 (ADMIN 이상)
 /admin/result-review      → VOC 결과 검토
-/admin/tag-rules          → 태그 규칙 관리
-/admin/tags               → 태그 마스터 관리
+/admin/tags               → 태그 마스터 + 태그 규칙 통합 관리
 /admin/systems            → 시스템 관리
 /admin/users              → 사용자 관리
 /admin/external-masters   → External Master 관리
@@ -70,6 +69,20 @@ Drawer 열림   /vocs?page=1&status=OPEN&drawer={vocId}
 Drawer        ?drawer={vocId}
 기본값        URL에서 omit, parse 실패 시 Zod fallback + URL replace
 ```
+
+---
+
+## §10.4.1 Admin 페이지 URL 컨벤션
+
+```
+/admin/tags                → 태그 마스터 + 태그 규칙 통합 페이지
+                             ?view=tags|rules    탭 상태 (기본 tags)
+                             ?q=<text>           키워드 검색 (view=rules 일 때만 의미)
+```
+
+- 태그 규칙은 별도 라우트 없이 `/admin/tags` 내부에서 관리한다 (행별 `규칙 N건` 뱃지 → `TagRulesManagerModal` Dialog).
+- `?view` / `?q`는 단일 source of truth — 새로고침 / 공유 링크 / 뒤로가기에서 동일 상태가 복원된다.
+- 기본값은 URL에서 omit, parse 실패 시 Zod fallback + URL replace (§10.4 일반 규칙 준용).
 
 ---
 
