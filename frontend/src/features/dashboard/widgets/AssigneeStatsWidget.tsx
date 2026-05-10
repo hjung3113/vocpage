@@ -1,11 +1,16 @@
 /**
  * AssigneeStatsWidget — Wave 2 Phase C (dashboard.md §8 담당자별 처리 현황 v3).
  * Grid table with intensity shading. xAxis independent from HeatmapWidget.
+ * P1-4: isHighlighted for current filter assignee.
+ * P0-2: Click-through nav to /voc.
  */
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@shared/ui/skeleton';
 import type { HeatmapXAxis } from '@contracts/dashboard';
 import { useAssigneeStats } from '../model/useAssigneeStats';
+import { useDashboardFilter } from '../model/dashboardFilter';
 import { GridTable, type GridTableRow } from './GridTable';
+import { buildVocUrl } from './buildVocUrl';
 
 const X_AXIS_OPTIONS: { id: HeatmapXAxis; label: string }[] = [
   { id: 'status', label: '상태' },
@@ -14,6 +19,8 @@ const X_AXIS_OPTIONS: { id: HeatmapXAxis; label: string }[] = [
 ];
 
 export function AssigneeStatsWidget() {
+  const navigate = useNavigate();
+  const { filter } = useDashboardFilter();
   const { data, isLoading, isError, refetch, xAxis, setXAxis } = useAssigneeStats();
 
   const rows: GridTableRow[] = data?.rows.map((r) => ({
@@ -22,8 +29,29 @@ export function AssigneeStatsWidget() {
     values: r.values,
     total: r.total,
     isUnassigned: r.is_unassigned,
-    isClickable: !r.is_unassigned,
+    isClickable: true,
+    // P1-4: highlight the row whose assigneeId matches the current filter
+    isHighlighted: r.id === filter.assigneeId,
   })) ?? [];
+
+  function handleCellClick(rowId: string | null, colIndex: number) {
+    const colKey = data?.headers[colIndex];
+    if (!colKey) return;
+    const widgetParams: Record<string, string> = {};
+    if (xAxis === 'status') widgetParams.status = colKey;
+    else if (xAxis === 'priority') widgetParams.priority = colKey;
+    else if (xAxis === 'tag') widgetParams.tag = colKey;
+    // 미배정 row: assigneeId='unassigned'
+    widgetParams.assigneeId = rowId ?? 'unassigned';
+    navigate(buildVocUrl(widgetParams, filter));
+  }
+
+  function handleRowClick(rowId: string | null) {
+    const widgetParams: Record<string, string> = {
+      assigneeId: rowId ?? 'unassigned',
+    };
+    navigate(buildVocUrl(widgetParams, filter));
+  }
 
   return (
     <div
@@ -84,6 +112,8 @@ export function AssigneeStatsWidget() {
             headers={data.headers}
             rows={rows}
             maxValue={data.max_value}
+            onCellClick={handleCellClick}
+            onRowClick={handleRowClick}
           />
         </div>
       )}

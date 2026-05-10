@@ -2,12 +2,16 @@
  * DistributionWidget — Wave 2 Phase C (dashboard.md §2 분포 탭).
  * widgetId: dist-matrix (shared slot — see DashboardShell).
  * Donut chart (recharts PieChart) + legend for status/priority/voc_type/tag.
+ * P0-2: Legend item click → /voc?<param>=<val>&...globalFilter.
  */
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Skeleton } from '@shared/ui/skeleton';
 import type { DistributionType } from '@contracts/dashboard';
 import { useDistribution } from '../model/useDistribution';
+import { useDashboardFilter } from '../model/dashboardFilter';
+import { buildVocUrl } from './buildVocUrl';
 
 const TABS: { id: DistributionType; label: string }[] = [
   { id: 'status', label: '상태' },
@@ -15,6 +19,14 @@ const TABS: { id: DistributionType; label: string }[] = [
   { id: 'voc_type', label: '유형' },
   { id: 'tag', label: '태그' },
 ];
+
+/** Mapping from DistributionType to /voc search param key */
+const TAB_PARAM: Record<DistributionType, string> = {
+  status: 'status',
+  priority: 'priority',
+  voc_type: 'vocType',
+  tag: 'tag',
+};
 
 /** Status / priority color tokens — CSS vars only. */
 const SLICE_COLORS: Record<string, string | undefined> = {
@@ -45,6 +57,14 @@ function sliceColor(key: string, index: number): string {
 export function DistributionWidget() {
   const [activeTab, setActiveTab] = useState<DistributionType>('status');
   const { data, isLoading, isError, refetch } = useDistribution(activeTab);
+  const { filter } = useDashboardFilter();
+  const navigate = useNavigate();
+
+  function handleLegendClick(entry: { value?: string }) {
+    if (!entry.value) return;
+    const paramKey = TAB_PARAM[activeTab];
+    navigate(buildVocUrl({ [paramKey]: entry.value }, filter));
+  }
 
   return (
     <div
@@ -124,6 +144,8 @@ export function DistributionWidget() {
                 iconType="circle"
                 iconSize={8}
                 formatter={(value) => <span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{value}</span>}
+                onClick={handleLegendClick}
+                wrapperStyle={{ cursor: 'pointer' }}
               />
             </PieChart>
           </ResponsiveContainer>

@@ -2,6 +2,7 @@
  * WeeklyTrendWidget — Wave 2 Phase C (dashboard.md §5 주간 트렌드 v3).
  * 3-line recharts LineChart: 신규 / 진입(검토중+처리중) / 완료.
  * 12-week fixed window — ignores global date range.
+ * P0-2: Point click navigates to /voc with series-specific params.
  */
 import {
   LineChart,
@@ -13,18 +14,56 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@shared/ui/skeleton';
 import { useWeeklyTrend } from '../model/useWeeklyTrend';
+import { useDashboardFilter } from '../model/dashboardFilter';
+import { buildVocUrl } from './buildVocUrl';
+
+/** Add N days to an ISO date string and return ISO date string. */
+function addDays(isoDate: string, n: number): string {
+  const d = new Date(isoDate);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
 
 export function WeeklyTrendWidget() {
+  const navigate = useNavigate();
+  const { filter } = useDashboardFilter();
   const { data, isLoading, isError, refetch } = useWeeklyTrend();
 
   const chartData = data?.weeks.map((week, i) => ({
     week,
+    weekIndex: i,
     신규: data.series.new[i],
     처리진입: data.series.enteredInProgress[i],
     완료: data.series.done[i],
   })) ?? [];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function handleDotClick(seriesKey: '신규' | '처리진입' | '완료', payload: any) {
+    if (!data || payload?.weekIndex === undefined) return;
+    const weekStart = data.weekStarts[payload.weekIndex as number];
+    if (!weekStart) return;
+    const weekEnd = addDays(weekStart, 6);
+
+    let widgetParams: Record<string, string> = {};
+    if (seriesKey === '신규') {
+      widgetParams = { startDate: weekStart, endDate: weekEnd };
+    } else if (seriesKey === '처리진입') {
+      widgetParams = { status: '검토중,처리중', snapshotDate: weekEnd };
+    } else {
+      // 완료
+      widgetParams = { status: '완료,드랍', startDate: weekStart, endDate: weekEnd };
+    }
+    navigate(buildVocUrl(widgetParams, filter));
+  }
+
+  // Recharts active dot click handler factory per series
+  function makeDotClickHandler(seriesKey: '신규' | '처리진입' | '완료') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (_: any, payload: any) => handleDotClick(seriesKey, payload);
+  }
 
   return (
     <div
@@ -93,9 +132,30 @@ export function WeeklyTrendWidget() {
                   <span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{value}</span>
                 )}
               />
-              <Line type="monotone" dataKey="신규" stroke="var(--chart-blue)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="처리진입" stroke="var(--chart-amber)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="완료" stroke="var(--chart-emerald)" strokeWidth={2} dot={false} />
+              <Line
+                type="monotone"
+                dataKey="신규"
+                stroke="var(--chart-blue)"
+                strokeWidth={2}
+                dot={{ r: 3, cursor: 'pointer' }}
+                activeDot={{ r: 5, cursor: 'pointer', onClick: makeDotClickHandler('신규') }}
+              />
+              <Line
+                type="monotone"
+                dataKey="처리진입"
+                stroke="var(--chart-amber)"
+                strokeWidth={2}
+                dot={{ r: 3, cursor: 'pointer' }}
+                activeDot={{ r: 5, cursor: 'pointer', onClick: makeDotClickHandler('처리진입') }}
+              />
+              <Line
+                type="monotone"
+                dataKey="완료"
+                stroke="var(--chart-emerald)"
+                strokeWidth={2}
+                dot={{ r: 3, cursor: 'pointer' }}
+                activeDot={{ r: 5, cursor: 'pointer', onClick: makeDotClickHandler('완료') }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>

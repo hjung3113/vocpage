@@ -2,9 +2,15 @@
  * AgingVocsWidget — Wave 2 Phase C (dashboard.md §9 장기 미처리 VOC Top 10 v3).
  * Data table. Elapsed days badge: 14–29 amber, 30+ red.
  * Date filter ignored (BE silently ignores).
+ * P1-3: Dim toggle responsive to globalTab (systemId → 메뉴별; else → 시스템별).
  */
+import { useState } from 'react';
 import { Skeleton } from '@shared/ui/skeleton';
+import type { AgingVocDim } from '@contracts/dashboard';
+
+type AgingDimOption = { id: AgingVocDim; label: string };
 import { useAgingVocs } from '../model/useAgingVocs';
+import { useDashboardFilter } from '../model/dashboardFilter';
 
 function elapsedBadgeStyle(days: number): string {
   if (days >= 30) return 'bg-[color-mix(in_oklch,var(--chart-red)_15%,transparent)] text-[var(--chart-red)]';
@@ -20,7 +26,18 @@ const PRIORITY_LABELS: Record<string, string> = {
 };
 
 export function AgingVocsWidget() {
-  const { data, isLoading, isError, refetch } = useAgingVocs(10, 'all');
+  const { filter } = useDashboardFilter();
+  const isSystemSelected = !!filter.systemId;
+  // Dim options depend on global tab: no systemId → 전체/시스템별; systemId → 전체/메뉴별
+  const dimOptions: AgingDimOption[] = isSystemSelected
+    ? [{ id: 'all' as AgingVocDim, label: '전체' }, { id: 'menu' as AgingVocDim, label: '메뉴별' }]
+    : [{ id: 'all' as AgingVocDim, label: '전체' }, { id: 'system' as AgingVocDim, label: '시스템별' }];
+
+  const [dim, setDim] = useState<AgingVocDim>('all');
+  const { data, isLoading, isError, refetch } = useAgingVocs(10, dim);
+
+  // Column header for the system/menu column
+  const groupColLabel = isSystemSelected ? '메뉴' : '시스템';
 
   return (
     <div
@@ -28,8 +45,27 @@ export function AgingVocsWidget() {
       aria-busy={isLoading}
       className="flex h-full flex-col gap-2 rounded-lg border border-[var(--border-standard)] bg-[var(--bg-panel)] p-4"
     >
-      <div className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-quaternary)]">
-        장기 미처리 Top 10
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-quaternary)]">
+          장기 미처리 Top 10
+        </div>
+        <div className="flex gap-1">
+          {dimOptions.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              data-testid={`aging-dim-${opt.id}`}
+              onClick={() => setDim(opt.id)}
+              className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+                dim === opt.id
+                  ? 'bg-[var(--brand)] text-[var(--text-on-brand)]'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {isLoading && (
@@ -65,7 +101,7 @@ export function AgingVocsWidget() {
                 <th className="py-2 text-left font-medium">이슈코드</th>
                 <th className="py-2 text-left font-medium">제목</th>
                 <th className="py-2 text-center font-medium">우선순위</th>
-                <th className="py-2 text-left font-medium">시스템</th>
+                <th className="py-2 text-left font-medium" data-testid="aging-group-col-header">{groupColLabel}</th>
                 <th className="py-2 text-right font-medium w-16">경과일</th>
               </tr>
             </thead>

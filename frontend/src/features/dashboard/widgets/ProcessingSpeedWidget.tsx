@@ -14,16 +14,16 @@ const DIM_OPTIONS: { id: ProcessingSpeedDim; label: string }[] = [
 
 function slaColor(rate: number | null): string {
   if (rate === null) return 'var(--text-quaternary)';
-  if (rate >= 80) return 'var(--chart-emerald)';
-  if (rate >= 60) return 'var(--chart-amber)';
-  return 'var(--chart-red)';
+  if (rate >= 80) return 'var(--status-green)';
+  if (rate >= 60) return 'var(--status-amber)';
+  return 'var(--status-red)';
 }
 
 function slaBarColor(rate: number | null): string {
   if (rate === null) return 'var(--border-subtle)';
-  if (rate >= 80) return 'var(--chart-emerald)';
-  if (rate >= 60) return 'var(--chart-amber)';
-  return 'var(--chart-red)';
+  if (rate >= 80) return 'var(--status-green)';
+  if (rate >= 60) return 'var(--status-amber)';
+  return 'var(--status-red)';
 }
 
 export function ProcessingSpeedWidget() {

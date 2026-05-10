@@ -9,6 +9,7 @@ import { WidgetPlaceholder } from './WidgetPlaceholder';
 import { KpiVolumeWidget } from '../widgets/KpiVolumeWidget';
 import { KpiQualityWidget } from '../widgets/KpiQualityWidget';
 import { DistributionWidget } from '../widgets/DistributionWidget';
+import { PriorityStatusMatrixWidget } from '../widgets/PriorityStatusMatrixWidget';
 import { HeatmapWidget } from '../widgets/HeatmapWidget';
 import { WeeklyTrendWidget } from '../widgets/WeeklyTrendWidget';
 import { ProcessingSpeedWidget } from '../widgets/ProcessingSpeedWidget';
@@ -21,8 +22,13 @@ function renderWidget(widgetId: string, isEditing: boolean) {
   // Phase B
   if (widgetId === 'kpi-volume') return <KpiVolumeWidget />;
   if (widgetId === 'kpi-quality') return <KpiQualityWidget />;
-  // Phase C
-  if (widgetId === 'dist-matrix') return <DistributionWidget />;
+  // Phase C — dist-matrix is a compound slot: §2 Distribution + §3 PriorityStatusMatrix stacked.
+  if (widgetId === 'dist-matrix') return (
+    <div className="flex h-full flex-col gap-4" data-testid="slot-dist-matrix">
+      <DistributionWidget />
+      <PriorityStatusMatrixWidget />
+    </div>
+  );
   if (widgetId === 'heatmap') return <HeatmapWidget />;
   if (widgetId === 'trend-tag') return <WeeklyTrendWidget />;
   if (widgetId === 'sla-aging') return <ProcessingSpeedWidget />;

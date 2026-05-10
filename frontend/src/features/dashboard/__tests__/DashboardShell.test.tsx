@@ -6,6 +6,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import { defaultLayouts, WIDGET_IDS } from '../defaultLayouts';
 import { DashboardFilterProvider } from '../model/dashboardFilter';
@@ -46,15 +47,17 @@ import { DashboardShell } from '../ui/DashboardShell';
 function renderShell(props: { isEditing: boolean }) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <QueryClientProvider client={qc}>
-      <DashboardFilterProvider initial={{ range: '1m' }}>
-        <DashboardShell
-          layouts={defaultLayouts}
-          isEditing={props.isEditing}
-          onLayoutChange={vi.fn()}
-        />
-      </DashboardFilterProvider>
-    </QueryClientProvider>,
+    <MemoryRouter>
+      <QueryClientProvider client={qc}>
+        <DashboardFilterProvider initial={{ range: '1m' }}>
+          <DashboardShell
+            layouts={defaultLayouts}
+            isEditing={props.isEditing}
+            onLayoutChange={vi.fn()}
+          />
+        </DashboardFilterProvider>
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
 }
 
@@ -63,8 +66,10 @@ describe('DashboardShell', () => {
     renderShell({ isEditing: false });
     expect(screen.getByTestId('widget-kpi-volume')).toBeDefined();
     expect(screen.getByTestId('widget-kpi-quality')).toBeDefined();
-    // Phase C widgets are now wired — check a few testids
+    // Phase C widgets are now wired — dist-matrix slot stacks Distribution + Matrix
     expect(screen.getByTestId('widget-distribution')).toBeDefined();
+    expect(screen.getByTestId('widget-priority-status-matrix')).toBeDefined();
+    expect(screen.getByTestId('slot-dist-matrix')).toBeDefined();
     expect(screen.getByTestId('widget-heatmap')).toBeDefined();
     expect(screen.getByTestId('widget-weekly-trend')).toBeDefined();
     expect(screen.getByTestId('widget-processing-speed')).toBeDefined();

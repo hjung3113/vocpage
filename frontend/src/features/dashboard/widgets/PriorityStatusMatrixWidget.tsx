@@ -2,11 +2,15 @@
  * PriorityStatusMatrixWidget — Wave 2 Phase C (dashboard.md §3).
  * 4×5 colored grid: priority rows × status cols.
  * Reuses GridTable for intensity-shaded rendering.
+ * P0-2: Cell click → /voc?priority=<P>&status=<S>&...globalFilter. Empty cells not clickable.
  */
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@shared/ui/skeleton';
 import type { MatrixPriority } from '@contracts/dashboard';
 import { usePriorityStatusMatrix } from '../model/usePriorityStatusMatrix';
+import { useDashboardFilter } from '../model/dashboardFilter';
 import { GridTable, type GridTableRow } from './GridTable';
+import { buildVocUrl } from './buildVocUrl';
 
 const PRIORITY_LABELS: Record<MatrixPriority, string> = {
   urgent: '긴급',
@@ -15,7 +19,17 @@ const PRIORITY_LABELS: Record<MatrixPriority, string> = {
   low: '낮음',
 };
 
+// Reverse map for label→priority key (used for navigation)
+const LABEL_TO_PRIORITY: Record<string, MatrixPriority> = {
+  긴급: 'urgent',
+  높음: 'high',
+  보통: 'medium',
+  낮음: 'low',
+};
+
 export function PriorityStatusMatrixWidget() {
+  const navigate = useNavigate();
+  const { filter } = useDashboardFilter();
   const { data, isLoading, isError, refetch } = usePriorityStatusMatrix();
 
   const rows: GridTableRow[] = data?.rows.map((r) => ({
@@ -25,6 +39,15 @@ export function PriorityStatusMatrixWidget() {
     total: r.row_total,
     isClickable: true,
   })) ?? [];
+
+  function handleCellClick(rowId: string | null, colIndex: number) {
+    if (!rowId || !data) return;
+    const status = data.columns[colIndex];
+    if (!status) return;
+    // Count check — only clickable if cell has value (GridTable enforces v > 0 guard)
+    const priorityKey = LABEL_TO_PRIORITY[rowId] ?? rowId;
+    navigate(buildVocUrl({ priority: priorityKey, status }, filter));
+  }
 
   return (
     <div
@@ -68,6 +91,7 @@ export function PriorityStatusMatrixWidget() {
             headers={data.columns}
             rows={rows}
             maxValue={data.max_value}
+            onCellClick={handleCellClick}
           />
         </div>
       )}

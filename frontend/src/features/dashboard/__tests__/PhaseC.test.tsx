@@ -6,15 +6,18 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import { DashboardFilterProvider } from '../model/dashboardFilter';
 
 function wrap(ui: React.ReactNode) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <QueryClientProvider client={qc}>
-      <DashboardFilterProvider initial={{ range: '1m' }}>{ui}</DashboardFilterProvider>
-    </QueryClientProvider>,
+    <MemoryRouter>
+      <QueryClientProvider client={qc}>
+        <DashboardFilterProvider initial={{ range: '1m' }}>{ui}</DashboardFilterProvider>
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
 }
 
@@ -109,7 +112,7 @@ describe('HeatmapWidget', () => {
   it('renders empty when no rows and no totalRow', () => {
     mockHeatmap.mockReturnValue({ isLoading: false, isError: false, data: { ...DEMO_HEATMAP, rows: [], totalRow: null }, refetch: vi.fn(), xAxis: 'status', setXAxis: vi.fn() } as never);
     wrap(<HeatmapWidget />);
-    expect(screen.getByText('데이터 없음')).toBeInTheDocument();
+    expect(screen.getByText('해당 기간 데이터 없음')).toBeInTheDocument();
   });
   it('xAxis toggle calls setXAxis', () => {
     const setXAxis = vi.fn();
@@ -187,3 +190,4 @@ describe('ProcessingSpeedWidget', () => {
 });
 
 // AssigneeStatsWidget + AgingVocsWidget tests → PhaseC-2.test.tsx
+// P0-2 click-through + P1-1 copy + P1-2 breadcrumb fix tests → PhaseC-3.test.tsx
