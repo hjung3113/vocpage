@@ -12,7 +12,8 @@ import { KpiVolumeWidget } from '../widgets/KpiVolumeWidget';
 import { KpiQualityWidget } from '../widgets/KpiQualityWidget';
 import { KpiCard } from '../widgets/KpiCard';
 
-vi.mock('../model/useDashboardSummary', () => ({
+vi.mock('../model/useDashboardSummary', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../model/useDashboardSummary')>()),
   useDashboardSummary: vi.fn(),
 }));
 const mockSummary = vi.mocked(summaryHook).useDashboardSummary;
@@ -124,25 +125,36 @@ describe('KpiCard formatting', () => {
     expect(screen.queryByTestId('kpi-delta-Y')).toBeNull();
   });
 
-  it('urgent accent applies red border when value > 0', () => {
+  it('urgent accent applies red border only when delta is increasing (spec §1)', () => {
     render(
       <KpiCard
         label="Z"
-        metric={{ value: 5, delta: 0, delta_kind: 'count' }}
+        metric={{ value: 5, delta: 2, delta_kind: 'count' }}
         accent="urgent"
       />,
     );
     expect(screen.getByTestId('kpi-card-Z').className).toMatch(/--chart-red/);
   });
 
-  it('urgent accent does NOT apply red border when value is 0', () => {
+  it('urgent accent does NOT apply when delta=0 even if value is high', () => {
     render(
       <KpiCard
         label="W"
-        metric={{ value: 0, delta: 0, delta_kind: 'count' }}
+        metric={{ value: 5, delta: 0, delta_kind: 'count' }}
         accent="urgent"
       />,
     );
     expect(screen.getByTestId('kpi-card-W').className).not.toMatch(/--chart-red/);
+  });
+
+  it('urgent accent does NOT apply when delta is negative', () => {
+    render(
+      <KpiCard
+        label="V"
+        metric={{ value: 5, delta: -1, delta_kind: 'count' }}
+        accent="urgent"
+      />,
+    );
+    expect(screen.getByTestId('kpi-card-V').className).not.toMatch(/--chart-red/);
   });
 });

@@ -12,6 +12,7 @@ export function KpiVolumeWidget() {
   return (
     <div
       data-testid="widget-kpi-volume"
+      aria-busy={isLoading}
       className="flex h-full flex-col gap-3 rounded-lg border border-[var(--border-standard)] bg-[var(--bg-panel)] p-4"
     >
       <div className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-quaternary)]">
@@ -19,7 +20,12 @@ export function KpiVolumeWidget() {
       </div>
 
       {isLoading && (
-        <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4" data-testid="kpi-volume-loading">
+        <div
+          role="status"
+          aria-live="polite"
+          className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4"
+          data-testid="kpi-volume-loading"
+        >
           {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-24" />
           ))}

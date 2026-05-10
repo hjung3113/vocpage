@@ -71,13 +71,15 @@ export function KpiCard({
   const positive = inverted ? direction < 0 : direction > 0;
   const negative = inverted ? direction > 0 : direction < 0;
 
-  // Spec §1 강조 보더 — urgent uses chart-red @ 35% alpha, overdue uses
-  // chart-amber @ 30%. color-mix keeps the value derived from a token so
-  // the no-raw-color lint stays satisfied.
+  // Spec §1 강조 보더 — only on *increase* vs prior period (dashboard.md §1
+  // "증가 시 red 강조 보더" / "증가 시 amber 강조 보더"). Use chart-red @ 35%
+  // alpha (urgent) or chart-amber @ 30% (overdue); color-mix keeps the
+  // value derived from tokens so the no-raw-color lint stays satisfied.
+  const accentIncreased = metric.delta !== null && metric.delta > 0;
   const accentBorder =
-    accent === 'urgent' && metric.value > 0
+    accent === 'urgent' && accentIncreased
       ? 'border-[color-mix(in_oklch,var(--chart-red)_35%,transparent)]'
-      : accent === 'overdue' && metric.value > 0
+      : accent === 'overdue' && accentIncreased
       ? 'border-[color-mix(in_oklch,var(--chart-amber)_30%,transparent)]'
       : 'border-[var(--border-subtle)]';
 
