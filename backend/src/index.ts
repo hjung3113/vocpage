@@ -19,6 +19,7 @@ import { adminUsersRouter } from './routes/admin-users';
 import { adminMastersRouter } from './routes/admin-masters';
 import { notificationsRouter } from './routes/notifications';
 import { commentsRouter } from './routes/comments';
+import { dashboardPhaseCRouter } from './routes/dashboard-phase-c';
 import { dashboardSettingsRouter } from './routes/dashboard-settings';
 import { dashboardSummaryRouter } from './routes/dashboard-summary';
 import { initMasterCache } from './services/admin/external-masters';
@@ -85,6 +86,7 @@ app.use('/api/admin', adminUsersRouter);
 app.use('/api/admin', adminMastersRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/vocs/:id/comments', commentsRouter);
+app.use('/api/dashboard', dashboardPhaseCRouter);
 app.use('/api/dashboard', dashboardSettingsRouter);
 app.use('/api/dashboard', dashboardSummaryRouter);
 
