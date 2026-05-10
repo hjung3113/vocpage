@@ -35,19 +35,31 @@ export function TagRulesFlatRow({
               key={kw}
               style={{
                 display: 'inline-flex',
-                padding: '1px 8px',
-                borderRadius: '9999px',
-                border: '1px solid var(--border-subtle)',
+                padding: '2px 8px',
+                borderRadius: 'var(--chip-radius-pill, 9999px)',
                 background: 'var(--bg-elevated)',
+                color: 'var(--text-primary)',
                 fontSize: '11.5px',
-                color: 'var(--text-secondary)',
+                fontWeight: 600,
               }}
             >
               {kw}
             </span>
           ))}
           {overflow > 0 && (
-            <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>+{overflow}</span>
+            <span
+              style={{
+                display: 'inline-flex',
+                padding: '2px 8px',
+                borderRadius: 'var(--chip-radius-pill, 9999px)',
+                background: 'var(--bg-elevated)',
+                color: 'var(--text-tertiary)',
+                fontSize: '11.5px',
+                fontWeight: 600,
+              }}
+            >
+              +{overflow}
+            </span>
           )}
         </div>
       </td>

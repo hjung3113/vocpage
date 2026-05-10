@@ -92,8 +92,39 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
 
   if (isError) {
     return (
-      <div role="alert" style={{ padding: 'var(--sp-5)', color: 'var(--status-red)', fontSize: '13px' }}>
-        규칙 목록을 불러오지 못했습니다.
+      <div
+        role="alert"
+        style={{
+          padding: 'var(--sp-5)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 'var(--sp-2)',
+        }}
+      >
+        <p style={{ margin: 0, color: 'var(--status-red)', fontSize: '13.5px', fontWeight: 600 }}>
+          규칙을 불러오지 못했습니다
+        </p>
+        <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>
+          네트워크 상태를 확인한 후 다시 시도해 주세요
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            ruleQueries.forEach((rq) => rq.refetch());
+          }}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid var(--status-red-border)',
+            background: 'transparent',
+            color: 'var(--status-red)',
+            fontSize: '12px',
+            cursor: 'pointer',
+          }}
+        >
+          다시 시도
+        </button>
       </div>
     );
   }

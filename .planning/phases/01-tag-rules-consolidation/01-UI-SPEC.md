@@ -222,6 +222,7 @@ All copy in Korean (per project memory `feedback_korean_questions`). English ide
 | Mutation error (delete)                        | `규칙을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요`                                      |
 | Inline duplicate keyword error                 | `이미 추가된 키워드입니다`                                                                    |
 | Inline empty keyword error                     | `키워드를 한 개 이상 입력하세요`                                                              |
+| Inline cap-reached keyword error               | `최대 {N}개까지 추가할 수 있습니다` (N = `KeywordChipInput` `max`, default 50)                |
 | Suspend confirm copy                           | `이 규칙을 일시중지하시겠습니까? 일시중지된 규칙은 신규 VOC에 자동 적용되지 않습니다.`        |
 | Suspend confirm primary                        | `일시중지`                                                                                    |
 | Resume confirm copy                            | `이 규칙을 재개하시겠습니까? 재개 후 신규 VOC부터 자동 태깅에 다시 사용됩니다.`               |

@@ -63,6 +63,8 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
   const [bannerError, setBannerError] = useState<string | null>(null);
 
   const rules = data?.rows ?? [];
+  // UI-SPEC §Spacing: Modal width 560 → 680 when sub-table N≥3.
+  const modalMinWidth = rules.length >= 3 ? '680px' : '560px';
 
   // Snapshot of keywords currently being submitted — drives the optimistic
   // placeholder row in TagRulesSubTable per UI-SPEC §Optimistic update.
@@ -147,13 +149,19 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', minWidth: '560px' }}>
-        <div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', minWidth: modalMinWidth }}>
+        <div
+          style={{
+            paddingBottom: 'var(--sp-3)',
+            borderBottom: '1px solid var(--border-subtle)',
+          }}
+        >
           <ModalHeader title={`${tag.name} · 규칙 ${tag.rule_ref_count}건`} onClose={onClose} />
           <p
             style={{
               margin: 'var(--sp-1) 0 0',
               fontSize: '12px',
+              fontWeight: 400,
               color: 'var(--text-tertiary)',
               lineHeight: 1.4,
             }}

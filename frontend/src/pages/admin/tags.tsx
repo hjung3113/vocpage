@@ -67,7 +67,7 @@ export default function AdminTagsPage() {
   }
 
   return (
-    <StickyHeaderLayout header={<PageHeader title="태그 마스터" />}>
+    <StickyHeaderLayout header={<PageHeader title="태그 관리" />}>
       <div
         style={{
           display: 'flex',

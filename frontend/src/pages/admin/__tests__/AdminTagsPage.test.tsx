@@ -120,7 +120,7 @@ describe('AdminTagsPage', () => {
     roleMock.mockReturnValue({ isAdmin: true, isManager: false, isDev: false, isUser: false });
     listTagsMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     renderPage();
-    expect(screen.getByText(/로딩 중/)).toBeInTheDocument();
+    expect(screen.getAllByTestId('tag-skeleton-row').length).toBeGreaterThan(0);
   });
 
   it('error: shows error message', () => {
