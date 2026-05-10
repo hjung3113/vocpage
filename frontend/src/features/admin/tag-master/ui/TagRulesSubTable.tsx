@@ -14,7 +14,7 @@ import { TagRuleActionMenu } from './TagRuleActionMenu';
 const Th = ({ children }: { children: ReactNode }) => (
   <th
     style={{
-      padding: '8px 12px',
+      padding: 'var(--sp-2) var(--sp-3)',
       fontSize: '12px',
       fontWeight: 600,
       color: 'var(--text-secondary)',
@@ -26,7 +26,7 @@ const Th = ({ children }: { children: ReactNode }) => (
 );
 
 const Td = ({ children }: { children: ReactNode }) => (
-  <td style={{ padding: '12px', verticalAlign: 'middle', color: 'var(--text-primary)' }}>
+  <td style={{ padding: 'var(--sp-3)', verticalAlign: 'middle', color: 'var(--text-primary)' }}>
     {children}
   </td>
 );
@@ -63,7 +63,7 @@ function KeywordChipsView({ keywords }: { keywords: string[] }) {
     fontWeight: 600,
   };
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-1)' }}>
       {visible.map((kw) => (
         <span key={kw} style={{ ...chip, color: 'var(--text-primary)' }}>
           {kw}

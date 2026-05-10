@@ -29,7 +29,7 @@ export function TagRuleAddForm({
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}
+      style={{ display: 'flex', gap: 'var(--sp-2)', alignItems: 'flex-start' }}
       aria-label="규칙 추가"
     >
       <div style={{ flex: 1 }}>

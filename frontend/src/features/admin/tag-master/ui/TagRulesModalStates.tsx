@@ -17,7 +17,7 @@ export function MutationErrorBanner({
     <div
       role="alert"
       style={{
-        padding: '8px 12px',
+        padding: 'var(--sp-2) var(--sp-3)',
         borderRadius: '6px',
         background: 'var(--status-red-bg)',
         color: 'var(--status-red)',
@@ -75,8 +75,8 @@ export function EmptyRulesState() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
-        padding: '32px 16px',
+        gap: 'var(--sp-2)',
+        padding: 'var(--sp-6) var(--sp-4)',
       }}
     >
       <ListPlus size={32} color="var(--text-quaternary)" />

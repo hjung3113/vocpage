@@ -72,7 +72,7 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
 
   if (isLoading) {
     return (
-      <div role="status" style={{ padding: '24px', color: 'var(--text-muted)', fontSize: '13px' }}>
+      <div role="status" style={{ padding: 'var(--sp-5)', color: 'var(--text-muted)', fontSize: '13px' }}>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -92,7 +92,7 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
 
   if (isError) {
     return (
-      <div role="alert" style={{ padding: '24px', color: 'var(--status-red)', fontSize: '13px' }}>
+      <div role="alert" style={{ padding: 'var(--sp-5)', color: 'var(--status-red)', fontSize: '13px' }}>
         규칙 목록을 불러오지 못했습니다.
       </div>
     );
@@ -130,7 +130,7 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
             <th
               key={h}
               style={{
-                padding: '8px 12px',
+                padding: 'var(--sp-2) var(--sp-3)',
                 textAlign: 'left',
                 fontSize: '11px',
                 fontWeight: 500,
@@ -161,7 +161,7 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
               role="note"
               data-testid="flat-truncated-notice"
               style={{
-                padding: '12px',
+                padding: 'var(--sp-3)',
                 fontSize: '12px',
                 color: 'var(--text-muted)',
                 background: 'var(--bg-subtle)',

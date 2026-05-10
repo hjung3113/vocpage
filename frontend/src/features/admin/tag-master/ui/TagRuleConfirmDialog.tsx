@@ -98,7 +98,7 @@ export function TagRuleConfirmDialog({
         style={{
           background: 'var(--bg-elevated)',
           borderRadius: '8px',
-          padding: '24px',
+          padding: 'var(--sp-5)',
           minWidth: '340px',
           maxWidth: '420px',
           boxShadow: 'var(--shadow-dialog)',
@@ -106,7 +106,7 @@ export function TagRuleConfirmDialog({
       >
         <p
           style={{
-            margin: '0 0 16px',
+            margin: '0 0 var(--sp-4)',
             fontSize: '13.5px',
             color: 'var(--text-primary)',
             lineHeight: 1.5,
@@ -114,7 +114,7 @@ export function TagRuleConfirmDialog({
         >
           {copy.body}
         </p>
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-2)', justifyContent: 'flex-end' }}>
           <button type="button" onClick={onCancel} disabled={pending} style={ghostBtn}>
             취소
           </button>

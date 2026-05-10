@@ -29,7 +29,7 @@ export function TagRulesFlatRow({
       }}
     >
       <td style={{ padding: '10px 12px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-1)' }}>
           {visible.map((kw) => (
             <span
               key={kw}

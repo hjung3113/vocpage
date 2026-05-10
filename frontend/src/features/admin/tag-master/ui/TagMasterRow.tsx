@@ -75,7 +75,7 @@ export function TagMasterRow({
               : {
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px',
+                  gap: 'var(--sp-1)',
                   padding: '2px 8px',
                   borderRadius: '9999px',
                   border: '1px solid var(--brand-border)',
@@ -94,7 +94,7 @@ export function TagMasterRow({
         {tag.created_at.slice(0, 10)}
       </td>
       <td style={{ padding: '10px 12px' }}>
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--sp-1)', flexWrap: 'wrap' }}>
           <TagMasterActionButton
             icon={<Pencil size={13} />}
             label="편집"

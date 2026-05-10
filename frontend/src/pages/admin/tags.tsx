@@ -95,7 +95,7 @@ export default function AdminTagsPage() {
                 data-testid={`tab-view-${t.v}`}
                 onClick={() => setView(t.v)}
                 style={{
-                  padding: '4px 12px',
+                  padding: 'var(--sp-1) var(--sp-3)',
                   borderRadius: '9999px',
                   fontSize: '12.5px',
                   fontWeight: active ? 600 : 500,

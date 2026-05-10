@@ -18,7 +18,7 @@ export function TagRulesFlatTableEmptyState({
         alignItems: 'center',
         justifyContent: 'center',
         gap: '6px',
-        padding: '24px',
+        padding: 'var(--sp-5)',
       }}
     >
       <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-secondary)' }}>

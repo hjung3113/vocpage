@@ -77,7 +77,7 @@ export function KeywordChipInput({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
       <div
         role="list"
         style={{
@@ -99,8 +99,8 @@ export function KeywordChipInput({
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px',
-              padding: '2px 8px',
+              gap: 'var(--sp-1)',
+              padding: '2px var(--sp-2)',
               borderRadius: 'var(--chip-radius-pill, 9999px)',
               background: 'var(--bg-elevated)',
               color: 'var(--text-primary)',

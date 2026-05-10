@@ -54,7 +54,7 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '24px', color: 'var(--text-muted)', fontSize: '13px' }}>
+      <div style={{ padding: 'var(--sp-5)', color: 'var(--text-muted)', fontSize: '13px' }}>
         로딩 중...
       </div>
     );
@@ -62,7 +62,7 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
 
   if (isError) {
     return (
-      <div style={{ padding: '24px', color: 'var(--status-red)', fontSize: '13px' }}>
+      <div style={{ padding: 'var(--sp-5)', color: 'var(--status-red)', fontSize: '13px' }}>
         태그 목록을 불러오지 못했습니다.
       </div>
     );
@@ -78,10 +78,10 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '16px',
+          marginBottom: 'var(--sp-4)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
           <Tag size={18} aria-hidden style={{ color: 'var(--accent)' }} />
           <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
             태그 마스터
@@ -127,8 +127,8 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
         <div
           role="alert"
           style={{
-            marginBottom: '12px',
-            padding: '8px 12px',
+            marginBottom: 'var(--sp-3)',
+            padding: 'var(--sp-2) var(--sp-3)',
             borderRadius: '6px',
             background: 'var(--status-red-bg)',
             color: 'var(--status-red)',
@@ -154,7 +154,7 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
               <th
                 key={h}
                 style={{
-                  padding: '8px 12px',
+                  padding: 'var(--sp-2) var(--sp-3)',
                   textAlign: 'left',
                   fontSize: '11px',
                   fontWeight: 500,
@@ -173,7 +173,7 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
             <tr>
               <td
                 colSpan={7}
-                style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--text-muted)' }}
+                style={{ padding: 'var(--sp-5) var(--sp-3)', textAlign: 'center', color: 'var(--text-muted)' }}
               >
                 태그가 없습니다.
               </td>

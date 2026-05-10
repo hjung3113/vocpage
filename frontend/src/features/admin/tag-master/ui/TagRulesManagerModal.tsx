@@ -137,12 +137,12 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '560px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', minWidth: '560px' }}>
         <div>
           <ModalHeader title={`${tag.name} · 규칙 ${tag.rule_ref_count}건`} onClose={onClose} />
           <p
             style={{
-              margin: '4px 0 0',
+              margin: 'var(--sp-1) 0 0',
               fontSize: '12px',
               color: 'var(--text-tertiary)',
               lineHeight: 1.4,
