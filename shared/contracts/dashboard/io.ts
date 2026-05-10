@@ -16,11 +16,18 @@ import {
   DateRangePreset,
   HeatmapXAxis,
   GlobalTabsOrderItem,
+  CustomDate,
 } from './entity';
 
 export const DashboardSettingsResponse = DashboardSettings;
 export type DashboardSettingsResponse = z.infer<typeof DashboardSettingsResponse>;
 
+/**
+ * ADR 0006: PUT body. `default_date_range` 와 `custom_start_date / custom_end_date`
+ * 의 cross-field invariant 는 patch 단독으로는 검증 불가 (예: dates 만 수정 +
+ * default_date_range 미포함). 따라서 io 단계는 *형태* 만 검증 — 시맨틱
+ * invariant 는 service 가 기존 row 와 머지 후 entity 스키마로 재검증한다.
+ */
 export const DashboardSettingsUpdate = z
   .object({
     widget_order: z.array(z.string()).optional(),
@@ -28,6 +35,8 @@ export const DashboardSettingsUpdate = z
     widget_sizes: RglLayouts.optional(),
     locked_fields: z.array(z.string()).optional(),
     default_date_range: DateRangePreset.optional(),
+    custom_start_date: CustomDate.nullable().optional(),
+    custom_end_date: CustomDate.nullable().optional(),
     heatmap_default_x_axis: HeatmapXAxis.optional(),
     globaltabs_order: z.array(GlobalTabsOrderItem).nullable().optional(),
   })

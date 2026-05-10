@@ -1,8 +1,10 @@
 /**
- * DashboardSettingsForm.tsx — Wave 2 Phase E
+ * DashboardSettingsForm.tsx — Wave 2 Phase E + ADR 0006.
  * Reusable form sections rendered inside DashboardSettingsDialog.
  */
+import type { Dispatch, SetStateAction } from 'react';
 import type { DateRangePreset, HeatmapXAxis } from '@contracts/dashboard';
+import { CustomDateRangePicker } from './CustomDateRangePicker';
 
 type Scope = 'self' | 'admin';
 
@@ -81,36 +83,41 @@ export function WidgetVisibilityList({ visibility, onToggle }: WidgetVisibilityL
 interface DateRangeRadiosProps {
   value: DateRangePreset;
   onChange: (next: DateRangePreset) => void;
+  /** ADR 0006 §7: scope='admin' 시 'custom' 선택 차단 + tooltip. */
+  scope?: 'self' | 'admin';
 }
 
-export function DateRangeRadios({ value, onChange }: DateRangeRadiosProps) {
-  const showCustom = value === 'custom';
+export function DateRangeRadios({ value, onChange, scope = 'self' }: DateRangeRadiosProps) {
+  const customAdminBlocked = scope === 'admin';
   return (
     <fieldset className="mb-6" role="radiogroup" aria-label="기본 날짜 범위">
       <legend className="mb-2 text-sm font-semibold text-[var(--text-primary)]">기본 날짜 범위</legend>
       <div className="flex flex-wrap gap-3">
-        {DATE_RANGE_OPTIONS.map((opt) => (
-          <label key={opt.value} className="flex cursor-pointer items-center gap-2 text-sm">
-            <input
-              type="radio"
-              name="default_date_range"
-              value={opt.value}
-              checked={value === opt.value}
-              onChange={() => onChange(opt.value)}
-              className="cursor-pointer accent-[var(--brand)]"
-            />
-            {opt.label}
-          </label>
-        ))}
-        {showCustom && (
-          <label
-            className="flex items-center gap-2 text-sm opacity-60"
-            title="현재 저장된 사용자 지정 범위. 변경하려면 다른 옵션을 선택하세요."
-          >
-            <input type="radio" name="default_date_range" value="custom" checked disabled readOnly />
-            사용자 지정
-          </label>
-        )}
+        {DATE_RANGE_OPTIONS.map((opt) => {
+          const blocked = opt.value === 'custom' && customAdminBlocked;
+          return (
+            <label
+              key={opt.value}
+              className={`flex items-center gap-2 text-sm ${blocked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+              title={
+                blocked
+                  ? "Admin 기본값은 절대 날짜라 시간 경과 시 stale 됩니다. 사용자별 'custom' 은 가능, Admin 전체 기본은 NextGen 의 상대 offset (ADR 후속) 에서 지원 예정."
+                  : undefined
+              }
+            >
+              <input
+                type="radio"
+                name="default_date_range"
+                value={opt.value}
+                checked={value === opt.value}
+                onChange={() => onChange(opt.value)}
+                disabled={blocked}
+                className="cursor-pointer accent-[var(--brand)] disabled:cursor-not-allowed"
+              />
+              {opt.label}
+            </label>
+          );
+        })}
       </div>
     </fieldset>
   );
@@ -141,5 +148,57 @@ export function XAxisRadios({ value, onChange }: XAxisRadiosProps) {
         ))}
       </div>
     </fieldset>
+  );
+}
+
+/** ADR 0006: radios + (when 'custom') range picker. Receives draft slice
+ * + setter to keep Dialog under max-lines. Admin scope excludes the picker. */
+export interface DateRangeDraftSlice {
+  default_date_range: DateRangePreset;
+  custom_start_date: string | null;
+  custom_end_date: string | null;
+}
+
+interface DateRangeSectionProps<T extends DateRangeDraftSlice> {
+  draft: T;
+  scope: 'self' | 'admin';
+  setDraft: Dispatch<SetStateAction<T | null>>;
+}
+
+export function DateRangeSection<T extends DateRangeDraftSlice>({
+  draft,
+  scope,
+  setDraft,
+}: DateRangeSectionProps<T>) {
+  return (
+    <>
+      <DateRangeRadios
+        value={draft.default_date_range}
+        scope={scope}
+        onChange={(next) =>
+          setDraft((d) =>
+            d
+              ? {
+                  ...d,
+                  default_date_range: next,
+                  custom_start_date: next === 'custom' ? d.custom_start_date : null,
+                  custom_end_date: next === 'custom' ? d.custom_end_date : null,
+                }
+              : d,
+          )
+        }
+      />
+      {draft.default_date_range === 'custom' && scope !== 'admin' && (
+        <CustomDateRangePicker
+          startDate={draft.custom_start_date}
+          endDate={draft.custom_end_date}
+          onChange={({ start, end }) =>
+            setDraft((d) =>
+              d ? { ...d, custom_start_date: start, custom_end_date: end } : d,
+            )
+          }
+        />
+      )}
+    </>
   );
 }

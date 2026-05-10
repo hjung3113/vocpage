@@ -33,6 +33,8 @@ const baseSettings: DashboardSettings = {
   widget_sizes: defaultLayouts,
   locked_fields: [],
   default_date_range: '3m',
+  custom_start_date: null,
+  custom_end_date: null,
   heatmap_default_x_axis: 'status',
   globaltabs_order: null,
   updated_at: '2026-01-01T00:00:00+09:00',

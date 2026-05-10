@@ -50,6 +50,8 @@ const baseSettings: DashboardSettings = {
   widget_sizes: defaultLayouts,
   locked_fields: [],
   default_date_range: '3m',
+  custom_start_date: null,
+  custom_end_date: null,
   heatmap_default_x_axis: 'status',
   globaltabs_order: null,
   updated_at: '2026-01-01T00:00:00+09:00',
@@ -140,9 +142,9 @@ describe('DashboardSettingsDialog', () => {
     expect(within(dialog).getByRole('radio', { name: '1개월' })).not.toBeChecked();
   });
 
-  it('renders custom date range as disabled radio when current value is custom', async () => {
+  it("ADR 0006: 'custom' radio enabled (Phase E disabled-radio 제거); dates 부재 시 저장 차단", async () => {
     mockUseDashboardSettings.mockReturnValue({
-      data: { ...baseSettings, default_date_range: 'custom' },
+      data: { ...baseSettings, default_date_range: 'custom', custom_start_date: null, custom_end_date: null },
       isLoading: false,
       isError: false,
     } as unknown as ReturnType<typeof useDashboardSettings>);
@@ -154,7 +156,9 @@ describe('DashboardSettingsDialog', () => {
 
     const customRadio = within(dialog).getByRole('radio', { name: /사용자 지정/ });
     expect(customRadio).toBeChecked();
-    expect(customRadio).toBeDisabled();
+    expect(customRadio).not.toBeDisabled();
+    // dates 미입력 시 저장 버튼 disabled.
+    expect(within(dialog).getByRole('button', { name: '저장' })).toBeDisabled();
   });
 
   it('Save and Reset are disabled-state aware when mutation is pending', async () => {
@@ -173,11 +177,14 @@ describe('DashboardSettingsDialog', () => {
     expect(within(dialog).getByRole('button', { name: '되돌리기' })).not.toBeDisabled();
   });
 
-  it('hides custom radio after user picks a non-custom option in draft', async () => {
-    // Server still has 'custom' but draft can move away from it; the disabled
-    // radio should disappear once the user has chosen a real preset.
+  it("ADR 0006 §5: 'custom' → 다른 enum 변경 시 dates 자동 NULL clear (저장 시 patch 에 null 포함)", async () => {
     mockUseDashboardSettings.mockReturnValue({
-      data: { ...baseSettings, default_date_range: 'custom' },
+      data: {
+        ...baseSettings,
+        default_date_range: 'custom',
+        custom_start_date: '2026-01-01',
+        custom_end_date: '2026-03-31',
+      },
       isLoading: false,
       isError: false,
     } as unknown as ReturnType<typeof useDashboardSettings>);
@@ -187,18 +194,23 @@ describe('DashboardSettingsDialog', () => {
     await user.click(screen.getByRole('button', { name: '설정' }));
     const dialog = await screen.findByRole('dialog');
 
-    expect(within(dialog).getByRole('radio', { name: /사용자 지정/ })).toBeInTheDocument();
     await user.click(within(dialog).getByRole('radio', { name: '1개월' }));
-    expect(within(dialog).queryByRole('radio', { name: /사용자 지정/ })).not.toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: '저장' }));
+
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+    const [patch] = mockMutate.mock.calls[0];
+    expect(patch.default_date_range).toBe('1m');
+    expect(patch.custom_start_date).toBeNull();
+    expect(patch.custom_end_date).toBeNull();
   });
 
-  it('does not render custom date range option when current value is not custom', async () => {
+  it("ADR 0006: 'custom' radio always rendered (Phase E disabled-radio fallback 제거)", async () => {
     const user = userEvent.setup();
     renderDialog();
     await user.click(screen.getByRole('button', { name: '설정' }));
     const dialog = await screen.findByRole('dialog');
 
-    expect(within(dialog).queryByRole('radio', { name: /사용자 지정/ })).not.toBeInTheDocument();
+    expect(within(dialog).getByRole('radio', { name: /사용자 지정/ })).toBeInTheDocument();
   });
 
 });

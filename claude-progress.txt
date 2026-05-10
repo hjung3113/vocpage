@@ -1,8 +1,28 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 2 Phase E 코드 완료 · PR #308 OPEN, 사용자 머지 대기)
+## 다음 세션 시작점 (2026-05-10 Wave 2 Phase E 머지 완료 · ADR 0006/0007 + Wave 3 구현 PR OPEN)
 
-→ **Wave 2 Phase E — DashboardSettingsDialog (PR #308, OPEN)**:
+→ **FU-026 ADR 0006 잠금 + Wave 3 Phase A 구현 (PR #310/#311, OPEN, 사용자 머지 대기)**:
+   - **PR #310 — ADR 0006 Accepted + 0007 Proposed** (`docs/adr-custom-date-range`, commits `3d23db2`/`24c94e0`):
+     - **0006 (Accepted 2026-05-10)**: `dashboard_settings.default_date_range='custom'` 의 `custom_start_date / custom_end_date DATE NULL` 신설 + CHECK (`'custom'` 시 양쪽 NOT NULL+start≤end / 그 외 양쪽 NULL). codex:rescue 적대적 리뷰 반영해 OQ 5건 잠금:
+       · OQ-1 (rogue row 백필) = abort 유지 + 운영 수동 절차 (옵션 A `'1m'` 복귀 / 옵션 B row 삭제) ADR §3 명문화. 자동 일괄 coerce 거부.
+       · OQ-2 (range 상한) = DB CHECK / zod refine 미적용 (`'all'` 정합). UI picker 5y soft cap 만.
+       · OQ-3 (Admin 행 시맨틱) = `'custom'` 차단 유지 (BE 415 `ADMIN_CUSTOM_NOT_SUPPORTED` + UI tooltip). 상대 offset 은 NextGen.
+       · OQ-4 (timezone) = ADR 0007 로 분기. 본 ADR 은 DATE + ISO date 직렬화까지만, 단일 timezone 운영 가정.
+       · OQ-5 (적대적 리뷰 추가, invariant 위반) = BE 응답 직전 검증 + 500 + 구조화 로그. fallback 강등 거부.
+     - **0007 (Proposed)**: `custom` 날짜 범위의 timezone 해석 시맨틱 OQ 4건 (TZ-OQ-1~4). 본 ADR 잠금 전 다중 timezone 운영 진입 금지.
+   - **PR #311 — Wave 3 Phase A 구현** (`feat/wave-3-custom-date-range`, base = `docs/adr-custom-date-range`, commit `393d588`):
+     - 마이그 023 (rogue row 가드 + 두 컬럼 + CHECK).
+     - shared/contracts/dashboard: `entity.ts` superRefine cross-field invariant + `io.ts` 두 옵셔널 컬럼.
+     - shared/openapi.yaml 두 컬럼 동기 (date format, nullable).
+     - BE `services/dashboard/settings.service.ts`: 'custom' 외 enum → dates auto NULL clear, merged invariant 검증 → 400 (`CUSTOM_DATES_REQUIRED` / `CUSTOM_DATES_RANGE_INVALID`), Admin 행 'custom' → 415 (§7), 응답 invariant → 500 (§6).
+     - FE `CustomDateRangePicker.tsx` (react-day-picker `mode="range"`, 5y soft cap, 2-month view) + `DateRangeSection` 추출 + Dialog `'custom'` enable + dates 미입력 시 저장 disable + scope='admin' tooltip 차단 + enum 변경 시 dates auto NULL clear.
+     - MSW handler 의 admin 'custom' 415 분기.
+     - Tests: BE 593 pass (+6 ADR 케이스 — custom 정상/dates 필수 400/range 역전 400/auto-clear/admin 415/invariant 500), FE 661 pass (Phase E disabled-radio 테스트를 enable+save-disable+auto-clear 시맨틱으로 갱신). FE/BE typecheck/lint 모두 0.
+   - **오케스트레이션 메모**: 사용자 지시 "결정 전부 적대적 리뷰어와 토론" → `codex:codex-rescue` 로 OQ 4건 적대적 리뷰. 추천 4건 중 OQ-2 채택 / OQ-4 강한 안 (별 ADR 분리) 채택 / OQ-1·3 부분 반영 / OQ-5 신설. 이후 "그냥 다 정리하고 완성까지" 지시 → 추가 grill 없이 일괄 구현.
+   - **다음 세션 액션**: PR #310 머지 → PR #311 base 자동 전환 (또는 rebase) → CI green → `gh pr merge 311 --merge --delete-branch` → 운영 DB 마이그 023 적용 (rogue row 진단 SQL 선행) → 통합 검증 (Dialog 에서 'custom' 선택 + 날짜 입력 + 저장 + 새로고침 picker 값 round-trip).
+
+→ **Wave 2 Phase E — DashboardSettingsDialog (PR #308/#309 머지 완료 2026-05-10)**:
    - **커밋 1 — Base settings panel** (`8d3bbc6`): Sheet 우측 슬라이드인 + 위젯 표시 8 토글 + 기본 날짜 범위 라디오 (1m/3m/1y/all; `'custom'` 은 disabled radio 로 round-trip 보존) + 히트맵 X축 라디오 (status/priority/tag) + Save/Reset/Cancel + close-while-saving guard. `DashboardShell` 가 `hiddenWidgetIds` 받아 children 과 `layouts[bp]` 둘 다 lockstep 으로 필터 (RGL key invariant). 적대적 리뷰 P0×2 + P1×2 close (RGL key alignment, close race, hiddenWidgetIds memoize, draft-driven custom radio).
    - **커밋 2 — Item 1 (admin-default scope toggle) + Item 2 (GlobalTabs reorder)** (`ca06321`):
      - **Item 1**: BE `GET /api/dashboard/settings?scope=admin` (admin only, raw admin-default row via `service.loadAdminDefault`). 403 `FORBIDDEN_ADMIN_SCOPE` for non-admin. FE `useDashboardSettings(scope)` / `useUpdateDashboardSettings(scope)` 가 `'self' | 'admin'` 받음. queryKey scoped, mutation success 가 두 scope 모두 invalidate. Dialog: `저장 대상` 토글 (`내 설정` / `기본값 (Admin)`) `user.role === 'admin'` 일 때만 표시. scope 전환 시 hooks 가 새 scope 로 re-key.

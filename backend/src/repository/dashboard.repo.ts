@@ -8,11 +8,23 @@ import type { DashboardSettings } from '../../../shared/contracts/dashboard';
 import type { DashboardSettingsUpdate } from '../../../shared/contracts/dashboard';
 
 const COLUMNS = `user_id, widget_order, widget_visibility, widget_sizes,
-  locked_fields, default_date_range, heatmap_default_x_axis,
-  globaltabs_order, updated_at`;
+  locked_fields, default_date_range, custom_start_date, custom_end_date,
+  heatmap_default_x_axis, globaltabs_order, updated_at`;
 
 function toIso(v: unknown): string {
   if (v instanceof Date) return v.toISOString();
+  return String(v);
+}
+
+/** ADR 0006: PG returns DATE as JS Date; serialize to YYYY-MM-DD (timezone-stable). */
+function toIsoDate(v: unknown): string | null {
+  if (v == null) return null;
+  if (v instanceof Date) {
+    const yyyy = v.getUTCFullYear();
+    const mm = String(v.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(v.getUTCDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
   return String(v);
 }
 
@@ -24,6 +36,8 @@ function row(r: Record<string, unknown>): DashboardSettings {
     widget_sizes: (r.widget_sizes as DashboardSettings['widget_sizes']) ?? {},
     locked_fields: (r.locked_fields as string[]) ?? [],
     default_date_range: r.default_date_range as DashboardSettings['default_date_range'],
+    custom_start_date: toIsoDate(r.custom_start_date),
+    custom_end_date: toIsoDate(r.custom_end_date),
     heatmap_default_x_axis: r.heatmap_default_x_axis as DashboardSettings['heatmap_default_x_axis'],
     globaltabs_order:
       (r.globaltabs_order as DashboardSettings['globaltabs_order']) ?? null,
