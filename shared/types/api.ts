@@ -520,7 +520,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get distribution by type */
+        /** Get distribution by type (status/priority/voc_type/tag) */
         get: operations["getDashboardDistribution"];
         put?: never;
         post?: never;
@@ -537,7 +537,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get priority-status matrix */
+        /** Get priority × status matrix (4 priorities × 5 statuses) */
         get: operations["getPriorityStatusMatrix"];
         put?: never;
         post?: never;
@@ -554,7 +554,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get heatmap data */
+        /** Get drilldown heatmap (system/menu × status|priority|tag) */
         get: operations["getDashboardHeatmap"];
         put?: never;
         post?: never;
@@ -571,7 +571,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get weekly trend */
+        /** Get 12-week trend (3 series — new/enteredInProgress/done) */
         get: operations["getWeeklyTrend"];
         put?: never;
         post?: never;
@@ -622,7 +622,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get assignee stats */
+        /** Get assignee processing stats (assignee × status|priority|tag) */
         get: operations["getAssigneeStats"];
         put?: never;
         post?: never;
@@ -639,7 +639,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get processing speed (SLA table) */
+        /** Get processing speed and SLA compliance rate per system/menu */
         get: operations["getProcessingSpeed"];
         put?: never;
         post?: never;
@@ -673,7 +673,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get top aging VOCs */
+        /** Get top long-pending VOCs (장기 미처리 Top 10) */
         get: operations["getAgingVocs"];
         put?: never;
         post?: never;
@@ -882,44 +882,6 @@ export interface paths {
         patch: operations["adminUpdateVocType"];
         trace?: never;
     };
-    "/admin/tag-rules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List tag rules (admin) */
-        get: operations["adminListTagRules"];
-        put?: never;
-        /** Create tag rule (admin) */
-        post: operations["adminCreateTagRule"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/tag-rules/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["id"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete tag rule (admin) */
-        delete: operations["adminDeleteTagRule"];
-        options?: never;
-        head?: never;
-        /** Update tag rule (admin) */
-        patch: operations["adminUpdateTagRule"];
-        trace?: never;
-    };
     "/admin/masters/refresh": {
         parameters: {
             query?: never;
@@ -1030,12 +992,54 @@ export interface paths {
         patch: operations["adminToggleTagExternal"];
         trace?: never;
     };
-    "/admin/tag-rules/{id}/suspend": {
+    "/admin/tags/{tagId}/rules": {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: components["parameters"]["id"];
+                tagId: string;
+            };
+            cookie?: never;
+        };
+        /** List tag rules for a tag (admin/manager/dev — read) */
+        get: operations["adminTagRulesList"];
+        put?: never;
+        /** Create a tag rule (manager+ — server derives created_by from session) */
+        post: operations["adminTagRulesCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/tags/{tagId}/rules/{ruleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tagId: string;
+                ruleId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a tag rule (admin only) */
+        delete: operations["adminTagRulesDelete"];
+        options?: never;
+        head?: never;
+        /** Update a tag rule (manager+) */
+        patch: operations["adminTagRulesUpdate"];
+        trace?: never;
+    };
+    "/admin/tags/{tagId}/rules/{ruleId}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tagId: string;
+                ruleId: string;
             };
             cookie?: never;
         };
@@ -1045,8 +1049,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Suspend or resume tag rule (admin only — tag_rules.suspended_until) */
-        patch: operations["adminSuspendTagRule"];
+        /** Suspend or resume a tag rule (admin only — tag_rules.suspended_until) */
+        patch: operations["adminTagRulesSuspend"];
         trace?: never;
     };
     "/admin/vocs/trash": {
@@ -1630,34 +1634,46 @@ export interface components {
         TagRule: {
             /** Format: uuid */
             id: string;
-            name: string;
-            pattern: string;
-            /** @enum {string} */
-            kind: "general";
             /** Format: uuid */
             tag_id: string;
-            is_active: boolean;
+            /** @enum {string} */
+            kind: "general";
+            keywords: string[];
+            /** @enum {string} */
+            match_mode: "keyword";
+            /** Format: date-time */
+            suspended_until: string | null;
+            /** Format: uuid */
+            created_by: string | null;
+            created_by_name: string | null;
+            /** Format: date-time */
+            created_at: string;
         };
-        TagRuleInput: {
-            name: string;
-            pattern: string;
+        TagRuleCreate: {
+            keywords: string[];
             /**
-             * @default general
+             * @default keyword
              * @enum {string}
              */
-            kind: "general";
-            /** Format: uuid */
-            tag_id: string;
-            is_active?: boolean;
+            match_mode: "keyword";
         };
         TagRulePatch: {
-            name?: string;
-            pattern?: string;
+            keywords?: string[];
             /** @enum {string} */
-            kind?: "general";
-            /** Format: uuid */
-            tag_id?: string;
-            is_active?: boolean;
+            match_mode?: "keyword";
+        };
+        TagRuleListQuery: {
+            q?: string;
+            /** @default 1 */
+            page: number;
+            /** @default 20 */
+            per_page: number;
+        };
+        TagRuleListResponse: {
+            rows: components["schemas"]["TagRule"][];
+            page: number;
+            per_page: number;
+            total: number;
         };
         Notification: {
             /** Format: uuid */
@@ -1827,6 +1843,10 @@ export interface components {
             locked_fields: string[];
             /** @enum {string} */
             default_date_range: "1m" | "3m" | "1y" | "all" | "custom";
+            /** Format: date */
+            custom_start_date: string | null;
+            /** Format: date */
+            custom_end_date: string | null;
             /** @enum {string} */
             heatmap_default_x_axis: "status" | "priority" | "tag";
             globaltabs_order: components["schemas"]["GlobalTabsOrderItem"][] | null;
@@ -1842,6 +1862,10 @@ export interface components {
             locked_fields?: string[];
             /** @enum {string} */
             default_date_range?: "1m" | "3m" | "1y" | "all" | "custom";
+            /** Format: date */
+            custom_start_date?: string | null;
+            /** Format: date */
+            custom_end_date?: string | null;
             /** @enum {string} */
             heatmap_default_x_axis?: "status" | "priority" | "tag";
             globaltabs_order?: components["schemas"]["GlobalTabsOrderItem"][] | null;
@@ -1849,7 +1873,102 @@ export interface components {
         DistributionItem: {
             label: string;
             count: number;
-            percentage?: number;
+            percentage: number;
+            key: string;
+        };
+        DistributionResponse: {
+            /** @enum {string} */
+            type: "status" | "priority" | "voc_type" | "tag";
+            /** @enum {string} */
+            dim: "all" | "system" | "menu";
+            total: number;
+            items: components["schemas"]["DistributionItem"][];
+        };
+        MatrixRow: {
+            /** @enum {string} */
+            priority: "urgent" | "high" | "medium" | "low";
+            cells: {
+                [key: string]: number;
+            };
+            row_total: number;
+        };
+        PriorityStatusMatrixResponse: {
+            columns: ("접수" | "검토중" | "처리중" | "완료" | "드랍")[];
+            rows: components["schemas"]["MatrixRow"][];
+            max_value: number;
+        };
+        HeatmapRow: {
+            name: string;
+            /** Format: uuid */
+            id: string | null;
+            /** @enum {string} */
+            level: "all" | "system" | "menu";
+            values: number[];
+            total: number;
+        };
+        HeatmapResponse: {
+            headers: string[];
+            totalRow: number[] | null;
+            rows: components["schemas"]["HeatmapRow"][];
+            max_value: number;
+        };
+        WeeklyTrendResponse: {
+            weeks: string[];
+            weekStarts: string[];
+            series: {
+                new: number[];
+                /** @description VOCs whose status_changed_at falls in this week and whose new status is 검토중 or 처리중. NOT a snapshot of in-progress count at week end (no status_history table). Spec deviation v3.1 (2026-05-10): 'Sun 23:59 snapshot' → 'transitioned-into-in-progress this week'. */
+                enteredInProgress: number[];
+                done: number[];
+            };
+        };
+        ProcessingSpeedRow: {
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            /** @description Average processing days: AVG(status_changed_at::date - created_at::date) WHERE status='완료'. Uses status_changed_at — there is NO completed_at column. */
+            avg_days: number | null;
+            /** @description Percentage of completed VOCs finished by their due_date. Null when slaEligibleCount === 0 (no completed VOCs with non-null due_date). SLA check: status_changed_at::date <= due_date. */
+            sla_rate: number | null;
+            completed_count: number;
+            /** @description Completed VOCs with a non-null due_date (SLA denominator). When 0, sla_rate is null. */
+            slaEligibleCount: number;
+            /** @description Completed VOCs with a null due_date — excluded from SLA computation. */
+            missingDueDateCount: number;
+        };
+        ProcessingSpeedResponse: {
+            /** @enum {string} */
+            dim: "all" | "system" | "menu";
+            rows: components["schemas"]["ProcessingSpeedRow"][];
+        };
+        AssigneeStatRow: {
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            is_unassigned: boolean;
+            values: number[];
+            total: number;
+        };
+        AssigneeStatsResponse: {
+            headers: string[];
+            rows: components["schemas"]["AssigneeStatRow"][];
+            max_value: number;
+        };
+        AgingVocItem: {
+            /** Format: uuid */
+            voc_id: string;
+            issue_code: string;
+            title: string;
+            /** @enum {string} */
+            priority: "urgent" | "high" | "medium" | "low";
+            elapsed_days: number;
+            system_name: string | null;
+            menu_name: string | null;
+        };
+        AgingVocsResponse: {
+            /** @enum {string} */
+            dim: "all" | "system";
+            items: components["schemas"]["AgingVocItem"][];
         };
         WeeklyTrendItem: {
             week: string;
@@ -3083,6 +3202,7 @@ export interface operations {
         parameters: {
             query: {
                 type: "status" | "priority" | "voc_type" | "tag";
+                dim?: "all" | "system" | "menu";
                 systemId?: components["parameters"]["dashboardSystemId"];
                 menuId?: components["parameters"]["dashboardMenuId"];
                 assigneeId?: components["parameters"]["dashboardAssigneeId"];
@@ -3095,16 +3215,18 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Distribution array */
+            /** @description Distribution response with items array */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DistributionItem"][];
+                    "application/json": components["schemas"]["DistributionResponse"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getPriorityStatusMatrix: {
@@ -3122,18 +3244,17 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Matrix */
+            /** @description Priority-status matrix with intensity normalisation value */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["PriorityStatusMatrixResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getDashboardHeatmap: {
@@ -3152,18 +3273,18 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Heatmap */
+            /** @description Heatmap with headers, totalRow, rows, and max_value */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["HeatmapResponse"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getWeeklyTrend: {
@@ -3173,8 +3294,6 @@ export interface operations {
                 systemId?: components["parameters"]["dashboardSystemId"];
                 menuId?: components["parameters"]["dashboardMenuId"];
                 assigneeId?: components["parameters"]["dashboardAssigneeId"];
-                startDate?: components["parameters"]["dashboardStartDate"];
-                endDate?: components["parameters"]["dashboardEndDate"];
             };
             header?: never;
             path?: never;
@@ -3182,16 +3301,17 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Trend array */
+            /** @description 12-week trend with 3 series and week-start ISO dates */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WeeklyTrendItem"][];
+                    "application/json": components["schemas"]["WeeklyTrendResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getTagDistribution: {
@@ -3265,23 +3385,24 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Assignee stats */
+            /** @description Assignee stats with 미배정 row always last */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["AssigneeStatsResponse"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getProcessingSpeed: {
         parameters: {
             query?: {
+                dim?: "all" | "system" | "menu";
                 systemId?: components["parameters"]["dashboardSystemId"];
                 menuId?: components["parameters"]["dashboardMenuId"];
                 assigneeId?: components["parameters"]["dashboardAssigneeId"];
@@ -3294,18 +3415,17 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description SLA table */
+            /** @description SLA table with avg_days and sla_rate per row */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    }[];
+                    "application/json": components["schemas"]["ProcessingSpeedResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getAging: {
@@ -3341,11 +3461,14 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: number;
+                dim?: "all" | "system";
                 systemId?: components["parameters"]["dashboardSystemId"];
                 menuId?: components["parameters"]["dashboardMenuId"];
                 assigneeId?: components["parameters"]["dashboardAssigneeId"];
-                startDate?: components["parameters"]["dashboardStartDate"];
-                endDate?: components["parameters"]["dashboardEndDate"];
+                /** @description Accepted but ignored — endpoint always reflects current snapshot (spec "날짜 무관"). */
+                startDate?: string;
+                /** @description Accepted but ignored — endpoint always reflects current snapshot (spec "날짜 무관"). */
+                endDate?: string;
             };
             header?: never;
             path?: never;
@@ -3353,16 +3476,17 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Top aging VOCs */
+            /** @description Long-pending VOCs sorted by elapsed_days DESC (date filter accepted but ignored) */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Voc"][];
+                    "application/json": components["schemas"]["AgingVocsResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getDashboardSettings: {
@@ -3752,109 +3876,6 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
-    adminListTagRules: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Tag rules */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TagRule"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminCreateTagRule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TagRuleInput"];
-            };
-        };
-        responses: {
-            /** @description Created tag rule */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TagRule"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminDeleteTagRule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OkResponse"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminUpdateTagRule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TagRulePatch"];
-            };
-        };
-        responses: {
-            /** @description Updated tag rule */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TagRule"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
     adminRefreshMasters: {
         parameters: {
             query?: never;
@@ -4071,12 +4092,128 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
-    adminSuspendTagRule: {
+    adminTagRulesList: {
+        parameters: {
+            query?: {
+                q?: string;
+                page?: number;
+                per_page?: number;
+            };
+            header?: never;
+            path: {
+                tagId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tag rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRuleListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminTagRulesCreate: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: components["parameters"]["id"];
+                tagId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagRuleCreate"];
+            };
+        };
+        responses: {
+            /** @description Created tag rule */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["BadRequest"];
+        };
+    };
+    adminTagRulesDelete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tagId: string;
+                ruleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminTagRulesUpdate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tagId: string;
+                ruleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagRulePatch"];
+            };
+        };
+        responses: {
+            /** @description Updated tag rule */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminTagRulesSuspend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tagId: string;
+                ruleId: string;
             };
             cookie?: never;
         };
