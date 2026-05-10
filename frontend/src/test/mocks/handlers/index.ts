@@ -10,6 +10,7 @@ import { adminTagsHandlers } from './admin-tags';
 import { adminTrashHandlers } from './admin-trash';
 import { adminUsersHandlers } from './admin-users';
 import { adminMastersHandlers } from './admin-masters';
+import { dashboardHandlers } from './dashboard';
 
 export const handlers = [
   ...healthHandlers,
@@ -24,4 +25,5 @@ export const handlers = [
   ...adminTrashHandlers,
   ...adminUsersHandlers,
   ...adminMastersHandlers,
+  ...dashboardHandlers,
 ];
