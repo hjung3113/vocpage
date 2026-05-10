@@ -1,23 +1,31 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 PageFrame 프리미티브 + VOC 마이그 — branch `refactor/page-frame-primitives`, PR 대기)
+## 다음 세션 시작점 (2026-05-10 사이드바 admin 메뉴 누락 픽스 + 스테일 브랜치 일괄 정리 머지 완료 → Wave 2 Phase C 진입)
 
-→ **PageFrame 아키텍처 도입 (브랜치 `refactor/page-frame-primitives`, 4 commits)** — 사용자 PR 생성 대기:
+→ **사이드바 admin 메뉴 누락 픽스** (PR #302 머지, 2026-05-10):
+   - 라우터·페이지·API·MSW·테스트는 W3-6 (외부 마스터) / W3-7 Phase E (사용자) 시점에 모두 머지됐는데 `Sidebar.tsx` `ADMIN_NAV_ITEMS` 등록만 누락 → admin 사용자가 메뉴 진입 불가 상태였음.
+   - 추가: `/admin/masters` (외부 마스터, admin/manager/dev — `adminGroup: true`, Database icon) + `/admin/users` (사용자, admin only — `adminStrict: true`, Users icon).
+   - 순서: 마스터 데이터 (tags → masters) → admin-only ops (users → trash). 검증: typecheck 0 / FE 603 pass.
+
+→ **스테일 브랜치 일괄 정리** (2026-05-10):
+   - **PR close 4건** (#291–#294, Wave 2 stacked-PR 계획 폐기분): docs/wave-2-dashboard-plan, chore/wave-2-rgl-install, migration/022-locked-widgets, feat/wave-2-contract. 사유: spec 변경 (locked_widgets → locked_fields 재설계, 022 번호 재할당) · 다른 형태로 main 반영 (RGL 설치, contract io.ts 재설계, dashboard plan 재작성). main 우회 경로 = Phase D #295 / Phase B #297·#298.
+   - **원격 브랜치 삭제 12건**: 위 4 unmerged + 머지 완료 8건 (docs/wave-3-phase-a-close, feat/w3-4-tag-master, feat/w3-5-trash, feat/wave-1-6-eta-batch, fix/fu-001-dompurify, fix/fu-002-notice-faq-indexes, fix/sidebar-admin-nav-missing-items, refactor/page-frame-primitives). 로컬 stale branch 5건도 삭제 (chennai 포함). 원격/로컬 모두 main 만 남음.
+
+→ **PageFrame 아키텍처 도입** (PR #301 머지, 2026-05-10):
    - **원인 진단 — 더블 스크롤**: AppShell `<main>` 의 `overflow-auto` 와 `BodyScrollLayout` 본문 `overflow-auto` 가 동시 활성. 대시보드는 RGL 이 명시 height 를 주입해 main 이 함께 스크롤바를 띄움.
    - **아키텍처 — 2-레이어 프리미티브 합성**: `PageFrame` (AppShell↔페이지 경계 유일 계약, `absolute inset-0 flex flex-col`) + 4 프리미티브 (`Sticky` / `Sticky variant=toolbar` / `Scroll` / `SplitRow` / `SidePanel`). 페이지는 flex chain 책임 없음 → 합성만.
    - **`StickyHeaderLayout` sugar (이름 변경)**: 기존 `BodyScrollLayout` 을 PageFrame 합성으로 재작성. 외부 시그니처 동일 → 8 페이지 무변경 유지. 이름 변경 이유: body 만 스크롤하려면 헤더를 형제로 받아야 하므로 본질은 "헤더 sticky 레이아웃".
    - **`<main>` invariant**: `overflow-auto` → `overflow-hidden`. 모든 페이지가 PageFrame 으로 main 패딩박스를 채우므로 main 은 절대 스크롤바를 띄울 수 없음 → 더블 스크롤 구조적 차단.
    - **`PageLayout` 삭제** + 라우터 스텁 2개(StubPage / HealthPage) → `StickyHeaderLayout` (EmptyState 한 줄, overflow 발생 X).
-   - **VOC 마이그**: 인라인 `flex flex-col h-full` + 수동 `overflow-hidden` row 체인 제거. `Sticky × 3 (Topbar / Status / Advanced) + SplitRow ⊃ Scroll(padded=false) + VocSidePanel`. 거동 100% 보존 (페이지네이션 동반 스크롤 포함).
-   - **MSW dashboard 핸들러** (`/api/dashboard/{settings,summary}`): 별도 commit (`test(msw):`).
+   - **VOC 마이그**: 인라인 `flex flex-col h-full` + 수동 `overflow-hidden` row 체인 제거. `Sticky × 3 (Topbar / Status / Advanced) + SplitRow ⊃ Scroll(padded=false) + VocSidePanel`. 거동 100% 보존.
+   - **MSW dashboard 핸들러** (`/api/dashboard/{settings,summary}`): 별도 commit.
    - **검증**: typecheck 0 / FE 603 pass / lint 0 / 토큰 lint 0.
 
 → **다음 세션 작업** (우선순위 순):
-   1. PR 생성 + 사용자 시각 검증 (대시보드 / VOC / 8 페이지 더블 스크롤 0 확인).
-   2. vite proxy 포트 정합 (3001→3000 또는 BE 포트 변경) — 별건.
-   3. **Wave 2 Phase C** — 7 endpoint BE 단일 PR + 7 위젯 FE PR (분포/매트릭스/히트맵/트렌드/SLA/담당자/Top10).
-   4. **Phase E** — DashboardSettingsDialog.
-   5. 운영/배포 phase.
+   1. vite proxy 포트 정합 (3001→3000 또는 BE 포트 변경) — 별건.
+   2. **Wave 2 Phase C** — 7 endpoint BE 단일 PR + 7 위젯 FE PR (분포/매트릭스/히트맵/트렌드/SLA/담당자/Top10).
+   3. **Phase E** — DashboardSettingsDialog (위젯 토글 + default_date_range + heatmap x-axis + admin lock).
+   4. 운영/배포 phase (`connect-pg-simple` / OIDC / production Dockerfile / Playwright E2E).
 
 → **마이그 번호** — 다음 = **023**.
 
