@@ -25,9 +25,17 @@ interface Props {
   onEditRule: (tag: TagMasterItem) => void;
 }
 
+// BE clamps per_page at 100 (shared/contracts/admin/tag.ts).
+// Flat table fetches the maximum so the cross-tag listing covers as many tags
+// as a single round-trip allows; if the project ever crosses 100 tags, the
+// truncation banner below surfaces the gap instead of silently dropping rules.
+const TAGS_PER_PAGE = 100;
+
 export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
-  const { data: tagsData, isLoading: tagsLoading } = useAdminTags();
+  const { data: tagsData, isLoading: tagsLoading } = useAdminTags({ per_page: TAGS_PER_PAGE });
   const tags = useMemo<TagMasterItem[]>(() => tagsData?.rows ?? [], [tagsData]);
+  const totalTags = tagsData?.total ?? 0;
+  const isTruncated = totalTags > tags.length;
 
   // useQueries — one nested rule list per tag, then flatten.
   const ruleQueries = useQueries({
@@ -146,6 +154,25 @@ export function TagRulesFlatTable({ q, onJumpToTag, onEditRule }: Props) {
             onEditRule={onEditRule}
           />
         ))}
+        {isTruncated && (
+          <tr>
+            <td
+              colSpan={6}
+              role="note"
+              data-testid="flat-truncated-notice"
+              style={{
+                padding: '12px',
+                fontSize: '12px',
+                color: 'var(--text-muted)',
+                background: 'var(--bg-subtle)',
+                borderTop: '1px solid var(--border-standard)',
+              }}
+            >
+              표시 가능한 {tags.length}개 태그까지의 규칙만 표시했습니다 (전체 {totalTags}개).
+              태그 탭에서 검색해 좁혀 주세요.
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );
