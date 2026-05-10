@@ -14,7 +14,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { PageLayout, PageHeader } from '@widgets/app-shell';
+import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { Button } from '@shared/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shared/ui/tabs';
 import { useRole } from '@entities/user/model/useRole';
@@ -146,7 +146,7 @@ export default function FaqPage() {
   );
 
   return (
-    <PageLayout
+    <StickyHeaderLayout
       header={
         <PageHeader
           title="FAQ"
@@ -209,6 +209,6 @@ export default function FaqPage() {
           onSubmit={submitForm}
         />
       </div>
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }

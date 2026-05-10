@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { env } from '@shared/config/env';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { AppShell, PageLayout, PageHeader } from '@widgets/app-shell';
+import { AppShell, StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { EmptyState } from '@shared/ui/empty-state';
 import { LoadingState } from '@shared/ui/skeleton';
 
@@ -44,20 +44,20 @@ function MockLoginRoute() {
 
 function StubPage({ title }: { title: string }) {
   return (
-    <PageLayout header={<PageHeader title={title} />}>
+    <StickyHeaderLayout header={<PageHeader title={title} />}>
       <EmptyState title="준비 중입니다." description="Wave 1에서 데이터가 연결됩니다." />
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }
 
 function HealthPage() {
   return (
-    <PageLayout header={<PageHeader title="Health Check" />}>
+    <StickyHeaderLayout header={<PageHeader title="Health Check" />}>
       <EmptyState
         title="/api/health — MSW stub"
         description="Wave 1에서 실제 fetch가 연결됩니다."
       />
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }
 

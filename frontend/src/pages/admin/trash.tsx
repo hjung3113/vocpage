@@ -5,7 +5,7 @@
  */
 import { Navigate } from 'react-router-dom';
 import { useRole } from '@entities/user/model/useRole';
-import { PageLayout, PageHeader } from '@widgets/app-shell';
+import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { TrashTable } from '@features/admin/trash';
 
 export default function AdminTrashPage() {
@@ -17,7 +17,7 @@ export default function AdminTrashPage() {
   }
 
   return (
-    <PageLayout header={<PageHeader title="휴지통" />}>
+    <StickyHeaderLayout header={<PageHeader title="휴지통" />}>
       <p
         style={{
           fontSize: '12px',
@@ -28,6 +28,6 @@ export default function AdminTrashPage() {
         소프트 삭제된 VOC — Admin만 복원 가능
       </p>
       <TrashTable />
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }

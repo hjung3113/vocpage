@@ -8,7 +8,7 @@
  */
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageLayout, PageHeader } from '@widgets/app-shell';
+import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { EmptyState } from '@shared/ui/empty-state';
 import { LoadingState } from '@shared/ui/skeleton';
 import {
@@ -52,33 +52,33 @@ export default function NotificationsPage() {
 
   if (list.isLoading) {
     return (
-      <PageLayout header={<PageHeader title="알림" />}>
+      <StickyHeaderLayout header={<PageHeader title="알림" />}>
         <LoadingState />
-      </PageLayout>
+      </StickyHeaderLayout>
     );
   }
 
   if (list.isError) {
     return (
-      <PageLayout header={<PageHeader title="알림" />}>
+      <StickyHeaderLayout header={<PageHeader title="알림" />}>
         <EmptyState
           title="알림을 불러오지 못했습니다."
           description="잠시 후 다시 시도해 주세요."
         />
-      </PageLayout>
+      </StickyHeaderLayout>
     );
   }
 
   if (items.length === 0) {
     return (
-      <PageLayout header={<PageHeader title="알림" />}>
+      <StickyHeaderLayout header={<PageHeader title="알림" />}>
         <EmptyState title="받은 알림이 없습니다." description="새 댓글·배정·상태 변경 시 여기에 표시됩니다." />
-      </PageLayout>
+      </StickyHeaderLayout>
     );
   }
 
   return (
-    <PageLayout header={<PageHeader title="알림" />}>
+    <StickyHeaderLayout header={<PageHeader title="알림" />}>
       <ul
         data-testid="notifications-list"
         style={{
@@ -157,6 +157,6 @@ export default function NotificationsPage() {
           return inner;
         })}
       </ul>
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }

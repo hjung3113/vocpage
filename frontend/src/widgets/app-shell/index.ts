@@ -1,4 +1,5 @@
 export { AppShell } from './AppShell';
-export { PageLayout } from './PageLayout';
+export { PageFrame } from './PageFrame';
+export { StickyHeaderLayout } from './StickyHeaderLayout';
 export { PageHeader } from './PageHeader';
 export { Sidebar } from './Sidebar';
