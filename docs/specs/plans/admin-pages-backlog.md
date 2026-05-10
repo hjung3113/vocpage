@@ -19,7 +19,7 @@
 | `/admin/systems` | 시스템/메뉴 관리 | `feature-voc.md §9.4.2` | `systems` / `menus` 테이블 (존재) | "기타" 메뉴 자동 생성 / archive 처리 / VOC 수 cascade. menu 단독 CRUD 는 `GET /api/masters/menus?system_id=` cascade 응답 재사용. |
 | `/admin/voc-types` (가칭) | 유형 관리 | `feature-voc.md §9.4.3` | `voc_types` 테이블 (존재) | 색상 swatch 포함. archive 시 신규 등록 차단·기존 데이터 유지. |
 | `/admin/result-review` | 결과 검토 | `feature-voc.md §9.4.5` | `structured_payload` 검증 게이트 + 임베딩/유사도 파이프라인 | 가장 무거움 — 매니저 동시 승인 동시성 제어 (`SELECT FOR UPDATE` + Idempotency-Key) 필요. NextGen 후보. |
-| `/admin/tag-rules` | 태그 규칙 관리 | `feature-voc.md §9.4.1` | `tag_rules` 테이블 (mig 014 존재) | FU-016 (P2) — PR #262 hotfix 에 일시중지 disabled placeholder. **§3 통합 제안 참조.** |
+| `/admin/tag-rules` | 태그 규칙 관리 | `feature-voc.md §9.4.1` | `tag_rules` 테이블 (mig 014 존재) | PR #262 hotfix 에 일시중지 disabled placeholder. **§3 통합 제안 참조.** |
 
 부수 drift:
 - `routing-conventions.md` 의 `/admin/external-masters` ↔ 구현 `/admin/masters` 명칭 불일치.
@@ -39,7 +39,7 @@
 - `tag_rules.tag_id` FK 가 마스터를 참조 → 의존 방향이 단방향이라 자연스러움.
 - 페이지 1 개 줄어듦 (`/admin/tag-rules` 미구현 → 그대로 폐기).
 - 태그 ↔ 규칙 인과관계가 한 화면에 묶여 운영 mental model 단순화.
-- FU-016 (Tag rule 일시중지 UI) 이 하위 액션으로 흡수 → close.
+- 일시중지 (`tag_rules.suspended_until`) UI 가 하위 액션으로 흡수 — PR #262 hotfix 의 disabled placeholder 대체.
 
 **Trade-off / 풀어야 할 OQ**:
 - OQ-1: 한 키워드가 여러 태그 규칙에 매핑됐을 때의 글로벌 검색 UX — `전체 규칙 보기` 토글 + 키워드 검색 박스로 충분한지.
@@ -58,5 +58,4 @@
 
 - 라우팅 정본: `routing-conventions.md`
 - 도메인 spec: `feature-voc.md §9.4.1 ~ §9.4.7`
-- 기존 followup: FU-016 (태그 규칙 일시중지 UI)
 - ADR: 0004 (admin permission), 0005 (trash/restore)
