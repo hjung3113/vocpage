@@ -115,6 +115,7 @@ export function KeywordChipInput({
               aria-label={`${kw} 제거`}
               onClick={() => removeChip(kw)}
               disabled={disabled}
+              className="tag-rule-icon-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -142,6 +143,7 @@ export function KeywordChipInput({
           disabled={disabled}
           maxLength={MAX_KEYWORD_LEN}
           aria-label={ariaLabel}
+          className="tag-rule-search-input"
           style={{
             flex: '1 1 120px',
             minWidth: '120px',

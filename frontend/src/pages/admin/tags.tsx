@@ -134,21 +134,23 @@ export default function AdminTagsPage() {
           />
         )}
       </div>
-      {view === 'tags' ? (
-        <TagMasterTable onOpenRules={setRulesModalTag} />
-      ) : (
-        <TagRulesFlatTable
-          q={qParam}
-          onJumpToTag={() => {
-            setParams((p) => {
-              p.set('view', 'tags');
-              p.delete('q');
-              return p;
-            });
-          }}
-          onEditRule={(tag) => setRulesModalTag(tag)}
-        />
-      )}
+      <div role="tabpanel" aria-label={view === 'tags' ? '태그 목록' : '전체 규칙 목록'}>
+        {view === 'tags' ? (
+          <TagMasterTable onOpenRules={setRulesModalTag} />
+        ) : (
+          <TagRulesFlatTable
+            q={qParam}
+            onJumpToTag={() => {
+              setParams((p) => {
+                p.set('view', 'tags');
+                p.delete('q');
+                return p;
+              });
+            }}
+            onEditRule={(tag) => setRulesModalTag(tag)}
+          />
+        )}
+      </div>
       {rulesModalTag && (
         <TagRulesManagerModal tag={rulesModalTag} onClose={() => setRulesModalTag(null)} />
       )}

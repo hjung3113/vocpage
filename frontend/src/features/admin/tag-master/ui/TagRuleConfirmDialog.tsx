@@ -139,7 +139,7 @@ export function TagRuleConfirmDialog({
           </AlertDialog.Description>
           <div style={{ display: 'flex', gap: 'var(--sp-2)', justifyContent: 'flex-end' }}>
             <AlertDialog.Cancel asChild>
-              <button type="button" disabled={pending} style={ghostBtn}>
+              <button type="button" disabled={pending} className="tag-rule-icon-btn" style={ghostBtn}>
                 취소
               </button>
             </AlertDialog.Cancel>
@@ -157,6 +157,7 @@ export function TagRuleConfirmDialog({
                   onConfirm();
                 }}
                 disabled={pending}
+                className="tag-rule-icon-btn"
                 style={{
                   ...(copy.destructive ? destructiveBtn : primaryBtn),
                   cursor: pending ? 'not-allowed' : 'pointer',
