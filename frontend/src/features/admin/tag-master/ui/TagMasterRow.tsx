@@ -2,7 +2,7 @@
  * TagMasterRow — single row in the Tag Master table.
  * Extracted to keep TagMasterTable under the 200-line limit.
  */
-import { Lock, Pencil, GitMerge, PauseCircle, Trash2 } from 'lucide-react';
+import { Lock, Pencil, GitMerge, Trash2 } from 'lucide-react';
 import { TagMasterActionButton } from './TagMasterActionButton';
 import type { TagMasterItem } from '@contracts/admin/tag';
 
@@ -12,7 +12,7 @@ interface Props {
   canMutate: boolean;
   onEdit: (tag: TagMasterItem) => void;
   onMerge: (tag: TagMasterItem) => void;
-  onSuspend: (id: string) => void;
+  onOpenRules: (tag: TagMasterItem) => void;
   onDelete: (tag: TagMasterItem) => void;
   onToggleExternal: (tag: TagMasterItem) => void;
 }
@@ -23,10 +23,11 @@ export function TagMasterRow({
   canMutate,
   onEdit,
   onMerge,
-  onSuspend,
+  onOpenRules,
   onDelete,
   onToggleExternal,
 }: Props) {
+  const ruleCount = tag.rule_ref_count;
   return (
     <tr style={{ borderBottom: '1px solid var(--border-standard)' }}>
       <td style={{ padding: '10px 12px', fontWeight: 500 }}>{tag.name}</td>
@@ -54,7 +55,41 @@ export function TagMasterRow({
         </button>
       </td>
       <td style={{ padding: '10px 12px', color: 'var(--text-secondary)' }}>{tag.usage_count}</td>
-      <td style={{ padding: '10px 12px', color: 'var(--text-secondary)' }}>{tag.rule_ref_count}</td>
+      <td style={{ padding: '10px 12px' }}>
+        <button
+          type="button"
+          onClick={() => onOpenRules(tag)}
+          aria-label={`${tag.name}의 규칙 ${ruleCount}건 관리`}
+          data-testid={`btn-open-rules-${tag.id}`}
+          style={
+            ruleCount === 0
+              ? {
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '2px 0',
+                  cursor: 'pointer',
+                  color: 'var(--text-quaternary)',
+                  fontSize: '11.5px',
+                  fontWeight: 500,
+                }
+              : {
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  border: '1px solid var(--brand-border)',
+                  background: 'var(--brand-bg)',
+                  color: 'var(--accent)',
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }
+          }
+        >
+          {ruleCount === 0 ? '규칙 없음' : `규칙 ${ruleCount}건`}
+        </button>
+      </td>
       <td style={{ padding: '10px 12px', color: 'var(--text-muted)', fontSize: '12px' }}>
         {tag.created_at.slice(0, 10)}
       </td>
@@ -73,18 +108,6 @@ export function TagMasterRow({
             enabled={isAdmin}
             onClick={() => onMerge(tag)}
             testId={`btn-merge-${tag.id}`}
-          />
-          {/*
-            일시중지: tag_rules.id 별 액션이라 tag row 에서 직접 호출 불가.
-            (Codex P2 — tag.id 를 rule id 자리에 넘기는 오매핑.)
-            규칙 선택 UI 가 들어올 때까지 disabled placeholder.
-          */}
-          <TagMasterActionButton
-            icon={<PauseCircle size={13} />}
-            label="일시중지"
-            enabled={false}
-            onClick={() => onSuspend(tag.id)}
-            testId={`btn-suspend-${tag.id}`}
           />
           <TagMasterActionButton
             icon={<Trash2 size={13} />}

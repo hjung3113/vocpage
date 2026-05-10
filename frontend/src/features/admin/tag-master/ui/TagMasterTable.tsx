@@ -15,11 +15,14 @@ import { useAdminTags, useDeleteTag, useToggleExternal } from '../api/tag-master
 import { TagMasterCreateModal } from './TagMasterCreateModal';
 import { TagMasterEditModal } from './TagMasterEditModal';
 import { TagMasterMergeModal } from './TagMasterMergeModal';
-import { TagMasterSuspendModal } from './TagMasterSuspendModal';
 import { TagMasterRow } from './TagMasterRow';
 import type { TagMasterItem as TagMasterItemT } from '@contracts/admin/tag';
 
-export function TagMasterTable() {
+interface Props {
+  onOpenRules?: (tag: TagMasterItemT) => void;
+}
+
+export function TagMasterTable({ onOpenRules }: Props = {}) {
   const { isAdmin, isManager } = useRole();
   const canMutate = isAdmin || isManager;
 
@@ -30,11 +33,6 @@ export function TagMasterTable() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<TagMasterItemT | null>(null);
   const [mergeSource, setMergeSource] = useState<TagMasterItemT | null>(null);
-  const [suspendTarget, setSuspendTarget] = useState<{
-    tagId: string;
-    ruleId: string;
-    suspended_until: string | null;
-  } | null>(null);
   const [inlineError, setInlineError] = useState<string | null>(null);
 
   function handleDelete(tag: TagMasterItemT) {
@@ -152,7 +150,7 @@ export function TagMasterTable() {
       >
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border-standard)' }}>
-            {['이름', '종류', '외부잠금', '사용(VOC)', '규칙', '추가일', '액션'].map((h) => (
+            {['이름', '종류', '외부잠금', '사용(VOC)', '규칙 N건', '추가일', '액션'].map((h) => (
               <th
                 key={h}
                 style={{
@@ -189,7 +187,7 @@ export function TagMasterTable() {
                 canMutate={canMutate}
                 onEdit={setEditTarget}
                 onMerge={setMergeSource}
-                onSuspend={(id) => setSuspendTarget({ tagId: id, ruleId: '', suspended_until: null })}
+                onOpenRules={(t) => onOpenRules?.(t)}
                 onDelete={handleDelete}
                 onToggleExternal={handleToggleExternal}
               />
@@ -206,14 +204,6 @@ export function TagMasterTable() {
           source={mergeSource}
           allTags={rows}
           onClose={() => setMergeSource(null)}
-        />
-      )}
-      {suspendTarget && (
-        <TagMasterSuspendModal
-          tagId={suspendTarget.tagId}
-          ruleId={suspendTarget.ruleId}
-          currentValue={suspendTarget.suspended_until}
-          onClose={() => setSuspendTarget(null)}
         />
       )}
     </div>
