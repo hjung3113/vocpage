@@ -3,7 +3,7 @@
  * Route component for /dashboard. Composes DashboardShell + EditModeToggle.
  */
 import '../styles/dashboard-rgl.css';
-import { PageLayout, PageHeader } from '@widgets/app-shell';
+import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import {
   DashboardShell,
   EditModeToggle,
@@ -16,7 +16,7 @@ export default function DashboardPage() {
     useDashboardDraft();
 
   return (
-    <PageLayout
+    <StickyHeaderLayout
       header={
         <PageHeader
           title="대시보드"
@@ -40,6 +40,6 @@ export default function DashboardPage() {
           onLayoutChange={onLayoutChange}
         />
       </DashboardFilterProvider>
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }

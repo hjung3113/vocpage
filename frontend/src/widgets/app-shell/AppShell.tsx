@@ -12,7 +12,7 @@ export function AppShell() {
     >
       <Sidebar />
       <main
-        className="flex-1 overflow-auto bg-[color:var(--bg-app)]"
+        className="relative flex-1 overflow-hidden bg-[color:var(--bg-app)]"
         style={{ padding: 'var(--app-main-pad)' }}
       >
         <ErrorBoundary>

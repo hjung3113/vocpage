@@ -14,7 +14,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { PageLayout, PageHeader } from '@widgets/app-shell';
+import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { Button } from '@shared/ui/button';
 import { EmptyState } from '@shared/ui/empty-state';
 import { LoadingState } from '@shared/ui/skeleton';
@@ -119,7 +119,7 @@ export default function NoticePage() {
   }
 
   return (
-    <PageLayout
+    <StickyHeaderLayout
       header={
         <PageHeader
           title="공지사항"
@@ -181,6 +181,6 @@ export default function NoticePage() {
           onSubmit={submitForm}
         />
       </div>
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }

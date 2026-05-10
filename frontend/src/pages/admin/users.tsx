@@ -5,7 +5,7 @@
  * Spec: requirements.md §15.2
  */
 import { Navigate } from 'react-router-dom';
-import { PageLayout, PageHeader } from '@widgets/app-shell';
+import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { useRole } from '@entities/user/model/useRole';
 import { UsersTable } from '@features/admin/users';
 import { Button } from '@shared/ui/button';
@@ -33,7 +33,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <PageLayout
+    <StickyHeaderLayout
       header={
         <PageHeader
           title="사용자"
@@ -42,6 +42,6 @@ export default function AdminUsersPage() {
       }
     >
       <UsersTable />
-    </PageLayout>
+    </StickyHeaderLayout>
   );
 }
