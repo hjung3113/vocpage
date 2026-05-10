@@ -25,7 +25,16 @@ Coverage: 5/5 v1 requirements mapped (REQ-admin-pages-wave split across Phases 1
   3. `/admin/tag-rules` 별 페이지 라우트와 사이드바 entry는 코드베이스에서 완전히 제거된다 (`rg -n "/admin/tag-rules"` = 0, ADR 등 historical 제외).
   4. `/admin/tags` 상단 `전체 규칙 보기` 토글로 모든 태그의 규칙을 키워드 검색할 수 있다.
   5. Spec 동기화 (feature-voc.md §9.4.1, routing-conventions.md, shared/openapi.yaml의 TagRule 스키마)가 동일 PR로 동봉된다.
-**Plans**: TBD
+**Plans**: 8 plans
+Plans:
+- [ ] 01-01-PLAN.md — Wave 0 scaffolds: matcher audit + parity script generalize + RED tests for mig 024 & D-11 optimistic
+- [ ] 01-02-PLAN.md — Mig 024 SQL (keywords[]+match_mode+created_by add, pattern drop) + tests GREEN + reconcile pattern readers (TDD)
+- [ ] 01-03-PLAN.md — OpenAPI rewrite to nested paths + zod TagRule/TagRuleCreate/TagRulePatch/TagRuleListQuery/TagRuleListResponse + parity tests
+- [ ] 01-04-PLAN.md — [BLOCKING] mig 024 push + 5 nested BE routes + permission matrix + IDOR/created_by-injection tests (TDD)
+- [ ] 01-05-PLAN.md — 5 FE TanStack hooks (D-11 optimistic) + MSW handlers + optimistic.test GREEN (TDD)
+- [ ] 01-06-PLAN.md — KeywordChipInput component + TagRulesManagerModal (Dialog + sub-table + permission gating)
+- [ ] 01-07-PLAN.md — TagMasterTable 규칙 N건 column + TagRulesFlatTable + page view-mode tabs + URL state + page integration test
+- [ ] 01-08-PLAN.md — Spec sync (feature-voc.md §9.4.1 + routing-conventions.md) + final SC-3 grep gate evidence
 **UI hint**: yes
 
 ### Phase 2: VOC Types Management
