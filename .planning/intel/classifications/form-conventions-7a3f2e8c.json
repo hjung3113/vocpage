@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/form-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Form / Validation Conventions",
+  "summary": "Frontend form and validation conventions covering RHF+Zod tooling, schema file locations, naming rules, feature structure, hook return shape, and server error mapping.",
+  "scope": ["frontend forms", "react-hook-form", "zod schemas", "shared/contracts", "features module structure", "server error mapping"],
+  "cross_refs": ["shared/contracts/voc/voc-create.schema", "features/voc-create/model/create-voc.schema.ts"],
+  "locked": false,
+  "precedence": null
+}

@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/table-filter-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Table / Filter Conventions",
+  "summary": "Frontend canonical spec for table pagination, server-side filtering, URL query synchronization, and column definition conventions.",
+  "scope": ["frontend tables", "pagination", "filters", "URL search params", "TanStack Query keys", "column definitions", "VOC workspace"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

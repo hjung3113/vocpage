@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/datetime-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Date / Time Conventions",
+  "summary": "Frontend canonical specification for date/time handling: UTC storage, Asia/Seoul display, date-fns-tz usage, and shared/lib/date.ts function contracts.",
+  "scope": ["frontend date/time formatting", "shared/lib/date.ts", "date-fns-tz", "UTC to Asia/Seoul conversion", "LocalDate vs Instant types"],
+  "cross_refs": ["shared/lib/date.ts", "shared/types/date.types.ts"],
+  "locked": false,
+  "precedence": null
+}

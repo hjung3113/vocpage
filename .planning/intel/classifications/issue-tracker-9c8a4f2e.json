@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/agents/issue-tracker.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Issue tracker: GitHub",
+  "summary": "Conventions and gh CLI commands for managing issues and PRDs as GitHub issues in this repo.",
+  "scope": ["GitHub issues", "gh CLI", "agent skills", "issue tracker conventions"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

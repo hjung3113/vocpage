@@ -1,0 +1,20 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/plans/next-session-tasks.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "vocpage — 다음 세션 태스크 계획",
+  "summary": "Active and deferred session task plan for vocpage, tracking next entry candidates, structure/naming cleanup, closed waves, and ops/deploy phase candidates.",
+  "scope": ["session planning", "task backlog", "structure/naming refactor", "ops/deploy phase", "wave tracking"],
+  "cross_refs": [
+    "claude-progress.txt",
+    "admin-pages-backlog.md",
+    "docs/adr/0007-custom-date-range-timezone.md",
+    "uidesign.md",
+    "requirements.md",
+    "feature-voc.md",
+    "backend/src/CLAUDE.md"
+  ],
+  "locked": false,
+  "precedence": null
+}

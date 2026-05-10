@@ -1,0 +1,22 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/plans/admin-pages-wave.md",
+  "type": "PRD",
+  "confidence": "medium",
+  "manifest_override": false,
+  "title": "Admin 미구현 페이지 Wave Plan (2026-05-10)",
+  "summary": "Phased wave plan to deliver four unimplemented admin pages (tag rules consolidation, voc-types, systems/menus, result-review) with scope, done-when, and risks per phase.",
+  "scope": ["/admin/tags", "/admin/voc-types", "/admin/systems", "/admin/result-review", "tag_rules", "admin pages"],
+  "cross_refs": [
+    "admin-pages-backlog.md",
+    "shared/openapi.yaml",
+    "backend/src/routes/admin-tags.ts",
+    "features/admin/tag-master/ui/TagMasterRow.tsx",
+    "feature-voc.md",
+    "routing-conventions.md",
+    "backend/src/index.ts",
+    "scripts/check-fixture-seed-parity.ts"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": "Plan/wave document with goals, scoped phases, and acceptance criteria — closest to PRD (requirements + scope per phase). Contains some locked decisions table but overall Status is Draft and the doc is a multi-phase delivery plan, not a single ADR. SPEC signals (endpoint references) are citations to existing OpenAPI rather than new contract definitions."
+}

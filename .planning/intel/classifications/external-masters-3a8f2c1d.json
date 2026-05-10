@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/external-masters.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "외부 마스터 연동 명세",
+  "summary": "Technical specification for integrating three external master data sources (equipment, DB, program) with field mappings, MSSQL queries, cache structures, and refresh contracts.",
+  "scope": ["external masters", "equipment master", "DB master", "program master", "MSSQL integration", "admin refresh API", "structured_payload validation"],
+  "cross_refs": ["requirements.md", "docs/adr/0004-admin-permission-model.md", "config/masters/equipment-stub.json"],
+  "locked": false,
+  "precedence": null
+}

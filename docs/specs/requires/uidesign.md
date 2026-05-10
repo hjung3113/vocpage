@@ -462,7 +462,7 @@ Every page is rendered through one container so the header line, title typograph
 - `className="h-*"` / `className="p[xy]-*"` on `Button`, `Input`, `Select`.
 - Custom topbar wrappers (e.g. ad-hoc `<header>` inside a page) — must be replaced by `<PageHeader>`.
 
-**Reference** — applies to all five pages: `/voc`, `/notice`, `/faq`, `/admin/tags`, `/admin/vocs/trash`. See `docs/specs/plans/followup-bucket.md` FU-017 for rollout sequencing.
+**Reference** — applies to all five pages: `/voc`, `/notice`, `/faq`, `/admin/tags`, `/admin/vocs/trash`.
 
 ### Load-more Button
 
@@ -1475,7 +1475,7 @@ Use these as templates when generating new components. They reference only token
 
 > 본 섹션은 ADR-0008 잠금 결과로 신설. `refSystem/Integrated Platform _ Standalone.html` 내 Flowline 모듈 (Linear-flavored, lines 835–1079) 의 시각 시그널 중 vocpage 와 형제 시스템 인식을 위해 도입할 항목을 명세한다. **본 §16 등재 항목만** ad-hoc 컴포넌트화 허용. 기타 Flowline 클래스(kanban / timeline 등) 는 별 ADR 후 진입.
 >
-> 시그널 분석 출처: `docs/specs/plans/flowline-alignment-cues.md`.
+> 시그널 분석 출처: `docs/adr/0008-flowline-design-alignment.md`.
 
 ### 16.1 Scope summary
 
@@ -1608,7 +1608,7 @@ props 신호: `variant?: 'dot-pill'`, `dotColor?: string` (token).
 
 ### 16.11 Cross-references
 
-- 시그널 분석: `docs/specs/plans/flowline-alignment-cues.md`.
+- 시그널 분석: `docs/adr/0008-flowline-design-alignment.md`.
 - ADR: `docs/adr/0008-flowline-design-alignment.md`.
 - 디자인 컨텍스트: `.impeccable.md` (refSystem · Linear UI + Jira UX).
 - 참조 HTML: `refSystem/Integrated Platform _ Standalone.html` lines 835–1079 (수동 편집 금지).

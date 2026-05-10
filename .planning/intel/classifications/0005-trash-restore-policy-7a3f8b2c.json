@@ -1,0 +1,17 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0005-trash-restore-policy.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "0005 — Trash 복원 정책 (보존 / 복원자 / cascade / audit)",
+  "summary": "Locks Trash restore policy for Wave 3 Phase C: indefinite retention, Admin-only restore, hard-delete disabled in MVP, sub-task individual restore, and voc_restore_log audit.",
+  "scope": ["Trash UI", "VOC soft delete", "voc_restore_log", "vocs.deleted_by", "migration 015", "Admin permissions", "tag_rules re-run on restore", "sub-task cascade"],
+  "cross_refs": [
+    "feature-voc.md",
+    "requirements.md",
+    "docs/adr/0004",
+    "next-session-tasks.md"
+  ],
+  "locked": true,
+  "precedence": null
+}

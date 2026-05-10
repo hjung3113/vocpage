@@ -1,0 +1,22 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0008-flowline-design-alignment.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "0008 — Flowline 디자인 정합화",
+  "summary": "ADR proposing visual alignment of vocpage with the Flowline reference module via 5 new shared UI primitives spec'd in uidesign.md §16.",
+  "scope": ["Flowline alignment", "shared/ui primitives", "uidesign.md §16", "VOC list/detail/admin/dashboard/shell visual system"],
+  "cross_refs": [
+    "refSystem/Integrated Platform _ Standalone.html",
+    "docs/specs/plans/flowline-alignment-cues.md",
+    "uidesign.md",
+    "frontend/src/shared/ui/issue-id",
+    "frontend/src/shared/ui/status-glyph",
+    "VocRow.tsx",
+    "VocActivityTimeline",
+    "globals.css"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": "Status is Proposed (not Accepted), so locked=false despite being an ADR."
+}

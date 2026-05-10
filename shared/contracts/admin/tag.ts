@@ -16,7 +16,14 @@
  *   - Admin only mutate    : POST   /api/admin/tags/:id/merge   (TagMasterMergeInput)
  *                            PATCH  /api/admin/tags/:id/external (TagExternalToggle)
  *                            DELETE /api/admin/tags/:id          (사용 VOC=0 + 규칙 참조 0)
- *                            PATCH  /api/admin/tag-rules/:id/suspend (TagRuleSuspendInput)
+ *                            PATCH  /api/admin/tags/:tagId/rules/:ruleId/suspend (TagRuleSuspendInput)
+ *
+ * Tag Rules (Phase 01 — D-08 nested resource):
+ *   GET    /api/admin/tags/:tagId/rules                (TagRuleListQuery → TagRuleListResponse)
+ *   POST   /api/admin/tags/:tagId/rules                (TagRuleCreate → TagRule)
+ *   PATCH  /api/admin/tags/:tagId/rules/:ruleId        (TagRulePatch → TagRule)
+ *   DELETE /api/admin/tags/:tagId/rules/:ruleId
+ *   PATCH  /api/admin/tags/:tagId/rules/:ruleId/suspend (TagRuleSuspendInput → TagRule)
  */
 import { z } from 'zod';
 import { Uuid } from '../common';
@@ -87,7 +94,7 @@ export const TagExternalToggle = z.object({
 });
 export type TagExternalToggle = z.infer<typeof TagExternalToggle>;
 
-/** PATCH /api/admin/tag-rules/:id/suspend — Admin only. NULL = resume immediately. */
+/** PATCH /api/admin/tags/:tagId/rules/:ruleId/suspend — Admin only. NULL = resume immediately. */
 export const TagRuleSuspendInput = z.object({
   suspended_until: Iso.nullable(),
 });
@@ -95,3 +102,64 @@ export type TagRuleSuspendInput = z.infer<typeof TagRuleSuspendInput>;
 
 export const TagIdParam = z.object({ id: Uuid });
 export type TagIdParam = z.infer<typeof TagIdParam>;
+
+/* -------------------------------------------------------------------------
+ * Tag Rules — Phase 01 consolidation
+ *  - D-05/D-06: pattern → keywords[] + match_mode (single 'keyword' enum, OQ-R1 Option C).
+ *  - D-07:    TagRuleCreate / TagRulePatch OMIT created_by (server reads req.user.id).
+ *  - D-08:    nested under /admin/tags/:tagId/rules (resource ownership reflects FK).
+ *  - D-12 + OQ-R5: created_by uuid|null + created_by_name string|null (BE join).
+ *  - kind:    locked to 'general' for v1 (menu rules deferred).
+ * ------------------------------------------------------------------------- */
+
+// T-01-11: cap keyword input size — at most 50 keywords per rule, each ≤60 chars.
+const KeywordItem = z.string().trim().min(1).max(60);
+const KeywordsArray = z.array(KeywordItem).min(1).max(50);
+
+export const TagRule = z.object({
+  id: Uuid,
+  tag_id: Uuid,
+  kind: z.literal('general'),
+  keywords: KeywordsArray,
+  match_mode: z.enum(['keyword']),
+  suspended_until: Iso.nullable(),
+  created_by: Uuid.nullable(),
+  created_by_name: z.string().nullable(),
+  created_at: Iso,
+});
+export type TagRuleT = z.infer<typeof TagRule>;
+
+/** POST /api/admin/tags/:tagId/rules — Manager+. Server derives created_by from req.user.id. */
+export const TagRuleCreate = z.object({
+  keywords: KeywordsArray,
+  match_mode: z.enum(['keyword']).default('keyword'),
+});
+export type TagRuleCreateT = z.infer<typeof TagRuleCreate>;
+
+/** PATCH /api/admin/tags/:tagId/rules/:ruleId — Manager+. Body fields all optional; created_by immutable. */
+export const TagRulePatch = z.object({
+  keywords: KeywordsArray.optional(),
+  match_mode: z.enum(['keyword']).optional(),
+});
+export type TagRulePatchT = z.infer<typeof TagRulePatch>;
+
+export const TagRuleListQuery = z.object({
+  q: z.string().trim().max(120).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  per_page: z.coerce.number().int().min(1).max(100).default(20),
+});
+export type TagRuleListQueryT = z.infer<typeof TagRuleListQuery>;
+
+export const TagRuleListResponse = z.object({
+  rows: z.array(TagRule),
+  page: z.number().int(),
+  per_page: z.number().int(),
+  total: z.number().int(),
+});
+export type TagRuleListResponseT = z.infer<typeof TagRuleListResponse>;
+
+export const RuleIdParam = z.object({
+  tagId: Uuid,
+  ruleId: Uuid,
+});
+export type RuleIdParamT = z.infer<typeof RuleIdParam>;
