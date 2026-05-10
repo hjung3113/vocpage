@@ -3,8 +3,8 @@
  * Extracted to keep TagMasterTable under the 200-line limit.
  */
 import { Lock, Pencil, GitMerge, PauseCircle, Trash2 } from 'lucide-react';
-import { ActionButton } from './ActionButton';
-import type { TagMasterItem } from '../../../../../shared/contracts/admin/tag';
+import { TagMasterActionButton } from './TagMasterActionButton';
+import type { TagMasterItem } from '@contracts/admin/tag';
 
 interface Props {
   tag: TagMasterItem;
@@ -60,14 +60,14 @@ export function TagMasterRow({
       </td>
       <td style={{ padding: '10px 12px' }}>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          <ActionButton
+          <TagMasterActionButton
             icon={<Pencil size={13} />}
             label="편집"
             enabled={canMutate}
             onClick={() => onEdit(tag)}
             testId={`btn-edit-${tag.id}`}
           />
-          <ActionButton
+          <TagMasterActionButton
             icon={<GitMerge size={13} />}
             label="병합"
             enabled={isAdmin}
@@ -79,14 +79,14 @@ export function TagMasterRow({
             (Codex P2 — tag.id 를 rule id 자리에 넘기는 오매핑.)
             규칙 선택 UI 가 들어올 때까지 disabled placeholder.
           */}
-          <ActionButton
+          <TagMasterActionButton
             icon={<PauseCircle size={13} />}
             label="일시중지"
             enabled={false}
             onClick={() => onSuspend(tag.id)}
             testId={`btn-suspend-${tag.id}`}
           />
-          <ActionButton
+          <TagMasterActionButton
             icon={<Trash2 size={13} />}
             label="삭제"
             enabled={isAdmin}

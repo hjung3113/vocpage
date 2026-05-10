@@ -2,7 +2,7 @@
  * ActionButton — reusable icon+label button for Tag Master table actions.
  * Disabled state shows "Admin 전용" tooltip.
  */
-export function ActionButton({
+export function TagMasterActionButton({
   icon,
   label,
   enabled,

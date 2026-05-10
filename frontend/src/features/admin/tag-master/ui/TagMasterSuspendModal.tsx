@@ -3,7 +3,7 @@
  * suspended_until = null → resume immediately.
  */
 import { useState } from 'react';
-import { useSuspendTagRule } from './api';
+import { useSuspendTagRule } from '../api/tag-master.api';
 import {
   ModalOverlay,
   ModalHeader,

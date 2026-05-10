@@ -6,7 +6,7 @@
 import { Navigate } from 'react-router-dom';
 import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import { useRole } from '@entities/user/model/useRole';
-import { TagMasterTable } from '@features/admin/tag-master/TagMasterTable';
+import { TagMasterTable } from '@features/admin/tag-master/ui/TagMasterTable';
 
 export default function AdminTagsPage() {
   const { isAdmin, isManager, isDev } = useRole();

@@ -4,7 +4,7 @@
  * 409/404/400 shown inline.
  */
 import { useState } from 'react';
-import { useMergeTag } from './api';
+import { useMergeTag } from '../api/tag-master.api';
 import {
   ModalOverlay,
   ModalHeader,
@@ -14,7 +14,7 @@ import {
   cancelBtnStyle,
   submitBtnStyle,
 } from './TagMasterCreateModal';
-import type { TagMasterItem } from '../../../../../shared/contracts/admin/tag';
+import type { TagMasterItem } from '@contracts/admin/tag';
 
 interface Props {
   source: TagMasterItem;

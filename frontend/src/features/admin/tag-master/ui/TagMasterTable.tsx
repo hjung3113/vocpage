@@ -11,13 +11,13 @@
 import { useState } from 'react';
 import { Tag, Plus } from 'lucide-react';
 import { useRole } from '@entities/user/model/useRole';
-import { useAdminTags, useDeleteTag, useToggleExternal } from './api';
+import { useAdminTags, useDeleteTag, useToggleExternal } from '../api/tag-master.api';
 import { TagMasterCreateModal } from './TagMasterCreateModal';
 import { TagMasterEditModal } from './TagMasterEditModal';
 import { TagMasterMergeModal } from './TagMasterMergeModal';
 import { TagMasterSuspendModal } from './TagMasterSuspendModal';
 import { TagMasterRow } from './TagMasterRow';
-import type { TagMasterItem as TagMasterItemT } from '../../../../../shared/contracts/admin/tag';
+import type { TagMasterItem as TagMasterItemT } from '@contracts/admin/tag';
 
 export function TagMasterTable() {
   const { isAdmin, isManager } = useRole();

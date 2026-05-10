@@ -25,7 +25,7 @@ const listTagsMock = vi.fn();
 const deleteTagMock = vi.fn();
 const toggleExternalMock = vi.fn();
 
-vi.mock('@features/admin/tag-master/api', () => ({
+vi.mock('@features/admin/tag-master/api/tag-master.api', () => ({
   useAdminTags: () => listTagsMock(),
   useCreateTag: () => ({ mutate: vi.fn(), isPending: false }),
   useRenameTag: () => ({ mutate: vi.fn(), isPending: false }),
