@@ -3,14 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-11T00:00:00.000Z"
-last_completed_plan: "01-05"
+last_updated: "2026-05-11T00:47:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 4
-  percent: 50
+  completed_plans: 7
+  percent: 88
 ---
 
 # STATE — vocpage
@@ -24,14 +23,14 @@ progress:
 ## Current Position
 
 - **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-04 + 01-05 + 01-06 complete (Wave 3 — BE 5 nested routes + FE 5 hooks with D-11 optimistic + FE Modal/ChipInput); 01-07 next (page wiring + view-mode tabs).
-- **Status**: Waves 0-3 landed + Modal/ChipInput shipped — scaffolds, mig 024, contract consolidation, BE handlers under /admin/tags/:tagId/rules (D-13 matrix + IDOR + server-derived created_by), FE hooks + MSW handlers + optimistic GREEN, TagRulesManagerModal + KeywordChipInput with permission gating + chip-array UX. BE 625 pass; FE 715 pass; parity 10/11 OK.
-- **Progress**: ███████░░░ Phase 1: 6/8 plans complete; 0/7 phases overall.
+- **Plan**: 01-04 + 01-05 + 01-06 + 01-07 complete (Wave 3 — BE 5 nested routes + FE 5 hooks with D-11 optimistic + FE Modal/ChipInput + Page wiring/view-mode tabs/?q debounce); 01-08 next (spec sync + grep gate).
+- **Status**: Waves 0-3 landed + Page integration shipped — scaffolds, mig 024, contract consolidation, BE handlers under /admin/tags/:tagId/rules (D-13 matrix + IDOR + server-derived created_by), FE hooks + MSW handlers + optimistic GREEN, TagRulesManagerModal + KeywordChipInput, /admin/tags 페이지에서 view-mode tabs (태그/전체 규칙) + ?view/?q URL state + 250ms debounce + cross-tag flat rules table. BE 625 pass; FE 721 pass; parity 10/11 OK.
+- **Progress**: ████████░░ Phase 1: 7/8 plans complete; 0/7 phases overall.
 
 ## Performance Metrics
 
 - BE test baseline: 625+ Jest passes (Plan 01-04 added 27 — D-13 matrix + IDOR + injection + route-order).
-- FE test baseline: 715+ Vitest passes (Plan 06 added 20 — KeywordChipInput 10 + TagRulesManagerModal 10).
+- FE test baseline: 721+ Vitest passes (Plan 07 added 6 — AdminTagsPage.plan07 integration; Plan 06 added 20).
 - Fixture-seed parity: currently `vocs` only — extend per phase (Phase 1 adds `tag_rules`, Phase 2 `voc_types`, Phase 3 `systems` / `menus`).
 - OpenAPI codegen drift target: 0.
 
