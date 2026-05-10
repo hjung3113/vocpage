@@ -113,7 +113,7 @@ export async function update(
   }
 
   // For non-admin users: silently drop any admin-locked fields from the patch
-  let effectivePatch: DashboardSettingsUpdate = { ...patch };
+  const effectivePatch: DashboardSettingsUpdate = { ...patch };
   if (!isAdmin) {
     const adminRow = await repo.getAdminDefault();
     const locked = new Set(adminRow?.locked_fields ?? []);

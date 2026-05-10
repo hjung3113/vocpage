@@ -93,10 +93,6 @@
       }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "node .claude/statusline.cjs"
-  },
   "enabledPlugins": {
     "dev-browser@dev-browser-marketplace": false,
     "claude-mem@thedotmack": false,
