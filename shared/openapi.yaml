@@ -854,22 +854,27 @@ paths:
     get:
       tags: [dashboard]
       operationId: getDashboardSummary
-      summary: Get KPI summary (8 metrics)
+      summary: Get KPI summary (8 metrics — Volume + Quality)
       parameters:
         - $ref: '#/components/parameters/dashboardSystemId'
         - $ref: '#/components/parameters/dashboardMenuId'
         - $ref: '#/components/parameters/dashboardAssigneeId'
         - $ref: '#/components/parameters/dashboardStartDate'
         - $ref: '#/components/parameters/dashboardEndDate'
+        - $ref: '#/components/parameters/dashboardRange'
       responses:
         '200':
-          description: KPI summary
+          description: KPI summary (Volume + Quality, 8 metrics)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DashboardSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /dashboard/distribution:
     get:
@@ -2435,6 +2440,13 @@ components:
       schema:
         type: string
         format: date
+    dashboardRange:
+      name: range
+      in: query
+      description: Date-range preset. Overrides the user's default_date_range. Required iff using a fixed window; with `custom`, supply startDate+endDate.
+      schema:
+        type: string
+        enum: [1m, 3m, 1y, all, custom]
 
   responses:
     BadRequest:
@@ -3214,26 +3226,50 @@ components:
           items:
             $ref: '#/components/schemas/SystemListItem'
 
+    KpiDeltaKind:
+      type: string
+      enum: [percent, count, days, percentage_point]
+
+    KpiMetric:
+      type: object
+      additionalProperties: false
+      required: [value, delta, delta_kind]
+      properties:
+        value:
+          type: number
+        delta:
+          type: number
+          nullable: true
+        delta_kind:
+          $ref: '#/components/schemas/KpiDeltaKind'
+
+    KpiVolume:
+      type: object
+      additionalProperties: false
+      required: [total_voc, unresolved, this_week_new, this_week_completed]
+      properties:
+        total_voc: { $ref: '#/components/schemas/KpiMetric' }
+        unresolved: { $ref: '#/components/schemas/KpiMetric' }
+        this_week_new: { $ref: '#/components/schemas/KpiMetric' }
+        this_week_completed: { $ref: '#/components/schemas/KpiMetric' }
+
+    KpiQuality:
+      type: object
+      additionalProperties: false
+      required: [avg_resolution_days, resolution_rate, urgent_high_unresolved, overdue_14d]
+      properties:
+        avg_resolution_days: { $ref: '#/components/schemas/KpiMetric' }
+        resolution_rate: { $ref: '#/components/schemas/KpiMetric' }
+        urgent_high_unresolved: { $ref: '#/components/schemas/KpiMetric' }
+        overdue_14d: { $ref: '#/components/schemas/KpiMetric' }
+
     DashboardSummary:
       type: object
-      required: [total, open, in_progress, completed, dropped, urgent, overdue, avg_resolution_days]
+      additionalProperties: false
+      required: [kpi_volume, kpi_quality]
       properties:
-        total:
-          type: integer
-        open:
-          type: integer
-        in_progress:
-          type: integer
-        completed:
-          type: integer
-        dropped:
-          type: integer
-        urgent:
-          type: integer
-        overdue:
-          type: integer
-        avg_resolution_days:
-          type: number
+        kpi_volume: { $ref: '#/components/schemas/KpiVolume' }
+        kpi_quality: { $ref: '#/components/schemas/KpiQuality' }
 
     RglLayoutItem:
       type: object
