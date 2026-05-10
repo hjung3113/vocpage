@@ -60,15 +60,65 @@ export const GlobalTabsOrderItem = z.object({
 });
 export type GlobalTabsOrderItem = z.infer<typeof GlobalTabsOrderItem>;
 
-export const DashboardSettings = z.object({
-  user_id: Uuid.nullable(),
-  widget_order: z.array(z.string()),
-  widget_visibility: z.record(z.string(), z.boolean()),
-  widget_sizes: RglLayouts,
-  locked_fields: z.array(z.string()),
-  default_date_range: DateRangePreset,
-  heatmap_default_x_axis: HeatmapXAxis,
-  globaltabs_order: z.array(GlobalTabsOrderItem).nullable(),
-  updated_at: Iso,
-});
+/**
+ * ADR 0006: 'custom' 기본 날짜 범위의 시작/종료일.
+ * `'custom'` 일 때만 양쪽 NOT NULL + start <= end. 그 외 enum 시 양쪽 NULL.
+ * Cross-field invariant 는 `DashboardSettings` / `DashboardSettingsUpdate` 의
+ * superRefine 으로 enforce (DB CHECK 와 동일 규칙). 상한 없음.
+ */
+const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD');
+export const CustomDate = IsoDate;
+
+const customDatesInvariant = (
+  s: {
+    default_date_range: DateRangePreset;
+    custom_start_date: string | null | undefined;
+    custom_end_date: string | null | undefined;
+  },
+  ctx: z.RefinementCtx,
+) => {
+  if (s.default_date_range === 'custom') {
+    if (!s.custom_start_date || !s.custom_end_date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['custom_start_date'],
+        message: "default_date_range='custom' requires custom_start_date and custom_end_date",
+      });
+      return;
+    }
+    if (s.custom_start_date > s.custom_end_date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['custom_end_date'],
+        message: 'custom_start_date must be <= custom_end_date',
+      });
+    }
+  } else {
+    if (s.custom_start_date != null || s.custom_end_date != null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['custom_start_date'],
+        message: "non-'custom' default_date_range requires both custom dates to be null",
+      });
+    }
+  }
+};
+
+export const DashboardSettings = z
+  .object({
+    user_id: Uuid.nullable(),
+    widget_order: z.array(z.string()),
+    widget_visibility: z.record(z.string(), z.boolean()),
+    widget_sizes: RglLayouts,
+    locked_fields: z.array(z.string()),
+    default_date_range: DateRangePreset,
+    custom_start_date: IsoDate.nullable(),
+    custom_end_date: IsoDate.nullable(),
+    heatmap_default_x_axis: HeatmapXAxis,
+    globaltabs_order: z.array(GlobalTabsOrderItem).nullable(),
+    updated_at: Iso,
+  })
+  .superRefine(customDatesInvariant);
 export type DashboardSettings = z.infer<typeof DashboardSettings>;
+
+export { customDatesInvariant };

@@ -1,15 +1,14 @@
 /**
- * DashboardSettingsDialog.tsx — Wave 2 Phase E
+ * DashboardSettingsDialog.tsx — Wave 2 Phase E + ADR 0006 (custom date range).
  *
  * Right-side Sheet (per dashboard.md §11.3) for editing dashboard preferences:
  *   - widget visibility (8 widgets)
- *   - default date range (1m/3m/1y/all; 'custom' surfaces as disabled radio)
+ *   - default date range (1m/3m/1y/all/custom)
+ *     · scope='self' 일 때 'custom' 선택 시 RangePicker 표시
+ *     · scope='admin' 일 때 'custom' 차단 (ADR 0006 §7)
  *   - heatmap default X-axis
  *   - admin-default save target toggle (admin only)
  *   - GlobalTabs reorder + visibility (admin scope only)
- *
- * Out of scope: 'custom' date range picker — schema lacks custom_start/end_date
- * columns; tracked as FU follow-up.
  */
 import { forwardRef, useEffect, useState, type ComponentPropsWithoutRef } from 'react';
 import { Settings } from 'lucide-react';
@@ -35,7 +34,7 @@ import { useUpdateDashboardSettings } from '../model/useUpdateDashboardSettings'
 import { WIDGET_IDS } from '../defaultLayouts';
 import {
   WidgetVisibilityList,
-  DateRangeRadios,
+  DateRangeSection,
   XAxisRadios,
   ScopeToggle,
 } from './DashboardSettingsForm';
@@ -46,6 +45,8 @@ type Scope = 'self' | 'admin';
 type DraftState = {
   widget_visibility: Record<string, boolean>;
   default_date_range: DateRangePreset;
+  custom_start_date: string | null;
+  custom_end_date: string | null;
   heatmap_default_x_axis: HeatmapXAxis;
   globaltabs_order: GlobalTabsOrderItem[] | null;
 };
@@ -58,6 +59,8 @@ function toDraft(s: DashboardSettings): DraftState {
   return {
     widget_visibility: visibility,
     default_date_range: s.default_date_range,
+    custom_start_date: s.custom_start_date,
+    custom_end_date: s.custom_end_date,
     heatmap_default_x_axis: s.heatmap_default_x_axis,
     globaltabs_order: s.globaltabs_order,
   };
@@ -97,13 +100,27 @@ export function DashboardSettingsDialog() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, scope, settings]);
 
+  const customDirty =
+    draft &&
+    draft.default_date_range === 'custom' &&
+    (!draft.custom_start_date || !draft.custom_end_date);
+
   const handleSave = () => {
     if (!draft) return;
+    if (customDirty) return; // ADR 0006: 'custom' 선택 시 dates 양쪽 필수.
     const patch: DashboardSettingsUpdate = {
       widget_visibility: draft.widget_visibility,
       default_date_range: draft.default_date_range,
       heatmap_default_x_axis: draft.heatmap_default_x_axis,
     };
+    if (draft.default_date_range === 'custom') {
+      patch.custom_start_date = draft.custom_start_date;
+      patch.custom_end_date = draft.custom_end_date;
+    } else {
+      // ADR §5: enum 변경 시 picker 값 자동 NULL clear (CHECK 정합).
+      patch.custom_start_date = null;
+      patch.custom_end_date = null;
+    }
     if (scope === 'admin') {
       patch.globaltabs_order = draft.globaltabs_order;
     }
@@ -153,10 +170,7 @@ export function DashboardSettingsDialog() {
             }
           />
 
-          <DateRangeRadios
-            value={draft.default_date_range}
-            onChange={(next) => setDraft((d) => (d ? { ...d, default_date_range: next } : d))}
-          />
+          <DateRangeSection draft={draft} scope={scope} setDraft={setDraft} />
 
           <XAxisRadios
             value={draft.heatmap_default_x_axis}
@@ -183,7 +197,8 @@ export function DashboardSettingsDialog() {
           <button
             type="button"
             onClick={handleSave}
-            disabled={isPending}
+            disabled={isPending || !!customDirty}
+            title={customDirty ? '시작일과 종료일을 모두 선택하세요.' : undefined}
             className="rounded bg-[var(--brand)] px-3 py-1.5 text-sm text-[var(--text-primary)] hover:bg-[var(--accent)] disabled:opacity-50 transition-colors"
           >
             {isPending ? '저장 중…' : '저장'}

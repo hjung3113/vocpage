@@ -3344,6 +3344,8 @@ components:
         - widget_sizes
         - locked_fields
         - default_date_range
+        - custom_start_date
+        - custom_end_date
         - heatmap_default_x_axis
         - globaltabs_order
         - updated_at
@@ -3366,6 +3368,15 @@ components:
         default_date_range:
           type: string
           enum: ['1m', '3m', '1y', 'all', 'custom']
+        # ADR 0006: 'custom' 일 때만 양쪽 NOT NULL + start <= end. 그 외 NULL.
+        custom_start_date:
+          type: string
+          format: date
+          nullable: true
+        custom_end_date:
+          type: string
+          format: date
+          nullable: true
         heatmap_default_x_axis:
           type: string
           enum: ['status', 'priority', 'tag']
@@ -3395,6 +3406,14 @@ components:
         default_date_range:
           type: string
           enum: ['1m', '3m', '1y', 'all', 'custom']
+        custom_start_date:
+          type: string
+          format: date
+          nullable: true
+        custom_end_date:
+          type: string
+          format: date
+          nullable: true
         heatmap_default_x_axis:
           type: string
           enum: ['status', 'priority', 'tag']

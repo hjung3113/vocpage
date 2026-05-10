@@ -21,6 +21,7 @@ export const DATE_RANGE_OPTIONS: { value: DateRangePreset; label: string }[] = [
   { value: '3m', label: '3개월' },
   { value: '1y', label: '1년' },
   { value: 'all', label: '전체' },
+  { value: 'custom', label: '사용자 지정' },
 ];
 
 export const X_AXIS_OPTIONS: { value: HeatmapXAxis; label: string }[] = [

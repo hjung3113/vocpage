@@ -44,6 +44,8 @@ const baseAdminRow = {
   widget_sizes: {},
   locked_fields: [],
   default_date_range: '3m',
+  custom_start_date: null,
+  custom_end_date: null,
   heatmap_default_x_axis: 'status',
   globaltabs_order: null,
   updated_at: UPDATED_AT,
@@ -56,6 +58,8 @@ const baseUserRow = {
   widget_sizes: {},
   locked_fields: [],
   default_date_range: '1y',
+  custom_start_date: null,
+  custom_end_date: null,
   heatmap_default_x_axis: 'tag',
   globaltabs_order: null,
   updated_at: UPDATED_AT,
@@ -401,5 +405,118 @@ describe('GET /api/dashboard/settings (Phase E: scope=admin)', () => {
     expect(res.status).toBe(200);
     expect(res.body.user_id).toBe(ADMIN_ID === res.body.user_id ? ADMIN_ID : USER_ID);
     expect(mockRepo.getByUserId).toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ADR 0006 — custom date range as default
+// ---------------------------------------------------------------------------
+
+describe('PUT /api/dashboard/settings (ADR 0006: custom date range)', () => {
+  test("user PUT default_date_range='custom' + valid dates → 200, repo upsert receives both", async () => {
+    mockRepo.getByUserId.mockResolvedValue(baseUserRow);
+    mockRepo.getAdminDefault.mockResolvedValue(baseAdminRow);
+    mockRepo.upsert.mockResolvedValue({
+      ...baseUserRow,
+      default_date_range: 'custom',
+      custom_start_date: '2026-01-01',
+      custom_end_date: '2026-03-31',
+    });
+
+    const res = await request(makeApp(USER_ID, 'user'))
+      .put('/api/dashboard/settings')
+      .send({
+        default_date_range: 'custom',
+        custom_start_date: '2026-01-01',
+        custom_end_date: '2026-03-31',
+      });
+
+    expect(res.status).toBe(200);
+    const upsertArgs = mockRepo.upsert.mock.calls[0];
+    expect(upsertArgs[0]).toBe(USER_ID);
+    expect(upsertArgs[1].default_date_range).toBe('custom');
+    expect(upsertArgs[1].custom_start_date).toBe('2026-01-01');
+    expect(upsertArgs[1].custom_end_date).toBe('2026-03-31');
+  });
+
+  test("user PUT default_date_range='custom' missing dates → 400 CUSTOM_DATES_REQUIRED", async () => {
+    mockRepo.getByUserId.mockResolvedValue({ ...baseUserRow, default_date_range: '1m' });
+    mockRepo.getAdminDefault.mockResolvedValue(baseAdminRow);
+
+    const res = await request(makeApp(USER_ID, 'user'))
+      .put('/api/dashboard/settings')
+      .send({ default_date_range: 'custom' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('CUSTOM_DATES_REQUIRED');
+  });
+
+  test('user PUT custom_end_date < custom_start_date → 400 CUSTOM_DATES_RANGE_INVALID', async () => {
+    mockRepo.getByUserId.mockResolvedValue(baseUserRow);
+    mockRepo.getAdminDefault.mockResolvedValue(baseAdminRow);
+
+    const res = await request(makeApp(USER_ID, 'user'))
+      .put('/api/dashboard/settings')
+      .send({
+        default_date_range: 'custom',
+        custom_start_date: '2026-03-31',
+        custom_end_date: '2026-01-01',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('CUSTOM_DATES_RANGE_INVALID');
+  });
+
+  test("user PUT default_date_range='1m' (was custom) → service auto-clears custom dates", async () => {
+    mockRepo.getByUserId.mockResolvedValue({
+      ...baseUserRow,
+      default_date_range: 'custom',
+      custom_start_date: '2026-01-01',
+      custom_end_date: '2026-03-31',
+    });
+    mockRepo.getAdminDefault.mockResolvedValue(baseAdminRow);
+    mockRepo.upsert.mockResolvedValue({ ...baseUserRow, default_date_range: '1m' });
+
+    const res = await request(makeApp(USER_ID, 'user'))
+      .put('/api/dashboard/settings')
+      .send({ default_date_range: '1m' });
+
+    expect(res.status).toBe(200);
+    const patch = mockRepo.upsert.mock.calls[0][1];
+    expect(patch.default_date_range).toBe('1m');
+    expect(patch.custom_start_date).toBeNull();
+    expect(patch.custom_end_date).toBeNull();
+  });
+
+  test("admin PUT ?scope=admin default_date_range='custom' → 415 ADMIN_CUSTOM_NOT_SUPPORTED (ADR §7)", async () => {
+    mockRepo.getByUserId.mockResolvedValue(null);
+    mockRepo.getAdminDefault.mockResolvedValue(baseAdminRow);
+
+    const res = await request(makeApp(ADMIN_ID, 'admin'))
+      .put('/api/dashboard/settings?scope=admin')
+      .send({
+        default_date_range: 'custom',
+        custom_start_date: '2026-01-01',
+        custom_end_date: '2026-03-31',
+      });
+
+    expect(res.status).toBe(415);
+    expect(res.body.code).toBe('ADMIN_CUSTOM_NOT_SUPPORTED');
+    expect(mockRepo.upsert).not.toHaveBeenCalled();
+  });
+
+  test('GET invariant violation (CHECK 우회 시) → 500 DASHBOARD_SETTINGS_INVARIANT_VIOLATION (ADR §6)', async () => {
+    // Simulate manual SQL leaving default_date_range='custom' but dates null.
+    mockRepo.getAdminDefault.mockResolvedValue(null);
+    mockRepo.getByUserId.mockResolvedValue({
+      ...baseUserRow,
+      default_date_range: 'custom',
+      custom_start_date: null,
+      custom_end_date: null,
+    });
+
+    const res = await request(makeApp(USER_ID, 'user')).get('/api/dashboard/settings');
+    expect(res.status).toBe(500);
+    expect(res.body.code).toBe('DASHBOARD_SETTINGS_INVARIANT_VIOLATION');
   });
 });

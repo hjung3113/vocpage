@@ -22,6 +22,8 @@ const ADMIN_DEFAULT_SETTINGS: DashboardSettings = {
   widget_sizes: {},
   locked_fields: [],
   default_date_range: '1m',
+  custom_start_date: null,
+  custom_end_date: null,
   heatmap_default_x_axis: 'status',
   globaltabs_order: null,
   updated_at: new Date().toISOString(),
@@ -58,6 +60,13 @@ export const dashboardHandlers = [
     const url = new URL(request.url);
     const adminScope = url.searchParams.get('scope') === 'admin';
     const patch = (await request.json().catch(() => ({}))) as Partial<DashboardSettings>;
+    // ADR 0006 §7: Admin 행은 'custom' 차단.
+    if (adminScope && patch.default_date_range === 'custom') {
+      return HttpResponse.json(
+        { code: 'ADMIN_CUSTOM_NOT_SUPPORTED', message: "Admin 기본값은 'custom' 미지원." },
+        { status: 415 },
+      );
+    }
     if (adminScope) {
       currentAdminSettings = {
         ...currentAdminSettings,
