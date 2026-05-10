@@ -1,6 +1,16 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 Wave 2 Phase C BE+FE 머지 완료 → Phase E 진입)
+## 다음 세션 시작점 (2026-05-10 Wave 2 Phase E 코드 완료 · PR #308 OPEN, 사용자 머지 대기)
+
+→ **Wave 2 Phase E — DashboardSettingsDialog (PR #308, OPEN)**:
+   - **커밋 1 — Base settings panel** (`8d3bbc6`): Sheet 우측 슬라이드인 + 위젯 표시 8 토글 + 기본 날짜 범위 라디오 (1m/3m/1y/all; `'custom'` 은 disabled radio 로 round-trip 보존) + 히트맵 X축 라디오 (status/priority/tag) + Save/Reset/Cancel + close-while-saving guard. `DashboardShell` 가 `hiddenWidgetIds` 받아 children 과 `layouts[bp]` 둘 다 lockstep 으로 필터 (RGL key invariant). 적대적 리뷰 P0×2 + P1×2 close (RGL key alignment, close race, hiddenWidgetIds memoize, draft-driven custom radio).
+   - **커밋 2 — Item 1 (admin-default scope toggle) + Item 2 (GlobalTabs reorder)** (`ca06321`):
+     - **Item 1**: BE `GET /api/dashboard/settings?scope=admin` (admin only, raw admin-default row via `service.loadAdminDefault`). 403 `FORBIDDEN_ADMIN_SCOPE` for non-admin. FE `useDashboardSettings(scope)` / `useUpdateDashboardSettings(scope)` 가 `'self' | 'admin'` 받음. queryKey scoped, mutation success 가 두 scope 모두 invalidate. Dialog: `저장 대상` 토글 (`내 설정` / `기본값 (Admin)`) `user.role === 'admin'` 일 때만 표시. scope 전환 시 hooks 가 새 scope 로 re-key.
+     - **Item 2**: 신규 `GlobalTabsEditor.tsx` — native HTML5 DnD reorder + 행별 visibility 토글 + systemId 추가/제거 + empty state. 신규 dep 없음. `scope === 'admin'` 일 때만 표시. Save patch 가 admin scope 에서만 `globaltabs_order` 포함.
+   - **Item 3 — `'custom'` 날짜 picker 의도적 미포함**: `dashboard_settings` 스키마에 `custom_start_date / custom_end_date` 컬럼 부재. 사용자 정의 범위를 *기본값* 으로 저장하려면 마이그 신설 필요. CLAUDE.md irreversibility 게이트 (DB 스키마 변경 ≥90% 신뢰 + 명시 승인) 적용 → FU-bucket (`FU-026`) 등록. base 의 disabled-custom-radio 는 기존 `'custom'` 값 silent loss 방지로 유지.
+   - **오케스트레이션 메모**: 사용자 직접 지시 "codex 사용 금지". 적대적 결정/리뷰는 `general-purpose` 에이전트로 대체. 두 라운드 (스코프 결정 Q1/Q2/Q3 + 코드 리뷰 P0×2/P1×2) 모두 일반 에이전트로 처리, 결과 수용/반박 포함.
+   - **검증 (PR #308 HEAD)**: BE typecheck 0 / 587 pass (+3) · FE typecheck 0 / 661 pass (+13: base 9 + admin 4) · lint 0 / token lint 0.
+   - **다음 세션 액션**: PR #308 코드/UI 확인 → CI green 시 `gh pr merge 308 --merge --delete-branch` → 머지 후 본 progress + `next-session-tasks.md` 동기화.
 
 → **Wave 2 Phase C — 7 endpoint BE + 7 위젯 FE 머지 완료** (PR #304/#305/#306, 2026-05-10):
    - **PR #304 — vite proxy 포트 정합**: BE `process.env.PORT ?? 3000` → `?? 3001` (vite proxy 가 `localhost:3001` 으로 forward; docker compose 는 컨테이너 내부 PORT=3000 명시 유지). 로컬 dev 페어링 정합.
