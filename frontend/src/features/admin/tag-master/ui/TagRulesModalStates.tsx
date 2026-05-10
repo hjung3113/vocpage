@@ -4,13 +4,17 @@
  * Phase 01 Plan 06. Extracted from TagRulesManagerModal for file-size discipline.
  * Copy bound to 01-UI-SPEC.md §Copywriting Contract.
  */
-import { ListPlus } from 'lucide-react';
+import { ListPlus, X } from 'lucide-react';
 
 export function MutationErrorBanner({
   message,
+  onRetry,
   onDismiss,
 }: {
   message: string;
+  /** Re-invoke the failed mutation. UI-SPEC §Error: `다시 시도` button retries. */
+  onRetry?: () => void;
+  /** Hide the banner without retrying. */
   onDismiss: () => void;
 }) {
   return (
@@ -26,24 +30,50 @@ export function MutationErrorBanner({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        gap: 'var(--sp-2)',
       }}
     >
       <span>{message}</span>
-      <button
-        type="button"
-        onClick={onDismiss}
-        style={{
-          background: 'transparent',
-          border: '1px solid var(--status-red-border)',
-          color: 'var(--status-red)',
-          padding: '3px 10px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          cursor: 'pointer',
-        }}
-      >
-        다시 시도
-      </button>
+      <span style={{ display: 'inline-flex', gap: 'var(--sp-1)' }}>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            data-testid="rule-banner-retry"
+            className="tag-rule-icon-btn"
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--status-red-border)',
+              color: 'var(--status-red)',
+              padding: '3px 10px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="알림 닫기"
+          data-testid="rule-banner-dismiss"
+          className="tag-rule-icon-btn"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--status-red)',
+            padding: '3px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
+          <X size={14} />
+        </button>
+      </span>
     </div>
   );
 }

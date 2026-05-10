@@ -61,6 +61,7 @@ export function TagMasterRow({
           onClick={() => onOpenRules(tag)}
           aria-label={`${tag.name}의 규칙 ${ruleCount}건 관리`}
           data-testid={`btn-open-rules-${tag.id}`}
+          className={ruleCount === 0 ? undefined : 'tag-rule-row-badge'}
           style={
             ruleCount === 0
               ? {

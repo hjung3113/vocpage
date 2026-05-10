@@ -94,6 +94,7 @@ export default function AdminTagsPage() {
                 aria-selected={active}
                 data-testid={`tab-view-${t.v}`}
                 onClick={() => setView(t.v)}
+                className="tag-rule-view-tab"
                 style={{
                   padding: 'var(--sp-1) var(--sp-3)',
                   borderRadius: '9999px',
@@ -119,6 +120,7 @@ export default function AdminTagsPage() {
             placeholder="키워드 또는 태그명으로 검색"
             aria-label="규칙 검색"
             data-testid="flat-search-input"
+            className="tag-rule-search-input"
             style={{
               width: '240px',
               height: '32px',

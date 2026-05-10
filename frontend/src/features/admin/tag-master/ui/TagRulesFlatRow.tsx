@@ -68,15 +68,14 @@ export function TagRulesFlatRow({
           type="button"
           onClick={() => onJumpToTag(tag.id)}
           data-testid={`flat-jump-tag-${tag.id}`}
+          className="tag-rule-flat-name-btn"
           style={{
             background: 'transparent',
             border: 'none',
             padding: 0,
             cursor: 'pointer',
-            color: 'var(--accent)',
             fontSize: '13px',
             fontWeight: 500,
-            textDecoration: 'underline',
           }}
         >
           {tag.name}

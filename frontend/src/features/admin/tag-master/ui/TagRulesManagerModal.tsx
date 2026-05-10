@@ -60,7 +60,7 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
   const [confirming, setConfirming] = useState<{ kind: TagRuleConfirmKind; rule: TagRuleT } | null>(
     null,
   );
-  const [bannerError, setBannerError] = useState<string | null>(null);
+  const [banner, setBanner] = useState<{ message: string; retry?: () => void } | null>(null);
 
   const rules = data?.rows ?? [];
   // UI-SPEC §Spacing: Modal width 560 → 680 when sub-table N≥3.
@@ -70,19 +70,20 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
   // placeholder row in TagRulesSubTable per UI-SPEC §Optimistic update.
   const [pendingCreateKeywords, setPendingCreateKeywords] = useState<string[] | null>(null);
 
-  function handleAdd() {
-    const submitted = keywords;
+  function handleAdd(retryKeywords?: string[]) {
+    const submitted = retryKeywords ?? keywords;
     setPendingCreateKeywords(submitted);
     createRule.mutate(
       { keywords: submitted, match_mode: 'keyword' },
       {
         onSuccess: () => {
           setKeywords([]);
-          setBannerError(null);
+          setBanner(null);
           setPendingCreateKeywords(null);
         },
         onError: () => {
-          setBannerError(ERROR_COPY.create);
+          // UI-SPEC §Error: retry button must re-fire the failed mutation.
+          setBanner({ message: ERROR_COPY.create, retry: () => handleAdd(submitted) });
           setPendingCreateKeywords(null);
         },
       },
@@ -92,7 +93,7 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
   function startEdit(rule: TagRuleT) {
     setEditingRuleId(rule.id);
     setEditKeywords(rule.keywords);
-    setBannerError(null);
+    setBanner(null);
   }
 
   function cancelEdit() {
@@ -100,17 +101,22 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
     setEditKeywords([]);
   }
 
-  function saveEdit(ruleId: string) {
-    if (editKeywords.length === 0) return;
+  function saveEdit(ruleId: string, retryKeywords?: string[]) {
+    const submitted = retryKeywords ?? editKeywords;
+    if (submitted.length === 0) return;
     updateRule.mutate(
-      { ruleId, keywords: editKeywords, match_mode: 'keyword' },
+      { ruleId, keywords: submitted, match_mode: 'keyword' },
       {
         onSuccess: () => {
           setEditingRuleId(null);
           setEditKeywords([]);
-          setBannerError(null);
+          setBanner(null);
         },
-        onError: () => setBannerError(ERROR_COPY.update),
+        onError: () =>
+          setBanner({
+            message: ERROR_COPY.update,
+            retry: () => saveEdit(ruleId, submitted),
+          }),
       },
     );
   }
@@ -122,11 +128,11 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
       deleteRule.mutate(rule.id, {
         onSuccess: () => {
           setConfirming(null);
-          setBannerError(null);
+          setBanner(null);
         },
         onError: () => {
           setConfirming(null);
-          setBannerError(ERROR_COPY.delete);
+          setBanner({ message: ERROR_COPY.delete, retry: () => retryDelete(rule) });
         },
       });
       return;
@@ -137,12 +143,37 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
       {
         onSuccess: () => {
           setConfirming(null);
-          setBannerError(null);
+          setBanner(null);
         },
         onError: () => {
           setConfirming(null);
-          setBannerError(ERROR_COPY.update);
+          setBanner({
+            message: ERROR_COPY.update,
+            retry: () => retrySuspend(rule, suspended_until),
+          });
         },
+      },
+    );
+  }
+
+  function retryDelete(rule: TagRuleT) {
+    deleteRule.mutate(rule.id, {
+      onSuccess: () => setBanner(null),
+      onError: () =>
+        setBanner({ message: ERROR_COPY.delete, retry: () => retryDelete(rule) }),
+    });
+  }
+
+  function retrySuspend(rule: TagRuleT, suspended_until: string | null) {
+    suspendRule.mutate(
+      { tagId: tag.id, ruleId: rule.id, suspended_until },
+      {
+        onSuccess: () => setBanner(null),
+        onError: () =>
+          setBanner({
+            message: ERROR_COPY.update,
+            retry: () => retrySuspend(rule, suspended_until),
+          }),
       },
     );
   }
@@ -177,8 +208,12 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
           pending={createRule.isPending}
         />
 
-        {bannerError && (
-          <MutationErrorBanner message={bannerError} onDismiss={() => setBannerError(null)} />
+        {banner && (
+          <MutationErrorBanner
+            message={banner.message}
+            onRetry={banner.retry}
+            onDismiss={() => setBanner(null)}
+          />
         )}
 
         {isLoading ? (
