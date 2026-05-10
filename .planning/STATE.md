@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-10T14:43:43.043Z"
-last_completed_plan: "01-01"
+last_updated: "2026-05-10T14:55:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
-  percent: 13
+  completed_plans: 2
+  percent: 25
+last_completed_plan: "01-02"
 ---
 
 # STATE — vocpage
@@ -24,9 +24,9 @@ progress:
 ## Current Position
 
 - **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-01 complete (Wave 0 scaffolds); 01-02 next (Wave 1 — mig 024 + contract reshape)
-- **Status**: Wave 0 landed — `01-MATCHER-AUDIT.md`, parity TARGETS triples, RED tests for mig 024 + D-11 optimistic.
-- **Progress**: █░░░░░░░░░ Phase 1: 1/8 plans complete; 0/7 phases overall.
+- **Plan**: 01-02 complete (Wave 1 — mig 024 GREEN + fixture/parity reshape); 01-03 next (Wave 2 — zod contracts + OpenAPI rewrite).
+- **Status**: Wave 1 landed — mig 024 ships keywords[]+match_mode+created_by, drops pattern; migration-024 5/5 GREEN; parity 10/11 OK; BE 598 passes.
+- **Progress**: ██░░░░░░░░ Phase 1: 2/8 plans complete; 0/7 phases overall.
 
 ## Performance Metrics
 
