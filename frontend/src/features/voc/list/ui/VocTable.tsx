@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { VocListHeader } from './VocListHeader';
-import { VocRow, type VocTypeMapEntry } from './VocRow';
+import { VocRow } from './VocRow';
 import { VocStatusGroupHeader } from './VocStatusGroupHeader';
 import type { VocListResponse, VocSortColumn, SortDir, VocStatus } from '@contracts/voc';
 
@@ -16,7 +16,6 @@ interface VocTableProps {
   onSort: (key: VocSortColumn) => void;
   onRowClick: (id: string) => void;
   assigneeMap: Record<string, string>;
-  vocTypeMap?: Record<string, VocTypeMapEntry>;
   selectedId?: string | null;
   groupByStatus?: boolean;
   collapsedStatuses?: ReadonlySet<VocStatus>;
@@ -50,7 +49,6 @@ export function VocTable({
   onSort,
   onRowClick,
   assigneeMap,
-  vocTypeMap,
   selectedId,
   groupByStatus = false,
   collapsedStatuses,
@@ -96,7 +94,6 @@ export function VocTable({
         <VocRow
           row={row}
           assigneeMap={assigneeMap}
-          vocTypeMap={vocTypeMap}
           selected={row.id === selectedId}
           onClick={() => onRowClick(row.id)}
           hasChildren={hasChildren}
@@ -109,7 +106,6 @@ export function VocTable({
               key={child.id}
               row={child}
               assigneeMap={assigneeMap}
-              vocTypeMap={vocTypeMap}
               selected={child.id === selectedId}
               onClick={() => onRowClick(child.id)}
               indented

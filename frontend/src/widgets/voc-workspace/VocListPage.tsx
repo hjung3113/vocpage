@@ -162,7 +162,6 @@ export function VocListPage() {
                     }}
                     selectedId={ctrl.drawer.vocId}
                     assigneeMap={ctrl.masters.assigneeMap}
-                    vocTypeMap={vocTypeMap}
                     groupByStatus
                     collapsedStatuses={collapsedStatuses}
                     onToggleStatus={toggleStatus}

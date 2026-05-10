@@ -1483,10 +1483,10 @@ Use these as templates when generating new components. They reference only token
 | ------ | --------------------- | --------------------------------------------- | --------- |
 | S1     | Issue ID (`.iid`)     | 신규 컴포넌트 `shared/ui/issue-id`            | implemented (Wave C) |
 | S2     | Status glyph (`.s-icon`) | 신규 `shared/ui/status-glyph` (SolidChip 보완) | implemented (Wave C) |
-| S3     | Priority bars (`.p-icon`) | 신규 `shared/ui/priority-bars`              | spec-only |
+| S3     | Priority bars (`.p-icon`) | 신규 `shared/ui/priority-bars`              | implemented (Wave C-ext) |
 | S4     | Tight row density     | **검증 완료** — `VocRow.tsx:35` 가 이미 동일 사양 | verified |
-| S5     | Group header band     | 신규 `shared/ui/list-group-header`            | spec-only |
-| S6     | Label chip            | 기존 `shared/ui/badge/OutlineChip` 에 `dot-pill` variant | spec-only |
+| S5     | Group header band     | 신규 `shared/ui/list-group-header`            | implemented (Wave C-ext) |
+| S6     | Label chip            | 기존 `shared/ui/badge/OutlineChip` 에 `dot-pill` variant | implemented (Wave C-ext) |
 | S7     | Activity feed         | 기존 `features/voc/review/ui/VocActivityTimeline` 유지, 시각 점검 별 wave | deferred |
 | Bonus  | Sparkline             | §11.4 Donut legend 옆 mini bar 패턴 재사용     | deferred |
 
@@ -1538,7 +1538,7 @@ VOC 상태 매핑: `received → todo`, `reviewing → review`, `processing → 
 | `med`     | bar 1·2 `var(--text-secondary)`, bar 3 `var(--text-quaternary)` |
 | `low`     | bar 1 `var(--text-secondary)`, bar 2·3 `var(--text-quaternary)` |
 
-`var(--text-quaternary)` 는 비활성 bar 의 디폴트.
+`var(--text-quaternary)` 는 비활성 bar 의 디폴트. status-glyph 와 priority-bars 는 row 그리드에서 column 분리되어 warm 색을 공유해도 시각 충돌이 적다 — Linear convention 을 따라 `urgent`(red) / `high`(orange) 는 색으로, `med` / `low` 는 회색 강도로 위계를 표현한다.
 
 ### 16.5 S4 — Tight row density (verified)
 

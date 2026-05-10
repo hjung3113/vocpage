@@ -47,10 +47,6 @@ const assigneeMap: Record<string, string> = {
   'user-123': '김담당',
 };
 
-const vocTypeMap: Record<string, { slug: string; name: string }> = {
-  'vtype-001': { slug: 'bug', name: '버그' },
-};
-
 describe('VocRow', () => {
   it('renders role="row" with data-testid="voc-row"', () => {
     render(<VocRow row={row} assigneeMap={assigneeMap} onClick={() => {}} />);
@@ -176,21 +172,8 @@ describe('VocRow', () => {
     expect(screen.queryAllByTestId('voc-tag-pill')).toHaveLength(0);
   });
 
-  it('F-2: renders VocTypeBadge in title cell when vocTypeMap has the row voc_type_id', () => {
-    render(
-      <VocRow row={row} assigneeMap={assigneeMap} vocTypeMap={vocTypeMap} onClick={() => {}} />,
-    );
-    expect(screen.getByTestId('voc-type-badge-bug')).toBeInTheDocument();
-  });
-
-  it('F-2: omits VocTypeBadge when vocTypeMap is absent (backward compatible)', () => {
+  it('Flowline C-extension: title cell does not prepend a VocTypeBadge (type info lives in detail/drawer)', () => {
     render(<VocRow row={row} assigneeMap={assigneeMap} onClick={() => {}} />);
-    expect(screen.queryByTestId('voc-type-badge-bug')).toBeNull();
-    expect(screen.queryByTestId('text-mark-unknown')).toBeNull();
-  });
-
-  it('F-2: omits VocTypeBadge when vocTypeMap is missing the row voc_type_id', () => {
-    render(<VocRow row={row} assigneeMap={assigneeMap} vocTypeMap={{}} onClick={() => {}} />);
     expect(screen.queryByTestId('voc-type-badge-bug')).toBeNull();
     expect(screen.queryByTestId('text-mark-unknown')).toBeNull();
   });

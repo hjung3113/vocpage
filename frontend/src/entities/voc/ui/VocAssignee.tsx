@@ -1,22 +1,5 @@
 import { UserX } from 'lucide-react';
 
-const COLOR_CLASSES = ['steel', 'teal', 'violet'] as const;
-export type AvatarColorClass = (typeof COLOR_CLASSES)[number];
-
-const COLOR_VAR: Record<AvatarColorClass, string> = {
-  steel: 'var(--avatar-steel)',
-  teal: 'var(--avatar-teal)',
-  violet: 'var(--avatar-violet)',
-};
-
-export function hashAssigneeColor(name: string): AvatarColorClass {
-  let h = 0;
-  for (let i = 0; i < name.length; i += 1) {
-    h = (h * 31 + name.charCodeAt(i)) | 0;
-  }
-  return COLOR_CLASSES[Math.abs(h) % COLOR_CLASSES.length] as AvatarColorClass;
-}
-
 const ROW_STYLE: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -25,26 +8,22 @@ const ROW_STYLE: React.CSSProperties = {
   color: 'var(--text-tertiary)',
 };
 
-const CIRCLE_BASE: React.CSSProperties = {
-  width: '22px',
-  height: '22px',
+const CIRCLE_STYLE: React.CSSProperties = {
+  width: '18px',
+  height: '18px',
   borderRadius: '50%',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: '9.5px',
-  fontWeight: 700,
-  color: 'var(--text-on-brand)',
+  fontSize: '9px',
+  fontWeight: 600,
+  color: 'var(--text-secondary)',
+  background: 'var(--bg-elevated)',
+  border: '1px solid var(--border-subtle)',
   flexShrink: 0,
 };
 
-export function VocAssignee({
-  name,
-  colorClass,
-}: {
-  name: string | null;
-  colorClass?: AvatarColorClass;
-}) {
+export function VocAssignee({ name }: { name: string | null }) {
   const trimmed = name?.trim() ?? '';
   if (!trimmed) {
     return (
@@ -59,16 +38,11 @@ export function VocAssignee({
     );
   }
 
-  const bucket = colorClass ?? hashAssigneeColor(trimmed);
   const initial = Array.from(trimmed)[0] ?? '';
 
   return (
-    <span
-      data-testid={`assignee-${bucket}`}
-      aria-label={`담당자 ${trimmed}`}
-      style={ROW_STYLE}
-    >
-      <span aria-hidden="true" style={{ ...CIRCLE_BASE, background: COLOR_VAR[bucket] }}>
+    <span data-testid="assignee-circle" aria-label={`담당자 ${trimmed}`} style={ROW_STYLE}>
+      <span aria-hidden="true" style={CIRCLE_STYLE}>
         {initial}
       </span>
       {trimmed}
