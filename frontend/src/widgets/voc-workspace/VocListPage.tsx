@@ -128,52 +128,54 @@ export function VocListPage() {
       <PageFrame.SplitRow>
         {!isPanelFullscreen && (
           <PageFrame.Scroll padded={false}>
-            <div className="flex-1">
-              {list.isLoading && (
-                <div className="px-6">
-                  <LoadingState data-testid="voc-loading" />
-                </div>
-              )}
-              {list.isError && (
-                <div className="px-6">
-                  <ErrorState onRetry={() => list.refetch()} />
-                </div>
-              )}
-              {!list.isLoading && !list.isError && rows.length === 0 && (
-                <div className="px-6">
-                  <EmptyState title="VOC가 없습니다" description="필터를 조정해보세요." />
-                </div>
-              )}
-              {!list.isLoading && !list.isError && rows.length > 0 && (
-                <VocTable
-                  rows={rows}
-                  sortBy={ctrl.sortBy}
-                  sortDir={ctrl.sortDir}
-                  onSort={(key) =>
-                    ctrl.setSort(
-                      key,
-                      ctrl.sortBy === key && ctrl.sortDir === 'desc' ? 'asc' : 'desc',
-                    )
-                  }
-                  onRowClick={(id) => {
-                    ctrl.create.setOpen(false);
-                    ctrl.drawer.open(id);
-                  }}
-                  selectedId={ctrl.drawer.vocId}
-                  assigneeMap={ctrl.masters.assigneeMap}
-                  vocTypeMap={vocTypeMap}
-                  groupByStatus
-                  collapsedStatuses={collapsedStatuses}
-                  onToggleStatus={toggleStatus}
-                />
-              )}
+            <div className="flex min-h-full flex-col">
+              <div className="flex-1">
+                {list.isLoading && (
+                  <div className="px-6">
+                    <LoadingState data-testid="voc-loading" />
+                  </div>
+                )}
+                {list.isError && (
+                  <div className="px-6">
+                    <ErrorState onRetry={() => list.refetch()} />
+                  </div>
+                )}
+                {!list.isLoading && !list.isError && rows.length === 0 && (
+                  <div className="px-6">
+                    <EmptyState title="VOC가 없습니다" description="필터를 조정해보세요." />
+                  </div>
+                )}
+                {!list.isLoading && !list.isError && rows.length > 0 && (
+                  <VocTable
+                    rows={rows}
+                    sortBy={ctrl.sortBy}
+                    sortDir={ctrl.sortDir}
+                    onSort={(key) =>
+                      ctrl.setSort(
+                        key,
+                        ctrl.sortBy === key && ctrl.sortDir === 'desc' ? 'asc' : 'desc',
+                      )
+                    }
+                    onRowClick={(id) => {
+                      ctrl.create.setOpen(false);
+                      ctrl.drawer.open(id);
+                    }}
+                    selectedId={ctrl.drawer.vocId}
+                    assigneeMap={ctrl.masters.assigneeMap}
+                    vocTypeMap={vocTypeMap}
+                    groupByStatus
+                    collapsedStatuses={collapsedStatuses}
+                    onToggleStatus={toggleStatus}
+                  />
+                )}
+              </div>
+              <VocPaginationBar
+                page={ctrl.page}
+                perPage={ctrl.perPage}
+                total={total}
+                onPageChange={ctrl.setPage}
+              />
             </div>
-            <VocPaginationBar
-              page={ctrl.page}
-              perPage={ctrl.perPage}
-              total={total}
-              onPageChange={ctrl.setPage}
-            />
           </PageFrame.Scroll>
         )}
 

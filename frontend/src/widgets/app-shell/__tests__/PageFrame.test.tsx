@@ -39,7 +39,7 @@ describe('PageFrame primitives', () => {
     expect(el.style.paddingBottom).toBe('var(--page-toolbar-gap-bottom)');
   });
 
-  it('Scroll is the only viewport: flex-1, min-h-0, overflow-auto', () => {
+  it('Scroll is the only viewport: flex-1, min-h-0, overflow-auto, plain block (no flex)', () => {
     const { getByText } = render(
       <PageFrame>
         <PageFrame.Scroll>BODY</PageFrame.Scroll>
@@ -50,6 +50,9 @@ describe('PageFrame primitives', () => {
     expect(el.className).toContain('min-h-0');
     expect(el.className).toContain('min-w-0');
     expect(el.className).toContain('overflow-auto');
+    // Scroll must be plain block — flex children would shrink and prevent overflow.
+    expect(el.className).not.toMatch(/(?:^|\s)flex(?:\s|$)/);
+    expect(el.className).not.toContain('flex-col');
   });
 
   it('Scroll padded=true (default) applies body padding tokens', () => {

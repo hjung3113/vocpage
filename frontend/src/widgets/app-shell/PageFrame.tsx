@@ -83,7 +83,7 @@ function Scroll({ children, padded = true, noTopGap = false }: ScrollProps) {
       }
     : undefined;
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto" style={style}>
+    <div className="min-h-0 min-w-0 flex-1 overflow-auto" style={style}>
       {children}
     </div>
   );
