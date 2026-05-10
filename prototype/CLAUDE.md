@@ -1,8 +1,8 @@
 # prototype/CLAUDE.md
 
-Static HTML visual sandbox — dashboard mockups, widget experiments, layout studies. Read root `CLAUDE.md` first.
+Static HTML visual sandbox — dashboard mockups, widget experiments, layout studies. Read root `CLAUDE.md` first (note: `prototype/` is no longer an implementation reference per root §1).
 
-**Not a reference (2026-05-09~):** `prototype/` is no longer a visual / behavior reference. No pixel / DOM / CSS citation. Implementation references are `requirements.md` + `uidesign.md` only. Active reviews → `docs/specs/reviews/`; archived → `docs/specs/archive/reviews/`. Token / typography / grid rules live in `uidesign.md` — not duplicated here.
+Active reviews → `docs/specs/reviews/`; archived → `docs/specs/archive/reviews/`.
 
 **Throwaway scope:**
 

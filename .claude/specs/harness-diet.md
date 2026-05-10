@@ -27,8 +27,10 @@
 
 4. **Plugin pruning** — `claude-md-management` disabled in
    `.claude/settings.local.json` (0 invocations in last 30 days).
-   Kept: `oh-my-claudecode`, `impeccable`, `playwright`, `codex`
-   (all show real use). `superpowers` already false locally.
+   Kept: `impeccable`, `playwright`, `codex` (all show real use).
+   `superpowers` already false locally. `oh-my-claudecode` (OMC) was
+   kept here originally but fully uninstalled on 2026-05-10 — see
+   `## Week 5 supplemental diet (2026-05-10)`.
 
 5. **opt-prompt skill family frozen** — see `Sunset clauses` below.
 
@@ -73,6 +75,42 @@ threshold, roll back the corresponding change.
    Threshold: ≥ 3 events/day means model is fighting the hooks; reverse.
    Zero events means the hooks are no longer earning their cost; relax
    the trigger or remove.
+
+## Week 5 supplemental diet (2026-05-10)
+
+Trigger: noticeable per-prompt freezes during Wave 2 Phase B work. Audit
+showed OMC magic-word path was never used in practice while still firing
+~1k+ lines of JS per prompt and per Stop. Branch: `docs/claude-harness-diet`.
+
+Changes:
+
+1. **OMC fully uninstalled** — `npm uninstall -g oh-my-claude-sisyphus` plus
+   removal of `~/.omc/`, `~/.claude/.omc*`, `~/.claude/plugins/oh-my-claudecode/`,
+   and 8 OMC hook files (`keyword-detector.mjs`, `session-start.mjs`,
+   `post-tool-use.mjs`, `post-tool-use-failure.mjs`, `persistent-mode.mjs`,
+   `code-simplifier.mjs`, `pre-tool-use.mjs`, `find-node.sh`) plus the
+   `hooks/lib/` shared modules. GSD (`gsd-*`) is a separate plugin and
+   stays — used in other repos.
+2. **`~/.claude/settings.json` slimmed** — UserPromptSubmit, PostCompact,
+   PostToolUseFailure blocks removed (all OMC-driven); Stop block emptied
+   (was OMC `persistent-mode` + `code-simplifier`); SessionStart trimmed
+   to two GSD entries. 232 → 158 lines.
+3. **`~/.claude/read-once/`** — disabled (project-side
+   `block-reread`/`block-read-after-edit` already cover the same role
+   per spec). Still on disk in case re-enable is needed.
+4. **`vocpage/.claude/settings.local.json`** — SessionStart printf for
+   Serena `initial_instructions` removed (project-side `serena-hooks
+   activate` already handles activation).
+5. **CLAUDE.md surface** — `AGENTS.md` deleted (one-line redirect to
+   `CLAUDE.md`; Codex now reads `CLAUDE.md` directly via project rule).
+   `prototype/CLAUDE.md` opening duplicate (the "not a reference 2026-05-09~"
+   line, already in root §1) removed.
+6. **`hookify.warn-no-verify.local.md`** added — was previously text-only
+   in root §3 / system prompt; now hookify catches `--no-verify` /
+   `--no-gpg-sign` on `git commit|push|merge|rebase`.
+
+Anti-pattern note (below) still applies: this is the second one-shot
+diet, not a recurring loop. Next diet only when metrics regress.
 
 ## Anti-pattern: "do not optimize the harness while building the product"
 
