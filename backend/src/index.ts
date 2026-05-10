@@ -37,7 +37,7 @@ if (isProduction && !process.env.SESSION_SECRET) {
 }
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 3001;
 
 app.use(pinoHttp({ logger }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173' }));
