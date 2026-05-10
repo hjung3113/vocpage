@@ -36,16 +36,15 @@ export default function AdminTagsPage() {
     setQDraft(qParam);
   }, [qParam]);
 
-  // Debounce qDraft → URL ?q= (250ms).
+  // Debounce qDraft → URL ?q= (250ms). Only runs in rules view; the search
+  // input itself is unmounted in tags view, so qDraft cannot diverge there.
   useEffect(() => {
-    if (view !== 'rules') return;
-    if (qDraft === qParam) return;
+    if (view !== 'rules' || qDraft === qParam) return;
     const id = setTimeout(() => {
       setParams(
         (p) => {
           if (qDraft) p.set('q', qDraft);
           else p.delete('q');
-          p.set('view', 'rules');
           return p;
         },
         { replace: true },

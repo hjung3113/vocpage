@@ -20,6 +20,16 @@ import { ADMIN_TAG_RULE_FIXTURES } from '../../../../../shared/fixtures/admin-ta
 const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001';
 const MOCK_USER_NAME = 'Mock Admin';
 
+// Mirrors BE LEFT JOIN users — given a created_by uuid, return display_name.
+// Unknown ids resolve to null, matching the BE no-match path.
+const MOCK_USER_DIRECTORY: Record<string, string> = {
+  [MOCK_USER_ID]: MOCK_USER_NAME,
+};
+function resolveCreatedByName(createdBy: string | null): string | null {
+  if (!createdBy) return null;
+  return MOCK_USER_DIRECTORY[createdBy] ?? null;
+}
+
 interface RuleStoreRow {
   id: string;
   tag_id: string;
@@ -41,7 +51,7 @@ function seedRuleStore(): RuleStoreRow[] {
     match_mode: r.match_mode,
     suspended_until: r.suspended_until,
     created_by: r.created_by,
-    created_by_name: null,
+    created_by_name: resolveCreatedByName(r.created_by),
     created_at: r.created_at,
   }));
 }

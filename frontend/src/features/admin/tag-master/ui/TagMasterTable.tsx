@@ -39,8 +39,8 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
     setInlineError(null);
     deleteTag.mutate(tag.id, {
       onError: (err) => {
-        const e = err as { status?: number; message?: string };
-        if (e.status === 409) {
+        const e = err as { status?: number; code?: string; message?: string };
+        if (e.code === 'CONFLICT' || e.status === 409) {
           setInlineError(`삭제 불가: ${e.message ?? '태그가 사용 중입니다.'}`);
         }
       },
