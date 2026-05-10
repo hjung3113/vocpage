@@ -31,7 +31,8 @@ export function TagMasterTable() {
   const [editTarget, setEditTarget] = useState<TagMasterItemT | null>(null);
   const [mergeSource, setMergeSource] = useState<TagMasterItemT | null>(null);
   const [suspendTarget, setSuspendTarget] = useState<{
-    id: string;
+    tagId: string;
+    ruleId: string;
     suspended_until: string | null;
   } | null>(null);
   const [inlineError, setInlineError] = useState<string | null>(null);
@@ -188,7 +189,7 @@ export function TagMasterTable() {
                 canMutate={canMutate}
                 onEdit={setEditTarget}
                 onMerge={setMergeSource}
-                onSuspend={(id) => setSuspendTarget({ id, suspended_until: null })}
+                onSuspend={(id) => setSuspendTarget({ tagId: id, ruleId: '', suspended_until: null })}
                 onDelete={handleDelete}
                 onToggleExternal={handleToggleExternal}
               />
@@ -209,7 +210,8 @@ export function TagMasterTable() {
       )}
       {suspendTarget && (
         <TagMasterSuspendModal
-          ruleId={suspendTarget.id}
+          tagId={suspendTarget.tagId}
+          ruleId={suspendTarget.ruleId}
           currentValue={suspendTarget.suspended_until}
           onClose={() => setSuspendTarget(null)}
         />

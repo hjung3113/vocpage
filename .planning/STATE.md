@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: unknown
 last_updated: "2026-05-11T00:00:00.000Z"
-last_completed_plan: "01-04"
+last_completed_plan: "01-05"
 progress:
   total_phases: 7
   completed_phases: 0
@@ -24,9 +24,9 @@ progress:
 ## Current Position
 
 - **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-04 complete (Wave 2 — BE 5 nested routes + IDOR + permission matrix); 01-05 next (Wave 3 — FE hooks).
-- **Status**: Waves 0-2 + 01-04 landed — scaffolds, mig 024 (keywords[]+match_mode+created_by), OpenAPI/zod/TS contract consolidation, and BE 5 nested handlers (list/create/update/delete/suspend) under /admin/tags/:tagId/rules with full D-13 matrix + IDOR scope checks + server-derived created_by. BE 625 pass; FE 691 pass.
-- **Progress**: █████░░░░░ Phase 1: 4/8 plans complete; 0/7 phases overall.
+- **Plan**: 01-04 + 01-05 complete (Wave 3 — BE 5 nested routes + FE 5 hooks with D-11 optimistic); 01-06 next (Wave 4 — Modal).
+- **Status**: Waves 0-3 landed — scaffolds, mig 024, contract consolidation, BE handlers under /admin/tags/:tagId/rules (D-13 matrix + IDOR + server-derived created_by), FE hooks + MSW handlers + optimistic GREEN. BE 625 pass; FE 695 pass; parity 10/11 OK.
+- **Progress**: ██████░░░░ Phase 1: 5/8 plans complete; 0/7 phases overall.
 
 ## Performance Metrics
 

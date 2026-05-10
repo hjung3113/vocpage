@@ -15,12 +15,13 @@ import {
 } from './TagMasterCreateModal';
 
 interface Props {
+  tagId: string;
   ruleId: string;
   currentValue: string | null;
   onClose: () => void;
 }
 
-export function TagMasterSuspendModal({ ruleId, currentValue, onClose }: Props) {
+export function TagMasterSuspendModal({ tagId, ruleId, currentValue, onClose }: Props) {
   const [suspendUntil, setSuspendUntil] = useState<string>(
     currentValue ? currentValue.slice(0, 16) : '',
   );
@@ -32,7 +33,7 @@ export function TagMasterSuspendModal({ ruleId, currentValue, onClose }: Props) 
     setError(null);
     const value = suspendUntil.trim() ? new Date(suspendUntil).toISOString() : null;
     suspendRule.mutate(
-      { id: ruleId, suspended_until: value },
+      { tagId, ruleId, suspended_until: value },
       {
         onSuccess: onClose,
         onError: (err) => {

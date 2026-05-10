@@ -1,17 +1,58 @@
 /**
  * MSW handlers for Tag Master admin endpoints (W3-4)
- * Mirrors backend /api/admin/tags + /api/admin/tag-rules shape.
+ * Mirrors backend /api/admin/tags + /api/admin/tags/:tagId/rules shape.
  * Responses validated against shared Zod contracts.
+ *
+ * Phase 01 Plan 05: 4 new nested tag-rule handlers + 1 renamed suspend
+ * (legacy flat suspend route deleted per D-09).
  */
 import { http, HttpResponse } from 'msw';
-import { TagMasterListResponse, TagMasterItem } from '../../../../../shared/contracts/admin/tag';
+import {
+  TagMasterListResponse,
+  TagMasterItem,
+  TagRule,
+  TagRuleListResponse,
+} from '../../../../../shared/contracts/admin/tag';
 import { ADMIN_TAG_FIXTURES, TAG_IDS } from '../../../../../shared/fixtures/admin-tag.fixtures';
+import { ADMIN_TAG_RULE_FIXTURES } from '../../../../../shared/fixtures/admin-tag-rule.fixtures';
 
-// Mutable in-memory store for test mutations
+// Mock user identity used as server-derived created_by on POST.
+const MOCK_USER_ID = '00000000-0000-4000-8000-000000000001';
+const MOCK_USER_NAME = 'Mock Admin';
+
+interface RuleStoreRow {
+  id: string;
+  tag_id: string;
+  kind: 'general';
+  keywords: string[];
+  match_mode: 'keyword';
+  suspended_until: string | null;
+  created_by: string | null;
+  created_by_name: string | null;
+  created_at: string;
+}
+
+function seedRuleStore(): RuleStoreRow[] {
+  return ADMIN_TAG_RULE_FIXTURES.map((r) => ({
+    id: r.id,
+    tag_id: r.tag_id,
+    kind: r.kind,
+    keywords: r.keywords,
+    match_mode: r.match_mode,
+    suspended_until: r.suspended_until,
+    created_by: r.created_by,
+    created_by_name: null,
+    created_at: r.created_at,
+  }));
+}
+
+// Mutable in-memory stores for test mutations
 let tagStore = [...ADMIN_TAG_FIXTURES];
+let ruleStore: RuleStoreRow[] = seedRuleStore();
 
 function resetStore() {
   tagStore = [...ADMIN_TAG_FIXTURES];
+  ruleStore = seedRuleStore();
 }
 
 export const adminTagsHandlers = [
@@ -66,22 +107,6 @@ export const adminTagsHandlers = [
     return HttpResponse.json(newTag, { status: 201 });
   }),
 
-  // PATCH /api/admin/tags/:id
-  http.patch('/api/admin/tags/:id', async ({ params, request }) => {
-    const { id } = params as { id: string };
-    const body = (await request.json()) as { name: string };
-    const idx = tagStore.findIndex((t) => t.id === id);
-    if (idx === -1) {
-      return HttpResponse.json(
-        { code: 'NOT_FOUND', message: '태그를 찾을 수 없습니다.', details: null },
-        { status: 404 },
-      );
-    }
-    const updated = TagMasterItem.parse({ ...tagStore[idx], name: body.name });
-    tagStore[idx] = updated;
-    return HttpResponse.json(updated);
-  }),
-
   // POST /api/admin/tags/:id/merge
   http.post('/api/admin/tags/:id/merge', async ({ params, request }) => {
     const { id } = params as { id: string };
@@ -103,7 +128,7 @@ export const adminTagsHandlers = [
     return HttpResponse.json({ mergedCount: 1 });
   }),
 
-  // PATCH /api/admin/tags/:id/external
+  // PATCH /api/admin/tags/:id/external — registered BEFORE PATCH /tags/:id
   http.patch('/api/admin/tags/:id/external', async ({ params, request }) => {
     const { id } = params as { id: string };
     const body = (await request.json()) as { is_external: boolean };
@@ -115,6 +140,145 @@ export const adminTagsHandlers = [
       );
     }
     const updated = TagMasterItem.parse({ ...tagStore[idx], is_external: body.is_external });
+    tagStore[idx] = updated;
+    return HttpResponse.json(updated);
+  }),
+
+  // ── Tag Rules (nested) — register suspend BEFORE :ruleId PATCH (Pitfall 6) ──
+
+  // GET /api/admin/tags/:tagId/rules
+  http.get('/api/admin/tags/:tagId/rules', ({ params, request }) => {
+    const { tagId } = params as { tagId: string };
+    const url = new URL(request.url);
+    const q = (url.searchParams.get('q') ?? '').toLowerCase();
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const per_page = Number(url.searchParams.get('per_page') ?? 20);
+    const tag = tagStore.find((t) => t.id === tagId);
+    if (!tag) {
+      return HttpResponse.json(
+        { code: 'NOT_FOUND', message: '태그를 찾을 수 없습니다.', details: null },
+        { status: 404 },
+      );
+    }
+    const filtered = ruleStore.filter(
+      (r) =>
+        r.tag_id === tagId &&
+        (q === '' ||
+          r.keywords.some((k) => k.toLowerCase().includes(q)) ||
+          tag.name.toLowerCase().includes(q)),
+    );
+    const total = filtered.length;
+    const rows = filtered.slice((page - 1) * per_page, page * per_page);
+    const body = TagRuleListResponse.parse({ rows, page, per_page, total });
+    return HttpResponse.json(body);
+  }),
+
+  // POST /api/admin/tags/:tagId/rules
+  http.post('/api/admin/tags/:tagId/rules', async ({ params, request }) => {
+    const { tagId } = params as { tagId: string };
+    const tag = tagStore.find((t) => t.id === tagId);
+    if (!tag) {
+      return HttpResponse.json(
+        { code: 'NOT_FOUND', message: '태그를 찾을 수 없습니다.', details: null },
+        { status: 404 },
+      );
+    }
+    const body = (await request.json()) as { keywords: string[]; match_mode?: string };
+    const newRule = TagRule.parse({
+      id: crypto.randomUUID(),
+      tag_id: tagId,
+      kind: 'general',
+      keywords: body.keywords,
+      match_mode: body.match_mode ?? 'keyword',
+      suspended_until: null,
+      created_by: MOCK_USER_ID,
+      created_by_name: MOCK_USER_NAME,
+      created_at: new Date().toISOString(),
+    });
+    ruleStore.push(newRule);
+    const tagIdx = tagStore.findIndex((t) => t.id === tagId);
+    const existingTag = tagStore[tagIdx];
+    if (tagIdx !== -1 && existingTag) {
+      tagStore[tagIdx] = TagMasterItem.parse({
+        ...existingTag,
+        rule_ref_count: existingTag.rule_ref_count + 1,
+      });
+    }
+    return HttpResponse.json(newRule, { status: 201 });
+  }),
+
+  // PATCH /api/admin/tags/:tagId/rules/:ruleId/suspend — BEFORE :ruleId PATCH
+  http.patch('/api/admin/tags/:tagId/rules/:ruleId/suspend', async ({ params, request }) => {
+      const { tagId, ruleId } = params as { tagId: string; ruleId: string };
+      const body = (await request.json()) as { suspended_until: string | null };
+      const idx = ruleStore.findIndex((r) => r.id === ruleId && r.tag_id === tagId);
+      if (idx === -1) {
+        return HttpResponse.json(
+          { code: 'NOT_FOUND', message: '규칙을 찾을 수 없습니다.', details: null },
+          { status: 404 },
+        );
+      }
+      const updated = TagRule.parse({
+        ...ruleStore[idx],
+        suspended_until: body.suspended_until,
+      });
+      ruleStore[idx] = updated;
+      return HttpResponse.json(updated);
+  }),
+
+  // PATCH /api/admin/tags/:tagId/rules/:ruleId
+  http.patch('/api/admin/tags/:tagId/rules/:ruleId', async ({ params, request }) => {
+    const { tagId, ruleId } = params as { tagId: string; ruleId: string };
+    const body = (await request.json()) as { keywords?: string[]; match_mode?: string };
+    const idx = ruleStore.findIndex((r) => r.id === ruleId && r.tag_id === tagId);
+    if (idx === -1) {
+      return HttpResponse.json(
+        { code: 'NOT_FOUND', message: '규칙을 찾을 수 없습니다.', details: null },
+        { status: 404 },
+      );
+    }
+    const updated = TagRule.parse({
+      ...ruleStore[idx],
+      ...(body.keywords ? { keywords: body.keywords } : {}),
+      ...(body.match_mode ? { match_mode: body.match_mode } : {}),
+    });
+    ruleStore[idx] = updated;
+    return HttpResponse.json(updated);
+  }),
+
+  // DELETE /api/admin/tags/:tagId/rules/:ruleId
+  http.delete('/api/admin/tags/:tagId/rules/:ruleId', ({ params }) => {
+    const { tagId, ruleId } = params as { tagId: string; ruleId: string };
+    const idx = ruleStore.findIndex((r) => r.id === ruleId && r.tag_id === tagId);
+    if (idx === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+    ruleStore.splice(idx, 1);
+    const tagIdx = tagStore.findIndex((t) => t.id === tagId);
+    const existingTag = tagStore[tagIdx];
+    if (tagIdx !== -1 && existingTag) {
+      tagStore[tagIdx] = TagMasterItem.parse({
+        ...existingTag,
+        rule_ref_count: Math.max(0, existingTag.rule_ref_count - 1),
+      });
+    }
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  // ── End tag rules ────────────────────────────────────────────────────────────
+
+  // PATCH /api/admin/tags/:id (rename) — AFTER /external
+  http.patch('/api/admin/tags/:id', async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const body = (await request.json()) as { name: string };
+    const idx = tagStore.findIndex((t) => t.id === id);
+    if (idx === -1) {
+      return HttpResponse.json(
+        { code: 'NOT_FOUND', message: '태그를 찾을 수 없습니다.', details: null },
+        { status: 404 },
+      );
+    }
+    const updated = TagMasterItem.parse({ ...tagStore[idx], name: body.name });
     tagStore[idx] = updated;
     return HttpResponse.json(updated);
   }),
@@ -141,13 +305,6 @@ export const adminTagsHandlers = [
     }
     tagStore = tagStore.filter((t) => t.id !== id);
     return HttpResponse.json({ deleted: true });
-  }),
-
-  // PATCH /api/admin/tag-rules/:id/suspend
-  http.patch('/api/admin/tag-rules/:id/suspend', async ({ params, request }) => {
-    const { id } = params as { id: string };
-    const body = (await request.json()) as { suspended_until: string | null };
-    return HttpResponse.json({ id, suspended_until: body.suspended_until });
   }),
 ];
 
