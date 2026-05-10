@@ -253,6 +253,12 @@
   --chip-font-size-xs: 10.5px;
   --chip-gap: 4px;
   --chip-dot-size: 6px;
+
+  /* Dashboard RGL (Wave 2 Phase D)
+     SSOT: tokens.ts; mirrored here for CSS consumers. Theme-independent. */
+  --dashboard-grid-margin: 16px;
+  --dashboard-grid-row-h: 64px;
+  --dashboard-handle-size: 12px;
 }
 
 body {

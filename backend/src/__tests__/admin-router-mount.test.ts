@@ -59,7 +59,7 @@ const userByRole: Record<Role, object> = {
   user: { id: 'aaaaaaaa-aaaa-4aaa-8aaa-000000000u01', role: 'user', name: 'U', email: 'u@x' },
 };
 
-function buildApp() {
+function _buildApp() {
   const app = express();
   app.use(express.json());
   app.use(

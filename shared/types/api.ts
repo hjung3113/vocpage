@@ -4,3549 +4,4790 @@
  */
 
 export interface paths {
-  '/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health check */
+        get: operations["getHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Health check */
-    get: operations['getHealth'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/mock-login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/auth/mock-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mock login (dev only) */
+        post: operations["mockLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Mock login (dev only) */
-    post: operations['mockLogin'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Logout */
-    post: operations['logout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get current user */
-    get: operations['getMe'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/vocs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List VOCs (paginated) */
+        get: operations["listVocs"];
+        put?: never;
+        /** Create VOC */
+        post: operations["createVoc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List VOCs (paginated) */
-    get: operations['listVocs'];
-    put?: never;
-    /** Create VOC */
-    post: operations['createVoc'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/vocs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** Get VOC detail */
+        get: operations["getVoc"];
+        put?: never;
+        post?: never;
+        /** Soft-delete VOC (admin only) */
+        delete: operations["deleteVoc"];
+        options?: never;
+        head?: never;
+        /** Update VOC */
+        patch: operations["updateVoc"];
+        trace?: never;
     };
-    /** Get VOC detail */
-    get: operations['getVoc'];
-    put?: never;
-    post?: never;
-    /** Soft-delete VOC (admin only) */
-    delete: operations['deleteVoc'];
-    options?: never;
-    head?: never;
-    /** Update VOC */
-    patch: operations['updateVoc'];
-    trace?: never;
-  };
-  '/vocs/{id}/status': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/vocs/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update VOC status */
+        patch: operations["updateVocStatus"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update VOC status */
-    patch: operations['updateVocStatus'];
-    trace?: never;
-  };
-  '/vocs/{id}/comments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/vocs/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List comments for a VOC (created_at ASC, max 200)
+         * @description Returns up to 200 comments ordered by created_at ASC.
+         *     Requires VOC read access. Internal notes are never included.
+         *     See feature-voc.md §8.13.
+         */
+        get: operations["listComments"];
+        put?: never;
+        /**
+         * Add comment to VOC
+         * @description Any authenticated user may comment on a non-deleted VOC.
+         *     Body is HTML (Toast UI output), max 16 KB. Empty or
+         *     whitespace-only HTML is rejected with 422 BODY_REQUIRED.
+         *     Fires notifyOnComment for author + assignee (debounced 5 min).
+         *     See feature-voc.md §8.13.
+         */
+        post: operations["createComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List comments for VOC */
-    get: operations['listComments'];
-    put?: never;
-    /** Add comment to VOC */
-    post: operations['createComment'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/comments/{commentId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        commentId: string;
-      };
-      cookie?: never;
+    "/vocs/{id}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Hard-delete comment (author or admin only)
+         * @description Hard delete — no soft delete, no audit log entry (spec §8.13).
+         *     Author or admin only. See feature-voc.md §8.13.
+         */
+        delete: operations["deleteComment"];
+        options?: never;
+        head?: never;
+        /**
+         * Update comment (author or admin only)
+         * @description Author or admin may update a comment body. updated_at is auto-refreshed.
+         *     Empty body → 422 BODY_REQUIRED. See feature-voc.md §8.13.
+         */
+        patch: operations["updateComment"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete comment */
-    delete: operations['deleteComment'];
-    options?: never;
-    head?: never;
-    /** Update comment */
-    patch: operations['updateComment'];
-    trace?: never;
-  };
-  '/vocs/{id}/notes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/vocs/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** List internal notes (manager/admin only) */
+        get: operations["listNotes"];
+        put?: never;
+        /** Add internal note (manager/admin only) */
+        post: operations["createNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List internal notes (manager/admin only) */
-    get: operations['listNotes'];
-    put?: never;
-    /** Add internal note (manager/admin only) */
-    post: operations['createNote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/notes/{noteId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        noteId: string;
-      };
-      cookie?: never;
+    "/vocs/{id}/notes/{noteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete internal note (manager/admin only) */
+        delete: operations["deleteNote"];
+        options?: never;
+        head?: never;
+        /** Update internal note (manager/admin only) */
+        patch: operations["updateNote"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete internal note (manager/admin only) */
-    delete: operations['deleteNote'];
-    options?: never;
-    head?: never;
-    /** Update internal note (manager/admin only) */
-    patch: operations['updateNote'];
-    trace?: never;
-  };
-  '/vocs/{id}/attachments': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/vocs/{id}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** List attachments for VOC */
+        get: operations["listAttachments"];
+        put?: never;
+        /** Upload attachment */
+        post: operations["uploadAttachment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List attachments for VOC */
-    get: operations['listAttachments'];
-    put?: never;
-    /** Upload attachment */
-    post: operations['uploadAttachment'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/attachments/{attachmentId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        attachmentId: string;
-      };
-      cookie?: never;
+    "/vocs/{id}/attachments/{attachmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete attachment */
+        delete: operations["deleteAttachment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete attachment */
-    delete: operations['deleteAttachment'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/tags': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all tags */
+        get: operations["listTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List all tags */
-    get: operations['listTags'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/masters/assignees': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/masters/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List assignable users (admin/manager/dev) for filter dropdowns */
+        get: operations["listAssignees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List assignable users (admin/manager/dev) for filter dropdowns */
-    get: operations['listAssignees'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/masters/tags': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/masters/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tags for filter dropdowns */
+        get: operations["listMasterTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List tags for filter dropdowns */
-    get: operations['listMasterTags'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/masters/voc-types': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/masters/voc-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List VOC types for filter dropdowns */
+        get: operations["listMasterVocTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List VOC types for filter dropdowns */
-    get: operations['listMasterVocTypes'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/tags': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/masters/systems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active systems with nested active menus (VOC create cascade) */
+        get: operations["listMasterSystems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Add tag to VOC */
-    post: operations['addVocTag'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/tags/{tagId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        tagId: string;
-      };
-      cookie?: never;
+    "/masters/menus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List menus (admin only — supports system_id filter and includeArchived) */
+        get: operations["listMasterMenus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Remove tag from VOC */
-    delete: operations['removeVocTag'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/notifications': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/vocs/{id}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add tag to VOC */
+        post: operations["addVocTag"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List notifications for current user */
-    get: operations['listNotifications'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/notifications/unread-count': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/vocs/{id}/tags/{tagId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                tagId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove tag from VOC */
+        delete: operations["removeVocTag"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get unread notification count */
-    get: operations['getUnreadCount'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/notifications/{id}/read': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List notifications for current user (with isUrgent join + lazy trim)
+         * @description Returns up to 50 most recent notifications. Lazy trim runs on every
+         *     call: deletes rows older than 30 days and trims per-user beyond the
+         *     50-row cap (Wave 5 W5-D4). `isUrgent` is computed at read time from
+         *     the joined `vocs.priority` (W5-D2) — Urgent demotion auto-clears the
+         *     flag on the next call.
+         */
+        get: operations["listNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Mark notification as read */
-    patch: operations['markNotificationRead'];
-    trace?: never;
-  };
-  '/dashboard/summary': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get unread notification count (ETag/304)
+         * @description Returns the unread count for the current user. Response carries an
+         *     ETag derived from `(count, latest_unread_id, latest_unread_created_at)`.
+         *     Conditional GET with `If-None-Match` returns 304 with no body
+         *     (Wave 5 W5-D7, 30-second polling endpoint).
+         */
+        get: operations["getUnreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get KPI summary (8 metrics) */
-    get: operations['getDashboardSummary'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/distribution': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/notifications/mark-all-read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark every unread notification of the current user as read */
+        post: operations["markAllRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get distribution by type */
-    get: operations['getDashboardDistribution'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/priority-status-matrix': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark notification as read */
+        patch: operations["markNotificationRead"];
+        trace?: never;
     };
-    /** Get priority-status matrix */
-    get: operations['getPriorityStatusMatrix'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/heatmap': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get KPI summary (8 metrics) */
+        get: operations["getDashboardSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get heatmap data */
-    get: operations['getDashboardHeatmap'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/weekly-trend': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/distribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get distribution by type */
+        get: operations["getDashboardDistribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get weekly trend */
-    get: operations['getWeeklyTrend'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/tag-distribution': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/priority-status-matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get priority-status matrix */
+        get: operations["getPriorityStatusMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get tag distribution */
-    get: operations['getTagDistribution'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/system-overview': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get heatmap data */
+        get: operations["getDashboardHeatmap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get system overview stats */
-    get: operations['getSystemOverview'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/assignee-stats': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/weekly-trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get weekly trend */
+        get: operations["getWeeklyTrend"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get assignee stats */
-    get: operations['getAssigneeStats'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/processing-speed': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/tag-distribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get tag distribution */
+        get: operations["getTagDistribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get processing speed (SLA table) */
-    get: operations['getProcessingSpeed'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/aging': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/system-overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get system overview stats */
+        get: operations["getSystemOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get aging bar data */
-    get: operations['getAging'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/aging-vocs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/assignee-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get assignee stats */
+        get: operations["getAssigneeStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get top aging VOCs */
-    get: operations['getAgingVocs'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/settings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/processing-speed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get processing speed (SLA table) */
+        get: operations["getProcessingSpeed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get dashboard settings */
-    get: operations['getDashboardSettings'];
-    /** Update dashboard settings */
-    put: operations['updateDashboardSettings'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/menus': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/aging": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get aging bar data */
+        get: operations["getAging"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get menus for dashboard filter */
-    get: operations['getDashboardMenus'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/dashboard/assignees': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/aging-vocs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get top aging VOCs */
+        get: operations["getAgingVocs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get assignees for dashboard filter */
-    get: operations['getDashboardAssignees'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/users': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get dashboard settings */
+        get: operations["getDashboardSettings"];
+        /** Update dashboard settings (locked_fields/globaltabs_order are admin-only) */
+        put: operations["updateDashboardSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List all users (admin) */
-    get: operations['adminListUsers'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/users/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/dashboard/menus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get menus for dashboard filter */
+        get: operations["getDashboardMenus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update user role/status (admin) */
-    patch: operations['adminUpdateUser'];
-    trace?: never;
-  };
-  '/admin/systems': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/dashboard/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get assignees for dashboard filter */
+        get: operations["getDashboardAssignees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List systems (admin) */
-    get: operations['adminListSystems'];
-    put?: never;
-    /** Create system (admin) */
-    post: operations['adminCreateSystem'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/systems/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List users (admin only — paginated; OQ-3 audit via /role-log) */
+        get: operations["adminListUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update system (admin) */
-    patch: operations['adminUpdateSystem'];
-    trace?: never;
-  };
-  '/admin/menus': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/admin/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update user role/is_active (admin only — last-admin guard 409) */
+        patch: operations["adminUpdateUser"];
+        trace?: never;
     };
-    /** List menus (admin) */
-    get: operations['adminListMenus'];
-    put?: never;
-    /** Create menu (admin) */
-    post: operations['adminCreateMenu'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/menus/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/systems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List systems (admin) */
+        get: operations["adminListSystems"];
+        put?: never;
+        /** Create system (admin) */
+        post: operations["adminCreateSystem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update menu (admin) */
-    patch: operations['adminUpdateMenu'];
-    trace?: never;
-  };
-  '/admin/voc-types': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/admin/systems/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update system (admin) */
+        patch: operations["adminUpdateSystem"];
+        trace?: never;
     };
-    /** List VOC types (admin) */
-    get: operations['adminListVocTypes'];
-    put?: never;
-    /** Create VOC type (admin) */
-    post: operations['adminCreateVocType'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/voc-types/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/menus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List menus (admin) */
+        get: operations["adminListMenus"];
+        put?: never;
+        /** Create menu (admin) */
+        post: operations["adminCreateMenu"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update VOC type (admin) */
-    patch: operations['adminUpdateVocType'];
-    trace?: never;
-  };
-  '/admin/tag-rules': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/admin/menus/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update menu (admin) */
+        patch: operations["adminUpdateMenu"];
+        trace?: never;
     };
-    /** List tag rules (admin) */
-    get: operations['adminListTagRules'];
-    put?: never;
-    /** Create tag rule (admin) */
-    post: operations['adminCreateTagRule'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/tag-rules/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/voc-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List VOC types (admin) */
+        get: operations["adminListVocTypes"];
+        put?: never;
+        /** Create VOC type (admin) */
+        post: operations["adminCreateVocType"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete tag rule (admin) */
-    delete: operations['adminDeleteTagRule'];
-    options?: never;
-    head?: never;
-    /** Update tag rule (admin) */
-    patch: operations['adminUpdateTagRule'];
-    trace?: never;
-  };
-  '/admin/masters/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/admin/voc-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update VOC type (admin) */
+        patch: operations["adminUpdateVocType"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Refresh master data cache */
-    post: operations['adminRefreshMasters'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/masters/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/tag-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tag rules (admin) */
+        get: operations["adminListTagRules"];
+        put?: never;
+        /** Create tag rule (admin) */
+        post: operations["adminCreateTagRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Refresh master data for a VOC */
-    post: operations['refreshVocMasters'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/payload': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/tag-rules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete tag rule (admin) */
+        delete: operations["adminDeleteTagRule"];
+        options?: never;
+        head?: never;
+        /** Update tag rule (admin) */
+        patch: operations["adminUpdateTagRule"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Submit structured payload for a VOC */
-    post: operations['submitVocPayload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/payload-history': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/masters/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh master data cache (manager+) */
+        post: operations["adminRefreshMasters"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get payload submission history for a VOC */
-    get: operations['getVocPayloadHistory'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/payload-review': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/masters/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** External masters status (admin/manager/dev — OQ-2 Option B) */
+        get: operations["adminMasterStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Approve or reject a VOC payload (Result Review) */
-    post: operations['reviewVocPayload'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/vocs/{id}/timeline': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tag master rows (admin/manager/dev — read) */
+        get: operations["adminListTags"];
+        put?: never;
+        /** Create tag master row (manager+ — slug auto-generated) */
+        post: operations["adminCreateTag"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get VOC timeline events (Manager/Admin only) */
-    get: operations['getVocTimeline'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/notices': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/admin/tags/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Permanently delete tag (admin only — usage=0 + rules ref=0) */
+        delete: operations["adminDeleteTag"];
+        options?: never;
+        head?: never;
+        /** Update tag name (manager+; kind/slug locked) */
+        patch: operations["adminUpdateTag"];
+        trace?: never;
     };
-    /** List notices (admin) */
-    get: operations['adminListNotices'];
-    put?: never;
-    /** Create notice (admin) */
-    post: operations['adminCreateNotice'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/notices/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/tags/{id}/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Merge tag into target (admin only) */
+        post: operations["adminMergeTag"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get notice by ID (admin) */
-    get: operations['adminGetNotice'];
-    /** Update notice (admin) */
-    put: operations['adminUpdateNotice'];
-    post?: never;
-    /** Delete notice (admin) */
-    delete: operations['adminDeleteNotice'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/faqs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/admin/tags/{id}/external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Toggle tag external lock (admin only — tags.is_external) */
+        patch: operations["adminToggleTagExternal"];
+        trace?: never;
     };
-    /** List FAQs (admin) */
-    get: operations['adminListFaqs'];
-    put?: never;
-    /** Create FAQ (admin) */
-    post: operations['adminCreateFaq'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/admin/faqs/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/tag-rules/{id}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Suspend or resume tag rule (admin only — tag_rules.suspended_until) */
+        patch: operations["adminSuspendTagRule"];
+        trace?: never;
     };
-    /** Get FAQ by ID (admin) */
-    get: operations['adminGetFaq'];
-    /** Update FAQ (admin) */
-    put: operations['adminUpdateFaq'];
-    post?: never;
-    /** Delete FAQ (admin) */
-    delete: operations['adminDeleteFaq'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/files/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
+    "/admin/vocs/trash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List soft-deleted VOCs (admin only — §15.4) */
+        get: operations["adminListTrash"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Download file by ID */
-    get: operations['downloadFile'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/admin/vocs/{id}/restore-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** Read voc_restore_log entries (admin only) */
+        get: operations["adminVocRestoreLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocs/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Restore soft-deleted VOC (admin only — re-runs tag_rules) */
+        patch: operations["restoreVoc"];
+        trace?: never;
+    };
+    "/admin/users/{id}/role-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** Read user_role_log entries (admin only — PIPA 7y) */
+        get: operations["adminUserRoleLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocs/{id}/masters/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh master data for a VOC */
+        post: operations["refreshVocMasters"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocs/{id}/payload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit structured payload for a VOC */
+        post: operations["submitVocPayload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocs/{id}/payload-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** Get payload submission history for a VOC */
+        get: operations["getVocPayloadHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocs/{id}/payload-review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve or reject a VOC payload (Result Review) */
+        post: operations["reviewVocPayload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocs/{id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** Get VOC timeline events (Manager/Admin only) */
+        get: operations["getVocTimeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        /** Download file by ID */
+        get: operations["downloadFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List notices (visibility-filtered for non-admin) */
+        get: operations["listNotices"];
+        put?: never;
+        /** Create notice (admin/manager) */
+        post: operations["createNotice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notices/popup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Login popup notices (BE stateless; FE owns dismiss state via localStorage per spec §10.3.2) */
+        get: operations["listPopupNotices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNotice"];
+        put?: never;
+        post?: never;
+        delete: operations["deleteNotice"];
+        options?: never;
+        head?: never;
+        patch: operations["updateNotice"];
+        trace?: never;
+    };
+    "/notices/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore soft-deleted notice (admin only) */
+        post: operations["restoreNotice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faqs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listFaqs"];
+        put?: never;
+        /** Create FAQ (admin/manager) */
+        post: operations["createFaq"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faqs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFaq"];
+        put?: never;
+        post?: never;
+        delete: operations["deleteFaq"];
+        options?: never;
+        head?: never;
+        patch: operations["updateFaq"];
+        trace?: never;
+    };
+    "/faqs/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore soft-deleted FAQ (admin only) */
+        post: operations["restoreFaq"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faq-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listFaqCategories"];
+        put?: never;
+        /** Create FAQ category (admin only) */
+        post: operations["createFaqCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faq-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete category (admin only). Returns 409 CATEGORY_HAS_ITEMS if FAQs are still attached. */
+        delete: operations["deleteFaqCategory"];
+        options?: never;
+        head?: never;
+        patch: operations["updateFaqCategory"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    OkResponse: {
-      /** @enum {boolean} */
-      ok: true;
+    schemas: {
+        OkResponse: {
+            /** @enum {boolean} */
+            ok: true;
+        };
+        ErrorResponse: {
+            code: string;
+            message: string;
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        /** @enum {string} */
+        UserRole: "user" | "manager" | "admin" | "dev";
+        AuthUser: {
+            /** Format: uuid */
+            id: string;
+            ad_username?: string | null;
+            display_name: string;
+            /** Format: email */
+            email: string;
+            role: components["schemas"]["UserRole"];
+        };
+        User: {
+            /** Format: uuid */
+            id: string;
+            ad_username: string;
+            display_name: string;
+            /** Format: email */
+            email: string;
+            role: components["schemas"]["UserRole"];
+            is_active: boolean;
+        };
+        /** @enum {string} */
+        VocStatus: "접수" | "검토중" | "처리중" | "완료" | "드랍";
+        /** @enum {string} */
+        VocPriority: "urgent" | "high" | "medium" | "low";
+        /** @enum {string} */
+        VocSource: "manual" | "import";
+        Voc: {
+            /** Format: uuid */
+            id: string;
+            issue_code: string;
+            sequence_no: number;
+            title: string;
+            body?: string | null;
+            status: components["schemas"]["VocStatus"];
+            priority: components["schemas"]["VocPriority"];
+            /** Format: uuid */
+            voc_type_id: string;
+            /** Format: uuid */
+            system_id: string;
+            /** Format: uuid */
+            menu_id: string;
+            /** Format: uuid */
+            assignee_id?: string | null;
+            /** Format: uuid */
+            author_id?: string;
+            /** Format: uuid */
+            parent_id?: string | null;
+            source: components["schemas"]["VocSource"];
+            review_status?: string | null;
+            structured_payload?: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string|null} */
+            resolution_quality?: "근본해결" | "임시조치" | null;
+            /** @enum {string|null} */
+            drop_reason?: "중복" | "정책거부" | "재현불가" | "범위외" | "기타" | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            due_date?: string | null;
+            /** Format: date-time */
+            deleted_at?: string | null;
+        };
+        VocInput: {
+            title: string;
+            body?: string;
+            status: components["schemas"]["VocStatus"];
+            priority: components["schemas"]["VocPriority"];
+            /** Format: uuid */
+            voc_type_id: string;
+            /** Format: uuid */
+            system_id: string;
+            /** Format: uuid */
+            menu_id: string;
+            /** Format: uuid */
+            assignee_id?: string;
+            /** Format: uuid */
+            parent_id?: string;
+            source?: components["schemas"]["VocSource"];
+        };
+        VocPatch: {
+            title?: string;
+            body?: string;
+            status?: components["schemas"]["VocStatus"];
+            priority?: components["schemas"]["VocPriority"];
+            /** Format: uuid */
+            voc_type_id?: string;
+            /** Format: uuid */
+            system_id?: string;
+            /** Format: uuid */
+            menu_id?: string;
+            /** Format: uuid */
+            assignee_id?: string;
+            /** @enum {string} */
+            review_status?: "unverified" | "approved" | "rejected" | "pending_deletion";
+            /** @enum {string} */
+            resolution_quality?: "근본해결" | "임시조치";
+            /** @enum {string} */
+            drop_reason?: "중복" | "정책거부" | "재현불가" | "범위외" | "기타";
+        };
+        Comment: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            voc_id: string;
+            /** Format: uuid */
+            author_id: string;
+            body: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        CommentListResponse: {
+            rows: components["schemas"]["Comment"][];
+        };
+        CommentResponse: {
+            comment: components["schemas"]["Comment"];
+        };
+        CreateCommentInput: {
+            /** @description HTML string (Toast UI output). Max 16 KB. Empty / whitespace-only rejected. */
+            body: string;
+        };
+        Note: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            voc_id: string;
+            /** Format: uuid */
+            author_id: string;
+            body: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            deleted_at?: string | null;
+        };
+        Attachment: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            voc_id: string;
+            filename: string;
+            original_name: string;
+            mime_type: string;
+            size: number;
+            url: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        Tag: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            kind: "general" | "menu";
+            color?: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        System: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            is_archived: boolean;
+        };
+        SystemInput: {
+            name: string;
+            slug: string;
+        };
+        SystemPatch: {
+            name?: string;
+            slug?: string;
+            is_archived?: boolean;
+        };
+        Menu: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            system_id: string;
+            name: string;
+            slug: string;
+            is_archived: boolean;
+        };
+        MenuInput: {
+            /** Format: uuid */
+            system_id: string;
+            name: string;
+            slug: string;
+        };
+        MenuPatch: {
+            name?: string;
+            slug?: string;
+            is_archived?: boolean;
+        };
+        VocType: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            color?: string | null;
+            sort_order: number;
+            is_archived: boolean;
+        };
+        VocTypeInput: {
+            name: string;
+            slug: string;
+            color?: string;
+            sort_order?: number;
+        };
+        VocTypePatch: {
+            name?: string;
+            slug?: string;
+            color?: string;
+            sort_order?: number;
+            is_archived?: boolean;
+        };
+        TagRule: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            pattern: string;
+            /** @enum {string} */
+            kind: "general";
+            /** Format: uuid */
+            tag_id: string;
+            is_active: boolean;
+        };
+        TagRuleInput: {
+            name: string;
+            pattern: string;
+            /**
+             * @default general
+             * @enum {string}
+             */
+            kind: "general";
+            /** Format: uuid */
+            tag_id: string;
+            is_active?: boolean;
+        };
+        TagRulePatch: {
+            name?: string;
+            pattern?: string;
+            /** @enum {string} */
+            kind?: "general";
+            /** Format: uuid */
+            tag_id?: string;
+            is_active?: boolean;
+        };
+        Notification: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "comment" | "status_change" | "assigned" | "mention";
+            label: string;
+            href?: string;
+            /** Format: date-time */
+            createdAt: string;
+            read: boolean;
+            /** Format: uuid */
+            voc_id?: string;
+            voc_issue_code?: string;
+            voc_title?: string;
+            isUrgent?: boolean;
+        };
+        NotificationListResponse: {
+            items: components["schemas"]["Notification"][];
+            unreadCount: number;
+        };
+        UnreadCountResponse: {
+            count: number;
+        };
+        VocListItem: {
+            /** Format: uuid */
+            id: string;
+            issue_code: string;
+            title: string;
+            status: components["schemas"]["VocStatus"];
+            priority: components["schemas"]["VocPriority"];
+            /** Format: uuid */
+            voc_type_id: string;
+            /** Format: uuid */
+            system_id: string;
+            /** Format: uuid */
+            menu_id: string;
+            /** Format: uuid */
+            assignee_id: string | null;
+            /** Format: uuid */
+            author_id: string;
+            /** Format: uuid */
+            parent_id: string | null;
+            source: components["schemas"]["VocSource"];
+            /** Format: date-time */
+            due_date: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            has_children: boolean;
+            notes_count: number;
+            tags: string[];
+        };
+        PaginatedVocs: {
+            rows: components["schemas"]["VocListItem"][];
+            total: number;
+            page: number;
+            per_page: number;
+        };
+        AssigneeListItem: {
+            /** Format: uuid */
+            id: string;
+            ad_username: string;
+            display_name: string;
+        };
+        AssigneeListResponse: {
+            rows: components["schemas"]["AssigneeListItem"][];
+        };
+        TagListItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            kind: string;
+        };
+        TagListResponse: {
+            rows: components["schemas"]["TagListItem"][];
+        };
+        VocTypeListItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            color: string | null;
+            sort_order: number;
+            is_archived: boolean;
+        };
+        VocTypeListResponse: {
+            rows: components["schemas"]["VocTypeListItem"][];
+        };
+        MenuListItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            system_id: string;
+            name: string;
+            slug: string;
+            is_archived: boolean;
+        };
+        MenuListResponse: {
+            rows: components["schemas"]["MenuListItem"][];
+        };
+        SystemListItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            is_archived: boolean;
+            menus: components["schemas"]["MenuListItem"][];
+        };
+        SystemListResponse: {
+            rows: components["schemas"]["SystemListItem"][];
+        };
+        DashboardSummary: {
+            total: number;
+            open: number;
+            in_progress: number;
+            completed: number;
+            dropped: number;
+            urgent: number;
+            overdue: number;
+            avg_resolution_days: number;
+        };
+        RglLayoutItem: {
+            i: string;
+            x: number;
+            y: number;
+            w: number;
+            h: number;
+            minW?: number;
+            minH?: number;
+            static?: boolean;
+        };
+        RglLayouts: {
+            xs?: components["schemas"]["RglLayoutItem"][];
+            sm?: components["schemas"]["RglLayoutItem"][];
+            md?: components["schemas"]["RglLayoutItem"][];
+            lg?: components["schemas"]["RglLayoutItem"][];
+            xl?: components["schemas"]["RglLayoutItem"][];
+        };
+        GlobalTabsOrderItem: {
+            systemId: string;
+            visible: boolean;
+        };
+        DashboardSettings: {
+            /** Format: uuid */
+            user_id: string | null;
+            widget_order: string[];
+            widget_visibility: {
+                [key: string]: boolean;
+            };
+            widget_sizes: components["schemas"]["RglLayouts"];
+            locked_fields: string[];
+            /** @enum {string} */
+            default_date_range: "1m" | "3m" | "1y" | "all" | "custom";
+            /** @enum {string} */
+            heatmap_default_x_axis: "status" | "priority" | "tag";
+            globaltabs_order: components["schemas"]["GlobalTabsOrderItem"][] | null;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        DashboardSettingsUpdate: {
+            widget_order?: string[];
+            widget_visibility?: {
+                [key: string]: boolean;
+            };
+            widget_sizes?: components["schemas"]["RglLayouts"];
+            locked_fields?: string[];
+            /** @enum {string} */
+            default_date_range?: "1m" | "3m" | "1y" | "all" | "custom";
+            /** @enum {string} */
+            heatmap_default_x_axis?: "status" | "priority" | "tag";
+            globaltabs_order?: components["schemas"]["GlobalTabsOrderItem"][] | null;
+        };
+        DistributionItem: {
+            label: string;
+            count: number;
+            percentage?: number;
+        };
+        WeeklyTrendItem: {
+            week: string;
+            count: number;
+        };
+        TagStatItem: {
+            /** Format: uuid */
+            tag_id: string;
+            name: string;
+            count: number;
+        };
+        SystemStatItem: {
+            /** Format: uuid */
+            system_id: string;
+            name: string;
+            count: number;
+        };
+        MasterRefreshResult: {
+            swapped: boolean;
+            /** Format: date-time */
+            loaded_at: string;
+            sources: {
+                equipment: {
+                    /** Format: date-time */
+                    loaded_at: string;
+                };
+                db: {
+                    /** Format: date-time */
+                    loaded_at: string;
+                };
+            };
+        };
+        MasterStatusSourceEntry: {
+            /** Format: date-time */
+            loaded_at: string;
+            /** Format: date-time */
+            kept_loaded_at?: string;
+        };
+        MasterStatus: {
+            /** Format: date-time */
+            loaded_at: string | null;
+            /** Format: date-time */
+            cooldown_until: string | null;
+            sources: {
+                equipment: components["schemas"]["MasterStatusSourceEntry"];
+                db: components["schemas"]["MasterStatusSourceEntry"];
+                program: components["schemas"]["MasterStatusSourceEntry"];
+            };
+        };
+        TagMasterItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            kind: "general" | "menu";
+            is_external: boolean;
+            usage_count: number;
+            rule_ref_count: number;
+            /** Format: date-time */
+            created_at: string;
+        };
+        TagMasterListResponse: {
+            rows: components["schemas"]["TagMasterItem"][];
+            page: number;
+            per_page: number;
+            total: number;
+        };
+        TagMasterCreate: {
+            name: string;
+            /** @enum {string} */
+            kind: "general" | "menu";
+        };
+        TagMasterPatch: {
+            name: string;
+        };
+        TagMasterMergeInput: {
+            /** Format: uuid */
+            targetId: string;
+        };
+        TagExternalToggle: {
+            is_external: boolean;
+        };
+        TagRuleSuspendInput: {
+            /** Format: date-time */
+            suspended_until: string | null;
+        };
+        TrashListItem: {
+            /** Format: uuid */
+            id: string;
+            issue_code: string;
+            title: string;
+            status: components["schemas"]["VocStatus"];
+            /** Format: uuid */
+            system_id: string;
+            /** Format: uuid */
+            menu_id: string;
+            /** Format: uuid */
+            deleted_by: string | null;
+            /** Format: date-time */
+            deleted_at: string;
+        };
+        TrashListResponse: {
+            rows: components["schemas"]["TrashListItem"][];
+            page: number;
+            per_page: number;
+            total: number;
+        };
+        VocRestoreLogEntry: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            voc_id: string;
+            /** @enum {string} */
+            action: "restore" | "hard_delete";
+            /** Format: uuid */
+            actor_id: string;
+            /** Format: date-time */
+            before_deleted_at: string | null;
+            /** Format: uuid */
+            before_deleted_by: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        VocRestoreResponse: {
+            /** Format: uuid */
+            voc_id: string;
+            /** Format: date-time */
+            restored_at: string;
+            audit: components["schemas"]["VocRestoreLogEntry"];
+        };
+        AdminUserItem: {
+            /** Format: uuid */
+            id: string;
+            ad_username: string;
+            display_name: string;
+            /** Format: email */
+            email: string;
+            role: components["schemas"]["UserRole"];
+            is_active: boolean;
+            /** Format: date-time */
+            created_at: string;
+        };
+        AdminUserListResponse: {
+            rows: components["schemas"]["AdminUserItem"][];
+            page: number;
+            per_page: number;
+            total: number;
+        };
+        AdminUserPatch: {
+            role?: components["schemas"]["UserRole"];
+            is_active?: boolean;
+            reason?: string;
+        } | unknown | unknown;
+        UserRoleLogEntry: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            user_id: string;
+            /** Format: uuid */
+            changed_by: string;
+            /** @enum {string|null} */
+            old_role: "user" | "dev" | "manager" | "admin" | null;
+            /** @enum {string|null} */
+            new_role: "user" | "dev" | "manager" | "admin" | null;
+            old_active: boolean | null;
+            new_active: boolean | null;
+            reason: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        VocPayloadHistory: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            voc_id: string;
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Format: uuid */
+            submitted_by: string;
+            /** Format: date-time */
+            submitted_at: string;
+            final_state?: string | null;
+            is_current: boolean;
+        };
+        Notice: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            body: string;
+            /** @enum {string} */
+            level: "normal" | "important" | "urgent";
+            is_popup: boolean;
+            is_visible: boolean;
+            /** Format: date-time */
+            visible_from?: string | null;
+            /** Format: date-time */
+            visible_to?: string | null;
+            /** Format: uuid */
+            author_id: string;
+            /** Format: date-time */
+            deleted_at?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        NoticeInput: {
+            title: string;
+            body: string;
+            /** @enum {string} */
+            level?: "normal" | "important" | "urgent";
+            is_popup?: boolean;
+            is_visible?: boolean;
+            /** Format: date-time */
+            visible_from?: string | null;
+            /** Format: date-time */
+            visible_to?: string | null;
+        };
+        FaqCategory: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            sort_order: number;
+            is_archived: boolean;
+        };
+        FaqCategoryInput: {
+            name: string;
+            slug: string;
+            sort_order?: number;
+            is_archived?: boolean;
+        };
+        Faq: {
+            /** Format: uuid */
+            id: string;
+            question: string;
+            answer: string;
+            /** Format: uuid */
+            category_id: string;
+            is_visible: boolean;
+            sort_order: number;
+            /** Format: uuid */
+            author_id: string;
+            /** Format: date-time */
+            deleted_at?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        FaqInput: {
+            question: string;
+            answer: string;
+            /** Format: uuid */
+            category_id: string;
+            is_visible?: boolean;
+            sort_order?: number;
+        };
     };
-    ErrorResponse: {
-      code: string;
-      message: string;
-      details?: {
-        [key: string]: unknown;
-      };
+    responses: {
+        /** @description Bad request */
+        BadRequest: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Unauthorized */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Forbidden */
+        Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Not found */
+        NotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Conflict */
+        Conflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
     };
-    /** @enum {string} */
-    UserRole: 'user' | 'manager' | 'admin' | 'dev';
-    AuthUser: {
-      /** Format: uuid */
-      id: string;
-      ad_username?: string | null;
-      display_name: string;
-      /** Format: email */
-      email: string;
-      role: components['schemas']['UserRole'];
+    parameters: {
+        id: string;
+        page: number;
+        limit: number;
+        dashboardSystemId: string;
+        dashboardMenuId: string;
+        dashboardAssigneeId: string;
+        dashboardStartDate: string;
+        dashboardEndDate: string;
     };
-    User: {
-      /** Format: uuid */
-      id: string;
-      ad_username: string;
-      display_name: string;
-      /** Format: email */
-      email: string;
-      role: components['schemas']['UserRole'];
-      is_active: boolean;
-    };
-    /** @enum {string} */
-    VocStatus: '접수' | '검토중' | '처리중' | '완료' | '드랍';
-    /** @enum {string} */
-    VocPriority: 'urgent' | 'high' | 'medium' | 'low';
-    /** @enum {string} */
-    VocSource: 'manual' | 'import';
-    Voc: {
-      /** Format: uuid */
-      id: string;
-      issue_code: string;
-      sequence_no: number;
-      title: string;
-      body?: string | null;
-      status: components['schemas']['VocStatus'];
-      priority: components['schemas']['VocPriority'];
-      /** Format: uuid */
-      voc_type_id: string;
-      /** Format: uuid */
-      system_id: string;
-      /** Format: uuid */
-      menu_id: string;
-      /** Format: uuid */
-      assignee_id?: string | null;
-      /** Format: uuid */
-      author_id?: string;
-      /** Format: uuid */
-      parent_id?: string | null;
-      source: components['schemas']['VocSource'];
-      review_status?: string | null;
-      structured_payload?: {
-        [key: string]: unknown;
-      } | null;
-      /** @enum {string|null} */
-      resolution_quality?: '근본해결' | '임시조치' | null;
-      /** @enum {string|null} */
-      drop_reason?: '중복' | '정책거부' | '재현불가' | '범위외' | '기타' | null;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-      /** Format: date-time */
-      due_date?: string | null;
-      /** Format: date-time */
-      deleted_at?: string | null;
-    };
-    VocInput: {
-      title: string;
-      body?: string;
-      status: components['schemas']['VocStatus'];
-      priority: components['schemas']['VocPriority'];
-      /** Format: uuid */
-      voc_type_id: string;
-      /** Format: uuid */
-      system_id: string;
-      /** Format: uuid */
-      menu_id: string;
-      /** Format: uuid */
-      assignee_id?: string;
-      /** Format: uuid */
-      parent_id?: string;
-      source?: components['schemas']['VocSource'];
-    };
-    VocPatch: {
-      title?: string;
-      body?: string;
-      status?: components['schemas']['VocStatus'];
-      priority?: components['schemas']['VocPriority'];
-      /** Format: uuid */
-      voc_type_id?: string;
-      /** Format: uuid */
-      system_id?: string;
-      /** Format: uuid */
-      menu_id?: string;
-      /** Format: uuid */
-      assignee_id?: string;
-      /** @enum {string} */
-      review_status?: 'unverified' | 'approved' | 'rejected' | 'pending_deletion';
-      /** @enum {string} */
-      resolution_quality?: '근본해결' | '임시조치';
-      /** @enum {string} */
-      drop_reason?: '중복' | '정책거부' | '재현불가' | '범위외' | '기타';
-    };
-    Comment: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      voc_id: string;
-      /** Format: uuid */
-      author_id: string;
-      body: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-    };
-    Note: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      voc_id: string;
-      /** Format: uuid */
-      author_id: string;
-      body: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-      /** Format: date-time */
-      deleted_at?: string | null;
-    };
-    Attachment: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      voc_id: string;
-      filename: string;
-      original_name: string;
-      mime_type: string;
-      size: number;
-      url: string;
-      /** Format: date-time */
-      created_at: string;
-    };
-    Tag: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      slug: string;
-      /** @enum {string} */
-      kind: 'general' | 'menu';
-      color?: string | null;
-      /** Format: date-time */
-      created_at: string;
-    };
-    System: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      slug: string;
-      is_archived: boolean;
-    };
-    SystemInput: {
-      name: string;
-      slug: string;
-    };
-    SystemPatch: {
-      name?: string;
-      slug?: string;
-      is_archived?: boolean;
-    };
-    Menu: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      system_id: string;
-      name: string;
-      slug: string;
-      is_archived: boolean;
-    };
-    MenuInput: {
-      /** Format: uuid */
-      system_id: string;
-      name: string;
-      slug: string;
-    };
-    MenuPatch: {
-      name?: string;
-      slug?: string;
-      is_archived?: boolean;
-    };
-    VocType: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      slug: string;
-      color?: string | null;
-      sort_order: number;
-      is_archived: boolean;
-    };
-    VocTypeInput: {
-      name: string;
-      slug: string;
-      color?: string;
-      sort_order?: number;
-    };
-    VocTypePatch: {
-      name?: string;
-      slug?: string;
-      color?: string;
-      sort_order?: number;
-      is_archived?: boolean;
-    };
-    TagRule: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      pattern: string;
-      /** @enum {string} */
-      kind: 'general';
-      /** Format: uuid */
-      tag_id: string;
-      is_active: boolean;
-    };
-    TagRuleInput: {
-      name: string;
-      pattern: string;
-      /**
-       * @default general
-       * @enum {string}
-       */
-      kind: 'general';
-      /** Format: uuid */
-      tag_id: string;
-      is_active?: boolean;
-    };
-    TagRulePatch: {
-      name?: string;
-      pattern?: string;
-      /** @enum {string} */
-      kind?: 'general';
-      /** Format: uuid */
-      tag_id?: string;
-      is_active?: boolean;
-    };
-    Notification: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      user_id: string;
-      /** @enum {string} */
-      type: 'status_change' | 'comment' | 'mention' | 'assignment' | 'urgent';
-      /** Format: uuid */
-      voc_id?: string | null;
-      message: string;
-      is_read: boolean;
-      /** Format: date-time */
-      created_at: string;
-    };
-    VocListItem: {
-      /** Format: uuid */
-      id: string;
-      issue_code: string;
-      title: string;
-      status: components['schemas']['VocStatus'];
-      priority: components['schemas']['VocPriority'];
-      /** Format: uuid */
-      voc_type_id: string;
-      /** Format: uuid */
-      system_id: string;
-      /** Format: uuid */
-      menu_id: string;
-      /** Format: uuid */
-      assignee_id: string | null;
-      /** Format: uuid */
-      author_id: string;
-      /** Format: uuid */
-      parent_id: string | null;
-      source: components['schemas']['VocSource'];
-      /** Format: date-time */
-      due_date: string | null;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-      has_children: boolean;
-      notes_count: number;
-      tags: string[];
-    };
-    PaginatedVocs: {
-      rows: components['schemas']['VocListItem'][];
-      total: number;
-      page: number;
-      per_page: number;
-    };
-    AssigneeListItem: {
-      /** Format: uuid */
-      id: string;
-      ad_username: string;
-      display_name: string;
-    };
-    AssigneeListResponse: {
-      rows: components['schemas']['AssigneeListItem'][];
-    };
-    TagListItem: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      slug: string;
-      kind: string;
-    };
-    TagListResponse: {
-      rows: components['schemas']['TagListItem'][];
-    };
-    VocTypeListItem: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      slug: string;
-      color: string | null;
-      sort_order: number;
-      is_archived: boolean;
-    };
-    VocTypeListResponse: {
-      rows: components['schemas']['VocTypeListItem'][];
-    };
-    DashboardSummary: {
-      total: number;
-      open: number;
-      in_progress: number;
-      completed: number;
-      dropped: number;
-      urgent: number;
-      overdue: number;
-      avg_resolution_days: number;
-    };
-    DashboardSettings: {
-      [key: string]: unknown;
-    };
-    DistributionItem: {
-      label: string;
-      count: number;
-      percentage?: number;
-    };
-    WeeklyTrendItem: {
-      week: string;
-      count: number;
-    };
-    TagStatItem: {
-      /** Format: uuid */
-      tag_id: string;
-      name: string;
-      count: number;
-    };
-    SystemStatItem: {
-      /** Format: uuid */
-      system_id: string;
-      name: string;
-      count: number;
-    };
-    MasterRefreshResult: {
-      swapped: boolean;
-      /** Format: date-time */
-      loaded_at: string;
-    };
-    VocPayloadHistory: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      voc_id: string;
-      payload: {
-        [key: string]: unknown;
-      };
-      /** Format: uuid */
-      submitted_by: string;
-      /** Format: date-time */
-      submitted_at: string;
-      final_state?: string | null;
-      is_current: boolean;
-    };
-    Notice: {
-      /** Format: uuid */
-      id: string;
-      title: string;
-      body: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-    };
-    NoticeInput: {
-      title: string;
-      body: string;
-    };
-    Faq: {
-      /** Format: uuid */
-      id: string;
-      question: string;
-      answer: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-    };
-    FaqInput: {
-      question: string;
-      answer: string;
-    };
-  };
-  responses: {
-    /** @description Bad request */
-    BadRequest: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ErrorResponse'];
-      };
-    };
-    /** @description Unauthorized */
-    Unauthorized: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ErrorResponse'];
-      };
-    };
-    /** @description Forbidden */
-    Forbidden: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ErrorResponse'];
-      };
-    };
-    /** @description Not found */
-    NotFound: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': components['schemas']['ErrorResponse'];
-      };
-    };
-  };
-  parameters: {
-    id: string;
-    page: number;
-    limit: number;
-    dashboardSystemId: string;
-    dashboardMenuId: string;
-    dashboardAssigneeId: string;
-    dashboardStartDate: string;
-    dashboardEndDate: string;
-  };
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  getHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            /** @enum {string} */
-            status: 'ok';
-            /** @enum {string} */
-            db: 'ok';
-            uptime: number;
-          };
-        };
-      };
-    };
-  };
-  mockLogin: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          role: 'admin' | 'manager' | 'dev' | 'user';
-        };
-      };
-    };
-    responses: {
-      /** @description Logged in */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            user: components['schemas']['AuthUser'];
-          };
-        };
-      };
-      400: components['responses']['BadRequest'];
-    };
-  };
-  logout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Logged out */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-    };
-  };
-  getMe: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Current user */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['AuthUser'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  listVocs: {
-    parameters: {
-      query?: {
-        page?: components['parameters']['page'];
-        per_page?: number;
-        sort_by?: 'issue_code' | 'title' | 'status' | 'assignee' | 'priority' | 'created_at';
-        sort_dir?: 'asc' | 'desc';
-        /** @description Repeat to filter by multiple statuses. */
-        status?: components['schemas']['VocStatus'][];
-        priorities?: components['schemas']['VocPriority'][];
-        system_id?: string;
-        voc_type_ids?: string[];
-        assignees?: string[];
-        tag_ids?: string[];
-        q?: string;
-        includeDeleted?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated VOC list */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PaginatedVocs'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  createVoc: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VocInput'];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Voc'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getVoc: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description VOC */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Voc'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  deleteVoc: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  updateVoc: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VocPatch'];
-      };
-    };
-    responses: {
-      /** @description Updated VOC */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Voc'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  updateVocStatus: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          status: components['schemas']['VocStatus'];
-        };
-      };
-    };
-    responses: {
-      /** @description Updated VOC */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Voc'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  listComments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Comments */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Comment'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  createComment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          body: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Created comment */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Comment'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  deleteComment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        commentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  updateComment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        commentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          body: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Updated comment */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Comment'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  listNotes: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Notes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Note'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  createNote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          body: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Created note */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Note'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  deleteNote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        noteId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  updateNote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        noteId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          body: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Updated note */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Note'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  listAttachments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Attachments */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Attachment'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  uploadAttachment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /** Format: binary */
-          file: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Created attachment */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Attachment'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  deleteAttachment: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        attachmentId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  listTags: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tags */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Tag'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  listAssignees: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Assignees */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['AssigneeListResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  listMasterTags: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tags */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TagListResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  listMasterVocTypes: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description VOC types */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VocTypeListResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  addVocTag: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: uuid */
-          tagId: string;
-        };
-      };
-    };
-    responses: {
-      /** @description Tag added */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  removeVocTag: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-        tagId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tag removed */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  listNotifications: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Notifications */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Notification'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getUnreadCount: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Count */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            count: number;
-          };
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  markNotificationRead: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Marked read */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  getDashboardSummary: {
-    parameters: {
-      query?: {
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description KPI summary */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DashboardSummary'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getDashboardDistribution: {
-    parameters: {
-      query: {
-        type: 'status' | 'priority' | 'voc_type' | 'tag';
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Distribution array */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DistributionItem'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getPriorityStatusMatrix: {
-    parameters: {
-      query?: {
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Matrix */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          }[];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getDashboardHeatmap: {
-    parameters: {
-      query?: {
-        xAxis?: 'status' | 'priority' | 'tag';
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Heatmap */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          }[];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getWeeklyTrend: {
-    parameters: {
-      query?: {
-        weeks?: number;
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Trend array */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['WeeklyTrendItem'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getTagDistribution: {
-    parameters: {
-      query?: {
-        limit?: number;
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tag stats */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TagStatItem'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getSystemOverview: {
-    parameters: {
-      query?: {
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description System stats */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SystemStatItem'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getAssigneeStats: {
-    parameters: {
-      query?: {
-        xAxis?: 'status' | 'priority' | 'tag';
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Assignee stats */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          }[];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getProcessingSpeed: {
-    parameters: {
-      query?: {
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description SLA table */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          }[];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getAging: {
-    parameters: {
-      query?: {
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Aging bar data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          }[];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getAgingVocs: {
-    parameters: {
-      query?: {
-        limit?: number;
-        systemId?: components['parameters']['dashboardSystemId'];
-        menuId?: components['parameters']['dashboardMenuId'];
-        assigneeId?: components['parameters']['dashboardAssigneeId'];
-        startDate?: components['parameters']['dashboardStartDate'];
-        endDate?: components['parameters']['dashboardEndDate'];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Top aging VOCs */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Voc'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getDashboardSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Settings */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DashboardSettings'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  updateDashboardSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DashboardSettings'];
-      };
-    };
-    responses: {
-      /** @description Updated settings */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['DashboardSettings'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getDashboardMenus: {
-    parameters: {
-      query?: {
-        systemId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Menus */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Menu'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  getDashboardAssignees: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Users */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['User'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-    };
-  };
-  adminListUsers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Users */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['User'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminUpdateUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          role?: components['schemas']['UserRole'];
-          is_active?: boolean;
-        };
-      };
-    };
-    responses: {
-      /** @description Updated user */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['User'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminListSystems: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Systems */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['System'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminCreateSystem: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SystemInput'];
-      };
-    };
-    responses: {
-      /** @description Created system */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['System'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminUpdateSystem: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SystemPatch'];
-      };
-    };
-    responses: {
-      /** @description Updated system */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['System'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminListMenus: {
-    parameters: {
-      query?: {
-        systemId?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Menus */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Menu'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminCreateMenu: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MenuInput'];
-      };
-    };
-    responses: {
-      /** @description Created menu */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Menu'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminUpdateMenu: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MenuPatch'];
-      };
-    };
-    responses: {
-      /** @description Updated menu */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Menu'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminListVocTypes: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description VOC types */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VocType'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminCreateVocType: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VocTypeInput'];
-      };
-    };
-    responses: {
-      /** @description Created VOC type */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VocType'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminUpdateVocType: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VocTypePatch'];
-      };
-    };
-    responses: {
-      /** @description Updated VOC type */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VocType'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminListTagRules: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tag rules */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TagRule'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminCreateTagRule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TagRuleInput'];
-      };
-    };
-    responses: {
-      /** @description Created tag rule */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TagRule'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminDeleteTagRule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminUpdateTagRule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TagRulePatch'];
-      };
-    };
-    responses: {
-      /** @description Updated tag rule */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['TagRule'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminRefreshMasters: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Refresh result */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['MasterRefreshResult'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  refreshVocMasters: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Refresh result */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['MasterRefreshResult'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  submitVocPayload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          equipment: string;
-          maker: string;
-          model: string;
-          process: string;
-          symptom: string;
-          root_cause: string;
-          resolution: string;
-          unverified_fields?: string[];
-        };
-      };
-    };
-    responses: {
-      /** @description Submitted payload history entry */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VocPayloadHistory'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  getVocPayloadHistory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Payload history list */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['VocPayloadHistory'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  reviewVocPayload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          decision: 'approved' | 'rejected';
-          comment?: string | null;
-        };
-      };
-    };
-    responses: {
-      /** @description Review recorded */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  getVocTimeline: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Timeline event list */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            [key: string]: unknown;
-          }[];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminListNotices: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Notice list */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Notice'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminCreateNotice: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['NoticeInput'];
-      };
-    };
-    responses: {
-      /** @description Created notice */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Notice'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminGetNotice: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Notice */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Notice'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminUpdateNotice: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['NoticeInput'];
-      };
-    };
-    responses: {
-      /** @description Updated notice */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Notice'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminDeleteNotice: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminListFaqs: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description FAQ list */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Faq'][];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminCreateFaq: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FaqInput'];
-      };
-    };
-    responses: {
-      /** @description Created FAQ */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Faq'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-    };
-  };
-  adminGetFaq: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description FAQ */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Faq'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminUpdateFaq: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FaqInput'];
-      };
-    };
-    responses: {
-      /** @description Updated FAQ */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Faq'];
-        };
-      };
-      400: components['responses']['BadRequest'];
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  adminDeleteFaq: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['OkResponse'];
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
-  downloadFile: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['id'];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description File binary content */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/octet-stream': string;
-        };
-      };
-      401: components['responses']['Unauthorized'];
-      403: components['responses']['Forbidden'];
-      404: components['responses']['NotFound'];
-    };
-  };
+    getHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "ok";
+                        /** @enum {string} */
+                        db: "ok";
+                        uptime: number;
+                    };
+                };
+            };
+        };
+    };
+    mockLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    role: "admin" | "manager" | "dev" | "user";
+                };
+            };
+        };
+        responses: {
+            /** @description Logged in */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: components["schemas"]["AuthUser"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Logged out */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthUser"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listVocs: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["page"];
+                per_page?: number;
+                sort_by?: "issue_code" | "title" | "status" | "assignee" | "priority" | "created_at";
+                sort_dir?: "asc" | "desc";
+                /** @description Repeat to filter by multiple statuses. */
+                status?: components["schemas"]["VocStatus"][];
+                priorities?: components["schemas"]["VocPriority"][];
+                system_id?: string;
+                voc_type_ids?: string[];
+                assignees?: string[];
+                tag_ids?: string[];
+                q?: string;
+                includeDeleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated VOC list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedVocs"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    createVoc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VocInput"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Voc"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getVoc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description VOC */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Voc"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    deleteVoc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateVoc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VocPatch"];
+            };
+        };
+        responses: {
+            /** @description Updated VOC */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Voc"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateVocStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    status: components["schemas"]["VocStatus"];
+                };
+            };
+        };
+        responses: {
+            /** @description Updated VOC */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Voc"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listComments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comment list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    createComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentInput"];
+            };
+        };
+        responses: {
+            /** @description Comment created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            /** @description Validation error (BODY_REQUIRED or BODY_TOO_LARGE) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentInput"];
+            };
+        };
+        responses: {
+            /** @description Updated comment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Validation error (BODY_REQUIRED or BODY_TOO_LARGE) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listNotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    createNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created note */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    deleteNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Updated note */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Attachment"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    uploadAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created attachment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Attachment"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    deleteAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tags */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tag"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listAssignees: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Assignees */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssigneeListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listMasterTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tags */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listMasterVocTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description VOC types */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocTypeListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listMasterSystems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Systems with nested menus (archived rows excluded) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listMasterMenus: {
+        parameters: {
+            query?: {
+                system_id?: string;
+                includeArchived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Menus */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenuListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    addVocTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    tagId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Tag added */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    removeVocTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+                tagId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tag removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listNotifications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notifications */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getUnreadCount: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-None-Match"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Count */
+            200: {
+                headers: {
+                    /** @description Strong-ish hash of the unread state. */
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCountResponse"];
+                };
+            };
+            /** @description Not Modified — unread state unchanged since the supplied ETag. */
+            304: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    markAllRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Marked all read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {integer} */
+                        unreadCount: 0;
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    markNotificationRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Marked read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getDashboardSummary: {
+        parameters: {
+            query?: {
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description KPI summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSummary"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getDashboardDistribution: {
+        parameters: {
+            query: {
+                type: "status" | "priority" | "voc_type" | "tag";
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Distribution array */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DistributionItem"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getPriorityStatusMatrix: {
+        parameters: {
+            query?: {
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matrix */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getDashboardHeatmap: {
+        parameters: {
+            query?: {
+                xAxis?: "status" | "priority" | "tag";
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Heatmap */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getWeeklyTrend: {
+        parameters: {
+            query?: {
+                weeks?: number;
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trend array */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyTrendItem"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getTagDistribution: {
+        parameters: {
+            query?: {
+                limit?: number;
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tag stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagStatItem"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getSystemOverview: {
+        parameters: {
+            query?: {
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description System stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemStatItem"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getAssigneeStats: {
+        parameters: {
+            query?: {
+                xAxis?: "status" | "priority" | "tag";
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Assignee stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getProcessingSpeed: {
+        parameters: {
+            query?: {
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description SLA table */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getAging: {
+        parameters: {
+            query?: {
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Aging bar data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getAgingVocs: {
+        parameters: {
+            query?: {
+                limit?: number;
+                systemId?: components["parameters"]["dashboardSystemId"];
+                menuId?: components["parameters"]["dashboardMenuId"];
+                assigneeId?: components["parameters"]["dashboardAssigneeId"];
+                startDate?: components["parameters"]["dashboardStartDate"];
+                endDate?: components["parameters"]["dashboardEndDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Top aging VOCs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Voc"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getDashboardSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSettings"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    updateDashboardSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DashboardSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Updated settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getDashboardMenus: {
+        parameters: {
+            query?: {
+                systemId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Menus */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Menu"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getDashboardAssignees: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Users */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    adminListUsers: {
+        parameters: {
+            query?: {
+                role?: components["schemas"]["UserRole"];
+                is_active?: boolean;
+                q?: string;
+                page?: number;
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Users */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminUpdateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminUserPatch"];
+            };
+        };
+        responses: {
+            /** @description Updated user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserItem"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["BadRequest"];
+        };
+    };
+    adminListSystems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Systems */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["System"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreateSystem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemInput"];
+            };
+        };
+        responses: {
+            /** @description Created system */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["System"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminUpdateSystem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemPatch"];
+            };
+        };
+        responses: {
+            /** @description Updated system */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["System"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListMenus: {
+        parameters: {
+            query?: {
+                systemId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Menus */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Menu"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreateMenu: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenuInput"];
+            };
+        };
+        responses: {
+            /** @description Created menu */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Menu"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminUpdateMenu: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenuPatch"];
+            };
+        };
+        responses: {
+            /** @description Updated menu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Menu"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListVocTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description VOC types */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocType"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreateVocType: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VocTypeInput"];
+            };
+        };
+        responses: {
+            /** @description Created VOC type */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocType"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminUpdateVocType: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VocTypePatch"];
+            };
+        };
+        responses: {
+            /** @description Updated VOC type */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocType"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListTagRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tag rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRule"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreateTagRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagRuleInput"];
+            };
+        };
+        responses: {
+            /** @description Created tag rule */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminDeleteTagRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUpdateTagRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagRulePatch"];
+            };
+        };
+        responses: {
+            /** @description Updated tag rule */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRule"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminRefreshMasters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refresh result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MasterRefreshResult"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["BadRequest"];
+            503: components["responses"]["BadRequest"];
+        };
+    };
+    adminMasterStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Master status snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MasterStatus"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminListTags: {
+        parameters: {
+            query?: {
+                kind?: "general" | "menu";
+                q?: string;
+                page?: number;
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tag master rows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagMasterListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreateTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagMasterCreate"];
+            };
+        };
+        responses: {
+            /** @description Created tag */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagMasterItem"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["BadRequest"];
+        };
+    };
+    adminDeleteTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["BadRequest"];
+        };
+    };
+    adminUpdateTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagMasterPatch"];
+            };
+        };
+        responses: {
+            /** @description Updated tag */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagMasterItem"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminMergeTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagMasterMergeInput"];
+            };
+        };
+        responses: {
+            /** @description Merged target tag */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagMasterItem"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminToggleTagExternal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagExternalToggle"];
+            };
+        };
+        responses: {
+            /** @description Updated tag */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagMasterItem"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminSuspendTagRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TagRuleSuspendInput"];
+            };
+        };
+        responses: {
+            /** @description Updated tag rule */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TagRule"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListTrash: {
+        parameters: {
+            query?: {
+                system_id?: string;
+                menu_id?: string;
+                q?: string;
+                deleted_from?: string;
+                deleted_to?: string;
+                page?: number;
+                per_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trash list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrashListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminVocRestoreLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restore log entries (oldest → newest) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocRestoreLogEntry"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    restoreVoc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored VOC + audit row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocRestoreResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminUserRoleLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Role log entries (newest → oldest) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserRoleLogEntry"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    refreshVocMasters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refresh result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MasterRefreshResult"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    submitVocPayload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    equipment: string;
+                    maker: string;
+                    model: string;
+                    process: string;
+                    symptom: string;
+                    root_cause: string;
+                    resolution: string;
+                    unverified_fields?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Submitted payload history entry */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocPayloadHistory"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getVocPayloadHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payload history list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocPayloadHistory"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    reviewVocPayload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "approve" | "reject";
+                    /** @description required when decision='reject' */
+                    comment?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Review recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getVocTimeline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Timeline event list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    downloadFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File binary content */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listNotices: {
+        parameters: {
+            query?: {
+                page?: number;
+                per_page?: number;
+                mode?: "user" | "admin";
+                includeDeleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notice list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows?: components["schemas"]["Notice"][];
+                        page?: number;
+                        per_page?: number;
+                        total?: number;
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    createNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoticeInput"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notice"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listPopupNotices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Popup notices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows?: components["schemas"]["Notice"][];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notice */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notice"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    deleteNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Soft-deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoticeInput"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notice"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    restoreNotice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notice"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listFaqs: {
+        parameters: {
+            query?: {
+                page?: number;
+                per_page?: number;
+                category_id?: string;
+                q?: string;
+                mode?: "user" | "admin";
+                includeDeleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description FAQ list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows?: components["schemas"]["Faq"][];
+                        page?: number;
+                        per_page?: number;
+                        total?: number;
+                    };
+                };
+            };
+        };
+    };
+    createFaq: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FaqInput"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Faq"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getFaq: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description FAQ */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Faq"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    deleteFaq: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Soft-deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    updateFaq: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FaqInput"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Faq"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    restoreFaq: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Faq"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listFaqCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Categories */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows?: components["schemas"]["FaqCategory"][];
+                    };
+                };
+            };
+        };
+    };
+    createFaqCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FaqCategoryInput"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FaqCategory"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    deleteFaqCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+            /** @description Category has FAQ items */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateFaqCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FaqCategoryInput"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FaqCategory"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
 }

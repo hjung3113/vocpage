@@ -49,6 +49,11 @@ export const tokens = {
   chipFontSizeXs: '10.5px',
   chipGap: '4px',
   chipDotSize: '6px',
+
+  // Dashboard RGL (Wave 2 Phase D)
+  dashboardGridMargin: '16px',
+  dashboardGridRowH: '64px',
+  dashboardHandleSize: '12px',
 } as const;
 
 export type TokenKey = keyof typeof tokens;
