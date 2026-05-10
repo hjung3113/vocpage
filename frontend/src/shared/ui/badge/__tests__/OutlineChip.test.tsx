@@ -41,4 +41,40 @@ describe('OutlineChip', () => {
     expect(style).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
     expect(style).not.toMatch(/oklch\(/i);
   });
+
+  describe('variant="dot-pill"', () => {
+    it('renders with data-variant="dot-pill" and a .lc-dot child (aria-hidden)', () => {
+      render(<OutlineChip variant="dot-pill" label="UX" />);
+      const el = screen.getByTestId('outline-chip');
+      expect(el).toHaveAttribute('data-variant', 'dot-pill');
+      const dot = el.querySelector('.lc-dot');
+      expect(dot).not.toBeNull();
+      expect(dot).toHaveAttribute('aria-hidden', 'true');
+      expect(el.textContent).toBe('UX');
+    });
+
+    it('default dot color is var(--text-quaternary); custom dotColor is honored', () => {
+      const { rerender } = render(<OutlineChip variant="dot-pill" label="UX" />);
+      let dot = screen.getByTestId('outline-chip').querySelector('.lc-dot') as HTMLElement;
+      expect(dot.getAttribute('style') ?? '').toContain('var(--text-quaternary)');
+
+      rerender(
+        <OutlineChip variant="dot-pill" label="UX" dotColor="var(--accent)" />,
+      );
+      dot = screen.getByTestId('outline-chip').querySelector('.lc-dot') as HTMLElement;
+      expect(dot.getAttribute('style') ?? '').toContain('var(--accent)');
+    });
+
+    it('inline style uses tokens only — no hex/oklch literals', () => {
+      render(<OutlineChip variant="dot-pill" label="UX" />);
+      const el = screen.getByTestId('outline-chip');
+      const style = el.getAttribute('style') ?? '';
+      expect(style).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
+      expect(style).not.toMatch(/oklch\(/i);
+      const dotStyle =
+        (el.querySelector('.lc-dot') as HTMLElement | null)?.getAttribute('style') ?? '';
+      expect(dotStyle).not.toMatch(/#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
+      expect(dotStyle).not.toMatch(/oklch\(/i);
+    });
+  });
 });

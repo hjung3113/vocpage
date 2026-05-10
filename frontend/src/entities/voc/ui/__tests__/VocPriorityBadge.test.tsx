@@ -4,16 +4,17 @@ import type { VocPriority } from '@contracts/voc';
 
 describe('VocPriorityBadge', () => {
   type Case = [VocPriority, string, string, number];
+  // [priority, label, bars-variant, fontWeight]
   const cases: Case[] = [
-    ['urgent', 'Urgent', 'flame', 700],
-    ['high', 'High', 'chevron-up', 400],
-    ['medium', 'Medium', 'minus', 400],
-    ['low', 'Low', 'chevron-down', 400],
+    ['urgent', 'Urgent', 'urgent', 700],
+    ['high', 'High', 'high', 400],
+    ['medium', 'Medium', 'med', 400],
+    ['low', 'Low', 'low', 400],
   ];
 
   it.each(cases)(
-    'renders priority=%s with label %s, icon %s, fontWeight %s',
-    (priority, label, iconClass, fontWeight) => {
+    'renders priority=%s with label %s, bars %s, fontWeight %s',
+    (priority, label, barsVariant, fontWeight) => {
       render(<VocPriorityBadge priority={priority} />);
 
       const el = screen.getByTestId(`priority-badge-${priority}`);
@@ -24,18 +25,27 @@ describe('VocPriorityBadge', () => {
       // font-weight via inline style
       expect(el.style.fontWeight).toBe(String(fontWeight));
 
-      // icon: lucide renders an svg; check aria-hidden child exists
-      const icon = el.querySelector('[aria-hidden="true"]');
-      expect(icon).not.toBeNull();
+      // PriorityBars glyph child rendered with matching variant
+      const bars = el.querySelector(`[data-testid="priority-bars-${barsVariant}"]`);
+      expect(bars).not.toBeNull();
+      expect(bars?.getAttribute('data-variant')).toBe(barsVariant);
 
-      // icon class contains the lucide icon name
-      expect(icon?.getAttribute('class') ?? '').toContain(iconClass);
+      // exactly 3 bar children inside the glyph
+      const segments = bars?.querySelectorAll('i[aria-hidden="true"]');
+      expect(segments?.length).toBe(3);
     },
   );
 
-  it('no hex color in className (lint hard rule)', () => {
+  it('iconOnly mode renders glyph without label text', () => {
+    render(<VocPriorityBadge priority="urgent" iconOnly />);
+    const el = screen.getByTestId('priority-badge-urgent');
+    expect(el.textContent ?? '').not.toContain('Urgent');
+    expect(el.querySelector('[data-testid="priority-bars-urgent"]')).not.toBeNull();
+  });
+
+  it('no hex color literal in markup (lint hard rule)', () => {
     render(<VocPriorityBadge priority="urgent" />);
     const el = screen.getByTestId('priority-badge-urgent');
-    expect(el.className).not.toMatch(/#[0-9a-f]/i);
+    expect(el.outerHTML).not.toMatch(/#[0-9a-f]{3,8}/i);
   });
 });

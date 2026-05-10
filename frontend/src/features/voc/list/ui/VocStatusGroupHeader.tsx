@@ -1,7 +1,6 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import type { CSSProperties, KeyboardEvent } from 'react';
 import type { VocStatus } from '@contracts/voc';
 import { VocStatusBadge } from '@entities/voc';
+import { ListGroupHeader } from '@shared/ui/list-group-header';
 
 export interface VocStatusGroupHeaderProps {
   status: VocStatus;
@@ -10,70 +9,33 @@ export interface VocStatusGroupHeaderProps {
   onToggle: () => void;
 }
 
-// Phase 5: Linear-style group header (ref Tasks.html `.igroup-h`).
-// padding 8px 24px, font-size 12px / 600, color text-secondary.
-const HEADER_STYLE: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  width: '100%',
-  paddingTop: '8px',
-  paddingBottom: '8px',
-  paddingLeft: 'var(--sp-5)',
-  paddingRight: 'var(--sp-5)',
-  background: 'var(--bg-panel)',
-  fontSize: '12px',
-  fontWeight: 600,
-  color: 'var(--text-secondary)',
-  letterSpacing: '0.02em',
-  border: 'none',
-  borderTop: '1px solid var(--border-subtle)',
-  borderBottom: '1px solid var(--border-subtle)',
-  cursor: 'pointer',
-  textAlign: 'left' as const,
-};
-
-const COUNT_STYLE: CSSProperties = {
-  fontSize: '11px',
-  color: 'var(--text-tertiary)',
-  fontWeight: 500,
-};
-
-const CHEVRON_STYLE: CSSProperties = {
-  width: 14,
-  height: 14,
-  color: 'var(--text-tertiary)',
-};
-
+// Wave C-extension: domain wrapper around `ListGroupHeader` (uidesign.md §16.6).
+// Visual contract identical to prior inline implementation; legacy `voc-*` testids
+// preserved for back-compat with consumers in `widgets/voc-workspace` integrations.
 export function VocStatusGroupHeader({
   status,
   count,
   collapsed,
   onToggle,
 }: VocStatusGroupHeaderProps) {
-  const Chevron = collapsed ? ChevronRight : ChevronDown;
-  const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onToggle();
-    }
-  };
   return (
-    <button
-      type="button"
-      data-testid={`voc-status-group-header-${status}`}
-      data-collapsed={collapsed ? 'true' : 'false'}
-      aria-expanded={!collapsed}
-      onClick={onToggle}
-      onKeyDown={handleKeyDown}
-      style={HEADER_STYLE}
+    <ListGroupHeader
+      collapsed={collapsed}
+      onToggle={onToggle}
+      testId={`voc-status-group-header-${status}`}
     >
-      <Chevron aria-hidden="true" style={CHEVRON_STYLE} data-testid="voc-status-group-chevron" />
       <VocStatusBadge status={status} iconOnly />
       <span>{status}</span>
-      <span style={COUNT_STYLE} data-testid="voc-status-group-count">
+      <span
+        data-testid="voc-status-group-count"
+        style={{
+          fontSize: '11px',
+          color: 'var(--text-tertiary)',
+          fontWeight: 500,
+        }}
+      >
         {count}
       </span>
-    </button>
+    </ListGroupHeader>
   );
 }
