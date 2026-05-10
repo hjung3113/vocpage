@@ -7,9 +7,9 @@
 
 | Phase | 범위                                                              | 상태       |
 | ----- | ----------------------------------------------------------------- | ---------- |
-| **D** | RGL Shell — settings BE + DashboardShell FE (위젯 콘텐츠 X)       | ⏳ 진행중  |
-| B     | KPI Volume / Quality 위젯 콘텐츠 + `/dashboard/summary` BE        | 후속       |
-| C     | 분포 / 매트릭스 / 히트맵 / 트렌드 / SLA / 담당자 / Top10 위젯     | 후속       |
+| **D** | RGL Shell — settings BE + DashboardShell FE (위젯 콘텐츠 X)       | ✅ PR #295 |
+| B     | KPI Volume / Quality 위젯 콘텐츠 + `/dashboard/summary` BE        | ✅ PR #297/#298 |
+| C     | 분포 / 매트릭스 / 히트맵 / 트렌드 / SLA / 담당자 / Top10 위젯     | ✅ PR #305 BE / PR #306 FE — 정본 = [`wave-2-phase-c.md`](./wave-2-phase-c.md) |
 | E     | 설정 패널 UI (위젯 토글, default_date_range, heatmap x-axis)      | 후속       |
 
 Phase 라벨은 의존성 우선순위 (D = shell 기반, B/C = 콘텐츠, E = 설정 패널). A 라벨은 사용 안 함.
