@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-10T15:30:00.000Z"
-last_completed_plan: "01-03"
+last_updated: "2026-05-11T00:00:00.000Z"
+last_completed_plan: "01-04"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 3
-  percent: 38
+  completed_plans: 4
+  percent: 50
 ---
 
 # STATE — vocpage
@@ -24,13 +24,13 @@ progress:
 ## Current Position
 
 - **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-03 complete (Wave 2 — contract rewrite + mig 024 GREEN); 01-04 / 01-05 next (Wave 3 — BE routes ‖ FE hooks).
-- **Status**: Waves 0-2 landed — scaffolds, mig 024 (keywords[]+match_mode+created_by), and OpenAPI/zod/TS contract consolidation. BE 598 pass; FE 691 pass; parity 10/11 OK.
-- **Progress**: ████░░░░░░ Phase 1: 3/8 plans complete; 0/7 phases overall.
+- **Plan**: 01-04 complete (Wave 2 — BE 5 nested routes + IDOR + permission matrix); 01-05 next (Wave 3 — FE hooks).
+- **Status**: Waves 0-2 + 01-04 landed — scaffolds, mig 024 (keywords[]+match_mode+created_by), OpenAPI/zod/TS contract consolidation, and BE 5 nested handlers (list/create/update/delete/suspend) under /admin/tags/:tagId/rules with full D-13 matrix + IDOR scope checks + server-derived created_by. BE 625 pass; FE 691 pass.
+- **Progress**: █████░░░░░ Phase 1: 4/8 plans complete; 0/7 phases overall.
 
 ## Performance Metrics
 
-- BE test baseline: 598+ Jest passes (Plan 01-03 added 5 parity tests).
+- BE test baseline: 625+ Jest passes (Plan 01-04 added 27 — D-13 matrix + IDOR + injection + route-order).
 - FE test baseline: 691+ Vitest passes (preserve across all phases).
 - Fixture-seed parity: currently `vocs` only — extend per phase (Phase 1 adds `tag_rules`, Phase 2 `voc_types`, Phase 3 `systems` / `menus`).
 - OpenAPI codegen drift target: 0.
@@ -74,4 +74,4 @@ progress:
 
 ## Next Action
 
-Run `/gsd-plan-phase 1` to decompose Tag Rules Consolidation into executable plans.
+Plan 01-05 (Wave 3 — FE hooks: queryKey + msw handler updates) and Plan 01-06 (FE Modal) can now run in parallel against the live BE contract.

@@ -30,7 +30,7 @@ Plans:
 - [ ] 01-01-PLAN.md — Wave 0 scaffolds: matcher audit + parity script generalize + RED tests for mig 024 & D-11 optimistic
 - [ ] 01-02-PLAN.md — Mig 024 SQL (keywords[]+match_mode+created_by add, pattern drop) + tests GREEN + reconcile pattern readers (TDD)
 - [x] 01-03-PLAN.md — OpenAPI rewrite to nested paths + zod TagRule/TagRuleCreate/TagRulePatch/TagRuleListQuery/TagRuleListResponse + parity tests
-- [ ] 01-04-PLAN.md — [BLOCKING] mig 024 push + 5 nested BE routes + permission matrix + IDOR/created_by-injection tests (TDD)
+- [x] 01-04-PLAN.md — [BLOCKING] mig 024 push + 5 nested BE routes + permission matrix + IDOR/created_by-injection tests (TDD)
 - [ ] 01-05-PLAN.md — 5 FE TanStack hooks (D-11 optimistic) + MSW handlers + optimistic.test GREEN (TDD)
 - [ ] 01-06-PLAN.md — KeywordChipInput component + TagRulesManagerModal (Dialog + sub-table + permission gating)
 - [ ] 01-07-PLAN.md — TagMasterTable 규칙 N건 column + TagRulesFlatTable + page view-mode tabs + URL state + page integration test
@@ -109,7 +109,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Tag Rules Consolidation | 0/? | Not started | - |
+| 1. Tag Rules Consolidation | 4/8 | In progress (Wave 0–2 + 01-04 BE routes done) | - |
 | 2. VOC Types Management | 0/? | Not started | - |
 | 3. Systems & Menus Management | 0/? | Not started | - |
 | 4. Dashboard Custom Round-trip + Mig 023 | 0/? | Gated (ADR-0007 Proposed) | - |
