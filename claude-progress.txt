@@ -1,18 +1,22 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 구조/네이밍 정리 1차 머지 완료)
+## 다음 세션 시작점 (2026-05-10 Flowline Wave C 머지 완료)
 
 → **머지 완료 (2026-05-10)**:
    - **PR #310** ADR 0006 (Accepted) + 0007 (Proposed) — `dashboard_settings.default_date_range='custom'` 컬럼 신설 + timezone OQ 별 ADR 분기.
    - **PR #312** Wave 3 Phase A 구현 — 마이그 023 + zod superRefine + BE service + FE CustomDateRangePicker. BE 593 / FE 661 pass.
    - **PR #313** specs 정리 + stub `/tags` nav 제거 + admin-pages-backlog.md.
    - **PR #314** 구조/네이밍 정리 1차 (deepening candidates 2 + 4) — `useVocFilter`/`useVocFilters` → `useVocFilterContext`/`useVocFilterUrlState`, `features/admin/tag-master/` 평면 → `api/+ui/`, `ActionButton` → `TagMasterActionButton`, `@contracts/admin/tag` alias 통일.
+   - **PR #316** ADR-0008 + `uidesign.md §16 Flowline Alignment Primitives` — Flowline 정합화 결정 + 시그널 7종 명세.
+   - **PR #317** Flowline Wave C — `shared/ui/issue-id` + `shared/ui/status-glyph` 신설. `VocStatusBadge` 가 두 모드(아이콘/칩+라벨) 모두 글리프 외부 wrap → VocRow / 드로어 / 디테일 / 그룹헤더 자동 적용. 671 vitest pass. §16.1 S1·S2 = `implemented`.
 
 → **구조/네이밍 정리 진행 상태 (2026-05-10 audit, codex 적대적 리뷰)**:
    - **완료**: Cand 2 (useVocFilter rename) · Cand 4 (tag-master split) — PR #314.
    - **차기 후보 (PROCEED, 단계적)**: Cand 1 entity api/ slice 네이밍 통일 — `entities/{master,user,notification,voc}/api/*` camelCase + `entities/{faq,notice}/api/*` 평면 → 모두 `subject.api.ts` / `subject.query-keys.ts`. ~9 파일 + 다수 caller, 슬라이스 단위 PR 분할 권장 (voc → master → user → notification → faq → notice → auth).
    - **DEFER**: Cand 3 `features/dashboard/widgets/` 와 top-level `widgets/` shadow — 12 컴포넌트 import churn 대비 leverage 약함 / Cand 5 backend repo·service suffix 혼재 (`*.repo.ts` vs `*.ts`) — 다음 BE 작업 시 같이 처리.
    - **REJECT**: Cand 6 backend `controllers/` + `validators/` orphan 의혹 — `backend/src/CLAUDE.md`가 5-layer 명시, ADR-0003 이 validators 보존 결정. 코드 drift 아니라 의도적 layer.
+
+→ **Flowline 정합화 상태**: ADR-0008 + Wave C 머지. 차기 — Wave D 후보 (S3 priority-bars / S5 list-group-header / S6 OutlineChip dot-pill variant) 는 사용처 발생 시 진입. S7 활동 피드 + sparkline deferred.
 
 → **다음 세션 작업 후보**:
    - **구조/네이밍 정리 2차** — Cand 1 voc 슬라이스부터 (`entities/voc/api/vocApi.ts` → `voc.api.ts` + `vocQueryKeys.ts` → `voc.query-keys.ts`).
@@ -21,4 +25,4 @@
    - **운영/배포 phase** — session store · OIDC · Production build · 실 MSSQL · E2E.
    - **ADR 0007 (timezone) 잠금** — 다중 timezone 운영 진입 전 별 세션.
 
-→ **현재 main 상태**: `5336d9c` (PR #314 머지 후).
+→ **현재 main 상태**: `e1b9999` (PR #317 머지 후).
