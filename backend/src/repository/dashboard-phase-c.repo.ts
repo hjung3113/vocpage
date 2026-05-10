@@ -554,9 +554,15 @@ export async function processingSpeedAll(
   const windowSql = windowClauses.length ? ' AND ' + windowClauses.join(' AND ') : '';
   const sql = `
     SELECT
-      AVG(EXTRACT(EPOCH FROM (status_changed_at - created_at)) / 86400.0) AS avg_days,
+      AVG(
+        ((status_changed_at AT TIME ZONE 'Asia/Seoul')::date
+         - (created_at AT TIME ZONE 'Asia/Seoul')::date)
+      ) AS avg_days,
       COUNT(*)::int AS completed_count,
-      COUNT(*) FILTER (WHERE due_date IS NOT NULL AND status_changed_at::date <= due_date)::int AS sla_pass,
+      COUNT(*) FILTER (
+        WHERE due_date IS NOT NULL
+          AND (status_changed_at AT TIME ZONE 'Asia/Seoul')::date <= due_date
+      )::int AS sla_pass,
       COUNT(*) FILTER (WHERE due_date IS NOT NULL)::int AS sla_eligible,
       COUNT(*) FILTER (WHERE due_date IS NULL)::int AS missing_due_date
     FROM vocs
@@ -595,9 +601,15 @@ export async function processingSpeedBySystem(
     SELECT
       s.id::text AS id,
       s.name,
-      AVG(EXTRACT(EPOCH FROM (v.status_changed_at - v.created_at)) / 86400.0) AS avg_days,
+      AVG(
+        ((v.status_changed_at AT TIME ZONE 'Asia/Seoul')::date
+         - (v.created_at AT TIME ZONE 'Asia/Seoul')::date)
+      ) AS avg_days,
       COUNT(*)::int AS completed_count,
-      COUNT(*) FILTER (WHERE v.due_date IS NOT NULL AND v.status_changed_at::date <= v.due_date)::int AS sla_pass,
+      COUNT(*) FILTER (
+        WHERE v.due_date IS NOT NULL
+          AND (v.status_changed_at AT TIME ZONE 'Asia/Seoul')::date <= v.due_date
+      )::int AS sla_pass,
       COUNT(*) FILTER (WHERE v.due_date IS NOT NULL)::int AS sla_eligible,
       COUNT(*) FILTER (WHERE v.due_date IS NULL)::int AS missing_due_date
     FROM vocs v
@@ -638,9 +650,15 @@ export async function processingSpeedByMenu(
     SELECT
       m.id::text AS id,
       m.name,
-      AVG(EXTRACT(EPOCH FROM (v.status_changed_at - v.created_at)) / 86400.0) AS avg_days,
+      AVG(
+        ((v.status_changed_at AT TIME ZONE 'Asia/Seoul')::date
+         - (v.created_at AT TIME ZONE 'Asia/Seoul')::date)
+      ) AS avg_days,
       COUNT(*)::int AS completed_count,
-      COUNT(*) FILTER (WHERE v.due_date IS NOT NULL AND v.status_changed_at::date <= v.due_date)::int AS sla_pass,
+      COUNT(*) FILTER (
+        WHERE v.due_date IS NOT NULL
+          AND (v.status_changed_at AT TIME ZONE 'Asia/Seoul')::date <= v.due_date
+      )::int AS sla_pass,
       COUNT(*) FILTER (WHERE v.due_date IS NOT NULL)::int AS sla_eligible,
       COUNT(*) FILTER (WHERE v.due_date IS NULL)::int AS missing_due_date
     FROM vocs v

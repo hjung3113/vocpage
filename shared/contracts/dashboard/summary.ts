@@ -62,7 +62,11 @@ export type DashboardSummary = z.infer<typeof DashboardSummary>;
  * - `startDate` / `endDate` are required iff `range=custom` (validated server-side).
  * - Dates are calendar dates in `YYYY-MM-DD` form, interpreted at KST midnight.
  */
-export const DashboardFilter = z
+/**
+ * Base object schema — exported so child filter schemas can call `.extend()`.
+ * Use `DashboardFilter` (the refined version) for direct route validation.
+ */
+export const DashboardFilterBase = z
   .object({
     systemId: Uuid.optional(),
     menuId: Uuid.optional(),
@@ -72,4 +76,26 @@ export const DashboardFilter = z
     endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   })
   .strict();
+
+/**
+ * Reusable refine for range=custom date requirement.
+ * Apply to any schema that extends DashboardFilterBase.
+ */
+export function requireDatesForCustomRange<
+  T extends { range?: string; startDate?: string; endDate?: string },
+>(v: T): boolean {
+  return v.range !== 'custom' || (!!v.startDate && !!v.endDate);
+}
+export const requireDatesForCustomRangeError: {
+  message: string;
+  path: string[];
+} = {
+  message: 'startDate and endDate are required when range=custom',
+  path: ['startDate'],
+};
+
+export const DashboardFilter = DashboardFilterBase.refine(
+  requireDatesForCustomRange,
+  requireDatesForCustomRangeError,
+);
 export type DashboardFilter = z.infer<typeof DashboardFilter>;

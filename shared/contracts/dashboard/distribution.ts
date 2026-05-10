@@ -12,7 +12,11 @@
  * `dim` is accepted by the server but not returned in the response body.
  */
 import { z } from 'zod';
-import { DashboardFilter } from './summary';
+import {
+  DashboardFilterBase,
+  requireDatesForCustomRange,
+  requireDatesForCustomRangeError,
+} from './summary';
 
 export const DistributionType = z.enum(['status', 'priority', 'voc_type', 'tag']);
 export type DistributionType = z.infer<typeof DistributionType>;
@@ -51,11 +55,13 @@ export const DistributionResponse = z
 export type DistributionResponse = z.infer<typeof DistributionResponse>;
 
 /** Query params for GET /api/dashboard/distribution (extends global filter). */
-export const DistributionFilter = DashboardFilter.extend({
+export const DistributionFilter = DashboardFilterBase.extend({
   type: DistributionType,
   dim: DistributionDim.optional(),
-}).refine(
-  (v) => !(v.dim === 'system' && v.systemId !== undefined),
-  { message: 'dim=system is incompatible with systemId scope' },
-);
+})
+  .refine(requireDatesForCustomRange, requireDatesForCustomRangeError)
+  .refine(
+    (v) => !(v.dim === 'system' && v.systemId !== undefined),
+    { message: 'dim=system is incompatible with systemId scope' },
+  );
 export type DistributionFilter = z.infer<typeof DistributionFilter>;

@@ -15,7 +15,11 @@
  * the drill-down arrow (`level === 'system'`) and handle breadcrumb navigation.
  */
 import { z } from 'zod';
-import { DashboardFilter } from './summary';
+import {
+  DashboardFilterBase,
+  requireDatesForCustomRange,
+  requireDatesForCustomRangeError,
+} from './summary';
 import { HeatmapXAxis } from './entity';
 
 /** One data row in the heatmap table. */
@@ -55,7 +59,7 @@ export const HeatmapResponse = z
 export type HeatmapResponse = z.infer<typeof HeatmapResponse>;
 
 /** Query params for GET /api/dashboard/heatmap. */
-export const HeatmapFilter = DashboardFilter.extend({
+export const HeatmapFilter = DashboardFilterBase.extend({
   xAxis: HeatmapXAxis.optional(),
-});
+}).refine(requireDatesForCustomRange, requireDatesForCustomRangeError);
 export type HeatmapFilter = z.infer<typeof HeatmapFilter>;

@@ -19,7 +19,7 @@
  *   dim=system → menu_name populated (within the active system), system_name null
  */
 import { z } from 'zod';
-import { DashboardFilter } from './summary';
+import { DashboardFilterBase } from './summary';
 
 export const AgingVocDim = z.enum(['all', 'system']);
 export type AgingVocDim = z.infer<typeof AgingVocDim>;
@@ -50,7 +50,7 @@ export const AgingVocsResponse = z
 export type AgingVocsResponse = z.infer<typeof AgingVocsResponse>;
 
 /** Query params for GET /api/dashboard/aging-vocs. */
-export const AgingVocsFilter = DashboardFilter.extend({
+export const AgingVocsFilter = DashboardFilterBase.extend({
   limit: z.coerce.number().int().positive().max(50).optional(),
   dim: AgingVocDim.optional(),
 });

@@ -14,7 +14,11 @@
  * Intensity shading: `max_value` across all data rows (same model as heatmap).
  */
 import { z } from 'zod';
-import { DashboardFilter } from './summary';
+import {
+  DashboardFilterBase,
+  requireDatesForCustomRange,
+  requireDatesForCustomRangeError,
+} from './summary';
 import { HeatmapXAxis } from './entity';
 
 export const AssigneeStatRow = z
@@ -46,7 +50,7 @@ export const AssigneeStatsResponse = z
 export type AssigneeStatsResponse = z.infer<typeof AssigneeStatsResponse>;
 
 /** Query params for GET /api/dashboard/assignee-stats. */
-export const AssigneeStatsFilter = DashboardFilter.extend({
+export const AssigneeStatsFilter = DashboardFilterBase.extend({
   xAxis: HeatmapXAxis.optional(),
-});
+}).refine(requireDatesForCustomRange, requireDatesForCustomRangeError);
 export type AssigneeStatsFilter = z.infer<typeof AssigneeStatsFilter>;

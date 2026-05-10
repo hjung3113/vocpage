@@ -12,7 +12,11 @@
  * completed VOCs in the window (cannot compute average or SLA).
  */
 import { z } from 'zod';
-import { DashboardFilter } from './summary';
+import {
+  DashboardFilterBase,
+  requireDatesForCustomRange,
+  requireDatesForCustomRangeError,
+} from './summary';
 
 export const ProcessingSpeedDim = z.enum(['all', 'system', 'menu']);
 export type ProcessingSpeedDim = z.infer<typeof ProcessingSpeedDim>;
@@ -61,10 +65,12 @@ export const ProcessingSpeedResponse = z
 export type ProcessingSpeedResponse = z.infer<typeof ProcessingSpeedResponse>;
 
 /** Query params for GET /api/dashboard/processing-speed. */
-export const ProcessingSpeedFilter = DashboardFilter.extend({
+export const ProcessingSpeedFilter = DashboardFilterBase.extend({
   dim: ProcessingSpeedDim.optional(),
-}).refine(
-  (v) => !(v.dim === 'system' && v.systemId !== undefined),
-  { message: 'dim=system is incompatible with systemId scope' },
-);
+})
+  .refine(requireDatesForCustomRange, requireDatesForCustomRangeError)
+  .refine(
+    (v) => !(v.dim === 'system' && v.systemId !== undefined),
+    { message: 'dim=system is incompatible with systemId scope' },
+  );
 export type ProcessingSpeedFilter = z.infer<typeof ProcessingSpeedFilter>;

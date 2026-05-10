@@ -245,6 +245,21 @@ describe('GET /api/dashboard/processing-speed', () => {
       .query({ dim: 'system', systemId: '11111111-1111-4111-8111-111111111111' });
     expect(res.status).toBe(400);
   });
+
+  it('range=custom without startDate/endDate → 400 (P1: requireDatesForCustomRange)', async () => {
+    const res = await request(makeApp('admin'))
+      .get('/api/dashboard/processing-speed')
+      .query({ range: 'custom' });
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('BAD_REQUEST');
+  });
+
+  it('range=custom with startDate+endDate → 200', async () => {
+    const res = await request(makeApp('admin'))
+      .get('/api/dashboard/processing-speed')
+      .query({ range: 'custom', startDate: '2026-01-01', endDate: '2026-05-01' });
+    expect(res.status).toBe(200);
+  });
 });
 
 // ── assignee-stats ────────────────────────────────────────────────────────────

@@ -22,7 +22,7 @@
  * can build VOC list navigation URLs without computing them client-side.
  */
 import { z } from 'zod';
-import { DashboardFilter } from './summary';
+import { DashboardFilterBase } from './summary';
 
 const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
@@ -60,7 +60,7 @@ export type WeeklyTrendResponse = z.infer<typeof WeeklyTrendResponse>;
  * `weeks` is fixed at 12 — param accepted but ignored (always 12).
  * `startDate` / `endDate` are accepted but ignored per spec.
  */
-export const WeeklyTrendFilter = DashboardFilter.extend({
+export const WeeklyTrendFilter = DashboardFilterBase.extend({
   weeks: z.coerce.number().int().positive().optional(),
 });
 export type WeeklyTrendFilter = z.infer<typeof WeeklyTrendFilter>;
