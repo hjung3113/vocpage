@@ -112,11 +112,15 @@ export type TagIdParam = z.infer<typeof TagIdParam>;
  *  - kind:    locked to 'general' for v1 (menu rules deferred).
  * ------------------------------------------------------------------------- */
 
+// T-01-11: cap keyword input size — at most 50 keywords per rule, each ≤60 chars.
+const KeywordItem = z.string().trim().min(1).max(60);
+const KeywordsArray = z.array(KeywordItem).min(1).max(50);
+
 export const TagRule = z.object({
   id: Uuid,
   tag_id: Uuid,
   kind: z.literal('general'),
-  keywords: z.array(z.string().trim().min(1)).min(1),
+  keywords: KeywordsArray,
   match_mode: z.enum(['keyword']),
   suspended_until: Iso.nullable(),
   created_by: Uuid.nullable(),
@@ -127,14 +131,14 @@ export type TagRuleT = z.infer<typeof TagRule>;
 
 /** POST /api/admin/tags/:tagId/rules — Manager+. Server derives created_by from req.user.id. */
 export const TagRuleCreate = z.object({
-  keywords: z.array(z.string().trim().min(1)).min(1),
+  keywords: KeywordsArray,
   match_mode: z.enum(['keyword']).default('keyword'),
 });
 export type TagRuleCreateT = z.infer<typeof TagRuleCreate>;
 
 /** PATCH /api/admin/tags/:tagId/rules/:ruleId — Manager+. Body fields all optional; created_by immutable. */
 export const TagRulePatch = z.object({
-  keywords: z.array(z.string().trim().min(1)).min(1).optional(),
+  keywords: KeywordsArray.optional(),
   match_mode: z.enum(['keyword']).optional(),
 });
 export type TagRulePatchT = z.infer<typeof TagRulePatch>;

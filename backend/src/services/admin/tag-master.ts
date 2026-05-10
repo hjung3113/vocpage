@@ -13,7 +13,15 @@
  *  - Merge is atomic (transaction): voc_tags rewired + tag_rules rewired + source hard-deleted
  */
 import { getPool } from '../../db';
-import type { TagMasterListQuery } from '../../../../shared/contracts/admin/tag';
+import type {
+  TagMasterListQuery,
+  TagRuleCreateT,
+  TagRulePatchT,
+  TagRuleListQueryT,
+  TagRuleT,
+} from '../../../../shared/contracts/admin/tag';
+import { TagRule } from '../../../../shared/contracts/admin/tag';
+import type { AuthUser } from '../../auth/types';
 import { escapeLikePattern } from '../../repository/voc';
 
 export async function listTags(query: TagMasterListQuery) {
@@ -232,17 +240,239 @@ export async function deleteTag(id: string) {
   return { deleted: true };
 }
 
-export async function suspendTagRule(id: string, suspendedUntil: string | null) {
+/* -------------------------------------------------------------------------
+ * Tag Rules — Phase 01 (D-08 nested resource, D-12 created_by, T-01-08 IDOR scope)
+ * Routes: /api/admin/tags/:tagId/rules*
+ * ------------------------------------------------------------------------- */
+
+const TAG_RULE_SELECT_BASE = `
+  SELECT
+    tr.id,
+    tr.tag_id,
+    tr.kind,
+    tr.keywords,
+    tr.match_mode,
+    tr.suspended_until,
+    tr.created_by,
+    u.name AS created_by_name,
+    tr.created_at
+  FROM tag_rules tr
+  LEFT JOIN users u ON u.id = tr.created_by
+`;
+
+function rowToTagRule(row: Record<string, unknown>): TagRuleT {
+  return TagRule.parse({
+    id: row.id,
+    tag_id: row.tag_id,
+    kind: row.kind,
+    keywords: row.keywords,
+    match_mode: row.match_mode,
+    suspended_until:
+      row.suspended_until instanceof Date ? row.suspended_until.toISOString() : row.suspended_until,
+    created_by: row.created_by,
+    created_by_name: row.created_by_name,
+    created_at:
+      row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
+  });
+}
+
+/** GET /api/admin/tags/:tagId/rules — admin/manager/dev */
+export async function listTagRules(tagId: string, query: TagRuleListQueryT) {
+  const pool = getPool();
+  const conditions: string[] = ['tr.tag_id = $1'];
+  const values: unknown[] = [tagId];
+  let i = 2;
+
+  if (query.q) {
+    // Match if any keyword ILIKEs q OR the parent tag name does.
+    conditions.push(
+      `(EXISTS (SELECT 1 FROM unnest(tr.keywords) k WHERE k ILIKE $${i} ESCAPE '\\')
+        OR (SELECT t.name FROM tags t WHERE t.id = tr.tag_id) ILIKE $${i} ESCAPE '\\')`,
+    );
+    values.push(`%${escapeLikePattern(query.q)}%`);
+    i += 1;
+  }
+
+  const where = `WHERE ${conditions.join(' AND ')}`;
+  const offset = (query.page - 1) * query.per_page;
+
+  const countSql = `SELECT COUNT(*)::int AS total FROM tag_rules tr ${where}`;
+  const rowsSql = `
+    ${TAG_RULE_SELECT_BASE}
+    ${where}
+    ORDER BY tr.created_at DESC
+    LIMIT $${i++} OFFSET $${i++}
+  `;
+  const rowValues = [...values, query.per_page, offset];
+
+  const [countResult, rowsResult] = await Promise.all([
+    pool.query(countSql, values),
+    pool.query(rowsSql, rowValues),
+  ]);
+
+  return {
+    rows: rowsResult.rows.map(rowToTagRule),
+    page: query.page,
+    per_page: query.per_page,
+    total: Number(countResult.rows[0]?.total ?? 0),
+  };
+}
+
+/** POST /api/admin/tags/:tagId/rules — manager+. created_by ALWAYS from req.user.id (T-01-09). */
+export async function createTagRule(
+  tagId: string,
+  input: TagRuleCreateT,
+  user: AuthUser,
+): Promise<TagRuleT> {
+  const pool = getPool();
+  // Dedupe keywords case-insensitively (matches FE chip dedupe per T-01-11 mitigation).
+  const seen = new Set<string>();
+  const dedupedKeywords = input.keywords.filter((kw) => {
+    const lower = kw.toLowerCase();
+    if (seen.has(lower)) return false;
+    seen.add(lower);
+    return true;
+  });
+
+  try {
+    const insertResult = await pool.query(
+      `INSERT INTO tag_rules (tag_id, kind, keywords, match_mode, created_by)
+       VALUES ($1, 'general', $2, $3, $4)
+       RETURNING id`,
+      [tagId, dedupedKeywords, input.match_mode, user.id],
+    );
+    const id = insertResult.rows[0]?.id as string;
+    const result = await pool.query(
+      `${TAG_RULE_SELECT_BASE} WHERE tr.id = $1`,
+      [id],
+    );
+    if (result.rowCount === 0) {
+      throw { code: 'NOT_FOUND', message: '생성된 규칙을 찾을 수 없습니다.' };
+    }
+    return rowToTagRule(result.rows[0]);
+  } catch (err: unknown) {
+    if (isUniqueViolation(err)) {
+      throw { code: 'CONFLICT', message: '동일한 키워드 규칙이 이미 존재합니다.' };
+    }
+    if (isForeignKeyViolation(err)) {
+      throw { code: 'NOT_FOUND', message: '태그를 찾을 수 없습니다.' };
+    }
+    throw err;
+  }
+}
+
+/** PATCH /api/admin/tags/:tagId/rules/:ruleId — manager+. T-01-08 IDOR: enforce tag_id scope. */
+export async function updateTagRule(
+  tagId: string,
+  ruleId: string,
+  input: TagRulePatchT,
+): Promise<TagRuleT> {
+  const pool = getPool();
+  // IDOR scope check: rule must belong to the path tagId.
+  const scope = await pool.query(
+    'SELECT id FROM tag_rules WHERE id = $1 AND tag_id = $2',
+    [ruleId, tagId],
+  );
+  if (scope.rowCount === 0) {
+    throw { code: 'NOT_FOUND', message: '태그 규칙을 찾을 수 없습니다.' };
+  }
+
+  const sets: string[] = [];
+  const values: unknown[] = [];
+  let i = 1;
+
+  if (input.keywords !== undefined) {
+    const seen = new Set<string>();
+    const deduped = input.keywords.filter((kw) => {
+      const lower = kw.toLowerCase();
+      if (seen.has(lower)) return false;
+      seen.add(lower);
+      return true;
+    });
+    sets.push(`keywords = $${i++}`);
+    values.push(deduped);
+  }
+  if (input.match_mode !== undefined) {
+    sets.push(`match_mode = $${i++}`);
+    values.push(input.match_mode);
+  }
+
+  if (sets.length === 0) {
+    // Nothing to update — return current row.
+    const current = await pool.query(`${TAG_RULE_SELECT_BASE} WHERE tr.id = $1`, [ruleId]);
+    return rowToTagRule(current.rows[0]);
+  }
+
+  values.push(ruleId);
+  await pool.query(
+    `UPDATE tag_rules SET ${sets.join(', ')} WHERE id = $${i}`,
+    values,
+  );
+  const result = await pool.query(`${TAG_RULE_SELECT_BASE} WHERE tr.id = $1`, [ruleId]);
+  return rowToTagRule(result.rows[0]);
+}
+
+/** DELETE /api/admin/tags/:tagId/rules/:ruleId — admin only. T-01-08 IDOR: enforce tag_id scope. */
+export async function deleteTagRule(tagId: string, ruleId: string): Promise<void> {
   const pool = getPool();
   const result = await pool.query(
-    `UPDATE tag_rules SET suspended_until = $1 WHERE id = $2
-     RETURNING id, suspended_until`,
-    [suspendedUntil, id],
+    'DELETE FROM tag_rules WHERE id = $1 AND tag_id = $2 RETURNING id',
+    [ruleId, tagId],
   );
   if (result.rowCount === 0) {
     throw { code: 'NOT_FOUND', message: '태그 규칙을 찾을 수 없습니다.' };
   }
-  return result.rows[0];
+}
+
+/**
+ * PATCH /api/admin/tags/:tagId/rules/:ruleId/suspend — admin only. T-01-08 IDOR scope.
+ *
+ * Overloaded: legacy 2-arg form (used by the soon-to-be-deleted /admin/tag-rules/:id/suspend
+ * route) is preserved temporarily so this Plan 01-04 Task 1 can ship a typecheck-clean commit;
+ * Task 2 deletes the legacy route and the 2-arg call site, leaving only the (tagId, ruleId, ...)
+ * form. The 2-arg path SKIPS the IDOR scope check by design — only the legacy callsite uses it.
+ */
+export async function suspendTagRule(
+  tagIdOrRuleId: string,
+  suspendedUntilOrRuleId: string | null,
+  suspendedUntil?: string | null,
+): Promise<TagRuleT> {
+  const pool = getPool();
+  let ruleId: string;
+  let suspended: string | null;
+  let scopeTagId: string | null;
+
+  if (suspendedUntil === undefined) {
+    // Legacy 2-arg form: (id, suspendedUntil) — callsite is the soon-deleted route.
+    ruleId = tagIdOrRuleId;
+    suspended = suspendedUntilOrRuleId;
+    scopeTagId = null;
+  } else {
+    // Nested 3-arg form: (tagId, ruleId, suspendedUntil)
+    scopeTagId = tagIdOrRuleId;
+    ruleId = suspendedUntilOrRuleId as string;
+    suspended = suspendedUntil;
+  }
+
+  if (scopeTagId !== null) {
+    const scope = await pool.query(
+      'SELECT id FROM tag_rules WHERE id = $1 AND tag_id = $2',
+      [ruleId, scopeTagId],
+    );
+    if (scope.rowCount === 0) {
+      throw { code: 'NOT_FOUND', message: '태그 규칙을 찾을 수 없습니다.' };
+    }
+  }
+
+  const updated = await pool.query(
+    'UPDATE tag_rules SET suspended_until = $1 WHERE id = $2 RETURNING id',
+    [suspended, ruleId],
+  );
+  if (updated.rowCount === 0) {
+    throw { code: 'NOT_FOUND', message: '태그 규칙을 찾을 수 없습니다.' };
+  }
+  const result = await pool.query(`${TAG_RULE_SELECT_BASE} WHERE tr.id = $1`, [ruleId]);
+  return rowToTagRule(result.rows[0]);
 }
 
 function isUniqueViolation(err: unknown): boolean {
@@ -251,5 +481,14 @@ function isUniqueViolation(err: unknown): boolean {
     err !== null &&
     'code' in err &&
     (err as { code: string }).code === '23505'
+  );
+}
+
+function isForeignKeyViolation(err: unknown): boolean {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'code' in err &&
+    (err as { code: string }).code === '23503'
   );
 }
