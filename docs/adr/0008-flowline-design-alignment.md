@@ -71,3 +71,15 @@ Proposed (2026-05-10). 본 ADR 잠금 후 `uidesign.md §16` 신설 PR 진입.
 ## Open Questions
 
 - 없음 (cues OQ 5건 전건 해소).
+
+## Lessons learned (post Wave C-ext, 2026-05-10)
+
+본 ADR 의 incremental wave 분해 (S1·S2 먼저, S3·S5·S6 는 "사용처 발생 시") 가 잘못된 결정이었다는 점이 Wave C-ext 에서 검증됨. 사후 학습 3건을 후속 wave 의 게이트로 사용한다.
+
+1. **Recognition 은 gestalt — 부분 적용으로 달성 불가**. Wave C 머지 직후 (S1+S2 만 적용) 의 sibling recognition 측정값은 6.5/10 — 변환 안 된 인접 요소(VocAssignee saturated avatar / VocTypeBadge Lucide / VocTagPill `#`-prefix / priority Lucide) 들이 새 Flowline grammar 를 시각적으로 압도. 묶음 도입 (S3+S5+S6 + 4 fix-skill) 후 8.3/10 도달. **차후 시각 정합화 wave 는 "관련 시그널 묶어서 한 번에" 를 원칙으로**.
+
+2. **시각 검증 없이 `implemented` 표기 금지**. Wave C 머지 시 §16.1 표 `implemented` 로 갱신했으나 dev 서버 / 브라우저 검증을 안 했음 — 표기가 과한 주장이었음을 사용자가 지적. **신규 시각 정합화 wave 의 `implemented` 표기 게이트**: (a) impeccable:critique sibling recognition ≥8/10, (b) 사용자 sign-off, 두 조건 동시 충족 시에만. 미충족 시 `code-shipped (visual sign-off pending)` 표기.
+
+3. **첫 critique 권고 무비판 수용 금지**. Wave C-ext 에서 첫 critique 가 "amber-progress vs orange-high 색 충돌" 을 P2 issue 로 지적 → high priority 색을 회색으로 다운그레이드 → recritique 에서 high≈med 정보 손실 (sub-threshold 차이) 이 새 blocker 로 드러남 → orange 복원으로 정정. **fix 적용 후 반드시 recritique 로 overcorrect 검증**. 다축 평가 (정보 완전성 / convention 일치 / column 분리 등) 누락 시 대안 검토 후 결정.
+
+위 3건은 본 ADR 외에 시각 정합화 성격의 모든 후속 wave 에 적용된다.

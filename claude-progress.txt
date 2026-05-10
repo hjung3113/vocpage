@@ -2,6 +2,8 @@
 
 ## 다음 세션 시작점 (2026-05-10 Flowline Wave C-extension 머지 완료, sibling 8.3/10)
 
+→ **시각 정합화 게이트 (ADR-0008 §Lessons learned)**: 시각 정합화 wave 는 (1) 관련 시그널 묶어서 한 번에 도입, (2) `implemented` 표기 전 impeccable:critique sibling ≥8/10 + 사용자 sign-off, (3) fix 후 반드시 recritique 로 overcorrect 검증. 자세한 근거는 `docs/adr/0008-flowline-design-alignment.md` §Lessons learned.
+
 → **머지 완료 (2026-05-10)**:
    - **PR #310** ADR 0006 (Accepted) + 0007 (Proposed) — `dashboard_settings.default_date_range='custom'` 컬럼 신설 + timezone OQ 별 ADR 분기.
    - **PR #312** Wave 3 Phase A 구현 — 마이그 023 + zod superRefine + BE service + FE CustomDateRangePicker. BE 593 / FE 661 pass.
