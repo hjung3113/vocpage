@@ -1,7 +1,8 @@
 ---
 phase: 1
 slug: tag-rules-consolidation
-status: draft
+status: approved
+reviewed_at: 2026-05-10
 shadcn_initialized: true
 preset: vocpage-custom (slate base + OKLCH Samsung Blue tokens — see uidesign.md §10)
 created: 2026-05-10
