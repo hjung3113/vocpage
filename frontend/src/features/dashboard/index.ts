@@ -1,5 +1,6 @@
 export { DashboardShell } from './ui/DashboardShell';
 export { EditModeToggle } from './ui/EditModeToggle';
+export { DashboardSettingsDialog } from './ui/DashboardSettingsDialog';
 export { WidgetPlaceholder } from './ui/WidgetPlaceholder';
 export { useDashboardDraft } from './model/useDashboardDraft';
 export { useDashboardSettings } from './model/useDashboardSettings';

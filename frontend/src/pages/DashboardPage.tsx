@@ -7,13 +7,23 @@ import { StickyHeaderLayout, PageHeader } from '@widgets/app-shell';
 import {
   DashboardShell,
   EditModeToggle,
+  DashboardSettingsDialog,
   useDashboardDraft,
   DashboardFilterProvider,
 } from '@features/dashboard';
 
 export default function DashboardPage() {
-  const { layouts, isEditing, isDirty, isSaving, setIsEditing, onLayoutChange, save, discard } =
-    useDashboardDraft();
+  const {
+    layouts,
+    isEditing,
+    isDirty,
+    isSaving,
+    hiddenWidgetIds,
+    setIsEditing,
+    onLayoutChange,
+    save,
+    discard,
+  } = useDashboardDraft();
 
   return (
     <StickyHeaderLayout
@@ -21,14 +31,17 @@ export default function DashboardPage() {
         <PageHeader
           title="대시보드"
           actions={
-            <EditModeToggle
-              isEditing={isEditing}
-              isDirty={isDirty}
-              isSaving={isSaving}
-              onToggle={setIsEditing}
-              onSave={save}
-              onDiscard={discard}
-            />
+            <div className="flex items-center gap-1">
+              <DashboardSettingsDialog />
+              <EditModeToggle
+                isEditing={isEditing}
+                isDirty={isDirty}
+                isSaving={isSaving}
+                onToggle={setIsEditing}
+                onSave={save}
+                onDiscard={discard}
+              />
+            </div>
           }
         />
       }
@@ -38,6 +51,7 @@ export default function DashboardPage() {
           layouts={layouts}
           isEditing={isEditing}
           onLayoutChange={onLayoutChange}
+          hiddenWidgetIds={hiddenWidgetIds}
         />
       </DashboardFilterProvider>
     </StickyHeaderLayout>

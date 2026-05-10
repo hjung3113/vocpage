@@ -43,14 +43,32 @@ interface DashboardShellProps {
   layouts: RglLayouts;
   isEditing: boolean;
   onLayoutChange: (currentLayout: Layout | readonly LayoutItem[], allLayouts: RglLayouts) => void;
+  hiddenWidgetIds?: ReadonlySet<string>;
 }
 
-export function DashboardShell({ layouts, isEditing, onLayoutChange }: DashboardShellProps) {
+export function DashboardShell({
+  layouts,
+  isEditing,
+  onLayoutChange,
+  hiddenWidgetIds,
+}: DashboardShellProps) {
+  const visibleIds = WIDGET_IDS.filter((id) => !hiddenWidgetIds?.has(id));
+  // P0-1: keep RGL layout entries in lockstep with rendered children. RGL
+  // requires every layout item to have a matching child key — leftover
+  // entries for hidden widgets corrupt onLayoutChange output.
+  const visibleLayouts = hiddenWidgetIds && hiddenWidgetIds.size > 0
+    ? Object.fromEntries(
+        Object.entries(layouts).map(([bp, items]) => [
+          bp,
+          items.filter((it) => !hiddenWidgetIds.has(it.i)),
+        ]),
+      ) as RglLayouts
+    : layouts;
   return (
     <div className="w-full">
       <ResponsiveGridLayout
         className="layout"
-        layouts={layouts}
+        layouts={visibleLayouts}
         breakpoints={RGL_BREAKPOINTS}
         cols={RGL_COLS}
         rowHeight={64}
@@ -62,7 +80,7 @@ export function DashboardShell({ layouts, isEditing, onLayoutChange }: Dashboard
         draggableHandle=".dashboard-widget-handle"
         useCSSTransforms
       >
-        {WIDGET_IDS.map((widgetId) => (
+        {visibleIds.map((widgetId) => (
           <div key={widgetId}>{renderWidget(widgetId, isEditing)}</div>
         ))}
       </ResponsiveGridLayout>
