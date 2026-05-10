@@ -11,6 +11,7 @@ import { adminTrashHandlers } from './admin-trash';
 import { adminUsersHandlers } from './admin-users';
 import { adminMastersHandlers } from './admin-masters';
 import { dashboardHandlers } from './dashboard';
+import { dashboardPhaseCHandlers } from './dashboard-phase-c';
 
 export const handlers = [
   ...healthHandlers,
@@ -26,4 +27,5 @@ export const handlers = [
   ...adminUsersHandlers,
   ...adminMastersHandlers,
   ...dashboardHandlers,
+  ...dashboardPhaseCHandlers,
 ];
