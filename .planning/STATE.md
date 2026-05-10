@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-10T14:43:43.043Z"
-last_completed_plan: "01-01"
+last_updated: "2026-05-10T15:30:00.000Z"
+last_completed_plan: "01-03"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
-  percent: 13
+  completed_plans: 3
+  percent: 38
 ---
 
 # STATE — vocpage
@@ -24,13 +24,13 @@ progress:
 ## Current Position
 
 - **Phase**: 1 — Tag Rules Consolidation
-- **Plan**: 01-01 complete (Wave 0 scaffolds); 01-02 next (Wave 1 — mig 024 + contract reshape)
-- **Status**: Wave 0 landed — `01-MATCHER-AUDIT.md`, parity TARGETS triples, RED tests for mig 024 + D-11 optimistic.
-- **Progress**: █░░░░░░░░░ Phase 1: 1/8 plans complete; 0/7 phases overall.
+- **Plan**: 01-01 complete (Wave 0 scaffolds); 01-03 complete (Wave 1 — contract rewrite); 01-02 / 01-04 next (Wave 1 — mig 024 + BE routes).
+- **Status**: Wave 1 contract surface (OpenAPI + zod + generated types) consolidated to nested `/admin/tags/{tagId}/rules` + `keywords[]+match_mode` + `created_by[+_name]`. 5 new parity tests guard zod ↔ openapi drift.
+- **Progress**: ███░░░░░░░ Phase 1: 3/8 plans complete; 0/7 phases overall.
 
 ## Performance Metrics
 
-- BE test baseline: 593+ Jest passes (preserve across all phases).
+- BE test baseline: 598+ Jest passes (Plan 01-03 added 5 parity tests).
 - FE test baseline: 691+ Vitest passes (preserve across all phases).
 - Fixture-seed parity: currently `vocs` only — extend per phase (Phase 1 adds `tag_rules`, Phase 2 `voc_types`, Phase 3 `systems` / `menus`).
 - OpenAPI codegen drift target: 0.
