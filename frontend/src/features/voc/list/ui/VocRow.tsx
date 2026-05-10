@@ -9,6 +9,7 @@ import {
   VocTagPill,
   VocTypeBadge,
 } from '@entities/voc';
+import { IssueId } from '@shared/ui/issue-id';
 
 type VocRowData = VocListResponse['rows'][number];
 
@@ -123,7 +124,7 @@ export function VocRow({
         className="voc-row-issue-code"
         style={indented ? { paddingLeft: '24px' } : undefined}
       >
-        {row.issue_code}
+        <IssueId id={row.issue_code} tone={indented ? 'subdued' : 'default'} />
       </div>
 
       <div role="gridcell" className="voc-row-title">

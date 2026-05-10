@@ -1,16 +1,16 @@
-import { Inbox, Eye, Loader2, CheckCircle2, CircleX, type LucideIcon } from 'lucide-react';
 import type { VocStatus } from '@contracts/voc';
 import { VOC_STATUS_SLUG } from '../model/vocStatus';
-import { SolidChip, TextMark } from '@shared/ui/badge';
+import { SolidChip } from '@shared/ui/badge';
+import { StatusGlyph, type StatusGlyphVariant } from '@shared/ui/status-glyph';
 
 type StatusSlug = 'received' | 'reviewing' | 'processing' | 'done' | 'drop';
 
-const STATUS_ICON_CONFIG: Record<StatusSlug, { Icon: LucideIcon; color: string }> = {
-  received: { Icon: Inbox, color: 'var(--status-received-fg)' },
-  reviewing: { Icon: Eye, color: 'var(--status-reviewing-fg)' },
-  processing: { Icon: Loader2, color: 'var(--status-processing-fg)' },
-  done: { Icon: CheckCircle2, color: 'var(--status-done-fg)' },
-  drop: { Icon: CircleX, color: 'var(--status-drop-fg)' },
+const SLUG_TO_GLYPH: Record<StatusSlug, StatusGlyphVariant> = {
+  received: 'todo',
+  reviewing: 'review',
+  processing: 'progress',
+  done: 'done',
+  drop: 'canceled',
 };
 
 export function VocStatusBadge({
@@ -21,29 +21,32 @@ export function VocStatusBadge({
   iconOnly?: boolean;
 }) {
   const slug = VOC_STATUS_SLUG[status];
+  const glyph = SLUG_TO_GLYPH[slug];
 
   if (iconOnly) {
-    const { Icon, color } = STATUS_ICON_CONFIG[slug];
     return (
-      <TextMark
-        variant={slug}
-        iconMode="icon-only"
-        icon={Icon}
-        label={status}
-        color={color}
-        weight={400}
-        extraTestId={`status-badge-${status}`}
-        ariaLabelOverride={`상태 ${status}`}
-      />
+      <span
+        data-testid={`status-badge-${status}`}
+        aria-label={`상태 ${status}`}
+        style={{ display: 'inline-flex', alignItems: 'center' }}
+      >
+        <StatusGlyph variant={glyph} />
+      </span>
     );
   }
 
   return (
-    <SolidChip
-      variant={slug}
-      label={status}
-      extraTestId={`status-badge-${status}`}
-      ariaLabelOverride={`상태 ${status}`}
-    />
+    <span
+      data-testid={`status-badge-${status}`}
+      aria-label={`상태 ${status}`}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+    >
+      <StatusGlyph variant={glyph} />
+      <SolidChip
+        variant={slug}
+        label={status}
+        extraTestId={`status-badge-chip-${status}`}
+      />
+    </span>
   );
 }

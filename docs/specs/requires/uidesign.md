@@ -1479,16 +1479,16 @@ Use these as templates when generating new components. They reference only token
 
 ### 16.1 Scope summary
 
-| Signal | 항목                  | 본 wave 처리                                  |
-| ------ | --------------------- | --------------------------------------------- |
-| S1     | Issue ID (`.iid`)     | 신규 컴포넌트 `shared/ui/issue-id`            |
-| S2     | Status glyph (`.s-icon`) | 신규 `shared/ui/status-glyph` (SolidChip 보완) |
-| S3     | Priority bars (`.p-icon`) | 신규 `shared/ui/priority-bars`              |
-| S4     | Tight row density     | **검증 완료** — `VocRow.tsx:35` 가 이미 동일 사양 |
-| S5     | Group header band     | 신규 `shared/ui/list-group-header`            |
-| S6     | Label chip            | 기존 `shared/ui/badge/OutlineChip` 에 `dot-pill` variant |
-| S7     | Activity feed         | 기존 `features/voc/review/ui/VocActivityTimeline` 유지, 시각 점검 별 wave |
-| Bonus  | Sparkline             | §11.4 Donut legend 옆 mini bar 패턴 재사용     |
+| Signal | 항목                  | 본 wave 처리                                  | 구현 상태 |
+| ------ | --------------------- | --------------------------------------------- | --------- |
+| S1     | Issue ID (`.iid`)     | 신규 컴포넌트 `shared/ui/issue-id`            | implemented (Wave C) |
+| S2     | Status glyph (`.s-icon`) | 신규 `shared/ui/status-glyph` (SolidChip 보완) | implemented (Wave C) |
+| S3     | Priority bars (`.p-icon`) | 신규 `shared/ui/priority-bars`              | spec-only |
+| S4     | Tight row density     | **검증 완료** — `VocRow.tsx:35` 가 이미 동일 사양 | verified |
+| S5     | Group header band     | 신규 `shared/ui/list-group-header`            | spec-only |
+| S6     | Label chip            | 기존 `shared/ui/badge/OutlineChip` 에 `dot-pill` variant | spec-only |
+| S7     | Activity feed         | 기존 `features/voc/review/ui/VocActivityTimeline` 유지, 시각 점검 별 wave | deferred |
+| Bonus  | Sparkline             | §11.4 Donut legend 옆 mini bar 패턴 재사용     | deferred |
 
 ### 16.2 S1 — Issue ID (`shared/ui/issue-id`)
 
