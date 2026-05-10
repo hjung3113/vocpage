@@ -44,7 +44,7 @@ vi.mock('../model/useAgingVocs', () => ({ useAgingVocs: () => ({ isLoading: true
 
 import { DashboardShell } from '../ui/DashboardShell';
 
-function renderShell(props: { isEditing: boolean }) {
+function renderShell(props: { isEditing: boolean; hiddenWidgetIds?: ReadonlySet<string> }) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <MemoryRouter>
@@ -54,6 +54,7 @@ function renderShell(props: { isEditing: boolean }) {
             layouts={defaultLayouts}
             isEditing={props.isEditing}
             onLayoutChange={vi.fn()}
+            hiddenWidgetIds={props.hiddenWidgetIds}
           />
         </DashboardFilterProvider>
       </QueryClientProvider>
@@ -90,6 +91,18 @@ describe('DashboardShell', () => {
     handles.forEach((h) => {
       expect(h.classList.contains('opacity-0')).toBe(false);
     });
+  });
+
+  it('Phase E: hides widgets listed in hiddenWidgetIds', () => {
+    renderShell({
+      isEditing: false,
+      hiddenWidgetIds: new Set(['heatmap', 'aging-top10']),
+    });
+    expect(screen.queryByTestId('widget-heatmap')).toBeNull();
+    expect(screen.queryByTestId('widget-aging-vocs')).toBeNull();
+    // Sibling widgets remain mounted
+    expect(screen.getByTestId('widget-kpi-volume')).toBeDefined();
+    expect(screen.getByTestId('widget-distribution')).toBeDefined();
   });
 
   it('drag handles are hidden when isEditing=false', () => {

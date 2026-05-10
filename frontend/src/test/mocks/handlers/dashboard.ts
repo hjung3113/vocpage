@@ -28,6 +28,7 @@ const ADMIN_DEFAULT_SETTINGS: DashboardSettings = {
 };
 
 let currentSettings: DashboardSettings = { ...ADMIN_DEFAULT_SETTINGS };
+let currentAdminSettings: DashboardSettings = { ...ADMIN_DEFAULT_SETTINGS };
 
 const DEMO_SUMMARY: DashboardSummary = {
   kpi_volume: {
@@ -45,10 +46,27 @@ const DEMO_SUMMARY: DashboardSummary = {
 };
 
 export const dashboardHandlers = [
-  http.get('/api/dashboard/settings', () => HttpResponse.json(currentSettings)),
+  http.get('/api/dashboard/settings', ({ request }) => {
+    const url = new URL(request.url);
+    if (url.searchParams.get('scope') === 'admin') {
+      return HttpResponse.json(currentAdminSettings);
+    }
+    return HttpResponse.json(currentSettings);
+  }),
 
   http.put('/api/dashboard/settings', async ({ request }) => {
+    const url = new URL(request.url);
+    const adminScope = url.searchParams.get('scope') === 'admin';
     const patch = (await request.json().catch(() => ({}))) as Partial<DashboardSettings>;
+    if (adminScope) {
+      currentAdminSettings = {
+        ...currentAdminSettings,
+        ...patch,
+        user_id: null,
+        updated_at: new Date().toISOString(),
+      };
+      return HttpResponse.json(currentAdminSettings);
+    }
     currentSettings = {
       ...currentSettings,
       ...patch,

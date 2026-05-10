@@ -34,12 +34,17 @@ function filterToQs(filter: Record<string, unknown>): string {
 }
 
 export const dashboardApi = {
-  getSettings(): Promise<DashboardSettings> {
-    return apiGet('/api/dashboard/settings', DashboardSettingsResponse);
+  getSettings(scope: 'self' | 'admin' = 'self'): Promise<DashboardSettings> {
+    const suffix = scope === 'admin' ? '?scope=admin' : '';
+    return apiGet(`/api/dashboard/settings${suffix}`, DashboardSettingsResponse);
   },
 
-  updateSettings(payload: DashboardSettingsUpdate): Promise<DashboardSettings> {
-    return apiPut('/api/dashboard/settings', payload, DashboardSettingsResponse);
+  updateSettings(
+    payload: DashboardSettingsUpdate,
+    scope: 'self' | 'admin' = 'self',
+  ): Promise<DashboardSettings> {
+    const suffix = scope === 'admin' ? '?scope=admin' : '';
+    return apiPut(`/api/dashboard/settings${suffix}`, payload, DashboardSettingsResponse);
   },
 
   getSummary(filter: DashboardFilter): Promise<DashboardSummary> {

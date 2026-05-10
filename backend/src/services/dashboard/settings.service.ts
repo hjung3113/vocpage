@@ -67,6 +67,17 @@ export async function loadResolved(userId: string): Promise<DashboardSettings> {
   return merge(admin, user);
 }
 
+
+/**
+ * Wave 2 Phase E (admin scope): return the raw admin-default row, falling back
+ * to ZERO_STATE when no admin row has been written yet. Admin only — caller
+ * must enforce role gate before invoking.
+ */
+export async function loadAdminDefault(): Promise<DashboardSettings> {
+  const admin = await repo.getAdminDefault();
+  return merge(admin, null);
+}
+
 /**
  * Apply a settings update with permission enforcement + lock-field silencing.
  *

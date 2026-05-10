@@ -5,7 +5,7 @@
  * Public API:
  *   { layouts, isEditing, isDirty, setIsEditing, onLayoutChange, save, discard }
  */
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { Layout, LayoutItem } from 'react-grid-layout/legacy';
 import type { RglLayouts } from '@contracts/dashboard';
 import { defaultLayouts } from '../defaultLayouts';
@@ -94,12 +94,28 @@ export function useDashboardDraft() {
     setState('clean');
   }, [lastSaved]);
 
+  // Phase E: stable Set of widget IDs explicitly hidden via widget_visibility.
+  // Missing entries default to visible. Memoized so DashboardShell doesn't
+  // re-render on unrelated state changes.
+  const hiddenWidgetIds = useMemo<ReadonlySet<string>>(
+    () =>
+      new Set(
+        settings
+          ? Object.entries(settings.widget_visibility)
+              .filter(([, v]) => v === false)
+              .map(([k]) => k)
+          : [],
+      ),
+    [settings],
+  );
+
   return {
     layouts,
     isEditing,
     isDirty: state === 'dirty',
     isSaving: state === 'saving',
     isLoading: state === 'loading',
+    hiddenWidgetIds,
     setIsEditing,
     onLayoutChange,
     save,
