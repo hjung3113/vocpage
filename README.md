@@ -4,7 +4,7 @@ VOC(Voice of Customer) 관리 시스템 — 사내 분석 시스템에 통합되
 
 Linear의 간결한 UX + Jira의 관리 기능을 결합. Samsung Blue 디자인 시스템 (OS 테마 자동 연동, dark/light 양방향 지원).
 
-> **현재 상태**: Wave 3 Phase A 머지 완료 (Admin 4 화면 — 마이그 014/015/017 + contracts, PR #250–#254, 2026-05-09). Wave 1.5/1.6/1.7/4 모두 머지. 다음 작업 = Wave 3 Phase B(Tag Master) + Phase C(Trash) 병렬. 진행 포인터: [`claude-progress.txt`](claude-progress.txt) (첫 30줄) → [`docs/specs/plans/next-session-tasks.md`](docs/specs/plans/next-session-tasks.md).
+> **현재 상태**: 진행 상태는 GSD 가 관리. [`/gsd-progress`](.planning/STATE.md) 또는 [`.planning/ROADMAP.md`](.planning/ROADMAP.md) 참조. 닫힌 wave history 는 git log + PR description.
 
 ---
 
@@ -145,12 +145,12 @@ prototype/
 | [`docs/specs/requires/dashboard.md`](docs/specs/requires/dashboard.md)                   | 대시보드 위젯 spec                                    |
 | [`docs/specs/requires/feature-notice-faq.md`](docs/specs/requires/feature-notice-faq.md) | 공지/FAQ 기능 상세                                    |
 | [`docs/specs/requires/external-masters.md`](docs/specs/requires/external-masters.md)     | 외부 마스터 캐시·스왑 spec                            |
-| [`docs/specs/plans/next-session-tasks.md`](docs/specs/plans/next-session-tasks.md)       | 진행 중 Phase 계획 + 이연 항목 + NextGen              |
-| [`docs/specs/plans/admin-pages-backlog.md`](docs/specs/plans/admin-pages-backlog.md)     | Admin 미구현 페이지 백로그                            |
-| [`docs/specs/plans/flowline-alignment-cues.md`](docs/specs/plans/flowline-alignment-cues.md) | Flowline 잔여 시그널 큐                          |
+| [`.planning/ROADMAP.md`](.planning/ROADMAP.md)                                           | GSD 로드맵 — 현 마일스톤의 모든 phase                 |
+| [`.planning/STATE.md`](.planning/STATE.md)                                               | GSD 현재 상태 — 활성 phase / 다음 작업                 |
+| [`.planning/PROJECT.md`](.planning/PROJECT.md)                                           | LOCKED 결정 + 프로젝트 컨텍스트                       |
 
 ---
 
 ## NextGen (MVP 이후 차세대 기능)
 
-이메일 알림 / AI 자동 분류 / FTS / SLA 에스컬레이션 등은 본 MVP 범위 밖. 자세한 항목은 `next-session-tasks.md` 「이연 항목」 섹션 참조.
+이메일 알림 / AI 자동 분류 / FTS / SLA 에스컬레이션 등은 본 MVP 범위 밖. 자세한 NextGen / 이연 항목은 `.planning/ROADMAP.md` 참조.

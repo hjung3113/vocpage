@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/requirements.md",
+  "type": "PRD",
+  "confidence": "medium",
+  "manifest_override": false,
+  "title": "VOC 시스템 요구사항 (Final)",
+  "summary": "Final requirements specification for the VOC (Voice of Customer) sub-system covering business/user/admin requirements, tech stack, DB schema, and operational settings.",
+  "scope": ["VOC system", "authentication (OIDC/AD SSO)", "user roles", "database schema", "tech stack", "Sub-task hierarchy", "auto-tagging", "dashboard access", "testing strategy"],
+  "cross_refs": ["feature-voc.md", "feature-notice-faq.md", "dashboard.md", "uidesign.md", "docs/specs/archive/plans/migration-012-draft.md"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Hybrid document: primarily PRD (business/user/admin requirements, role definitions, success criteria framing) but contains substantial SPEC content (DB schema, tech stack table, API/auth contracts). Classified as PRD because the document's self-declared framing is '요구사항' (requirements) and section 2 is requirement definition; technical specs are supporting detail. Synthesizer may want to extract SPEC-level constraints (DB schema §4, auth §2.1) separately."
+}

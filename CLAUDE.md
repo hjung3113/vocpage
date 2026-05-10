@@ -6,9 +6,11 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 
 **Canonical sources:**
 
-- Progress: `claude-progress.txt` (first 30 lines) + `docs/specs/plans/next-session-tasks.md` (active + deferred) + `docs/specs/plans/admin-pages-backlog.md` (admin 미구현 페이지) + `docs/specs/plans/flowline-alignment-cues.md` (Flowline 잔여 시그널). Closed-wave history lives in git log + PR descriptions — no standalone wave plan or follow-up register.
-- Spec: `docs/specs/requires/requirements.md` + `feature-*.md`.
+- Project state: `.planning/STATE.md` (current milestone + active phase) + `.planning/ROADMAP.md` (all phases) + `.planning/PROJECT.md` (LOCKED decisions). Managed by GSD commands — do not hand-edit.
+- Decisions: `docs/adr/` (ADRs are immutable history; LOCKED decisions also surface in `.planning/PROJECT.md` `<decisions>` blocks).
+- Spec: `docs/specs/requires/requirements.md` + `feature-*.md` + `*-conventions.md`.
 - Design: `docs/specs/requires/uidesign.md`.
+- Codebase map: `.planning/codebase/` (refresh via `/gsd-map-codebase`).
 - Sub-dir maps: `frontend/CLAUDE.md`, `backend/CLAUDE.md` (consult before editing in those trees).
 
 **Implementation reference (2026-05-09~):** `requirements.md` + `uidesign.md` only. `prototype/` is no longer a visual / behavior reference — pixel / DOM / CSS citation forbidden.
@@ -16,8 +18,7 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 **Document rules:**
 
 - Permanent specs in `docs/specs/requires/`. Past history lives in git log + PR descriptions — never in standalone changelog files.
-- ID rules: Wave / Phase are append-only integers; sub-decimals forbidden; batch labels are plan-table column metadata, never part of the ID.
-- On merge: sync `next-session-tasks.md` + `claude-progress.txt`.
+- Phase / plan / state files in `.planning/` are owned by GSD commands (`/gsd-plan-phase`, `/gsd-execute-phase`, `/gsd-progress`, `/gsd-resume-work`). Hand-edit only when GSD itself produces or asks for it.
 - `CLAUDE.md` / `MEMORY.md` writing: English only, objective and unambiguous, no supplementary commentary or hedging. Root `CLAUDE.md` stays under 200 lines.
 
 **Top-level directories:**
@@ -30,18 +31,17 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 
 **Start every session:**
 
-1. `claude-progress.txt` (first 30 lines).
-2. `next-session-tasks.md` for the current Phase.
-3. Relevant spec selectively.
-4. Memory index `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — purge entries already in specs / git.
+1. `/gsd-progress` (or `/gsd-resume-work`) — restores state from `.planning/STATE.md` + active phase.
+2. Relevant spec from `docs/specs/requires/` and ADRs from `docs/adr/` selectively.
+3. Memory index `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — purge entries already in specs / git.
 
-**Input framing (before coding):** state **Goal** (what + why, 1 line) · **Scope** (files in / out) · **Done when** (verifiable conditions) · **Constraints** (style / tokens / patterns). Skip for trivial one-liners.
+**Input framing (before coding):** state **Goal** (what + why, 1 line) · **Scope** (files in / out) · **Done when** (verifiable conditions) · **Constraints** (style / tokens / patterns). Skip for trivial one-liners. Inside a GSD phase, the active PLAN.md provides this framing — only frame manually for ad-hoc work.
 
 **Approval scope:** user approval covers its declared scope + reversible items inside. Plan approval → batches OK. Batch approval → leaves OK. Spec-derived → no extra approval. Re-ask on (1) new plan / batch, (2) irreversible not in spec, (3) user contradiction.
 
 **Completion language:** leaves → report what landed, no "done"; phase / wave / PR-merge → wait for explicit user confirmation.
 
-**Session continuity:** every design decision → spec or ADR before session ends. Phase close → `claude-progress.txt` + commit. No implementation without a spec section.
+**Session continuity:** every design decision → ADR (or `.planning/PROJECT.md` `<decisions>` block via GSD) before session ends. Phase progress is tracked by GSD in `.planning/STATE.md` + phase manifest — no separate progress file. No implementation without a spec section.
 
 ## 3. Engineering Rules
 

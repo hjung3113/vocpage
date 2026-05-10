@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/dashboard.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "VOC 대시보드 요구사항 명세 (v3 — 2026-04-23 확정)",
+  "summary": "Requirements specification for the VOC dashboard covering target users, layout, global filters, widgets, and admin settings.",
+  "scope": ["VOC dashboard", "global filters", "KPI widgets", "drilldown heatmap", "dashboard_settings", "role-based access (Manager/Admin/Dev)"],
+  "cross_refs": ["prototype/prototype.html", "docs/specs/plans/dashboard-impl.md"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Path under requires/ and content centers on user-facing requirements (target users, purpose, layout, filter behavior); contains some implementation hints (DB columns, API paths) but the document is framed as 요구사항 명세 (requirements spec), so PRD over SPEC."
+}

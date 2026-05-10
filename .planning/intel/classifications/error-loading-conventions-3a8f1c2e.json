@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/error-loading-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Error / Loading / Empty State Conventions",
+  "summary": "Frontend conventions for error, loading, and empty-state handling including 401/403/422 mapping and component placement.",
+  "scope": ["frontend error handling", "loading states", "empty states", "permission UI", "shared/ui components"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

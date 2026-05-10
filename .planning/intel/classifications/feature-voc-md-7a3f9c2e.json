@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/feature-voc.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "VOC 핵심 기능 명세",
+  "summary": "Detailed technical specification for VOC core features including issue code format, status state machine, review_status sub-state machine, and permission model.",
+  "scope": ["VOC issue code", "status transition matrix", "review_status sub-state machine", "permission model", "voc_history", "voc_payload_history", "embedding"],
+  "cross_refs": ["docs/specs/requires/requirements.md"],
+  "locked": false,
+  "precedence": null
+}

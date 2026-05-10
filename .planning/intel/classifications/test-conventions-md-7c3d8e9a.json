@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/test-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Test / Mock Conventions",
+  "summary": "Frontend testing and mocking conventions covering test prioritization, fixture locations, MSW structure/setup, and test file organization.",
+  "scope": ["frontend testing", "MSW mocks", "fixtures", "Vitest", "Playwright", "test file layout"],
+  "cross_refs": ["shared/fixtures/", "test/mocks/fixtures/", "check-fixture-seed-parity.ts"],
+  "locked": false,
+  "precedence": null
+}

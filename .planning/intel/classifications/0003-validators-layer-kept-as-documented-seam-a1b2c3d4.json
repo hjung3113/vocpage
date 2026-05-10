@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0003-validators-layer-kept-as-documented-seam.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "validators/ 레이어는 현재 비어있어도 유지한다",
+  "summary": "Decides to retain backend/src/validators/voc.ts as a documented architectural seam for BE-only validation rules even though it currently only re-exports shared/contracts.",
+  "scope": ["backend/src/validators", "shared/contracts/voc", "BE-only validation"],
+  "cross_refs": ["backend/src/CLAUDE.md", "backend/src/validators/voc.ts", "shared/contracts/voc"],
+  "locked": false,
+  "precedence": null,
+  "notes": "ADR path + Context/Decision/Considered Options structure confirm ADR. No explicit Status field present; locked=false because Accepted status is not stated."
+}

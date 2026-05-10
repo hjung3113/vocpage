@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/feature-notice-faq.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "공지사항 & FAQ 기능 명세 (2026-04-21 추가)",
+  "summary": "Notice and FAQ feature requirements covering sidebar navigation, data fields, login popup behavior, and admin/manager management permissions.",
+  "scope": ["notice", "FAQ", "sidebar navigation", "count badges", "login popup", "admin permissions"],
+  "cross_refs": ["docs/specs/requires/requirements.md"],
+  "locked": false,
+  "precedence": null
+}

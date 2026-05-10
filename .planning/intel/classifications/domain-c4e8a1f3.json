@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/agents/domain.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Domain Docs",
+  "summary": "Guidance for engineering skills on consuming repo domain documentation (CONTEXT.md and ADRs) when exploring the codebase.",
+  "scope": ["domain documentation", "CONTEXT.md", "ADR consumption", "engineering skills workflow"],
+  "cross_refs": ["CONTEXT.md", "docs/adr/", "docs/adr/0001-example.md"],
+  "locked": false,
+  "precedence": null
+}

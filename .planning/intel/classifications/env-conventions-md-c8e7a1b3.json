@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/env-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Environment Variable Conventions",
+  "summary": "Frontend environment variable conventions: file location, Zod-validated implementation pattern, test setup, variable list, and access principles.",
+  "scope": ["frontend env vars", "import.meta.env", "Vite", "Zod schema validation", "vitest test env", "shared/config/env.ts"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

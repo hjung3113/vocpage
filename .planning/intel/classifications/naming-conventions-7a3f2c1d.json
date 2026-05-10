@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/naming-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Naming Conventions",
+  "summary": "Frontend (React + TypeScript) naming convention rules for folders, files, components, hooks, and event handlers.",
+  "scope": ["frontend", "naming", "folders", "files", "components", "hooks", "typescript", "react"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

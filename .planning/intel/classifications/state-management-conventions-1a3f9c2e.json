@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/state-management-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "State Management Conventions",
+  "summary": "Frontend state management conventions defining where to store state (Query, URL, Context, useState) and rules for TanStack Query, Context, and URL params.",
+  "scope": ["frontend state management", "TanStack Query", "React Context", "URL search params", "React Hook Form", "AuthContext", "VOCFilterContext", "MasterCacheContext"],
+  "cross_refs": ["shared/lib/storage.ts", "voc.query-keys.ts"],
+  "locked": false,
+  "precedence": null
+}

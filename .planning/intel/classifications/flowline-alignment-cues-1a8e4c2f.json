@@ -1,0 +1,22 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/plans/flowline-alignment-cues.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Flowline Alignment Cues",
+  "summary": "Draft working queue mapping Flowline visual signals to vocpage and proposing a wave plan for design alignment.",
+  "scope": ["vocpage UI", "Flowline visual signals", "VOC list/drawer", "admin", "dashboard", "shared/ui components"],
+  "cross_refs": [
+    "refSystem/Integrated Platform _ Standalone.html",
+    "uidesign.md",
+    "shared/ui/badge/SolidChip.tsx",
+    "shared/ui/badge/OutlineChip.tsx",
+    "features/voc/list/ui/VocRow.tsx",
+    "features/voc/review/ui/VocActivityTimeline.tsx",
+    "ActivityAvatar.tsx",
+    "VocHistory.tsx",
+    "globals.css"
+  ],
+  "locked": false,
+  "precedence": null
+}

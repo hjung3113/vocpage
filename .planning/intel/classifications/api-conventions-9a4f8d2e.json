@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/api-conventions.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "API Conventions",
+  "summary": "Frontend API layer canonical spec covering response envelopes, file locations, query key factories, auth boundaries, and cache invalidation rules.",
+  "scope": ["frontend API layer", "HTTP client", "React Query", "query keys", "auth boundary", "MSW handlers", "response envelope", "pagination"],
+  "cross_refs": ["shared/api/client.ts", "shared/api/queryClient.ts", "shared/api/error.ts"],
+  "locked": false,
+  "precedence": null
+}

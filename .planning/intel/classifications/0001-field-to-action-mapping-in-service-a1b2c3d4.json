@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0001-field-to-action-mapping-in-service.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "field→action 매핑은 service 레이어 소유",
+  "summary": "Decides that inferActions field-to-action mapping stays in the service layer rather than moving into the permissions module to preserve concern separation.",
+  "scope": ["services/voc.ts", "services/permissions/assertCanManageVoc.ts", "VocUpdate", "VocAction", "permissions module"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Path matches **/adr/** and filename 0001-*.md. Contains Considered Options and Consequences sections. No explicit Status field; '채택' (adopted) appears inline marking the chosen option, but without a formal Status: Accepted header, locked is conservatively set to false."
+}
