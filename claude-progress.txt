@@ -1,6 +1,26 @@
 # vocpage — Session Progress
 
-## 다음 세션 시작점 (2026-05-10 P2 후속 batch 머지 완료 — Wave 2 또는 운영/배포 phase)
+## 다음 세션 시작점 (2026-05-10 Wave 2 Phase D 머지 완료 — Phase B/C/E 진입)
+
+→ **Wave 2 Phase D RGL Shell 머지 완료** (PR #295, 2026-05-10):
+   - **BE**: `routes/dashboard-settings.ts` + `services/dashboard/settings.service.ts` + `repository/dashboard.repo.ts` 신규. `GET/PUT /api/dashboard/settings` (auth required, per-field merge admin∘user). 권한: `scope=admin` + `locked_fields` + `globaltabs_order` 모두 admin-only (3종 별 403 코드).
+   - **FE**: `features/dashboard/*` (defaultLayouts × 8 widget × 5 breakpoint, lockMerge 순수 함수, useDashboardDraft state machine + saveCounter race guard, useDashboardSettings + useUpdateDashboardSettings TanStack hooks, DashboardShell ResponsiveRGL, WidgetPlaceholder, EditModeToggle), `pages/DashboardPage` + lazy 라우트 (StubPage 교체), `dashboard-rgl.css` + 토큰 3종 (`--dashboard-grid-margin/RowH/HandleSize`).
+   - **Contract**: `shared/contracts/dashboard/{entity,io}` (zod) + `shared/openapi.yaml` `DashboardSettings` 정형 schema + `RglLayoutItem.strict()` + `RglLayouts` 모든 breakpoint optional. `DashboardSettingsUpdate.strict()`.
+   - **Migration 022**: `dashboard_admin_default_unique.sql` — Postgres NULL UNIQUE 맹점 차단 (partial unique index `WHERE user_id IS NULL`).
+   - **codex:rescue 적대적 리뷰**: P0 1건 + P1 5건 + P2 2건 모두 close.
+   - **메트릭**: BE 462 → 487 (+25) 그린, FE 575 → 587 (+12) 그린, typecheck 0, lint 0.
+
+→ **다음 세션 작업**: Wave 2 잔여 phase 진입 후보:
+   - **Phase B (KPI Volume + Quality)** — `/dashboard/summary` BE + KPI 위젯 콘텐츠 FE.
+   - **Phase C (분포 / 매트릭스 / 히트맵 / 트렌드 / SLA / 담당자 / Top10)** — 위젯별 BE 엔드포인트 + 콘텐츠.
+   - **Phase E (설정 패널)** — widget toggle + default_date_range + heatmap_x_axis editor.
+   - **운영/배포 phase** — `connect-pg-simple` / OIDC / production Dockerfile / Playwright E2E.
+
+→ **마이그 번호** — 다음 마이그 번호 = **023**.
+
+---
+
+## 이전 세션 시작점 (2026-05-10 P2 후속 batch 머지 완료 — Wave 2 또는 운영/배포 phase)
 
 → **P2 후속 3건 머지 완료** (2026-05-10):
    - **FU-023** (PR #287): `createTag` slug 파생을 `<name>-<kind>` 로 변경 — FU-014 (name, kind) UNIQUE 와 정합. `('공통','general')` / `('공통','menu')` 둘 다 distinct slug. admin-tags.sql.test.ts `it.todo` → 실 테스트.
