@@ -147,42 +147,57 @@ function metric(value: number, prior: number | null, kind: KpiMetric['delta_kind
 /** Compute the full 8-KPI summary. */
 export async function computeSummary(resolved: ResolvedFilter): Promise<DashboardSummary> {
   const { scope, current, prior, weekCurrent, weekPrior, now } = resolved;
-  const todayEnd = kstStartOfDay(now); // snapshot instant = today 00:00 KST
-  const lastWeekSnapshot = shiftDays(todayEnd, -7);
+  // Spec §1 "현재 시점 스냅샷" — snapshot KPIs use `now` directly. Prior
+  // comparison snapshot is exactly 7 days earlier (전주 동시점).
+  const snapshotNow = now;
+  const snapshotPrior = shiftDays(now, -7);
+  const widestEnd = shiftDays(kstStartOfDay(now), 1);
 
   // Volume — total_voc (period), unresolved (snapshot), this_week_new/completed (week-fixed).
   const totalCurrent = current
     ? await repo.countCreatedAndCompleted(scope, current.start, current.end)
-    : await repo.countCreatedAndCompleted(scope, new Date(0), shiftDays(todayEnd, 1));
+    : await repo.countCreatedAndCompleted(scope, new Date(0), widestEnd);
   const totalPrior = prior
     ? await repo.countCreatedAndCompleted(scope, prior.start, prior.end)
     : null;
 
-  const unresolvedNow = await repo.snapshotUnresolved(scope, todayEnd);
-  const unresolvedPrior = await repo.snapshotUnresolved(scope, lastWeekSnapshot);
+  const unresolvedNow = await repo.snapshotUnresolved(scope, snapshotNow);
+  const unresolvedPrior = await repo.snapshotUnresolved(scope, snapshotPrior);
 
   const weekNow = await repo.countCreatedAndCompleted(scope, weekCurrent.start, weekCurrent.end);
   const weekLast = await repo.countCreatedAndCompleted(scope, weekPrior.start, weekPrior.end);
 
-  // Quality — avg_resolution_days (period), resolution_rate (period), urgent_high / overdue (snapshot).
+  // Quality — avg_resolution_days + resolution_rate (period), urgent_high + overdue (snapshot).
   const avgCurrent = current
     ? await repo.avgResolutionDaysInWindow(scope, current.start, current.end)
-    : await repo.avgResolutionDaysInWindow(scope, new Date(0), shiftDays(todayEnd, 1));
+    : await repo.avgResolutionDaysInWindow(scope, new Date(0), widestEnd);
   const avgPrior = prior
     ? await repo.avgResolutionDaysInWindow(scope, prior.start, prior.end)
     : null;
 
-  const resolutionRateCurrent = computeResolutionRate(totalCurrent.completed, unresolvedNow);
+  // resolution_rate is "기간 연동" — both numerator and denominator must be
+  // window-consistent. Denominator = unresolved snapshot at the *window end*
+  // (or `now` for range=all). Prior uses prior-window end. This keeps the
+  // %p delta meaningful (compares like-for-like).
+  const currentEnd = current ? current.end : snapshotNow;
+  const priorEnd = prior ? prior.end : snapshotPrior;
+  const unresolvedAtCurrentEnd = current
+    ? await repo.snapshotUnresolved(scope, currentEnd)
+    : unresolvedNow;
+  const unresolvedAtPriorEnd =
+    totalPrior === null ? null : await repo.snapshotUnresolved(scope, priorEnd);
+
+  const resolutionRateCurrent = computeResolutionRate(totalCurrent.completed, unresolvedAtCurrentEnd);
   const resolutionRatePrior =
-    totalPrior === null
+    totalPrior === null || unresolvedAtPriorEnd === null
       ? null
-      : computeResolutionRate(totalPrior.completed, unresolvedPrior);
+      : computeResolutionRate(totalPrior.completed, unresolvedAtPriorEnd);
 
-  const urgentHighNow = await repo.snapshotUrgentHighUnresolved(scope, todayEnd);
-  const urgentHighPrior = await repo.snapshotUrgentHighUnresolved(scope, lastWeekSnapshot);
+  const urgentHighNow = await repo.snapshotUrgentHighUnresolved(scope, snapshotNow);
+  const urgentHighPrior = await repo.snapshotUrgentHighUnresolved(scope, snapshotPrior);
 
-  const overdueNow = await repo.snapshotOverdue14d(scope, todayEnd);
-  const overduePrior = await repo.snapshotOverdue14d(scope, lastWeekSnapshot);
+  const overdueNow = await repo.snapshotOverdue14d(scope, snapshotNow);
+  const overduePrior = await repo.snapshotOverdue14d(scope, snapshotPrior);
 
   return {
     kpi_volume: {

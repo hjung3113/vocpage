@@ -90,6 +90,11 @@ export async function snapshotUnresolved(
   scope: MetricsScope,
   at: Date,
 ): Promise<number> {
+  // As-of unresolved at instant `at`: row was unresolved iff
+  //   created_at <= at AND (status is currently NOT_DONE OR
+  //   status was changed to a terminal state strictly after `at`).
+  // Priority/scope columns are read as current — acceptable for the
+  // dashboard horizon where these rarely change retroactively.
   const pool = getPool();
   const { sql: scopeSql, values: scopeValues } = scopePredicates(scope, 2);
   const sql = `
@@ -97,7 +102,7 @@ export async function snapshotUnresolved(
     FROM vocs
     WHERE ${scopeSql}
       AND created_at <= $1
-      AND status = ANY($${scopeValues.length + 2})
+      AND (status = ANY($${scopeValues.length + 2}) OR status_changed_at > $1)
   `;
   const res = await pool.query(sql, [at, ...scopeValues, NOT_DONE]);
   return Number(res.rows[0]?.n ?? 0);
@@ -108,6 +113,8 @@ export async function snapshotUrgentHighUnresolved(
   scope: MetricsScope,
   at: Date,
 ): Promise<number> {
+  // As-of: created_at <= at AND priority IN (urgent,high) AND
+  //   row was unresolved at `at` (current NOT_DONE OR status_changed_at > at).
   const pool = getPool();
   const { sql: scopeSql, values: scopeValues } = scopePredicates(scope, 2);
   const sql = `
@@ -116,7 +123,7 @@ export async function snapshotUrgentHighUnresolved(
     WHERE ${scopeSql}
       AND created_at <= $1
       AND priority = ANY($${scopeValues.length + 2})
-      AND status = ANY($${scopeValues.length + 3})
+      AND (status = ANY($${scopeValues.length + 3}) OR status_changed_at > $1)
   `;
   const res = await pool.query(sql, [at, ...scopeValues, ['urgent', 'high'], NOT_DONE]);
   return Number(res.rows[0]?.n ?? 0);
@@ -127,6 +134,7 @@ export async function snapshotOverdue14d(
   scope: MetricsScope,
   at: Date,
 ): Promise<number> {
+  // As-of overdue: created_at <= at - 14d AND row was unresolved at `at`.
   const pool = getPool();
   const { sql: scopeSql, values: scopeValues } = scopePredicates(scope, 2);
   const sql = `
@@ -134,7 +142,7 @@ export async function snapshotOverdue14d(
     FROM vocs
     WHERE ${scopeSql}
       AND created_at <= ($1::timestamptz - INTERVAL '14 days')
-      AND status = ANY($${scopeValues.length + 2})
+      AND (status = ANY($${scopeValues.length + 2}) OR status_changed_at > $1)
   `;
   const res = await pool.query(sql, [at, ...scopeValues, NOT_DONE]);
   return Number(res.rows[0]?.n ?? 0);

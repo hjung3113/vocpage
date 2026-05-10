@@ -247,6 +247,47 @@ describe('computeSummary — empty + delta arithmetic', () => {
   });
 });
 
+describe('computeSummary — P1 fixes (codex review)', () => {
+  it('snapshot KPIs query at exact `now`, not KST midnight', async () => {
+    await getSummary({ filter: { range: '1m' }, userId: USER_ID, now: NOW });
+    // First snapshotUnresolved call (current) must be `now`, second (prior) `now-7d`.
+    expect(repoM.snapshotUnresolved).toHaveBeenCalled();
+    const calls = repoM.snapshotUnresolved.mock.calls;
+    expect((calls[0]?.[1] as Date).toISOString()).toBe(NOW.toISOString());
+    expect((calls[1]?.[1] as Date).toISOString()).toBe(
+      new Date(NOW.getTime() - 7 * 86400_000).toISOString(),
+    );
+  });
+
+  it('snapshot urgent_high + overdue use `now` (not midnight)', async () => {
+    await getSummary({ filter: { range: '1m' }, userId: USER_ID, now: NOW });
+    expect((repoM.snapshotUrgentHighUnresolved.mock.calls[0]?.[1] as Date).toISOString()).toBe(
+      NOW.toISOString(),
+    );
+    expect((repoM.snapshotOverdue14d.mock.calls[0]?.[1] as Date).toISOString()).toBe(
+      NOW.toISOString(),
+    );
+  });
+
+  it('resolution_rate denominator uses period-end snapshot, not now', async () => {
+    repoM.countCreatedAndCompleted
+      .mockResolvedValueOnce({ total: 100, completed: 60, unresolved: 0 }) // current period
+      .mockResolvedValueOnce({ total: 80, completed: 40, unresolved: 0 })  // prior period
+      .mockResolvedValueOnce({ total: 0, completed: 0, unresolved: 0 })    // weekCurrent
+      .mockResolvedValueOnce({ total: 0, completed: 0, unresolved: 0 });   // weekPrior
+    repoM.snapshotUnresolved
+      .mockResolvedValueOnce(10) // unresolvedNow
+      .mockResolvedValueOnce(15) // unresolvedPrior (7d ago)
+      .mockResolvedValueOnce(20) // current.end (resolution-rate denom)
+      .mockResolvedValueOnce(25); // prior.end (resolution-rate denom)
+    const out = await getSummary({ filter: { range: '1m' }, userId: USER_ID, now: NOW });
+    // Current rate uses 60/(60+20) = 75%. Prior rate uses 40/(40+25) = 61.538…%.
+    expect(out.kpi_quality.resolution_rate.value).toBeCloseTo(75);
+    expect(out.kpi_quality.resolution_rate.delta_kind).toBe('percentage_point');
+    expect(out.kpi_quality.resolution_rate.delta).toBeCloseTo(75 - 40 / 65 * 100);
+  });
+});
+
 describe('getSummary — end-to-end', () => {
   it('resolves + computes without throwing on a fresh dataset', async () => {
     const out = await getSummary({ filter: { range: '1m' }, userId: USER_ID, now: NOW });
