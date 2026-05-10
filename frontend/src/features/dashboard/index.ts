@@ -6,3 +6,8 @@ export { useDashboardSettings } from './model/useDashboardSettings';
 export { useUpdateDashboardSettings } from './model/useUpdateDashboardSettings';
 export { defaultLayouts, WIDGET_IDS, RGL_BREAKPOINTS, RGL_COLS } from './defaultLayouts';
 export { mergeLockedLayout } from './lockMerge';
+export { DashboardFilterProvider, useDashboardFilter } from './model/dashboardFilter';
+export { useDashboardSummary } from './model/useDashboardSummary';
+export { KpiVolumeWidget } from './widgets/KpiVolumeWidget';
+export { KpiQualityWidget } from './widgets/KpiQualityWidget';
+export { KpiCard } from './widgets/KpiCard';

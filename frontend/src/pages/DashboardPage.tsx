@@ -4,7 +4,12 @@
  */
 import '../styles/dashboard-rgl.css';
 import { PageLayout, PageHeader } from '@widgets/app-shell';
-import { DashboardShell, EditModeToggle, useDashboardDraft } from '@features/dashboard';
+import {
+  DashboardShell,
+  EditModeToggle,
+  useDashboardDraft,
+  DashboardFilterProvider,
+} from '@features/dashboard';
 
 export default function DashboardPage() {
   const { layouts, isEditing, isDirty, isSaving, setIsEditing, onLayoutChange, save, discard } =
@@ -28,11 +33,13 @@ export default function DashboardPage() {
         />
       }
     >
-      <DashboardShell
-        layouts={layouts}
-        isEditing={isEditing}
-        onLayoutChange={onLayoutChange}
-      />
+      <DashboardFilterProvider>
+        <DashboardShell
+          layouts={layouts}
+          isEditing={isEditing}
+          onLayoutChange={onLayoutChange}
+        />
+      </DashboardFilterProvider>
     </PageLayout>
   );
 }

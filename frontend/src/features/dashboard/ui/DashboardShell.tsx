@@ -6,6 +6,18 @@ import { Responsive, WidthProvider, type Layout, type LayoutItem } from 'react-g
 import type { RglLayouts } from '@contracts/dashboard';
 import { WIDGET_IDS, RGL_BREAKPOINTS, RGL_COLS } from '../defaultLayouts';
 import { WidgetPlaceholder } from './WidgetPlaceholder';
+import { KpiVolumeWidget } from '../widgets/KpiVolumeWidget';
+import { KpiQualityWidget } from '../widgets/KpiQualityWidget';
+
+function renderWidget(widgetId: string, isEditing: boolean) {
+  // Wave 2 Phase B — KPI widgets are wired. Other widgets remain placeholders
+  // until their phases (C / E). Edit mode keeps the drag handle visible by
+  // falling back to the placeholder, so resize gestures hit a stable target.
+  if (isEditing) return <WidgetPlaceholder widgetId={widgetId} isEditing={isEditing} />;
+  if (widgetId === 'kpi-volume') return <KpiVolumeWidget />;
+  if (widgetId === 'kpi-quality') return <KpiQualityWidget />;
+  return <WidgetPlaceholder widgetId={widgetId} isEditing={isEditing} />;
+}
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -33,9 +45,7 @@ export function DashboardShell({ layouts, isEditing, onLayoutChange }: Dashboard
         useCSSTransforms
       >
         {WIDGET_IDS.map((widgetId) => (
-          <div key={widgetId}>
-            <WidgetPlaceholder widgetId={widgetId} isEditing={isEditing} />
-          </div>
+          <div key={widgetId}>{renderWidget(widgetId, isEditing)}</div>
         ))}
       </ResponsiveGridLayout>
     </div>
