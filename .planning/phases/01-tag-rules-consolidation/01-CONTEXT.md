@@ -161,7 +161,19 @@ Out of scope:
 
 </deferred>
 
+<oq_resolutions>
+## Research-driven Open Question Resolutions (2026-05-10)
+
+Resolved during /gsd-plan-phase before planner spawn. These are LOCKED for Phase 1.
+
+- **OQ-R1 (schema, BLOCKING resolved):** Option C — `mig 024` adds `keywords text[] NOT NULL DEFAULT '{}'` and `match_mode text NOT NULL DEFAULT 'keyword'` to `tag_rules`; the legacy `pattern text` column is dropped in the same migration. All BE/FE/MSW/contract readers must be updated to consume `keywords[]` + `match_mode` (no JSON parsing of `pattern`). Wave 0 must run `rg -n "tag_rules" backend/src/services/` to enumerate matcher consumers (per OQ-R3) and reconcile.
+- **OQ-R2 (created_by backfill):** NULL preserved for pre-existing rows. FE renders `—` per UI-SPEC.md OQ-UI-2. No data backfill task in mig 024.
+- **OQ-R5 (author display):** BE list endpoint JOINs `users.display_name` and returns `created_by_name` in the response. FE renders the field directly — no `useCurrentUser` hook is added. OpenAPI `TagRule` schema must include `created_by_name?: string | null`.
+
+</oq_resolutions>
+
 ---
 
 *Phase: 1-tag-rules-consolidation*
 *Context gathered: 2026-05-10*
+*OQ resolutions appended: 2026-05-10*
