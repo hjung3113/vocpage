@@ -1468,3 +1468,148 @@ Use these as templates when generating new components. They reference only token
 - ❌ Mixed shadow tokens on one element — raise the surface level instead
 - ✅ Every color comes from `var(--…)`; every spacing from `--sp-*`; every radius from §7 "Border Radius by Element"
 - ✅ Light and dark must both be tested before considering a component done
+
+---
+
+## 16. Flowline Alignment Primitives
+
+> 본 섹션은 ADR-0008 잠금 결과로 신설. `refSystem/Integrated Platform _ Standalone.html` 내 Flowline 모듈 (Linear-flavored, lines 835–1079) 의 시각 시그널 중 vocpage 와 형제 시스템 인식을 위해 도입할 항목을 명세한다. **본 §16 등재 항목만** ad-hoc 컴포넌트화 허용. 기타 Flowline 클래스(kanban / timeline 등) 는 별 ADR 후 진입.
+>
+> 시그널 분석 출처: `docs/specs/plans/flowline-alignment-cues.md`.
+
+### 16.1 Scope summary
+
+| Signal | 항목                  | 본 wave 처리                                  |
+| ------ | --------------------- | --------------------------------------------- |
+| S1     | Issue ID (`.iid`)     | 신규 컴포넌트 `shared/ui/issue-id`            |
+| S2     | Status glyph (`.s-icon`) | 신규 `shared/ui/status-glyph` (SolidChip 보완) |
+| S3     | Priority bars (`.p-icon`) | 신규 `shared/ui/priority-bars`              |
+| S4     | Tight row density     | **검증 완료** — `VocRow.tsx:35` 가 이미 동일 사양 |
+| S5     | Group header band     | 신규 `shared/ui/list-group-header`            |
+| S6     | Label chip            | 기존 `shared/ui/badge/OutlineChip` 에 `dot-pill` variant |
+| S7     | Activity feed         | 기존 `features/voc/review/ui/VocActivityTimeline` 유지, 시각 점검 별 wave |
+| Bonus  | Sparkline             | §11.4 Donut legend 옆 mini bar 패턴 재사용     |
+
+### 16.2 S1 — Issue ID (`shared/ui/issue-id`)
+
+```css
+font-family: var(--font-mono);
+font-size: 11.5px;
+color: var(--text-tertiary);
+background: var(--bg-elevated);
+border: 1px solid var(--border-subtle);
+padding: 1px 6px;
+border-radius: 4px;
+letter-spacing: 0.01em;
+```
+
+- 용도: VOC ID (`VOC-318`), 사용자 ID, 태그 ID 등 도메인 키. 본문 텍스트와 분리되는 시각 앵커.
+- props: `id: string` (필수), `tone?: 'default' | 'subdued'` (subdued 는 `opacity: 0.7`, 하위 행에서 사용).
+
+### 16.3 S2 — Status glyph (`shared/ui/status-glyph`)
+
+14×14 원형 ring. SolidChip 의 좌측 prepend 용. **텍스트 대체 아님**.
+
+| Variant     | 시각                                                                                     |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| `backlog`   | dashed ring · `var(--text-quaternary)`                                                   |
+| `todo`      | solid ring · `var(--text-tertiary)`                                                      |
+| `progress`  | solid ring `var(--chart-amber)` + `conic-gradient(var(--chart-amber) 0 60%, transparent 60% 100%)` |
+| `review`    | ring `var(--chart-blue)` + 80% conic                                                     |
+| `done`      | filled `var(--chart-emerald)` + white check (`::after`, 1.5px border-left/bottom, rotate -45deg) |
+| `canceled`  | filled `var(--text-quaternary)` + white `×`                                              |
+
+VOC 상태 매핑: `received → todo`, `reviewing → review`, `processing → progress`, `done → done`, `drop → canceled`. (글리프와 텍스트 라벨이 함께 보이므로 매핑 손실 없음.)
+
+### 16.4 S3 — Priority bars (`shared/ui/priority-bars`)
+
+```css
+.priority-bars { width: 14px; height: 14px; display: inline-flex; align-items: flex-end; justify-content: center; gap: 1.5px; flex: 0 0 auto; }
+.priority-bars i { width: 2.5px; border-radius: 1px; }
+.priority-bars i:nth-child(1) { height: 4px; }
+.priority-bars i:nth-child(2) { height: 7px; }
+.priority-bars i:nth-child(3) { height: 10px; }
+```
+
+| Variant   | bar 색상                                                |
+| --------- | ------------------------------------------------------- |
+| `urgent`  | 3 bar 모두 `var(--status-red)`                          |
+| `high`    | 3 bar 모두 `var(--status-orange)`                       |
+| `med`     | bar 1·2 `var(--text-secondary)`, bar 3 `var(--text-quaternary)` |
+| `low`     | bar 1 `var(--text-secondary)`, bar 2·3 `var(--text-quaternary)` |
+
+`var(--text-quaternary)` 는 비활성 bar 의 디폴트.
+
+### 16.5 S4 — Tight row density (verified)
+
+- `frontend/src/features/voc/list/ui/VocRow.tsx` 가 이미 다음 사양:
+  - `padding: 7px 24px`
+  - `min-height: 36px`
+  - `font-size: 13px`
+  - `gap: 10px`
+- Flowline `.irow` 사양과 동일. **추가 작업 없음**. 본 항목은 회귀 방지 목적 명시.
+
+### 16.6 S5 — Group header band (`shared/ui/list-group-header`)
+
+```css
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 8px 24px;
+background: var(--bg-panel);
+font-size: 12px;
+color: var(--text-secondary);
+font-weight: 600;
+border-bottom: 1px solid var(--border-subtle);
+cursor: pointer;
+```
+
+- 우측 count: `font-size: 11px; color: var(--text-tertiary); font-weight: 500`.
+- 용도: VOC 리스트 상태별 그룹핑, admin 테이블 카테고리 분리.
+
+### 16.7 S6 — Label chip (`OutlineChip` `dot-pill` variant)
+
+기존 `shared/ui/badge/OutlineChip` 에 variant 추가:
+
+```css
+.outline-chip[data-variant='dot-pill'] {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.outline-chip[data-variant='dot-pill'] .lc-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+```
+
+props 신호: `variant?: 'dot-pill'`, `dotColor?: string` (token).
+
+### 16.8 S7 — Activity feed (deferred verification)
+
+- 기존: `features/voc/review/ui/VocActivityTimeline.tsx`, `ActivityAvatar.tsx`, `VocHistory.tsx`.
+- 본 wave: 변경 없음. Flowline `.act` 사양 (gap 10px / padding 10px 0 / line 13px secondary 1.55 / time 11px quaternary / `b` text-primary 600) 과 비교 점검은 별 wave.
+
+### 16.9 Sparkline note
+
+- Flowline `.sparkline` 은 6px 너비 막대 시리즈. §11.4 Donut legend 의 mini bar 패턴 (proportional width, `var(--bg-elevated)` track) 과 의도가 동일하므로 별도 컴포넌트 도입 보류. 차후 시계열 sparkline 사용처 발생 시 §11 확장.
+
+### 16.10 Adoption rules
+
+1. 본 §16 등재 컴포넌트만 `shared/ui/` 신설 허용. 기타 Flowline 클래스 적용 금지.
+2. 신규 컴포넌트 첫 사용 PR 에서 §16 표 "구현 상태" 갱신 (`spec-only` → `implemented`).
+3. SolidChip + status-glyph 결합 시 `<status-glyph>` 가 좌측 prepend, 텍스트 라벨 우측. 이중 렌더링 금지(글리프 단독 / 텍스트 단독 케이스 별도 props).
+4. priority-bars 와 텍스트 우선순위 라벨 결합은 선택 — 좁은 컬럼은 글리프만, 넓은 컬럼은 둘 다.
+5. issue-id 는 본문 inline 사용 시 mono 폰트 유지, 줄높이 보정으로 위치 정렬.
+
+### 16.11 Cross-references
+
+- 시그널 분석: `docs/specs/plans/flowline-alignment-cues.md`.
+- ADR: `docs/adr/0008-flowline-design-alignment.md`.
+- 디자인 컨텍스트: `.impeccable.md` (refSystem · Linear UI + Jira UX).
+- 참조 HTML: `refSystem/Integrated Platform _ Standalone.html` lines 835–1079 (수동 편집 금지).
+- 토큰: `frontend/src/shared/styles/globals.css` (변경 없음 — 모든 참조 토큰 기존 보유).
