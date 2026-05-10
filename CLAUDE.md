@@ -77,7 +77,7 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 - Think before coding: state assumptions; surface multiple interpretations.
 - Simplicity first; surgical changes; goal-driven verification per step. YAGNI. Match nearby code style.
 - Pre-commit: `npm run lint -w frontend` once before first commit. Tests before commit.
-- Progress docs at phase / wave close only — intra-phase PRs exempt. The `warn-doc-cleanup-before-pr` hookify checklist applies on `gh pr merge` for phase / wave-close PRs only.
+- Progress docs at phase / wave close only — intra-phase PRs exempt.
 
 **Refactoring** (structure change without behavior change; never combined with feature change):
 
@@ -85,8 +85,6 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 - During: `git mv` for moves; one refactor at a time.
 - After (in order): update all references → `rg -n "<old>"` returns 0 → Serena ref-check on renames → typecheck → tests → exercise the surface.
 - Escalate to `code-reviewer` only on public API change, ≥3 modules, or DB schema / migration.
-
-**Git workflow:** feature branch (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`) before any change; never push to main; PRs opened by user; merge with `gh pr merge <n> --merge --delete-branch` (squash / rebase forbidden); after merge `git branch -D <branch>`. Enforced by `.claude/hookify.block-*.local.md`.
 
 ## 4. Agent Skills
 
