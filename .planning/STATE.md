@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 01 complete
-last_updated: "2026-05-10T16:04:02.703Z"
+status: Phase 01 implemented + UI wave gate signed off — ready for Phase 02
+last_updated: "2026-05-11T22:10:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 1
@@ -18,11 +18,11 @@ progress:
 
 - **Core value**: VOC 관리 — 다중 시스템에서 고객의 목소리를 추적·분류·승인하는 사내 도구.
 - **Current milestone**: Wave 4 admin + visual identity (PROJECT.md §Current Milestone).
-- **Current focus**: Phase 1 — Tag Rules Consolidation (`/admin/tags` 통합).
+- **Current focus**: Phase 2 — VOC Types Management (`/admin/voc-types` 신설).
 
 ## Current Position
 
-- **Phase**: 1 — Tag Rules Consolidation **COMPLETE** (all 8 plans landed; SC-1..5 verified).
+- **Phase**: 1 — Tag Rules Consolidation **IMPLEMENTED** (all 8 plans landed; SC-1..5 verified; UI recritique 51/60, all pillars ≥8, sign-off 2026-05-11).
 - **Plan**: 01-08 complete — feature-voc.md §9.4.1 rewritten + routing-conventions.md /admin/tag-rules entry removed + §10.4.1 ?view=/?q= convention added; SC-3 grep gate = 0 hits.
 - **Status**: Phase 1 closed. Waves 0–4 fully landed: scaffolds + mig 024 + contracts + BE 5 nested routes (D-13 matrix + IDOR + server-derived created_by) + FE hooks/MSW with D-11 optimistic + TagRulesManagerModal + KeywordChipInput + /admin/tags page (view-mode tabs + ?view/?q URL state + 250ms debounce + cross-tag flat rules table) + spec sync (this plan). BE 625 pass; FE 721 pass; parity 10/11 OK; lint clean.
 - **Progress**: ██████████ Phase 1: 8/8 plans complete; 1/7 phases overall.
@@ -73,4 +73,5 @@ progress:
 
 ## Next Action
 
-Phase 1 ready for `/gsd-verify-work` + PR open. Subsequent: Phase 2 (voc_types color + merge) or Phase 3 (systems/menus admin) per ROADMAP priority.
+Phase 2 entry: `/gsd-discuss-phase 2` (Plans = TBD; gather context before plan-phase).
+Alternative: `/gsd-plan-phase 2` if vision already clear. Phase 1 → `/gsd-ship` for PR when ready.
