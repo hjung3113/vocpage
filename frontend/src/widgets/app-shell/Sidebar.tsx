@@ -45,7 +45,7 @@ const NAV_ITEMS: NavItem[] = [
  * 휴지통 (Trash) 은 Admin only — `adminStrict` 로 Manager / Dev 미노출 (ADR 0005).
  */
 const ADMIN_NAV_ITEMS: NavItem[] = [
-  { to: '/admin/tags', label: '태그 마스터', icon: Tag, adminGroup: true },
+  { to: '/admin/tags', label: '태그 관리', icon: Tag, adminGroup: true },
   { to: '/admin/masters', label: '외부 마스터', icon: Database, adminGroup: true },
   { to: '/admin/users', label: '사용자', icon: Users, adminStrict: true },
   { to: '/admin/vocs/trash', label: '휴지통', icon: Trash2, adminStrict: true },

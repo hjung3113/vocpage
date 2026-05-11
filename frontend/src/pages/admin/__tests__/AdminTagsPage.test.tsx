@@ -97,7 +97,7 @@ describe('AdminTagsPage', () => {
     renderPage();
     expect(screen.getByText('버그')).toBeInTheDocument();
     expect(screen.getByText('미사용')).toBeInTheDocument();
-    expect(screen.getAllByText('태그 마스터').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('태그 관리').length).toBeGreaterThanOrEqual(1);
   });
 
   it('manager: add button enabled, merge button disabled', () => {

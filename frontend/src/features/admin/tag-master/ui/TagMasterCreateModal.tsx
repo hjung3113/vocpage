@@ -95,9 +95,12 @@ export function TagMasterCreateModal({ onClose }: Props) {
 export function ModalOverlay({
   children,
   onClose,
+  maxWidth = '480px',
 }: {
   children: React.ReactNode;
   onClose: () => void;
+  /** Outer container cap. Wider modals (tag rules) pass e.g. '720px'. */
+  maxWidth?: string;
 }) {
   return (
     <div
@@ -122,7 +125,7 @@ export function ModalOverlay({
           borderRadius: '8px',
           padding: '24px',
           minWidth: '340px',
-          maxWidth: '480px',
+          maxWidth,
           width: '100%',
           boxShadow: 'var(--shadow-dialog)',
         }}

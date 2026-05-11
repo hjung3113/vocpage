@@ -179,13 +179,13 @@ export function TagRulesManagerModal({ tag, onClose }: Props) {
   }
 
   return (
-    <ModalOverlay onClose={onClose}>
+    <ModalOverlay onClose={onClose} maxWidth={modalMinWidth}>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--sp-4)',
-          minWidth: modalMinWidth,
+          width: '100%',
           maxHeight: 'min(720px, calc(100vh - 96px))',
         }}
       >

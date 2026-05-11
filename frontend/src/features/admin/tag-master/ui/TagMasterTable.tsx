@@ -9,7 +9,7 @@
  * 409 CONFLICT errors shown inline (not toast).
  */
 import { useState } from 'react';
-import { Tag, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useRole } from '@entities/user/model/useRole';
 import { useAdminTags, useDeleteTag, useToggleExternal } from '../api/tag-master.api';
 import { TagMasterCreateModal } from './TagMasterCreateModal';
@@ -126,10 +126,6 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
-          <Tag size={18} aria-hidden style={{ color: 'var(--accent)' }} />
-          <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
-            태그 마스터
-          </span>
           <span
             style={{
               fontSize: '12px',
@@ -139,7 +135,7 @@ export function TagMasterTable({ onOpenRules }: Props = {}) {
               padding: '2px 6px',
             }}
           >
-            {data?.total ?? 0}건
+            전체 {data?.total ?? 0}건
           </span>
         </div>
         <button
