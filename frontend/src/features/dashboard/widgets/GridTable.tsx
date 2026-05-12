@@ -27,8 +27,8 @@ export interface GridTableProps {
 
 /**
  * Compute cell background intensity.
- * Spec (dashboard.md §3/§4/§8): opacity ∈ [0.06, 0.62], applied via oklch inline style.
- */ // allow-raw-color: spec-literal oklch formula per dashboard.md §3/§4/§8
+ * Spec (dashboard.md §3/§4/§8): mix ratio ∈ [6%, 62%] via color-mix(var(--chart-blue), transparent).
+ */
 export function cellOpacity(value: number, maxValue: number): number {
   if (maxValue === 0 || value === 0) return 0;
   const ratio = value / maxValue;
@@ -122,7 +122,7 @@ export function GridTable({ headers, rows, maxValue, totalRow, onCellClick, onRo
                     )}
                     style={{
                       backgroundColor: opacity > 0
-                        ? `oklch(63% 0.19 258 / ${opacity.toFixed(3)})` // allow-raw-color: spec-literal intensity formula per dashboard.md §3/§4/§8
+                        ? `color-mix(in oklch, var(--chart-blue) ${Math.round(opacity * 100)}%, transparent)`
                         : undefined,
                     }}
                     onClick={

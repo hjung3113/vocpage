@@ -12,7 +12,6 @@ import {
   Users,
   Database,
 } from 'lucide-react';
-import { cn } from '@shared/lib/cn';
 import { useRole } from '@entities/user/model/useRole';
 import { useNoticePopup } from '@entities/notice';
 import { useUnreadBadge } from '@entities/notification';
@@ -70,79 +69,39 @@ export function Sidebar() {
   return (
     <nav
       className="flex flex-col border-r border-[color:var(--border-standard)] bg-[color:var(--bg-panel)]"
-      style={{ width: '222px', fontFamily: 'Pretendard Variable, Pretendard, sans-serif' }}
+      style={{ width: '222px' }}
     >
       {/* 워크스페이스 셀렉터 */}
       <div
         data-testid="workspace-selector"
-        className="flex items-center gap-2 border-b border-[color:var(--border-standard)]"
-        style={{ padding: '8px 10px', minHeight: '36px' }}
+        className="flex min-h-9 items-center gap-2 border-b border-[color:var(--border-standard)] px-[10px] py-2"
       >
         <div
-          className="flex shrink-0 items-center justify-center rounded"
-          style={{
-            width: '20px',
-            height: '20px',
-            background: 'var(--brand)',
-            color: 'var(--bg-elevated)',
-          }}
+          className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[var(--brand)] text-[var(--bg-elevated)]"
           aria-hidden
         >
           <MessageSquare size={12} />
         </div>
         <span
           className="flex-1 truncate font-medium"
-          style={{ fontSize: '13px', color: 'var(--text-primary)' }}
+          style={{ fontSize: 'var(--fs-body)' }}
         >
           VOC Page
         </span>
-        <ChevronDown size={14} aria-hidden style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+        <ChevronDown size={14} aria-hidden className="shrink-0 text-[color:var(--text-muted)]" />
       </div>
 
       {/* nav 섹션 */}
-      <div className="flex-1 overflow-y-auto" style={{ padding: '0 8px' }}>
-        {/* 섹션 헤더 — 셀렉터와 12px 분리 */}
-        <div
-          data-testid="section-header-workspace"
-          style={{
-            marginTop: '16px',
-            padding: '4px 2px',
-            fontSize: '11px',
-            fontWeight: 500,
-            letterSpacing: '0.6px',
-            textTransform: 'uppercase',
-            color: 'var(--text-muted)',
-          }}
-        >
+      <div className="flex-1 overflow-y-auto px-2">
+        {/* 섹션 헤더 — 셀렉터와 16px 분리 */}
+        <div data-testid="section-header-workspace" className="sidebar-section-header">
           Workspace
         </div>
 
         {visible.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              cn('flex items-center transition-colors', isActive ? 'font-medium' : '')
-            }
-            style={({ isActive }) => ({
-              height: '34px',
-              padding: '9px 12px',
-              gap: '10px',
-              borderRadius: '6px',
-              fontSize: '13.5px',
-              fontWeight: isActive ? 600 : 500,
-              color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--brand-bg)' : undefined,
-            })}
-          >
-            <Icon
-              size={16}
-              aria-hidden
-              style={{
-                flexShrink: 0,
-              }}
-            />
-            <span style={{ flex: 1 }}>{label}</span>
+          <NavLink key={to} to={to} className="sidebar-nav-item">
+            <Icon size={16} aria-hidden className="shrink-0" />
+            <span className="flex-1">{label}</span>
             {to === '/notice' ? (
               <NavItemCountBadge
                 count={0}
@@ -168,49 +127,23 @@ export function Sidebar() {
         {/* 관리자 그룹 — admin / manager / dev 만 노출 (ADR 0004 §6.2) */}
         {showAdminGroup && (
           <>
-            <div
-              data-testid="section-header-admin"
-              style={{
-                marginTop: '16px',
-                padding: '4px 2px',
-                fontSize: '11px',
-                fontWeight: 500,
-                letterSpacing: '0.6px',
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
-              }}
-            >
+            <div data-testid="section-header-admin" className="sidebar-section-header">
               관리자
             </div>
             {ADMIN_NAV_ITEMS.filter((item) => !item.adminStrict || isAdmin).map(
               ({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  cn('flex items-center transition-colors', isActive ? 'font-medium' : '')
-                }
-                style={({ isActive }) => ({
-                  height: '34px',
-                  padding: '9px 12px',
-                  gap: '10px',
-                  borderRadius: '6px',
-                  fontSize: '13.5px',
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  background: isActive ? 'var(--brand-bg)' : undefined,
-                })}
-              >
-                <Icon size={16} aria-hidden style={{ flexShrink: 0 }} />
-                <span style={{ flex: 1 }}>{label}</span>
-              </NavLink>
-            ))}
+                <NavLink key={to} to={to} className="sidebar-nav-item">
+                  <Icon size={16} aria-hidden className="shrink-0" />
+                  <span className="flex-1">{label}</span>
+                </NavLink>
+              ),
+            )}
           </>
         )}
       </div>
 
       {/* 유저 카드 — 역할 전환 popover */}
-      <div data-testid="user-card" style={{ marginTop: 'auto' }}>
+      <div data-testid="user-card" className="mt-auto">
         <SidebarUserSwitcher />
       </div>
     </nav>

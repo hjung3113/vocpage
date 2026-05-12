@@ -149,6 +149,11 @@
     sans-serif;
   --font-mono: 'D2Coding', 'SF Mono', 'Menlo', ui-monospace, monospace;
 
+  /* Font-size scale — single source of truth; use var(--fs-*) everywhere */
+  --fs-caption: 11px;    /* section labels, column headers, count badges */
+  --fs-body: 13.5px;     /* nav items, row text, default UI body */
+  --fs-heading-sm: 15px; /* page headings, dialog titles */
+
   /* Chart colors */
   --chart-blue: oklch(63% 0.19 258);
   --chart-sky: oklch(72% 0.14 235);
@@ -739,3 +744,44 @@ body {
 }
 
 /* === C-7+ END === */
+
+/* === Sidebar styles ===
+   Moves nav-item and section-header styles out of inline JSX into CSS.
+   Active state uses aria-current="page" (set automatically by NavLink). */
+.sidebar-section-header {
+  margin-top: var(--sp-4);
+  padding: var(--sp-1) 2px;
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 9px var(--sp-3);
+  gap: 10px;
+  border-radius: 6px;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.sidebar-nav-item[aria-current='page'] {
+  font-weight: 600;
+  color: var(--accent);
+  background-color: var(--brand-bg);
+}
+
+.sidebar-nav-item:hover:not([aria-current='page']) {
+  color: var(--text-primary);
+  background-color: var(--brand-bg);
+}
+/* === Sidebar styles END === */
