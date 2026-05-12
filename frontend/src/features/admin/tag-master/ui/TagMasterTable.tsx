@@ -9,39 +9,38 @@
  * 409 CONFLICT errors shown inline (not toast).
  */
 import { useState } from 'react';
-import { Tag, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useRole } from '@entities/user/model/useRole';
 import { useAdminTags, useDeleteTag, useToggleExternal } from '../api/tag-master.api';
 import { TagMasterCreateModal } from './TagMasterCreateModal';
 import { TagMasterEditModal } from './TagMasterEditModal';
 import { TagMasterMergeModal } from './TagMasterMergeModal';
-import { TagMasterSuspendModal } from './TagMasterSuspendModal';
 import { TagMasterRow } from './TagMasterRow';
 import type { TagMasterItem as TagMasterItemT } from '@contracts/admin/tag';
 
-export function TagMasterTable() {
+interface Props {
+  onOpenRules?: (tag: TagMasterItemT) => void;
+}
+
+export function TagMasterTable({ onOpenRules }: Props = {}) {
   const { isAdmin, isManager } = useRole();
   const canMutate = isAdmin || isManager;
 
-  const { data, isLoading, isError } = useAdminTags();
+  const { data, isLoading, isError, refetch } = useAdminTags();
   const deleteTag = useDeleteTag();
   const toggleExternal = useToggleExternal();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<TagMasterItemT | null>(null);
   const [mergeSource, setMergeSource] = useState<TagMasterItemT | null>(null);
-  const [suspendTarget, setSuspendTarget] = useState<{
-    id: string;
-    suspended_until: string | null;
-  } | null>(null);
   const [inlineError, setInlineError] = useState<string | null>(null);
 
   function handleDelete(tag: TagMasterItemT) {
     setInlineError(null);
     deleteTag.mutate(tag.id, {
       onError: (err) => {
-        const e = err as { status?: number; message?: string };
-        if (e.status === 409) {
+        const e = err as { status?: number; code?: string; message?: string };
+        if (e.code === 'CONFLICT' || e.status === 409) {
           setInlineError(`삭제 불가: ${e.message ?? '태그가 사용 중입니다.'}`);
         }
       },
@@ -55,16 +54,60 @@ export function TagMasterTable() {
 
   if (isLoading) {
     return (
-      <div style={{ padding: '24px', color: 'var(--text-muted)', fontSize: '13px' }}>
-        로딩 중...
+      <div
+        role="status"
+        aria-label="태그 불러오는 중"
+        style={{ padding: 'var(--sp-5)', display: 'flex', flexDirection: 'column', gap: '6px' }}
+      >
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            data-testid="tag-skeleton-row"
+            style={{
+              height: '40px',
+              borderRadius: '6px',
+              background: 'var(--bg-elevated)',
+              opacity: 0.6,
+            }}
+          />
+        ))}
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div style={{ padding: '24px', color: 'var(--status-red)', fontSize: '13px' }}>
-        태그 목록을 불러오지 못했습니다.
+      <div
+        role="alert"
+        style={{
+          padding: 'var(--sp-5)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 'var(--sp-2)',
+        }}
+      >
+        <p style={{ margin: 0, color: 'var(--status-red)', fontSize: '13.5px', fontWeight: 600 }}>
+          태그를 불러오지 못했습니다
+        </p>
+        <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>
+          네트워크 상태를 확인한 후 다시 시도해 주세요
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid var(--status-red-border)',
+            background: 'transparent',
+            color: 'var(--status-red)',
+            fontSize: '12px',
+            cursor: 'pointer',
+          }}
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
@@ -79,14 +122,10 @@ export function TagMasterTable() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '16px',
+          marginBottom: 'var(--sp-4)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Tag size={18} aria-hidden style={{ color: 'var(--accent)' }} />
-          <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
-            태그 마스터
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
           <span
             style={{
               fontSize: '12px',
@@ -96,7 +135,7 @@ export function TagMasterTable() {
               padding: '2px 6px',
             }}
           >
-            {data?.total ?? 0}건
+            전체 {data?.total ?? 0}건
           </span>
         </div>
         <button
@@ -128,8 +167,8 @@ export function TagMasterTable() {
         <div
           role="alert"
           style={{
-            marginBottom: '12px',
-            padding: '8px 12px',
+            marginBottom: 'var(--sp-3)',
+            padding: 'var(--sp-2) var(--sp-3)',
             borderRadius: '6px',
             background: 'var(--status-red-bg)',
             color: 'var(--status-red)',
@@ -151,11 +190,11 @@ export function TagMasterTable() {
       >
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border-standard)' }}>
-            {['이름', '종류', '외부잠금', '사용(VOC)', '규칙', '추가일', '액션'].map((h) => (
+            {['이름', '종류', '외부잠금', '사용(VOC)', '규칙 N건', '추가일', '액션'].map((h) => (
               <th
                 key={h}
                 style={{
-                  padding: '8px 12px',
+                  padding: 'var(--sp-2) var(--sp-3)',
                   textAlign: 'left',
                   fontSize: '11px',
                   fontWeight: 500,
@@ -174,7 +213,7 @@ export function TagMasterTable() {
             <tr>
               <td
                 colSpan={7}
-                style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--text-muted)' }}
+                style={{ padding: 'var(--sp-5) var(--sp-3)', textAlign: 'center', color: 'var(--text-muted)' }}
               >
                 태그가 없습니다.
               </td>
@@ -188,7 +227,7 @@ export function TagMasterTable() {
                 canMutate={canMutate}
                 onEdit={setEditTarget}
                 onMerge={setMergeSource}
-                onSuspend={(id) => setSuspendTarget({ id, suspended_until: null })}
+                onOpenRules={(t) => onOpenRules?.(t)}
                 onDelete={handleDelete}
                 onToggleExternal={handleToggleExternal}
               />
@@ -205,13 +244,6 @@ export function TagMasterTable() {
           source={mergeSource}
           allTags={rows}
           onClose={() => setMergeSource(null)}
-        />
-      )}
-      {suspendTarget && (
-        <TagMasterSuspendModal
-          ruleId={suspendTarget.id}
-          currentValue={suspendTarget.suspended_until}
-          onClose={() => setSuspendTarget(null)}
         />
       )}
     </div>

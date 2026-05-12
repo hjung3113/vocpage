@@ -544,9 +544,73 @@ VOC 목록 테이블에서 부모 VOC 행에 자식 서브태스크를 인라인
 
 #### 9.4.1 태그 규칙 관리
 
-- 테이블: 키워드 목록(쉼표 구분) | 생성 태그명 | 매칭 방식(키워드) | 작업(수정/삭제)
-- "규칙 추가" 버튼 → 인라인 입력 폼
-- 규칙 삭제 시 확인 다이얼로그 없이 즉시 삭제 (프로토타입 한정)
+태그별 자동 태깅 규칙(`tag_rules`)은 별도 라우트 없이 `/admin/tags` 페이지에서 통합 관리한다. 별도의 단독 규칙 라우트 / 사이드바 entry는 존재하지 않는다.
+
+**편집 표면 (Modal-based row consolidation)**
+
+- `/admin/tags` 태그 마스터 테이블의 각 행에는 `규칙 N건` 뱃지가 노출된다. 뱃지 클릭 시 `TagRulesManagerModal`(Dialog)이 열린다.
+- Modal 헤더: 부모 태그명 + `규칙 N건` 카운트.
+- Modal 본문: (a) 신규 규칙 추가 폼 + (b) 해당 태그의 `tag_rules` sub-table.
+- Sub-table 컬럼: `키워드 목록 | 매칭 방식 | 일시중지 상태 | 작성자 | 작업(수정/일시중지/재개/삭제)`.
+- 규칙 추가/수정/삭제/일시중지/재개는 모두 Modal 내부의 row-action으로 수행한다. Side drawer / 인라인 확장 row는 채택하지 않으며, admin Modal 패턴(`TagMasterEditModal` / `TagMasterSuspendModal` 등)과 일관된다.
+
+**View-mode 탭 (전체 규칙 보기)**
+
+- 페이지 상단에 view-mode 탭(`태그` / `전체 규칙`)을 둔다.
+- `전체 규칙` 탭: 모든 태그의 `tag_rules`를 평면(flat) 테이블로 표시 — `키워드 | 태그 | 매칭 방식 | 일시중지 상태 | 작성자 | 작업`. 키워드 검색 input 노출.
+- URL state는 단일 source of truth: `?view=tags|rules` (기본 `tags`) + `?q=<text>` (`view=rules` 일 때만 의미). 새로고침 / 공유 링크 / 뒤로가기 모두 동일 상태 복원.
+
+**입력 폼 / 검증**
+
+- `keywords` 입력은 chip array UX (Enter / 쉼표로 chip 추가, x로 제거, 중복 입력 시 inline 에러). 폼 제출 시 정규화된 string array로 BE에 전달.
+- `match_mode` select는 렌더하되 옵션은 `keyword` 단일을 유지한다 (regex / exact 옵션은 NextGen).
+- `created_by`는 FE에서 미입력. 서버가 현재 로그인 사용자의 `users.id`로 자동 set하며, 응답에는 LEFT JOIN한 `created_by_name`(= `users.display_name`)을 포함한다. FE는 이 값을 그대로 표시하고, NULL인 pre-existing row는 `—`로 렌더한다.
+
+**REST API (nested resource, mig 024 이후 정본)**
+
+```
+GET    /api/admin/tags/{tagId}/rules                     # 목록 (created_by_name 포함)
+POST   /api/admin/tags/{tagId}/rules                     # 생성
+PATCH  /api/admin/tags/{tagId}/rules/{ruleId}            # 수정
+DELETE /api/admin/tags/{tagId}/rules/{ruleId}            # 삭제
+PATCH  /api/admin/tags/{tagId}/rules/{ruleId}/suspend    # 일시중지 / 재개
+```
+
+구 단독 규칙 경로는 본 phase에서 alias 없이 즉시 제거되었다. `shared/openapi.yaml`의 paths 블록도 nested 형태로만 존재한다.
+
+**Schema (mig 024)**
+
+`tag_rules` 컬럼은 다음과 같다.
+
+| 컬럼 | 타입 | 비고 |
+| --- | --- | --- |
+| `id` | uuid PK | |
+| `tag_id` | uuid FK → `tags.id` | |
+| `kind` | text | |
+| `keywords` | `text[] NOT NULL DEFAULT '{}'` | 정규화된 chip array |
+| `match_mode` | `text NOT NULL DEFAULT 'keyword'` | 현재 단일 옵션 |
+| `suspended_until` | timestamptz NULL | 일시중지 만료 시각 |
+| `created_by` | uuid NULL REFERENCES `users(id)` | pre-existing row는 NULL 보존 |
+| `created_at` | timestamptz NOT NULL | |
+
+기존 `pattern text` 컬럼은 본 migration에서 drop. 모든 BE / FE / MSW / contract 소비자는 `keywords[]` + `match_mode`만을 읽는다 (JSON 파싱 없음). List 응답에는 `created_by_name?: string | null`이 포함된다 (OpenAPI `TagRule` 스키마 정본).
+
+**권한 (D-13, ADR-0004 §irreversible 준용)**
+
+- `GET   /api/admin/tags/{tagId}/rules`             — Admin / Manager / Dev (read).
+- `POST  /api/admin/tags/{tagId}/rules`             — Manager+.
+- `PATCH /api/admin/tags/{tagId}/rules/{ruleId}`    — Manager+.
+- `DELETE /api/admin/tags/{tagId}/rules/{ruleId}`   — Admin only (irreversible 보호).
+- `PATCH /api/admin/tags/{tagId}/rules/{ruleId}/suspend` — Admin only.
+- 사이드바 `/admin/tags` entry visibility는 §9.4.6 (태그 마스터 권한)을 준용한다.
+
+**Optimistic update (D-11)**
+
+create / delete mutation의 `onMutate`에서 admin-tags 캐시의 해당 태그 `rule_ref_count`를 ±1 한다 (rollback context 보존). `onError`에서 rollback, `onSettled`에서 admin-tags list invalidate로 서버 진실과 동기화한다. 동일 태그에 대한 동시 mutation race는 last-write-wins.
+
+**휴지통 복원 멱등성**
+
+VOC 복원 시 `tag_rules` 멱등 재실행 정책은 §9.4.7 (휴지통)과 ADR-0005를 그대로 따른다. 본 nested rename 이후에도 호출부 식별자만 nested 형태로 갱신될 뿐, 정책 자체는 불변.
 
 #### 9.4.2 시스템/메뉴 관리
 

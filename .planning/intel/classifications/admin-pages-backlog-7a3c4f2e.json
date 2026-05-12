@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/plans/admin-pages-backlog.md",
+  "type": "DOC",
+  "confidence": "medium",
+  "manifest_override": false,
+  "title": "Admin 페이지 백로그 (2026-05-10)",
+  "summary": "Backlog memo cataloging admin area implemented/unimplemented pages with an integration proposal for tag rules into tag master.",
+  "scope": ["admin pages", "/admin/tags", "/admin/masters", "/admin/users", "/admin/vocs/trash", "/admin/systems", "/admin/voc-types", "/admin/result-review", "/admin/tag-rules", "tag_rules", "routing-conventions"],
+  "cross_refs": ["feature-voc.md", "requirements.md", "external-masters.md", "routing-conventions.md", "docs/adr/0004", "docs/adr/0005"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Planning/backlog memo with proposal sections; not a locked decision (ADR), not user-story PRD, not API/schema spec. Contains a proposal awaiting user decision before plan promotion."
+}

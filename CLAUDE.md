@@ -6,9 +6,11 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 
 **Canonical sources:**
 
-- Progress: `claude-progress.txt` (first 30 lines) + `docs/specs/plans/next-session-tasks.md` (active + deferred) + `docs/specs/plans/wave-3-admin.md` (active wave) + `docs/specs/plans/followup-bucket.md` (closed-wave follow-ups, `FU-NNN`).
-- Spec: `docs/specs/requires/requirements.md` + `feature-*.md`.
+- Project state: `.planning/STATE.md` (current milestone + active phase) + `.planning/ROADMAP.md` (all phases) + `.planning/PROJECT.md` (LOCKED decisions). Managed by GSD commands — do not hand-edit.
+- Decisions: `docs/adr/` (ADRs are immutable history; LOCKED decisions also surface in `.planning/PROJECT.md` `<decisions>` blocks).
+- Spec: `docs/specs/requires/requirements.md` + `feature-*.md` + `*-conventions.md`.
 - Design: `docs/specs/requires/uidesign.md`.
+- Codebase map: `.planning/codebase/` (refresh via `/gsd-map-codebase`).
 - Sub-dir maps: `frontend/CLAUDE.md`, `backend/CLAUDE.md` (consult before editing in those trees).
 
 **Implementation reference (2026-05-09~):** `requirements.md` + `uidesign.md` only. `prototype/` is no longer a visual / behavior reference — pixel / DOM / CSS citation forbidden.
@@ -16,13 +18,11 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 **Document rules:**
 
 - Permanent specs in `docs/specs/requires/`. Past history lives in git log + PR descriptions — never in standalone changelog files.
-- ID rules: Wave / Phase are append-only integers; sub-decimals forbidden; batch labels are plan-table column metadata, never part of the ID.
-- On merge: sync `next-session-tasks.md` + `claude-progress.txt`.
+- Phase / plan / state files in `.planning/` are owned by GSD commands (`/gsd-plan-phase`, `/gsd-execute-phase`, `/gsd-progress`, `/gsd-resume-work`). Hand-edit only when GSD itself produces or asks for it.
 - `CLAUDE.md` / `MEMORY.md` writing: English only, objective and unambiguous, no supplementary commentary or hedging. Root `CLAUDE.md` stays under 200 lines.
 
 **Top-level directories:**
 
-- `benchmark/` — ground-truth PNGs (`01–22-…`) for `scripts/visual-diff.ts`. New screen = baseline + INDEX row.
 - `graphify-out/` — auto-generated, do not hand-edit. Refresh: `graphify update .`.
 - `scripts/` — utilities (`check-fixture-seed-parity.ts`, `shadcn-token-rewrite.ts`, `visual-diff.ts`).
 - `shared/` — `types/` (FE + BE entities / enums) · `contracts/` (zod schemas, single source) · `fixtures/` (MSW + seed, parity enforced) · `openapi.yaml` (REST contract reference).
@@ -31,18 +31,17 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 
 **Start every session:**
 
-1. `claude-progress.txt` (first 30 lines).
-2. `next-session-tasks.md` for the current Phase.
-3. Relevant spec selectively.
-4. Memory index `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — purge entries already in specs / git.
+1. `/gsd-progress` (or `/gsd-resume-work`) — restores state from `.planning/STATE.md` + active phase.
+2. Relevant spec from `docs/specs/requires/` and ADRs from `docs/adr/` selectively.
+3. Memory index `~/.claude/projects/-Users-hyojung-Desktop-2026-vocpage/memory/MEMORY.md` — purge entries already in specs / git.
 
-**Input framing (before coding):** state **Goal** (what + why, 1 line) · **Scope** (files in / out) · **Done when** (verifiable conditions) · **Constraints** (style / tokens / patterns). Skip for trivial one-liners.
+**Input framing (before coding):** state **Goal** (what + why, 1 line) · **Scope** (files in / out) · **Done when** (verifiable conditions) · **Constraints** (style / tokens / patterns). Skip for trivial one-liners. Inside a GSD phase, the active PLAN.md provides this framing — only frame manually for ad-hoc work.
 
 **Approval scope:** user approval covers its declared scope + reversible items inside. Plan approval → batches OK. Batch approval → leaves OK. Spec-derived → no extra approval. Re-ask on (1) new plan / batch, (2) irreversible not in spec, (3) user contradiction.
 
 **Completion language:** leaves → report what landed, no "done"; phase / wave / PR-merge → wait for explicit user confirmation.
 
-**Session continuity:** every design decision → spec or ADR before session ends. Phase close → `claude-progress.txt` + commit. No implementation without a spec section.
+**Session continuity:** every design decision → ADR (or `.planning/PROJECT.md` `<decisions>` block via GSD) before session ends. Phase progress is tracked by GSD in `.planning/STATE.md` + phase manifest — no separate progress file. No implementation without a spec section.
 
 ## 3. Engineering Rules
 
@@ -78,7 +77,7 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 - Think before coding: state assumptions; surface multiple interpretations.
 - Simplicity first; surgical changes; goal-driven verification per step. YAGNI. Match nearby code style.
 - Pre-commit: `npm run lint -w frontend` once before first commit. Tests before commit.
-- Progress docs at phase / wave close only — intra-phase PRs exempt. The `warn-doc-cleanup-before-pr` hookify checklist applies on `gh pr merge` for phase / wave-close PRs only.
+- Progress docs at phase / wave close only — intra-phase PRs exempt.
 
 **Refactoring** (structure change without behavior change; never combined with feature change):
 
@@ -86,8 +85,6 @@ VOC (Voice of Customer) management system. Three-tier: React SPA → Express RES
 - During: `git mv` for moves; one refactor at a time.
 - After (in order): update all references → `rg -n "<old>"` returns 0 → Serena ref-check on renames → typecheck → tests → exercise the surface.
 - Escalate to `code-reviewer` only on public API change, ≥3 modules, or DB schema / migration.
-
-**Git workflow:** feature branch (`docs/<topic>` / `feat/<topic>` / `fix/<topic>`) before any change; never push to main; PRs opened by user; merge with `gh pr merge <n> --merge --delete-branch` (squash / rebase forbidden); after merge `git branch -D <branch>`. Enforced by `.claude/hookify.block-*.local.md`.
 
 ## 4. Agent Skills
 

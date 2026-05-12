@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/specs/requires/uidesign.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "VOCpage UI Design System",
+  "summary": "Visual-layer specification defining OKLCH color tokens, typography, surfaces, spacing, and component visual rules for VOCpage's light/dark themed enterprise UI.",
+  "scope": ["design tokens", "color palette (OKLCH)", "theme system (light/dark)", "typography", "surfaces and elevation", "border-radius", "shadows", "component visuals", "layout rules"],
+  "cross_refs": ["requirements.md", "feature-*.md", "design.md"],
+  "locked": false,
+  "precedence": null
+}

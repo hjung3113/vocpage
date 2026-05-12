@@ -8,7 +8,7 @@
  *   - POST   /api/admin/tags/:id/merge    : admin → 200, manager/dev/user → 403
  *   - PATCH  /api/admin/tags/:id/external : admin → 200, manager/dev/user → 403
  *   - DELETE /api/admin/tags/:id          : admin → 200 (unused) / 409 (used); others → 403
- *   - PATCH  /api/admin/tag-rules/:id/suspend: admin → 200, manager/dev/user → 403
+ *   - PATCH  /api/admin/tags/:tagId/rules/:ruleId/suspend: admin → 200, manager/dev/user → 403
  *
  * Regression cases:
  *   - merge atomic: target not found → 404
@@ -34,6 +34,10 @@ jest.mock('../../services/admin/tag-master', () => ({
   mergeTags: jest.fn(),
   toggleExternal: jest.fn(),
   deleteTag: jest.fn(),
+  listTagRules: jest.fn(),
+  createTagRule: jest.fn(),
+  updateTagRule: jest.fn(),
+  deleteTagRule: jest.fn(),
   suspendTagRule: jest.fn(),
 }));
 
@@ -92,7 +96,48 @@ beforeEach(() => {
   (svc.mergeTags as jest.Mock).mockResolvedValue({ mergedCount: 1 });
   (svc.toggleExternal as jest.Mock).mockResolvedValue({ ...MOCK_TAG, is_external: true });
   (svc.deleteTag as jest.Mock).mockResolvedValue({ deleted: true });
-  (svc.suspendTagRule as jest.Mock).mockResolvedValue({ id: RULE_ID, suspended_until: null });
+  (svc.listTagRules as jest.Mock).mockResolvedValue({
+    rows: [],
+    page: 1,
+    per_page: 20,
+    total: 0,
+  });
+  (svc.createTagRule as jest.Mock).mockImplementation(
+    async (_tagId: string, _input: unknown, user: { id: string; name: string }) => ({
+      id: RULE_ID,
+      tag_id: ADMIN_TAG_ID,
+      kind: 'general',
+      keywords: ['kw'],
+      match_mode: 'keyword',
+      suspended_until: null,
+      created_by: user.id,
+      created_by_name: user.name,
+      created_at: '2026-01-01T00:00:00.000Z',
+    }),
+  );
+  (svc.updateTagRule as jest.Mock).mockResolvedValue({
+    id: RULE_ID,
+    tag_id: ADMIN_TAG_ID,
+    kind: 'general',
+    keywords: ['kw'],
+    match_mode: 'keyword',
+    suspended_until: null,
+    created_by: null,
+    created_by_name: null,
+    created_at: '2026-01-01T00:00:00.000Z',
+  });
+  (svc.deleteTagRule as jest.Mock).mockResolvedValue(undefined);
+  (svc.suspendTagRule as jest.Mock).mockResolvedValue({
+    id: RULE_ID,
+    tag_id: ADMIN_TAG_ID,
+    kind: 'general',
+    keywords: ['kw'],
+    match_mode: 'keyword',
+    suspended_until: null,
+    created_by: null,
+    created_by_name: null,
+    created_at: '2026-01-01T00:00:00.000Z',
+  });
 });
 
 // ─────────────────────────────────────────────
@@ -248,22 +293,179 @@ describe('DELETE /api/admin/tags/:id', () => {
 });
 
 // ─────────────────────────────────────────────
-// PATCH /api/admin/tag-rules/:id/suspend — Admin only
+// tag rules CRUD — D-13 permission matrix (5 routes × 4 roles)
+// Plan 01-04 / threats T-01-07 (matrix), T-01-08 (IDOR), T-01-09 (created_by injection),
+// T-01-10 (route order /suspend before /:ruleId).
 // ─────────────────────────────────────────────
-describe('PATCH /api/admin/tag-rules/:id/suspend', () => {
-  test('admin → 200', async () => {
+describe('tag rules CRUD — D-13 permission matrix', () => {
+  type Method = 'get' | 'post' | 'patch' | 'delete';
+  type Role = 'admin' | 'manager' | 'dev' | 'user';
+  type Case = {
+    label: string;
+    method: Method;
+    path: (t: string, r: string) => string;
+    body?: unknown;
+    ok: readonly Role[];
+    okStatus: number;
+    deny: readonly Role[];
+  };
+
+  const cases: readonly Case[] = [
+    {
+      label: 'GET    /tags/:tagId/rules',
+      method: 'get',
+      path: (t) => `/api/admin/tags/${t}/rules`,
+      ok: ['admin', 'manager', 'dev'],
+      okStatus: 200,
+      deny: ['user'],
+    },
+    {
+      label: 'POST   /tags/:tagId/rules',
+      method: 'post',
+      path: (t) => `/api/admin/tags/${t}/rules`,
+      body: { keywords: ['kw'], match_mode: 'keyword' },
+      ok: ['admin', 'manager'],
+      okStatus: 201,
+      deny: ['dev', 'user'],
+    },
+    {
+      label: 'PATCH  /tags/:tagId/rules/:ruleId',
+      method: 'patch',
+      path: (t, r) => `/api/admin/tags/${t}/rules/${r}`,
+      body: { keywords: ['kw2'] },
+      ok: ['admin', 'manager'],
+      okStatus: 200,
+      deny: ['dev', 'user'],
+    },
+    {
+      label: 'DELETE /tags/:tagId/rules/:ruleId',
+      method: 'delete',
+      path: (t, r) => `/api/admin/tags/${t}/rules/${r}`,
+      ok: ['admin'],
+      okStatus: 204,
+      deny: ['manager', 'dev', 'user'],
+    },
+    {
+      label: 'PATCH  /tags/:tagId/rules/:ruleId/suspend',
+      method: 'patch',
+      path: (t, r) => `/api/admin/tags/${t}/rules/${r}/suspend`,
+      body: { suspended_until: null },
+      ok: ['admin'],
+      okStatus: 200,
+      deny: ['manager', 'dev', 'user'],
+    },
+  ] as const;
+
+  for (const c of cases) {
+    describe(c.label, () => {
+      for (const role of c.ok) {
+        test(`${role} → ${c.okStatus}`, async () => {
+          const agent = await agentAs(role);
+          const url = c.path(ADMIN_TAG_ID, RULE_ID);
+          const req = c.body ? agent[c.method](url).send(c.body) : agent[c.method](url);
+          const res = await req;
+          expect(res.status).toBe(c.okStatus);
+        });
+      }
+      for (const role of c.deny) {
+        test(`${role} → 403`, async () => {
+          const agent = await agentAs(role);
+          const url = c.path(ADMIN_TAG_ID, RULE_ID);
+          const req = c.body ? agent[c.method](url).send(c.body) : agent[c.method](url);
+          const res = await req;
+          expect(res.status).toBe(403);
+        });
+      }
+    });
+  }
+});
+
+// ─────────────────────────────────────────────
+// T-01-09 — created_by injection ignored (server reads req.user.id)
+// ─────────────────────────────────────────────
+describe('POST /api/admin/tags/:tagId/rules — created_by IDOR injection (T-01-09)', () => {
+  test('attacker-supplied created_by is IGNORED; server uses authenticated user.id', async () => {
+    const ATTACKER_UUID = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
     const agent = await agentAs('admin');
     const res = await agent
-      .patch(`/api/admin/tag-rules/${RULE_ID}/suspend`)
-      .send({ suspended_until: null });
-    expect(res.status).toBe(200);
+      .post(`/api/admin/tags/${ADMIN_TAG_ID}/rules`)
+      // body smuggles created_by — zod schema OMITS it (Plan 03), express strips,
+      // and even if it slipped through, the service receives a 3rd-arg user from req.user.
+      .send({ keywords: ['kw'], match_mode: 'keyword', created_by: ATTACKER_UUID });
+    expect(res.status).toBe(201);
+
+    const callArgs = (svc.createTagRule as jest.Mock).mock.calls[0];
+    const tagIdArg = callArgs[0];
+    const inputArg = callArgs[1];
+    const userArg = callArgs[2];
+    expect(tagIdArg).toBe(ADMIN_TAG_ID);
+    expect(inputArg).not.toHaveProperty('created_by');
+    expect(userArg).toBeDefined();
+    expect(userArg.role).toBe('admin');
+    // Response reflects the authenticated user (mock echoes user.id back), NOT the attacker UUID.
+    expect(res.body.created_by).toBe(userArg.id);
+    expect(res.body.created_by).not.toBe(ATTACKER_UUID);
+  });
+});
+
+// ─────────────────────────────────────────────
+// T-01-08 — IDOR: tag_id mismatch on PATCH/DELETE/suspend → 404
+// ─────────────────────────────────────────────
+describe('tag rules IDOR — wrong tag scope (T-01-08)', () => {
+  const WRONG_TAG = MANAGER_TAG_ID;
+
+  test('PATCH /tags/<wrong-tag>/rules/<ruleId> → 404 when rule belongs to a different tag', async () => {
+    (svc.updateTagRule as jest.Mock).mockRejectedValue({
+      code: 'NOT_FOUND',
+      message: '태그 규칙을 찾을 수 없습니다.',
+    });
+    const agent = await agentAs('admin');
+    const res = await agent
+      .patch(`/api/admin/tags/${WRONG_TAG}/rules/${RULE_ID}`)
+      .send({ keywords: ['kw'] });
+    expect(res.status).toBe(404);
   });
 
-  test.each(['manager', 'dev', 'user'] as const)('%s → 403', async (role) => {
-    const agent = await agentAs(role);
+  test('DELETE /tags/<wrong-tag>/rules/<ruleId> → 404 (IDOR)', async () => {
+    (svc.deleteTagRule as jest.Mock).mockRejectedValue({
+      code: 'NOT_FOUND',
+      message: '태그 규칙을 찾을 수 없습니다.',
+    });
+    const agent = await agentAs('admin');
+    const res = await agent.delete(`/api/admin/tags/${WRONG_TAG}/rules/${RULE_ID}`);
+    expect(res.status).toBe(404);
+  });
+
+  test('PATCH /tags/<wrong-tag>/rules/<ruleId>/suspend → 404 (IDOR)', async () => {
+    (svc.suspendTagRule as jest.Mock).mockRejectedValue({
+      code: 'NOT_FOUND',
+      message: '태그 규칙을 찾을 수 없습니다.',
+    });
+    const agent = await agentAs('admin');
     const res = await agent
-      .patch(`/api/admin/tag-rules/${RULE_ID}/suspend`)
+      .patch(`/api/admin/tags/${WRONG_TAG}/rules/${RULE_ID}/suspend`)
       .send({ suspended_until: null });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(404);
+  });
+});
+
+// ─────────────────────────────────────────────
+// T-01-10 — Express route order: /suspend body shape vs plain PATCH body shape
+// ─────────────────────────────────────────────
+describe('tag rules route order (T-01-10)', () => {
+  test('PATCH /:ruleId/suspend hits suspend handler (not the plain :ruleId PATCH)', async () => {
+    const agent = await agentAs('admin');
+    await agent
+      .patch(`/api/admin/tags/${ADMIN_TAG_ID}/rules/${RULE_ID}/suspend`)
+      .send({ suspended_until: '2030-01-01T00:00:00+09:00' });
+    expect((svc.suspendTagRule as jest.Mock).mock.calls.length).toBe(1);
+    expect((svc.updateTagRule as jest.Mock).mock.calls.length).toBe(0);
+  });
+
+  test('PATCH /:ruleId (no /suspend) hits update handler (not suspend)', async () => {
+    const agent = await agentAs('admin');
+    await agent.patch(`/api/admin/tags/${ADMIN_TAG_ID}/rules/${RULE_ID}`).send({ keywords: ['kw'] });
+    expect((svc.updateTagRule as jest.Mock).mock.calls.length).toBe(1);
+    expect((svc.suspendTagRule as jest.Mock).mock.calls.length).toBe(0);
   });
 });

@@ -1,0 +1,22 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0006-custom-date-range-default.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "0006 — Dashboard `default_date_range='custom'` 사용자 정의 시작/종료일 저장 정책",
+  "summary": "Locks schema, CHECK constraints, zod, API, and UI semantics for persisting custom default date range in dashboard_settings.",
+  "scope": ["dashboard_settings", "default_date_range", "custom date range", "migration 023", "zod contracts", "DashboardSettingsDialog", "Admin default row"],
+  "cross_refs": [
+    "docs/specs/requires/dashboard.md",
+    "docs/specs/requires/requirements.md",
+    "docs/specs/plans/followup-bucket.md",
+    "docs/adr/0007-*",
+    "frontend/src/features/dashboard/ui/DashboardSettingsForm.tsx",
+    "frontend/src/features/dashboard/model/useDashboardDraft.ts",
+    "backend/migrations/022_dashboard_admin_default_unique.sql",
+    "shared/openapi.yaml",
+    "shared/contracts/"
+  ],
+  "locked": true,
+  "precedence": null
+}

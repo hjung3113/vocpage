@@ -1,0 +1,17 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0004-admin-permission-model.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "0004 — Admin 페이지 4 화면 권한 모델",
+  "summary": "Locks per-screen mutate/read permissions for Wave 3 admin pages (Tag Master, Trash, External Masters, Users) across admin/manager/dev/user roles.",
+  "scope": ["Admin pages", "Tag Master", "Trash", "External Masters", "Users", "Role-based access control", "BE route guards", "FE sidebar guards"],
+  "cross_refs": [
+    "requirements.md",
+    "feature-voc.md",
+    "uidesign.md",
+    "external-masters.md"
+  ],
+  "locked": true,
+  "precedence": null
+}

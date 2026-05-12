@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0007-custom-date-range-timezone.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "0007 — Dashboard `custom` 날짜 범위의 timezone 해석 시맨틱",
+  "summary": "ADR locking timezone interpretation semantics for dashboard custom date range fields, currently in Proposed status with open questions.",
+  "scope": ["dashboard_settings", "custom_start_date", "custom_end_date", "timezone interpretation", "cron aggregation day boundary"],
+  "cross_refs": ["docs/adr/0006-custom-date-range-default.md", "docs/specs/requires/dashboard.md"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

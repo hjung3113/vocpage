@@ -1,0 +1,12 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/agents/triage-labels.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Triage Labels",
+  "summary": "Maps five canonical triage roles from mattpocock/skills to the actual issue-tracker label strings used in this repo.",
+  "scope": ["issue triage", "GitHub labels", "agent workflow"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

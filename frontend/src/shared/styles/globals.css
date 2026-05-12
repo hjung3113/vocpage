@@ -666,3 +666,76 @@ body {
   font-size: 13px;
   color: var(--text-secondary);
 }
+
+/* === C-7+: Phase 01 Tag Rules Consolidation — interactive recipes === */
+
+/*
+ * Bound to .planning/phases/01-tag-rules-consolidation/01-UI-SPEC.md.
+ * Migrated from inline styles to express :hover / :focus-visible / :active
+ * + prefers-reduced-motion paths that inline-style cannot.
+ */
+
+.tag-rule-view-tab {
+  transition:
+    background 120ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 80ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tag-rule-view-tab:active {
+  transform: scale(0.94);
+}
+.tag-rule-view-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-bg);
+}
+
+.tag-rule-row-badge {
+  transition: background 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tag-rule-row-badge:hover {
+  background: color-mix(in oklch, var(--brand-bg) 80%, var(--accent) 10%);
+}
+.tag-rule-row-badge:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-bg);
+}
+
+.tag-rule-flat-name-btn {
+  transition: color 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.tag-rule-flat-name-btn:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.tag-rule-flat-name-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-bg);
+  border-radius: 2px;
+}
+
+.tag-rule-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-bg);
+  border-radius: 4px;
+}
+
+.tag-rule-search-input:focus-visible {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px var(--brand-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-rule-view-tab,
+  .tag-rule-row-badge,
+  .tag-rule-flat-name-btn {
+    transition: none;
+  }
+  .tag-rule-view-tab:active {
+    transform: none;
+  }
+}
+
+/* === C-7+ END === */

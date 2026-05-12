@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/hyojung/Desktop/2026/vocpage/docs/adr/0002-list-response-aggregated-fields.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "VOC 목록 응답의 has_children / notes_count는 SQL 집계로 계산한다",
+  "summary": "Decision to compute VocListItem.has_children and notes_count via SQL aggregates in listVocs instead of hardcoded defaults.",
+  "scope": ["VocListItem", "shared/contracts/voc/entity.ts", "services/voc.ts", "repository/voc.ts", "voc_internal_notes", "VocRow", "VocTable"],
+  "cross_refs": ["shared/contracts/voc/entity.ts", "services/voc.ts", "repository/voc.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": "ADR file in docs/adr/ with Context/Decision/Consequences structure. No explicit Status field; locked set to false since Accepted status not declared."
+}

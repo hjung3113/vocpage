@@ -1529,92 +1529,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /admin/tag-rules:
-    get:
-      tags: [admin]
-      operationId: adminListTagRules
-      summary: List tag rules (admin)
-      responses:
-        '200':
-          description: Tag rules
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TagRule'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-    post:
-      tags: [admin]
-      operationId: adminCreateTagRule
-      summary: Create tag rule (admin)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TagRuleInput'
-      responses:
-        '201':
-          description: Created tag rule
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TagRule'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-
-  /admin/tag-rules/{id}:
-    parameters:
-      - $ref: '#/components/parameters/id'
-    patch:
-      tags: [admin]
-      operationId: adminUpdateTagRule
-      summary: Update tag rule (admin)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TagRulePatch'
-      responses:
-        '200':
-          description: Updated tag rule
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TagRule'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags: [admin]
-      operationId: adminDeleteTagRule
-      summary: Delete tag rule (admin)
-      responses:
-        '200':
-          description: Deleted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OkResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
   /admin/masters/refresh:
     post:
       tags: [admin]
@@ -1814,13 +1728,133 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /admin/tag-rules/{id}/suspend:
+  /admin/tags/{tagId}/rules:
     parameters:
-      - $ref: '#/components/parameters/id'
+      - in: path
+        name: tagId
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      tags: [admin]
+      operationId: adminTagRulesList
+      summary: List tag rules for a tag (admin/manager/dev — read)
+      parameters:
+        - in: query
+          name: q
+          required: false
+          schema: { type: string, maxLength: 120 }
+        - in: query
+          name: page
+          required: false
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: per_page
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Tag rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRuleListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [admin]
+      operationId: adminTagRulesCreate
+      summary: Create a tag rule (manager+ — server derives created_by from session)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRuleCreate'
+      responses:
+        '201':
+          description: Created tag rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/BadRequest'
+
+  /admin/tags/{tagId}/rules/{ruleId}:
+    parameters:
+      - in: path
+        name: tagId
+        required: true
+        schema: { type: string, format: uuid }
+      - in: path
+        name: ruleId
+        required: true
+        schema: { type: string, format: uuid }
     patch:
       tags: [admin]
-      operationId: adminSuspendTagRule
-      summary: Suspend or resume tag rule (admin only — tag_rules.suspended_until)
+      operationId: adminTagRulesUpdate
+      summary: Update a tag rule (manager+)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRulePatch'
+      responses:
+        '200':
+          description: Updated tag rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [admin]
+      operationId: adminTagRulesDelete
+      summary: Delete a tag rule (admin only)
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/tags/{tagId}/rules/{ruleId}/suspend:
+    parameters:
+      - in: path
+        name: tagId
+        required: true
+        schema: { type: string, format: uuid }
+      - in: path
+        name: ruleId
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      tags: [admin]
+      operationId: adminTagRulesSuspend
+      summary: Suspend or resume a tag rule (admin only — tag_rules.suspended_until)
       requestBody:
         required: true
         content:
@@ -2957,59 +2991,52 @@ components:
         is_archived:
           type: boolean
 
+    # Phase 01 Plan 03 — TagRule consolidation.
+    #  pattern → keywords[] + match_mode (D-05/D-06 + OQ-R1 Option C)
+    #  D-08 nested resource (/admin/tags/:tagId/rules); kind locked to 'general' for v1.
+    #  D-12 + OQ-R5: created_by uuid|null + created_by_name string|null (BE join).
     TagRule:
       type: object
-      required: [id, name, pattern, kind, tag_id, is_active]
+      required: [id, tag_id, kind, keywords, match_mode, suspended_until, created_by, created_by_name, created_at]
       properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        pattern:
-          type: string
-        kind:
-          type: string
-          enum: ['general']
-        tag_id:
-          type: string
-          format: uuid
-        is_active:
-          type: boolean
+        id:                { type: string, format: uuid }
+        tag_id:            { type: string, format: uuid }
+        kind:              { type: string, enum: [general] }
+        keywords:          { type: array, items: { type: string }, minItems: 1 }
+        match_mode:        { type: string, enum: [keyword] }
+        suspended_until:   { type: string, format: date-time, nullable: true }
+        created_by:        { type: string, format: uuid, nullable: true }
+        created_by_name:   { type: string, nullable: true }
+        created_at:        { type: string, format: date-time }
 
-    TagRuleInput:
+    TagRuleCreate:
       type: object
-      required: [name, pattern, tag_id]
+      required: [keywords]
       properties:
-        name:
-          type: string
-        pattern:
-          type: string
-        kind:
-          type: string
-          enum: ['general']
-          default: general
-        tag_id:
-          type: string
-          format: uuid
-        is_active:
-          type: boolean
+        keywords:    { type: array, items: { type: string, minLength: 1 }, minItems: 1 }
+        match_mode:  { type: string, enum: [keyword], default: keyword }
 
     TagRulePatch:
       type: object
       properties:
-        name:
-          type: string
-        pattern:
-          type: string
-        kind:
-          type: string
-          enum: ['general']
-        tag_id:
-          type: string
-          format: uuid
-        is_active:
-          type: boolean
+        keywords:    { type: array, items: { type: string, minLength: 1 }, minItems: 1 }
+        match_mode:  { type: string, enum: [keyword] }
+
+    TagRuleListQuery:
+      type: object
+      properties:
+        q:        { type: string, maxLength: 120 }
+        page:     { type: integer, minimum: 1, default: 1 }
+        per_page: { type: integer, minimum: 1, maximum: 100, default: 20 }
+
+    TagRuleListResponse:
+      type: object
+      required: [rows, page, per_page, total]
+      properties:
+        rows:     { type: array, items: { $ref: '#/components/schemas/TagRule' } }
+        page:     { type: integer }
+        per_page: { type: integer }
+        total:    { type: integer }
 
     Notification:
       type: object

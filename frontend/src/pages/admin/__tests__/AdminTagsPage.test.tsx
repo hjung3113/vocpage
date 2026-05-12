@@ -1,12 +1,8 @@
 /**
- * AdminTagsPage — smoke + role-guard tests (W3-4)
+ * AdminTagsPage — smoke + role-guard tests (W3-4 baseline).
  *
- * Covers:
- *  1. Admin/Manager/Dev: page renders tag list
- *  2. Admin: all action buttons enabled
- *  3. Manager: add/edit enabled, merge/delete/external/suspend disabled
- *  4. Dev: no action buttons (read-only)
- *  5. 409 inline error shown on delete of used tag
+ * Phase 01 Plan 07 integration coverage lives in AdminTagsPage.plan07.test.tsx
+ * (split for max-lines compliance).
  */
 import { screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -14,26 +10,33 @@ import { render } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// ── Mock useRole ───────────────────────────────────────────────────────────────
 const roleMock = vi.fn();
-vi.mock('@entities/user/model/useRole', () => ({
-  useRole: () => roleMock(),
-}));
+vi.mock('@entities/user/model/useRole', () => ({ useRole: () => roleMock() }));
 
-// ── Mock tag-master api hooks ──────────────────────────────────────────────────
 const listTagsMock = vi.fn();
 const deleteTagMock = vi.fn();
 const toggleExternalMock = vi.fn();
 
-vi.mock('@features/admin/tag-master/api/tag-master.api', () => ({
-  useAdminTags: () => listTagsMock(),
-  useCreateTag: () => ({ mutate: vi.fn(), isPending: false }),
-  useRenameTag: () => ({ mutate: vi.fn(), isPending: false }),
-  useMergeTag: () => ({ mutate: vi.fn(), isPending: false }),
-  useToggleExternal: () => toggleExternalMock(),
-  useDeleteTag: () => deleteTagMock(),
-  useSuspendTagRule: () => ({ mutate: vi.fn(), isPending: false }),
-}));
+vi.mock('@features/admin/tag-master/api/tag-master.api', () => {
+  const noop = () => ({ mutate: vi.fn(), isPending: false });
+  return {
+    useAdminTags: () => listTagsMock(),
+    useAdminTagRules: () => ({
+      data: { rows: [], total: 0 },
+      isLoading: false,
+      isError: false,
+    }),
+    useCreateTag: noop,
+    useRenameTag: noop,
+    useMergeTag: noop,
+    useToggleExternal: () => toggleExternalMock(),
+    useDeleteTag: () => deleteTagMock(),
+    useCreateTagRule: noop,
+    useUpdateTagRule: noop,
+    useDeleteTagRule: noop,
+    useSuspendTagRule: noop,
+  };
+});
 
 import AdminTagsPage from '../tags';
 
@@ -81,106 +84,54 @@ function mockList(tags = MOCK_TAGS) {
   });
 }
 
-function mockDelete(opts: { mutate?: ReturnType<typeof vi.fn> } = {}) {
-  const mutate = opts.mutate ?? vi.fn();
-  deleteTagMock.mockReturnValue({ mutate, isPending: false });
-  return mutate;
-}
-
-function mockToggle() {
-  const mutate = vi.fn();
-  toggleExternalMock.mockReturnValue({ mutate, isPending: false });
-  return mutate;
-}
-
 beforeEach(() => {
   vi.clearAllMocks();
-  mockDelete();
-  mockToggle();
+  deleteTagMock.mockReturnValue({ mutate: vi.fn(), isPending: false });
+  toggleExternalMock.mockReturnValue({ mutate: vi.fn(), isPending: false });
 });
 
 describe('AdminTagsPage', () => {
   it('admin: renders tag list with tag names', () => {
-    roleMock.mockReturnValue({
-      isAdmin: true,
-      isManager: false,
-      isDev: false,
-      isUser: false,
-      role: 'admin',
-    });
+    roleMock.mockReturnValue({ isAdmin: true, isManager: false, isDev: false, isUser: false });
     mockList();
     renderPage();
     expect(screen.getByText('버그')).toBeInTheDocument();
     expect(screen.getByText('미사용')).toBeInTheDocument();
-    expect(screen.getAllByText('태그 마스터').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('태그 관리').length).toBeGreaterThanOrEqual(1);
   });
 
   it('manager: add button enabled, merge button disabled', () => {
-    roleMock.mockReturnValue({
-      isAdmin: false,
-      isManager: true,
-      isDev: false,
-      isUser: false,
-      role: 'manager',
-    });
+    roleMock.mockReturnValue({ isAdmin: false, isManager: true, isDev: false, isUser: false });
     mockList();
     renderPage();
-    const addBtn = screen.getByTestId('btn-create-tag');
-    expect(addBtn).not.toBeDisabled();
-    const mergeBtns = screen.getAllByTestId(/^btn-merge-/);
-    mergeBtns.forEach((btn) => expect(btn).toBeDisabled());
+    expect(screen.getByTestId('btn-create-tag')).not.toBeDisabled();
+    screen.getAllByTestId(/^btn-merge-/).forEach((btn) => expect(btn).toBeDisabled());
   });
 
   it('admin: merge/delete/external buttons all enabled', () => {
-    roleMock.mockReturnValue({
-      isAdmin: true,
-      isManager: false,
-      isDev: false,
-      isUser: false,
-      role: 'admin',
-    });
+    roleMock.mockReturnValue({ isAdmin: true, isManager: false, isDev: false, isUser: false });
     mockList();
     renderPage();
-    const deleteBtns = screen.getAllByTestId(/^btn-delete-/);
-    deleteBtns.forEach((btn) => expect(btn).not.toBeDisabled());
-    const mergeBtns = screen.getAllByTestId(/^btn-merge-/);
-    mergeBtns.forEach((btn) => expect(btn).not.toBeDisabled());
+    screen.getAllByTestId(/^btn-delete-/).forEach((btn) => expect(btn).not.toBeDisabled());
+    screen.getAllByTestId(/^btn-merge-/).forEach((btn) => expect(btn).not.toBeDisabled());
   });
 
   it('loading: shows loading text', () => {
-    roleMock.mockReturnValue({
-      isAdmin: true,
-      isManager: false,
-      isDev: false,
-      isUser: false,
-      role: 'admin',
-    });
+    roleMock.mockReturnValue({ isAdmin: true, isManager: false, isDev: false, isUser: false });
     listTagsMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     renderPage();
-    expect(screen.getByText(/로딩 중/)).toBeInTheDocument();
+    expect(screen.getAllByTestId('tag-skeleton-row').length).toBeGreaterThan(0);
   });
 
   it('error: shows error message', () => {
-    roleMock.mockReturnValue({
-      isAdmin: true,
-      isManager: false,
-      isDev: false,
-      isUser: false,
-      role: 'admin',
-    });
+    roleMock.mockReturnValue({ isAdmin: true, isManager: false, isDev: false, isUser: false });
     listTagsMock.mockReturnValue({ data: undefined, isLoading: false, isError: true });
     renderPage();
     expect(screen.getByText(/불러오지 못했습니다/)).toBeInTheDocument();
   });
 
   it('empty: shows empty state', () => {
-    roleMock.mockReturnValue({
-      isAdmin: true,
-      isManager: false,
-      isDev: false,
-      isUser: false,
-      role: 'admin',
-    });
+    roleMock.mockReturnValue({ isAdmin: true, isManager: false, isDev: false, isUser: false });
     mockList([]);
     renderPage();
     expect(screen.getByText('태그가 없습니다.')).toBeInTheDocument();
