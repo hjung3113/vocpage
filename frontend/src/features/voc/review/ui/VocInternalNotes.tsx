@@ -35,8 +35,8 @@ export function VocInternalNotes({ notes, notesLoading, pending, role, isOwner, 
       style={{ background: 'var(--status-amber-bg)' }}
     >
       <p
-        className="text-[11px] font-semibold uppercase tracking-[0.07em]"
-        style={{ color: 'var(--text-secondary)' }}
+        className="text-[10.5px] font-semibold uppercase tracking-[0.07em]"
+        style={{ color: 'var(--text-quaternary)' }}
       >
         내부 메모{count > 0 && ` (${count})`}
       </p>

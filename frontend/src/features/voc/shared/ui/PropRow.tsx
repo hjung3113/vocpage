@@ -10,8 +10,8 @@ export function PropRow({ label, testId, children }: PropRowProps) {
   return (
     <div className="flex items-center gap-3 py-1 min-h-[28px]">
       <span
-        className="w-20 shrink-0 text-[11px] leading-none"
-        style={{ color: 'var(--text-tertiary)' }}
+        className="w-20 shrink-0 text-[10.5px] leading-none"
+        style={{ color: 'var(--text-quaternary)' }}
       >
         {label}
       </span>

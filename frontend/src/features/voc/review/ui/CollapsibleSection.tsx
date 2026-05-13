@@ -36,8 +36,8 @@ export function CollapsibleSection({
         )}
       >
         <span
-          className="text-[11px] font-semibold tracking-[0.07em] uppercase"
-          style={{ color: 'var(--text-secondary)' }}
+          className="text-[10.5px] font-semibold tracking-[0.07em] uppercase"
+          style={{ color: 'var(--text-quaternary)' }}
         >
           {title}
         </span>
@@ -46,7 +46,7 @@ export function CollapsibleSection({
             'h-3.5 w-3.5 shrink-0 transition-transform duration-200',
             !open && '-rotate-90',
           )}
-          style={{ color: open ? 'var(--text-quaternary)' : 'var(--text-secondary)' }}
+          style={{ color: 'var(--text-quaternary)' }}
         />
       </CollapsibleTrigger>
       <CollapsibleContent className="flex flex-col gap-3 pb-1">{children}</CollapsibleContent>

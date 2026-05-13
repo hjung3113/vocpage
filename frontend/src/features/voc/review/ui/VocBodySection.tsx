@@ -7,13 +7,7 @@ interface Props {
 
 export function VocBodySection({ body }: Props) {
   return (
-    <VocSection testId="drawer-body">
-      <span
-        className="text-[11px] font-semibold tracking-[0.07em] uppercase"
-        style={{ color: 'var(--text-secondary)' }}
-      >
-        본문
-      </span>
+    <VocSection title="본문" testId="drawer-body">
       <div
         data-testid="voc-body-section"
         className="rounded px-3 py-3"
